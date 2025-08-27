@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Enhanced Authentication Test Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 1400px;
+            width: 100%;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .log-container {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .log-entry {
+            margin-bottom: 0.5rem;
+            padding: 0.25rem;
+            border-radius: 4px;
+            word-wrap: break-word;
+        }
+
+        .log-entry.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .log-entry.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .log-entry.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .log-entry.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        .test-results {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .test-result {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .test-result.pass {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .test-result.fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .test-result.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .metric {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        .metric h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .metric p {
+            color: #666;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list li::before {
+            content: "✅";
+            margin-right: 0.5rem;
+        }
+
+        .security-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .security-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+
+        .security-item h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .security-item p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .security-item.warning {
+            border-left-color: #ffc107;
+        }
+
+        .security-item.error {
+            border-left-color: #dc3545;
+        }
+
+        .api-endpoints {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .endpoint h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .endpoint p {
+            color: #666;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .endpoint .method {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .endpoint .method.get {
+            background: #28a745;
+            color: white;
+        }
+
+        .endpoint .method.post {
+            background: #007bff;
+            color: white;
+        }
+
+        .endpoint .method.put {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .endpoint .method.delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .config-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .config-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .config-item:last-child {
+            border-bottom: none;
+        }
+
+        .config-item label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .config-item span {
+            color: #666;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .responsive-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .responsive-table th,
+        .responsive-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .responsive-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .responsive-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        .badge.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                text-align: center;
+                border-bottom: 1px solid #e0e0e0;
+                border-left: none;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .security-status {
+                grid-template-columns: 1fr;
+            }
+
+            .api-endpoints {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Complete Enhanced Authentication Test Suite</h1>
+            <p>Comprehensive testing for JWT authentication, API service, and security features</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('overview')">Overview</button>
+            <button class="tab" onclick="switchTab('authentication')">Authentication</button>
+            <button class="tab" onclick="switchTab('api-service')">API Service</button>
+            <button class="tab" onclick="switchTab('security')">Security Features</button>
+            <button class="tab" onclick="switchTab('testing')">Testing</button>
+            <button class="tab" onclick="switchTab('configuration')">Configuration</button>
+            <button class="tab" onclick="switchTab('documentation')">Documentation</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview-tab" class="tab-content active">
+            <div class="status info">
+                <strong>Welcome to the Complete Enhanced Authentication Test Suite!</strong><br>
+                This comprehensive testing interface validates all security features, JWT authentication, and API service functionality.
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>🚀 Quick Start</h3>
+                    <p>Get started with the enhanced authentication system in minutes:</p>
+                    <ol>
+                        <li>Load the required scripts (Security Manager, API Service)</li>
+                        <li>Initialize the components</li>
+                        <li>Run the automated tests</li>
+                        <li>Review the results and security status</li>
+                    </ol>
+                    <button class="btn" onclick="initializeComponents()">Initialize Components</button>
+                    <button class="btn btn-success" onclick="runAllTests()">Run All Tests</button>
+                </div>
+
+                <div class="card">
+                    <h3>📊 System Status</h3>
+                    <div id="system-status">
+                        <div class="metrics">
+                            <div class="metric">
+                                <h4>Security Manager</h4>
+                                <p id="security-manager-status">❌</p>
+                            </div>
+                            <div class="metric">
+                                <h4>API Service</h4>
+                                <p id="api-service-status">❌</p>
+                            </div>
+                            <div class="metric">
+                                <h4>Test Suite</h4>
+                                <p id="test-suite-status">❌</p>
+                            </div>
+                            <div class="metric">
+                                <h4>Environment</h4>
+                                <p id="environment-status">❌</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🔧 Features Implemented</h3>
+                    <ul class="feature-list">
+                        <li>JWT Authentication with refresh tokens</li>
+                        <li>CSRF Protection with dynamic tokens</li>
+                        <li>Rate Limiting with configurable thresholds</li>
+                        <li>Intelligent Caching with TTL</li>
+                        <li>Input Validation and Sanitization</li>
+                        <li>Secure Token Storage</li>
+                        <li>Automatic Token Refresh</li>
+                        <li>Comprehensive Error Handling</li>
+                        <li>Audit Logging</li>
+                        <li>Service Worker Integration</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>📈 Performance Metrics</h3>
+                    <div id="performance-metrics">
+                        <div class="metrics">
+                            <div class="metric">
+                                <h4>API Response Time</h4>
+                                <p id="api-response-time">-</p>
+                            </div>
+                            <div class="metric">
+                                <h4>Cache Hit Rate</h4>
+                                <p id="cache-hit-rate">-</p>
+                            </div>
+                            <div class="metric">
+                                <h4>Rate Limit Usage</h4>
+                                <p id="rate-limit-usage">-</p>
+                            </div>
+                            <div class="metric">
+                                <h4>Security Score</h4>
+                                <p id="security-score">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-results">
+                <h3>🧪 Test Results Summary</h3>
+                <div id="test-summary">
+                    <p>Run tests to see results...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Authentication Tab -->
+        <div id="authentication-tab" class="tab-content">
+            <div class="status info">
+                <strong>Authentication Testing</strong><br>
+                Test JWT authentication, login/logout functionality, and token management.
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>🔐 Login Test</h3>
+                    <form id="login-test-form">
+                        <div class="form-group">
+                            <label for="test-username">Username:</label>
+                            <input type="text" id="test-username" value="testuser" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="test-password">Password:</label>
+                            <input type="password" id="test-password" value="testpass" required>
+                        </div>
+                        <button type="submit" class="btn">Test Login</button>
+                        <button type="button" class="btn btn-secondary" onclick="testLogout()">Test Logout</button>
+                    </form>
+                    <div id="login-test-result"></div>
+                </div>
+
+                <div class="card">
+                    <h3>🔄 Token Management</h3>
+                    <button class="btn" onclick="testTokenRefresh()">Refresh Token</button>
+                    <button class="btn" onclick="testTokenVerification()">Verify Token</button>
+                    <button class="btn btn-danger" onclick="testTokenRevocation()">Revoke Token</button>
+                    <div id="token-test-result"></div>
+                </div>
+
+                <div class="card">
+                    <h3>👤 User Information</h3>
+                    <div id="user-info-display">
+                        <p>Login to see user information...</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📋 Authentication Status</h3>
+                    <div id="auth-status">
+                        <div class="security-item">
+                            <h4>Authentication State</h4>
+                            <p id="auth-state">Not authenticated</p>
+                        </div>
+                        <div class="security-item">
+                            <h4>Token Status</h4>
+                            <p id="token-state">No token</p>
+                        </div>
+                        <div class="security-item">
+                            <h4>Session Duration</h4>
+                            <p id="session-duration">-</p>
+                        </div>
+                        <div class="security-item">
+                            <h4>Last Activity</h4>
+                            <p id="last-activity">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="log-container">
+                <h4>Authentication Log</h4>
+                <div id="auth-log"></div>
+            </div>
+        </div>
+
+        <!-- API Service Tab -->
+        <div id="api-service-tab" class="tab-content">
+            <div class="status info">
+                <strong>API Service Testing</strong><br>
+                Test the enhanced API service with security features, caching, and rate limiting.
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>🌐 API Endpoints</h3>
+                    <div class="api-endpoints">
+                        <div class="endpoint">
+                            <h4><span class="method post">POST</span> /api/v1/auth/login</h4>
+                            <p>User authentication</p>
+                            <button class="btn" onclick="testEndpoint('login')">Test</button>
+                        </div>
+                        <div class="endpoint">
+                            <h4><span class="method post">POST</span> /api/v1/token</h4>
+                            <p>Token generation</p>
+                            <button class="btn" onclick="testEndpoint('token')">Test</button>
+                        </div>
+                        <div class="endpoint">
+                            <h4><span class="method post">POST</span> /api/v1/token/refresh</h4>
+                            <p>Token refresh</p>
+                            <button class="btn" onclick="testEndpoint('refresh')">Test</button>
+                        </div>
+                        <div class="endpoint">
+                            <h4><span class="method get">GET</span> /api/v1/verify</h4>
+                            <p>Token verification</p>
+                            <button class="btn" onclick="testEndpoint('verify')">Test</button>
+                        </div>
+                        <div class="endpoint">
+                            <h4><span class="method post">POST</span> /api/v1/token/revoke</h4>
+                            <p>Token revocation</p>
+                            <button class="btn" onclick="testEndpoint('revoke')">Test</button>
+                        </div>
+                        <div class="endpoint">
+                            <h4><span class="method get">GET</span> /api/v1/protected</h4>
+                            <p>Protected resource</p>
+                            <button class="btn" onclick="testEndpoint('protected')">Test</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 API Service Status</h3>
+                    <div id="api-service-status-detail">
+                        <div class="security-item">
+                            <h4>Base URL</h4>
+                            <p id="api-base-url">-</p>
+                        </div>
+                        <div class="security-item">
+                            <h4>Authentication</h4>
+                            <p id="api-auth-status">-</p>
+                        </div>
+                        <div class="security-item">
+                            <h4>Rate Limit</h4>
+                            <p id="api-rate-limit">-</p>
+                        </div>
+                        <div class="security-item">
+                            <h4>Cache Size</h4>
+                            <p id="api-cache-size">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🚀 Request Testing</h3>
+                    <div class="form-group">
+                        <label for="custom-endpoint">Custom Endpoint:</label>
+                        <input type="text" id="custom-endpoint" placeholder="/api/v1/custom">
+                    </div>
+                    <div class="form-group">
+                        <label for="request-method">Method:</label>
+                        <select id="request-method">
+                            <option value="GET">GET</option>
+                            <option value="POST">POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="DELETE">DELETE</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="request-body">Request Body (JSON):</label>
+                        <textarea id="request-body" placeholder='{"key": "value"}'></textarea>
+                    </div>
+                    <button class="btn" onclick="testCustomRequest()">Send Request</button>
+                    <div id="custom-request-result"></div>
+                </div>
+
+                <div class="card">
+                    <h3>💾 Cache Management</h3>
+                    <button class="btn" onclick="viewCache()">View Cache</button>
+                    <button class="btn btn-secondary" onclick="clearCache()">Clear Cache</button>
+                    <button class="btn btn-warning" onclick="clearExpiredCache()">Clear Expired</button>
+                    <div id="cache-display"></div>
+                </div>
+            </div>
+
+            <div class="log-container">
+                <h4>API Service Log</h4>
+                <div id="api-log"></div>
+            </div>
+        </div>
+
+        <!-- Security Features Tab -->
+        <div id="security-tab" class="tab-content">
+            <div class="status info">
+                <strong>Security Features Testing</strong><br>
+                Test CSRF protection, rate limiting, input validation, and other security features.
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>🛡️ Security Status</h3>
+                    <div id="security-status-detail">
+                        <div class="security-item">
+                            <h4>CSRF Token</h4>
+                            <p id="csrf-token-status">Not initialized</p>
+                        </div>
+                        <div class="security-item">
+                            <h4>Rate Limiting</h4>
+                            <p id="rate-limiting-status">Not initialized</p>
+                        </div>
+                        <div class="security-item">
+                            <h4>Input Validation</h4>
+                            <p id="input-validation-status">Not initialized</p>
+                        </div>
+                        <div class="security-item">
+                            <h4>Security Headers</h4>
+                            <p id="security-headers-status">Not initialized</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🔒 Security Tests</h3>
+                    <button class="btn" onclick="testCSRFProtection()">Test CSRF Protection</button>
+                    <button class="btn" onclick="testRateLimiting()">Test Rate Limiting</button>
+                    <button class="btn" onclick="testInputValidation()">Test Input Validation</button>
+                    <button class="btn" onclick="testSecurityHeaders()">Test Security Headers</button>
+                    <button class="btn btn-warning" onclick="testXSSProtection()">Test XSS Protection</button>
+                    <div id="security-test-results"></div>
+                </div>
+
+                <div class="card">
+                    <h3>📋 Security Headers</h3>
+                    <div id="security-headers-display">
+                        <table class="responsive-table">
+                            <thead>
+                                <tr>
+                                    <th>Header</th>
+                                    <th>Value</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="security-headers-table">
+                                <tr>
+                                    <td>Content-Type</td>
+                                    <td>application/json</td>
+                                    <td><span class="badge success">✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td>X-API-Version</td>
+                                    <td>v1</td>
+                                    <td><span class="badge success">✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td>X-CSRF-Token</td>
+                                    <td>-</td>
+                                    <td><span class="badge warning">⚠</span></td>
+                                </tr>
+                                <tr>
+                                    <td>X-Content-Type-Options</td>
+                                    <td>nosniff</td>
+                                    <td><span class="badge success">✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td>X-Frame-Options</td>
+                                    <td>DENY</td>
+                                    <td><span class="badge success">✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td>X-XSS-Protection</td>
+                                    <td>1; mode=block</td>
+                                    <td><span class="badge success">✓</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🚨 Security Audit</h3>
+                    <button class="btn" onclick="runSecurityAudit()">Run Security Audit</button>
+                    <div id="security-audit-results"></div>
+                </div>
+            </div>
+
+            <div class="log-container">
+                <h4>Security Log</h4>
+                <div id="security-log"></div>
+            </div>
+        </div>
+
+        <!-- Testing Tab -->
+        <div id="testing-tab" class="tab-content">
+            <div class="status info">
+                <strong>Comprehensive Testing</strong><br>
+                Run automated tests for all components and view detailed results.
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>🧪 Test Suite</h3>
+                    <button class="btn btn-success" onclick="runAllTests()">Run All Tests</button>
+                    <button class="btn" onclick="runAuthenticationTests()">Authentication Tests</button>
+                    <button class="btn" onclick="runAPITests()">API Service Tests</button>
+                    <button class="btn" onclick="runSecurityTests()">Security Tests</button>
+                    <button class="btn btn-secondary" onclick="clearTestResults()">Clear Results</button>
+                    <div id="test-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="test-progress-fill" style="width: 0%">0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 Test Results</h3>
+                    <div id="test-results-container">
+                        <p>Run tests to see results...</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📈 Performance Tests</h3>
+                    <button class="btn" onclick="runPerformanceTests()">Run Performance Tests</button>
+                    <div id="performance-test-results"></div>
+                </div>
+
+                <div class="card">
+                    <h3>🔧 Load Testing</h3>
+                    <div class="form-group">
+                        <label for="load-test-requests">Number of Requests:</label>
+                        <input type="number" id="load-test-requests" value="100" min="1" max="1000">
+                    </div>
+                    <div class="form-group">
+                        <label for="load-test-concurrent">Concurrent Requests:</label>
+                        <input type="number" id="load-test-concurrent" value="10" min="1" max="50">
+                    </div>
+                    <button class="btn" onclick="runLoadTest()">Run Load Test</button>
+                    <div id="load-test-results"></div>
+                </div>
+            </div>
+
+            <div class="log-container">
+                <h4>Test Log</h4>
+                <div id="test-log"></div>
+            </div>
+        </div>
+
+        <!-- Configuration Tab -->
+        <div id="configuration-tab" class="tab-content">
+            <div class="status info">
+                <strong>Configuration Management</strong><br>
+                View and modify configuration settings for all components.
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>⚙️ Environment Configuration</h3>
+                    <div class="config-section">
+                        <h3>Current Environment</h3>
+                        <div class="config-item">
+                            <label>Environment:</label>
+                            <span id="current-environment">-</span>
+                        </div>
+                        <div class="config-item">
+                            <label>API Base URL:</label>
+                            <span id="config-api-base-url">-</span>
+                        </div>
+                        <div class="config-item">
+                            <label>Rate Limit Max:</label>
+                            <span id="config-rate-limit-max">-</span>
+                        </div>
+                        <div class="config-item">
+                            <label>Rate Limit Window:</label>
+                            <span id="config-rate-limit-window">-</span>
+                        </div>
+                        <div class="config-item">
+                            <label>Cache TTL:</label>
+                            <span id="config-cache-ttl">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🔧 Component Configuration</h3>
+                    <div class="config-section">
+                        <h3>Security Manager</h3>
+                        <div class="config-item">
+                            <label>Token Storage:</label>
+                            <span id="config-token-storage">sessionStorage</span>
+                        </div>
+                        <div class="config-item">
+                            <label>CSRF Enabled:</label>
+                            <span id="config-csrf-enabled">true</span>
+                        </div>
+                        <div class="config-item">
+                            <label>Rate Limiting Enabled:</label>
+                            <span id="config-rate-limiting-enabled">true</span>
+                        </div>
+                    </div>
+                    <div class="config-section">
+                        <h3>API Service</h3>
+                        <div class="config-item">
+                            <label>Default Timeout:</label>
+                            <span id="config-default-timeout">30000ms</span>
+                        </div>
+                        <div class="config-item">
+                            <label>Retry Attempts:</label>
+                            <span id="config-retry-attempts">3</span>
+                        </div>
+                        <div class="config-item">
+                            <label>Cache Enabled:</label>
+                            <span id="config-cache-enabled">true</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📝 Custom Configuration</h3>
+                    <div class="form-group">
+                        <label for="custom-config">Custom Configuration (JSON):</label>
+                        <textarea id="custom-config" rows="10" placeholder='{
+  "api": {
+    "baseURL": "https://api.example.com",
+    "timeout": 30000
+  },
+  "security": {
+    "rateLimit": {
+      "maxRequests": 100,
+      "windowMs": 60000
+    }
+  }
+}'></textarea>
+                    </div>
+                    <button class="btn" onclick="applyCustomConfiguration()">Apply Configuration</button>
+                    <button class="btn btn-secondary" onclick="resetConfiguration()">Reset to Default</button>
+                    <div id="custom-config-result"></div>
+                </div>
+
+                <div class="card">
+                    <h3>💾 Export/Import Configuration</h3>
+                    <button class="btn" onclick="exportConfiguration()">Export Configuration</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('import-config-file').click()">Import Configuration</button>
+                    <input type="file" id="import-config-file" accept=".json" style="display: none;" onchange="importConfiguration(event)">
+                    <div id="config-export-import-result"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documentation Tab -->
+        <div id="documentation-tab" class="tab-content">
+            <div class="status info">
+                <strong>Documentation & Examples</strong><br>
+                Comprehensive documentation, usage examples, and integration guides.
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>📚 Getting Started</h3>
+                    <div class="code-block">// Initialize the enhanced authentication system
+const securityManager = new SecurityManager();
+const api = new APIService('https://api.example.com');
+
+// Integrate components
+api.initSecurityManager(securityManager);
+
+// Login with enhanced security
+try {
+    const result = await api.login({
+        username: 'user@example.com',
+        password: 'secure-password'
+    });
+    console.log('Login successful:', result);
+} catch (error) {
+    console.error('Login failed:', error.message);
+}</div>
+                </div>
+
+                <div class="card">
+                    <h3>🔐 Authentication Examples</h3>
+                    <div class="code-block>// Secure API calls
+const userData = await api.getProtectedResource('/api/v1/user');
+
+// POST request with validation
+const newPost = await api.post('/api/v1/posts', {
+    title: 'My Post',
+    content: 'Secure content'
+});
+
+// Token management
+const isValid = await api.verifyToken();
+if (!isValid) {
+    const refreshed = await api.refreshToken();
+    if (!refreshed) {
+        // Redirect to login
+        window.location.href = '/login';
+    }
+}</div>
+                </div>
+
+                <div class="card">
+                    <h3>🛡️ Security Features</h3>
+                    <div class="code-block">// Input sanitization
+const cleanInput = api.sanitizeString(userInput);
+
+// Rate limiting check
+if (api.rateLimiter.canMakeRequest()) {
+    // Make request
+} else {
+    // Handle rate limit exceeded
+}
+
+// Cache management
+api.cacheManager.set('user_data', userData, 300000); // 5 minutes
+const cached = api.cacheManager.get('user_data');
+
+// Security status
+const status = api.getStatus();
+console.log('Security status:', status);</div>
+                </div>
+
+                <div class="card">
+                    <h3>🧪 Testing Examples</h3>
+                    <div class="code-block">// Run comprehensive tests
+const testSuite = new EnhancedAPITestSuite();
+await testSuite.initialize();
+const results = await testSuite.runAllTests();
+
+// Check test results
+const passed = results.filter(r => r.type === 'success').length;
+const failed = results.filter(r => r.type === 'error').length;
+console.log(`Tests: ${passed} passed, ${failed} failed`);</div>
+                </div>
+
+                <div class="card">
+                    <h3>📖 Integration Guide</h3>
+                    <h4>1. Include Scripts</h4>
+                    <div class="code-block"><script src="security-manager.js"></script>
+<script src="enhanced-api-service.js"></script>
+<script src="test-enhanced-api-service.js"></script></div>
+
+                    <h4>2. Initialize Components</h4>
+                    <div class="code-block">const securityManager = new SecurityManager();
+const api = new APIService(CONFIG.API_BASE_URL);
+api.initSecurityManager(securityManager);</div>
+
+                    <h4>3. Use in Your Application</h4>
+                    <div class="code-block">// Login
+async function login(username, password) {
+    try {
+        const result = await api.login({ username, password });
+        // Handle successful login
+        return result;
+    } catch (error) {
+        // Handle login error
+        throw error;
+    }
+}
+
+// Make authenticated requests
+async function getProtectedData() {
+    try {
+        const data = await api.getProtectedResource('/api/v1/data');
+        return data;
+    } catch (error) {
+        // Handle error
+        throw error;
+    }
+}</div>
+                </div>
+
+                <div class="card">
+                    <h3>🔧 Advanced Configuration</h3>
+                    <div class="code-block">// Custom rate limiting
+const api = new APIService('https://api.example.com');
+api.rateLimiter = new RateLimiter(200, 60000); // 200 requests per minute
+
+// Custom caching
+api.cacheManager = new CacheManager(10 * 60 * 1000); // 10 minutes TTL
+
+// Custom security headers
+api.defaultHeaders = {
+    ...api.defaultHeaders,
+    'X-Custom-Header': 'custom-value',
+    'X-Request-ID': generateRequestId()
+};</div>
+                </div>
+
+                <div class="card">
+                    <h3>🚨 Error Handling</h3>
+                    <div class="code-block">// Comprehensive error handling
+try {
+    const result = await api.request('/api/v1/protected');
+    return result;
+} catch (error) {
+    if (error.message.includes('Rate limit exceeded')) {
+        // Handle rate limiting
+        showRateLimitError();
+    } else if (error.message.includes('Session expired')) {
+        // Handle authentication error
+        redirectToLogin();
+    } else if (error.message.includes('Network error')) {
+        // Handle network issues
+        showNetworkError();
+    } else {
+        // Handle other errors
+        showGenericError(error.message);
+    }
+}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include required scripts -->
+    <script src="security-manager.js"></script>
+    <script src="enhanced-api-service.js"></script>
+    <script src="test-enhanced-api-service.js"></script>
+    
+    <script>
+        // Global variables
+        let securityManager = null;
+        let api = null;
+        let testSuite = null;
+        let currentTab = 'overview';
+        let activityLogs = {
+            auth: [],
+            api: [],
+            security: [],
+            test: []
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeApplication();
+        });
+
+        async function initializeApplication() {
+            try {
+                logActivity('system', 'Initializing enhanced authentication test suite...', 'info');
+                
+                // Initialize components
+                await initializeComponents();
+                
+                // Update system status
+                updateSystemStatus();
+                
+                // Load configuration
+                loadConfiguration();
+                
+                logActivity('system', 'Application initialized successfully', 'success');
+                
+            } catch (error) {
+                logActivity('system', `Initialization failed: ${error.message}`, 'error');
+                console.error('Initialization error:', error);
+            }
+        }
+
+        async function initializeComponents() {
+            // Initialize security manager
+            if (typeof SecurityManager !== 'undefined') {
+                securityManager = new SecurityManager();
+                document.getElementById('security-manager-status').textContent = '✅';
+                logActivity('system', 'Security manager initialized', 'success');
+            } else {
+                document.getElementById('security-manager-status').textContent = '❌';
+                logActivity('system', 'Security manager not available', 'error');
+            }
+
+            // Initialize API service
+            if (typeof APIService !== 'undefined') {
+                api = new APIService(currentConfig.API_BASE_URL);
+                
+                // Integrate with security manager
+                if (securityManager) {
+                    api.initSecurityManager(securityManager);
+                }
+                
+                document.getElementById('api-service-status').textContent = '✅';
+                logActivity('system', 'API service initialized', 'success');
+            } else {
+                document.getElementById('api-service-status').textContent = '❌';
+                logActivity('system', 'API service not available', 'error');
+            }
+
+            // Initialize test suite
+            if (typeof EnhancedAPITestSuite !== 'undefined') {
+                testSuite = new EnhancedAPITestSuite();
+                await testSuite.initialize();
+                document.getElementById('test-suite-status').textContent = '✅';
+                logActivity('system', 'Test suite initialized', 'success');
+            } else {
+                document.getElementById('test-suite-status').textContent = '❌';
+                logActivity('system', 'Test suite not available', 'error');
+            }
+
+            // Set environment status
+            const environment = window.location.hostname === 'localhost' ? 'Development' : 'Production';
+            document.getElementById('environment-status').textContent = environment === 'Development' ? '✅' : '✅';
+            logActivity('system', `Environment: ${environment}`, 'info');
+        }
+
+        function updateSystemStatus() {
+            // Update performance metrics
+            updatePerformanceMetrics();
+            
+            // Update security status
+            updateSecurityStatus();
+            
+            // Update API service status
+            updateAPIServiceStatus();
+        }
+
+        function updatePerformanceMetrics() {
+            if (api) {
+                const status = api.getStatus();
+                document.getElementById('api-response-time').textContent = status.avgResponseTime || '-';
+                document.getElementById('cache-hit-rate').textContent = status.cacheHitRate || '-';
+                document.getElementById('rate-limit-usage').textContent = status.rateLimitUsage || '-';
+                document.getElementById('security-score').textContent = status.securityScore || '-';
+            }
+        }
+
+        function updateSecurityStatus() {
+            if (securityManager) {
+                const status = securityManager.getSecurityStatus();
+                document.getElementById('csrf-token-status').textContent = 
+                    status.csrfToken ? `Active (${status.csrfToken.substring(0, 16)}...)` : 'Not active';
+                document.getElementById('rate-limiting-status').textContent = 
+                    `${status.rateLimitRemaining} requests remaining`;
+                document.getElementById('input-validation-status').textContent = 
+                    status.inputValidation ? 'Enabled' : 'Disabled';
+                document.getElementById('security-headers-status').textContent = 
+                    status.securityHeaders ? 'Enabled' : 'Disabled';
+            }
+        }
+
+        function updateAPIServiceStatus() {
+            if (api) {
+                const status = api.getStatus();
+                document.getElementById('api-base-url').textContent = status.baseURL;
+                document.getElementById('api-auth-status').textContent = status.hasToken ? 'Authenticated' : 'Not authenticated';
+                document.getElementById('api-rate-limit').textContent = `${status.rateLimitRemaining} remaining`;
+                document.getElementById('api-cache-size').textContent = `${status.cacheSize} items`;
+            }
+        }
+
+        function loadConfiguration() {
+            if (typeof currentConfig !== 'undefined') {
+                document.getElementById('current-environment').textContent = 
+                    window.location.hostname === 'localhost' ? 'Development' : 'Production';
+                document.getElementById('config-api-base-url').textContent = currentConfig.API_BASE_URL;
+                document.getElementById('config-rate-limit-max').textContent = currentConfig.RATE_LIMIT_MAX || 50;
+                document.getElementById('config-rate-limit-window').textContent = currentConfig.RATE_LIMIT_WINDOW || 60000;
+                document.getElementById('config-cache-ttl').textContent = currentConfig.CACHE_TTL || 300000;
+            }
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Add active class to clicked tab button
+            event.target.classList.add('active');
+            
+            currentTab = tabName;
+            
+            // Update status when switching to specific tabs
+            if (tabName === 'overview') {
+                updateSystemStatus();
+            } else if (tabName === 'security') {
+                updateSecurityStatus();
+            } else if (tabName === 'api-service') {
+                updateAPIServiceStatus();
+            }
+        }
+
+        function logActivity(category, message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = {
+                timestamp,
+                message,
+                type
+            };
+            
+            activityLogs[category].push(logEntry);
+            
+            // Update corresponding log display
+            const logContainer = document.getElementById(`${category}-log`);
+            if (logContainer) {
+                const logElement = document.createElement('div');
+                logElement.className = `log-entry ${type}`;
+                logElement.textContent = `[${timestamp}] ${message}`;
+                logContainer.appendChild(logElement);
+                logContainer.scrollTop = logContainer.scrollHeight;
+                
+                // Keep only last 100 log entries
+                while (logContainer.children.length > 100) {
+                    logContainer.removeChild(logContainer.firstChild);
+                }
+            }
+        }
+
+        // Authentication functions
+        async function testLogin(event) {
+            if (event) event.preventDefault();
+            
+            const username = document.getElementById('test-username').value;
+            const password = document.getElementById('test-password').value;
+            const resultDiv = document.getElementById('login-test-result');
+            
+            try {
+                logActivity('auth', `Attempting login for user: ${username}`, 'info');
+                
+                const result = await api.login({ username, password });
+                
+                resultDiv.innerHTML = '<div class="status success">Login successful!</div>';
+                logActivity('auth', `Login successful for user: ${username}`, 'success');
+                
+                // Update user info display
+                updateUserInformation(result.user);
+                updateAuthenticationStatus();
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="status error">Login failed: ${error.message}</div>`;
+                logActivity('auth', `Login failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLogout() {
+            try {
+                logActivity('auth', 'Attempting logout', 'info');
+                
+                await api.revokeToken();
+                
+                document.getElementById('login-test-result').innerHTML = '<div class="status info">Logged out successfully</div>';
+                document.getElementById('user-info-display').innerHTML = '<p>Login to see user information...</p>';
+                
+                logActivity('auth', 'Logout successful', 'success');
+                updateAuthenticationStatus();
+                
+            } catch (error) {
+                logActivity('auth', `Logout failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testTokenRefresh() {
+            try {
+                logActivity('auth', 'Attempting token refresh', 'info');
+                
+                const result = await api.refreshToken();
+                
+                document.getElementById('token-test-result').innerHTML = '<div class="status success">Token refreshed successfully!</div>';
+                logActivity('auth', 'Token refresh successful', 'success');
+                updateAuthenticationStatus();
+                
+            } catch (error) {
+                document.getElementById('token-test-result').innerHTML = `<div class="status error">Token refresh failed: ${error.message}</div>`;
+                logActivity('auth', `Token refresh failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testTokenVerification() {
+            try {
+                logActivity('auth', 'Attempting token verification', 'info');
+                
+                const result = await api.verifyToken();
+                
+                document.getElementById('token-test-result').innerHTML = '<div class="status success">Token verification successful!</div>';
+                logActivity('auth', 'Token verification successful', 'success');
+                
+            } catch (error) {
+                document.getElementById('token-test-result').innerHTML = `<div class="status error">Token verification failed: ${error.message}</div>`;
+                logActivity('auth', `Token verification failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testTokenRevocation() {
+            try {
+                logActivity('auth', 'Attempting token revocation', 'info');
+                
+                const result = await api.revokeToken();
+                
+                document.getElementById('token-test-result').innerHTML = '<div class="status success">Token revoked successfully!</div>';
+                logActivity('auth', 'Token revocation successful', 'success');
+                updateAuthenticationStatus();
+                
+            } catch (error) {
+                document.getElementById('token-test-result').innerHTML = `<div class="status error">Token revocation failed: ${error.message}</div>`;
+                logActivity('auth', `Token revocation failed: ${error.message}`, 'error');
+            }
+        }
+
+        function updateUserInformation(user) {
+            if (user) {
+                document.getElementById('user-info-display').innerHTML = `
+                    <div class="user-info">
+                        <h4>User Information</h4>
+                        <p><strong>ID:</strong> ${user.id}</p>
+                        <p><strong>Username:</strong> ${user.username}</p>
+                        <p><strong>Role:</strong> ${user.role}</p>
+                        <p><strong>Created:</strong> ${new Date(user.created_at).toLocaleString()}</p>
+                        <p><strong>Last Login:</strong> ${user.last_login ? new Date(user.last_login).toLocaleString() : 'Never'}</p>
+                        <p><strong>MFA Enabled:</strong> ${user.mfa_enabled ? 'Yes' : 'No'}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function updateAuthenticationStatus() {
+            if (api) {
+                const status = api.getStatus();
+                const authState = status.hasToken ? 'Authenticated' : 'Not authenticated';
+                const tokenState = status.hasToken ? (status.tokenValid ? 'Valid' : 'Expired') : 'No token';
+                
+                document.getElementById('auth-state').textContent = authState;
+                document.getElementById('token-state').textContent = tokenState;
+                document.getElementById('session-duration').textContent = status.sessionDuration || '-';
+                document.getElementById('last-activity').textContent = new Date().toLocaleTimeString();
+            }
+        }
+
+        // API Service functions
+        async function testEndpoint(endpoint) {
+            try {
+                logActivity('api', `Testing endpoint: ${endpoint}`, 'info');
+                
+                let result;
+                switch (endpoint) {
+                    case 'login':
+                        result = await api.login({ username: 'testuser', password: 'testpass' });
+                        break;
+                    case 'token':
+                        result = await api.getToken();
+                        break;
+                    case 'refresh':
+                        result = await api.refreshToken();
+                        break;
+                    case 'verify':
+                        result = await api.verifyToken();
+                        break;
+                    case 'revoke':
+                        result = await api.revokeToken();
+                        break;
+                    case 'protected':
+                        result = await api.getProtectedResource('/api/v1/protected');
+                        break;
+                    default:
+                        throw new Error('Unknown endpoint');
+                }
+                
+                logActivity('api', `Endpoint ${endpoint} test successful`, 'success');
+                alert(`Endpoint ${endpoint} test successful!`);
+                
+            } catch (error) {
+                logActivity('api', `Endpoint ${endpoint} test failed: ${error.message}`, 'error');
+                alert(`Endpoint ${endpoint} test failed: ${error.message}`);
+            }
+        }
+
+        async function testCustomRequest() {
+            const endpoint = document.getElementById('custom-endpoint').value;
+            const method = document.getElementById('request-method').value;
+            const body = document.getElementById('request-body').value;
+            const resultDiv = document.getElementById('custom-request-result');
+            
+            try {
+                logActivity('api', `Making custom ${method} request to ${endpoint}`, 'info');
+                
+                let result;
+                const options = { method };
+                
+                if (body && (method === 'POST' || method === 'PUT')) {
