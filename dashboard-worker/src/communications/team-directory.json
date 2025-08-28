@@ -602,12 +602,66 @@
           "quickActions": ["email", "slack", "system-setup", "access-management", "tool-integration"]
         }
       ]
+    },
+    "water-system": {
+      "name": "Water System Operations",
+      "domain": "@water-system.fire22",
+      "email": "water-system@fire22.com",
+      "slack": "#water-system",
+      "color": "#0ea5e9",
+      "members": [
+        {
+          "id": "aqua-manager",
+          "name": "Aqua Manager",
+          "role": "Water System Operations Manager",
+          "email": "aqua.manager@water-system.fire22",
+          "slack": "@aqua.manager",
+          "phone": "+1-555-1401",
+          "status": "available",
+          "avatar": "AM",
+          "priority": "department-head",
+          "quickActions": ["schedule", "email", "slack", "call", "system-maintenance", "infrastructure-check", "metrics"]
+        },
+        {
+          "id": "flow-specialist",
+          "name": "Flow Specialist",
+          "role": "Water Flow Monitoring Specialist",
+          "email": "flow.specialist@water-system.fire22",
+          "slack": "@flow.specialist",
+          "phone": "+1-555-1402",
+          "status": "available",
+          "avatar": "FS",
+          "quickActions": ["email", "slack", "metrics", "system-maintenance", "infrastructure-check"]
+        },
+        {
+          "id": "pressure-engineer",
+          "name": "Pressure Engineer",
+          "role": "Water Pressure Systems Engineer",
+          "email": "pressure.engineer@water-system.fire22",
+          "slack": "@pressure.engineer",
+          "phone": "+1-555-1403",
+          "status": "available",
+          "avatar": "PE",
+          "quickActions": ["email", "slack", "system-maintenance", "infrastructure-check", "metrics"]
+        },
+        {
+          "id": "temp-analyst",
+          "name": "Temperature Analyst",
+          "role": "Water Temperature Monitoring Analyst",
+          "email": "temp.analyst@water-system.fire22",
+          "slack": "@temp.analyst",
+          "phone": "+1-555-1404",
+          "status": "available",
+          "avatar": "TA",
+          "quickActions": ["email", "slack", "metrics", "data-analysis", "system-maintenance"]
+        }
+      ]
     }
   },
   "communicationChannels": {
     "email": {
       "server": "mail.fire22.com",
-      "domains": ["@fire22.com", "@finance.fire22", "@support.fire22", "@compliance.fire22", "@operations.fire22", "@tech.fire22", "@marketing.fire22", "@exec.fire22", "@team.fire22", "@design.fire22", "@communications.fire22", "@vip.fire22", "@hr.fire22", "@maintenance.fire22", "@product.fire22", "@onboarding.fire22"],
+      "domains": ["@fire22.com", "@finance.fire22", "@support.fire22", "@compliance.fire22", "@operations.fire22", "@tech.fire22", "@marketing.fire22", "@exec.fire22", "@team.fire22", "@design.fire22", "@communications.fire22", "@vip.fire22", "@hr.fire22", "@maintenance.fire22", "@product.fire22", "@onboarding.fire22", "@water-system.fire22"],
       "groups": {
         "all": "all@fire22.com",
         "department-heads": "heads@fire22.com",
@@ -644,6 +698,7 @@
         "maintenance": "@fire22_maintenance",
         "product-management": "@fire22_product",
         "onboarding": "@fire22_onboarding",
+        "water-system": "@fire22_water_system",
         "general": "@fire22_general",
         "announcements": "@fire22_news",
         "help": "@fire22_help",

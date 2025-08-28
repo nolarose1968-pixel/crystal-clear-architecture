@@ -1,0 +1,154 @@
+{
+  "date": "2025-08-28",
+  "overallStatus": "critical",
+  "checks": [
+    {
+      "component": "Dashboard Files",
+      "status": "critical",
+      "message": "Dashboard index.html not found",
+      "timestamp": "2025-08-28T21:30:07.344Z"
+    },
+    {
+      "component": "RSS Feed - finance",
+      "status": "critical",
+      "message": "Missing feeds: RSS=false, Atom=false",
+      "timestamp": "2025-08-28T21:30:07.344Z"
+    },
+    {
+      "component": "RSS Feed - support",
+      "status": "critical",
+      "message": "Missing feeds: RSS=false, Atom=false",
+      "timestamp": "2025-08-28T21:30:07.344Z"
+    },
+    {
+      "component": "RSS Feed - compliance",
+      "status": "critical",
+      "message": "Missing feeds: RSS=false, Atom=false",
+      "timestamp": "2025-08-28T21:30:07.344Z"
+    },
+    {
+      "component": "RSS Feed - operations",
+      "status": "critical",
+      "message": "Missing feeds: RSS=false, Atom=false",
+      "timestamp": "2025-08-28T21:30:07.344Z"
+    },
+    {
+      "component": "RSS Feed - technology",
+      "status": "critical",
+      "message": "Missing feeds: RSS=false, Atom=false",
+      "timestamp": "2025-08-28T21:30:07.344Z"
+    },
+    {
+      "component": "RSS Feed - marketing",
+      "status": "critical",
+      "message": "Missing feeds: RSS=false, Atom=false",
+      "timestamp": "2025-08-28T21:30:07.344Z"
+    },
+    {
+      "component": "RSS Feed - management",
+      "status": "critical",
+      "message": "Missing feeds: RSS=false, Atom=false",
+      "timestamp": "2025-08-28T21:30:07.344Z"
+    },
+    {
+      "component": "RSS Feed - communications",
+      "status": "critical",
+      "message": "Missing feeds: RSS=false, Atom=false",
+      "timestamp": "2025-08-28T21:30:07.344Z"
+    },
+    {
+      "component": "RSS Feed - contributors",
+      "status": "critical",
+      "message": "Missing feeds: RSS=false, Atom=false",
+      "timestamp": "2025-08-28T21:30:07.344Z"
+    },
+    {
+      "component": "RSS Feed - design",
+      "status": "critical",
+      "message": "Missing feeds: RSS=false, Atom=false",
+      "timestamp": "2025-08-28T21:30:07.344Z"
+    },
+    {
+      "component": "RSS Feed System",
+      "status": "critical",
+      "message": "0/20 feeds operational (0.0%)",
+      "timestamp": "2025-08-28T21:30:07.345Z"
+    },
+    {
+      "component": "Database Connectivity",
+      "status": "warning",
+      "message": "Database file not found - may be using in-memory DB",
+      "timestamp": "2025-08-28T21:30:07.345Z"
+    },
+    {
+      "component": "API Endpoint /api/tasks",
+      "status": "warning",
+      "message": "Endpoint file not found",
+      "timestamp": "2025-08-28T21:30:07.345Z"
+    },
+    {
+      "component": "API Endpoint /api/tasks/events",
+      "status": "warning",
+      "message": "Endpoint file not found",
+      "timestamp": "2025-08-28T21:30:07.345Z"
+    },
+    {
+      "component": "API Endpoint /api/departments",
+      "status": "healthy",
+      "message": "Endpoint available",
+      "timestamp": "2025-08-28T21:30:07.346Z"
+    },
+    {
+      "component": "API Endpoint /feeds/index.html",
+      "status": "healthy",
+      "message": "Endpoint available",
+      "timestamp": "2025-08-28T21:30:07.346Z"
+    },
+    {
+      "component": "API System",
+      "status": "critical",
+      "message": "2/4 endpoints operational",
+      "timestamp": "2025-08-28T21:30:07.346Z"
+    },
+    {
+      "component": "Codebase Health",
+      "status": "healthy",
+      "message": "Codebase structure valid (2 deps, 4 devDeps)",
+      "timestamp": "2025-08-28T21:30:07.348Z",
+      "metrics": {
+        "dependencies": 2,
+        "devDependencies": 4,
+        "hasTypeScript": true,
+        "hasReadme": true,
+        "hasGitignore": true
+      }
+    },
+    {
+      "component": "Documentation Status",
+      "status": "warning",
+      "message": "Documentation partially complete (1/3 key docs)",
+      "timestamp": "2025-08-28T21:30:07.348Z"
+    },
+    {
+      "component": "Security Status",
+      "status": "critical",
+      "message": "1 potentially sensitive files found",
+      "timestamp": "2025-08-28T21:30:07.349Z"
+    },
+    {
+      "component": "Performance Metrics",
+      "status": "healthy",
+      "message": "Health check completed in 15ms",
+      "timestamp": "2025-08-28T21:30:07.349Z",
+      "metrics": {
+        "checkDuration": 15,
+        "distSize": 0
+      }
+    }
+  ],
+  "summary": {
+    "healthy": 4,
+    "warning": 4,
+    "critical": 14
+  }
+}

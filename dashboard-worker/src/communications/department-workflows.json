@@ -359,6 +359,63 @@
         "Design system documentation and guidelines",
         "Creative asset approval and brand consistency"
       ]
+    },
+    "water-system": {
+      "name": "Water System Operations Department",
+      "head": "Aqua Manager",
+      "email": "aqua.manager@water-system.fire22",
+      "status": "active",
+      "workflows": {
+        "dailyWaterMonitoring": {
+          "frequency": "daily",
+          "deadline": "9AM daily",
+          "recipient": "sarah.martinez@communications.fire22",
+          "tasks": [
+            "Monitor water system metrics (flow rate, temperature, pressure)",
+            "Document system performance and any anomalies",
+            "Report system status and operational health",
+            "Highlight any maintenance needs or system alerts"
+          ]
+        },
+        "weeklyWaterSystemReport": {
+          "frequency": "weekly",
+          "deadline": "Friday 2PM",
+          "recipient": "sarah.martinez@communications.fire22",
+          "tasks": [
+            "Compile comprehensive weekly water system performance",
+            "Document any system incidents or maintenance activities",
+            "Provide water quality and safety compliance updates",
+            "Include infrastructure health and capacity planning"
+          ]
+        },
+        "emergencyWaterSystemAlerts": {
+          "trigger": "system-alerts",
+          "sla": "immediate",
+          "tasks": [
+            "Immediate notification to Communications team for critical alerts",
+            "Provide system impact assessment and safety implications",
+            "Coordinate emergency response communications",
+            "Regular status updates until system stabilization"
+          ]
+        },
+        "waterSystemMaintenance": {
+          "trigger": "scheduled-maintenance",
+          "sla": "24-hours-notice",
+          "tasks": [
+            "Notify Communications team of planned maintenance windows",
+            "Provide maintenance scope and expected duration",
+            "Coordinate maintenance announcements to affected users",
+            "Post-maintenance status updates and system verification"
+          ]
+        }
+      },
+      "communicationTasks": [
+        "Daily water system status updates to Communications team",
+        "Weekly comprehensive water system performance reports",
+        "Emergency water system incident communications",
+        "Water system maintenance and upgrade announcements",
+        "Water quality and safety compliance communications"
+      ]
     }
   },
   "workflowIntegration": {
@@ -371,7 +428,8 @@
         "marketing": "#marketing",
         "operations": "#operations",
         "legal": "#compliance",
-        "design": "#design"
+        "design": "#design",
+        "water-system": "#water-system"
       },
       "escalation": "#emergencies"
     },
