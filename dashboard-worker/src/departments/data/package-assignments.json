@@ -1,0 +1,83 @@
+[
+  {
+    "packageName": "@fire22/core-dashboard",
+    "department": "Technology",
+    "maintainer": "Mike Hunt",
+    "maintainerEmail": "mike.hunt@technology.fire22",
+    "maintainerEmployeeId": "EMP-TECH-001",
+    "priority": "critical",
+    "description": "Main dashboard application with SSE and real-time features"
+  },
+  {
+    "packageName": "@fire22/pattern-system",
+    "department": "Technology",
+    "maintainer": "Mike Hunt",
+    "maintainerEmail": "mike.hunt@technology.fire22",
+    "maintainerEmployeeId": "EMP-TECH-001",
+    "priority": "critical",
+    "description": "Pattern Weaver system with 13 unified patterns"
+  },
+  {
+    "packageName": "@fire22/security-scanner",
+    "department": "Security",
+    "maintainer": "TBD",
+    "maintainerEmail": "head@security.fire22",
+    "maintainerEmployeeId": "TBD",
+    "priority": "critical",
+    "description": "Bun-native security scanner with CVE detection"
+  },
+  {
+    "packageName": "@fire22/api-client",
+    "department": "Technology",
+    "maintainer": "Mike Hunt",
+    "maintainerEmail": "mike.hunt@technology.fire22",
+    "maintainerEmployeeId": "EMP-TECH-001",
+    "priority": "high",
+    "description": "Fire22 API integration client with authentication"
+  },
+  {
+    "packageName": "@fire22/sports-betting",
+    "department": "Operations",
+    "maintainer": "TBD",
+    "maintainerEmail": "head@operations.fire22",
+    "maintainerEmployeeId": "TBD",
+    "priority": "high",
+    "description": "Sports betting functionality and wager management"
+  },
+  {
+    "packageName": "@fire22/telegram-integration",
+    "department": "Marketing",
+    "maintainer": "TBD",
+    "maintainerEmail": "head@marketing.fire22",
+    "maintainerEmployeeId": "TBD",
+    "priority": "medium",
+    "description": "Telegram bot and notification system"
+  },
+  {
+    "packageName": "@fire22/build-system",
+    "department": "Technology",
+    "maintainer": "Mike Hunt",
+    "maintainerEmail": "mike.hunt@technology.fire22",
+    "maintainerEmployeeId": "EMP-TECH-001",
+    "priority": "high",
+    "description": "Multi-profile build system with 9 build profiles"
+  },
+  {
+    "packageName": "@fire22/financial-reporting",
+    "department": "Finance",
+    "maintainer": "TBD",
+    "maintainerEmail": "head@finance.fire22",
+    "maintainerEmployeeId": "TBD",
+    "priority": "high",
+    "description": "Financial data processing and reporting tools"
+  },
+  {
+    "packageName": "@fire22/compliance-tools",
+    "department": "Legal",
+    "maintainer": "TBD",
+    "maintainerEmail": "head@legal.fire22",
+    "maintainerEmployeeId": "TBD",
+    "priority": "medium",
+    "description": "Legal compliance and audit trail management"
+  }
+]

@@ -1,0 +1,115 @@
+# Cloudflare Pages Configuration for Fire22 Dashboard
+# Site: fire22-dashboard.pages.dev (Custom Domain: dashboard.fire22.ag)
+
+[build]
+  command = "bun run build:pages"
+  publish = "dist/pages"
+  
+[build.environment]
+  NODE_VERSION = "20"
+  BUN_VERSION = "1.2.20"
+
+[context.production]
+  command = "bun run build:production"
+  
+[context.preview]  
+  command = "bun run build:preview"
+
+# Department-specific build contexts
+[context.finance]
+  command = "bun run build:department --dept=finance"
+  
+[context.support]
+  command = "bun run build:department --dept=support"
+  
+[context.compliance] 
+  command = "bun run build:department --dept=compliance"
+  
+[context.operations]
+  command = "bun run build:department --dept=operations"
+  
+[context.technology]
+  command = "bun run build:department --dept=technology"
+  
+[context.marketing]
+  command = "bun run build:department --dept=marketing"
+  
+[context.management]
+  command = "bun run build:department --dept=management"
+  
+[context.contributors]
+  command = "bun run build:department --dept=contributors"
+
+# Headers and Security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+[[headers]]
+  for = "/feeds/*"
+  [headers.values]
+    Content-Type = "application/rss+xml; charset=utf-8"
+    Cache-Control = "public, max-age=300"
+    
+[[headers]]
+  for = "/api/*"  
+  [headers.values]
+    Access-Control-Allow-Origin = "*.fire22.ag"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Authorization, Content-Type"
+
+# Redirects for department access
+[[redirects]]
+  from = "/finance"
+  to = "/departments/finance-department.html"
+  status = 302
+  
+[[redirects]]
+  from = "/support"  
+  to = "/departments/customer-support-department.html"
+  status = 302
+  
+[[redirects]]
+  from = "/compliance"
+  to = "/departments/compliance-department.html" 
+  status = 302
+  
+[[redirects]]
+  from = "/operations"
+  to = "/departments/operations-department.html"
+  status = 302
+  
+[[redirects]]
+  from = "/technology"
+  to = "/departments/technology-department.html"
+  status = 302
+  
+[[redirects]]
+  from = "/marketing"
+  to = "/departments/marketing-department.html"
+  status = 302
+  
+[[redirects]]
+  from = "/management"
+  to = "/departments/management-department.html"
+  status = 302
+  
+[[redirects]]
+  from = "/team"
+  to = "/departments/team-contributors-department.html"
+  status = 302
+
+# RSS Feed shortcuts
+[[redirects]]
+  from = "/rss"
+  to = "/feeds/error-codes-rss.xml"
+  status = 302
+  
+[[redirects]]  
+  from = "/atom"
+  to = "/feeds/error-codes-atom.xml"
+  status = 302

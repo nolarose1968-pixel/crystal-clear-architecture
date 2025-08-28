@@ -1,0 +1,130 @@
+[
+  {
+    "issueNumber": 2,
+    "title": "🚨 CRITICAL: Fire22 Data Extraction Completely Blocked - Multiple System Failures",
+    "labels": [
+      "P0-critical",
+      "escalation",
+      "fire22-platform",
+      "auth-blocked",
+      "data-extraction"
+    ],
+    "department": "security-team",
+    "emails": [
+      "security@fire22.ag",
+      "auth-team@fire22.ag",
+      "head@security.fire22",
+      "john.paulsack@fire22.ag"
+    ],
+    "timestamp": "2025-08-28T20:32:13.403Z",
+    "txTimestamp": "[CDT][2025-08-28T20:32:13.403Z]",
+    "priority": "CRITICAL",
+    "urgency": "P0-critical"
+  },
+  {
+    "issueNumber": 2,
+    "title": "🚨 CRITICAL: Fire22 Data Extraction Completely Blocked - Multiple System Failures",
+    "labels": [
+      "P0-critical",
+      "escalation",
+      "fire22-platform",
+      "auth-blocked",
+      "data-extraction"
+    ],
+    "department": "infrastructure-team",
+    "emails": [
+      "infrastructure@fire22.ag",
+      "platform-team@fire22.ag",
+      "head@technology.fire22",
+      "mike.hunt@technology.fire22"
+    ],
+    "timestamp": "2025-08-28T20:32:13.403Z",
+    "txTimestamp": "[CDT][2025-08-28T20:32:13.403Z]",
+    "priority": "CRITICAL",
+    "urgency": "P0-critical"
+  },
+  {
+    "issueNumber": 2,
+    "title": "🚨 CRITICAL: Fire22 Data Extraction Completely Blocked - Multiple System Failures",
+    "labels": [
+      "P0-critical",
+      "escalation",
+      "fire22-platform",
+      "auth-blocked",
+      "data-extraction"
+    ],
+    "department": "devops-team",
+    "emails": [
+      "devops@fire22.ag",
+      "cloudflare-team@fire22.ag",
+      "head@operations.fire22"
+    ],
+    "timestamp": "2025-08-28T20:32:13.403Z",
+    "txTimestamp": "[CDT][2025-08-28T20:32:13.403Z]",
+    "priority": "CRITICAL",
+    "urgency": "P0-critical"
+  },
+  {
+    "issueNumber": 2,
+    "title": "🚨 CRITICAL: Fire22 Data Extraction Completely Blocked - Multiple System Failures",
+    "labels": [
+      "P0-critical",
+      "escalation",
+      "fire22-platform",
+      "auth-blocked",
+      "data-extraction"
+    ],
+    "department": "data-team",
+    "emails": [
+      "data@fire22.ag",
+      "analytics-team@fire22.ag",
+      "head@finance.fire22"
+    ],
+    "timestamp": "2025-08-28T20:32:13.403Z",
+    "txTimestamp": "[CDT][2025-08-28T20:32:13.403Z]",
+    "priority": "CRITICAL",
+    "urgency": "P0-critical"
+  },
+  {
+    "issueNumber": 2,
+    "title": "🚨 CRITICAL: Fire22 Data Extraction Completely Blocked - Multiple System Failures",
+    "labels": [
+      "P0-critical",
+      "escalation",
+      "fire22-platform",
+      "auth-blocked",
+      "data-extraction"
+    ],
+    "department": "communications-team",
+    "emails": [
+      "communications@fire22.ag",
+      "pr@fire22.ag",
+      "head@marketing.fire22"
+    ],
+    "timestamp": "2025-08-28T20:32:13.403Z",
+    "txTimestamp": "[CDT][2025-08-28T20:32:13.403Z]",
+    "priority": "CRITICAL",
+    "urgency": "P0-critical"
+  },
+  {
+    "issueNumber": 2,
+    "title": "🚨 CRITICAL: Fire22 Data Extraction Completely Blocked - Multiple System Failures",
+    "labels": [
+      "P0-critical",
+      "escalation",
+      "fire22-platform",
+      "auth-blocked",
+      "data-extraction"
+    ],
+    "department": "recon-team",
+    "emails": [
+      "reconnaissance@fire22.ag",
+      "intelligence@fire22.ag",
+      "head@security.fire22"
+    ],
+    "timestamp": "2025-08-28T20:32:13.403Z",
+    "txTimestamp": "[CDT][2025-08-28T20:32:13.403Z]",
+    "priority": "CRITICAL",
+    "urgency": "P0-critical"
+  }
+]

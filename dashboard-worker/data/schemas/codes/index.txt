@@ -1,0 +1,19 @@
+[L-449]-div class="media-body text-xs-right">
+                                                        <span data-action="get-weekly-figure"
+                                                            class="font-large-2 text-bold-300"
+                                                            data-field="grand-total-weekly"><i
+                                                                class="fa fa-circle-o-notch fa-spin animated-fast"></i></span>
+                                                        <div class="total-day">
+                                                            <span class="a font-large-2 text-bold-300"
+                                                                data-field="grand-total-day"></span>
+                                                            <span class="b" data-language="L-449">Today</span>
+                                                        </div>
+
+                                                    </div>
+                                                    <p class="text-muted"><label data-language="L-257"></label>
+                                                        <!-- <span class="info float-xs-right" data-language="L-192">...</span> -->
+                                                    </p>
+                                                    <progress class="progress progress-sm" value="100"
+                                                        max="100"></progress>
+                                                </div>
+                                            </div>

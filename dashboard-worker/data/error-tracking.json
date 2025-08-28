@@ -1,0 +1,66 @@
+{
+  "occurrences": [
+    {
+      "errorCode": "E5001",
+      "timestamp": "2025-08-28T16:19:19.981Z",
+      "context": {
+        "connectionName": "error-system",
+        "connectionType": "ErrorSystem",
+        "endpoint": "http://localhost:3001/api/errors",
+        "errorMessage": "Failed to get error statistics: Not Found"
+      },
+      "source": "unknown"
+    },
+    {
+      "errorCode": "E5001",
+      "timestamp": "2025-08-28T16:19:19.984Z",
+      "context": {
+        "endpoint": "unknown",
+        "method": "unknown"
+      },
+      "source": "unknown"
+    },
+    {
+      "errorCode": "E2001",
+      "timestamp": "2025-08-28T16:19:19.988Z",
+      "context": {
+        "connectionName": "fire22-dashboard",
+        "connectionType": "D1",
+        "endpoint": "http://localhost:3001/api/d1/fire22-dashboard",
+        "errorMessage": "D1 query failed: Not Found"
+      },
+      "source": "unknown"
+    },
+    {
+      "errorCode": "E2001",
+      "timestamp": "2025-08-28T16:19:19.988Z",
+      "context": {
+        "endpoint": "unknown",
+        "method": "unknown"
+      },
+      "source": "unknown"
+    },
+    {
+      "errorCode": "E2001",
+      "timestamp": "2025-08-28T16:19:19.990Z",
+      "context": {
+        "connectionName": "fire22-registry",
+        "connectionType": "D1",
+        "endpoint": "http://localhost:3001/api/d1/fire22-registry",
+        "errorMessage": "D1 query failed: Not Found"
+      },
+      "source": "unknown"
+    },
+    {
+      "errorCode": "E2001",
+      "timestamp": "2025-08-28T16:19:19.991Z",
+      "context": {
+        "endpoint": "unknown",
+        "method": "unknown"
+      },
+      "source": "unknown"
+    }
+  ],
+  "lastUpdated": "2025-08-28T16:19:19.991Z",
+  "totalTracked": 6
+}

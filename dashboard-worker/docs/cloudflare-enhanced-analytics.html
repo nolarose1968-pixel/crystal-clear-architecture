@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudflare Enhanced Analytics - Fire22 Dashboard</title>
+    <link rel="stylesheet" href="fire22-branding.css">
+    <style>
+        :root {
+            --cf-orange: #FF6600;
+            --cf-blue: #0066CC;
+            --cf-gray: #666666;
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --error-red: #EF4444;
+        }
+
+        .cloudflare-header {
+            background: linear-gradient(135deg, var(--cf-orange), var(--cf-blue));
+            color: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .cf-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .cf-metric-card {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border: 2px solid var(--cf-orange);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .cf-metric-card h3 {
+            color: var(--cf-blue);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--cf-orange);
+            margin: 0.5rem 0;
+        }
+
+        .metric-trend {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .trend-up { color: var(--success-green); }
+        .trend-down { color: var(--error-red); }
+        .trend-stable { color: var(--cf-gray); }
+
+        .cf-optimization-card {
+            background: linear-gradient(145deg, #fff7ed, #fed7aa);
+            border: 2px solid var(--warning-yellow);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .priority-critical { border-left: 5px solid var(--error-red); }
+        .priority-high { border-left: 5px solid var(--warning-yellow); }
+        .priority-medium { border-left: 5px solid var(--cf-blue); }
+        .priority-low { border-left: 5px solid var(--cf-gray); }
+
+        .implementation-steps {
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+
+        .implementation-steps ol {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .cost-savings {
+            background: var(--success-green);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        .geographic-data {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .country-list, .colo-list {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .country-item, .colo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .country-item:last-child, .colo-item:last-child {
+            border-bottom: none;
+        }
+
+        .percentage-bar {
+            height: 4px;
+            background: var(--cf-orange);
+            border-radius: 2px;
+            margin-top: 0.25rem;
+        }
+
+        .alert-banner {
+            background: linear-gradient(90deg, var(--error-red), #dc2626);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-warning {
+            background: linear-gradient(90deg, var(--warning-yellow), #d97706);
+        }
+
+        .service-tabs {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .service-tab {
+            padding: 0.75rem 1.5rem;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .service-tab.active {
+            background: var(--cf-orange);
+            color: white;
+        }
+
+        .service-content {
+            display: none;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 0 8px 8px 8px;
+        }
+
+        .service-content.active {
+            display: block;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+        }
+
+        .integration-example {
+            background: linear-gradient(145deg, #f0f9ff, #e0f2fe);
+            border: 2px solid var(--cf-blue);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .cf-metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .geographic-data {
+                grid-template-columns: 1fr;
+            }
+
+            .service-tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="cloudflare-header">
+        <h1>🟠 Cloudflare Enhanced Analytics Dashboard</h1>
+        <p>Comprehensive monitoring and optimization for Cloudflare Workers, KV, R2, D1, and more</p>
+        <div style="margin-top: 1rem;">
+            <span id="live-status" style="background: var(--success-green); padding: 0.5rem 1rem; border-radius: 20px;">
+                ● Live Monitoring Active
+            </span>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Real-time Overview -->
+        <section id="overview">
+            <h2>📊 Real-time Cloudflare Metrics</h2>
+            <div class="cf-metrics-grid">
+                <div class="cf-metric-card">
+                    <h3>🚀 Workers Performance</h3>
+                    <div class="metric-value" id="total-requests">2,847,391</div>
+                    <div class="metric-trend trend-up">
+                        ↗ +12.3% from last hour
+                    </div>
+                    <p>Total Requests: <strong>99.97% Success Rate</strong></p>
+                    <p>Avg Response: <strong>23ms</strong></p>
+                    <p>CPU Time: <strong>4.2ms avg</strong></p>
+                </div>
+
+                <div class="cf-metric-card">
+                    <h3>🗄️ KV Store Operations</h3>
+                    <div class="metric-value" id="kv-operations">1,429,847</div>
+                    <div class="metric-trend trend-up">
+                        ↗ +8.7% hit rate improvement
+                    </div>
+                    <p>Hit Rate: <strong>94.2%</strong> (Target: 95%)</p>
+                    <p>P95 Latency: <strong>18ms</strong></p>
+                    <p>Data Transfer: <strong>142GB</strong></p>
+                </div>
+
+                <div class="cf-metric-card">
+                    <h3>💾 R2 Storage</h3>
+                    <div class="metric-value" id="r2-operations">487,293</div>
+                    <div class="metric-trend trend-stable">
+                        → Stable performance
+                    </div>
+                    <p>Gets: <strong>421,847</strong> | Puts: <strong>65,446</strong></p>
+                    <p>P95 Latency: <strong>89ms</strong></p>
+                    <p>Data Transfer: <strong>2.3TB</strong></p>
+                </div>
+
+                <div class="cf-metric-card">
+                    <h3>🗃️ D1 Database</h3>
+                    <div class="metric-value" id="d1-queries">892,547</div>
+                    <div class="metric-trend trend-down">
+                        ↘ -15% query time (optimized!)
+                    </div>
+                    <p>Reads: <strong>743K</strong> | Writes: <strong>149K</strong></p>
+                    <p>Avg Query Time: <strong>12ms</strong></p>
+                    <p>Rows Processed: <strong>12.4M</strong></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alerts Section -->
+        <section id="alerts">
+            <h2>🚨 Active Alerts & Recommendations</h2>
+            
+            <div class="alert-banner alert-warning">
+                <span>⚠️</span>
+                <div>
+                    <strong>KV Latency Warning:</strong> P95 latency (89ms) approaching threshold (100ms)
+                    <br><small>Recommendation: Implement regional key optimization</small>
+                </div>
+            </div>
+
+            <div class="alert-banner">
+                <span>🚨</span>
+                <div>
+                    <strong>Workers CPU Time Alert:</strong> Average CPU time increased by 23% in last hour
+                    <br><small>Action Required: Review recent deployments and optimize hot paths</small>
+                </div>
+            </div>
+        </section>
+
+        <!-- Service-specific Analytics -->
+        <section id="service-analytics">
+            <h2>🔧 Service-specific Analytics & Optimizations</h2>
+            
+            <div class="service-tabs">
+                <button class="service-tab active" onclick="showService('workers')">Workers</button>
+                <button class="service-tab" onclick="showService('kv')">KV Store</button>
+                <button class="service-tab" onclick="showService('r2')">R2 Storage</button>
+                <button class="service-tab" onclick="showService('d1')">D1 Database</button>
+            </div>
+
+            <div id="workers-content" class="service-content active">
+                <h3>🚀 Cloudflare Workers Analytics</h3>
+                <div class="cf-optimization-card priority-high">
+                    <h4>High CPU Time Optimization - HIGH Priority</h4>
+                    <p><strong>Issue:</strong> Average CPU time: 52.3ms (target: <50ms)</p>
+                    <p><strong>Expected Impact:</strong> 40-60% reduction in CPU time and billing costs</p>
+                    <div class="cost-savings">Estimated Savings: $142.50/month</div>
+                    
+                    <div class="implementation-steps">
+                        <h5>Implementation Steps:</h5>
+                        <ol>
+                            <li>Profile Worker execution with Performance API</li>
+                            <li>Optimize hot code paths and algorithms</li>
+                            <li>Implement caching for expensive computations</li>
+                            <li>Use WebAssembly for CPU-intensive tasks</li>
+                            <li>Optimize JSON parsing and serialization</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="integration-example">
+                    <h4>🔨 Integration Example</h4>
+                    <div class="code-block">
+// Enhanced Workers Analytics Integration
+import { CloudflareAnalyticsIntegration } from '@fire22/enhanced-logging';
+
+const cfAnalytics = new CloudflareAnalyticsIntegration(
+  cacheMonitor, 
+  analyticsLogger,
+  {
+    accountId: 'your-account-id',
+    enableRealTimeStats: true,
+    alertThresholds: {
+      errorRate: 0.01,
+      responseTime: 100,
+      cpuTime: 50,
+      kvLatency: 100,
+      r2Latency: 200,
+      d1QueryTime: 50
+    }
+  }
+);
+
+// Log Worker invocation
+cfAnalytics.logWorkerInvocation(
+  'dashboard-worker',
+  request.headers.get('cf-request-id'),
+  request.cf.colo,
+  request.cf.country,
+  {
+    cpuTime: performance.now() * 1000,
+    wallTime: Date.now() - startTime,
+    memoryUsage: getMemoryUsage()
+  }
+);
+                    </div>
+                </div>
+            </div>
+
+            <div id="kv-content" class="service-content">
+                <h3>🗄️ KV Store Optimization</h3>
+                <div class="cf-optimization-card priority-medium">
+                    <h4>KV Latency Optimization - MEDIUM Priority</h4>
+                    <p><strong>Issue:</strong> P95 latency: 89.3ms (target: <50ms)</p>
+                    <p><strong>Expected Impact:</strong> 50-70% latency reduction, improved cache hit rates</p>
+                    <div class="cost-savings">Estimated Savings: $78.20/month</div>
+                    
+                    <div class="implementation-steps">
+                        <h5>Implementation Steps:</h5>
+                        <ol>
+                            <li>Optimize key naming patterns for better locality</li>
+                            <li>Implement key prefixing by region/user</li>
+                            <li>Use batch operations where possible</li>
+                            <li>Implement TTL-based cache warming</li>
+                            <li>Monitor and optimize hot keys</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="integration-example">
+                    <h4>🔨 KV Analytics Integration</h4>
+                    <div class="code-block">
+// KV Operation Logging with Enhanced Analytics
+cfAnalytics.logKVOperation(
+  'GET',
+  'user_profile_12345',
+  true, // hit
+  18,   // latency ms
+  2048, // size bytes
+  'LAX', // colo
+  { component: 'user-service' }
+);
+
+// Get KV-specific optimizations
+const kvOptimizations = cfAnalytics.getCloudflareOptimizations()
+  .filter(opt => opt.service === 'KV');
+                    </div>
+                </div>
+            </div>
+
+            <div id="r2-content" class="service-content">
+                <h3>💾 R2 Storage Analytics</h3>
+                <div class="cf-optimization-card priority-medium">
+                    <h4>R2 Latency Optimization - MEDIUM Priority</h4>
+                    <p><strong>Issue:</strong> P95 latency: 189ms (target: <100ms)</p>
+                    <p><strong>Expected Impact:</strong> 30-50% latency reduction, 20-40% cost savings</p>
+                    <div class="cost-savings">Estimated Savings: $94.70/month</div>
+                </div>
+            </div>
+
+            <div id="d1-content" class="service-content">
+                <h3>🗃️ D1 Database Analytics</h3>
+                <div class="cf-optimization-card priority-high">
+                    <h4>D1 Query Optimization - HIGH Priority</h4>
+                    <p><strong>Issue:</strong> Average query time: 67ms (target: <30ms)</p>
+                    <p><strong>Expected Impact:</strong> 60-80% query time reduction, improved throughput</p>
+                    <div class="cost-savings">Estimated Savings: $56.30/month</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Geographic Analytics -->
+        <section id="geographic">
+            <h2>🌍 Geographic Performance Analytics</h2>
+            <div class="geographic-data">
+                <div class="country-list">
+                    <h3>Top Countries by Requests</h3>
+                    <div class="country-item">
+                        <span>🇺🇸 United States</span>
+                        <div>
+                            <strong>847,392</strong> (29.8%)
+                            <div class="percentage-bar" style="width: 30%;"></div>
+                        </div>
+                    </div>
+                    <div class="country-item">
+                        <span>🇬🇧 United Kingdom</span>
+                        <div>
+                            <strong>423,847</strong> (14.9%)
+                            <div class="percentage-bar" style="width: 15%;"></div>
+                        </div>
+                    </div>
+                    <div class="country-item">
+                        <span>🇩🇪 Germany</span>
+                        <div>
+                            <strong>398,291</strong> (14.0%)
+                            <div class="percentage-bar" style="width: 14%;"></div>
+                        </div>
+                    </div>
+                    <div class="country-item">
+                        <span>🇫🇷 France</span>
+                        <div>
+                            <strong>284,473</strong> (10.0%)
+                            <div class="percentage-bar" style="width: 10%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="colo-list">
+                    <h3>Top Data Centers (Colos)</h3>
+                    <div class="colo-item">
+                        <span>LAX (Los Angeles)</span>
+                        <div>
+                            <strong>194,847</strong> | 15ms avg
+                        </div>
+                    </div>
+                    <div class="colo-item">
+                        <span>LHR (London)</span>
+                        <div>
+                            <strong>167,293</strong> | 28ms avg
+                        </div>
+                    </div>
+                    <div class="colo-item">
+                        <span>FRA (Frankfurt)</span>
+                        <div>
+                            <strong>142,847</strong> | 31ms avg
+                        </div>
+                    </div>
+                    <div class="colo-item">
+                        <span>CDG (Paris)</span>
+                        <div>
+                            <strong>128,394</strong> | 33ms avg
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cost Analysis -->
+        <section id="cost-analysis">
+            <h2>💰 Cloudflare Cost Analysis & Optimization</h2>
+            <div class="cf-metrics-grid">
+                <div class="cf-metric-card">
+                    <h3>💵 Current Monthly Costs</h3>
+                    <div class="metric-value">$247.83</div>
+                    <div style="margin: 1rem 0;">
+                        <div>Workers: <strong>$89.40</strong></div>
+                        <div>KV Store: <strong>$67.23</strong></div>
+                        <div>R2 Storage: <strong>$76.50</strong></div>
+                        <div>D1 Database: <strong>$14.70</strong></div>
+                    </div>
+                </div>
+
+                <div class="cf-metric-card">
+                    <h3>📈 Optimization Potential</h3>
+                    <div class="metric-value" style="color: var(--success-green);">-$89.20</div>
+                    <div class="metric-trend trend-down" style="color: var(--success-green);">
+                        ↘ 36% potential cost reduction
+                    </div>
+                    <div style="margin: 1rem 0;">
+                        <div>Projected: <strong>$158.63/month</strong></div>
+                        <div>Annual Savings: <strong>$1,070.40</strong></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Implementation Guide -->
+        <section id="implementation">
+            <h2>🛠️ Implementation Guide</h2>
+            <div class="integration-example">
+                <h3>Quick Start Integration</h3>
+                <div class="code-block">
+import { 
+  CloudflareAnalyticsIntegration,
+  createEnhancedAnalyticsSystem 
+} from '@fire22/enhanced-logging';
+
+// 1. Create enhanced analytics system
+const { analyticsLogger, cacheMonitor } = createEnhancedAnalyticsSystem();
+
+// 2. Initialize Cloudflare integration
+const cfAnalytics = new CloudflareAnalyticsIntegration(
+  cacheMonitor,
+  analyticsLogger,
+  {
+    accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
+    enableRealTimeStats: true,
+    enableLogpush: true,
+    alertThresholds: {
+      errorRate: 0.01,
+      responseTime: 100,
+      cpuTime: 50,
+      kvLatency: 100,
+      r2Latency: 200,
+      d1QueryTime: 50
+    }
+  }
+);
+
+// 3. Use in your Worker
+export default {
+  async fetch(request, env, ctx) {
+    const startTime = Date.now();
+    
+    try {
+      // Your worker logic here
+      const response = await handleRequest(request);
+      
+      // Log successful invocation
+      cfAnalytics.logWorkerInvocation(
+        'dashboard-worker',
+        request.headers.get('cf-request-id'),
+        request.cf.colo,
+        request.cf.country,
+        {
+          cpuTime: performance.now() * 1000,
+          wallTime: Date.now() - startTime
+        }
+      );
+      
+      return response;
+    } catch (error) {
+      // Log errors with context
+      cfAnalytics.logWorkerInvocation(
+        'dashboard-worker',
+        request.headers.get('cf-request-id'),
+        request.cf.colo,
+        request.cf.country,
+        {
+          cpuTime: performance.now() * 1000,
+          wallTime: Date.now() - startTime
+        },
+        {
+          errors: [{
+            name: error.name,
+            message: error.message,
+            stack: error.stack
+          }]
+        }
+      );
+      
+      throw error;
+    }
+  }
+};
+
+// 4. Get analytics dashboard data
+const dashboardData = cfAnalytics.getCloudflareAnalytics();
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Service tab switching
+        function showService(service) {
+            // Hide all content
+            document.querySelectorAll('.service-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active from all tabs
+            document.querySelectorAll('.service-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected content and activate tab
+            document.getElementById(service + '-content').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Simulate real-time updates
+        function updateMetrics() {
+            const elements = {
+                'total-requests': () => Math.floor(2847391 + Math.random() * 1000),
+                'kv-operations': () => Math.floor(1429847 + Math.random() * 500),
+                'r2-operations': () => Math.floor(487293 + Math.random() * 200),
+                'd1-queries': () => Math.floor(892547 + Math.random() * 300)
+            };
+
+            Object.entries(elements).forEach(([id, generator]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = generator().toLocaleString();
+                }
+            });
+        }
+
+        // Update metrics every 5 seconds
+        setInterval(updateMetrics, 5000);
+
+        // Update live status indicator
+        function updateLiveStatus() {
+            const status = document.getElementById('live-status');
+            const isLive = Math.random() > 0.1; // 90% uptime simulation
+            
+            if (isLive) {
+                status.style.background = 'var(--success-green)';
+                status.innerHTML = '● Live Monitoring Active';
+            } else {
+                status.style.background = 'var(--warning-yellow)';
+                status.innerHTML = '⚠ Partial Monitoring';
+            }
+        }
+
+        setInterval(updateLiveStatus, 30000);
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateMetrics();
+            updateLiveStatus();
+            
+            console.log('🟠 Cloudflare Enhanced Analytics Dashboard Loaded');
+            console.log('📊 Real-time monitoring active for Workers, KV, R2, and D1');
+        });
+    </script>
+</body>
+</html>

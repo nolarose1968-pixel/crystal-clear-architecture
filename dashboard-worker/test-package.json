@@ -1,0 +1,409 @@
+{
+  "name": "fire22-dashboard-test",
+  "version": "2.1.0-beta.3",
+  "description": "Comprehensive test package for demonstrating bun pm pkg commands with rich metadata",
+  "keywords": [
+    "dashboard",
+    "fire22",
+    "betting",
+    "sportsbook",
+    "analytics",
+    "monitoring"
+  ],
+  "author": {
+    "name": "Fire22 Team",
+    "email": "dev@fire22.ag",
+    "url": "https://fire22.ag"
+  },
+  "contributors": [
+    {
+      "name": "Blake PPH",
+      "email": "blake@fire22.ag",
+      "role": "Lead Developer"
+    },
+    {
+      "name": "Calvin",
+      "email": "calvin@fire22.ag",
+      "role": "Architect"
+    }
+  ],
+  "maintainers": [
+    "dev@fire22.ag",
+    "support@fire22.ag"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brendadeeznuts1111/fire22-dashboard-worker.git",
+    "directory": "dashboard-worker"
+  },
+  "bugs": {
+    "url": "https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues",
+    "email": "bugs@fire22.ag"
+  },
+  "homepage": "https://fire22.ag/dashboard",
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/fire22"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "private": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "dist/**/*",
+    "src/**/*",
+    "*.md",
+    "LICENSE"
+  ],
+  "directories": {
+    "lib": "src",
+    "bin": "bin",
+    "man": "man",
+    "doc": "docs",
+    "example": "examples",
+    "test": "tests"
+  },
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build ./src/index.ts --target=bun --outdir ./dist",
+    "build:prod": "bun build ./src/index.ts --target=bun --outdir ./dist --minify",
+    "build:analyze": "bun build ./src/index.ts --target=bun --outdir ./dist --analyze",
+    "test": "bun test",
+    "test:quick": "bun run test-quick.bun.ts",
+    "test:checklist": "bun run test-checklist.bun.ts",
+    "test:coverage": "bun test --coverage",
+    "test:watch": "bun test --watch",
+    "test:integration": "bun test --test-name-pattern='integration'",
+    "test:e2e": "bun test --test-name-pattern='e2e'",
+    "lint": "bun run lint:check",
+    "lint:check": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "lint:domains": "bun run scripts/lint-domains.ts",
+    "format": "prettier --write src/**/*.ts",
+    "format:check": "prettier --check src/**/*.ts",
+    "clean": "rm -rf dist node_modules/.cache",
+    "clean:all": "rm -rf dist node_modules bun.lockb",
+    "install:clean": "bun run clean:all && bun install",
+    "prepack": "bun run build",
+    "postpack": "bun run clean",
+    "prepublishOnly": "bun run test:checklist && bun run build:prod",
+    "postpublish": "bun run clean",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:prod": "wrangler deploy --env production",
+    "rollback": "wrangler rollback",
+    "monitor": "bun run monitor-health.bun.ts",
+    "monitor:watch": "bun --watch monitor-health.bun.ts",
+    "validate": "bun run validate-deployment.bun.ts",
+    "analyze": "bun run build:analyze",
+    "bundle": "bun run scripts/bundle.ts",
+    "deps:audit": "bun run scripts/deps-audit.ts",
+    "deps:update": "bun update",
+    "deps:outdated": "bun outdated",
+    "deps:check": "bun pm ls --all",
+    "cache:clear": "bun pm cache rm",
+    "cache:info": "bun pm cache",
+    "version:patch": "bun pm version patch",
+    "version:minor": "bun pm version minor",
+    "version:major": "bun pm version major",
+    "version:prerelease": "bun pm version prerelease --preid beta",
+    "pack:test": "bun pm pack --dry-run",
+    "pack:create": "bun pm pack --destination ./packages",
+    "cli": "bun run scripts/cli.ts",
+    "setup": "bun run scripts/setup-database.js",
+    "migrate": "bun run scripts/migrate.ts",
+    "seed": "bun run scripts/seed.ts",
+    "backup": "bun run scripts/backup.ts",
+    "restore": "bun run scripts/restore.ts"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "bun-types": "^1.0.0",
+    "drizzle-orm": "^0.29.3",
+    "better-sqlite3": "^9.2.2",
+    "zod": "^3.22.4",
+    "date-fns": "^3.0.6",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.0.0",
+    "@types/lodash": "^4.14.202",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.2",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "bun": ">=1.0.0"
+  },
+  "optionalDependencies": {
+    "sqlite3": "^5.1.6"
+  },
+  "overrides": {
+    "typescript": "^5.3.3"
+  },
+  "resolutions": {
+    "typescript": "^5.3.3"
+  },
+  "bundledDependencies": [
+    "drizzle-orm",
+    "zod"
+  ],
+  "config": {
+    "port": 3000,
+    "environment": "development",
+    "debug": false,
+    "logLevel": "info",
+    "cache": {
+      "enabled": true,
+      "ttl": 30000,
+      "maxSize": 1000
+    },
+    "database": {
+      "type": "sqlite",
+      "path": "./data/fire22.db",
+      "migrations": "./migrations"
+    },
+    "monitoring": {
+      "enabled": true,
+      "interval": 5000,
+      "endpoints": [
+        "/api/health",
+        "/api/health/system",
+        "/api/health/permissions"
+      ]
+    }
+  },
+  "bun": {
+    "entrypoints": [
+      "./src/index.ts",
+      "./src/dashboard.ts",
+      "./src/api.ts"
+    ],
+    "output": "./dist",
+    "target": "bun",
+    "minify": false,
+    "sourcemap": "external",
+    "external": [
+      "sqlite3",
+      "better-sqlite3"
+    ]
+  },
+  "wrangler": {
+    "name": "fire22-dashboard",
+    "main": "src/index.ts",
+    "compatibility_date": "2024-01-15",
+    "compatibility_flags": [
+      "nodejs_compat"
+    ],
+    "env": {
+      "staging": {
+        "name": "fire22-dashboard-staging"
+      },
+      "production": {
+        "name": "fire22-dashboard-prod"
+      }
+    }
+  },
+  "jest": {
+    "preset": "bun",
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    }
+  },
+  "eslintConfig": {
+    "extends": [
+      "@typescript-eslint/recommended",
+      "prettier"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "rules": {
+      "@typescript-eslint/no-unused-vars": "error",
+      "@typescript-eslint/explicit-function-return-type": "warn"
+    }
+  },
+  "prettier": {
+    "semi": true,
+    "trailingComma": "es5",
+    "singleQuote": true,
+    "printWidth": 80,
+    "tabWidth": 2
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "bun run test:checklist"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "release": {
+    "branches": [
+      "main",
+      "develop"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/git",
+      "@semantic-release/github"
+    ]
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "packageManager": "bun@1.0.35",
+  "volta": {
+    "node": "18.19.0",
+    "bun": "1.0.35"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./dashboard": {
+      "import": "./dist/dashboard.js",
+      "require": "./dist/dashboard.cjs",
+      "types": "./dist/dashboard.d.ts"
+    },
+    "./api": {
+      "import": "./dist/api.js",
+      "require": "./dist/api.cjs",
+      "types": "./dist/api.d.ts"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": ["./dist/*"]
+    }
+  },
+  "bin": {
+    "fire22-dashboard": "./dist/cli.js",
+    "fire22-monitor": "./dist/monitor.js"
+  },
+  "man": [
+    "./man/fire22-dashboard.1",
+    "./man/fire22-monitor.1"
+  ],
+  "keywords": [
+    "dashboard",
+    "fire22",
+    "betting",
+    "sportsbook",
+    "analytics",
+    "monitoring",
+    "cloudflare",
+    "workers",
+    "d1",
+    "sqlite",
+    "typescript",
+    "bun"
+  ],
+  "categories": [
+    "web-frameworks",
+    "monitoring",
+    "analytics"
+  ],
+  "badges": [
+    {
+      "description": "Build Status",
+      "url": "https://github.com/brendadeeznuts1111/fire22-dashboard-worker/workflows/build/badge.svg",
+      "href": "https://github.com/brendadeeznuts1111/fire22-dashboard-worker/actions"
+    },
+    {
+      "description": "Test Coverage",
+      "url": "https://codecov.io/gh/fire22/dashboard-worker/branch/main/graph/badge.svg",
+      "href": "https://codecov.io/gh/fire22/dashboard-worker"
+    },
+    {
+      "description": "npm version",
+      "url": "https://badge.fury.io/js/fire22-dashboard.svg",
+      "href": "https://badge.fury.io/js/fire22-dashboard"
+    }
+  ],
+  "metadata": {
+    "created": "2024-01-15T10:00:00Z",
+    "lastModified": "2024-12-26T15:30:00Z",
+    "maintainer": "Fire22 Development Team",
+    "support": {
+      "email": "support@fire22.ag",
+      "chat": "https://discord.gg/fire22",
+      "docs": "https://docs.fire22.ag",
+      "issues": "https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues"
+    },
+    "roadmap": [
+      "v2.2.0 - Enhanced monitoring dashboard",
+      "v2.3.0 - Real-time alerts system",
+      "v2.4.0 - Advanced analytics engine"
+    ],
+    "changelog": "https://github.com/brendadeeznuts1111/fire22-dashboard-worker/blob/main/CHANGELOG.md",
+    "contributing": "https://github.com/brendadeeznuts1111/fire22-dashboard-worker/blob/main/CONTRIBUTING.md",
+    "codeOfConduct": "https://github.com/brendadeeznuts1111/fire22-dashboard-worker/blob/main/CODE_OF_CONDUCT.md"
+  }
+}

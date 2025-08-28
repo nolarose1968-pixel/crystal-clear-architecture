@@ -1,0 +1,265 @@
+{
+  "tests": [
+    {
+      "id": "database-connection-failure",
+      "name": "Database Connection Failure",
+      "description": "Simulate database connection loss to test error handling and recovery",
+      "category": "database",
+      "severity": "critical",
+      "duration": 30000,
+      "enabled": true,
+      "targets": [
+        "fire22-dashboard",
+        "fire22-registry"
+      ],
+      "parameters": {
+        "failureType": "connection_timeout",
+        "affectedQueries": [
+          "SELECT",
+          "INSERT",
+          "UPDATE"
+        ],
+        "partialFailure": false
+      },
+      "expectedBehavior": {
+        "errorCodes": [
+          "E2001",
+          "E2002"
+        ],
+        "recoveryTime": 15,
+        "alertsTriggered": [
+          "critical-database-errors"
+        ],
+        "gracefulDegradation": true
+      }
+    },
+    {
+      "id": "api-rate-limit-surge",
+      "name": "API Rate Limit Surge",
+      "description": "Flood API endpoints to test rate limiting and error responses",
+      "category": "api",
+      "severity": "medium",
+      "duration": 20000,
+      "enabled": true,
+      "targets": [
+        "/api/errors",
+        "/api/customers",
+        "/health"
+      ],
+      "parameters": {
+        "requestsPerSecond": 1000,
+        "concurrent": 50,
+        "patterns": [
+          "burst",
+          "sustained"
+        ]
+      },
+      "expectedBehavior": {
+        "errorCodes": [
+          "E3002"
+        ],
+        "recoveryTime": 10,
+        "alertsTriggered": [
+          "api-rate-limit-surge"
+        ],
+        "gracefulDegradation": true
+      }
+    },
+    {
+      "id": "network-partition",
+      "name": "Network Partition Simulation",
+      "description": "Simulate network connectivity issues between services",
+      "category": "network",
+      "severity": "high",
+      "duration": 45000,
+      "enabled": true,
+      "targets": [
+        "hub-connection",
+        "telegram-bot",
+        "fire22-api"
+      ],
+      "parameters": {
+        "partitionType": "intermittent",
+        "affectedServices": [
+          "50%"
+        ],
+        "latencyIncrease": 5000
+      },
+      "expectedBehavior": {
+        "errorCodes": [
+          "E4001",
+          "E4002"
+        ],
+        "recoveryTime": 30,
+        "alertsTriggered": [
+          "network-partition-alert"
+        ],
+        "gracefulDegradation": true
+      }
+    },
+    {
+      "id": "error-system-overload",
+      "name": "Error System Overload",
+      "description": "Overwhelm error tracking system with high volume of errors",
+      "category": "error_system",
+      "severity": "high",
+      "duration": 25000,
+      "enabled": true,
+      "targets": [
+        "error-tracker",
+        "error-registry",
+        "alert-system"
+      ],
+      "parameters": {
+        "errorVolume": 10000,
+        "errorTypes": [
+          "E1001",
+          "E2001",
+          "E3001",
+          "E4001",
+          "E5001"
+        ],
+        "concurrentStreams": 20
+      },
+      "expectedBehavior": {
+        "errorCodes": [
+          "E5001"
+        ],
+        "recoveryTime": 20,
+        "alertsTriggered": [
+          "error-system-overload"
+        ],
+        "gracefulDegradation": true
+      }
+    },
+    {
+      "id": "memory-pressure",
+      "name": "Memory Pressure Test",
+      "description": "Create memory pressure to test resource handling",
+      "category": "system",
+      "severity": "critical",
+      "duration": 60000,
+      "enabled": true,
+      "targets": [
+        "error-tracker",
+        "hub-connection"
+      ],
+      "parameters": {
+        "memoryPressure": "80%",
+        "leakSimulation": true,
+        "gcStress": true
+      },
+      "expectedBehavior": {
+        "errorCodes": [
+          "E1002"
+        ],
+        "recoveryTime": 45,
+        "alertsTriggered": [
+          "memory-pressure-alert"
+        ],
+        "gracefulDegradation": true
+      }
+    },
+    {
+      "id": "cascade-failure",
+      "name": "Cascade Failure Simulation",
+      "description": "Test resilience against cascading failures across services",
+      "category": "system",
+      "severity": "critical",
+      "duration": 90000,
+      "enabled": true,
+      "targets": [
+        "database",
+        "api",
+        "error-system",
+        "telegram"
+      ],
+      "parameters": {
+        "initialFailure": "database",
+        "propagationDelay": 5000,
+        "failureChain": [
+          "database",
+          "api",
+          "error-system"
+        ]
+      },
+      "expectedBehavior": {
+        "errorCodes": [
+          "E2001",
+          "E3001",
+          "E5001"
+        ],
+        "recoveryTime": 60,
+        "alertsTriggered": [
+          "cascade-failure-alert",
+          "critical-system-failure"
+        ],
+        "gracefulDegradation": true
+      }
+    },
+    {
+      "id": "fire22-integration-disruption",
+      "name": "Fire22 Integration Disruption",
+      "description": "Simulate Fire22 API disruption and test fallback mechanisms",
+      "category": "api",
+      "severity": "high",
+      "duration": 40000,
+      "enabled": true,
+      "targets": [
+        "fire22-api",
+        "fire22-auth",
+        "fire22-data-sync"
+      ],
+      "parameters": {
+        "disruptionType": "intermittent_500",
+        "affectedEndpoints": [
+          "customers",
+          "agents",
+          "transactions"
+        ],
+        "errorRate": 0.7
+      },
+      "expectedBehavior": {
+        "errorCodes": [
+          "E7001",
+          "E7002"
+        ],
+        "recoveryTime": 25,
+        "alertsTriggered": [
+          "fire22-integration-failures"
+        ],
+        "gracefulDegradation": true
+      }
+    },
+    {
+      "id": "documentation-system-failure",
+      "name": "Documentation System Failure",
+      "description": "Test error handling when documentation links fail",
+      "category": "error_system",
+      "severity": "medium",
+      "duration": 15000,
+      "enabled": true,
+      "targets": [
+        "error-registry",
+        "documentation-links"
+      ],
+      "parameters": {
+        "brokenLinks": [
+          "50%"
+        ],
+        "registryCorruption": false,
+        "validationFailure": true
+      },
+      "expectedBehavior": {
+        "errorCodes": [
+          "E5001"
+        ],
+        "recoveryTime": 10,
+        "alertsTriggered": [
+          "documentation-failure"
+        ],
+        "gracefulDegradation": true
+      }
+    }
+  ]
+}

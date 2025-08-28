@@ -1,0 +1,100 @@
+[
+  {
+    "name": "Technology",
+    "head": "Mike Hunt",
+    "email": "mike.hunt@technology.fire22",
+    "internalId": "DEPT-TECH-001",
+    "headEmployeeId": "EMP-TECH-001",
+    "packages": [
+      "@fire22/core-dashboard",
+      "@fire22/pattern-system"
+    ],
+    "dependencies": [
+      "typescript",
+      "@types/bun",
+      "eslint"
+    ],
+    "maintenanceResponsibilities": [
+      "@fire22/core-dashboard",
+      "@fire22/pattern-system",
+      "@fire22/api-client",
+      "@fire22/build-system"
+    ],
+    "status": "active"
+  },
+  {
+    "name": "Marketing",
+    "head": "TBD",
+    "email": "head@marketing.fire22",
+    "internalId": "DEPT-MARK-002",
+    "headEmployeeId": "TBD",
+    "packages": [
+      "@fire22/marketing-tools"
+    ],
+    "dependencies": [],
+    "maintenanceResponsibilities": [
+      "@fire22/telegram-integration"
+    ],
+    "status": "pending"
+  },
+  {
+    "name": "Security",
+    "head": "TBD",
+    "email": "head@security.fire22",
+    "internalId": "DEPT-SEC-003",
+    "headEmployeeId": "TBD",
+    "packages": [
+      "@fire22/security-scanner"
+    ],
+    "dependencies": [],
+    "maintenanceResponsibilities": [
+      "@fire22/security-scanner"
+    ],
+    "status": "pending"
+  },
+  {
+    "name": "Finance",
+    "head": "TBD",
+    "email": "head@finance.fire22",
+    "internalId": "DEPT-FIN-004",
+    "headEmployeeId": "TBD",
+    "packages": [
+      "@fire22/financial-reporting"
+    ],
+    "dependencies": [],
+    "maintenanceResponsibilities": [
+      "@fire22/financial-reporting"
+    ],
+    "status": "pending"
+  },
+  {
+    "name": "Operations",
+    "head": "TBD",
+    "email": "head@operations.fire22",
+    "internalId": "DEPT-OPS-005",
+    "headEmployeeId": "TBD",
+    "packages": [
+      "@fire22/ops-tools"
+    ],
+    "dependencies": [],
+    "maintenanceResponsibilities": [
+      "@fire22/sports-betting"
+    ],
+    "status": "pending"
+  },
+  {
+    "name": "Legal",
+    "head": "TBD",
+    "email": "head@legal.fire22",
+    "internalId": "DEPT-LEG-006",
+    "headEmployeeId": "TBD",
+    "packages": [
+      "@fire22/compliance-tools"
+    ],
+    "dependencies": [],
+    "maintenanceResponsibilities": [
+      "@fire22/compliance-tools"
+    ],
+    "status": "pending"
+  }
+]

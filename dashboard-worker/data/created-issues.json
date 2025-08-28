@@ -1,0 +1,42 @@
+{
+  "issue-1756410921795": {
+    "id": "issue-1756410921795",
+    "externalId": "github-0oyxfyzlv",
+    "provider": "github",
+    "errorCode": "UNKNOWN",
+    "title": "🚨 CRITICAL: E1001 - SYSTEM_INIT_FAILED",
+    "url": "https://github.com/fire22-company/dashboard-worker/issues/658",
+    "status": "open",
+    "createdAt": "2025-08-28T19:55:21.795Z",
+    "updatedAt": "2025-08-28T19:55:21.795Z",
+    "assignees": [
+      "platform-team"
+    ],
+    "labels": [
+      "critical",
+      "system-failure",
+      "auto-created"
+    ],
+    "priority": "critical"
+  },
+  "issue-1756410922299": {
+    "id": "issue-1756410922299",
+    "externalId": "github-gj2kmc4bl",
+    "provider": "github",
+    "errorCode": "UNKNOWN",
+    "title": "🚨 CRITICAL: E2001 - DB_CONNECTION_FAILED",
+    "url": "https://github.com/fire22-company/dashboard-worker/issues/48",
+    "status": "open",
+    "createdAt": "2025-08-28T19:55:22.299Z",
+    "updatedAt": "2025-08-28T19:55:22.299Z",
+    "assignees": [
+      "platform-team"
+    ],
+    "labels": [
+      "critical",
+      "system-failure",
+      "auto-created"
+    ],
+    "priority": "critical"
+  }
+}

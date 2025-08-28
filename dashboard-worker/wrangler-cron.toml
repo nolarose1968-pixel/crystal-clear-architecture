@@ -1,0 +1,20 @@
+# Cloudflare Workers Cron Triggers
+# Add these triggers to your wrangler.toml file
+
+[triggers]
+# Sync with Fire22 API every 15 minutes
+crons = [
+  "*/15 * * * *",     # Fire22 API sync - every 15 minutes
+  "0 */6 * * *",      # Health check - every 6 hours  
+  "0 9 * * *",        # Daily report generation - 9 AM UTC
+  "0 0 * * 0"         # Weekly cleanup - Sunday midnight UTC
+]
+
+# Example cron schedule patterns:
+# "*/5 * * * *"       - Every 5 minutes
+# "0 */2 * * *"       - Every 2 hours
+# "0 9 * * *"         - Daily at 9 AM UTC
+# "0 0 * * 0"         - Weekly on Sunday at midnight UTC
+# "0 0 1 * *"         - Monthly on the 1st at midnight UTC
+
+# To add these to your main wrangler.toml, copy the crons array to your [triggers] section

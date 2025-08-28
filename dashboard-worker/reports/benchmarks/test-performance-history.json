@@ -1,0 +1,14 @@
+[
+  {
+    "timestamp": "2025-08-28T15:25:54.326Z",
+    "gitCommit": "unknown",
+    "branch": "unknown",
+    "bunVersion": "1.2.21",
+    "testSuite": "quick",
+    "duration": 336,
+    "testCount": 0,
+    "passedCount": 0,
+    "failedCount": 0,
+    "memoryUsage": 2
+  }
+]
