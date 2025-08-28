@@ -188,7 +188,112 @@
           "options": ["email", "slack", "dashboard", "intranet", "external-website"],
           "required": true
         }
-      ]
+      ],
+      "water-system-daily-report": {
+        "name": "Water System Daily Report Template",
+        "sections": [
+          {
+            "title": "System Status Overview",
+            "required": true,
+            "format": "status-summary",
+            "fields": ["operational-status", "system-health", "alert-level"]
+          },
+          {
+            "title": "Key Metrics",
+            "required": true,
+            "format": "metrics-table",
+            "fields": ["flow-rate", "temperature", "pressure", "water-quality"]
+          },
+          {
+            "title": "Incidents & Alerts",
+            "required": false,
+            "format": "incident-log",
+            "escalation": true
+          },
+          {
+            "title": "Maintenance Activities",
+            "required": false,
+            "format": "maintenance-log",
+            "fields": ["scheduled-maintenance", "emergency-repairs", "upgrades"]
+          },
+          {
+            "title": "Safety & Compliance",
+            "required": true,
+            "format": "compliance-checklist",
+            "fields": ["water-quality-standards", "safety-protocols", "regulatory-compliance"]
+          }
+        ],
+        "recipients": ["communications@fire22.com", "operations@fire22.com"],
+        "deadline": "9AM daily"
+      },
+      "water-system-weekly-report": {
+        "name": "Water System Weekly Report Template",
+        "sections": [
+          {
+            "title": "Weekly Performance Summary",
+            "required": true,
+            "format": "performance-summary",
+            "fields": ["uptime", "efficiency", "capacity-utilization", "cost-analysis"]
+          },
+          {
+            "title": "Incident Analysis",
+            "required": true,
+            "format": "incident-analysis",
+            "fields": ["incident-count", "resolution-time", "root-cause-analysis", "preventive-measures"]
+          },
+          {
+            "title": "Maintenance Summary",
+            "required": true,
+            "format": "maintenance-summary",
+            "fields": ["completed-maintenance", "scheduled-maintenance", "maintenance-costs", "equipment-health"]
+          },
+          {
+            "title": "Infrastructure Updates",
+            "required": false,
+            "format": "infrastructure-updates",
+            "fields": ["upgrades", "expansions", "retirements", "capacity-planning"]
+          },
+          {
+            "title": "Compliance & Safety",
+            "required": true,
+            "format": "compliance-report",
+            "fields": ["regulatory-compliance", "safety-audits", "training-completion", "incident-prevention"]
+          }
+        ],
+        "recipients": ["communications@fire22.com", "operations@fire22.com", "compliance@fire22.com"],
+        "deadline": "Friday 2PM weekly"
+      },
+      "water-system-emergency-alert": {
+        "name": "Water System Emergency Alert Template",
+        "sections": [
+          {
+            "title": "Emergency Summary",
+            "required": true,
+            "format": "emergency-summary",
+            "fields": ["incident-type", "severity-level", "affected-systems", "immediate-impact"]
+          },
+          {
+            "title": "Safety Instructions",
+            "required": true,
+            "format": "safety-instructions",
+            "fields": ["evacuation-requirements", "safety-zones", "protective-measures", "emergency-contacts"]
+          },
+          {
+            "title": "Response Actions",
+            "required": true,
+            "format": "response-actions",
+            "fields": ["immediate-actions", "response-team", "estimated-resolution", "status-updates"]
+          },
+          {
+            "title": "Communication Plan",
+            "required": true,
+            "format": "communication-plan",
+            "fields": ["notification-channels", "update-frequency", "stakeholder-communications", "external-notifications"]
+          }
+        ],
+        "recipients": ["emergency@fire22.com", "communications@fire22.com", "operations@fire22.com"],
+        "deadline": "Immediate upon incident detection"
+      }
     }
   },
   "communicationMetrics": {
@@ -224,6 +329,28 @@
         "target": "24-hours",
         "measurement": "average-time-from-request-to-approval",
         "alert": "above-48-hours"
+      },
+      "waterSystemCommunications": {
+        "dailyReportSubmission": {
+          "target": "100%",
+          "measurement": "daily-water-system-reports-submitted / total-days",
+          "alert": "below-95%"
+        },
+        "emergencyResponseTime": {
+          "target": "5-minutes",
+          "measurement": "time-from-water-incident-to-first-communication",
+          "alert": "above-10-minutes"
+        },
+        "maintenanceNotification": {
+          "target": "24-hours-notice",
+          "measurement": "scheduled-maintenance-notifications / total-maintenance-events",
+          "alert": "below-90%"
+        },
+        "complianceReporting": {
+          "target": "100%",
+          "measurement": "water-safety-compliance-reports / required-reports",
+          "alert": "below-100%"
+        }
       }
     }
   },
@@ -233,20 +360,28 @@
         "#communications": "Primary communications team channel",
         "#announcements": "Company-wide announcements",
         "#department-updates": "Weekly department update summaries",
-        "#emergency-comms": "Emergency communications coordination"
+        "#emergency-comms": "Emergency communications coordination",
+        "#water-system": "Water system operations and monitoring",
+        "#water-alerts": "Water system emergency alerts and notifications"
       },
       "botCommands": [
         "/comms-submit-update [department]",
         "/comms-request-announcement",
         "/comms-emergency-alert [level]",
-        "/comms-metrics-report"
+        "/comms-metrics-report",
+        "/water-system-status [system]",
+        "/water-system-alert [level] [description]",
+        "/water-system-maintenance [type] [duration]",
+        "/water-system-report [type] [date]"
       ]
     },
     "emailIntegration": {
       "groups": {
         "communications@fire22.com": "Main communications team inbox",
         "announcements@fire22.com": "Company announcements distribution",
-        "emergency-comms@fire22.com": "Emergency communications"
+        "emergency-comms@fire22.com": "Emergency communications",
+        "water-system@fire22.com": "Water system operations communications",
+        "water-alerts@fire22.com": "Water system emergency alerts"
       },
       "templates": "Integrated with department email templates system",
       "automation": "Auto-routing based on content type and priority"
@@ -256,13 +391,21 @@
         "/api/communications/submit-update",
         "/api/communications/request-announcement",
         "/api/communications/metrics",
-        "/api/communications/workflow-status"
+        "/api/communications/workflow-status",
+        "/api/communications/water-system/status",
+        "/api/communications/water-system/alerts",
+        "/api/communications/water-system/maintenance",
+        "/api/communications/water-system/reports"
       ],
       "widgets": [
         "communication-metrics-dashboard",
         "pending-approvals-queue",
         "department-update-status",
-        "announcement-calendar"
+        "announcement-calendar",
+        "water-system-status-dashboard",
+        "water-system-alerts-queue",
+        "water-system-maintenance-schedule",
+        "water-system-compliance-reports"
       ]
     }
   }
