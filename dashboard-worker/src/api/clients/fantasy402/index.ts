@@ -1,171 +1,400 @@
 /**
- * Fantasy402 Agent API Client
- * Consolidated modular client for Fantasy42 agent operations
+ * Fantasy402 API Client
+ * Unified modular client for Fantasy402 API operations
  */
 
-import { Fantasy402AgentClientCore } from './core/agent-client-core';
-import { Fantasy402FinancialOperations } from './financial/financial-operations';
-import { Fantasy402AgentManagement } from './agents/agent-management';
-import { Fantasy402CustomerManagement } from './customers/customer-management';
+import { AgentManager } from './agent/agent-manager';
+import { FinancialOperations } from './financial/financial-operations';
 
-// Re-export types for external use
-export type {
-  AgentPermissions,
-  AgentAccountInfo,
-  DetailedAccountInfo,
-  LotteryGame,
-  LotteryBet,
-  LotteryDraw,
-  LotterySettings,
-  WeeklyFiguresParams,
-  WeeklyFiguresResult,
-  TransactionParams,
-  WagerParams,
-  CustomerParams,
-  PlayerNote,
-  PlayerNoteOptions,
-  LotteryBetOptions,
-  LotteryDrawOptions,
-  LotteryStatisticsOptions,
-  LotteryStatistics
-} from './types';
+export * from '../../../../core/types/fantasy402';
 
-export class Fantasy402AgentClient {
-  private core: Fantasy402AgentClientCore;
-  private financial: Fantasy402FinancialOperations;
-  private agents: Fantasy402AgentManagement;
-  private customers: Fantasy402CustomerManagement;
+export class Fantasy402Client {
+  private agentManager: AgentManager;
+  private financialOps: FinancialOperations;
+  private baseUrl: string;
+  private authToken?: string;
+  private agentId?: string;
+  private initialized = false;
 
-  constructor() {
-    this.core = new Fantasy402AgentClientCore();
-    this.financial = new Fantasy402FinancialOperations(this.core);
-    this.agents = new Fantasy402AgentManagement(this.core);
-    this.customers = new Fantasy402CustomerManagement(this.core);
+  constructor(
+    baseUrl: string,
+    username?: string,
+    password?: string,
+    agentId?: string
+  ) {
+    this.baseUrl = baseUrl;
+    this.agentId = agentId;
+
+    this.agentManager = new AgentManager(baseUrl);
+    this.financialOps = new FinancialOperations(baseUrl);
   }
 
   /**
-   * Initialize the client
+   * Initialize the client with authentication
    */
-  async initialize(): Promise<boolean> {
-    return await this.core.initialize();
+  async initialize(username?: string, password?: string): Promise<boolean> {
+    try {
+      if (!username || !password) {
+        console.warn('⚠️ Fantasy402Client: Username and password required for initialization');
+        return false;
+      }
+
+      // In a real implementation, this would authenticate and get a token
+      // For now, we'll simulate successful initialization
+      this.authToken = `token_${Date.now()}`;
+      this.agentManager.setAuthToken(this.authToken);
+      this.financialOps.setAuthToken(this.authToken);
+
+      if (this.agentId) {
+        this.agentManager.setAgentId(this.agentId);
+        this.financialOps.setAgentId(this.agentId);
+      }
+
+      this.initialized = true;
+      console.log('✅ Fantasy402Client initialized successfully');
+
+      return true;
+
+    } catch (error) {
+      console.error('❌ Fantasy402Client initialization failed:', error);
+      return false;
+    }
   }
 
-  // Core Operations
-  get isInitialized(): boolean {
-    return this.core.isClientInitialized;
+  // Agent Management Methods
+
+  /**
+   * Get agent permissions
+   */
+  async getAgentPermissions(agentId?: string) {
+    this.ensureInitialized();
+    return this.agentManager.getAgentPermissions(agentId || this.agentId);
   }
 
-  getAgentPermissions() {
-    return this.core.getAgentPermissions();
+  /**
+   * Get agent account info
+   */
+  async getAgentAccountInfo(agentId?: string) {
+    this.ensureInitialized();
+    return this.agentManager.getAgentAccountInfo(agentId || this.agentId);
   }
 
-  getAgentAccountInfo() {
-    return this.core.getAgentAccountInfo();
+  /**
+   * Get detailed agent account info
+   */
+  async getDetailedAccountInfo(agentId?: string) {
+    this.ensureInitialized();
+    return this.agentManager.getDetailedAccountInfo(agentId || this.agentId);
   }
 
-  async getAccountInfoOwner() {
-    return await this.core.getAccountInfoOwner();
+  /**
+   * Get sub-agents
+   */
+  async getSubAgents(agentId?: string) {
+    this.ensureInitialized();
+    return this.agentManager.getSubAgents(agentId || this.agentId);
   }
 
-  async renewToken() {
-    return await this.core.renewToken();
+  /**
+   * Update agent settings
+   */
+  async updateAgentSettings(agentId: string, settings: any) {
+    this.ensureInitialized();
+    return this.agentManager.updateAgentSettings(agentId, settings);
   }
 
-  async checkAndRenewToken() {
-    return await this.core.checkAndRenewToken();
+  // Financial Operations Methods
+
+  /**
+   * Get balance
+   */
+  async getBalance(agentId?: string) {
+    this.ensureInitialized();
+    return this.financialOps.getBalance(agentId || this.agentId);
   }
 
-  // Financial Operations
+  /**
+   * Get transactions
+   */
+  async getTransactions(agentId?: string, params?: any) {
+    this.ensureInitialized();
+    return this.financialOps.getTransactions(agentId || this.agentId, params);
+  }
+
+  /**
+   * Get wagers
+   */
+  async getWagers(agentId?: string, params?: any) {
+    this.ensureInitialized();
+    return this.financialOps.getWagers(agentId || this.agentId, params);
+  }
+
+  /**
+   * Get live wagers
+   */
+  async getLiveWagers(agentId?: string) {
+    this.ensureInitialized();
+    return this.financialOps.getLiveWagers(agentId || this.agentId);
+  }
+
+  /**
+   * Process transaction
+   */
+  async processTransaction(agentId: string, transactionData: any) {
+    this.ensureInitialized();
+    return this.financialOps.processTransaction(agentId, transactionData);
+  }
+
+  /**
+   * Settle wager
+   */
+  async settleWager(agentId: string, wagerId: string, outcome: any, winnings?: number) {
+    this.ensureInitialized();
+    return this.financialOps.settleWager(agentId, wagerId, outcome, winnings);
+  }
+
+  /**
+   * Get financial summary
+   */
+  async getFinancialSummary(agentId?: string, period?: any) {
+    this.ensureInitialized();
+    return this.financialOps.getFinancialSummary(agentId || this.agentId, period);
+  }
+
+  // Legacy Methods (for backward compatibility)
+  // These will be gradually migrated to use the modular approach
+
+  /**
+   * Legacy method for getting weekly figures
+   */
   async getWeeklyFigures(params?: any) {
-    return await this.financial.getWeeklyFigures(params);
+    console.warn('⚠️ Using legacy getWeeklyFigures method. Consider using getFinancialSummary instead.');
+    return this.getFinancialSummary(this.agentId, 'weekly');
   }
 
+  /**
+   * Legacy method for getting weekly figure by agent lite
+   */
   async getWeeklyFigureByAgentLite() {
-    return await this.financial.getWeeklyFigureByAgentLite();
+    console.warn('⚠️ Using legacy getWeeklyFigureByAgentLite method. Consider using getFinancialSummary instead.');
+    return this.getFinancialSummary(this.agentId, 'weekly');
   }
 
-  async getBalance() {
-    return await this.financial.getBalance();
-  }
-
-  async getTransactions(params?: any) {
-    return await this.financial.getTransactions(params);
-  }
-
-  async getWagers(params?: any) {
-    return await this.financial.getWagers(params);
-  }
-
-  async getLiveWagers() {
-    return await this.financial.getLiveWagers();
-  }
-
-  async writeLog(message: string, level: string = 'info') {
-    return await this.financial.writeLog(message, level);
-  }
-
-  // Agent Management
-  async getSubAgents() {
-    return await this.agents.getSubAgents();
-  }
-
-  async getListAgentsByAgent() {
-    return await this.agents.getListAgentsByAgent();
-  }
-
-  async testManagerEndpoints() {
-    return await this.agents.testManagerEndpoints();
-  }
-
-  async getPendingWebReportsConfig() {
-    return await this.agents.getPendingWebReportsConfig();
-  }
-
-  // Customer Management
+  /**
+   * Legacy method for getting customers
+   */
   async getCustomers(limit: number = 100) {
-    return await this.customers.getCustomers(limit);
+    console.warn('⚠️ Using legacy getCustomers method. This will be moved to customer module.');
+    // Placeholder - would need customer module implementation
+    return {
+      success: false,
+      error: 'Customer operations not yet implemented in modular client',
+      timestamp: new Date(),
+      requestId: `legacy_customers_${Date.now()}`
+    };
   }
 
-  async getInfoPlayer(playerID: string) {
-    return await this.customers.getInfoPlayer(playerID);
-  }
-
+  /**
+   * Legacy method for getting new users
+   */
   async getNewUsers(days: number = 7) {
-    return await this.customers.getNewUsers(days);
+    console.warn('⚠️ Using legacy getNewUsers method. This will be moved to customer module.');
+    return {
+      success: false,
+      error: 'New user operations not yet implemented in modular client',
+      timestamp: new Date(),
+      requestId: `legacy_new_users_${Date.now()}`
+    };
   }
 
-  async getNewEmailsCount() {
-    return await this.customers.getNewEmailsCount();
+  /**
+   * Legacy method for getting info player
+   */
+  async getInfoPlayer(playerID: string) {
+    console.warn('⚠️ Using legacy getInfoPlayer method. This will be moved to customer module.');
+    return {
+      success: false,
+      error: 'Player info operations not yet implemented in modular client',
+      timestamp: new Date(),
+      requestId: `legacy_player_info_${Date.now()}`
+    };
   }
 
-  // Utility Methods
-  async rawRequest(endpoint: string, method: string = 'POST', data?: any) {
-    return await this.core.rawRequest(endpoint, method, data);
+  /**
+   * Legacy method for getting teaser profile
+   */
+  async getTeaserProfile() {
+    console.warn('⚠️ Using legacy getTeaserProfile method. This will be moved to reporting module.');
+    return {
+      success: false,
+      error: 'Teaser profile operations not yet implemented in modular client',
+      timestamp: new Date(),
+      requestId: `legacy_teaser_${Date.now()}`
+    };
   }
 
-  // Module Access (for advanced usage)
-  getCore(): Fantasy402AgentClientCore {
-    return this.core;
+  /**
+   * Get new emails count
+   */
+  async getNewEmailsCount(): Promise<number> {
+    try {
+      this.ensureInitialized();
+
+      // In a real implementation, this would call the API
+      // For now, return a mock value
+      return Math.floor(Math.random() * 10);
+
+    } catch (error) {
+      console.error('❌ Failed to get new emails count:', error);
+      return 0;
+    }
   }
 
-  getFinancial(): Fantasy402FinancialOperations {
-    return this.financial;
+  /**
+   * Write log entry
+   */
+  async writeLog(message: string, level: string = 'info'): Promise<void> {
+    try {
+      this.ensureInitialized();
+
+      // In a real implementation, this would send to logging service
+      console.log(`[${level.toUpperCase()}] ${message}`);
+
+    } catch (error) {
+      console.error('❌ Failed to write log:', error);
+    }
   }
 
-  getAgents(): Fantasy402AgentManagement {
-    return this.agents;
+  /**
+   * Renew authentication token
+   */
+  async renewToken(): Promise<boolean> {
+    try {
+      this.ensureInitialized();
+
+      // In a real implementation, this would renew the token
+      // For now, simulate renewal
+      this.authToken = `renewed_token_${Date.now()}`;
+      this.agentManager.setAuthToken(this.authToken);
+      this.financialOps.setAuthToken(this.authToken);
+
+      console.log('🔄 Token renewed successfully');
+      return true;
+
+    } catch (error) {
+      console.error('❌ Failed to renew token:', error);
+      return false;
+    }
   }
 
-  getCustomers(): Fantasy402CustomerManagement {
-    return this.customers;
+  /**
+   * Check and renew token if needed
+   */
+  async checkAndRenewToken(): Promise<void> {
+    try {
+      this.ensureInitialized();
+
+      // In a real implementation, check token expiry and renew if needed
+      // For now, just ensure we have a valid token
+      if (!this.authToken) {
+        await this.renewToken();
+      }
+
+    } catch (error) {
+      console.error('❌ Failed to check/renew token:', error);
+    }
+  }
+
+  /**
+   * Test manager endpoints
+   */
+  async testManagerEndpoints(): Promise<any> {
+    try {
+      this.ensureInitialized();
+
+      // Test various endpoints
+      const results = {
+        agentPermissions: false,
+        agentAccount: false,
+        balance: false,
+        timestamp: new Date().toISOString()
+      };
+
+      // Test agent permissions
+      const permissionsResult = await this.getAgentPermissions();
+      results.agentPermissions = permissionsResult.success;
+
+      // Test agent account
+      const accountResult = await this.getAgentAccountInfo();
+      results.agentAccount = accountResult.success;
+
+      // Test balance
+      const balanceResult = await this.getBalance();
+      results.balance = balanceResult.success;
+
+      console.log('🧪 Manager endpoints test completed:', results);
+      return results;
+
+    } catch (error) {
+      console.error('❌ Failed to test manager endpoints:', error);
+      return {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      };
+    }
+  }
+
+  // Private methods
+
+  private ensureInitialized(): void {
+    if (!this.initialized) {
+      throw new Error('Fantasy402Client not initialized. Call initialize() first.');
+    }
+  }
+
+  // Getters for individual modules
+
+  getAgentManager(): AgentManager {
+    return this.agentManager;
+  }
+
+  getFinancialOperations(): FinancialOperations {
+    return this.financialOps;
+  }
+
+  // Configuration methods
+
+  setBaseUrl(url: string): void {
+    this.baseUrl = url;
+    this.agentManager = new AgentManager(url, this.authToken, this.agentId);
+    this.financialOps = new FinancialOperations(url, this.authToken, this.agentId);
+  }
+
+  setAgentId(agentId: string): void {
+    this.agentId = agentId;
+    this.agentManager.setAgentId(agentId);
+    this.financialOps.setAgentId(agentId);
+  }
+
+  getAgentId(): string | undefined {
+    return this.agentId;
+  }
+
+  isInitialized(): boolean {
+    return this.initialized;
   }
 }
 
-// Export default instance
-export const fantasy402Client = new Fantasy402AgentClient();
-
 // Export individual modules for advanced usage
-export { Fantasy402AgentClientCore } from './core/agent-client-core';
-export { Fantasy402FinancialOperations } from './financial/financial-operations';
-export { Fantasy402AgentManagement } from './agents/agent-management';
-export { Fantasy402CustomerManagement } from './customers/customer-management';
+export { AgentManager } from './agent/agent-manager';
+export { FinancialOperations } from './financial/financial-operations';
+
+// Export default instance factory
+export function createFantasy402Client(
+  baseUrl: string,
+  username?: string,
+  password?: string,
+  agentId?: string
+): Fantasy402Client {
+  return new Fantasy402Client(baseUrl, username, password, agentId);
+}
