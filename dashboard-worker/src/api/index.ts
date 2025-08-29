@@ -14,6 +14,7 @@ import { managerRoutes } from './routes/manager.routes';
 import { healthRoutes } from './routes/health.routes';
 import { customerRoutes } from './routes/customer.routes';
 import { linesRoutes } from './routes/lines.routes';
+import { hierarchyRoutes } from './routes/hierarchy.routes';
 
 const api = Router({ base: '/api' });
 
@@ -29,6 +30,7 @@ api.all('*', authenticate);
 
 // Role-based routes
 api.all('/admin/*', adminRoutes.handle);
+api.all('/hierarchy/*', hierarchyRoutes.handle);
 api.all('/other/*', otherRoutes.handle);
 api.all('/financial/*', financialRoutes.handle);
 api.all('/manager/*', managerRoutes.handle);

@@ -397,7 +397,7 @@ export class Fantasy402AgentClient {
       }
       
       // Handle the case where accountInfo is null (old failing response)
-      if (response && response.accountInfo ==== null) {
+      if (response && response.accountInfo === null) {
         console.error('❌ getAccountInfoOwner returned null accountInfo - request parameters may be incorrect');
         throw new Error('Account information not available - null response from API');
       }
@@ -808,14 +808,6 @@ export class Fantasy402AgentClient {
         agentSite: '1'
       };
 
-        agentID: requestPayload.agentID,
-        days: requestPayload.days,
-        operation: requestPayload.operation,
-        RRO: requestPayload.RRO,
-        agentOwner: requestPayload.agentOwner,
-        agentSite: requestPayload.agentSite
-      });
-
       // Make the POST request to getNewUsersInfo
       const response = await this.auth.request('Manager/getNewUsersInfo', 'POST', requestPayload);
       
@@ -881,14 +873,6 @@ export class Fantasy402AgentClient {
         agentOwner: agentID.toUpperCase(),
         agentSite: '1'
       };
-
-        acc: requestPayload.acc,
-        operation: requestPayload.operation,
-        RRO: requestPayload.RRO,
-        agentID: requestPayload.agentID,
-        agentOwner: requestPayload.agentOwner,
-        agentSite: requestPayload.agentSite
-      });
 
       // Make the POST request to getTeaserProfile
       const response = await this.auth.request('Manager/getTeaserProfile', 'POST', requestPayload);
@@ -957,14 +941,6 @@ export class Fantasy402AgentClient {
         agentOwner: agentID.toUpperCase(),           // Agent owner parameter
         agentSite: '1'                               // Site identifier
       };
-
-        customerID: requestPayload.customerID,
-        agentID: requestPayload.agentID,
-        operation: requestPayload.operation,
-        RRO: requestPayload.RRO,
-        agentOwner: requestPayload.agentOwner,
-        agentSite: requestPayload.agentSite
-      });
 
       // Make the POST request to getInfoPlayer
       const response = await this.auth.request('Manager/getInfoPlayer', 'POST', requestPayload);
@@ -1061,12 +1037,6 @@ export class Fantasy402AgentClient {
         token: session.jwtToken, // JWT token in body as required
         operation: 'getConfigWebReportsPending'
       };
-
-        agentID: requestPayload.agentID,
-        agentType: requestPayload.agentType,
-        operation: requestPayload.operation,
-        hasToken: !!requestPayload.token
-      });
 
       // Make the POST request to getConfigWebReportsPending
       const response = await this.auth.request('Manager/getConfigWebReportsPending', 'POST', requestPayload);
@@ -1412,11 +1382,6 @@ export class Fantasy402AgentClient {
         }
       });
 
-        allowLotto: settings.allowLotto,
-        lottoMaxWager: settings.lottoMaxWager,
-        lottoDailyLimit: settings.lottoDailyLimit
-      });
-
       const response = await this.auth.request('Manager/updateLotterySettings', 'POST', requestPayload);
 
       if (response && typeof response === 'object' && response.success !== false) {
@@ -1509,11 +1474,6 @@ export class Fantasy402AgentClient {
         agentSite: '1'
       };
 
-        gameId: betData.gameId,
-        betAmount: betData.betAmount,
-        numbers: betData.numbers.length
-      });
-
       const response = await this.auth.request('Manager/placeLotteryBet', 'POST', requestPayload);
 
       if (response && typeof response === 'object' && response.bet) {
@@ -1592,10 +1552,6 @@ export class Fantasy402AgentClient {
         agentOwner: agentID.toUpperCase(),
         agentSite: '1'
       };
-
-        status: options.status,
-        limit: options.limit
-      });
 
       const response = await this.auth.request('Manager/getLotteryBets', 'POST', requestPayload);
 
@@ -1972,11 +1928,6 @@ export class Fantasy402AgentClient {
         timestamp: new Date().toISOString()
       };
 
-        category,
-        notesLength: notes.length,
-        agentName
-      });
-
       const response = await this.auth.request('Manager/updatePlayerNotes', 'POST', requestPayload);
 
       if (response && typeof response === 'object' && response.success !== false) {
@@ -2054,12 +2005,6 @@ export class Fantasy402AgentClient {
         timestamp: new Date().toISOString(),
         isActive: true
       };
-
-        noteId,
-        category,
-        noteLength: note.length,
-        agentName
-      });
 
       const response = await this.auth.request('Manager/addPlayerNote', 'POST', requestPayload);
 
@@ -2139,10 +2084,6 @@ export class Fantasy402AgentClient {
         agentSite: '1'
       };
 
-        category: options.category,
-        limit: options.limit
-      });
-
       const response = await this.auth.request('Manager/getPlayerNoteHistory', 'POST', requestPayload);
 
       if (response && typeof response === 'object') {
@@ -2209,11 +2150,6 @@ export class Fantasy402AgentClient {
         timestamp: new Date().toISOString(),
         isActive: false
       };
-
-        customerID,
-        agentName,
-        reason
-      });
 
       const response = await this.auth.request('Manager/deletePlayerNote', 'POST', requestPayload);
 
@@ -2289,9 +2225,6 @@ export class Fantasy402AgentClient {
         agentOwner: agentID.toUpperCase(),
         agentSite: '1'
       };
-
-        limit: options.limit
-      });
 
       const response = await this.auth.request('Manager/getNotesByCategory', 'POST', requestPayload);
 
@@ -2382,10 +2315,6 @@ export class Fantasy402AgentClient {
         agentOwner: agentID.toUpperCase(),
         agentSite: '1'
       };
-
-        category: options.category,
-        limit: options.limit
-      });
 
       const response = await this.auth.request('Manager/searchPlayerNotes', 'POST', requestPayload);
 
