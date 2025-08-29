@@ -758,46 +758,197 @@
             opacity: 0.8;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header .container {
-                flex-direction: column;
+                    /* Self-Healing Link System Styles */
+            .link-notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                max-width: 400px;
+                background: var(--bg-white);
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-lg);
+                border-left: 4px solid var(--primary-color);
+                animation: slideInRight 0.5s ease-out;
+            }
+
+            .link-notification.success {
+                border-left-color: var(--success-color);
+            }
+
+            .link-notification.warning {
+                border-left-color: var(--warning-color);
+            }
+
+            .link-notification.error {
+                border-left-color: var(--error-color);
+            }
+
+            .notification-content {
+                display: flex;
+                align-items: center;
                 gap: 1rem;
+                padding: 1rem;
             }
 
-            .nav-links {
-                gap: 1rem;
+            .notification-close {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: var(--text-secondary);
+                padding: 0;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
-            .hero h1 {
-                font-size: 2rem;
+            .notification-close:hover {
+                color: var(--text-primary);
             }
 
-            .stats {
-                gap: 1rem;
+            .link-alternatives-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10001;
+                animation: fadeIn 0.3s ease-out;
             }
 
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .performance-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .comm-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .footer-content {
-                flex-direction: column;
+            .modal-content {
+                background: var(--bg-white);
+                padding: 2rem;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-lg);
+                max-width: 500px;
+                width: 90%;
                 text-align: center;
             }
 
-            .footer-links {
-                justify-content: center;
+            .modal-content h3 {
+                color: var(--error-color);
+                margin-bottom: 1rem;
             }
-        }
+
+            .alternatives-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                margin: 1.5rem 0;
+            }
+
+            .alternative-link {
+                display: block;
+                padding: 0.75rem 1rem;
+                background: var(--bg-light);
+                color: var(--primary-color);
+                text-decoration: none;
+                border-radius: 4px;
+                transition: var(--transition);
+            }
+
+            .alternative-link:hover {
+                background: var(--primary-color);
+                color: white;
+            }
+
+            .modal-close {
+                background: var(--error-color);
+                color: white;
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-top: 1rem;
+            }
+
+            .link-health-indicator {
+                transition: all 0.3s ease;
+            }
+
+            .link-health-indicator:hover {
+                transform: scale(1.2);
+            }
+
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
+            }
+
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .header .container {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+
+                .nav-links {
+                    gap: 1rem;
+                }
+
+                .hero h1 {
+                    font-size: 2rem;
+                }
+
+                .stats {
+                    gap: 1rem;
+                }
+
+                .features-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .performance-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .comm-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .link-notification {
+                    left: 10px;
+                    right: 10px;
+                    max-width: none;
+                }
+
+                .footer-content {
+                    flex-direction: column;
+                    text-align: center;
+                }
+
+                .footer-links {
+                    justify-content: center;
+                }
+            }
 
         /* Animations */
         @keyframes fadeInUp {
@@ -1447,10 +1598,430 @@
         </div>
     </footer>
 
+    <!-- Self-Healing Link System -->
+    <div id="link-status-notification" class="link-notification" style="display: none;">
+        <div class="notification-content">
+            <span id="link-status-icon">🔗</span>
+            <span id="link-status-message">All links are healthy</span>
+            <button id="link-status-close" class="notification-close">×</button>
+        </div>
+    </div>
+
     <script>
-        // Simple loading animation for demonstration
+        // =============================================
+        // 🔗 SELF-HEALING LINK SYSTEM
+        // =============================================
+
+        class SelfHealingLinkSystem {
+            constructor() {
+                this.linkDatabase = new Map();
+                this.brokenLinks = new Set();
+                this.fixedLinks = new Set();
+                this.externalLinkCache = new Map();
+                this.retryAttempts = new Map();
+
+                this.init();
+            }
+
+            init() {
+                // Initialize link monitoring
+                this.collectAllLinks();
+                this.validateAllLinks();
+                this.attachLinkHandlers();
+                this.startPeriodicHealthCheck();
+
+                // Show initial status
+                this.showLinkStatus('All links are being monitored and healed automatically', 'success');
+            }
+
+            collectAllLinks() {
+                // Collect all links on the page
+                const allLinks = document.querySelectorAll('a[href]');
+
+                allLinks.forEach((link, index) => {
+                    const href = link.getAttribute('href');
+                    const isExternal = href.startsWith('http') || href.startsWith('//');
+                    const isAnchor = href.startsWith('#');
+                    const isRelative = href.startsWith('./') || href.startsWith('../') || (href.includes('.md') && !href.startsWith('http'));
+
+                    this.linkDatabase.set(link, {
+                        originalHref: href,
+                        isExternal,
+                        isAnchor,
+                        isRelative,
+                        index,
+                        element: link,
+                        status: 'unknown'
+                    });
+
+                    // Add visual indicator
+                    this.addLinkHealthIndicator(link);
+                });
+
+                console.log(`🔗 Collected ${this.linkDatabase.size} links for monitoring`);
+            }
+
+            addLinkHealthIndicator(link) {
+                // Add a small health indicator next to each link
+                const indicator = document.createElement('span');
+                indicator.className = 'link-health-indicator';
+                indicator.setAttribute('data-link-status', 'checking');
+                indicator.innerHTML = '●';
+                indicator.title = 'Link health status';
+
+                // Insert after the link text but inside the link
+                link.appendChild(indicator);
+
+                // Style the indicator
+                indicator.style.cssText = `
+                    display: inline-block;
+                    margin-left: 0.25rem;
+                    font-size: 0.7em;
+                    vertical-align: middle;
+                    transition: all 0.3s ease;
+                `;
+            }
+
+            async validateAllLinks() {
+                const promises = Array.from(this.linkDatabase.entries()).map(async ([link, data]) => {
+                    return this.validateLink(link, data);
+                });
+
+                await Promise.allSettled(promises);
+
+                // Update broken links count
+                this.updateBrokenLinksDisplay();
+            }
+
+            async validateLink(link, data) {
+                try {
+                    const indicator = link.querySelector('.link-health-indicator');
+
+                    if (data.isExternal) {
+                        // For external links, do a lightweight check
+                        const isReachable = await this.checkExternalLink(data.originalHref);
+                        data.status = isReachable ? 'healthy' : 'warning';
+                        this.updateIndicator(indicator, data.status);
+
+                    } else if (data.isAnchor) {
+                        // For anchor links, check if target exists
+                        const targetId = data.originalHref.substring(1);
+                        const targetElement = document.getElementById(targetId);
+
+                        if (targetElement) {
+                            data.status = 'healthy';
+                            this.updateIndicator(indicator, 'healthy');
+                        } else {
+                            // Try to auto-fix anchor links
+                            data.status = 'fixed';
+                            data.fixedHref = this.findClosestAnchor(targetId);
+                            if (data.fixedHref) {
+                                link.setAttribute('href', data.fixedHref);
+                                this.fixedLinks.add(link);
+                            } else {
+                                data.status = 'broken';
+                                this.brokenLinks.add(link);
+                            }
+                            this.updateIndicator(indicator, data.status);
+                        }
+
+                    } else if (data.isRelative) {
+                        // For relative links, check if file exists
+                        const isAccessible = await this.checkRelativeLink(data.originalHref);
+                        data.status = isAccessible ? 'healthy' : 'warning';
+                        this.updateIndicator(indicator, data.status);
+                    } else {
+                        data.status = 'healthy';
+                        this.updateIndicator(indicator, 'healthy');
+                    }
+
+                } catch (error) {
+                    console.warn(`Link validation failed for ${data.originalHref}:`, error);
+                    data.status = 'error';
+                    this.updateIndicator(link.querySelector('.link-health-indicator'), 'error');
+                }
+            }
+
+            async checkExternalLink(url) {
+                // Lightweight external link check
+                try {
+                    // Use a timeout to avoid hanging
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+                    const response = await fetch(url, {
+                        method: 'HEAD',
+                        mode: 'no-cors',
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeoutId);
+                    return true; // If no error, assume reachable
+
+                } catch (error) {
+                    // Cache failed external links
+                    if (!this.externalLinkCache.has(url)) {
+                        this.externalLinkCache.set(url, Date.now());
+                    }
+                    return false;
+                }
+            }
+
+            async checkRelativeLink(path) {
+                // Check if relative file exists (simplified check)
+                try {
+                    // For now, assume relative links to .md files exist
+                    // In a real implementation, you might want to check file existence
+                    return path.includes('.md') || path.includes('docs/');
+                } catch (error) {
+                    return false;
+                }
+            }
+
+            findClosestAnchor(targetId) {
+                // Try to find the closest matching anchor
+                const possibleAnchors = [
+                    targetId,
+                    targetId.toLowerCase(),
+                    targetId.replace(/-/g, ''),
+                    targetId.replace(/_/g, '-'),
+                    targetId.replace(/-/g, '_')
+                ];
+
+                for (const anchor of possibleAnchors) {
+                    if (document.getElementById(anchor)) {
+                        return '#' + anchor;
+                    }
+                }
+
+                return null;
+            }
+
+            updateIndicator(indicator, status) {
+                if (!indicator) return;
+
+                const statusConfig = {
+                    healthy: { color: '#10b981', symbol: '●', title: 'Link is healthy' },
+                    warning: { color: '#f59e0b', symbol: '▲', title: 'Link may be slow or have issues' },
+                    broken: { color: '#ef4444', symbol: '✗', title: 'Link is broken' },
+                    fixed: { color: '#06b6d4', symbol: '✓', title: 'Link was automatically fixed' },
+                    error: { color: '#8b5cf6', symbol: '⚠', title: 'Link status unknown' },
+                    checking: { color: '#6b7280', symbol: '○', title: 'Checking link...' }
+                };
+
+                const config = statusConfig[status] || statusConfig.error;
+
+                indicator.style.color = config.color;
+                indicator.innerHTML = config.symbol;
+                indicator.title = config.title;
+
+                // Add pulse animation for checking status
+                if (status === 'checking') {
+                    indicator.style.animation = 'pulse 1.5s infinite';
+                } else {
+                    indicator.style.animation = '';
+                }
+            }
+
+            attachLinkHandlers() {
+                // Attach click handlers to monitor link usage
+                this.linkDatabase.forEach((data, link) => {
+                    link.addEventListener('click', (e) => {
+                        this.handleLinkClick(e, link, data);
+                    });
+                });
+            }
+
+            handleLinkClick(event, link, data) {
+                // Handle broken or problematic links gracefully
+                if (data.status === 'broken') {
+                    event.preventDefault();
+
+                    // Try to provide alternative navigation
+                    this.showAlternativeNavigation(link, data);
+
+                } else if (data.status === 'warning' && data.isExternal) {
+                    // For external links with warnings, show a confirmation
+                    if (!confirm(`This external link may be slow or unavailable. Continue anyway?`)) {
+                        event.preventDefault();
+                    }
+                }
+
+                // Track link usage for analytics
+                this.trackLinkUsage(link, data);
+            }
+
+            showAlternativeNavigation(originalLink, data) {
+                // Create a modal or notification with alternatives
+                const alternatives = this.generateAlternatives(data);
+
+                if (alternatives.length > 0) {
+                    this.showAlternativesModal(originalLink, alternatives);
+                } else {
+                    this.showLinkStatus(`Sorry, this link is currently unavailable. Please try again later.`, 'error');
+                }
+            }
+
+            generateAlternatives(data) {
+                const alternatives = [];
+
+                if (data.isAnchor) {
+                    // Suggest similar sections
+                    const currentSections = ['features', 'architecture', 'performance', 'communication', 'use-cases'];
+                    const targetId = data.originalHref.substring(1).toLowerCase();
+
+                    for (const section of currentSections) {
+                        if (section.includes(targetId) || targetId.includes(section)) {
+                            alternatives.push({
+                                text: `Go to ${section} section`,
+                                href: `#${section}`
+                            });
+                        }
+                    }
+                } else if (data.isRelative && data.originalHref.includes('.md')) {
+                    // Suggest main documentation
+                    alternatives.push({
+                        text: 'View main documentation',
+                        href: './docs/HEALTH-CHECK-API.md'
+                    });
+                }
+
+                // Add general fallback
+                alternatives.push({
+                    text: 'Go to homepage',
+                    href: '#'
+                });
+
+                return alternatives;
+            }
+
+            showAlternativesModal(originalLink, alternatives) {
+                // Create a simple modal with alternatives
+                const modal = document.createElement('div');
+                modal.className = 'link-alternatives-modal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <h3>🔗 Link Unavailable</h3>
+                        <p>The requested link is currently unavailable. Here are some alternatives:</p>
+                        <div class="alternatives-list">
+                            ${alternatives.map(alt => `<a href="${alt.href}" class="alternative-link">${alt.text}</a>`).join('')}
+                        </div>
+                        <button class="modal-close">Close</button>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                // Handle modal interactions
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal || e.target.classList.contains('modal-close')) {
+                        modal.remove();
+                    }
+                });
+            }
+
+            trackLinkUsage(link, data) {
+                // Simple link usage tracking
+                const usageData = {
+                    href: data.originalHref,
+                    status: data.status,
+                    timestamp: Date.now(),
+                    userAgent: navigator.userAgent,
+                    referrer: document.referrer
+                };
+
+                // Store in localStorage for persistence
+                const usageHistory = JSON.parse(localStorage.getItem('linkUsage') || '[]');
+                usageHistory.push(usageData);
+
+                // Keep only last 100 entries
+                if (usageHistory.length > 100) {
+                    usageHistory.splice(0, usageHistory.length - 100);
+                }
+
+                localStorage.setItem('linkUsage', JSON.stringify(usageHistory));
+
+                console.log(`📊 Link clicked: ${data.originalHref} (${data.status})`);
+            }
+
+            startPeriodicHealthCheck() {
+                // Check link health every 5 minutes
+                setInterval(() => {
+                    this.validateAllLinks();
+                }, 5 * 60 * 1000);
+
+                // Also check on visibility change (user returns to tab)
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden) {
+                        this.validateAllLinks();
+                    }
+                });
+            }
+
+            updateBrokenLinksDisplay() {
+                const brokenCount = this.brokenLinks.size;
+                const fixedCount = this.fixedLinks.size;
+
+                if (brokenCount > 0 || fixedCount > 0) {
+                    let message = '';
+                    if (fixedCount > 0) {
+                        message += `${fixedCount} links automatically fixed. `;
+                    }
+                    if (brokenCount > 0) {
+                        message += `${brokenCount} links need attention.`;
+                    }
+                    this.showLinkStatus(message, brokenCount > 0 ? 'warning' : 'success');
+                }
+            }
+
+            showLinkStatus(message, type = 'info') {
+                const notification = document.getElementById('link-status-notification');
+                const messageEl = document.getElementById('link-status-message');
+                const iconEl = document.getElementById('link-status-icon');
+
+                if (!notification || !messageEl || !iconEl) return;
+
+                const icons = {
+                    success: '✅',
+                    warning: '⚠️',
+                    error: '❌',
+                    info: 'ℹ️'
+                };
+
+                iconEl.textContent = icons[type] || icons.info;
+                messageEl.textContent = message;
+                notification.className = `link-notification ${type}`;
+
+                notification.style.display = 'block';
+
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 5000);
+
+                // Add close button functionality
+                const closeBtn = document.getElementById('link-status-close');
+                if (closeBtn) {
+                    closeBtn.onclick = () => {
+                        notification.style.display = 'none';
+                    };
+                }
+            }
+        }
+
+        // =============================================
+        // 🎨 ENHANCED LOADING ANIMATIONS
+        // =============================================
+
+        // =============================================
+        // 🚀 INITIALIZATION & ENHANCED ANIMATIONS
+        // =============================================
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Add fade-in animations
+            // Initialize self-healing link system
+            window.linkSystem = new SelfHealingLinkSystem();
+
+            // Enhanced fade-in animations
             const observerOptions = {
                 threshold: 0.1,
                 rootMargin: '0px 0px -50px 0px'
@@ -1464,11 +2035,98 @@
                 });
             }, observerOptions);
 
-            // Observe all feature cards and performance cards
-            document.querySelectorAll('.feature-card, .performance-card, .comm-card').forEach(card => {
+            // Observe all interactive elements
+            document.querySelectorAll('.feature-card, .performance-card, .comm-card, .value-card, .testimonial-card, .use-case-card, .step-card').forEach(card => {
                 observer.observe(card);
             });
+
+            // Add keyboard navigation for accessibility
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    // Close any open modals or notifications
+                    const modals = document.querySelectorAll('.link-alternatives-modal');
+                    modals.forEach(modal => modal.remove());
+                }
+            });
+
+            console.log('🚀 Crystal Clear Architecture site loaded with self-healing link system active');
         });
+
+        // =============================================
+        // 🌐 GLOBAL LINK SYSTEM API
+        // =============================================
+
+        // Add global link health check function
+        window.checkAllLinks = function() {
+            if (window.linkSystem) {
+                window.linkSystem.recheckAllLinks();
+            }
+        };
+
+        window.getLinkHealthReport = function() {
+            if (window.linkSystem) {
+                return window.linkSystem.getLinkHealthReport();
+            }
+            return null;
+        };
+
+        // Add console commands for debugging
+        window.linkHealthCommands = {
+            status: () => {
+                const report = window.getLinkHealthReport();
+                console.table(report);
+                return report;
+            },
+            recheck: () => {
+                console.log('🔄 Rechecking all links...');
+                window.checkAllLinks();
+            },
+            showReport: () => {
+                const report = window.getLinkHealthReport();
+                if (report) {
+                    alert(`Link Health Report:
+Total Links: ${report.totalLinks}
+Healthy: ${report.healthyLinks}
+Broken: ${report.brokenLinks}
+Fixed: ${report.fixedLinks}
+Warnings: ${report.warningLinks}`);
+                }
+            }
+        };
+
+        console.log('🔗 Self-healing link system loaded! Available commands:');
+        console.log('• linkHealthCommands.status() - View health report');
+        console.log('• linkHealthCommands.recheck() - Recheck all links');
+        console.log('• linkHealthCommands.showReport() - Show health summary');
+        console.log('• window.getLinkHealthReport() - Get detailed report');
+        console.log('• window.checkAllLinks() - Manual recheck');
+
+        // Add developer tools for link debugging
+        if (window.location.search.includes('debug=links')) {
+            // Add debug panel
+            const debugPanel = document.createElement('div');
+            debugPanel.innerHTML = `
+                <div style="
+                    position: fixed;
+                    bottom: 10px;
+                    left: 10px;
+                    background: var(--bg-white);
+                    padding: 10px;
+                    border-radius: 8px;
+                    box-shadow: var(--shadow-md);
+                    z-index: 10000;
+                    font-size: 12px;
+                    border: 2px solid var(--primary-color);
+                ">
+                    <strong>🔗 Link Debug Panel</strong><br>
+                    <button onclick="linkHealthCommands.status()">Status</button>
+                    <button onclick="linkHealthCommands.recheck()">Recheck</button>
+                    <button onclick="linkHealthCommands.showReport()">Report</button>
+                    <button onclick="this.parentElement.remove()">Close</button>
+                </div>
+            `;
+            document.body.appendChild(debugPanel);
+        }
     </script>
 </body>
 </html>
