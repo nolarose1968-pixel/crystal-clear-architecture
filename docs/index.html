@@ -726,6 +726,80 @@
             color: var(--primary-color);
         }
 
+        /* Performance Monitoring Highlight */
+        .performance-monitoring-highlight {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin: 2rem 0;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            align-items: center;
+            border: 1px solid #e5e7eb;
+            box-shadow: var(--shadow);
+        }
+
+        .highlight-content h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .highlight-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .highlight-features {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .highlight-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .highlight-visual {
+            text-align: center;
+        }
+
+        .metric-preview {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .metric-item {
+            background: white;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .metric-item .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-item .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
         /* Footer */
         .footer {
             padding: 2rem 0;
@@ -993,8 +1067,10 @@
                 <a href="#features">Features</a>
                 <a href="#architecture">Architecture</a>
                 <a href="#performance">Performance</a>
+                <a href="performance-monitoring.html">🚀 Monitoring</a>
                 <a href="#communication">Communication</a>
                 <a href="#use-cases">Use Cases</a>
+                <a href="dependency-analysis.html">🔍 Dependencies</a>
                 <a href="https://github.com/nolarose1968-pixel/crystal-clear-architecture" target="_blank">GitHub</a>
                 <a href="https://dashboard-worker.brendawill2233.workers.dev/dashboard" target="_blank" class="cta-button">Live Demo</a>
             </nav>
@@ -1340,6 +1416,37 @@
     <section class="performance" id="performance">
         <div class="container">
             <h2 class="section-title">⚡ Performance Breakthrough</h2>
+
+            <!-- Performance Monitoring Suite Highlight -->
+            <div class="performance-monitoring-highlight">
+                <div class="highlight-content">
+                    <h3>🚀 New: Enterprise Performance Monitoring Suite</h3>
+                    <p>Real-time monitoring, load testing, and AI-powered optimization for your analytics systems.</p>
+                    <div class="highlight-features">
+                        <span class="highlight-badge">📊 Real-Time Monitoring</span>
+                        <span class="highlight-badge">🧪 Load Testing</span>
+                        <span class="highlight-badge">💡 AI Insights</span>
+                        <span class="highlight-badge">🎯 5 Test Scenarios</span>
+                    </div>
+                    <a href="performance-monitoring.html" class="cta-button">Explore Performance Suite</a>
+                </div>
+                <div class="highlight-visual">
+                    <div class="metric-preview">
+                        <div class="metric-item">
+                            <span class="metric-value"><100ms</span>
+                            <span class="metric-label">Response Time</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-value">99.9%</span>
+                            <span class="metric-label">Accuracy</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-value">5</span>
+                            <span class="metric-label">Test Types</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <p class="section-subtitle">
                 Cutting-edge performance technologies delivering 70-80% latency reduction
             </p>
