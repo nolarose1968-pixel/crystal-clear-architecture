@@ -47,10 +47,18 @@ class DepartmentPagesGenerator {
       if (existsSync(deptConfigPath)) {
         const deptConfig = JSON.parse(readFileSync(deptConfigPath, 'utf-8'));
         // Merge configurations
-        this.departments = this.mergeDepartmentData(this.departments, deptConfig.departments);
+        if (deptConfig.departments && Array.isArray(deptConfig.departments)) {
+          this.departments = this.mergeDepartmentData(this.departments, deptConfig.departments);
+        }
+      }
+
+      // Ensure departments is always an array
+      if (!Array.isArray(this.departments)) {
+        this.departments = [];
       }
     } catch (error) {
       console.error('❌ Error loading departments:', error);
+      this.departments = [];
     }
   }
 

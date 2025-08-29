@@ -279,7 +279,6 @@ export class PatternConnector {
           { pattern: 'TABULAR', action: 'Display results' }
         ];
         
-        console.log(Bun.inspect.table(workflow));
         return workflow;
       },
       
@@ -292,7 +291,6 @@ export class PatternConnector {
           { pattern: 'SECURE', action: 'Secure sensitive data' }
         ];
         
-        console.log(Bun.inspect.table(workflow));
         return workflow;
       },
       
@@ -305,7 +303,6 @@ export class PatternConnector {
           { pattern: 'TIMING', action: 'Measure compilation' }
         ];
         
-        console.log(Bun.inspect.table(workflow));
         return workflow;
       },
       
@@ -318,7 +315,6 @@ export class PatternConnector {
           { pattern: 'TABULAR', action: 'Display results' }
         ];
         
-        console.log(Bun.inspect.table(workflow));
         return workflow;
       },
       
@@ -332,7 +328,6 @@ export class PatternConnector {
           { pattern: 'TIMING', action: 'Measure setup time' }
         ];
         
-        console.log(Bun.inspect.table(workflow));
         return workflow;
       },
       
@@ -345,8 +340,6 @@ export class PatternConnector {
           { pattern: 'TIMING', action: 'Measure streaming performance' }
         ];
         
-        console.log(`\n🔄 File Streaming Analysis Workflow for: ${filePath}`);
-        console.log(Bun.inspect.table(workflow));
         
         // Execute workflow
         const fileInfo = await patternWeaver.applyPattern('FILESYSTEM', {
@@ -355,11 +348,9 @@ export class PatternConnector {
         });
         
         if (!fileInfo.exists) {
-          console.log(`❌ File not found: ${filePath}`);
           return { error: 'File not found', workflow };
         }
         
-        console.log(`📊 File Info: ${fileInfo.size} bytes, type: ${fileInfo.type || 'unknown'}`);
         
         const streamResult = await patternWeaver.applyPattern('STREAM', {
           source: 'file',
@@ -382,8 +373,6 @@ export class PatternConnector {
             { Metric: 'Data Types', Value: streamResult.analysis.dataTypes.join(', ') || 'Text' }
           ]);
           
-          console.log('\n📈 Stream Analysis Results:');
-          console.log(analysisTable.formatted);
           
           if (Object.keys(streamResult.analysis.patterns).length > 0) {
             const patternTable = patternWeaver.applyPattern('TABULAR', 
@@ -394,12 +383,9 @@ export class PatternConnector {
               }))
             );
             
-            console.log('\n🔍 Pattern Analysis:');
-            console.log(patternTable.formatted);
           }
         }
         
-        console.log(`\n⚡ Performance: ${streamResult.processingTime}, Throughput: ${streamResult.throughput}`);
         
         return { fileInfo, streamResult, workflow };
       },
@@ -413,8 +399,6 @@ export class PatternConnector {
           { pattern: 'TABULAR', action: 'Summary report' }
         ];
         
-        console.log(`\n🗂️  Large File Processing Workflow: ${filePath}`);
-        console.log(Bun.inspect.table(workflow));
         
         // Get file info first
         const fileInfo = await patternWeaver.applyPattern('FILESYSTEM', {
@@ -427,7 +411,6 @@ export class PatternConnector {
         }
         
         const isLargeFile = fileInfo.size > 10 * 1024 * 1024; // > 10MB
-        console.log(`📦 File size: ${(fileInfo.size / 1024 / 1024).toFixed(2)} MB ${isLargeFile ? '(Large file detected)' : ''}`);
         
         // Process with chunking
         const streamResult = await patternWeaver.applyPattern('STREAM', {
@@ -436,7 +419,6 @@ export class PatternConnector {
           bufferSize: chunkSize,
           chunkProcessor: async (chunk: Uint8Array, index: number) => {
             // Process each chunk
-            console.log(`📝 Processing chunk ${index + 1}: ${chunk.length} bytes`);
             
             // Example: Count specific patterns in chunk
             const text = Buffer.from(chunk).toString('utf8');
@@ -461,8 +443,6 @@ export class PatternConnector {
         ];
         
         const summaryTable = patternWeaver.applyPattern('TABULAR', summary);
-        console.log('\n📊 Processing Summary:');
-        console.log(summaryTable.formatted);
         
         return { fileInfo, streamResult, summary, workflow };
       },
@@ -476,8 +456,6 @@ export class PatternConnector {
           { pattern: 'TABULAR', action: 'Difference report' }
         ];
         
-        console.log(`\n🔍 File Comparison Workflow: ${file1} vs ${file2}`);
-        console.log(Bun.inspect.table(workflow));
         
         // Get info for both files
         const [info1, info2] = await Promise.all([
@@ -511,8 +489,6 @@ export class PatternConnector {
         ];
         
         const comparisonTable = patternWeaver.applyPattern('TABULAR', comparison);
-        console.log('\n📈 File Comparison Results:');
-        console.log(comparisonTable.formatted);
         
         return { info1, info2, stream1, stream2, comparison, workflow };
       },
@@ -528,8 +504,6 @@ export class PatternConnector {
           { pattern: 'SECURE', action: 'Validate file security' }
         ];
         
-        console.log(`\n🔄 Multi-Pattern Streaming Workflow: ${filePath}`);
-        console.log(Bun.inspect.table(workflow));
         
         // Step 1: FILESYSTEM pattern for validation
         const fileValidation = await patternWeaver.applyPattern('FILESYSTEM', {
@@ -538,7 +512,6 @@ export class PatternConnector {
         });
         
         if (!fileValidation.allValid) {
-          console.log(`❌ File validation failed for: ${filePath}`);
           return { error: 'File validation failed', workflow };
         }
         
@@ -560,7 +533,7 @@ export class PatternConnector {
             });
             
             // Security check for sensitive patterns
-            const hasSensitive = text.match(/password|key|secret|token/i) !== null;
+            const hasSensitive = text.match(/password|key|secret|token/i) !=== null;
             
             return {
               textWidth: width,
@@ -605,8 +578,6 @@ export class PatternConnector {
           { Metric: 'Workflow Time', Value: timedResult.formatted }
         ]);
         
-        console.log('\n📊 Multi-Pattern Processing Summary:');
-        console.log(summaryTable.formatted);
         
         // Analysis results table
         if (streamProcessing.analysis) {
@@ -619,8 +590,6 @@ export class PatternConnector {
             { Analysis: 'Pattern Count', Value: Object.keys(streamProcessing.analysis.patterns).length }
           ]);
           
-          console.log('\n📈 Detailed Analysis:');
-          console.log(analysisTable.formatted);
         }
         
         // Security summary if sensitive content found
@@ -629,7 +598,6 @@ export class PatternConnector {
         );
         
         if (sensitiveChunks.length > 0) {
-          console.log(`\n🔒 Security Alert: ${sensitiveChunks.length} chunks contain potentially sensitive content`);
           
           const securityTable = patternWeaver.applyPattern('TABULAR', [
             { Security: 'Sensitive Chunks', Value: sensitiveChunks.length },
@@ -638,7 +606,6 @@ export class PatternConnector {
             { Security: 'Recommendation', Value: 'Review content before sharing' }
           ]);
           
-          console.log(securityTable.formatted);
         }
         
         return {
@@ -661,8 +628,6 @@ export class PatternConnector {
           { pattern: 'UTILITIES', action: 'Output formatting and export' }
         ];
         
-        console.log(`\n🏭 Cross-Pattern Data Pipeline: ${inputFiles.length} files → ${outputFormat.toUpperCase()}`);
-        console.log(Bun.inspect.table(workflow));
         
         // Step 1: Batch file validation using FILESYSTEM pattern
         const batchValidation = await patternWeaver.applyPattern('FILESYSTEM', {
@@ -670,7 +635,6 @@ export class PatternConnector {
           paths: inputFiles
         });
         
-        console.log(`📋 Validation: ${batchValidation.existingFiles}/${batchValidation.totalFiles} files found`);
         
         const validFiles = batchValidation.results
           .filter((r: any) => r.exists)
@@ -684,7 +648,6 @@ export class PatternConnector {
         const pipelineStart = Bun.nanoseconds();
         
         const streamPromises = validFiles.map(async (file: string, index: number) => {
-          console.log(`🔄 Processing file ${index + 1}/${validFiles.length}: ${file.split('/').pop()}`);
           
           return await patternWeaver.applyPattern('STREAM', {
             source: 'file',
@@ -748,8 +711,6 @@ export class PatternConnector {
               data1: aggregatedData,
               data2: aggregatedData // This will just return the data structure
             });
-            console.log('\n📄 JSON Output:');
-            console.log(JSON.stringify(aggregatedData, null, 2));
             break;
             
           case 'csv':
@@ -759,15 +720,11 @@ export class PatternConnector {
               Object.values(row).map(val => `"${val}"`).join(',')
             );
             finalOutput = [csvHeaders, ...csvRows].join('\n');
-            console.log('\n📊 CSV Output:');
-            console.log(finalOutput);
             break;
             
           case 'table':
           default:
             finalOutput = patternWeaver.applyPattern('TABULAR', aggregatedData);
-            console.log('\n📋 Tabular Output:');
-            console.log(finalOutput.formatted);
             break;
         }
         
@@ -783,8 +740,6 @@ export class PatternConnector {
         ];
         
         const summaryTable = patternWeaver.applyPattern('TABULAR', pipelineSummary);
-        console.log('\n⚡ Pipeline Performance Summary:');
-        console.log(summaryTable.formatted);
         
         return {
           batchValidation,
@@ -811,9 +766,6 @@ export class PatternConnector {
    * Initialize pattern connections throughout the app
    */
   static async initialize() {
-    console.log("╭─────────────────────────────────────────────────────────╮");
-    console.log("│           Initializing Pattern Connections              │");
-    console.log("╰─────────────────────────────────────────────────────────╯");
     
     // Register core patterns
     const patterns = [
@@ -853,7 +805,6 @@ export class PatternConnector {
     }
     
     // Display pattern web
-    console.log("\n" + patternWeaver.visualizePatternWeb());
     
     // Show connection points
     const connections = {
@@ -863,8 +814,6 @@ export class PatternConnector {
       'Workflows': Object.keys(this.defineWorkflows()).length
     };
     
-    console.log("\nPattern Connection Summary:");
-    console.log(Bun.inspect.table(
       Object.entries(connections).map(([type, count]) => ({
         'Connection Type': type,
         'Count': count,
@@ -885,7 +834,6 @@ export function withPattern(patternName: string, fn: Function) {
   return async (...args: any[]) => {
     const timing = patternWeaver.applyPattern('TIMING', () => fn(...args));
     
-    console.log(`[Pattern: ${patternName}] Executed in ${timing.formatted}`);
     
     return timing.result;
   };
@@ -899,7 +847,6 @@ export function UsePattern(patternName: string) {
     const originalMethod = descriptor.value;
     
     descriptor.value = async function(...args: any[]) {
-      console.log(`[${patternName}] Applying to ${propertyName}`);
       
       const timing = patternWeaver.applyPattern('TIMING', () => 
         originalMethod.apply(this, args)

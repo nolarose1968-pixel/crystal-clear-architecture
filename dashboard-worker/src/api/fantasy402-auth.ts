@@ -33,7 +33,6 @@ export class Fantasy402Auth {
    */
   async login(): Promise<AuthResponse> {
     try {
-      console.log(`🔐 Attempting login for user: ${this.username}`);
 
       // Prepare the form data exactly as shown in the cURL
       const formData = new URLSearchParams({
@@ -65,14 +64,12 @@ export class Fantasy402Auth {
         body: formData.toString()
       });
 
-      console.log(`📡 Response Status: ${response.status}`);
 
       // Extract cookies from response headers
       const cookies: string[] = [];
       const setCookieHeader = response.headers.get('set-cookie');
       if (setCookieHeader) {
         cookies.push(setCookieHeader);
-        console.log(`🍪 Received cookies: ${setCookieHeader.slice(0, 100)}...`);
       }
 
       // Parse individual cookies
@@ -86,9 +83,7 @@ export class Fantasy402Auth {
       
       try {
         responseData = JSON.parse(responseText);
-        console.log(`📦 Response data:`, JSON.stringify(responseData).slice(0, 200));
       } catch {
-        console.log(`📄 Response text:`, responseText.slice(0, 200));
         responseData = responseText;
       }
 
@@ -106,7 +101,6 @@ export class Fantasy402Auth {
         if (responseData && typeof responseData === 'object') {
           if (responseData.code) {
             this.session.bearerToken = responseData.code;
-            console.log(`🎫 JWT Bearer token received!`);
             
             // Decode JWT to get expiration
             try {
@@ -114,12 +108,8 @@ export class Fantasy402Auth {
               const decoded = JSON.parse(atob(payload));
               if (decoded.exp) {
                 this.session.expiresAt = decoded.exp * 1000; // Convert to milliseconds
-                console.log(`   Token expires at: ${new Date(this.session.expiresAt).toISOString()}`);
               }
-              console.log(`   JWT Subject: ${decoded.sub}`);
-              console.log(`   JWT Office: ${decoded.off}`);
             } catch (e) {
-              console.log(`   Could not decode JWT`);
             }
           }
           
@@ -132,7 +122,6 @@ export class Fantasy402Auth {
           }
         }
 
-        console.log(`✅ Login successful! Session ID: ${this.session.phpSessionId}`);
 
         return {
           success: true,
@@ -162,7 +151,6 @@ export class Fantasy402Auth {
    */
   async request(endpoint: string, method: string = 'POST', data?: any): Promise<any> {
     if (!this.session) {
-      console.log('🔄 No session, attempting login...');
       const loginResult = await this.login();
       if (!loginResult.success) {
         throw new Error('Authentication failed');
@@ -171,7 +159,6 @@ export class Fantasy402Auth {
 
     // Build cookie header from session
     const cookieHeader = this.buildCookieHeader();
-    console.log(`🍪 Using cookies: ${cookieHeader.slice(0, 100)}...`);
 
     const headers: HeadersInit = {
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -203,7 +190,6 @@ export class Fantasy402Auth {
       }
     }
 
-    console.log(`📡 Making request to: ${url}`);
     const response = await fetch(url, options);
     const responseText = await response.text();
 

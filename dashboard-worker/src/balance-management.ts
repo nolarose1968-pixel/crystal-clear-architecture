@@ -195,7 +195,6 @@ export class BalanceAuditTrail {
         event.riskScore || 0
       );
 
-      console.log(`✅ Balance change logged: ${event.changeType} for ${event.customerId}`);
     } catch (error) {
       console.error('❌ Failed to log balance change:', error);
       throw error;
@@ -694,7 +693,6 @@ export class BalanceManager {
 
   private static async setCurrentBalance(customerId: string, balance: number): Promise<void> {
     // This would integrate with your existing balance update logic
-    console.log(`Setting balance for ${customerId} to $${balance}`);
   }
 
   private static calculateRiskScore(
@@ -805,7 +803,6 @@ export async function initializeBalanceTables(): Promise<void> {
       ON balance_threshold_alerts(customer_id, acknowledged)
     `).run();
 
-    console.log('✅ Balance management tables initialized successfully');
   } catch (error) {
     console.error('❌ Failed to initialize balance tables:', error);
     throw error;

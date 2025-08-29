@@ -81,7 +81,6 @@ export class Fire22Scoreboard extends EventEmitter {
   }
 
   private async initializeScoreboard(): Promise<void> {
-    console.log('🏆 Initializing Fire22 Scoreboard...');
 
     // Setup event listeners for UI elements
     this.setupUIEventListeners();
@@ -97,7 +96,6 @@ export class Fire22Scoreboard extends EventEmitter {
     // Setup keyboard shortcuts
     this.setupKeyboardShortcuts();
 
-    console.log('✅ Fire22 Scoreboard initialized');
   }
 
   private setupUIEventListeners(): void {
@@ -226,7 +224,6 @@ export class Fire22Scoreboard extends EventEmitter {
         this.games.set(game.id, game);
       });
 
-      console.log(`📊 Loaded ${mockGames.length} games`);
       this.emit('games-loaded', mockGames);
 
     } catch (error) {
@@ -274,7 +271,6 @@ export class Fire22Scoreboard extends EventEmitter {
     }
 
     this.emit('scoreboard-shown');
-    console.log('🏆 Scoreboard shown');
   }
 
   /**
@@ -289,7 +285,6 @@ export class Fire22Scoreboard extends EventEmitter {
 
     this.isVisible = false;
     this.emit('scoreboard-closed');
-    console.log('📊 Scoreboard closed');
   }
 
   /**
@@ -735,7 +730,6 @@ export class Fire22Scoreboard extends EventEmitter {
     const game = this.games.get(gameId);
     if (!game) return;
 
-    console.log(`🎯 Selected game: ${game.homeTeam} vs ${game.awayTeam}`);
 
     // Show game details modal or trigger betting interface
     this.showGameDetails(game);
@@ -842,7 +836,6 @@ export class Fire22Scoreboard extends EventEmitter {
    * Refresh scoreboard
    */
   async refreshScoreboard(): Promise<void> {
-    console.log('🔄 Refreshing scoreboard...');
 
     // Simulate refreshing game data
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -875,7 +868,6 @@ export class Fire22Scoreboard extends EventEmitter {
     }
 
     this.emit('scoreboard-refreshed');
-    console.log('✅ Scoreboard refreshed');
   }
 
   /**
@@ -883,7 +875,6 @@ export class Fire22Scoreboard extends EventEmitter {
    */
   private async exportScoreboard(): Promise<void> {
     try {
-      console.log('📊 Exporting scoreboard...');
 
       const games = Array.from(this.games.values());
       const timestamp = new Date().toISOString().slice(0, 10);
@@ -935,7 +926,6 @@ export class Fire22Scoreboard extends EventEmitter {
         }
       });
 
-      console.log('✅ Scoreboard exported successfully');
 
     } catch (error) {
       console.error('❌ Failed to export scoreboard:', error);
@@ -983,7 +973,6 @@ export class Fire22Scoreboard extends EventEmitter {
     this.games.clear();
     this.removeAllListeners();
 
-    console.log('🧹 Fire22 Scoreboard cleaned up');
   }
 }
 

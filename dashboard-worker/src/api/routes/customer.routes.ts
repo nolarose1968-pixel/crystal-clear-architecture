@@ -7,14 +7,21 @@ import { Router } from 'itty-router';
 import { validate } from '../middleware/validate.middleware';
 import { authorize } from '../middleware/authorize.middleware';
 import * as controller from '../controllers/customer.controller';
-import * as schemas from '@fire22/validator/schemas';
+import * as schemas from '../schemas/index';
 
-const router = Router({ base: '/customer' });
+const router = Router({ base: '/customers' });
 
 // /api/customer/getHeriarchy (from server.js:954)
 router.post('/getHeriarchy',
   authorize(["customer.*"]),
   controller.getHeriarchy
+);
+
+// Create new customer
+router.post('/',
+  authorize(["customer.create", "admin.*"]),
+  validate(schemas.CreateCustomerDashboardRequestSchema),
+  controller.createCustomer
 );
 
 export const customerRoutes = router;

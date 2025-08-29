@@ -82,7 +82,6 @@ export class EnhancedAPIService {
       const config = await enhancedConfigManager.getEnhancedConfig();
       if (config.JWT_SECRET) {
         // In a real implementation, you'd decrypt and validate the stored token
-        console.log('🔐 Loaded JWT secret from enhanced security storage');
       }
     } catch (error) {
       console.warn('⚠️ Could not load stored tokens:', error);
@@ -143,7 +142,6 @@ export class EnhancedAPIService {
       sessionStorage.setItem('fire22_token_expiry', this.tokenExpiry.toString());
     }
 
-    console.log('🔐 Authentication tokens set');
   }
 
   /**
@@ -171,7 +169,6 @@ export class EnhancedAPIService {
       if (response.ok) {
         const data: TokenResponse = await response.json();
         this.setAuthTokens(data.access_token, data.refresh_token);
-        console.log('🔄 Token refreshed successfully');
         return true;
       } else {
         console.error('❌ Token refresh failed:', response.status);
@@ -199,7 +196,6 @@ export class EnhancedAPIService {
       sessionStorage.removeItem('fire22_token_expiry');
     }
 
-    console.log('🗑️ Authentication tokens cleared');
   }
 
   /**
@@ -211,7 +207,6 @@ export class EnhancedAPIService {
 
     // Check token expiry and refresh if needed
     if (this.token && this.isTokenExpired()) {
-      console.log('🔄 Token expired, attempting refresh...');
       const refreshed = await this.refreshAuthToken();
       if (!refreshed) {
         throw new Error('Token refresh failed');
@@ -281,7 +276,6 @@ export class EnhancedAPIService {
 
         // Handle 401 Unauthorized
         if (response.status === 401 && attempt < this.config.retryAttempts) {
-          console.log(`🔄 Attempt ${attempt}: Token expired, refreshing...`);
           const refreshed = await this.refreshAuthToken();
           if (refreshed) {
             // Update authorization header
@@ -402,7 +396,6 @@ export class EnhancedAPIService {
 
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('🔒 Security Audit:', auditLog);
     }
 
     // Send to security monitoring endpoint if configured
@@ -456,7 +449,6 @@ export class EnhancedAPIService {
    */
   updateSecurityConfig(updates: Partial<APIConfig>): void {
     this.config = { ...this.config, ...updates };
-    console.log('🔧 Security configuration updated:', updates);
   }
 }
 
@@ -465,25 +457,8 @@ export const enhancedAPI = new EnhancedAPIService();
 
 // Run if called directly
 if (import.meta.main) {
-  console.log('🔐 Enhanced API Service - Fire22 Security Integration');
-  console.log('=' .repeat(60));
-  console.log('This service provides:');
-  console.log('• JWT token authentication and management');
-  console.log('• Enhanced security headers and validation');
-  console.log('• Protected resource access methods');
-  console.log('• Security monitoring and audit logging');
-  console.log('• Integration with Fire22 enhanced security');
-  console.log('=' .repeat(60));
   
   // Show current configuration
   const status = enhancedAPI.getSecurityStatus();
-  console.log('\n📊 Current Security Status:');
-  console.log(`   Security Level: ${status.securityLevel}`);
-  console.log(`   Client ID: ${status.clientId}`);
-  console.log(`   Authenticated: ${status.authenticated}`);
-  console.log(`   Token Expired: ${status.tokenExpired}`);
   
-  console.log('\n✅ Enhanced API Service is ready for use!');
-  console.log('   Import and use in your dashboard:');
-  console.log('   import { enhancedAPI } from "./src/api/enhanced-api-service"');
 }

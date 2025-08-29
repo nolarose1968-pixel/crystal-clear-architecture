@@ -198,20 +198,14 @@ const server = Bun.serve({
   }
 });
 
-console.log(`🚀 Fire22 Staging Review Server with ETag support`);
-console.log(`📍 Running at: ${server.url}`);
-console.log(`✨ Automatic ETag generation enabled for all static and JSON routes`);
-console.log(`💾 Bandwidth savings active with 304 Not Modified responses`);
 
 // Demo: Testing ETag functionality
 async function testETagSupport() {
-  console.log("\n🧪 Testing ETag Support...\n");
   
   // Test static route
   const staticUrl = new URL("/", server.url);
   const staticResponse = await fetch(staticUrl);
   const staticETag = staticResponse.headers.get("etag");
-  console.log(`Static HTML ETag: ${staticETag}`);
   
   // Test with If-None-Match (should return 304)
   const cachedResponse = await fetch(staticUrl, {
@@ -219,13 +213,11 @@ async function testETagSupport() {
       "If-None-Match": staticETag
     }
   });
-  console.log(`Cached response status: ${cachedResponse.status} (should be 304)`);
   
   // Test JSON endpoint
   const jsonUrl = new URL("/api/reviews/pending", server.url);
   const jsonResponse = await fetch(jsonUrl);
   const jsonETag = jsonResponse.headers.get("etag");
-  console.log(`\nJSON API ETag: ${jsonETag}`);
   
   // Test JSON with If-None-Match
   const cachedJsonResponse = await fetch(jsonUrl, {
@@ -233,14 +225,9 @@ async function testETagSupport() {
       "If-None-Match": jsonETag
     }
   });
-  console.log(`Cached JSON status: ${cachedJsonResponse.status} (should be 304)`);
   
   // Demonstrate bandwidth savings
   const fullSize = (await staticResponse.text()).length;
-  console.log(`\n💾 Bandwidth Savings:`);
-  console.log(`Full response size: ${fullSize} bytes`);
-  console.log(`304 response size: ~150 bytes`);
-  console.log(`Savings per request: ${fullSize - 150} bytes (${Math.round((fullSize - 150) / fullSize * 100)}%)`);
 }
 
 // Run test after 1 second

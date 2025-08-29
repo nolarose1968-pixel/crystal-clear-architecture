@@ -71,4 +71,10 @@ router.get('/debug/cache-stats',
   controller.debugCacheStats
 );
 
+// /api/admin/system/rules - System rules and policies
+router.get('/system/rules',
+  authorize(["admin.*", "system.read"]),
+  controller.getRules
+);
+
 export const adminRoutes = router;

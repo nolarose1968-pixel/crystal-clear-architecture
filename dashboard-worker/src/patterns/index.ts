@@ -162,34 +162,24 @@ export const PatternUtils = {
  * Initialize the entire pattern system
  */
 export async function initializePatterns() {
-  console.log("╭─────────────────────────────────────────────────────────╮");
-  console.log("│                 🕸️ PATTERN WEAVER SYSTEM                │");
-  console.log("│         Initializing Pattern Connections...            │");
-  console.log("╰─────────────────────────────────────────────────────────╯");
-  console.log();
   
   // Initialize pattern connections
   await PatternConnector.initialize();
   
   // Display pattern registry
-  console.log("\n📚 Pattern Registry:");
   const registryTable = Object.entries(PatternRegistry.patterns).map(([key, name]) => ({
     Pattern: key,
     Description: name,
     Connections: PatternRegistry.connections.get(key.split('_')[0])?.length || 0
   }));
-  console.log(Bun.inspect.table(registryTable));
   
   // Show pattern contexts
-  console.log("\n🔗 Pattern Contexts:");
   const contextTable = Array.from(PatternRegistry.connections.entries()).map(([context, patterns]) => ({
     Context: context,
     Patterns: patterns.join(', '),
     Count: patterns.length
   }));
-  console.log(Bun.inspect.table(contextTable));
   
-  console.log("\n✅ Pattern system initialized successfully!");
   
   return {
     weaver: patternWeaver,
@@ -228,7 +218,6 @@ export const PatternExamples = {
     const results = await PatternUtils.parallel(
       { pattern: 'VERSIONER', context: { type: 'increment', version: config.version, release: 'patch' } },
       { pattern: 'BUILDER', context: config },
-      { pattern: 'TIMING', context: () => console.log('Building...') }
     );
     return results;
   },
@@ -240,7 +229,6 @@ export const PatternExamples = {
       const processed = await PatternUtils.chain(
         { pattern: 'LOADER', context: file },
         { pattern: 'STYLER', context: file },
-        { pattern: 'TIMING', context: () => console.log(`Processing ${file}`) }
       );
       results.push(processed);
     }
@@ -375,7 +363,6 @@ export const PatternExamples = {
   async getFileDetails(filePath: string) {
     const results = await PatternUtils.chain(
       { pattern: 'FILESYSTEM', context: { operation: 'info', path: filePath } },
-      { pattern: 'TIMING', context: () => console.log(`Getting info for ${filePath}`) },
       { pattern: 'TABULAR', context: [] }
     );
     return results;
@@ -462,7 +449,6 @@ export const PatternExamples = {
     const results = await PatternUtils.chain(
       { pattern: 'UTILITIES', context: { operation: 'gzip', input: buffer } },
       { pattern: 'UTILITIES', context: { operation: 'gunzip', input: null } }, // result from previous
-      { pattern: 'TIMING', context: () => console.log('Compression cycle complete') }
     );
     
     return {
@@ -936,7 +922,6 @@ export const PatternExamples = {
       // Performance timing
       { 
         pattern: 'TIMING',
-        context: () => console.log('Processing large file...')
       }
     );
     
@@ -1111,8 +1096,6 @@ export const PatternExamples = {
   },
   // Advanced file streaming workflow
   async fileStreamingWorkflow() {
-    console.log("🌊 Advanced File Streaming Analysis");
-    console.log("═".repeat(50));
     
     // Test with the pattern-weaver.ts file itself
     const filePath = './src/patterns/pattern-weaver.ts';
@@ -1123,7 +1106,6 @@ export const PatternExamples = {
       path: filePath
     });
     
-    console.log("\n📊 File Information:");
     const infoTable = await patternWeaver.applyPattern('TABULAR', {
       data: [
         { Property: 'Path', Value: filePath },
@@ -1132,10 +1114,8 @@ export const PatternExamples = {
         { Property: 'Last Modified', Value: new Date(fileInfo.lastModified).toLocaleString() }
       ]
     }) as TabularResult;
-    console.log(infoTable.formatted);
     
     // Step 2: Stream with advanced analysis
-    console.log("\n🔄 Streaming with Analysis...");
     const streamResult = await patternWeaver.applyPattern('STREAM', {
       source: 'file',
       filePath,
@@ -1157,7 +1137,6 @@ export const PatternExamples = {
     });
     
     if (streamResult.success && streamResult.analysis) {
-      console.log("\n📈 Analysis Results:");
       const analysisTable = await patternWeaver.applyPattern('TABULAR', {
         data: [
           { Metric: 'Total Lines', Value: streamResult.analysis.lineCount.toLocaleString() },
@@ -1170,11 +1149,9 @@ export const PatternExamples = {
           { Metric: 'Throughput', Value: streamResult.throughput }
         ]
       }) as TabularResult;
-      console.log(analysisTable.formatted);
       
       // Pattern frequency analysis
       if (Object.keys(streamResult.analysis.patterns).length > 0) {
-        console.log("\n🔍 Code Pattern Analysis:");
         const patterns = Object.entries(streamResult.analysis.patterns)
           .map(([pattern, count]) => ({
             Pattern: pattern,
@@ -1185,16 +1162,13 @@ export const PatternExamples = {
           .sort((a, b) => (b.Occurrences as number) - (a.Occurrences as number));
           
         const patternsTable = await patternWeaver.applyPattern('TABULAR', { data: patterns }) as TabularResult;
-        console.log(patternsTable.formatted);
       }
       
       // Data type detection
       if (streamResult.analysis.dataTypes.length > 0) {
-        console.log("\n🏷️  Detected Data Types:");
         const dataTable = await patternWeaver.applyPattern('TABULAR', {
           data: streamResult.analysis.dataTypes.map((type: string) => ({ 'Data Type': type, Status: '✅ Detected' }))
         }) as TabularResult;
-        console.log(dataTable.formatted);
       }
     }
     
@@ -1203,8 +1177,6 @@ export const PatternExamples = {
   
   // Large file processing demonstration
   async largeFileDemo() {
-    console.log("🗂️  Large File Processing Demo");
-    console.log("═".repeat(40));
     
     // Simulate processing multiple files
     const files = [
@@ -1216,7 +1188,6 @@ export const PatternExamples = {
     const results = [];
     
     for (const file of files) {
-      console.log(`\n📝 Processing: ${file.split('/').pop()}`);
       
       const startTime = Bun.nanoseconds();
       
@@ -1227,7 +1198,6 @@ export const PatternExamples = {
       });
       
       if (!info.exists) {
-        console.log(`❌ File not found: ${file}`);
         continue;
       }
       
@@ -1262,17 +1232,13 @@ export const PatternExamples = {
     }
     
     // Display results table
-    console.log("\n📊 Processing Results Summary:");
     const summaryTable = await patternWeaver.applyPattern('TABULAR', { data: results }) as TabularResult;
-    console.log(summaryTable.formatted);
     
     return results;
   },
   
   // Stream performance comparison
   async streamPerformanceTest() {
-    console.log("⚡ Stream Performance Testing");
-    console.log("═".repeat(35));
     
     const testFile = './src/patterns/pattern-weaver.ts';
     const tests = [
@@ -1295,7 +1261,6 @@ export const PatternExamples = {
     const performanceResults = [];
     
     for (const test of tests) {
-      console.log(`\n🔍 Testing: ${test.name}`);
       
       const result = await patternWeaver.applyPattern('STREAM', test.config);
       
@@ -1309,17 +1274,13 @@ export const PatternExamples = {
       });
     }
     
-    console.log("\n📊 Performance Comparison:");
     const perfTable = await patternWeaver.applyPattern('TABULAR', { data: performanceResults }) as TabularResult;
-    console.log(perfTable.formatted);
     
     return performanceResults;
   },
   
   // File streaming with compression analysis
   async compressionStreamingWorkflow() {
-    console.log("🗜️  Compression-Aware Streaming");
-    console.log("═".repeat(35));
     
     const files = [
       './src/patterns/pattern-weaver.ts',
@@ -1330,7 +1291,6 @@ export const PatternExamples = {
     const compressionResults = [];
     
     for (const file of files) {
-      console.log(`\n📦 Analyzing: ${file.split('/').pop()}`);
       
       const streamResult = await patternWeaver.applyPattern('STREAM', {
         source: 'file',
@@ -1370,9 +1330,7 @@ export const PatternExamples = {
       }
     }
     
-    console.log("\n📊 Compression Analysis Results:");
     const compressionTable = await patternWeaver.applyPattern('TABULAR', { data: compressionResults }) as TabularResult;
-    console.log(compressionTable.formatted);
     
     return compressionResults;
   }

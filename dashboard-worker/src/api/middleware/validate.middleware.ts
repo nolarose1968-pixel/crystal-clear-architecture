@@ -360,7 +360,7 @@ export function sanitizeInput(data: any): any {
     return data.map(sanitizeInput);
   }
   
-  if (typeof data === 'object' && data !== null) {
+  if (typeof data === 'object' && data !=== null) {
     const sanitized: any = {};
     for (const [key, value] of Object.entries(data)) {
       sanitized[key] = sanitizeInput(value);

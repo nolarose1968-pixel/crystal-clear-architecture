@@ -18,7 +18,6 @@ export class SecureFire22Client {
   async initialize(): Promise<boolean> {
     try {
       // Try to get credentials from Bun.secrets
-      console.log('🔐 Retrieving secure credentials...');
       
       this.authToken = await secrets.get({
         service: SecureFire22Client.SERVICE_NAME,
@@ -27,7 +26,6 @@ export class SecureFire22Client {
       
       if (!this.authToken) {
         console.warn('⚠️ Fire22 API token not found in secure storage');
-        console.log('💡 Run: bun run scripts/setup-secure-credentials.ts');
         
         // Fallback to environment variable
         this.authToken = process.env.FIRE22_TOKEN || null;
@@ -44,7 +42,6 @@ export class SecureFire22Client {
         name: "fire22-session"
       }) || process.env.FIRE22_SESSION || '';
       
-      console.log('✅ Secure Fire22 client initialized');
       return true;
       
     } catch (error) {
@@ -75,7 +72,6 @@ export class SecureFire22Client {
       this.authToken = token;
       this.sessionCookies = session || this.sessionCookies;
       
-      console.log('✅ Credentials updated securely');
       return true;
       
     } catch (error) {
@@ -143,7 +139,6 @@ export class SecureFire22Client {
   async testConnection(): Promise<boolean> {
     try {
       await this.callAPI('getAuthorizations');
-      console.log('✅ Fire22 API connection successful');
       return true;
     } catch (error) {
       console.error('❌ Fire22 API connection failed:', error);
@@ -169,7 +164,6 @@ export class SecureFire22Client {
       this.authToken = null;
       this.sessionCookies = null;
       
-      console.log('✅ Credentials cleared');
       
     } catch (error) {
       console.warn('⚠️ Failed to clear some credentials:', error);
@@ -221,7 +215,6 @@ export const secureFire22Client = new SecureFire22Client();
 
 // CLI test interface
 if (import.meta.main) {
-  console.log(`
 ╔════════════════════════════════════════════════════════╗
 ║        Secure Fire22 Client Test                      ║
 ╚════════════════════════════════════════════════════════╝
@@ -229,28 +222,20 @@ if (import.meta.main) {
   
   const client = new SecureFire22Client();
   
-  console.log('1. Initializing secure client...');
   const initialized = await client.initialize();
   
   if (!initialized) {
-    console.log('\n❌ Failed to initialize. Please set up credentials first:');
-    console.log('   bun run scripts/setup-secure-credentials.ts');
     process.exit(1);
   }
   
-  console.log('2. Testing API connection...');
   const connected = await client.testConnection();
   
   if (connected) {
-    console.log('3. Fetching weekly figures...');
     try {
       const data = await client.getWeeklyFigureByAgentLite({ week: 0 });
-      console.log('✅ Weekly figures retrieved successfully');
-      console.log('   Summary:', data.summary || 'No data');
     } catch (error) {
       console.error('❌ Failed to fetch weekly figures:', error);
     }
   }
   
-  console.log('\n✨ Test complete');
 }

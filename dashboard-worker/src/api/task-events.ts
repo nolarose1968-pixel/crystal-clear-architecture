@@ -267,7 +267,7 @@ export class TaskEventService {
 // Global event service instance
 let taskEventService: TaskEventService | null = null;
 
-export function getTaskEventService(db: SQL): TaskEventService {
+export function getTaskEventService(db: Database): TaskEventService {
   if (!taskEventService) {
     taskEventService = new TaskEventService(db);
   }

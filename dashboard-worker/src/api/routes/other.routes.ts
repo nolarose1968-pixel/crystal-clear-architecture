@@ -299,6 +299,154 @@ router.get('//api/matrix/score',
   controller.apiMatrixScore
 );
 
+// Collections endpoints
+router.get('/collections/dashboard',
+  authorize(["collections.view", "settlements.view"]),
+  validate(GetLinesQuerySchema), // Using existing schema for now
+  controller.getCollectionsDashboard
+);
+
+router.get('/collections/pending-settlements',
+  authorize(["collections.view", "settlements.view"]),
+  validate(GetLinesQuerySchema), // Using existing schema for now
+  controller.getPendingSettlements
+);
+
+router.post('/collections/process-settlement',
+  authorize(["collections.process", "settlements.process"]),
+  controller.processSettlement
+);
+
+// Alternative route for collections (direct access)
+router.get('/collections',
+  authorize(["collections.view", "settlements.view"]),
+  validate(GetLinesQuerySchema), // Using existing schema for now
+  controller.getCollectionsDashboard
+);
+
+// Adjustments endpoints
+router.get('/adjustments/history',
+  authorize(["adjustments.view", "admin.adjustments"]),
+  controller.getAdjustmentsHistory
+);
+
+router.post('/adjustments/create',
+  authorize(["adjustments.create", "admin.adjustments"]),
+  controller.createAdjustment
+);
+
+router.post('/adjustments/approve',
+  authorize(["adjustments.approve", "admin.adjustments"]),
+  controller.approveAdjustment
+);
+
+router.get('/adjustments/types',
+  authorize(["adjustments.view"]),
+  controller.getAdjustmentTypes
+);
+
+// Alternative route for adjustments (direct access)
+router.get('/adjustments',
+  authorize(["adjustments.view", "admin.adjustments"]),
+  controller.getAdjustmentsHistory
+);
+
+// Distributions endpoints
+router.get('/distributions/overview',
+  authorize(["distributions.view", "financial.view"]),
+  controller.getDistributionsOverview
+);
+
+router.get('/distributions/history',
+  authorize(["distributions.view", "financial.view"]),
+  controller.getDistributionHistory
+);
+
+router.post('/distributions/payment',
+  authorize(["distributions.process", "financial.process"]),
+  controller.processDistributionPayment
+);
+
+router.get('/distributions/settings',
+  authorize(["distributions.view"]),
+  controller.getDistributionSettings
+);
+
+router.get('/distributions/analytics',
+  authorize(["distributions.view", "analytics.view"]),
+  controller.getDistributionAnalytics
+);
+
+// Alternative route for distributions (direct access)
+router.get('/distributions',
+  authorize(["distributions.view", "financial.view"]),
+  controller.getDistributionsOverview
+);
+
+// Free play transactions endpoints
+router.get('/free-play/overview',
+  authorize(["free-play.view", "promotions.view"]),
+  controller.getFreePlayOverview
+);
+
+router.get('/free-play/history',
+  authorize(["free-play.view", "promotions.view"]),
+  controller.getFreePlayHistory
+);
+
+router.post('/free-play/create',
+  authorize(["free-play.create", "promotions.manage"]),
+  controller.createFreePlayTransaction
+);
+
+router.post('/free-play/redeem',
+  authorize(["free-play.redeem", "promotions.manage"]),
+  controller.redeemFreePlayTransaction
+);
+
+router.get('/free-play/settings',
+  authorize(["free-play.view"]),
+  controller.getFreePlaySettings
+);
+
+router.get('/free-play/analytics',
+  authorize(["free-play.view", "analytics.view"]),
+  controller.getFreePlayAnalytics
+);
+
+// Alternative route for free play (direct access)
+router.get('/free-play',
+  authorize(["free-play.view", "promotions.view"]),
+  controller.getFreePlayOverview
+);
+
+// Balances endpoints
+router.get('/balances/customer',
+  authorize(["balances.view", "customer.view"]),
+  controller.getCustomerBalances
+);
+
+router.get('/balances/summary',
+  authorize(["balances.view", "admin.balances"]),
+  controller.getAllBalancesSummary
+);
+
+router.post('/balances/update',
+  authorize(["balances.update", "admin.balances"]),
+  controller.updateCustomerBalance
+);
+
+router.get('/balances/settings',
+  authorize(["balances.view"]),
+  controller.getBalanceSettings
+);
+
+// Alternative route for balances (direct access)
+router.get('/balances',
+  authorize(["balances.view", "admin.balances"]),
+  controller.getAllBalancesSummary
+);
+
 // /dashboard (from server.js:1079)
 router.get('//dashboard',
   authorize(["authenticated"]),

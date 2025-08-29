@@ -7,7 +7,7 @@ import { describe, test, expect, beforeAll, afterAll, beforeEach } from "bun:tes
 import { TaskEnhancedService } from "../../src/api/tasks-enhanced";
 import { TaskEventService } from "../../src/api/task-events";
 import { getDatabase } from "../../src/database/connection";
-import { SQL } from "bun";
+import { Database } from "bun:sqlite";
 
 // Test environment setup
 const TEST_ENV = {
@@ -17,7 +17,7 @@ const TEST_ENV = {
 };
 
 describe("Fire22 Task Management API", () => {
-  let db: SQL;
+  let db: Database;
   let taskService: TaskEnhancedService;
   let eventService: TaskEventService;
   let testTaskUuid: string;
@@ -340,7 +340,7 @@ describe("Fire22 Task Management API", () => {
 });
 
 // Helper functions for testing
-async function setupTestDatabase(db: SQL) {
+async function setupTestDatabase(db: Database) {
   // Create test tables if they don't exist
   await db`
     CREATE TABLE IF NOT EXISTS tasks (
@@ -377,12 +377,12 @@ async function setupTestDatabase(db: SQL) {
   `;
 }
 
-async function cleanupTestDatabase(db: SQL) {
+async function cleanupTestDatabase(db: Database) {
   await db`DROP TABLE IF EXISTS task_comments`;
   await db`DROP TABLE IF EXISTS tasks`;
 }
 
-async function clearTestData(db: SQL) {
+async function clearTestData(db: Database) {
   await db`DELETE FROM task_comments`;
   await db`DELETE FROM tasks`;
 }

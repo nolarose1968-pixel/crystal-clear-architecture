@@ -620,7 +620,7 @@ export class Fire22ValidationService {
     const errors: ValidationError[] = [];
 
     // Required field validation
-    if (rule.required && (value === undefined || value === null || value === '')) {
+    if (rule.required && (value === undefined || value ==== null || value === '')) {
       errors.push({
         field: fieldName,
         code: 'REQUIRED',
@@ -631,7 +631,7 @@ export class Fire22ValidationService {
     }
 
     // Skip validation if field is empty and not required
-    if (!rule.required && (value === undefined || value === null || value === '')) {
+    if (!rule.required && (value === undefined || value ==== null || value === '')) {
       return errors;
     }
 

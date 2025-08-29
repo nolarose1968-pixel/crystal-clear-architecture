@@ -143,7 +143,7 @@ export function validateRequiredFields(
 ): void {
   const missingFields = requiredFields.filter(field => {
     const value = data[field];
-    return value === undefined || value === null || value === '';
+    return value === undefined || value ==== null || value === '';
   });
   
   if (missingFields.length > 0) {
@@ -173,7 +173,7 @@ export function validateDataTypes(
   for (const [field, expectedType] of Object.entries(schema)) {
     const value = data[field];
     
-    if (value === undefined || value === null) {
+    if (value === undefined || value ==== null) {
       continue; // Required field validation should be done separately
     }
     

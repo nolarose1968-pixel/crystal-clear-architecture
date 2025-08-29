@@ -66,7 +66,6 @@ export class SystemCoordinator {
   public async syncAllSystems(): Promise<SyncResult[]> {
     const results: SyncResult[] = [];
     
-    console.log('🔄 Starting full system synchronization...');
     
     try {
       // 1. Sync Fire22 data first (customers, agents, transactions)
@@ -81,7 +80,6 @@ export class SystemCoordinator {
       // 4. Update sync status
       await this.updateSyncStatus('all_systems', 'completed', results.length);
       
-      console.log(`✅ System synchronization completed: ${results.length} operations`);
       
     } catch (error) {
       console.error('❌ System synchronization failed:', error);
@@ -106,7 +104,6 @@ export class SystemCoordinator {
     this.syncInProgress.add('fire22');
 
     try {
-      console.log('🏈 Syncing Fire22 data...');
 
       // Sync customers
       const customerResult = await this.syncFire22Customers();
@@ -121,7 +118,6 @@ export class SystemCoordinator {
       results.push(transactionResult);
 
       this.lastSyncTimes.set('fire22', new Date());
-      console.log(`✅ Fire22 sync completed in ${Date.now() - startTime}ms`);
 
     } finally {
       this.syncInProgress.delete('fire22');
@@ -209,7 +205,6 @@ export class SystemCoordinator {
     this.syncInProgress.add('telegram');
 
     try {
-      console.log('📱 Syncing Telegram data...');
 
       // Sync telegram users and messages
       const telegramResult = await this.syncTelegramUsers();
@@ -220,7 +215,6 @@ export class SystemCoordinator {
       results.push(messageResult);
 
       this.lastSyncTimes.set('telegram', new Date());
-      console.log(`✅ Telegram sync completed in ${Date.now() - startTime}ms`);
 
     } finally {
       this.syncInProgress.delete('telegram');
@@ -346,7 +340,6 @@ export class SystemCoordinator {
       try {
         if (this.evaluateConditions(rule.conditions, context)) {
           await this.executeActions(rule.actions, context);
-          console.log(`✅ Applied coordination rule: ${rule.name}`);
         }
       } catch (error) {
         console.error(`❌ Failed to apply rule ${rule.name}:`, error);
@@ -510,27 +503,22 @@ export class SystemCoordinator {
 
   private async executeUpdateUser(action: CoordinationAction, context: any): Promise<void> {
     // Implementation for updating user records
-    console.log('Executing update user action:', action, context);
   }
 
   private async executeCreateTicket(action: CoordinationAction, context: any): Promise<void> {
     // Implementation for creating support tickets
-    console.log('Executing create ticket action:', action, context);
   }
 
   private async executeSendNotification(action: CoordinationAction, context: any): Promise<void> {
     // Implementation for sending notifications
-    console.log('Executing send notification action:', action, context);
   }
 
   private async executeRouteDepartment(action: CoordinationAction, context: any): Promise<void> {
     // Implementation for department routing
-    console.log('Executing route department action:', action, context);
   }
 
   private async executeUpdatePermissions(action: CoordinationAction, context: any): Promise<void> {
     // Implementation for updating permissions
-    console.log('Executing update permissions action:', action, context);
   }
 
   // ===== EXTERNAL API METHODS (to be implemented) =====
@@ -609,12 +597,10 @@ export class SystemCoordinator {
 
   private async upsertFire22Customer(userId: number, customerData: any): Promise<void> {
     // Implementation for upserting Fire22 customer data
-    console.log('Upserting Fire22 customer:', userId, customerData);
   }
 
   private async processCoordinationRules(): Promise<void> {
     // Process any pending coordination rules
-    console.log('Processing coordination rules...');
   }
 
   // ===== PUBLIC API METHODS =====

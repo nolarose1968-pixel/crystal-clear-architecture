@@ -75,10 +75,10 @@
     "typescript": "^5.0.0"
   },
   "peerDependencies": {
-    "bun": ">=1.2.0"
+    "bun": ">=1.2.21"
   },
   "engines": {
-    "bun": ">=1.2.0",
+    "bun": ">=1.2.21",
     "node": ">=20.0.0"
   },
   "repository": {

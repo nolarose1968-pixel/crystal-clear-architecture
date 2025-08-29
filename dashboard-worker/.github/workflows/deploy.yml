@@ -18,7 +18,7 @@ on:
 
 env:
   NODE_VERSION: '18'
-  BUN_VERSION: '1.2.20'
+  BUN_VERSION: '1.2.21'
 
 jobs:
   # 🔍 Environment Validation

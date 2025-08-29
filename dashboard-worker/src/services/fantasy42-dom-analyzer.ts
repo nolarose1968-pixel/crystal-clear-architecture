@@ -76,7 +76,6 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-    console.log('🔍 Initializing Fantasy42 DOM Analyzer...');
 
     // Setup initial analysis
     await this.analyzeCurrentPage();
@@ -88,14 +87,12 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
     this.loadDefaultScripts();
 
     this.isInitialized = true;
-    console.log('✅ Fantasy42 DOM Analyzer initialized');
   }
 
   /**
    * Analyze the current page structure
    */
   async analyzeCurrentPage(): Promise<Fantasy42PageStructure> {
-    console.log('📊 Analyzing current page structure...');
 
     const structure: Fantasy42PageStructure = {
       url: window.location.href,
@@ -137,7 +134,6 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
     this.pageStructure = structure;
     this.emit('page-analyzed', structure);
 
-    console.log(`✅ Page analysis complete: ${structure.mainContent.length} main elements, ${structure.forms.length} forms, ${structure.tables.length} tables`);
     return structure;
   }
 
@@ -595,7 +591,6 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
       }
     }, 1000);
 
-    console.log('👀 Page monitoring active');
   }
 
   /**
@@ -661,7 +656,6 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
       conditions: ['transaction-form-available']
     });
 
-    console.log(`✅ Loaded ${this.automationScripts.size} automation scripts`);
   }
 
   /**
@@ -673,7 +667,6 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
       throw new Error(`Script '${scriptName}' not found`);
     }
 
-    console.log(`🎬 Executing script: ${script.name}`);
 
     for (const step of script.steps) {
       try {
@@ -687,7 +680,6 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
       }
     }
 
-    console.log(`✅ Script '${script.name}' completed successfully`);
   }
 
   /**
@@ -787,7 +779,6 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
    * Handle URL changes
    */
   private handleUrlChange(newUrl: string): void {
-    console.log(`🔄 URL changed to: ${newUrl}`);
     this.emit('url-changed', newUrl);
 
     // Re-analyze page
@@ -822,7 +813,6 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
       });
 
       if (isTriggered) {
-        console.log(`🎯 Automation trigger detected: ${scriptName}`);
         this.emit('automation-triggered', { scriptName, element });
       }
     }
@@ -902,7 +892,6 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
    */
   addAutomationScript(script: AutomationScript): void {
     this.automationScripts.set(script.name, script);
-    console.log(`✅ Added automation script: ${script.name}`);
   }
 
   /**
@@ -910,7 +899,6 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
    */
   removeAutomationScript(scriptName: string): void {
     this.automationScripts.delete(scriptName);
-    console.log(`✅ Removed automation script: ${scriptName}`);
   }
 
   /**

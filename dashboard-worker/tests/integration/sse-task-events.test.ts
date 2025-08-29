@@ -8,7 +8,7 @@ import { TaskService } from "../../src/api/tasks-enhanced";
 import { TaskEventService } from "../../src/api/task-events";
 import { DesignTeamIntegrationService } from "../../src/api/design-team-integration";
 import { getDatabase } from "../../src/database/connection";
-import { SQL } from "bun";
+import { Database } from "bun:sqlite";
 
 // Test environment
 const TEST_ENV = {
@@ -18,7 +18,7 @@ const TEST_ENV = {
 };
 
 describe("Fire22 Task Events SSE Integration", () => {
-  let db: SQL;
+  let db: Database;
   let taskService: TaskService;
   let eventService: TaskEventService;
   let designService: DesignTeamIntegrationService;
@@ -283,7 +283,7 @@ describe("Fire22 Task Events SSE Integration", () => {
 });
 
 // Helper functions
-async function setupTestDatabase(db: SQL) {
+async function setupTestDatabase(db: Database) {
   await db`
     CREATE TABLE IF NOT EXISTS tasks (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -319,7 +319,7 @@ async function setupTestDatabase(db: SQL) {
   `;
 }
 
-async function cleanupTestDatabase(db: SQL) {
+async function cleanupTestDatabase(db: Database) {
   await db`DROP TABLE IF EXISTS design_system_updates`;
   await db`DROP TABLE IF EXISTS design_review_metadata`;
   await db`DROP TABLE IF EXISTS design_assets`;

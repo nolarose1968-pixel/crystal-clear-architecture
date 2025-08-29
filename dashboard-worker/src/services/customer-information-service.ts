@@ -200,7 +200,6 @@ export class CustomerInformationService extends EventEmitter {
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-    console.log('👤 Initializing Customer Information Service...');
 
     // Initialize dependencies
     await this.formService.initialize();
@@ -219,7 +218,6 @@ export class CustomerInformationService extends EventEmitter {
     this.setupAutomatedTasks();
 
     this.isInitialized = true;
-    console.log('✅ Customer Information Service initialized');
   }
 
   /**
@@ -257,7 +255,6 @@ export class CustomerInformationService extends EventEmitter {
       custom: (value: string) => this.validateAge(value)
     });
 
-    console.log('✅ Validation rules initialized');
   }
 
   /**
@@ -279,7 +276,6 @@ export class CustomerInformationService extends EventEmitter {
       this.updateSearchIndex(customer);
     });
 
-    console.log('👂 Event listeners setup');
   }
 
   /**
@@ -287,7 +283,6 @@ export class CustomerInformationService extends EventEmitter {
    */
   private async loadCustomerData(): Promise<void> {
     try {
-      console.log('📊 Loading customer data...');
 
       // Load from API/storage
       const response = await fetch('/api/customers');
@@ -298,7 +293,6 @@ export class CustomerInformationService extends EventEmitter {
           this.customers.set(customer.id, customer);
         });
 
-        console.log(`✅ Loaded ${data.customers.length} customer profiles`);
       }
     } catch (error) {
       console.warn('⚠️ Failed to load customer data:', error);
@@ -317,7 +311,6 @@ export class CustomerInformationService extends EventEmitter {
       this.syncWithBackend();
     }, 30000); // 30 seconds
 
-    console.log('🔄 Real-time sync enabled');
   }
 
   /**
@@ -328,7 +321,6 @@ export class CustomerInformationService extends EventEmitter {
       const ws = new WebSocket('ws://localhost:8080/customers');
 
       ws.onopen = () => {
-        console.log('🔌 Customer WebSocket connected');
       };
 
       ws.onmessage = (event) => {
@@ -337,7 +329,6 @@ export class CustomerInformationService extends EventEmitter {
       };
 
       ws.onclose = () => {
-        console.log('🔌 Customer WebSocket disconnected');
         // Reconnect after delay
         setTimeout(() => this.setupWebSocketConnection(), 5000);
       };
@@ -355,13 +346,11 @@ export class CustomerInformationService extends EventEmitter {
    * Build search index for fast queries
    */
   private buildSearchIndex(): void {
-    console.log('🔍 Building search index...');
 
     this.customers.forEach(customer => {
       this.updateSearchIndex(customer);
     });
 
-    console.log('✅ Search index built');
   }
 
   /**
@@ -408,7 +397,6 @@ export class CustomerInformationService extends EventEmitter {
       this.updateRiskAssessments();
     }, 60 * 60 * 1000); // 1 hour
 
-    console.log('⏰ Automated tasks scheduled');
   }
 
   /**
@@ -444,7 +432,6 @@ export class CustomerInformationService extends EventEmitter {
     await this.syncCustomerToBackend(customer);
 
     this.emit('customer-created', customer);
-    console.log(`👤 Customer created: ${customer.customerId}`);
 
     return customer;
   }
@@ -489,7 +476,6 @@ export class CustomerInformationService extends EventEmitter {
     await this.syncCustomerToBackend(customer);
 
     this.emit('customer-updated', customer);
-    console.log(`👤 Customer updated: ${customer.customerId}`);
 
     return customer;
   }
@@ -958,7 +944,7 @@ export class CustomerInformationService extends EventEmitter {
       for (const key in newObj) {
         const fullPath = path ? `${path}.${key}` : key;
 
-        if (typeof newObj[key] === 'object' && newObj[key] !== null && !Array.isArray(newObj[key])) {
+        if (typeof newObj[key] === 'object' && newObj[key] !=== null && !Array.isArray(newObj[key])) {
           compareObjects(oldObj[key], newObj[key], fullPath);
         } else if (oldObj[key] !== newObj[key]) {
           changes[fullPath] = {
@@ -1019,7 +1005,6 @@ export class CustomerInformationService extends EventEmitter {
         body: JSON.stringify({ updates })
       });
 
-      console.log(`✅ Synced ${updates.length} customer updates`);
     } catch (error) {
       console.warn('⚠️ Failed to sync customer updates:', error);
       // Re-queue failed updates
@@ -1061,7 +1046,6 @@ export class CustomerInformationService extends EventEmitter {
           await this.createCustomer(data.data);
         }
 
-        console.log('📝 Customer form processed successfully');
       } catch (error) {
         console.error('❌ Failed to process customer form:', error);
       }
@@ -1111,21 +1095,18 @@ export class CustomerInformationService extends EventEmitter {
    * Perform daily cleanup
    */
   private async performDailyCleanup(): Promise<void> {
-    console.log('🧹 Performing daily customer data cleanup...');
 
     // Remove old search index entries
     // Clean up temporary data
     // Archive old transaction history
     // Update customer risk scores
 
-    console.log('✅ Daily cleanup completed');
   }
 
   /**
    * Update risk assessments
    */
   private async updateRiskAssessments(): Promise<void> {
-    console.log('📊 Updating customer risk assessments...');
 
     for (const customer of this.customers.values()) {
       const riskAssessment = this.assessRisk(customer);
@@ -1138,7 +1119,6 @@ export class CustomerInformationService extends EventEmitter {
       customer.financial.riskScore = Math.max(0, Math.min(100, customer.financial.riskScore));
     }
 
-    console.log('✅ Risk assessments updated');
   }
 
   /**
@@ -1221,7 +1201,6 @@ export class CustomerInformationService extends EventEmitter {
     // Clear timers
     // Save pending changes
     this.removeAllListeners();
-    console.log('🧹 Customer Information Service cleaned up');
   }
 }
 

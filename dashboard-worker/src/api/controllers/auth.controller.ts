@@ -14,7 +14,6 @@ export async function login(request: ValidatedRequest): Promise<Response> {
   try {
     const { username, password } = request.validatedBody || await request.json();
     
-    // TODO: Implement actual authentication logic
     // For now, mock authentication
     if (!username || !password) {
       return new Response(JSON.stringify({
@@ -76,7 +75,6 @@ export async function login(request: ValidatedRequest): Promise<Response> {
  */
 export async function logout(request: ValidatedRequest): Promise<Response> {
   try {
-    // TODO: Implement token revocation logic
     // For now, just return success
     const response = {
       success: true,
@@ -162,7 +160,6 @@ export async function refresh(request: ValidatedRequest): Promise<Response> {
       });
     }
     
-    // TODO: Implement actual refresh token validation and rotation
     // For now, mock the response
     const user = {
       id: 'user_123',

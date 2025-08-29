@@ -115,7 +115,6 @@ export class CashierService extends EventEmitter {
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-    console.log('💰 Initializing Cashier Service...');
 
     // Load existing transactions and sessions
     await this.loadExistingData();
@@ -124,7 +123,6 @@ export class CashierService extends EventEmitter {
     this.setupEventListeners();
 
     this.isInitialized = true;
-    console.log('✅ Cashier Service initialized');
   }
 
   /**
@@ -201,7 +199,6 @@ export class CashierService extends EventEmitter {
     this.sessions.set(session.sessionId, session);
 
     this.emit('session-started', session);
-    console.log(`💰 Cashier session started for ${cashierName}`);
 
     return session;
   }
@@ -222,7 +219,6 @@ export class CashierService extends EventEmitter {
     this.currentSession = null;
 
     this.emit('session-closed', session);
-    console.log(`💰 Cashier session closed for ${session.cashierName}`);
 
     return session;
   }
@@ -273,7 +269,6 @@ export class CashierService extends EventEmitter {
     }
 
     this.emit('transaction-created', transaction);
-    console.log(`💰 Deposit processed: $${request.amount} for customer ${request.customerId}`);
 
     return transaction;
   }
@@ -329,7 +324,6 @@ export class CashierService extends EventEmitter {
     }
 
     this.emit('transaction-created', transaction);
-    console.log(`💰 Withdrawal processed: $${request.amount} for customer ${request.customerId}`);
 
     return transaction;
   }
@@ -359,7 +353,6 @@ export class CashierService extends EventEmitter {
     }
 
     this.emit('transaction-updated', transaction);
-    console.log(`✅ Transaction ${transactionId} approved by ${approvedBy}`);
 
     return transaction;
   }
@@ -385,7 +378,6 @@ export class CashierService extends EventEmitter {
     this.transactions.set(transactionId, transaction);
 
     this.emit('transaction-updated', transaction);
-    console.log(`❌ Transaction ${transactionId} rejected by ${rejectedBy}`);
 
     return transaction;
   }
@@ -577,19 +569,15 @@ export class CashierService extends EventEmitter {
   // Event handlers
 
   private onTransactionCreated(transaction: CashierTransaction): void {
-    console.log(`📝 Transaction created: ${transaction.id} - ${transaction.type} $${transaction.amount}`);
   }
 
   private onTransactionUpdated(transaction: CashierTransaction): void {
-    console.log(`📝 Transaction updated: ${transaction.id} - Status: ${transaction.status}`);
   }
 
   private onSessionStarted(session: CashierSession): void {
-    console.log(`💰 Session started: ${session.sessionId} for ${session.cashierName}`);
   }
 
   private onSessionClosed(session: CashierSession): void {
-    console.log(`💰 Session closed: ${session.sessionId} - Final balance: $${session.currentBalance}`);
   }
 }
 

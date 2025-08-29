@@ -349,7 +349,6 @@ export class ErrorHandler {
       // In production, integrate with Sentry, DataDog, etc.
       // For now, just console log for monitoring pickup
       if (error.severity === 'critical' || error.severity === 'high') {
-        console.log('MONITORING_ALERT:', JSON.stringify({
           service: 'fire22-dashboard',
           error: error.code,
           severity: error.severity,
@@ -358,9 +357,110 @@ export class ErrorHandler {
           endpoint: error.context.endpoint,
         }));
       }
+
+      // Send R2/Storage errors to infrastructure team
+      if (error.code === ERROR_CODES.R2_BUCKET_ALREADY_EXISTS || 
+          error.code === ERROR_CODES.STORAGE_ERROR) {
+        await this.notifyInfrastructureTeam(error);
+      }
+
+      // Send critical errors to appropriate department teams
+      if (error.severity === 'critical') {
+        await this.notifyDepartmentTeam(error);
+      }
     } catch (monitoringError) {
       console.error('Failed to send error to monitoring:', monitoringError);
     }
+  }
+
+  /**
+   * Notify infrastructure team about storage-related issues
+   */
+  private async notifyInfrastructureTeam(error: Fire22Error): Promise<void> {
+    const notification = {
+      team: 'infrastructure-team',
+      errorCode: error.code,
+      severity: error.severity,
+      message: error.message,
+      correlationId: error.context.correlationId,
+      timestamp: error.context.timestamp,
+      context: {
+        bucketName: error.context.additional?.bucketName,
+        cloudflareErrorCode: error.context.additional?.cloudflareErrorCode,
+      },
+      troubleshooting: error.troubleshooting,
+    };
+
+    // Log for team notification system pickup
+    
+    // Also notify Cloudflare team for R2/Worker issues
+    if (error.code === ERROR_CODES.R2_BUCKET_ALREADY_EXISTS || 
+        error.code === ERROR_CODES.STORAGE_ERROR ||
+        error.context.additional?.cloudflareErrorCode) {
+      const cloudflareNotification = {
+        ...notification,
+        team: 'cloudflare-team',
+        wranglerContext: {
+          errorCode: error.context.additional?.cloudflareErrorCode,
+          bucketName: error.context.additional?.bucketName,
+          endpoint: error.context.endpoint,
+        }
+      };
+    }
+    
+    // Notify CI team if this affects deployments
+    if (error.context.endpoint?.includes('/deploy') || 
+        error.context.endpoint?.includes('/build') ||
+        error.context.additional?.isDeploymentError) {
+      const ciNotification = {
+        ...notification,
+        team: 'ci-team',
+        deploymentContext: {
+          endpoint: error.context.endpoint,
+          errorCode: error.code,
+          timestamp: error.context.timestamp,
+        }
+      };
+    }
+  }
+
+  /**
+   * Notify appropriate department team based on error category
+   */
+  private async notifyDepartmentTeam(error: Fire22Error): Promise<void> {
+    let team = 'devops-team'; // Default team
+
+    // Route to appropriate team based on error category
+    switch (error.category) {
+      case 'auth':
+        team = 'security-team';
+        break;
+      case 'database':
+        team = 'data-team';
+        break;
+      case 'external':
+      case 'network':
+        team = 'infrastructure-team';
+        break;
+      case 'server':
+        team = 'devops-team';
+        break;
+    }
+
+    const notification = {
+      team,
+      errorCode: error.code,
+      severity: error.severity,
+      category: error.category,
+      message: error.message,
+      correlationId: error.context.correlationId,
+      timestamp: error.context.timestamp,
+      endpoint: error.context.endpoint,
+      userId: error.context.userId,
+      troubleshooting: error.troubleshooting,
+    };
+
+    // Log for team notification system pickup
   }
 
   /**

@@ -408,10 +408,10 @@ All documentation files now include comprehensive notation support demonstrating
 - **🔴 Deprecated**: 2% of endpoints
 
 ### 🚀 **Performance Metrics**
-- **API Response Time**: `<Component100ms average
+- **API Response Time**: <100ms average
 - **Cache Hit Rate**: 85%+
-- **Database Query Time**: &lt;Component10ms average
-- **System Uptime**: &gt;`99.9%
+- **Database Query Time**: <10ms average
+- **System Uptime**: >99.9%
 
 ---
 

@@ -16,7 +16,6 @@ export async function validateLKeyTelegramConsistency(request: ValidatedRequest)
     const { agentID } = request.validatedBody || await request.json();
     const env = request.env;
     
-    console.log(`🔍 Starting L-Key validation for agent: ${agentID || 'ALL'}`);
     
     const validator = new LKeyTelegramValidator(env);
     const report = await validator.validateLKeyTelegramConsistency(agentID);
@@ -33,7 +32,6 @@ export async function validateLKeyTelegramConsistency(request: ValidatedRequest)
       }
     };
     
-    console.log(`✅ Validation completed: ${report.validMappings} valid, ${report.mismatches + report.missing + report.invalid} issues`);
     
     return new Response(JSON.stringify(response), {
       status: 200,
@@ -71,7 +69,6 @@ export async function autoFixValidationIssues(request: ValidatedRequest): Promis
       });
     }
     
-    console.log(`🔧 Starting auto-fix for ${report.fixableIssues} issues...`);
     
     const validator = new LKeyTelegramValidator(env);
     const fixResults = await validator.autoFixIssues(report);
@@ -86,7 +83,6 @@ export async function autoFixValidationIssues(request: ValidatedRequest): Promis
       }
     };
     
-    console.log(`✅ Auto-fix completed: ${fixResults.fixed} fixed, ${fixResults.failed} failed`);
     
     return new Response(JSON.stringify(response), {
       status: 200,
@@ -226,7 +222,6 @@ export async function validateSpecificCustomer(request: ValidatedRequest): Promi
       });
     }
     
-    console.log(`🔍 Validating specific customer: ${customerID}`);
     
     const validator = new LKeyTelegramValidator(env);
     const fullReport = await validator.validateLKeyTelegramConsistency(agentID);

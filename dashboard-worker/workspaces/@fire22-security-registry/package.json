@@ -104,7 +104,7 @@
     "security-policies/**/*"
   ],
   "engines": {
-    "bun": ">=1.2.0",
+    "bun": ">=1.2.21",
     "node": ">=18.0.0"
   },
   "security": {

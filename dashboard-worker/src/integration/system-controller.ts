@@ -53,7 +53,6 @@ export class Fire22SystemController {
    */
   async initialize(): Promise<boolean> {
     try {
-      console.log('🚀 Initializing Fire22 System Integration...');
 
       // Initialize database connection
       await this.initializeDatabase();
@@ -76,7 +75,6 @@ export class Fire22SystemController {
       // Mark dashboard as online
       this.status.dashboard = 'online';
 
-      console.log('✅ Fire22 System Integration initialized successfully');
       await this.broadcastSystemEvent('system:initialized', { status: this.status });
 
       return true;
@@ -95,9 +93,7 @@ export class Fire22SystemController {
         // Test database connection
         await this.env.DB.prepare('SELECT 1').first();
         this.status.database = 'connected';
-        console.log('✅ Database connected');
       } else {
-        console.log('⚠️ Database not configured');
         this.status.database = 'disconnected';
       }
     } catch (error) {
@@ -112,15 +108,12 @@ export class Fire22SystemController {
   private async initializeTelegramBot(): Promise<void> {
     try {
       if (!this.env.BOT_TOKEN) {
-        console.log('⚠️ BOT_TOKEN not configured, skipping Telegram bot');
         return;
       }
 
       // Telegram bot disabled for Cloudflare Workers compatibility
-      console.log('⚠️ Telegram bot disabled for Cloudflare Workers compatibility');
       this.status.telegramBot = 'disabled';
 
-      // TODO: Implement Cloudflare Workers compatible Telegram bot
       // using fetch API instead of Deno imports
 
     } catch (error) {
@@ -141,7 +134,6 @@ export class Fire22SystemController {
       this.addEventListener('system:alert', this.handleSystemAlert.bind(this));
 
       this.status.notifications = 'active';
-      console.log('✅ Notification system initialized');
     } catch (error) {
       console.error('❌ Notification system initialization failed:', error);
       this.status.notifications = 'error';
@@ -158,7 +150,6 @@ export class Fire22SystemController {
       this.addEventListener('agent:performance', this.broadcastAgentUpdate.bind(this));
 
       this.status.realTimeUpdates = 'active';
-      console.log('✅ Real-time updates initialized');
     } catch (error) {
       console.error('❌ Real-time updates initialization failed:', error);
       this.status.realTimeUpdates = 'error';
@@ -216,7 +207,6 @@ export class Fire22SystemController {
    * Handle user login events
    */
   private async handleUserLogin(data: any): Promise<void> {
-    console.log(`👤 User login: ${data.username}`);
     
     // Send notification if Telegram bot is available
     if (this.telegramBot && data.telegramId) {
@@ -231,7 +221,6 @@ export class Fire22SystemController {
    * Handle wager placed events
    */
   private async handleWagerPlaced(data: any): Promise<void> {
-    console.log(`🎯 Wager placed: $${data.amount} by ${data.username}`);
     
     // Broadcast to dashboard
     await this.broadcastDataUpdate({
@@ -252,7 +241,6 @@ export class Fire22SystemController {
    * Handle balance changed events
    */
   private async handleBalanceChanged(data: any): Promise<void> {
-    console.log(`💰 Balance changed: ${data.username} - $${data.newBalance}`);
     
     // Send Telegram notification for significant changes
     if (this.telegramBot && data.telegramId && Math.abs(data.change) > 100) {
@@ -267,7 +255,6 @@ export class Fire22SystemController {
    * Handle system alerts
    */
   private async handleSystemAlert(data: any): Promise<void> {
-    console.log(`🚨 System alert: ${data.message}`);
     
     // Broadcast to all admin channels
     if (this.telegramBot) {
@@ -280,7 +267,13 @@ export class Fire22SystemController {
    */
   private async broadcastDataUpdate(data: any): Promise<void> {
     // This would integrate with WebSocket/SSE for real-time dashboard updates
-    console.log('📡 Broadcasting data update:', data.type);
+  }
+
+  /**
+   * Broadcast agent update event
+   */
+  private async broadcastAgentUpdate(data: any): Promise<void> {
+    // This would integrate with WebSocket/SSE for real-time agent performance updates
   }
 
   /**
@@ -301,7 +294,6 @@ export class Fire22SystemController {
    * Shutdown system gracefully
    */
   async shutdown(): Promise<void> {
-    console.log('🔄 Shutting down Fire22 System...');
     
     if (this.telegramBot) {
       await this.telegramBot.stop();
@@ -315,7 +307,6 @@ export class Fire22SystemController {
       realTimeUpdates: 'inactive'
     };
     
-    console.log('✅ Fire22 System shutdown complete');
   }
 }
 

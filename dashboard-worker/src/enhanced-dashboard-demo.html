@@ -933,6 +933,11 @@
                     this.addFeedItem('System initialized', 'success');
                     // Initialize language elements
                     updateLanguageElements(this.currentLanguage);
+                                    // Initialize action handlers
+                this.initActionHandlers();
+
+                // Initialize field toggles
+                this.initFieldToggles();
                 },
 
                 // Language Management
@@ -940,6 +945,524 @@
                     this.currentLanguage = lang;
                     updateLanguageElements(lang);
                     this.addFeedItem(`🌐 Language changed to ${lang.toUpperCase()}`, 'info');
+                },
+
+                // Action Handlers
+                initActionHandlers() {
+                    document.addEventListener('click', (e) => {
+                        const target = e.target.closest('[data-action]');
+                        if (target) {
+                            const action = target.getAttribute('data-action');
+                            this.handleAction(action, target, e);
+                        }
+                    });
+                },
+
+                handleAction(action, element, event) {
+                    switch (action) {
+                        case 'add-account':
+                            this.handleAddCustomer();
+                            break;
+                        case 'get-rules':
+                            this.handleGetRules();
+                            break;
+                        case 'get-transactions':
+                            this.handleGetTransactions();
+                            break;
+                        case 'get-lines':
+                            this.handleGetLines();
+                            break;
+                        case 'get-game-admin':
+                            this.addFeedItem('🎮 Opening Game Admin...', 'info');
+                            break;
+                        case 'get-agent-performance':
+                            this.addFeedItem('📊 Opening Agent Performance...', 'info');
+                            break;
+                        case 'get-analysis':
+                            this.addFeedItem('📈 Opening Analysis Dashboard...', 'info');
+                            break;
+                        case 'get-ip-tracker':
+                            this.addFeedItem('🌐 Opening IP Tracker...', 'info');
+                            break;
+                        case 'get-transaction-history':
+                            this.addFeedItem('💰 Opening Transaction History...', 'info');
+                            break;
+                        case 'get-settled-figure':
+                            this.handleGetSettledFigure();
+                            break;
+                        case 'get-lines':
+                            if (target.getAttribute('data-type') === 'sportbook') {
+                                this.addFeedItem('🏆 Opening Sportsbook Lines...', 'info');
+                            }
+                            break;
+                        case 'get-adjustments':
+                            this.handleGetAdjustments();
+                            break;
+                        case 'get-distributions':
+                            this.handleGetDistributions();
+                            break;
+                        case 'get-free-play':
+                            this.handleGetFreePlay();
+                            break;
+                        case 'get-analysis':
+                            this.addFeedItem('📊 Opening Analysis Dashboard...', 'info');
+                            break;
+                        default:
+                            this.addFeedItem(`⚠️ Unknown action: ${action}`, 'warning');
+                    }
+                },
+
+                handleAddCustomer() {
+                    this.addFeedItem('👤 Opening Add Customer modal...', 'info');
+
+                    // Load the modal component if not already loaded
+                    if (!document.getElementById('add-customer-modal')) {
+                        this.loadAddCustomerModal();
+                    } else {
+                        // Modal already loaded, just open it
+                        if (window.openAddCustomerModal) {
+                            window.openAddCustomerModal();
+                        }
+                    }
+                },
+
+                async loadAddCustomerModal() {
+                    try {
+                        const response = await fetch('/ui/components/add-customer-modal.html');
+                        if (response.ok) {
+                            const modalHtml = await response.text();
+                            // Insert modal into document
+                            document.body.insertAdjacentHTML('beforeend', modalHtml);
+                            // Open the modal
+                            setTimeout(() => {
+                                if (window.openAddCustomerModal) {
+                                    window.openAddCustomerModal();
+                                }
+                            }, 100);
+                        } else {
+                            this.addFeedItem('❌ Failed to load customer modal', 'error');
+                        }
+                    } catch (error) {
+                        this.addFeedItem('❌ Error loading customer modal', 'error');
+                        console.error('Modal load error:', error);
+                    }
+                },
+
+                handleGetRules() {
+                    this.addFeedItem('📋 Opening System Rules & Policies...', 'info');
+
+                    // Load the modal component if not already loaded
+                    if (!document.getElementById('rules-modal')) {
+                        this.loadRulesModal();
+                    } else {
+                        // Modal already loaded, just open it
+                        if (window.openRulesModal) {
+                            window.openRulesModal();
+                        }
+                    }
+                },
+
+                async loadRulesModal() {
+                    try {
+                        const response = await fetch('/ui/components/rules-modal.html');
+                        if (response.ok) {
+                            const modalHtml = await response.text();
+                            // Insert modal into document
+                            document.body.insertAdjacentHTML('beforeend', modalHtml);
+                            // Open the modal
+                            setTimeout(() => {
+                                if (window.openRulesModal) {
+                                    window.openRulesModal();
+                                }
+                            }, 100);
+                        } else {
+                            this.addFeedItem('❌ Failed to load rules modal', 'error');
+                        }
+                    } catch (error) {
+                        this.addFeedItem('❌ Error loading rules modal', 'error');
+                        console.error('Modal load error:', error);
+                    }
+                },
+
+                handleGetTransactions() {
+                    this.addFeedItem('💰 Opening Cashier & Transactions...', 'info');
+
+                    // Load the modal component if not already loaded
+                    if (!document.getElementById('transactions-modal')) {
+                        this.loadTransactionsModal();
+                    } else {
+                        // Modal already loaded, just open it
+                        if (window.openTransactionsModal) {
+                            window.openTransactionsModal();
+                        }
+                    }
+                },
+
+                async loadTransactionsModal() {
+                    try {
+                        const response = await fetch('/ui/components/transactions-modal.html');
+                        if (response.ok) {
+                            const modalHtml = await response.text();
+                            // Insert modal into document
+                            document.body.insertAdjacentHTML('beforeend', modalHtml);
+                            // Open the modal
+                            setTimeout(() => {
+                                if (window.openTransactionsModal) {
+                                    window.openTransactionsModal();
+                                }
+                            }, 100);
+                        } else {
+                            this.addFeedItem('❌ Failed to load transactions modal', 'error');
+                        }
+                    } catch (error) {
+                        this.addFeedItem('❌ Error loading transactions modal', 'error');
+                        console.error('Modal load error:', error);
+                    }
+                },
+
+                handleGetLines() {
+                    this.addFeedItem('🎯 Opening Ticketwriter & Betting Lines...', 'info');
+
+                    // Load the modal component if not already loaded
+                    if (!document.getElementById('ticketwriter-modal')) {
+                        this.loadTicketwriterModal();
+                    } else {
+                        // Modal already loaded, just open it
+                        if (window.openTicketwriterModal) {
+                            window.openTicketwriterModal();
+                        }
+                    }
+                },
+
+                async loadTicketwriterModal() {
+                    try {
+                        const response = await fetch('/ui/components/ticketwriter-modal.html');
+                        if (response.ok) {
+                            const modalHtml = await response.text();
+                            // Insert modal into document
+                            document.body.insertAdjacentHTML('beforeend', modalHtml);
+                            // Open the modal
+                            setTimeout(() => {
+                                if (window.openTicketwriterModal) {
+                                    window.openTicketwriterModal();
+                                }
+                            }, 100);
+                        } else {
+                            this.addFeedItem('❌ Failed to load ticketwriter modal', 'error');
+                        }
+                    } catch (error) {
+                        this.addFeedItem('❌ Error loading ticketwriter modal', 'error');
+                        console.error('Modal load error:', error);
+                    }
+                },
+
+                handleGetSettledFigure() {
+                    this.addFeedItem('💵 Opening Collections & Settlements...', 'info');
+
+                    // Load the modal component if not already loaded
+                    if (!document.getElementById('collections-modal')) {
+                        this.loadCollectionsModal();
+                    } else {
+                        // Modal already loaded, just open it
+                        if (window.openCollectionsModal) {
+                            window.openCollectionsModal();
+                        }
+                    }
+                },
+
+                async loadCollectionsModal() {
+                    try {
+                        const response = await fetch('/ui/components/collections-modal.html');
+                        if (response.ok) {
+                            const modalHtml = await response.text();
+                            // Insert modal into document
+                            document.body.insertAdjacentHTML('beforeend', modalHtml);
+                            // Open the modal
+                            setTimeout(() => {
+                                if (window.openCollectionsModal) {
+                                    window.openCollectionsModal();
+                                }
+                            }, 100);
+                        } else {
+                            this.addFeedItem('❌ Failed to load collections modal', 'error');
+                        }
+                    } catch (error) {
+                        this.addFeedItem('❌ Error loading collections modal', 'error');
+                        console.error('Modal load error:', error);
+                    }
+                },
+
+                handleGetAdjustments() {
+                    this.addFeedItem('🔧 Opening Adjustments & Corrections...', 'info');
+
+                    // Load the modal component if not already loaded
+                    if (!document.getElementById('adjustments-modal')) {
+                        this.loadAdjustmentsModal();
+                    } else {
+                        // Modal already loaded, just open it
+                        if (window.openAdjustmentsModal) {
+                            window.openAdjustmentsModal();
+                        }
+                    }
+                },
+
+                async loadAdjustmentsModal() {
+                    try {
+                        const response = await fetch('/ui/components/adjustments-modal.html');
+                        if (response.ok) {
+                            const modalHtml = await response.text();
+                            // Insert modal into document
+                            document.body.insertAdjacentHTML('beforeend', modalHtml);
+                            // Open the modal
+                            setTimeout(() => {
+                                if (window.openAdjustmentsModal) {
+                                    window.openAdjustmentsModal();
+                                }
+                            }, 100);
+                        } else {
+                            this.addFeedItem('❌ Failed to load adjustments modal', 'error');
+                        }
+                    } catch (error) {
+                        this.addFeedItem('❌ Error loading adjustments modal', 'error');
+                        console.error('Modal load error:', error);
+                    }
+                },
+
+                handleGetDistributions() {
+                    this.addFeedItem('📊 Opening Distributions Management...', 'info');
+                    this.loadDistributionsModal();
+                },
+
+                async loadDistributionsModal() {
+                    try {
+                        const response = await fetch('/ui/components/distributions-modal.html');
+                        if (response.ok) {
+                            const modalHtml = await response.text();
+                            // Insert modal into document
+                            document.body.insertAdjacentHTML('beforeend', modalHtml);
+                            // Open the modal
+                            setTimeout(() => {
+                                if (window.openDistributionsModal) {
+                                    window.openDistributionsModal();
+                                }
+                            }, 100);
+                        } else {
+                            this.addFeedItem('❌ Failed to load distributions modal', 'error');
+                        }
+                    } catch (error) {
+                        this.addFeedItem('❌ Error loading distributions modal', 'error');
+                        console.error('Modal load error:', error);
+                    }
+                },
+
+                handleGetFreePlay() {
+                    this.addFeedItem('🎁 Opening Free Play & Bonus Management...', 'info');
+                    this.loadFreePlayModal();
+                },
+
+                async loadFreePlayModal() {
+                    try {
+                        const response = await fetch('/ui/components/free-play-modal.html');
+                        if (response.ok) {
+                            const modalHtml = await response.text();
+                            // Insert modal into document
+                            document.body.insertAdjacentHTML('beforeend', modalHtml);
+                            // Open the modal
+                            setTimeout(() => {
+                                if (window.openFreePlayModal) {
+                                    window.openFreePlayModal();
+                                }
+                            }, 100);
+                        } else {
+                            this.addFeedItem('❌ Failed to load free play modal', 'error');
+                        }
+                    } catch (error) {
+                        this.addFeedItem('❌ Error loading free play modal', 'error');
+                        console.error('Modal load error:', error);
+                    }
+                },
+
+                // Field Toggles Management
+                initFieldToggles() {
+                    // Handle balances toggle
+                    const balancesToggle = document.querySelector('input[data-field="balances"]');
+                    if (balancesToggle) {
+                        balancesToggle.addEventListener('change', (e) => {
+                            this.handleBalancesToggle(e.target.checked);
+                        });
+
+                        // Set initial state based on saved preference
+                        const savedState = localStorage.getItem('balancesVisible');
+                        if (savedState !== null) {
+                            balancesToggle.checked = savedState === 'true';
+                            this.handleBalancesToggle(balancesToggle.checked);
+                        }
+                    }
+
+                    // Handle distributions toggle
+                    const distributionsToggle = document.querySelector('input[data-field="distributions"]');
+                    if (distributionsToggle) {
+                        distributionsToggle.addEventListener('change', (e) => {
+                            this.handleDistributionsToggle(e.target.checked);
+                        });
+
+                        // Set initial state based on saved preference
+                        const savedState = localStorage.getItem('distributionsVisible');
+                        if (savedState !== null) {
+                            distributionsToggle.checked = savedState === 'true';
+                            this.handleDistributionsToggle(distributionsToggle.checked);
+                        }
+                    }
+
+                    // Handle free play toggle
+                    const freePlayToggle = document.querySelector('input[data-field="free-play"]');
+                    if (freePlayToggle) {
+                        freePlayToggle.addEventListener('change', (e) => {
+                            this.handleFreePlayToggle(e.target.checked);
+                        });
+
+                        // Set initial state based on saved preference
+                        const savedState = localStorage.getItem('freePlayVisible');
+                        if (savedState !== null) {
+                            freePlayToggle.checked = savedState === 'true';
+                            this.handleFreePlayToggle(freePlayToggle.checked);
+                        }
+                    }
+                },
+
+                handleBalancesToggle(isVisible) {
+                    // Save preference
+                    localStorage.setItem('balancesVisible', isVisible.toString());
+
+                    // Find all balance display elements
+                    const balanceElements = document.querySelectorAll('.balance-display, .balance-amount, .balance-value, [data-balance]');
+
+                    balanceElements.forEach(element => {
+                        if (isVisible) {
+                            element.style.display = '';
+                            element.style.visibility = 'visible';
+                        } else {
+                            element.style.display = 'none';
+                            element.style.visibility = 'hidden';
+                        }
+                    });
+
+                    // Update balance visibility in tables and cards
+                    const balanceCells = document.querySelectorAll('td:nth-child(3), td:nth-child(4), .balance-item, .metric-card');
+                    balanceCells.forEach(cell => {
+                        if (cell.textContent.includes('$') || cell.classList.contains('balance')) {
+                            if (isVisible) {
+                                cell.style.display = '';
+                                cell.style.visibility = 'visible';
+                            } else {
+                                cell.style.display = 'none';
+                                cell.style.visibility = 'hidden';
+                            }
+                        }
+                    });
+
+                    // Update dashboard feed
+                    if (isVisible) {
+                        this.addFeedItem('💰 Balance information is now visible', 'info');
+                    } else {
+                        this.addFeedItem('🔒 Balance information is now hidden', 'info');
+                    }
+
+                    // Dispatch custom event for other components
+                    const event = new CustomEvent('balanceVisibilityChanged', {
+                        detail: { visible: isVisible }
+                    });
+                    document.dispatchEvent(event);
+                },
+
+                handleDistributionsToggle(isVisible) {
+                    // Save preference
+                    localStorage.setItem('distributionsVisible', isVisible.toString());
+
+                    // Find all distribution display elements
+                    const distributionElements = document.querySelectorAll('.distribution-display, .distribution-amount, .distribution-value, [data-distribution]');
+
+                    distributionElements.forEach(element => {
+                        if (isVisible) {
+                            element.style.display = '';
+                            element.style.visibility = 'visible';
+                        } else {
+                            element.style.display = 'none';
+                            element.style.visibility = 'hidden';
+                        }
+                    });
+
+                    // Update distribution visibility in tables and cards
+                    const distributionCells = document.querySelectorAll('td:nth-child(4), td:nth-child(5), .distribution-item, .distribution-card');
+                    distributionCells.forEach(cell => {
+                        if (cell.textContent.includes('$') || cell.classList.contains('distribution')) {
+                            if (isVisible) {
+                                cell.style.display = '';
+                                cell.style.visibility = 'visible';
+                            } else {
+                                cell.style.display = 'none';
+                                cell.style.visibility = 'hidden';
+                            }
+                        }
+                    });
+
+                    // Update dashboard feed
+                    if (isVisible) {
+                        this.addFeedItem('📊 Distribution information is now visible', 'info');
+                    } else {
+                        this.addFeedItem('🔒 Distribution information is now hidden', 'info');
+                    }
+
+                    // Dispatch custom event for other components
+                    const event = new CustomEvent('distributionVisibilityChanged', {
+                        detail: { visible: isVisible }
+                    });
+                    document.dispatchEvent(event);
+                },
+
+                handleFreePlayToggle(isVisible) {
+                    // Save preference
+                    localStorage.setItem('freePlayVisible', isVisible.toString());
+
+                    // Find all free play display elements
+                    const freePlayElements = document.querySelectorAll('.free-play-display, .free-play-amount, .free-play-value, [data-free-play]');
+
+                    freePlayElements.forEach(element => {
+                        if (isVisible) {
+                            element.style.display = '';
+                            element.style.visibility = 'visible';
+                        } else {
+                            element.style.display = 'none';
+                            element.style.visibility = 'hidden';
+                        }
+                    });
+
+                    // Update free play visibility in tables and cards
+                    const freePlayCells = document.querySelectorAll('td:nth-child(5), td:nth-child(6), .free-play-item, .bonus-card');
+                    freePlayCells.forEach(cell => {
+                        if (cell.textContent.includes('$') || cell.classList.contains('free-play') || cell.classList.contains('bonus')) {
+                            if (isVisible) {
+                                cell.style.display = '';
+                                cell.style.visibility = 'visible';
+                            } else {
+                                cell.style.display = 'none';
+                                cell.style.visibility = 'hidden';
+                            }
+                        }
+                    });
+
+                    // Update dashboard feed
+                    if (isVisible) {
+                        this.addFeedItem('🎁 Free play information is now visible', 'info');
+                    } else {
+                        this.addFeedItem('🔒 Free play information is now hidden', 'info');
+                    }
+
+                    // Dispatch custom event for other components
+                    const event = new CustomEvent('freePlayVisibilityChanged', {
+                        detail: { visible: isVisible }
+                    });
+                    document.dispatchEvent(event);
                 },
 
                 t(code, lang) {

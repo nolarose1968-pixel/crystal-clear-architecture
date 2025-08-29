@@ -633,13 +633,11 @@ export class P2PQueueAPIEnhanced {
       // Get Telegram bot instance from environment
       const telegramBot = this.env.TELEGRAM_BOT;
       if (!telegramBot) {
-        console.log('Telegram bot not available, skipping notification');
         return;
       }
 
       const chatId = item.telegramGroupId || item.telegramChatId;
       if (!chatId) {
-        console.log('No Telegram chat ID available for notification');
         return;
       }
 
@@ -705,7 +703,6 @@ export class P2PQueueAPIEnhanced {
         });
       }
 
-      console.log(`✅ Telegram notification sent for ${event} to ${chatId}`);
     } catch (error) {
       console.error('Failed to send Telegram notification:', error instanceof Error ? error.message : String(error));
     }
@@ -717,7 +714,6 @@ export class P2PQueueAPIEnhanced {
   private async checkForImmediateMatches(item: Partial<P2PQueueItemEnhanced>): Promise<void> {
     // This would implement the actual matching logic
     // For now, just log that we're checking
-    console.log(`Checking for immediate matches for ${item.type || 'item'}`);
   }
 
   /**

@@ -241,9 +241,6 @@ class PackageAnalyzer {
       total: Object.keys(deps).length + Object.keys(devDeps).length,
       production: Object.keys(deps).length,
       development: Object.keys(devDeps).length,
-      outdated: [], // TODO: Implement outdated check
-      vulnerable: [], // TODO: Implement vulnerability check
-      bundleSize: 'Unknown' // TODO: Implement bundle size analysis
     };
   }
 
@@ -393,7 +390,7 @@ class PackageAnalyzer {
 
             for (const pattern of routePatterns) {
               let match;
-              while ((match = pattern.exec(content)) !== null) {
+              while ((match = pattern.exec(content)) !=== null) {
                 const endpoint = match[2] || match[1];
                 if (endpoint && endpoint.startsWith('/')) {
                   endpoints.push(endpoint);

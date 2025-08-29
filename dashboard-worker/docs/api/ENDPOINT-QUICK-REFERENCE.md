@@ -152,14 +152,14 @@ GET /api/health/database           # Database status
 ## 📊 **PERFORMANCE METRICS**
 
 ### ⚡ **Response Times**
-- **Health Check**: `<Fivems
-- **Cache Access**: <Onems  
-- **Database Query**: <Component10ms
-- **API Response**: &lt;Component100ms
+- **Health Check**: <5ms
+- **Cache Access**: <1ms  
+- **Database Query**: <10ms
+- **API Response**: <100ms
 
 ### 📈 **System Capacity**
 - **Cache Hit Rate**: 85%+
-- **System Uptime**: &gt;`99.9%
+- **System Uptime**: >99.9%
 - **Throughput**: 1000+ req/sec
 
 ---

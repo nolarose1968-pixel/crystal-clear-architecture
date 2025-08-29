@@ -28,14 +28,12 @@ const mockEnv = {
 };
 
 async function runValidationTest() {
-  console.log('🧪 Starting L-Key to Telegram Validation Test...\n');
   
   try {
     // Initialize validator
     let validator: LKeyTelegramValidator;
     try {
       validator = new LKeyTelegramValidator(mockEnv);
-      console.log('✅ Validator initialized successfully');
     } catch (error) {
       console.error('❌ Validator initialization failed:', error.message);
       return {
@@ -45,13 +43,11 @@ async function runValidationTest() {
     }
     
     // Run validation with demo data
-    console.log('🔍 Running validation on demo data...');
     let report: ValidationReport;
     try {
       report = await validator.validateLKeyTelegramConsistency('BLAKEPPH');
     } catch (error) {
       console.error('❌ Validation execution failed:', error.message);
-      console.log('⚠️ Attempting graceful fallback...');
       
       // Return a minimal error report
       return {
@@ -67,71 +63,44 @@ async function runValidationTest() {
     }
     
     // Display results
-    console.log('\n📊 Validation Results:');
-    console.log('==========================================');
-    console.log(`Total Customers: ${report.totalCustomers}`);
-    console.log(`Total Telegram Users: ${report.totalTelegramUsers}`);
-    console.log(`Valid Mappings: ${report.validMappings}`);
-    console.log(`Mismatches: ${report.mismatches}`);
-    console.log(`Missing Data: ${report.missing}`);
-    console.log(`Invalid Formats: ${report.invalid}`);
-    console.log(`Fixable Issues: ${report.fixableIssues}`);
-    console.log(`Critical Issues: ${report.criticalIssues}`);
-    console.log(`Errors Encountered: ${report.errors?.length || 0}`);
-    console.log(`Warnings: ${report.warnings?.length || 0}`);
-    console.log(`Recovered Errors: ${report.recoveredErrors || 0}`);
-    console.log(`Fatal Errors: ${report.fatalErrors || 0}`);
     
     // Show sample issues
     if (report.customerValidations.length > 0) {
-      console.log('\n🔍 Sample Customer Issues:');
       const issueCustomers = report.customerValidations
         .filter(c => c.issues.length > 0)
         .slice(0, 3);
         
       for (const customer of issueCustomers) {
-        console.log(`- ${customer.customerID} (${customer.name}): ${customer.issues.join(', ')}`);
       }
     }
     
     if (report.telegramValidations.length > 0) {
-      console.log('\n📱 Sample Telegram Issues:');
       const issueTelegram = report.telegramValidations
         .filter(t => t.issues.length > 0)
         .slice(0, 3);
         
       for (const telegram of issueTelegram) {
-        console.log(`- ${telegram.telegramId} (@${telegram.username || 'N/A'}): ${telegram.issues.join(', ')}`);
       }
     }
     
     // Show recommendations
-    console.log('\n💡 Recommendations:');
     for (const recommendation of report.recommendations) {
-      console.log(`- ${recommendation}`);
     }
     
     // Test auto-fix functionality
     if (report.fixableIssues > 0) {
-      console.log('\n🔧 Testing auto-fix functionality...');
       const fixResults = await validator.autoFixIssues(report);
       
-      console.log(`Fixed: ${fixResults.fixed}, Failed: ${fixResults.failed}`);
       
       if (fixResults.results.length > 0) {
-        console.log('\n🛠️  Fix Results:');
         for (const result of fixResults.results.slice(0, 5)) {
           const status = result.success ? '✅' : '❌';
-          console.log(`${status} ${result.type}: ${result.details}`);
         }
       }
     }
     
     // Generate summary
-    console.log('\n📋 Summary Report:');
-    console.log(validator.generateSummary(report));
     
-    console.log('\n🎉 Validation test completed successfully!');
     
     return {
       success: true,
@@ -155,12 +124,10 @@ async function runValidationTest() {
 
 // Test specific validation scenarios
 async function testValidationScenarios() {
-  console.log('\n🧪 Testing Specific Validation Scenarios...\n');
   
   const validator = new LKeyTelegramValidator(mockEnv);
   
   // Test 1: Valid customer data
-  console.log('Test 1: Valid Customer Data');
   const validCustomer = {
     customerID: 'AL501',
     name: 'John Smith',
@@ -175,29 +142,20 @@ async function testValidationScenarios() {
     }
   };
   
-  console.log('✅ Valid customer should pass all validations');
   
   // Test 2: Invalid Telegram ID format  
-  console.log('\nTest 2: Invalid Telegram ID Format');
   const invalidTelegramId = 'abc123def'; // Should be numeric
-  console.log(`❌ Telegram ID '${invalidTelegramId}' should be flagged as invalid`);
   
   // Test 3: Missing L-key mapping
-  console.log('\nTest 3: Missing L-key Mapping');
   const unknownCustomerType = 'UNKNOWN_TYPE';
-  console.log(`❌ Customer type '${unknownCustomerType}' should be flagged as missing L-key`);
   
   // Test 4: Username format validation
-  console.log('\nTest 4: Username Format Validation');
   const invalidUsername = 'user with spaces!@#'; // Should not contain spaces or special chars
-  console.log(`❌ Username '${invalidUsername}' should be flagged as invalid format`);
   
-  console.log('\n✅ All test scenarios identified correctly');
 }
 
 // Performance test
 async function testValidationPerformance() {
-  console.log('\n⚡ Testing Validation Performance...\n');
   
   const validator = new LKeyTelegramValidator(mockEnv);
   
@@ -208,22 +166,14 @@ async function testValidationPerformance() {
   const processingTime = endTime - startTime;
   const customersPerSecond = Math.round((report.totalCustomers / processingTime) * 1000);
   
-  console.log(`📊 Performance Results:`);
-  console.log(`- Processing Time: ${processingTime}ms`);
-  console.log(`- Customers Processed: ${report.totalCustomers}`);
-  console.log(`- Processing Rate: ${customersPerSecond} customers/second`);
   
   if (processingTime < 5000) {
-    console.log('✅ Performance test passed (< 5 seconds)');
   } else {
-    console.log('⚠️ Performance test warning (> 5 seconds)');
   }
 }
 
 // Main test execution
 async function main() {
-  console.log('🔥📱 Fire22 L-Key to Telegram Validation Test Suite');
-  console.log('=====================================================\n');
   
   // Run comprehensive validation test
   const mainTestResult = await runValidationTest();
@@ -239,14 +189,6 @@ async function main() {
   // Run performance test
   await testValidationPerformance();
   
-  console.log('\n🎉 All tests completed successfully!');
-  console.log('=====================================================');
-  console.log('Summary:');
-  console.log(`- Total Records Validated: ${mainTestResult.summary.totalValidated}`);
-  console.log(`- Success Rate: ${mainTestResult.summary.successRate}`);
-  console.log(`- Issues Found: ${mainTestResult.summary.issuesFound}`);
-  console.log(`- Fixable Issues: ${mainTestResult.summary.fixableIssues}`);
-  console.log('=====================================================');
 }
 
 // Run tests if this script is executed directly

@@ -202,7 +202,7 @@ export class DatabaseLinksManager {
     } else {
       // Pull hub R2 objects to local
       const data = await hubConnection.downloadFromR2(link.name, 'sync-marker');
-      return data !== null;
+      return data !=== null;
     }
   }
 

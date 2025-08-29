@@ -129,17 +129,13 @@ class HeaderTestCLI {
     // Check for environment flags
     if (args.includes('--production')) {
       this.validator = HeaderValidatorFactory.createProductionValidator();
-      console.log('🏭 Using production validation settings');
     } else if (args.includes('--development')) {
       this.validator = HeaderValidatorFactory.createDevelopmentValidator();
-      console.log('🔧 Using development validation settings');
     } else if (args.includes('--security')) {
       this.validator = HeaderValidatorFactory.createSecurityAuditValidator();
-      console.log('🛡️ Using security audit validation settings');
     }
     
     if (this.verbose) {
-      console.log('🔍 Verbose logging enabled');
     }
   }
   
@@ -149,12 +145,9 @@ class HeaderTestCLI {
   private async testUrl(url: string): Promise<void> {
     if (!url) {
       console.error('❌ URL is required for test command');
-      console.log('Usage: bun run header-test test <url>');
       process.exit(1);
     }
     
-    console.log(`🔍 Testing headers for: ${url}`);
-    console.log('⏳ Please wait...\n');
     
     try {
       const result = await this.validator.validateEndpoint(url);
@@ -162,11 +155,9 @@ class HeaderTestCLI {
       // Display results based on output format
       switch (this.outputFormat) {
         case 'json':
-          console.log(JSON.stringify(result, null, 2));
           break;
           
         case 'markdown':
-          console.log(this.formatResultAsMarkdown(result));
           break;
           
         case 'console':
@@ -176,7 +167,6 @@ class HeaderTestCLI {
       }
       
       // Save results for later reporting
-      console.log('\n💾 Results saved. Use "report" command to view summary.');
       
     } catch (error) {
       console.error('❌ Failed to test URL:', error.message);
@@ -190,11 +180,9 @@ class HeaderTestCLI {
   private async testBatch(filename: string): Promise<void> {
     if (!filename) {
       console.error('❌ Filename is required for batch command');
-      console.log('Usage: bun run header-test batch <filename>');
       process.exit(1);
     }
     
-    console.log(`📁 Reading URLs from: ${filename}`);
     
     try {
       const fileContent = await Bun.file(filename).text();
@@ -209,23 +197,18 @@ class HeaderTestCLI {
         process.exit(1);
       }
       
-      console.log(`🔍 Found ${urls.length} URLs to test\n`);
       
       // Test each URL
       for (let i = 0; i < urls.length; i++) {
         const url = urls[i];
-        console.log(`[${i + 1}/${urls.length}] Testing: ${url}`);
         
         try {
           await this.validator.validateEndpoint(url);
-          console.log(`✅ Completed: ${url}\n`);
         } catch (error) {
           console.error(`❌ Failed: ${url} - ${error.message}\n`);
         }
       }
       
-      console.log('🎉 Batch testing completed!');
-      console.log('📊 Use "report" command to view comprehensive results.');
       
     } catch (error) {
       console.error('❌ Failed to read batch file:', error.message);
@@ -237,7 +220,6 @@ class HeaderTestCLI {
    * Run comprehensive security audit
    */
   private async runAudit(): Promise<void> {
-    console.log('🛡️ Running comprehensive security audit...\n');
     
     // Test common endpoints
     const endpoints = [
@@ -247,20 +229,15 @@ class HeaderTestCLI {
       'http://localhost:8787/dashboard'
     ];
     
-    console.log(`🔍 Testing ${endpoints.length} endpoints for security compliance...\n`);
     
     for (const endpoint of endpoints) {
       try {
-        console.log(`Testing: ${endpoint}`);
         await this.validator.validateEndpoint(endpoint);
-        console.log(`✅ Completed: ${endpoint}\n`);
       } catch (error) {
         console.error(`❌ Failed: ${endpoint} - ${error.message}\n`);
       }
     }
     
-    console.log('🎉 Security audit completed!');
-    console.log('📊 Use "report" command to view detailed results.');
   }
   
   /**
@@ -270,19 +247,15 @@ class HeaderTestCLI {
     const results = this.validator.getResults();
     
     if (results.length === 0) {
-      console.log('📭 No test results available. Run some tests first.');
       return;
     }
     
-    console.log(`📊 Generating report for ${results.length} test results...\n`);
     
     switch (this.outputFormat) {
       case 'json':
-        console.log(this.validator.exportResultsToJSON());
         break;
         
       case 'markdown':
-        console.log(this.validator.generateValidationReport());
         break;
         
       case 'console':
@@ -301,7 +274,6 @@ class HeaderTestCLI {
       } else {
         await Bun.write(filename, this.validator.generateValidationReport());
       }
-      console.log(`\n💾 Report saved to: ${filename}`);
     } catch (error) {
       console.warn(`⚠️ Failed to save report: ${error.message}`);
     }
@@ -312,68 +284,39 @@ class HeaderTestCLI {
    */
   private async clearResults(): Promise<void> {
     this.validator.clearResults();
-    console.log('🧹 Test results cleared successfully');
   }
   
   /**
    * Display help information
    */
   private showHelp(): void {
-    console.log(helpText);
   }
   
   /**
    * Display result in console format
    */
   private displayResultConsole(result: any): void {
-    console.log('📊 Header Validation Results');
-    console.log('=' .repeat(50));
-    console.log(`URL: ${result.url}`);
-    console.log(`Timestamp: ${result.timestamp}`);
-    console.log(`Overall Score: ${result.overallScore}/100`);
-    console.log(`Compliant: ${result.compliant ? '✅ Yes' : '❌ No'}`);
-    console.log('');
     
-    console.log('🔐 Security Headers:');
-    console.log(`  Score: ${result.detailedResults.security.score}/100`);
-    console.log(`  Compliant: ${result.detailedResults.security.compliant ? '✅ Yes' : '❌ No'}`);
     
     if (result.detailedResults.security.issues.length > 0) {
-      console.log('  Issues:');
       result.detailedResults.security.issues.forEach((issue: string) => {
-        console.log(`    ❌ ${issue}`);
       });
     }
     
-    console.log('');
-    console.log('🌐 CORS Headers:');
-    console.log(`  Score: ${result.detailedResults.cors.score}/100`);
-    console.log(`  Valid: ${result.detailedResults.cors.valid ? '✅ Yes' : '❌ No'}`);
     
     if (result.detailedResults.cors.issues.length > 0) {
-      console.log('  Issues:');
       result.detailedResults.cors.issues.forEach((issue: string) => {
-        console.log(`    ❌ ${issue}`);
       });
     }
     
-    console.log('');
-    console.log('🏷️ System Headers:');
-    console.log(`  Score: ${result.detailedResults.system.score}/100`);
-    console.log(`  Compliant: ${result.detailedResults.system.compliant ? '✅ Yes' : '❌ No'}`);
     
     if (result.detailedResults.system.issues.length > 0) {
-      console.log('  Issues:');
       result.detailedResults.system.issues.forEach((issue: string) => {
-        console.log(`    ❌ ${issue}`);
       });
     }
     
     if (result.recommendations.length > 0) {
-      console.log('');
-      console.log('💡 Recommendations:');
       result.recommendations.forEach((rec: string) => {
-        console.log(`  💡 ${rec}`);
       });
     }
   }
@@ -382,37 +325,25 @@ class HeaderTestCLI {
    * Display summary in console format
    */
   private displaySummaryConsole(results: any[]): void {
-    console.log('📊 Header Validation Summary');
-    console.log('=' .repeat(50));
-    console.log(`Total Endpoints Tested: ${results.length}`);
     
     const avgScore = Math.round(
       results.reduce((sum, result) => sum + result.overallScore, 0) / results.length
     );
-    console.log(`Average Overall Score: ${avgScore}/100`);
     
     const compliantCount = results.filter(result => result.compliant).length;
     const complianceRate = Math.round((compliantCount / results.length) * 100);
-    console.log(`Compliance Rate: ${complianceRate}% (${compliantCount}/${results.length})`);
     
     const totalIssues = results.reduce((sum, result) => sum + result.issues.length, 0);
     const totalRecommendations = results.reduce((sum, result) => sum + result.recommendations.length, 0);
     
-    console.log(`Total Issues Found: ${totalIssues}`);
-    console.log(`Total Recommendations: ${totalRecommendations}`);
     
-    console.log('');
-    console.log('🏆 Top Performers:');
     const topResults = results
       .sort((a, b) => b.overallScore - a.overallScore)
       .slice(0, 3);
     
     topResults.forEach((result, index) => {
-      console.log(`  ${index + 1}. ${result.url} - ${result.overallScore}/100`);
     });
     
-    console.log('');
-    console.log('⚠️ Needs Attention:');
     const needsAttention = results
       .filter(result => result.overallScore < 70)
       .sort((a, b) => a.overallScore - b.overallScore)
@@ -420,10 +351,8 @@ class HeaderTestCLI {
     
     if (needsAttention.length > 0) {
       needsAttention.forEach((result, index) => {
-        console.log(`  ${index + 1}. ${result.url} - ${result.overallScore}/100`);
       });
     } else {
-      console.log('  All endpoints are performing well! 🎉');
     }
   }
   

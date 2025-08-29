@@ -100,7 +100,6 @@ export class LKeyTelegramValidator {
    * Main validation function - validates entire system with graceful error handling
    */
   async validateLKeyTelegramConsistency(agentID?: string): Promise<ValidationReport> {
-    console.log('🔍 Starting L-Key to Telegram validation...');
     
     // Reset error tracking
     this.errors = [];
@@ -120,7 +119,6 @@ export class LKeyTelegramValidator {
       );
       
       const customers = customerData.customers;
-      console.log(`📊 Validating ${customers.length} Fire22 customers...`);
       
       // Perform validations with error handling
       let customerValidations: CustomerValidation[] = [];
@@ -166,7 +164,6 @@ export class LKeyTelegramValidator {
         recoveredErrors
       );
       
-      console.log(`✅ Validation complete. Found ${report.mismatches} mismatches, ${this.errors.length} errors.`);
       return report;
       
     } catch (error) {
@@ -215,7 +212,6 @@ export class LKeyTelegramValidator {
       }
     }
     
-    console.log(`📊 Partial validation: ${processedCount}/${customers.length} customers processed, ${errorCount} errors`);
     return validations;
   }
   
@@ -259,7 +255,6 @@ export class LKeyTelegramValidator {
       }
     }
     
-    console.log(`📊 Partial Telegram validation: ${processedCount}/${telegramUsers.length} users processed, ${errorCount} errors`);
     return validations;
   }
   
@@ -627,7 +622,6 @@ export class LKeyTelegramValidator {
     failed: number;
     results: Array<{ type: string; success: boolean; details: string; }>;
   }> {
-    console.log('🔧 Starting auto-fix for identified issues...');
     
     const results: Array<{ type: string; success: boolean; details: string; }> = [];
     let fixed = 0;
@@ -692,7 +686,6 @@ export class LKeyTelegramValidator {
       }
     }
     
-    console.log(`✅ Auto-fix complete: ${fixed} fixed, ${failed} failed`);
     
     return { fixed, failed, results };
   }
@@ -776,7 +769,6 @@ export class LKeyTelegramValidator {
     
     if (filePath) {
       // In a real implementation, this would write to file
-      console.log(`📊 Report exported to ${filePath}`);
     }
     
     return jsonReport;

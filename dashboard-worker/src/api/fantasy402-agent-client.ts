@@ -161,7 +161,6 @@ export class Fantasy402AgentClient {
    */
   async initialize(): Promise<boolean> {
     try {
-      console.log('🚀 Initializing Fantasy402 Agent Client...');
       
       // Step 1: Login
       const loginResult = await this.auth.login();
@@ -182,15 +181,11 @@ export class Fantasy402AgentClient {
           active: loginResult.data.accountInfo.Active === 'Y',
           agentType: loginResult.data.accountInfo.AgentType || 'M'
         };
-        console.log(`✅ Account: ${this.accountInfo.customerID}`);
-        console.log(`   Balance: $${this.accountInfo.balance.toLocaleString()}`);
-        console.log(`   Office: ${this.accountInfo.office}`);
       }
       
       // Step 2: Get Authorizations
       await this.fetchAuthorizations();
       
-      console.log('✅ Agent client initialized successfully');
       return true;
     } catch (error) {
       console.error('❌ Initialization failed:', error);
@@ -203,7 +198,6 @@ export class Fantasy402AgentClient {
    */
   private async fetchAuthorizations(): Promise<void> {
     try {
-      console.log('🔐 Fetching agent authorizations...');
       
       const response = await this.auth.request('Manager/getAuthorizations', 'POST', {
         agentID: this.auth.getSession()?.customerId
@@ -223,11 +217,6 @@ export class Fantasy402AgentClient {
           rawPermissions: response
         };
         
-        console.log(`✅ Permissions loaded for agent: ${this.permissions.agentID}`);
-        console.log(`   Master Agent: ${this.permissions.masterAgentID}`);
-        console.log(`   Is Office: ${this.permissions.isOffice}`);
-        console.log(`   Can Manage Lines: ${this.permissions.canManageLines}`);
-        console.log(`   Can Add Accounts: ${this.permissions.canAddAccounts}`);
       }
     } catch (error) {
       console.error('⚠️ Could not fetch authorizations:', error);
@@ -246,7 +235,6 @@ export class Fantasy402AgentClient {
     try {
       const agentID = this.permissions?.agentID || this.auth.getSession()?.customerId;
       
-      console.log(`📊 Fetching weekly figures for agent: ${agentID}`);
       
       // Try the lite version first with all required parameters
       const response = await this.auth.getWeeklyFiguresLite({
@@ -296,7 +284,6 @@ export class Fantasy402AgentClient {
     try {
       const agentID = this.permissions?.agentID || this.auth.getSession()?.customerId;
       
-      console.log(`📈 Fetching weekly figure by agent lite for: ${agentID}`);
       
       const response = await this.auth.request('Manager/getWeeklyFigureByAgentLite', 'POST', {
         agentID: agentID?.toUpperCase()
@@ -308,7 +295,6 @@ export class Fantasy402AgentClient {
         const today = typeof response.Today === 'number' ? response.Today : 0;
         const active = typeof response.Active === 'number' ? response.Active : 0;
         
-        console.log(`✅ Weekly figures - Week: $${thisWeek.toLocaleString()}, Today: $${today.toLocaleString()}, Active: ${active}`);
         
         return {
           thisWeek,
@@ -339,7 +325,6 @@ export class Fantasy402AgentClient {
     try {
       const agentID = this.permissions?.agentID || this.auth.getSession()?.customerId;
       
-      console.log(`👤 Fetching detailed account info for: ${agentID}`);
       
       // Get JWT token for request body (required by this endpoint)
       const jwtToken = this.auth.getSession()?.bearerToken;
@@ -358,7 +343,6 @@ export class Fantasy402AgentClient {
         agentSite: '1'                          // Required site identifier
       };
       
-      console.log(`📡 Making getAccountInfoOwner request with complete parameters for agent: ${agentID}`);
       
       const response = await this.auth.request(endpointURL, httpMethod, requestData);
       
@@ -366,8 +350,6 @@ export class Fantasy402AgentClient {
         // Extract account data directly from response.accountInfo (single level)
         const accountData = response.accountInfo;
         
-        console.log(`✅ Received comprehensive account data with ${Object.keys(accountData).length} fields`);
-        console.log(`🏢 Agent Type: ${accountData.AgentType}, Office: ${accountData.Office}, Store: ${accountData.Store}`);
         
         // Extract and clean the data (excluding sensitive information)
         const accountInfo: DetailedAccountInfo = {
@@ -410,14 +392,12 @@ export class Fantasy402AgentClient {
           }
         };
         
-        console.log(`✅ Account info loaded - Type: ${accountInfo.agentType}, Office: ${accountInfo.office}, Balance: $${accountInfo.currentBalance.toLocaleString()}`);
-        console.log(`🔧 Permissions - ManageLines: ${accountInfo.manageLinesFlag}, AddAccounts: ${accountInfo.addNewAccountFlag}, DeleteBets: ${accountInfo.permitDeleteBets}`);
         
         return accountInfo;
       }
       
       // Handle the case where accountInfo is null (old failing response)
-      if (response && response.accountInfo === null) {
+      if (response && response.accountInfo ==== null) {
         console.error('❌ getAccountInfoOwner returned null accountInfo - request parameters may be incorrect');
         throw new Error('Account information not available - null response from API');
       }
@@ -437,7 +417,6 @@ export class Fantasy402AgentClient {
     try {
       const agentID = this.permissions?.agentID || this.auth.getSession()?.customerId;
       
-      console.log(`👥 Fetching sub-agents for: ${agentID}`);
       
       const response = await this.auth.request('Manager/getListAgenstByAgent', 'POST', {
         agentID: agentID?.toUpperCase()
@@ -455,7 +434,6 @@ export class Fantasy402AgentClient {
    */
   async getBalance(): Promise<any> {
     try {
-      console.log('💰 Fetching account balance');
       return await this.auth.getCustomerBalance();
     } catch (error) {
       console.error('❌ Failed to get balance:', error);
@@ -472,7 +450,6 @@ export class Fantasy402AgentClient {
     limit?: number;
   }): Promise<any> {
     try {
-      console.log('📈 Fetching transactions');
       return await this.auth.getCustomerTransactions(params);
     } catch (error) {
       console.error('❌ Failed to get transactions:', error);
@@ -490,7 +467,6 @@ export class Fantasy402AgentClient {
     status?: string;
   }): Promise<any> {
     try {
-      console.log('🎲 Fetching wagers');
       return await this.auth.getCustomerWagers(params);
     } catch (error) {
       console.error('❌ Failed to get wagers:', error);
@@ -506,7 +482,6 @@ export class Fantasy402AgentClient {
     try {
       const agentID = this.permissions?.agentID || this.auth.getSession()?.customerId;
       
-      console.log(`🎯 Fetching live wagers for Manager: ${agentID}`);
       
       // Try Manager-level endpoint first
       try {
@@ -516,22 +491,17 @@ export class Fantasy402AgentClient {
           operation: 'getLiveWagers'
         };
         
-        console.log('📤 Manager live wagers request:', managerWagersPayload);
         
         const managerResponse = await this.auth.request('Manager/getLiveWagers', 'POST', managerWagersPayload);
         
         if (managerResponse && (managerResponse.wagers || managerResponse.LIST || managerResponse.ARRAY)) {
-          console.log('✅ Successfully retrieved Manager-level live wagers');
           return managerResponse;
         }
         
-        console.log('⚠️ Manager endpoint returned unexpected format, trying alternatives...');
       } catch (managerError) {
-        console.log('⚠️ Manager/getLiveWagers endpoint failed:', managerError);
       }
       
       // Fallback to customer-level endpoint
-      console.log('🔄 Falling back to customer live wagers endpoint');
       return await this.auth.getCustomerLiveWagers();
       
     } catch (error) {
@@ -554,7 +524,6 @@ export class Fantasy402AgentClient {
     try {
       const agentID = this.permissions?.agentID || this.auth.getSession()?.customerId;
       
-      console.log(`👥 Attempting to fetch customers for Manager agent: ${agentID}`);
       
       // Enhanced request with Manager context and multiple parameter variations
       const requestPayload = {
@@ -565,15 +534,12 @@ export class Fantasy402AgentClient {
         limit: limit // Alternative limit parameter
       };
       
-      console.log('📤 Customer list request payload:', requestPayload);
       
       const response = await this.auth.request('Manager/getCustomersList', 'POST', requestPayload);
       
       if (response && (response.customers || response.LIST || response.ARRAY)) {
-        console.log('✅ Successfully retrieved customer list');
         return response;
       } else {
-        console.log('⚠️ Customer list response format unexpected:', response);
         return response || { customers: [], message: 'No customers found' };
       }
       
@@ -582,7 +548,6 @@ export class Fantasy402AgentClient {
       
       // Try alternative endpoint structure
       try {
-        console.log('🔄 Trying alternative customer list endpoint...');
         
         const alternativeResponse = await this.auth.request('Manager/getCustomers', 'POST', {
           agentID: agentID?.toUpperCase(),
@@ -591,11 +556,9 @@ export class Fantasy402AgentClient {
         });
         
         if (alternativeResponse) {
-          console.log('✅ Alternative customer endpoint succeeded');
           return alternativeResponse;
         }
       } catch (altError) {
-        console.log('⚠️ Alternative customer endpoint also failed:', altError);
       }
       
       return { 
@@ -668,7 +631,6 @@ export class Fantasy402AgentClient {
           }
         }
         
-        console.log('✅ Token renewed successfully');
         return true;
       }
       
@@ -688,7 +650,6 @@ export class Fantasy402AgentClient {
     
     const fiveMinutes = 5 * 60 * 1000;
     if (session.expiresAt && (Date.now() + fiveMinutes) > session.expiresAt) {
-      console.log('🔄 Token expiring soon, renewing...');
       await this.renewToken();
     }
   }
@@ -742,7 +703,6 @@ export class Fantasy402AgentClient {
       attempts: number;
     }> = [];
     
-    console.log(`🧪 Testing Manager endpoints for Agent: ${agentID} (Type: M)`);
     
     // Define endpoints to test with various parameter combinations
     const endpointsToTest = [
@@ -782,22 +742,18 @@ export class Fantasy402AgentClient {
         attempts++;
         
         try {
-          console.log(`🎯 Testing ${endpointTest.name} (attempt ${attempts}):`, payload);
           
           const response = await this.auth.request(endpointTest.name, 'POST', payload);
           
           if (response && response !== 'Invalid Method' && !response.error) {
-            console.log(`✅ ${endpointTest.name} succeeded on attempt ${attempts}`);
             success = true;
             successData = response;
             break;
           } else {
-            console.log(`⚠️ ${endpointTest.name} attempt ${attempts} returned:`, response);
             lastError = typeof response === 'string' ? response : JSON.stringify(response);
           }
         } catch (error) {
           const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-          console.log(`❌ ${endpointTest.name} attempt ${attempts} failed:`, errorMsg);
           lastError = errorMsg;
         }
         
@@ -820,7 +776,6 @@ export class Fantasy402AgentClient {
       total: results.length
     };
     
-    console.log(`🏁 Manager endpoint testing complete: ${summary.successful}/${summary.total} successful`);
     
     return {
       endpointResults: results,
@@ -834,7 +789,6 @@ export class Fantasy402AgentClient {
    */
   async getNewUsers(days: number = 7): Promise<any> {
     try {
-      console.log(`👥 Fetching new users info for last ${days} days...`);
       
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -854,7 +808,6 @@ export class Fantasy402AgentClient {
         agentSite: '1'
       };
 
-      console.log(`📤 New users request payload for agent: ${agentID}`, {
         agentID: requestPayload.agentID,
         days: requestPayload.days,
         operation: requestPayload.operation,
@@ -867,7 +820,6 @@ export class Fantasy402AgentClient {
       const response = await this.auth.request('Manager/getNewUsersInfo', 'POST', requestPayload);
       
       if (response && typeof response === 'object') {
-        console.log('✅ New users information retrieved successfully');
         
         // Transform the response to match our expected format
         return {
@@ -879,7 +831,6 @@ export class Fantasy402AgentClient {
           lastUpdated: new Date().toISOString()
         };
       } else {
-        console.log('⚠️ Unexpected new users response format:', response);
         return {
           success: false,
           data: {},
@@ -911,7 +862,6 @@ export class Fantasy402AgentClient {
    */
   async getTeaserProfile(): Promise<any> {
     try {
-      console.log('🎲 Fetching teaser profile configuration...');
       
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -932,7 +882,6 @@ export class Fantasy402AgentClient {
         agentSite: '1'
       };
 
-      console.log(`📤 Teaser profile request payload for agent: ${agentID}`, {
         acc: requestPayload.acc,
         operation: requestPayload.operation,
         RRO: requestPayload.RRO,
@@ -945,7 +894,6 @@ export class Fantasy402AgentClient {
       const response = await this.auth.request('Manager/getTeaserProfile', 'POST', requestPayload);
       
       if (response && typeof response === 'object') {
-        console.log('✅ Teaser profile configuration retrieved successfully');
         
         // Transform the response to match our expected format
         return {
@@ -958,7 +906,6 @@ export class Fantasy402AgentClient {
           lastUpdated: new Date().toISOString()
         };
       } else {
-        console.log('⚠️ Unexpected teaser profile response format:', response);
         return {
           success: false,
           data: {},
@@ -992,7 +939,6 @@ export class Fantasy402AgentClient {
    */
   async getInfoPlayer(playerID: string): Promise<any> {
     try {
-      console.log(`👤 Fetching detailed player information for: ${playerID}`);
       
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -1012,7 +958,6 @@ export class Fantasy402AgentClient {
         agentSite: '1'                               // Site identifier
       };
 
-      console.log(`📤 Player info request payload for customer: ${playerID}`, {
         customerID: requestPayload.customerID,
         agentID: requestPayload.agentID,
         operation: requestPayload.operation,
@@ -1025,7 +970,6 @@ export class Fantasy402AgentClient {
       const response = await this.auth.request('Manager/getInfoPlayer', 'POST', requestPayload);
       
       if (response && typeof response === 'object') {
-        console.log('✅ Player information retrieved successfully');
         
         // Transform the response to match our expected format
         return {
@@ -1074,7 +1018,6 @@ export class Fantasy402AgentClient {
           lastUpdated: new Date().toISOString()
         };
       } else {
-        console.log('⚠️ Unexpected player info response format:', response);
         return {
           success: false,
           data: {},
@@ -1102,7 +1045,6 @@ export class Fantasy402AgentClient {
    */
   async getPendingWebReportsConfig(): Promise<any> {
     try {
-      console.log('📋 Fetching pending web reports configuration...');
       
       // Get current session and JWT token
       const session = this.auth.getSession();
@@ -1120,7 +1062,6 @@ export class Fantasy402AgentClient {
         operation: 'getConfigWebReportsPending'
       };
 
-      console.log(`📤 Web reports config request payload for agent: ${agentID}`, {
         agentID: requestPayload.agentID,
         agentType: requestPayload.agentType,
         operation: requestPayload.operation,
@@ -1131,7 +1072,6 @@ export class Fantasy402AgentClient {
       const response = await this.auth.request('Manager/getConfigWebReportsPending', 'POST', requestPayload);
       
       if (response && typeof response === 'object') {
-        console.log('✅ Web reports configuration retrieved successfully');
         
         // Transform the response to match our expected format
         return {
@@ -1142,7 +1082,6 @@ export class Fantasy402AgentClient {
           lastUpdated: new Date().toISOString()
         };
       } else {
-        console.log('⚠️ Unexpected web reports config response format:', response);
         return {
           success: false,
           config: {},
@@ -1172,7 +1111,6 @@ export class Fantasy402AgentClient {
    */
   async getListAgenstByAgent(): Promise<any> {
     try {
-      console.log('👥 Fetching comprehensive customer list...');
       
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -1191,7 +1129,6 @@ export class Fantasy402AgentClient {
         offset: 0
       };
 
-      console.log('📤 Customer list request payload:', requestPayload);
 
       const response = await this.auth.request('Manager/getListAgenstByAgent', 'POST', requestPayload);
       
@@ -1247,7 +1184,6 @@ export class Fantasy402AgentClient {
           };
         });
 
-        console.log(`✅ Loaded ${sanitizedCustomers.length} customers with sanitized data`);
         
         return {
           success: true,
@@ -1257,7 +1193,6 @@ export class Fantasy402AgentClient {
         };
         
       } else {
-        console.log('⚠️ Unexpected customer list response format:', response);
         return {
           success: false,
           customers: [],
@@ -1294,7 +1229,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-      console.log('🎲 Fetching available lottery games...');
 
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -1313,12 +1247,10 @@ export class Fantasy402AgentClient {
         agentSite: '1'
       };
 
-      console.log(`📤 Lottery games request payload for agent: ${agentID}`);
 
       const response = await this.auth.request('Manager/getLotteryGames', 'POST', requestPayload);
 
       if (response && typeof response === 'object') {
-        console.log('✅ Lottery games retrieved successfully');
 
         // Transform the response to match our expected format
         const games: LotteryGame[] = [];
@@ -1343,7 +1275,6 @@ export class Fantasy402AgentClient {
           lastUpdated: new Date().toISOString()
         };
       } else {
-        console.log('⚠️ Unexpected lottery games response format:', response);
         return {
           success: false,
           games: [],
@@ -1373,7 +1304,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-      console.log(`🎲 Fetching lottery settings for customer: ${customerID}`);
 
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -1393,12 +1323,10 @@ export class Fantasy402AgentClient {
         agentSite: '1'
       };
 
-      console.log(`📤 Lottery settings request for customer: ${customerID}`);
 
       const response = await this.auth.request('Manager/getLotterySettings', 'POST', requestPayload);
 
       if (response && typeof response === 'object' && response.settings) {
-        console.log('✅ Lottery settings retrieved successfully');
 
         const settings: LotterySettings = {
           customerID,
@@ -1420,7 +1348,6 @@ export class Fantasy402AgentClient {
           settings
         };
       } else {
-        console.log('⚠️ No lottery settings found for customer');
         return {
           success: false,
           settings: null,
@@ -1448,7 +1375,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-      console.log(`🎲 Updating lottery settings for customer: ${customerID}`);
 
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -1486,7 +1412,6 @@ export class Fantasy402AgentClient {
         }
       });
 
-      console.log(`📤 Updating lottery settings for customer: ${customerID}`, {
         allowLotto: settings.allowLotto,
         lottoMaxWager: settings.lottoMaxWager,
         lottoDailyLimit: settings.lottoDailyLimit
@@ -1495,13 +1420,11 @@ export class Fantasy402AgentClient {
       const response = await this.auth.request('Manager/updateLotterySettings', 'POST', requestPayload);
 
       if (response && typeof response === 'object' && response.success !== false) {
-        console.log('✅ Lottery settings updated successfully');
         return {
           success: true,
           message: 'Lottery settings updated successfully'
         };
       } else {
-        console.log('⚠️ Lottery settings update failed:', response);
         return {
           success: false,
           message: 'Failed to update lottery settings',
@@ -1535,7 +1458,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-      console.log(`🎲 Placing lottery bet for customer: ${customerID}`);
 
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -1587,7 +1509,6 @@ export class Fantasy402AgentClient {
         agentSite: '1'
       };
 
-      console.log(`📤 Placing lottery bet for customer: ${customerID}`, {
         gameId: betData.gameId,
         betAmount: betData.betAmount,
         numbers: betData.numbers.length
@@ -1596,7 +1517,6 @@ export class Fantasy402AgentClient {
       const response = await this.auth.request('Manager/placeLotteryBet', 'POST', requestPayload);
 
       if (response && typeof response === 'object' && response.bet) {
-        console.log('✅ Lottery bet placed successfully');
 
         const bet: LotteryBet = {
           betId: response.bet.BetID || response.bet.betId || '',
@@ -1617,7 +1537,6 @@ export class Fantasy402AgentClient {
           bet
         };
       } else {
-        console.log('⚠️ Lottery bet placement failed:', response);
         return {
           success: false,
           bet: null,
@@ -1651,7 +1570,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-      console.log(`🎲 Fetching lottery bets for customer: ${customerID}`);
 
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -1675,7 +1593,6 @@ export class Fantasy402AgentClient {
         agentSite: '1'
       };
 
-      console.log(`📤 Lottery bets request for customer: ${customerID}`, {
         status: options.status,
         limit: options.limit
       });
@@ -1683,7 +1600,6 @@ export class Fantasy402AgentClient {
       const response = await this.auth.request('Manager/getLotteryBets', 'POST', requestPayload);
 
       if (response && typeof response === 'object') {
-        console.log('✅ Lottery bets retrieved successfully');
 
         const bets: LotteryBet[] = [];
         if (response.bets && Array.isArray(response.bets)) {
@@ -1711,7 +1627,6 @@ export class Fantasy402AgentClient {
           totalCount: response.totalCount || bets.length
         };
       } else {
-        console.log('⚠️ No lottery bets found for customer');
         return {
           success: false,
           bets: [],
@@ -1746,7 +1661,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-      console.log('🎲 Fetching lottery draw results...');
 
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -1769,12 +1683,10 @@ export class Fantasy402AgentClient {
         agentSite: '1'
       };
 
-      console.log('📤 Lottery draws request payload');
 
       const response = await this.auth.request('Manager/getLotteryDraws', 'POST', requestPayload);
 
       if (response && typeof response === 'object') {
-        console.log('✅ Lottery draws retrieved successfully');
 
         const draws: LotteryDraw[] = [];
         if (response.draws && Array.isArray(response.draws)) {
@@ -1799,7 +1711,6 @@ export class Fantasy402AgentClient {
           draws
         };
       } else {
-        console.log('⚠️ No lottery draws found');
         return {
           success: false,
           draws: [],
@@ -1854,7 +1765,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-      console.log('📊 Fetching lottery statistics...');
 
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -1876,12 +1786,10 @@ export class Fantasy402AgentClient {
         agentSite: '1'
       };
 
-      console.log('📤 Lottery statistics request payload');
 
       const response = await this.auth.request('Manager/getLotteryStatistics', 'POST', requestPayload);
 
       if (response && typeof response === 'object' && response.statistics) {
-        console.log('✅ Lottery statistics retrieved successfully');
 
         const stats = response.statistics;
         const statistics = {
@@ -1903,7 +1811,6 @@ export class Fantasy402AgentClient {
           statistics
         };
       } else {
-        console.log('⚠️ No lottery statistics available');
         return {
           success: false,
           statistics: {
@@ -1969,7 +1876,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-      console.log(`📝 Fetching player notes for customer: ${customerID}`);
 
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -1989,12 +1895,10 @@ export class Fantasy402AgentClient {
         agentSite: '1'
       };
 
-      console.log(`📤 Player notes request for customer: ${customerID}`);
 
       const response = await this.auth.request('Manager/getPlayerNotes', 'POST', requestPayload);
 
       if (response && typeof response === 'object') {
-        console.log('✅ Player notes retrieved successfully');
 
         const notes = {
           playerNotes: response.playerNotes || response.PlayerNotes || '',
@@ -2007,7 +1911,6 @@ export class Fantasy402AgentClient {
           ...notes
         };
       } else {
-        console.log('⚠️ No player notes found for customer');
         return {
           success: false,
           playerNotes: '',
@@ -2040,7 +1943,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-      console.log(`📝 Updating player notes for customer: ${customerID}`);
 
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -2070,7 +1972,6 @@ export class Fantasy402AgentClient {
         timestamp: new Date().toISOString()
       };
 
-      console.log(`📤 Updating player notes for customer: ${customerID}`, {
         category,
         notesLength: notes.length,
         agentName
@@ -2079,7 +1980,6 @@ export class Fantasy402AgentClient {
       const response = await this.auth.request('Manager/updatePlayerNotes', 'POST', requestPayload);
 
       if (response && typeof response === 'object' && response.success !== false) {
-        console.log('✅ Player notes updated successfully');
 
         const noteId = response.noteId || `note_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
@@ -2089,7 +1989,6 @@ export class Fantasy402AgentClient {
           noteId: noteId
         };
       } else {
-        console.log('⚠️ Player notes update failed:', response);
         return {
           success: false,
           message: 'Failed to update player notes',
@@ -2118,7 +2017,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-      console.log(`📝 Adding player note for customer: ${customerID}`);
 
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -2157,7 +2055,6 @@ export class Fantasy402AgentClient {
         isActive: true
       };
 
-      console.log(`📤 Adding player note for customer: ${customerID}`, {
         noteId,
         category,
         noteLength: note.length,
@@ -2167,7 +2064,6 @@ export class Fantasy402AgentClient {
       const response = await this.auth.request('Manager/addPlayerNote', 'POST', requestPayload);
 
       if (response && typeof response === 'object' && response.success !== false) {
-        console.log('✅ Player note added successfully');
 
         return {
           success: true,
@@ -2175,7 +2071,6 @@ export class Fantasy402AgentClient {
           noteId: noteId
         };
       } else {
-        console.log('⚠️ Player note addition failed:', response);
         return {
           success: false,
           message: 'Failed to add player note',
@@ -2220,7 +2115,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-      console.log(`📋 Fetching player note history for customer: ${customerID}`);
 
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -2245,7 +2139,6 @@ export class Fantasy402AgentClient {
         agentSite: '1'
       };
 
-      console.log(`📤 Player note history request for customer: ${customerID}`, {
         category: options.category,
         limit: options.limit
       });
@@ -2253,7 +2146,6 @@ export class Fantasy402AgentClient {
       const response = await this.auth.request('Manager/getPlayerNoteHistory', 'POST', requestPayload);
 
       if (response && typeof response === 'object') {
-        console.log('✅ Player note history retrieved successfully');
 
         const noteHistory = response.noteHistory || response.NoteHistory || [];
         const totalCount = response.totalCount || noteHistory.length;
@@ -2264,7 +2156,6 @@ export class Fantasy402AgentClient {
           totalCount
         };
       } else {
-        console.log('⚠️ No player note history found for customer');
         return {
           success: false,
           noteHistory: [],
@@ -2294,7 +2185,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-      console.log(`🗑️ Deleting player note: ${noteId} for customer: ${customerID}`);
 
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -2320,7 +2210,6 @@ export class Fantasy402AgentClient {
         isActive: false
       };
 
-      console.log(`📤 Deleting player note: ${noteId}`, {
         customerID,
         agentName,
         reason
@@ -2329,14 +2218,12 @@ export class Fantasy402AgentClient {
       const response = await this.auth.request('Manager/deletePlayerNote', 'POST', requestPayload);
 
       if (response && typeof response === 'object' && response.success !== false) {
-        console.log('✅ Player note deleted successfully');
 
         return {
           success: true,
           message: 'Player note deleted successfully'
         };
       } else {
-        console.log('⚠️ Player note deletion failed:', response);
         return {
           success: false,
           message: 'Failed to delete player note',
@@ -2380,7 +2267,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-      console.log(`📋 Fetching notes by category: ${category}`);
 
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -2404,14 +2290,12 @@ export class Fantasy402AgentClient {
         agentSite: '1'
       };
 
-      console.log(`📤 Category notes request: ${category}`, {
         limit: options.limit
       });
 
       const response = await this.auth.request('Manager/getNotesByCategory', 'POST', requestPayload);
 
       if (response && typeof response === 'object') {
-        console.log('✅ Category notes retrieved successfully');
 
         const notes = response.notes || response.Notes || [];
         const totalCount = response.totalCount || notes.length;
@@ -2422,7 +2306,6 @@ export class Fantasy402AgentClient {
           totalCount
         };
       } else {
-        console.log('⚠️ No notes found for category');
         return {
           success: false,
           notes: [],
@@ -2471,7 +2354,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-      console.log(`🔍 Searching player notes for: "${searchTerm}"`);
 
       // Get current session and agent information
       const session = this.auth.getSession();
@@ -2501,7 +2383,6 @@ export class Fantasy402AgentClient {
         agentSite: '1'
       };
 
-      console.log(`📤 Player notes search: "${searchTerm}"`, {
         category: options.category,
         limit: options.limit
       });
@@ -2509,7 +2390,6 @@ export class Fantasy402AgentClient {
       const response = await this.auth.request('Manager/searchPlayerNotes', 'POST', requestPayload);
 
       if (response && typeof response === 'object') {
-        console.log('✅ Player notes search completed successfully');
 
         const results = response.results || response.searchResults || [];
         const totalCount = response.totalCount || results.length;
@@ -2521,7 +2401,6 @@ export class Fantasy402AgentClient {
           searchTerm: searchTerm
         };
       } else {
-        console.log('⚠️ No search results found');
         return {
           success: false,
           results: [],

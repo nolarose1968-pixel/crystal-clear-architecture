@@ -336,10 +336,19 @@ export class MainWorker {
         return MonitoringUtils.addCorrelationId(response, correlationId);
       }
 
-      // Handle favicon.ico requests
+      // Handle favicon.ico requests with proper Fire22 branding
       if (path === '/favicon.ico') {
-        const response = new Response(null, { status: 204 });
-        return MonitoringUtils.addCorrelationId(response, correlationId);
+        // Create a simple SVG favicon with Fire22 branding
+        const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" fill="#ffd700"/><text x="16" y="22" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#000">F</text></svg>`;
+
+        const response = new Response(faviconSvg, {
+          headers: {
+            'Content-Type': 'image/svg+xml',
+            'Cache-Control': 'public, max-age=31536000',
+            'X-Correlation-ID': correlationId
+          }
+        });
+        return response;
       }
 
       // Handle generic /health path (redirect or simple response)

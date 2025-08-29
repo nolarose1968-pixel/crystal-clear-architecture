@@ -57,7 +57,6 @@ export class CustomerInformationInterface extends EventEmitter {
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-    console.log('👤 Initializing Customer Information Interface...');
 
     // Initialize dependencies
     await this.customerService.initialize();
@@ -77,7 +76,6 @@ export class CustomerInformationInterface extends EventEmitter {
     }
 
     this.isInitialized = true;
-    console.log('✅ Customer Information Interface initialized');
   }
 
   /**
@@ -124,7 +122,6 @@ export class CustomerInformationInterface extends EventEmitter {
       }
     });
 
-    console.log('👂 Event listeners setup');
   }
 
   /**
@@ -280,7 +277,6 @@ export class CustomerInformationInterface extends EventEmitter {
       cancelButton: { text: 'Cancel', class: 'btn btn-secondary' }
     });
 
-    console.log('📝 Customer forms initialized');
   }
 
   /**
@@ -292,7 +288,6 @@ export class CustomerInformationInterface extends EventEmitter {
       this.refreshCurrentView();
     }, 30000);
 
-    console.log('🔄 Real-time updates enabled');
   }
 
   /**
@@ -812,7 +807,6 @@ export class CustomerInformationInterface extends EventEmitter {
    */
   private initializeComponents(): void {
     // Initialize any additional components if needed
-    console.log('🔧 Customer interface components initialized');
   }
 
   /**
@@ -1208,7 +1202,6 @@ export class CustomerInformationInterface extends EventEmitter {
    */
   private viewCustomerTransactions(): void {
     // This would integrate with the cashier service to show customer transactions
-    console.log('Viewing customer transactions...');
     // Implementation would open transaction history for the selected customer
   }
 
@@ -1329,7 +1322,6 @@ export class CustomerInformationInterface extends EventEmitter {
   private populateFormWithCustomerData(customer: CustomerProfile): void {
     // This would populate the form fields with customer data
     // Implementation depends on the form management service integration
-    console.log('Populating form with customer data:', customer);
   }
 
   /**
@@ -1442,12 +1434,10 @@ export class CustomerInformationInterface extends EventEmitter {
   // Event handlers
 
   private onCustomerCreated(customer: CustomerProfile): void {
-    console.log(`👤 Customer created: ${customer.customerId}`);
     this.refreshCurrentView();
   }
 
   private onCustomerUpdated(customer: CustomerProfile): void {
-    console.log(`👤 Customer updated: ${customer.customerId}`);
     this.refreshCurrentView();
 
     // Update selected customer if it's the current one
@@ -1463,7 +1453,6 @@ export class CustomerInformationInterface extends EventEmitter {
   }
 
   private onCustomerUpdatedRealtime(customer: CustomerProfile): void {
-    console.log(`🔄 Customer updated in real-time: ${customer.customerId}`);
     this.onCustomerUpdated(customer);
   }
 }

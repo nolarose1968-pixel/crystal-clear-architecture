@@ -159,34 +159,16 @@ export function displayBuildInfo(): void {
   const config = getEffectiveConfig();
   const runtimeArgs = parseRuntimeArgs();
   
-  console.log('🚀 Fire22 Dashboard Worker - Build Information');
-  console.log('==============================================');
-  console.log(`📦 Version: ${config.version}`);
-  console.log(`🏗️ Build Time: ${config.buildTime}`);
-  console.log(`🌍 Environment: ${config.environment}`);
-  console.log(`🔧 Debug Mode: ${config.debugMode}`);
-  console.log(`📝 Log Level: ${config.logLevel}`);
-  console.log(`🌐 API URL: ${config.apiUrl}`);
-  console.log(`🔌 Port: ${config.runtime.port}`);
-  console.log(`🏠 Host: ${config.runtime.host}`);
-  console.log(`⚡ Optimize: ${config.runtime.optimize}`);
-  console.log(`📊 Monitor: ${config.runtime.monitor}`);
-  console.log(`🎮 Demo Mode: ${config.runtime.demoMode}`);
   
   if (Object.keys(runtimeArgs).length > 0) {
-    console.log('\n🔧 Runtime Arguments:');
-    console.log(JSON.stringify(runtimeArgs, null, 2));
   }
   
   if (config.features.bytecode) {
-    console.log('\n⚡ Bytecode compilation enabled');
   }
   
   if (config.features.windows) {
-    console.log('🪟 Windows metadata embedded');
   }
   
-  console.log('==============================================\n');
 }
 
 /**

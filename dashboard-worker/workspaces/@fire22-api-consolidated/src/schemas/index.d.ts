@@ -428,15 +428,15 @@ export declare const LoginResponseSchema: z.ZodObject<{
             tokenType: z.ZodLiteral<"Bearer">;
             expiresIn: z.ZodNumber;
         }, "strip", z.ZodTypeAny, {
-            expiresIn: number;
             refreshToken: string;
             accessToken: string;
             tokenType: "Bearer";
+            expiresIn: number;
         }, {
-            expiresIn: number;
             refreshToken: string;
             accessToken: string;
             tokenType: "Bearer";
+            expiresIn: number;
         }>;
     }, "strip", z.ZodTypeAny, {
         user: {
@@ -447,10 +447,10 @@ export declare const LoginResponseSchema: z.ZodObject<{
             username: string;
         };
         tokens: {
-            expiresIn: number;
             refreshToken: string;
             accessToken: string;
             tokenType: "Bearer";
+            expiresIn: number;
         };
     }, {
         user: {
@@ -461,10 +461,10 @@ export declare const LoginResponseSchema: z.ZodObject<{
             username: string;
         };
         tokens: {
-            expiresIn: number;
             refreshToken: string;
             accessToken: string;
             tokenType: "Bearer";
+            expiresIn: number;
         };
     }>;
     message: z.ZodString;
@@ -480,10 +480,10 @@ export declare const LoginResponseSchema: z.ZodObject<{
             username: string;
         };
         tokens: {
-            expiresIn: number;
             refreshToken: string;
             accessToken: string;
             tokenType: "Bearer";
+            expiresIn: number;
         };
     };
 }, {
@@ -498,10 +498,10 @@ export declare const LoginResponseSchema: z.ZodObject<{
             username: string;
         };
         tokens: {
-            expiresIn: number;
             refreshToken: string;
             accessToken: string;
             tokenType: "Bearer";
+            expiresIn: number;
         };
     };
 }>;

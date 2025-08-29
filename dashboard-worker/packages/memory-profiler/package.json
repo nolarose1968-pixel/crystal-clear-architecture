@@ -32,7 +32,7 @@
     "typescript": "^5.9.2"
   },
   "peerDependencies": {
-    "bun": ">=1.2.0"
+    "bun": ">=1.2.21"
   },
   "optionalDependencies": {},
   "trustedDependencies": [],

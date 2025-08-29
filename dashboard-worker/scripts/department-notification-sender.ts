@@ -67,6 +67,20 @@ class DepartmentNotificationSender {
       "head@technology.fire22",
       "mike.hunt@technology.fire22"
     ],
+    "cloudflare-team": [
+      "cloudflare-team@fire22.ag",
+      "cloudflare-workers@fire22.ag",
+      "cloudflare-r2@fire22.ag",
+      "wrangler-support@fire22.ag",
+      "edge-team@fire22.ag"
+    ],
+    "ci-team": [
+      "ci@fire22.ag",
+      "ci-cd@fire22.ag", 
+      "github-actions@fire22.ag",
+      "build-team@fire22.ag",
+      "release-automation@fire22.ag"
+    ],
     "devops-team": [
       "devops@fire22.ag", 
       "cloudflare-team@fire22.ag",

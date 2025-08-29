@@ -136,7 +136,6 @@ export class HubConnectionManager {
       }
 
       const hubData = await hubResponse.json();
-      console.log('Hub health:', hubData);
 
       // Test each connection
       const connectionResults = await Promise.allSettled(
@@ -225,7 +224,6 @@ export class HubConnectionManager {
 
       if (response.ok) {
         const healthData = await response.json();
-        console.log(`✅ Error System connected: ${healthData.data?.registry?.totalErrorCodes || 0} error codes`);
         
         // Update error tracking info
         if (connection.errorTracking) {
@@ -269,7 +267,6 @@ export class HubConnectionManager {
 
       if (response.ok) {
         const botInfo = await response.json();
-        console.log(`✅ Telegram bot connected: @${botInfo.result?.username || 'Unknown'}`);
         return true;
       } else {
         console.error('Telegram bot API test failed:', response.statusText);
@@ -726,7 +723,6 @@ export class HubConnectionManager {
 
       if (response.ok) {
         const result = await response.json();
-        console.log(`📊 Error tracked: ${errorCode} (${result.data?.currentStatistics?.occurrences || 0} occurrences)`);
         return true;
       } else {
         console.warn(`Failed to track error ${errorCode}:`, response.statusText);
@@ -827,7 +823,6 @@ export const hubConnection = new HubConnectionManager();
 if (typeof window === 'undefined') {
   // Server-side initialization
   hubConnection.connectToHub().then(result => {
-    console.log(`🔗 Hub connection initialized: ${result.connections.length} services, ${result.connections.filter(c => c.status === 'connected').length} connected`);
   }).catch(error => {
     console.error('🚨 Hub connection failed:', error.message);
   });

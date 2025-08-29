@@ -95,4 +95,10 @@ router.post('/queue/complete',
   controller.apiQueueComplete
 );
 
+// /api/transactions - Get transactions history
+router.get('/transactions',
+  authorize(["financial.read", "customer.*"]),
+  controller.getTransactions
+);
+
 export const financialRoutes = router;

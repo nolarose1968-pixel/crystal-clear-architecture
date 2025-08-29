@@ -43,13 +43,9 @@ async function benchmark(
 }
 
 function printResult(result: BenchmarkResult) {
-  console.log(`📊 ${result.name}:`);
-  console.log(`   ${result.opsPerSecond.toFixed(0)} ops/sec`);
-  console.log(`   ${result.averageTime.toFixed(3)}ms avg`);
 }
 
 async function main() {
-  console.log('🚀 Fire22 Standalone Component Benchmarks\n');
   
   // Test 1: Schema validation (if available)
   try {
@@ -75,7 +71,6 @@ async function main() {
     printResult(schemaResult);
     
   } catch (error) {
-    console.log('⚠️ Schema validation test skipped:', error.message);
   }
   
   // Test 2: JWT Token generation (if available)
@@ -97,7 +92,6 @@ async function main() {
     printResult(jwtResult);
     
   } catch (error) {
-    console.log('⚠️ JWT test skipped:', error.message);
   }
   
   // Test 3: Request parsing simulation
@@ -257,18 +251,10 @@ async function main() {
     }
   };
   
-  console.log('\n📋 Performance Summary:');
-  console.log('   Schema Validation: 5,000+ ops/sec');
-  console.log('   JWT Generation: 1,000+ ops/sec');
-  console.log('   Request Parsing: 10,000+ ops/sec');
-  console.log('   Route Matching: 10,000+ ops/sec');
-  console.log('   Permission Checks: 10,000+ ops/sec');
   
-  console.log('\n✅ All API components show excellent performance!');
   
   // Save results
   await Bun.write('standalone-benchmark-results.json', JSON.stringify(report, null, 2));
-  console.log('\n📄 Results saved to standalone-benchmark-results.json');
 }
 
 if (import.meta.main) {

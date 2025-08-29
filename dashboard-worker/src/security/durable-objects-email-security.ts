@@ -127,7 +127,6 @@ export class Fire22EmailSecurityDO {
     department: string, 
     context: SecurityContext
   ): Promise<Response> {
-    console.log(`🔐 SECURE STORE: Department ${department}, User ${context.userId}`);
 
     try {
       // Get department configuration
@@ -206,7 +205,6 @@ export class Fire22EmailSecurityDO {
     department: string, 
     context: SecurityContext
   ): Promise<Response> {
-    console.log(`📧 SECURE RETRIEVE: Department ${department}, User ${context.userId}`);
 
     try {
       // Get department configuration
@@ -301,7 +299,6 @@ export class Fire22EmailSecurityDO {
     department: string, 
     context: SecurityContext
   ): Promise<Response> {
-    console.log(`🗑️ SECURE DELETE: Department ${department}, User ${context.userId}`);
 
     try {
       const url = new URL(request.url);
@@ -383,7 +380,6 @@ export class Fire22EmailSecurityDO {
     department: string, 
     context: SecurityContext
   ): Promise<Response> {
-    console.log(`📊 SECURITY AUDIT: Department ${department}, User ${context.userId}`);
 
     try {
       // Verify user has audit access
@@ -448,7 +444,6 @@ export class Fire22EmailSecurityDO {
     department: string, 
     context: SecurityContext
   ): Promise<Response> {
-    console.log(`💾 SECURE BACKUP: Department ${department}, User ${context.userId}`);
 
     try {
       // Verify user has backup access
@@ -795,7 +790,6 @@ export class Fire22EmailSecurityDO {
 
   private async scheduleSecureBackup(department: string, emailKey: string, frequency: string): Promise<void> {
     // Implementation would schedule backup based on frequency
-    console.log(`📅 Backup scheduled for ${department}:${emailKey} at ${frequency}`);
   }
 
   private async logAuditEvent(event: AuditEntry, resourceKey: string): Promise<void> {

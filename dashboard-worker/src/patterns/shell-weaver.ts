@@ -385,7 +385,6 @@ export class ShellPatternWeaver {
     
     // Display welcome message
     if (welcomeMessage) {
-      console.log(welcomeMessage);
     }
     
     process.stdout.write(prompt);
@@ -396,7 +395,6 @@ export class ShellPatternWeaver {
         
         // Check for exit command
         if (input.toLowerCase() === exitCommand.toLowerCase()) {
-          console.log("Goodbye! 👋");
           break;
         }
         
@@ -408,7 +406,6 @@ export class ShellPatternWeaver {
         
         // Validate input if validator provided
         if (validator && !validator(input)) {
-          console.log("❌ Invalid input");
           process.stdout.write(prompt);
           continue;
         }
@@ -437,13 +434,9 @@ export class ShellPatternWeaver {
         
         // Display result
         if (result.error) {
-          console.log(`❌ Error: ${result.error}`);
         } else if (result.stdout) {
-          console.log(result.stdout);
         } else if (typeof result === 'string') {
-          console.log(result);
         } else if (typeof result === 'object') {
-          console.log(JSON.stringify(result, null, 2));
         }
         
         process.stdout.write(prompt);
@@ -481,7 +474,6 @@ export class ShellPatternWeaver {
     let processedData: any[] = [];
     
     try {
-      console.log("🌊 Stream processing started... (pipe data or press Ctrl+D to finish)");
       
       for await (const chunk of Bun.stdin.stream()) {
         const chunkText = Buffer.from(chunk).toString(encoding);
@@ -513,7 +505,6 @@ export class ShellPatternWeaver {
         
         // Real-time output for debugging
         if (chunkText.trim()) {
-          console.log(`📝 Chunk ${chunks.length}: ${chunkText.substring(0, 50)}${chunkText.length > 50 ? '...' : ''}`);
         }
       }
       
@@ -703,7 +694,6 @@ export class ShellPatternWeaver {
   readonly workflows = {
     // Development workflow
     development: async () => {
-      console.log("📦 Starting development workflow...");
       
       const steps = [
         { name: "Install dependencies", command: "bun install" },
@@ -715,7 +705,6 @@ export class ShellPatternWeaver {
       ];
       
       for (const step of steps) {
-        console.log(`\n🔄 ${step.name}...`);
         const result = await this.executeShell(step.command);
         
         if (!result.success) {
@@ -723,7 +712,6 @@ export class ShellPatternWeaver {
           return false;
         }
         
-        console.log(`✅ Completed in ${result.duration}`);
       }
       
       return true;
@@ -782,7 +770,6 @@ export class ShellPatternWeaver {
     
     // Interactive CLI workflow
     interactiveCLI: async () => {
-      console.log("🎯 Starting interactive CLI workflow...");
       
       const shellWeaver = new ShellPatternWeaver();
       
@@ -833,7 +820,6 @@ export class ShellPatternWeaver {
     
     // Stream processing workflow
     streamProcessor: async () => {
-      console.log("🌊 Starting stream processing workflow...");
       
       const shellWeaver = new ShellPatternWeaver();
       
@@ -869,8 +855,6 @@ export class ShellPatternWeaver {
             warnings: processed.filter(p => p.type === 'warning').length
           };
           
-          console.log("📊 Processing Summary:");
-          console.log(Bun.inspect.table([summary]));
           
           return processed;
         },
@@ -889,7 +873,6 @@ export class ShellPatternWeaver {
     
     // File system validation workflow
     validateProject: async () => {
-      console.log("📁 Starting project validation workflow...");
       
       const shellWeaver = new ShellPatternWeaver();
       
@@ -910,11 +893,8 @@ export class ShellPatternWeaver {
       const validation = await shellWeaver.validateFiles(criticalFiles);
       
       // Display results in table format with property filtering
-      console.log("📊 File Validation Results:");
       
       // Full table
-      console.log("Full Analysis:");
-      console.log(Bun.inspect.table(
         validation.files.map(f => ({
           File: f.path.split('/').pop() || f.path,
           Path: f.path,
@@ -928,7 +908,6 @@ export class ShellPatternWeaver {
       ));
       
       // Summary table
-      console.log("\n📈 Summary by Status:");
       const statusSummary = [
         {
           Status: '✅ Existing',
@@ -941,16 +920,10 @@ export class ShellPatternWeaver {
           TotalSize: 'N/A'
         }
       ];
-      console.log(Bun.inspect.table(statusSummary, { colors: true }));
       
       // Summary
-      console.log(`\n📈 Summary: ${validation.existingFiles}/${validation.totalFiles} files found`);
-      console.log(`⏱️  Validation time: ${validation.validationTime}`);
-      console.log(`💾 Total size: ${(validation.totalSize / 1024).toFixed(1)}KB`);
       
       if (validation.missingFiles.length > 0) {
-        console.log(`\n❌ Missing files:`);
-        validation.missingFiles.forEach(file => console.log(`   • ${file}`));
       }
       
       return validation;
@@ -958,13 +931,11 @@ export class ShellPatternWeaver {
     
     // File system monitoring workflow
     monitorFiles: async (watchPaths: string[] = ['src/', 'docs/', 'package.json']) => {
-      console.log("👁️  Starting file monitoring workflow...");
       
       const shellWeaver = new ShellPatternWeaver();
       
       // Initial baseline
       let lastCheck = await shellWeaver.validateFiles(watchPaths);
-      console.log(`📊 Monitoring ${lastCheck.totalFiles} paths...`);
       
       // Monitor for changes (simulated - in real implementation would use file watchers)
       const monitorInterval = setInterval(async () => {
@@ -994,8 +965,6 @@ export class ShellPatternWeaver {
         }
         
         if (changes.length > 0) {
-          console.log("🔄 File changes detected:");
-          console.log(Bun.inspect.table(
             changes,
             ['path', 'change', 'timestamp'], // Show only essential change info
             { colors: true }
@@ -1008,7 +977,6 @@ export class ShellPatternWeaver {
       // Stop monitoring after 60 seconds (demo)
       setTimeout(() => {
         clearInterval(monitorInterval);
-        console.log("⏹️  File monitoring stopped");
       }, 60000);
       
       return { monitoring: true, interval: monitorInterval };
@@ -1019,9 +987,6 @@ export class ShellPatternWeaver {
    * Display shell pattern capabilities
    */
   displayCapabilities(): void {
-    console.log("╭─────────────────────────────────────────────────────────╮");
-    console.log("│              🐚 Shell Pattern Capabilities              │");
-    console.log("╰─────────────────────────────────────────────────────────╯");
     
     // Shell patterns
     const shellTable = Object.entries(this.shellPatterns).map(([key, pattern]) => ({
@@ -1030,8 +995,6 @@ export class ShellPatternWeaver {
       Features: pattern.bunFeatures.join(', '),
       AppliesTo: pattern.applies.join(', ')
     }));
-    console.log("\n🐚 Shell Patterns:");
-    console.log(Bun.inspect.table(
       shellTable, 
       ['Pattern', 'Name', 'Features'], // Show only key info
       { colors: true }
@@ -1039,8 +1002,6 @@ export class ShellPatternWeaver {
     
     // Command patterns
     const commandCategories = Object.keys(this.commandPatterns);
-    console.log("\n📝 Command Categories:");
-    console.log(Bun.inspect.table(
       commandCategories.map(cat => ({
         Category: cat.toUpperCase(),
         Commands: Object.keys((this.commandPatterns as any)[cat]).join(', '),
@@ -1052,8 +1013,6 @@ export class ShellPatternWeaver {
     
     // Package patterns
     const packageCategories = Object.keys(this.packagePatterns);
-    console.log("\n📦 Bunx Package Categories:");
-    console.log(Bun.inspect.table(
       packageCategories.map(cat => ({
         Category: cat.charAt(0).toUpperCase() + cat.slice(1),
         Count: Object.keys((this.packagePatterns as any)[cat]).length,

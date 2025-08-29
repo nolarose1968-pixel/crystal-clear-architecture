@@ -562,7 +562,6 @@ export class P2PQueueAPI {
   private async notifyTelegram(event: string, item: Partial<P2PQueueItem>): Promise<void> {
     try {
       // This would integrate with your existing Telegram bot system
-      console.log(`Telegram notification for ${event}:`, item);
       
       // Example implementation:
       // await this.env.TELEGRAM_BOT.sendMessage({
@@ -579,7 +578,6 @@ export class P2PQueueAPI {
    */
   private async notifyMatchApproved(match: any): Promise<void> {
     try {
-      console.log('Match approved notification:', match);
       
       // This would integrate with your existing Telegram bot system
       // await this.env.TELEGRAM_BOT.sendMessage({

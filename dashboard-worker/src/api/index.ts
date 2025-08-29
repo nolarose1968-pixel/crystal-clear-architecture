@@ -13,6 +13,7 @@ import { financialRoutes } from './routes/financial.routes';
 import { managerRoutes } from './routes/manager.routes';
 import { healthRoutes } from './routes/health.routes';
 import { customerRoutes } from './routes/customer.routes';
+import { linesRoutes } from './routes/lines.routes';
 
 const api = Router({ base: '/api' });
 
@@ -31,7 +32,8 @@ api.all('/admin/*', adminRoutes.handle);
 api.all('/other/*', otherRoutes.handle);
 api.all('/financial/*', financialRoutes.handle);
 api.all('/manager/*', managerRoutes.handle);
-api.all('/customer/*', customerRoutes.handle);
+api.all('/customers/*', customerRoutes.handle);
+api.all('/lines/*', linesRoutes.handle);
 
 // 404 handler
 api.all('*', () => new Response('Not Found', { status: 404 }));

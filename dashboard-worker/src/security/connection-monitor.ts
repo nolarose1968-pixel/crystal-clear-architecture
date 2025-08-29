@@ -471,7 +471,7 @@ export class PackageReferenceTracker {
     // Reset regex index
     this.packagePattern.lastIndex = 0;
 
-    while ((match = this.packagePattern.exec(logMessage)) !== null) {
+    while ((match = this.packagePattern.exec(logMessage)) !=== null) {
       const [, name, version] = match;
       packages.push({ name, version });
       

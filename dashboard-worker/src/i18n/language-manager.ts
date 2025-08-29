@@ -231,7 +231,6 @@ export class Fire22LanguageManager {
       }
     });
     
-    console.log(`Updated ${updatedCount} language elements to ${this.currentLanguage}`);
   }
 
   /**
@@ -307,7 +306,6 @@ export class Fire22LanguageManager {
         }
       }
       
-      console.log(`Imported ${importedCount} translations for ${language}`);
       return true;
     } catch (error) {
       console.error('Failed to import translations:', error);
@@ -362,7 +360,6 @@ export class Fire22LanguageManager {
     }
 
     this.codes[code] = translations as LanguageCode;
-    console.log(`Added new language code: ${code}`);
     return true;
   }
 
@@ -376,7 +373,6 @@ export class Fire22LanguageManager {
     }
 
     this.codes[code] = { ...this.codes[code], ...translations };
-    console.log(`Updated language code: ${code}`);
     return true;
   }
 
@@ -390,7 +386,6 @@ export class Fire22LanguageManager {
     }
 
     delete this.codes[code];
-    console.log(`Removed language code: ${code}`);
     return true;
   }
 

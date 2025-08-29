@@ -300,3 +300,199 @@ export async function debugCacheStats(request: ValidatedRequest): Promise<Respon
     });
   }
 }
+
+/**
+ * Get system rules and policies
+ */
+export async function getRules(request: ValidatedRequest): Promise<Response> {
+  try {
+    const url = new URL(request.url);
+    const category = url.searchParams.get('category') || 'all';
+    const format = url.searchParams.get('format') || 'detailed';
+
+    // System rules and policies
+    const systemRules = {
+      business: {
+        title: 'Business Rules',
+        description: 'Core business logic and operational policies',
+        rules: [
+          {
+            id: 'BR001',
+            name: 'Customer Onboarding',
+            description: 'All new customers must complete KYC verification within 24 hours',
+            severity: 'high',
+            category: 'compliance',
+            lastUpdated: '2024-01-15',
+            status: 'active'
+          },
+          {
+            id: 'BR002',
+            name: 'Transaction Limits',
+            description: 'Daily transaction limits based on customer tier and risk assessment',
+            severity: 'medium',
+            category: 'operations',
+            lastUpdated: '2024-01-10',
+            status: 'active'
+          },
+          {
+            id: 'BR003',
+            name: 'Risk Assessment',
+            description: 'Automated risk scoring for all customer transactions',
+            severity: 'high',
+            category: 'security',
+            lastUpdated: '2024-01-08',
+            status: 'active'
+          }
+        ]
+      },
+      compliance: {
+        title: 'Compliance Rules',
+        description: 'Regulatory compliance and legal requirements',
+        rules: [
+          {
+            id: 'CR001',
+            name: 'AML Monitoring',
+            description: 'Anti-Money Laundering transaction monitoring and reporting',
+            severity: 'critical',
+            category: 'compliance',
+            lastUpdated: '2024-01-12',
+            status: 'active'
+          },
+          {
+            id: 'CR002',
+            name: 'KYC Verification',
+            description: 'Know Your Customer verification requirements',
+            severity: 'high',
+            category: 'compliance',
+            lastUpdated: '2024-01-14',
+            status: 'active'
+          },
+          {
+            id: 'CR003',
+            name: 'Transaction Reporting',
+            description: 'SAR filing requirements for suspicious activities',
+            severity: 'high',
+            category: 'compliance',
+            lastUpdated: '2024-01-11',
+            status: 'active'
+          }
+        ]
+      },
+      operational: {
+        title: 'Operational Rules',
+        description: 'System operations and maintenance policies',
+        rules: [
+          {
+            id: 'OR001',
+            name: 'System Maintenance',
+            description: 'Scheduled maintenance windows and procedures',
+            severity: 'medium',
+            category: 'operations',
+            lastUpdated: '2024-01-09',
+            status: 'active'
+          },
+          {
+            id: 'OR002',
+            name: 'Backup Procedures',
+            description: 'Automated backup schedules and retention policies',
+            severity: 'high',
+            category: 'operations',
+            lastUpdated: '2024-01-07',
+            status: 'active'
+          },
+          {
+            id: 'OR003',
+            name: 'Incident Response',
+            description: 'Security incident response and escalation procedures',
+            severity: 'critical',
+            category: 'security',
+            lastUpdated: '2024-01-13',
+            status: 'active'
+          }
+        ]
+      },
+      security: {
+        title: 'Security Rules',
+        description: 'Security policies and access controls',
+        rules: [
+          {
+            id: 'SR001',
+            name: 'Access Control',
+            description: 'Role-based access control and permissions',
+            severity: 'high',
+            category: 'security',
+            lastUpdated: '2024-01-06',
+            status: 'active'
+          },
+          {
+            id: 'SR002',
+            name: 'Data Encryption',
+            description: 'Data encryption standards and key management',
+            severity: 'critical',
+            category: 'security',
+            lastUpdated: '2024-01-05',
+            status: 'active'
+          },
+          {
+            id: 'SR003',
+            name: 'Audit Logging',
+            description: 'Comprehensive audit logging for all system activities',
+            severity: 'high',
+            category: 'security',
+            lastUpdated: '2024-01-04',
+            status: 'active'
+          }
+        ]
+      }
+    };
+
+    // Filter by category if specified
+    let filteredRules = systemRules;
+    if (category !== 'all' && category in systemRules) {
+      filteredRules = { [category]: systemRules[category as keyof typeof systemRules] };
+    }
+
+    // Format response based on requested format
+    let responseData;
+    if (format === 'summary') {
+      responseData = {
+        categories: Object.keys(filteredRules),
+        totalRules: Object.values(filteredRules).reduce((total, cat) => total + cat.rules.length, 0),
+        lastUpdated: new Date().toISOString(),
+        summary: Object.entries(filteredRules).map(([key, cat]) => ({
+          category: key,
+          title: cat.title,
+          ruleCount: cat.rules.length,
+          criticalRules: cat.rules.filter(r => r.severity === 'critical').length,
+          highRules: cat.rules.filter(r => r.severity === 'high').length
+        }))
+      };
+    } else {
+      responseData = {
+        success: true,
+        data: {
+          rules: filteredRules,
+          metadata: {
+            totalCategories: Object.keys(filteredRules).length,
+            totalRules: Object.values(filteredRules).reduce((total, cat) => total + cat.rules.length, 0),
+            lastUpdated: new Date().toISOString(),
+            generatedBy: 'Fire22 Rule Engine v2.1'
+          }
+        }
+      };
+    }
+
+    return new Response(JSON.stringify(responseData), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error: any) {
+    return new Response(JSON.stringify({
+      error: 'Failed to get system rules',
+      message: error.message
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}

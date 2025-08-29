@@ -131,11 +131,12 @@ export class TaskService {
 
       // Insert tags if provided
       if (taskData.tags && taskData.tags.length > 0) {
-        const tagValues = taskData.tags.map(tag => [taskUuid, tag]);
-        await this.db`
-          INSERT INTO task_tags (task_uuid, tag) 
-          VALUES ${SQL.values(tagValues)}
-        `;
+        for (const tag of taskData.tags) {
+          await this.db`
+            INSERT INTO task_tags (task_uuid, tag) 
+            VALUES (${taskUuid}, ${tag})
+          `;
+        }
       }
 
       // Log activity
@@ -190,25 +191,36 @@ export class TaskService {
     const currentTask = await this.getTaskByUuid(uuid);
     
     try {
-      // Build update query dynamically
-      const updateFields: string[] = [];
-      const updateValues: any[] = [];
+      // Update fields individually using tagged template literals
+      const updates: Array<{field: string, value: any}> = [];
       
       Object.entries(updateData).forEach(([key, value]) => {
         if (value !== undefined && key !== 'tags') {
           const dbField = this.camelToSnake(key);
-          updateFields.push(`${dbField} = ?`);
-          updateValues.push(value);
+          updates.push({field: dbField, value});
         }
       });
 
-      if (updateFields.length > 0) {
-        updateFields.push('updated_at = CURRENT_TIMESTAMP');
+      // Build and execute update query
+      if (updates.length > 0) {
+        // Create a dynamic update query using a more Bun-SQL friendly approach
+        const updateFields: Record<string, any> = {};
+        updates.forEach(update => {
+          updateFields[update.field] = update.value;
+        });
         
-        const query = `UPDATE tasks SET ${updateFields.join(', ')} WHERE uuid = ?`;
-        updateValues.push(uuid);
+        // Generate SET clause dynamically
+        const setClause = Object.keys(updateFields)
+          .map((field, index) => `${field} = $${index + 2}`)
+          .join(', ');
         
-        await this.db.query(query, updateValues);
+        const values = [uuid, ...Object.values(updateFields)];
+        
+        // Use raw query for dynamic field updates
+        await this.db.query(
+          `UPDATE tasks SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE uuid = $1`,
+          values
+        );
       }
 
       // Update tags if provided
@@ -216,11 +228,12 @@ export class TaskService {
         await this.db`DELETE FROM task_tags WHERE task_uuid = ${uuid}`;
         
         if (taskData.tags.length > 0) {
-          const tagValues = taskData.tags.map(tag => [uuid, tag]);
-          await this.db`
-            INSERT INTO task_tags (task_uuid, tag) 
-            VALUES ${SQL.values(tagValues)}
-          `;
+          for (const tag of taskData.tags) {
+            await this.db`
+              INSERT INTO task_tags (task_uuid, tag) 
+              VALUES (${uuid}, ${tag})
+            `;
+          }
         }
       }
 
@@ -364,12 +377,13 @@ export class TaskService {
     // Get tags for all tasks
     const taskUuids = tasksResult.map((t: any) => t.uuid);
     const tagsResult = taskUuids.length > 0 
-      ? await this.db`
-          SELECT task_uuid, tag 
-          FROM task_tags 
-          WHERE task_uuid IN (${SQL.values(taskUuids.map(id => [id]))})
-          ORDER BY tag
-        `
+      ? await this.db.query(
+          `SELECT task_uuid, tag 
+           FROM task_tags 
+           WHERE task_uuid IN (${taskUuids.map((_, i) => `$${i + 1}`).join(', ')})
+           ORDER BY tag`,
+          taskUuids
+        )
       : [];
 
     const tagsByTask = tagsResult.reduce((acc: any, tag: any) => {

@@ -199,7 +199,7 @@ export class ExcelExportService extends EventEmitter {
    * Format cell value based on column type
    */
   private formatCellValue(value: any, column: ExcelColumn): any {
-    if (value == null) return '';
+    if (value === null) return '';
 
     switch (column.type) {
       case 'currency':

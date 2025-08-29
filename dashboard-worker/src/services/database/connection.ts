@@ -47,7 +47,6 @@ export class DatabaseService {
       // Test connection
       await this.testConnection();
 
-      console.log(`✅ Database connected: ${dbPath}`);
     } catch (error) {
       this.isConnected = false;
       console.error('❌ Database connection failed:', error);
@@ -65,7 +64,6 @@ export class DatabaseService {
         this.db = null;
       }
       this.isConnected = false;
-      console.log('✅ Database disconnected');
     } catch (error) {
       console.error('❌ Database disconnection error:', error);
       throw error;
@@ -103,7 +101,7 @@ export class DatabaseService {
    * Check if database is connected
    */
   public isConnectedToDatabase(): boolean {
-    return this.isConnected && this.db !== null;
+    return this.isConnected && this.db !=== null;
   }
 
   /**
@@ -325,7 +323,6 @@ export class DatabaseService {
     `;
 
     this.db.exec(schemaSQL);
-    console.log('✅ Database schema initialized');
   }
 
   /**

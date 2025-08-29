@@ -36,7 +36,7 @@
     "zod": "^3.22.4"
   },
   "peerDependencies": {
-    "bun": ">=1.2.20"
+    "bun": ">=1.2.21"
   },
   "devDependencies": {
     "@types/bun": "^1.2.21",
@@ -65,7 +65,7 @@
     "directory": "packages/security-scanner"
   },
   "engines": {
-    "bun": ">=1.2.20",
+    "bun": ">=1.2.21",
     "node": ">=18.0.0"
   },
   "trustedDependencies": [

@@ -98,7 +98,6 @@ const server = Bun.serve({
     
     // Track metrics
     if (ifNoneMatch) {
-      console.log(`📊 ETag check for ${url.pathname}: ${ifNoneMatch}`);
     }
     
     // Large JSON responses that benefit from ETag caching
@@ -110,7 +109,6 @@ const server = Bun.serve({
         const dataSize = JSON.stringify(PACKAGE_REGISTRY).length;
         cacheMetrics.bandwidth_saved += dataSize;
         cacheMetrics.hits++;
-        console.log(`💾 Saved ${dataSize} bytes with ETag cache hit`);
       }
       
       return response;
@@ -128,7 +126,6 @@ const server = Bun.serve({
           const dataSize = JSON.stringify(artifacts).length;
           cacheMetrics.bandwidth_saved += dataSize;
           cacheMetrics.hits++;
-          console.log(`💾 Huge savings! ${dataSize} bytes saved for artifacts`);
         }
         
         return response;
@@ -345,14 +342,5 @@ Cached fetch:
   }
 });
 
-console.log(`\n🔥 Fire22 Enhanced ETag Server`);
-console.log(`📍 URL: ${server.url}`);
-console.log(`✨ Features:`);
-console.log(`   - Automatic ETag generation for all responses`);
-console.log(`   - 304 Not Modified for unchanged content`);
-console.log(`   - Bandwidth savings tracking`);
-console.log(`   - Large dataset optimization`);
-console.log(`   - Zero configuration required!`);
-console.log(`\n💡 Open ${server.url} in your browser to see the demo\n`);
 
 export { server, cacheMetrics };

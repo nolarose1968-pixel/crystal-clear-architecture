@@ -96,7 +96,6 @@ export class FormManagementService extends EventEmitter {
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-    console.log('📝 Initializing Form Management Service...');
 
     // Load required libraries
     await this.loadLibraries();
@@ -108,7 +107,6 @@ export class FormManagementService extends EventEmitter {
     this.initializeDefaultForms();
 
     this.isInitialized = true;
-    console.log('✅ Form Management Service initialized');
   }
 
   /**
@@ -129,7 +127,6 @@ export class FormManagementService extends EventEmitter {
       await this.loadScript(lib);
     }
 
-    console.log('📚 Form libraries loaded');
   }
 
   /**
@@ -171,7 +168,6 @@ export class FormManagementService extends EventEmitter {
       }
     });
 
-    console.log('👂 Global listeners setup');
   }
 
   /**
@@ -288,7 +284,6 @@ export class FormManagementService extends EventEmitter {
       }
     });
 
-    console.log('📋 Default forms initialized');
   }
 
   /**
@@ -297,7 +292,6 @@ export class FormManagementService extends EventEmitter {
   registerForm(config: FormConfig): void {
     this.forms.set(config.id, config);
     this.emit('form-registered', config);
-    console.log(`📝 Form registered: ${config.id}`);
   }
 
   /**
@@ -320,7 +314,6 @@ export class FormManagementService extends EventEmitter {
     this.formData.set(formId, {});
 
     this.emit('form-created', { formId, config });
-    console.log(`📋 Form created: ${formId}`);
   }
 
   /**
@@ -527,7 +520,6 @@ export class FormManagementService extends EventEmitter {
     // Setup conditional logic
     this.setupConditionalLogic(config);
 
-    console.log(`🔧 Form components initialized: ${config.id}`);
   }
 
   /**
@@ -582,7 +574,6 @@ export class FormManagementService extends EventEmitter {
       }
     });
 
-    console.log('🔍 Select2 components initialized');
   }
 
   /**
@@ -634,7 +625,6 @@ export class FormManagementService extends EventEmitter {
       }
     });
 
-    console.log('📅 Date/Time pickers initialized');
   }
 
   /**
@@ -672,7 +662,6 @@ export class FormManagementService extends EventEmitter {
       }
     });
 
-    console.log('🔀 Conditional logic setup');
   }
 
   /**
@@ -727,7 +716,6 @@ export class FormManagementService extends EventEmitter {
       }
 
       this.emit('form-submit-success', { formId, data: formData, result });
-      console.log(`✅ Form submitted successfully: ${formId}`);
 
     } catch (error) {
       console.error(`❌ Form submission failed: ${formId}`, error);
@@ -834,14 +822,14 @@ export class FormManagementService extends EventEmitter {
     const warnings: Record<string, string> = {};
 
     // Required validation
-    if (field.required && (value === '' || value === null || value === undefined ||
+    if (field.required && (value === '' || value ==== null || value === undefined ||
         (Array.isArray(value) && value.length === 0))) {
       errors[field.id] = `${field.label} is required`;
       return { isValid: false, errors, warnings };
     }
 
     // Skip further validation if field is empty and not required
-    if (!field.required && (value === '' || value === null || value === undefined)) {
+    if (!field.required && (value === '' || value ==== null || value === undefined)) {
       return { isValid: true, errors, warnings };
     }
 
@@ -986,7 +974,6 @@ export class FormManagementService extends EventEmitter {
       case 'transaction-filter':
         return await this.handleTransactionFilterSubmission(data);
       default:
-        console.log(`Local submission for form: ${formId}`, data);
         return { success: true, data };
     }
   }
@@ -996,7 +983,6 @@ export class FormManagementService extends EventEmitter {
    */
   private async handleAgentManagementSubmission(data: FormData): Promise<any> {
     // Simulate API call
-    console.log('👥 Creating/updating agent:', data);
 
     // Here you would typically make an API call to save the agent
     // For demo purposes, we'll just return success
@@ -1011,7 +997,6 @@ export class FormManagementService extends EventEmitter {
    * Handle transaction filter form submission
    */
   private async handleTransactionFilterSubmission(data: FormData): Promise<any> {
-    console.log('🔍 Applying transaction filters:', data);
 
     // Here you would typically apply filters to a transaction list
     // For demo purposes, we'll just return success
@@ -1067,7 +1052,6 @@ export class FormManagementService extends EventEmitter {
     this.clearValidationErrors(config);
 
     this.emit('form-reset', { formId });
-    console.log(`🔄 Form reset: ${formId}`);
   }
 
   /**
@@ -1098,7 +1082,6 @@ export class FormManagementService extends EventEmitter {
     this.forms.delete(formId);
     this.formData.delete(formId);
     this.emit('form-removed', { formId });
-    console.log(`🗑️ Form removed: ${formId}`);
   }
 
   /**
@@ -1109,7 +1092,6 @@ export class FormManagementService extends EventEmitter {
     this.formData.clear();
     this.initializedComponents.clear();
     this.removeAllListeners();
-    console.log('🧹 Form Management Service cleaned up');
   }
 }
 

@@ -295,6 +295,8 @@
     "validate:wiki": "bun run scripts/validate-deployment.ts --target wiki-mirror",
     "deployment:report": "bun run scripts/generate-deployment-report.ts",
     "github:pages:deploy": "gh workflow run github-pages.yml",
+    "test:pages-setup": "bun run scripts/test-pages-setup.ts",
+    "init:pages": "bun run scripts/initialize-pages.ts",
     "deploy:all:departments": "bun run scripts/deploy-all-departments.ts deploy",
     "deploy:all:production": "bun run scripts/deploy-all-departments.ts deploy --env production",
     "deploy:all:parallel": "bash -c 'bun run scripts/deploy-all-departments.ts deploy --parallel \"${1:-5}\"' -- ",
@@ -315,6 +317,24 @@
     "registry:token:delete": "bun run scripts/setup-registry-token.ts delete",
     "publish:fire22": "bun run scripts/publish-fire22-packages.ts",
     "publish:fire22:dry": "bun run scripts/publish-fire22-packages.ts --dry-run",
+    "system:audit": "bun run scripts/system-organization-master-plan.ts",
+    "api:connectivity-test": "bun run scripts/api-connectivity-test.ts",
+    "dashboard:unified": "bun run src/components/unified-dashboard.ts",
+    "system:health-check": "bun run scripts/api-connectivity-test.ts",
+    "system:optimize": "bun run scripts/system-optimization-runner.ts",
+    "search:demo": "open search-demo.html",
+    "search:api-test": "bun run -e \"console.log('Search API endpoints: /api/search, /api/customers/search, /api/agents/search')\"",
+    "excel:demo": "open excel-export-demo.html",
+    "excel:export-agents": "bun run -e \"import('./src/services/excel-export-service.ts').then(m => m.exportAgentData().then(console.log))\"",
+    "excel:export-customers": "bun run -e \"import('./src/services/excel-export-service.ts').then(m => m.exportCustomerData().then(console.log))\"",
+    "excel:export-system": "bun run -e \"import('./src/services/excel-export-service.ts').then(m => m.exportSystemReport().then(console.log))\"",
+    "scoreboard:demo": "open scoreboard-demo.html",
+    "scoreboard:open": "bun run -e \"import('./src/components/scoreboard-integration.ts').then(m => m.fire22Scoreboard.showScoreboard())\"",
+    "financial:demo": "open financial-reporting-demo.html",
+    "financial:report": "bun run -e \"import('./src/services/financial-reporting-service.ts').then(m => m.generateFinancialReport({dateRange: {startDate: '2025-08-10', endDate: '2025-08-12'}}).then(console.log))\"",
+    "form:demo": "open form-management-demo.html",
+    "cashier:demo": "open cashier-demo.html",
+    "customer:demo": "open customer-management-demo.html",
     "publish:security-scanner": "cd packages/security-scanner && bun publish --registry https://fire22-security-registry.nolarose1968-806.workers.dev/",
     "publish:env-manager": "cd packages/env-manager && bun publish --registry https://fire22-security-registry.nolarose1968-806.workers.dev/",
     "publish:wager-system": "cd packages/wager-system && bun publish --registry https://fire22-security-registry.nolarose1968-806.workers.dev/",
@@ -323,7 +343,13 @@
     "pack:env-manager": "cd packages/env-manager && TARBALL=$(bun pm pack --quiet) && echo 'Created: $TARBALL'",
     "pack:wager-system": "cd packages/wager-system && TARBALL=$(bun pm pack --quiet) && echo 'Created: $TARBALL'",
     "validate:all": "echo '🔍 Running comprehensive validation...' && bun run typecheck && bun test && bun run all:build && bun run all:test && echo '✅ All validations passed'",
-    "ci:build": "echo '🚀 CI Build Pipeline' && bun install --frozen-lockfile && bun run typecheck && bun test && bun run all:build"
+    "ci:build": "echo '🚀 CI Build Pipeline' && bun install --frozen-lockfile && bun run typecheck && bun test && bun run all:build",
+    "health": "bun run scripts/health-check-cli.ts",
+    "health:check": "bun run scripts/health-check-cli.ts check",
+    "health:component": "bun run scripts/health-check-cli.ts component",
+    "health:endpoint": "bun run scripts/health-check-cli.ts endpoint",
+    "health:stats": "bun run scripts/health-check-cli.ts stats",
+    "test:telegram-health": "bun run scripts/test-telegram-health-integration.ts"
   },
   "workspaces": [
     "workspaces/@fire22-*",
@@ -341,12 +367,15 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/marked": "6.0.0",
     "bun-types": "latest",
+    "highlight.js": "11.11.1",
+    "marked": "16.2.1",
     "prettier": "3.6.2",
     "typescript": "5.9.2"
   },
   "peerDependencies": {
-    "bun": ">=1.2.0"
+    "bun": ">=1.2.21"
   },
   "optionalDependencies": {
     "@swc/core": "^1.3.0",
@@ -372,6 +401,6 @@
   },
   "engines": {
     "node": ">=18.0",
-    "bun": ">=1.1.0"
+    "bun": ">=1.2.21"
   }
 }

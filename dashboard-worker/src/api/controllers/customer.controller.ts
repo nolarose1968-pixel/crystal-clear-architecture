@@ -1,10 +1,23 @@
 /**
  * Customer Controller
- * 
+ *
  * Handles customer-level operations for Fire22 dashboard
  */
 
 import type { ValidatedRequest } from '../middleware/validate.middleware';
+
+export interface CreateCustomerRequest {
+  name: string;
+  email: string;
+  phone?: string;
+  customerType: string;
+  serviceTier: number;
+  initialBalance?: number;
+  currency?: string;
+  telegramId?: string;
+  referralCode?: string;
+  metadata?: Record<string, any>;
+}
 
 /**
  * Get customer hierarchy
@@ -183,7 +196,7 @@ export async function getBettingHistory(request: ValidatedRequest): Promise<Resp
 export async function getBalance(request: ValidatedRequest): Promise<Response> {
   try {
     const customerId = request.user?.id;
-    
+
     if (!customerId) {
       return new Response(JSON.stringify({
         error: 'Unauthorized',
@@ -193,7 +206,7 @@ export async function getBalance(request: ValidatedRequest): Promise<Response> {
         headers: { 'Content-Type': 'application/json' }
       });
     }
-    
+
     // TODO: Implement balance logic
     const response = {
       success: true,
@@ -208,7 +221,7 @@ export async function getBalance(request: ValidatedRequest): Promise<Response> {
         timestamp: new Date().toISOString()
       }
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
@@ -216,6 +229,122 @@ export async function getBalance(request: ValidatedRequest): Promise<Response> {
   } catch (error: any) {
     return new Response(JSON.stringify({
       error: 'Failed to get customer balance',
+      message: error.message
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+/**
+ * Create new customer
+ */
+export async function createCustomer(request: ValidatedRequest): Promise<Response> {
+  try {
+    const customerData: CreateCustomerRequest = request.validatedBody || await request.json();
+
+    // Validate required fields
+    if (!customerData.name || !customerData.email || !customerData.customerType) {
+      return new Response(JSON.stringify({
+        error: 'Validation Error',
+        message: 'Name, email, and customer type are required'
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(customerData.email)) {
+      return new Response(JSON.stringify({
+        error: 'Validation Error',
+        message: 'Invalid email format'
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Validate customer type
+    const validTypes = ['NEW', 'REGULAR', 'VIP', 'VVIP', 'PREPAID', 'CREDIT', 'CASH_ONLY'];
+    if (!validTypes.includes(customerData.customerType)) {
+      return new Response(JSON.stringify({
+        error: 'Validation Error',
+        message: 'Invalid customer type'
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Validate service tier
+    if (customerData.serviceTier < 1 || customerData.serviceTier > 3) {
+      return new Response(JSON.stringify({
+        error: 'Validation Error',
+        message: 'Service tier must be between 1 and 3'
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Generate customer ID
+    const customerId = `CUST-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
+    // Prepare customer data
+    const newCustomer = {
+      customerId,
+      name: customerData.name,
+      email: customerData.email,
+      phone: customerData.phone || '',
+      customerType: customerData.customerType,
+      serviceTier: customerData.serviceTier,
+      balance: customerData.initialBalance || 0,
+      currency: customerData.currency || 'USD',
+      telegramId: customerData.telegramId || '',
+      referralCode: customerData.referralCode || '',
+      metadata: customerData.metadata || {},
+      status: 'ACTIVE',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: request.user?.id || 'SYSTEM'
+    };
+
+    // TODO: Save to database
+    console.log('📝 Creating new customer:', newCustomer);
+
+    // TODO: Send welcome email
+    if (customerData.email) {
+      console.log('📧 Sending welcome email to:', customerData.email);
+    }
+
+    // TODO: Create Telegram notification if telegramId provided
+    if (customerData.telegramId) {
+      console.log('🚨 Setting up Telegram notifications for:', customerData.telegramId);
+    }
+
+    const response = {
+      success: true,
+      message: 'Customer created successfully',
+      data: {
+        customerId: newCustomer.customerId,
+        name: newCustomer.name,
+        email: newCustomer.email,
+        status: newCustomer.status,
+        createdAt: newCustomer.createdAt
+      }
+    };
+
+    return new Response(JSON.stringify(response), {
+      status: 201,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error: any) {
+    console.error('❌ Create customer error:', error);
+    return new Response(JSON.stringify({
+      error: 'Failed to create customer',
       message: error.message
     }), {
       status: 500,
