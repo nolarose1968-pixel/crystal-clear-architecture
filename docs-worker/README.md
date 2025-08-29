@@ -39,7 +39,7 @@ graph TB
 ### 1. Install Wrangler CLI
 
 ```bash
-npm install -g wrangler
+bun add -g wrangler
 ```
 
 ### 2. Login to Cloudflare
@@ -62,8 +62,8 @@ GITHUB_BRANCH = "main"  # or your default branch
 
 ```bash
 cd docs-worker
-npm install
-npm run deploy
+bun install
+bun run deploy
 ```
 
 ## ⚙️ Configuration
@@ -125,7 +125,7 @@ curl -X POST \
 
 ```bash
 # Start local development server
-npm run dev
+bun run dev
 
 # Open http://localhost:8787
 ```
@@ -137,17 +137,17 @@ npm run dev
 npm test
 
 # Type checking
-npm run typecheck
+bun run typecheck
 
 # Linting
-npm run lint
+bun run lint
 ```
 
 ### Logs
 
 ```bash
 # View live logs
-npm run logs
+bun run logs
 ```
 
 ## 📊 Monitoring & Analytics
@@ -198,10 +198,10 @@ on:
 
 ```bash
 # Deploy to production
-npm run deploy
+bun run deploy
 
 # Dry run (test deployment)
-npm run build
+bun run build
 ```
 
 ## 🔒 Security
@@ -282,8 +282,8 @@ console.log('Debug info:', data);
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test locally: `npm run dev`
-5. Deploy: `npm run deploy`
+4. Test locally: `bun run dev`
+5. Deploy: `bun run deploy`
 6. Create a Pull Request
 
 ## 📄 License

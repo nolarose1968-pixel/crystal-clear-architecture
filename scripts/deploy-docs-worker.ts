@@ -69,7 +69,7 @@ class DocsWorkerDeployer {
     try {
       execSync('wrangler --version', { stdio: 'pipe' });
     } catch (error) {
-      throw new Error('Wrangler CLI not found. Install with: npm install -g wrangler');
+      throw new Error('Wrangler CLI not found. Install with: bun add -g wrangler');
     }
 
     // Check Cloudflare authentication
@@ -124,15 +124,15 @@ class DocsWorkerDeployer {
     try {
       // Install dependencies
       console.log('📦 Installing dependencies...');
-      execSync('npm install', { stdio: 'inherit' });
+      execSync('bun install', { stdio: 'inherit' });
 
       // Run type check
       console.log('🔍 Running type check...');
-      execSync('npm run typecheck', { stdio: 'pipe' });
+      execSync('bun run typecheck', { stdio: 'pipe' });
 
       // Deploy to Cloudflare
       console.log('🚀 Deploying to Cloudflare...');
-      execSync('npm run deploy', { stdio: 'inherit' });
+      execSync('bun run deploy', { stdio: 'inherit' });
 
     } catch (error) {
       throw new Error(`Build/deploy failed: ${error instanceof Error ? error.message : error}`);
@@ -203,7 +203,7 @@ class DocsWorkerDeployer {
     console.log('');
     console.log('🔧 Management:');
     console.log(`   📊 View Logs: wrangler tail`);
-    console.log(`   🔄 Redeploy: npm run deploy (from docs-worker/)`);
+    console.log(`   🔄 Redeploy: bun run deploy (from docs-worker/)`);
     console.log(`   🧹 Clear Cache: POST ${workerUrl}/api/clear-cache`);
     console.log('');
     console.log('⚡ Features:');
