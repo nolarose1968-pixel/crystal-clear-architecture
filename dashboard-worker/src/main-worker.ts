@@ -397,6 +397,7 @@ export class MainWorker {
                 this.initializeCharts();
                 this.setupWebSocketConnection();
                 this.setupRealTimeUpdates();
+                this.setupEventListeners();
             }
 
             async loadDashboardData() {
@@ -521,7 +522,7 @@ export class MainWorker {
 
                 this.charts.agentPerformance = new Chart(ctx, {
                     type: 'bar',
-                    data: {
+        data: {
                         labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
                         datasets: [{
                             label: 'Active Agents',
@@ -562,7 +563,7 @@ export class MainWorker {
 
                 this.charts.commission = new Chart(ctx, {
                     type: 'doughnut',
-                    data: {
+        data: {
                         labels: ['Internet', 'Casino', 'Sports', 'Mobile', 'Other'],
                         datasets: [{
                             data: [35, 25, 20, 12, 8],
@@ -595,7 +596,7 @@ export class MainWorker {
 
                 this.charts.activity = new Chart(ctx, {
                     type: 'line',
-                    data: {
+              data: {
                         labels: activityData.labels,
                         datasets: [{
                             label: 'Daily Activity',
@@ -799,6 +800,260 @@ export class MainWorker {
                 }
             }
 
+            setupEventListeners() {
+                // Advanced filtering event listeners
+                this.setupFilterEventListeners();
+
+                // Date input event listeners
+                const startDateInput = document.getElementById('start-date');
+                const endDateInput = document.getElementById('end-date');
+
+                if (startDateInput) {
+                    startDateInput.addEventListener('change', () => {
+                        this.validateDateRange();
+                        this.updateActiveFiltersDisplay();
+                    });
+                }
+
+                if (endDateInput) {
+                    endDateInput.addEventListener('change', () => {
+                        this.validateDateRange();
+                        this.updateActiveFiltersDisplay();
+                    });
+                }
+
+                // Filter select event listeners
+                ['data-source-filter', 'global-chart-type', 'time-granularity'].forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.addEventListener('change', () => {
+                            this.updateActiveFiltersDisplay();
+                        });
+                    }
+                });
+            }
+
+            setupFilterEventListeners() {
+                // Apply filters button
+                const applyBtn = document.getElementById('apply-filters');
+                if (applyBtn) {
+                    applyBtn.addEventListener('click', () => {
+                        this.applyFilters();
+                    });
+                }
+
+                // Reset filters button
+                const resetBtn = document.getElementById('reset-filters');
+                if (resetBtn) {
+                    resetBtn.addEventListener('click', () => {
+                        this.resetFilters();
+                    });
+                }
+            }
+
+            validateDateRange() {
+                const startDate = document.getElementById('start-date');
+                const endDate = document.getElementById('end-date');
+
+                if (startDate && endDate && startDate.value && endDate.value) {
+                    const start = new Date(startDate.value);
+                    const end = new Date(endDate.value);
+
+                    if (start > end) {
+                        this.showToast('Start date cannot be after end date', 'error');
+                        startDate.value = endDate.value;
+                        return false;
+                    }
+
+                    const diffTime = Math.abs(end - start);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays > 365) {
+                        this.showToast('Date range cannot exceed 1 year', 'warning');
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            getCurrentFilters() {
+                return {
+                    dateRange: {
+                        start: document.getElementById('start-date')?.value || null,
+                        end: document.getElementById('end-date')?.value || null
+                    },
+                    dataSource: document.getElementById('data-source-filter')?.value || 'all',
+                    chartType: document.getElementById('global-chart-type')?.value || 'line',
+                    granularity: document.getElementById('time-granularity')?.value || 'day'
+                };
+            }
+
+            applyFilters() {
+                const filters = this.getCurrentFilters();
+
+                if (!this.validateDateRange()) {
+                    return;
+                }
+
+                console.log('🎯 Applying filters:', filters);
+                this.updateChartsWithFilters(filters);
+                this.updateActiveFiltersDisplay();
+                this.showToast('Filters applied successfully!', 'success');
+            }
+
+            resetFilters() {
+                document.getElementById('start-date').value = '';
+                document.getElementById('end-date').value = '';
+                document.getElementById('data-source-filter').value = 'all';
+                document.getElementById('global-chart-type').value = 'line';
+                document.getElementById('time-granularity').value = 'day';
+
+                document.getElementById('active-filters').style.display = 'none';
+
+                this.updateChartsWithFilters({
+                    dateRange: { start: null, end: null },
+                    dataSource: 'all',
+                    chartType: 'line',
+                    granularity: 'day'
+                });
+
+                this.showToast('Filters reset successfully!', 'info');
+            }
+
+            updateChartsWithFilters(filters) {
+                if (this.charts.revenue) {
+                    const revenueData = this.generateRevenueDataWithFilters(filters);
+                    this.charts.revenue.data.labels = revenueData.labels;
+                    this.charts.revenue.data.datasets[0].data = revenueData.data;
+                    this.charts.revenue.update('none');
+                }
+
+                if (filters.chartType !== 'line') {
+                    this.updateChartTypes(filters.chartType);
+                }
+            }
+
+            generateRevenueDataWithFilters(filters) {
+                let days = 30;
+
+                if (filters.dateRange.start && filters.dateRange.end) {
+                    const start = new Date(filters.dateRange.start);
+                    const end = new Date(filters.dateRange.end);
+                    const diffTime = Math.abs(end - start);
+                    days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                }
+
+                let step = 1;
+                let labelFormat = (date) => date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                if (filters.granularity === 'week') {
+                    step = 7;
+                    labelFormat = (date) => 'Week ' + Math.ceil(date.getDate() / 7);
+                } else if (filters.granularity === 'month') {
+                    step = 30;
+                    labelFormat = (date) => date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                }
+
+                const labels = [];
+                const data = [];
+                const endDate = new Date();
+
+                for (let i = days - 1; i >= 0; i -= step) {
+                    const date = new Date(endDate);
+                    date.setDate(date.getDate() - i);
+                    labels.push(labelFormat(date));
+
+                    let baseRevenue = 5000;
+                    const trend = ((days - i) / step) * 200;
+                    const randomVariation = (Math.random() - 0.5) * 3000;
+                    const dayOfWeek = date.getDay();
+                    const weekendMultiplier = (dayOfWeek === 0 || dayOfWeek === 6) ? 0.7 : 1;
+
+                    if (filters.dataSource === 'fantasy402') {
+                        baseRevenue *= 1.2;
+                    } else if (filters.dataSource === 'agents') {
+                        baseRevenue *= 0.8;
+                    }
+
+                    data.push(Math.max(1000, (baseRevenue + trend + randomVariation) * weekendMultiplier));
+                }
+
+                return { labels, data };
+            }
+
+            updateChartTypes(chartType) {
+                Object.keys(this.charts).forEach(chartKey => {
+                    const chart = this.charts[chartKey];
+                    if (chart) {
+                        try {
+                            if (chartType === 'bar' && chartKey === 'revenue') {
+                                chart.config.type = 'bar';
+                            } else if (chartType === 'doughnut' && chartKey === 'commission') {
+                                chart.config.type = 'doughnut';
+                            } else if (chartType === 'radar' && chartKey === 'performance') {
+                                chart.config.type = 'radar';
+                            }
+                            chart.update('none');
+    } catch (error) {
+                            console.warn('Could not update chart type for ' + chartKey + ':', error);
+                        }
+                    }
+                });
+            }
+
+            updateActiveFiltersDisplay() {
+                const filters = this.getCurrentFilters();
+                const activeFiltersDiv = document.getElementById('active-filters');
+                const filterTagsDiv = document.getElementById('filter-tags');
+
+                if (!activeFiltersDiv || !filterTagsDiv) return;
+
+                const activeTags = [];
+
+                if (filters.dateRange.start || filters.dateRange.end) {
+                    const start = filters.dateRange.start ? new Date(filters.dateRange.start).toLocaleDateString() : 'Start';
+                    const end = filters.dateRange.end ? new Date(filters.dateRange.end).toLocaleDateString() : 'End';
+                    activeTags.push('📅 ' + start + ' - ' + end);
+                }
+
+                if (filters.dataSource !== 'all') {
+                    const sourceLabels = {
+                        fantasy402: '🎮 Fantasy402',
+                        fire22: '🔥 Fire22',
+                        agents: '👥 Agents',
+                        transactions: '💳 Transactions'
+                    };
+                    activeTags.push(sourceLabels[filters.dataSource] || filters.dataSource);
+                }
+
+                if (filters.chartType !== 'line') {
+                    const typeLabels = {
+                        bar: '📊 Bar',
+                        doughnut: '🥧 Doughnut',
+                        radar: '🎯 Radar',
+                        mixed: '🔄 Mixed'
+                    };
+                    activeTags.push(typeLabels[filters.chartType] || filters.chartType);
+                }
+
+                if (filters.granularity !== 'day') {
+                    const granularityLabels = {
+                        hour: '🕐 Hourly',
+                        week: '📅 Weekly',
+                        month: '📆 Monthly'
+                    };
+                    activeTags.push(granularityLabels[filters.granularity] || filters.granularity);
+                }
+
+                if (activeTags.length > 0) {
+                    filterTagsDiv.innerHTML = activeTags.map(tag => '<span style="background: rgba(255, 215, 0, 0.2); color: #ffd700; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(255, 215, 0, 0.3);">' + tag + '</span>').join('');
+                    activeFiltersDiv.style.display = 'block';
+                } else {
+                    activeFiltersDiv.style.display = 'none';
+                }
+            }
+
             showToast(message, type = 'info') {
                 const toast = document.createElement('div');
                 toast.style.cssText = \`
@@ -820,10 +1075,7 @@ export class MainWorker {
                 \`;
 
                 const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
-                toast.innerHTML = \`
-                    <span>\${icon}</span>
-                    <span>\${message}</span>
-                \`;
+                toast.innerHTML = '<span>' + icon + '</span><span>' + message + '</span>';
 
                 document.body.appendChild(toast);
 
@@ -881,7 +1133,7 @@ export class MainWorker {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = \`fire22-dashboard-\${new Date().toISOString().split('T')[0]}.json\`;
+                a.download = 'fire22-dashboard-' + new Date().toISOString().split('T')[0] + '.json';
                 a.click();
                 URL.revokeObjectURL(url);
 
