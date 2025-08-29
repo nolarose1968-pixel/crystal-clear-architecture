@@ -14,8 +14,24 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
+    "clean-css": "^5.3.3",
     "drizzle-kit": "^0.31.4",
     "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.0"
+    "tailwindcss": "^3.4.0",
+    "terser": "^5.36.0",
+    "webpack": "^5.97.1",
+    "webpack-bundle-analyzer": "^4.10.2",
+    "webpack-cli": "^5.1.4",
+    "workbox-webpack-plugin": "^7.1.0"
+  },
+  "scripts": {
+    "build": "node build/build.js",
+    "build:analyze": "node build/build.js && npx webpack-bundle-analyzer build/stats.json",
+    "build:dev": "NODE_ENV=development node build/build.js",
+    "build:prod": "NODE_ENV=production node build/build.js",
+    "optimize": "npm run build:prod && npm run build:analyze",
+    "serve": "npx serve build -p 3000",
+    "dashboard:dev": "node dashboard-server.js",
+    "lighthouse": "npx lighthouse http://localhost:3000/analytics/ --output=json --output-path=./build/lighthouse-report.json"
   }
 }

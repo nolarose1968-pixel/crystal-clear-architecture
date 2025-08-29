@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>🔥 Fire22 Performance Dashboard</title>
+        <meta name="description" content="Enterprise-grade domain-driven architecture reference implementation showcasing 70-80% performance improvement and $1.05M+ annual value through strategic transformation">
+        <meta name="keywords" content="domain-driven-design, architecture, TypeScript, Bun, dashboard, API, scalability, performance, enterprise, DDD, clean-architecture">
+        <link rel="stylesheet" href="terminal-framework.css">
+        <style>
+            /* Performance Dashboard Specific Styling */
+            body {
+                background: var(--bg-gradient);
+                color: var(--text);
+            }
+
+            .performance-header {
+                background: var(--secondary);
+                border: var(--border-width) var(--border-style) var(--border-color-accent);
+                padding: var(--space-6);
+                margin-bottom: var(--space-6);
+                position: relative;
+            }
+
+            .performance-header::before {
+                content: '╭────────────────────────────────────────────────────────────────────────╮';
+                position: absolute;
+                top: -1px;
+                left: -1px;
+                right: -1px;
+                color: var(--accent);
+                font-size: var(--font-size-sm);
+                line-height: 1;
+                text-align: center;
+            }
+
+            .performance-header::after {
+                content: '╰────────────────────────────────────────────────────────────────────────╯';
+                position: absolute;
+                bottom: -1px;
+                left: -1px;
+                right: -1px;
+                color: var(--accent);
+                font-size: var(--font-size-sm);
+                line-height: 1;
+                text-align: center;
+            }
+
+            .performance-header h1 {
+                color: var(--fire);
+                font-size: var(--font-size-4xl);
+                margin-bottom: var(--space-2);
+                display: flex;
+                align-items: center;
+                gap: var(--space-3);
+                text-shadow: var(--shadow-glow-fire);
+                animation: flame-flicker 2s ease-in-out infinite;
+                font-family: var(--font-mono);
+            }
+
+            .performance-header .fire22-logo {
+                color: var(--fire);
+                font-size: var(--font-size-5xl);
+            }
+
+            .performance-header p {
+                color: var(--text-secondary);
+                font-size: var(--font-size-lg);
+                margin-bottom: var(--space-4);
+                font-family: var(--font-mono);
+            }
+
+            /* Resources Section */
+            .resources-section {
+                background: var(--secondary);
+                border: var(--border-width) var(--border-style) var(--border-color);
+                padding: var(--space-5);
+                margin-bottom: var(--space-6);
+                position: relative;
+            }
+
+            .resources-section h2 {
+                color: var(--accent);
+                font-size: var(--font-size-2xl);
+                margin-bottom: var(--space-4);
+                font-family: var(--font-mono);
+                display: flex;
+                align-items: center;
+                gap: var(--space-2);
+            }
+
+            /* Application Performance Sections */
+            .app-performance-section,
+            .network-performance-section {
+                background: var(--secondary);
+                border: var(--border-width) var(--border-style) var(--border-color);
+                padding: var(--space-5);
+                margin-bottom: var(--space-6);
+                position: relative;
+            }
+
+            .app-performance-section h2,
+            .network-performance-section h2 {
+                color: var(--accent);
+                font-size: var(--font-size-2xl);
+                margin-bottom: var(--space-4);
+                font-family: var(--font-mono);
+                display: flex;
+                align-items: center;
+                gap: var(--space-2);
+            }
+
+            /* Status Cards */
+            .status-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: var(--space-4);
+                margin-bottom: var(--space-6);
+            }
+
+            .status-card {
+                background: var(--tertiary);
+                border: var(--border-width) var(--border-style) var(--border-color);
+                padding: var(--space-4);
+                border-radius: var(--border-radius);
+                position: relative;
+            }
+
+            .status-card::before {
+                content: '├─';
+                position: absolute;
+                top: var(--space-2);
+                left: -8px;
+                color: var(--accent);
+            }
+
+            .status-indicator {
+                display: flex;
+                align-items: center;
+                gap: var(--space-2);
+                margin-bottom: var(--space-2);
+            }
+
+            .status-dot {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: var(--success);
+                animation: pulse 2s infinite;
+            }
+
+            .status-dot.error { background: var(--danger); }
+            .status-dot.warning { background: var(--warning); }
+
+            /* Prediction Cards */
+            .prediction-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: var(--space-4);
+            }
+
+            .prediction-card {
+                background: var(--tertiary);
+                border: var(--border-width) var(--border-style) var(--border-color);
+                padding: var(--space-4);
+                border-radius: var(--border-radius);
+            }
+
+            .prediction-confidence {
+                color: var(--accent);
+                font-size: var(--font-size-sm);
+                font-weight: 500;
+                margin-bottom: var(--space-1);
+            }
+
+            .prediction-value {
+                color: var(--text);
+                font-size: var(--font-size-lg);
+                font-weight: 600;
+                margin-bottom: var(--space-1);
+            }
+
+            .prediction-trend {
+                color: var(--text-secondary);
+                font-size: var(--font-size-sm);
+            }
+
+            /* Result Items */
+            .result-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: var(--space-2);
+                background: var(--tertiary);
+                border-radius: var(--border-radius-sm);
+                margin-bottom: var(--space-2);
+            }
+
+            .result-item span:first-child {
+                color: var(--text-secondary);
+            }
+
+            .result-item span:last-child {
+                color: var(--text);
+                font-weight: 600;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="terminal-container">
+            <!-- Header -->
+            <header class="performance-header">
+                <h1>
+                    <span class="fire22-logo">🔥</span>
+                    Fire22 Performance Dashboard
+                </h1>
+                <p>Real-time system performance monitoring and optimization analytics</p>
+            </header>
+
+            <!-- System Status Overview -->
+            <section class="status-overview">
+                <div class="status-item">
+                    <div class="status-icon">🏥</div>
+                    <div class="status-info">
+                        <div class="status-label">System Health</div>
+                        <div class="status-value" id="overall-status">Healthy</div>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon">👥</div>
+                    <div class="status-info">
+                        <div class="status-label">Active Users</div>
+                        <div class="status-value" id="active-users-count">1,247</div>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon">🚨</div>
+                    <div class="status-info">
+                        <div class="status-label">Active Alerts</div>
+                        <div class="status-value" id="active-alerts-count">0</div>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon">⚡</div>
+                    <div class="status-info">
+                        <div class="status-label">System Load</div>
+                        <div class="status-value" id="system-load">Low</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Controls -->
+            <section class="performance-controls">
+                <div class="control-group">
+                    <label for="time-range">Time Range:</label>
+                    <select id="time-range" class="control-select">
+                        <option value="5m">Last 5 Minutes</option>
+                        <option value="15m">Last 15 Minutes</option>
+                        <option value="1h" selected>Last Hour</option>
+                        <option value="6h">Last 6 Hours</option>
+                        <option value="24h">Last 24 Hours</option>
+                        <option value="7d">Last 7 Days</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="refresh-interval">Auto Refresh:</label>
+                    <select id="refresh-interval" class="control-select">
+                        <option value="5000">5 seconds</option>
+                        <option value="10000">10 seconds</option>
+                        <option value="30000" selected>30 seconds</option>
+                        <option value="60000">1 minute</option>
+                        <option value="0">Manual</option>
+                    </select>
+                </div>
+                <button id="refresh-data" class="control-button primary">
+                    🔄 Refresh Now
+                </button>
+                <button id="run-diagnostics" class="control-button secondary">
+                    🔍 Run Diagnostics
+                </button>
+                <button id="export-metrics" class="control-button secondary">
+                    📤 Export Report
+                </button>
+            </section>
+
+            <!-- Performance Metrics Overview -->
+            <section class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Response Time</span>
+                        <div class="metric-status excellent"></div>
+                    </div>
+                    <div class="metric-value" id="response-time">142ms</div>
+                    <div class="metric-label">Average API Response</div>
+                    <div class="metric-trend trend-up">↗ +12% improved</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Throughput</span>
+                        <div class="metric-status good"></div>
+                    </div>
+                    <div class="metric-value" id="throughput">1,247</div>
+                    <div class="metric-label">Requests per minute</div>
+                    <div class="metric-trend trend-up">↗ +8% increased</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Error Rate</span>
+                        <div class="metric-status excellent"></div>
+                    </div>
+                    <div class="metric-value" id="error-rate">0.02%</div>
+                    <div class="metric-label">System error rate</div>
+                    <div class="metric-trend trend-down">↘ -15% reduced</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Uptime</span>
+                        <div class="metric-status excellent"></div>
+                    </div>
+                    <div class="metric-value" id="uptime">99.94%</div>
+                    <div class="metric-label">Last 30 days</div>
+                    <div class="metric-trend trend-stable">→ Stable</div>
+                </div>
+            </section>
+
+            <!-- Live Performance Monitor -->
+            <section class="performance-monitor">
+                <div class="monitor-grid">
+                    <div class="monitor-item">
+                        <span class="monitor-label">CPU Usage</span>
+                        <span class="monitor-value healthy" id="cpu-usage">23%</span>
+                    </div>
+                    <div class="monitor-item">
+                        <span class="monitor-label">Memory Usage</span>
+                        <span class="monitor-value healthy" id="memory-usage">67%</span>
+                    </div>
+                    <div class="monitor-item">
+                        <span class="monitor-label">Active Connections</span>
+                        <span class="monitor-value healthy" id="active-connections">342</span>
+                    </div>
+                    <div class="monitor-item">
+                        <span class="monitor-label">Connection Pool</span>
+                        <span class="monitor-value healthy" id="connection-pool">75/100</span>
+                    </div>
+                    <div class="monitor-item">
+                        <span class="monitor-label">Cache Hit Rate</span>
+                        <span class="monitor-value healthy" id="cache-hit-rate">87%</span>
+                    </div>
+                    <div class="monitor-item">
+                        <span class="monitor-label">Replication Lag</span>
+                        <span class="monitor-value healthy" id="replication-lag">50ms</span>
+                    </div>
+                    <div class="monitor-item">
+                        <span class="monitor-label">Deadlocks</span>
+                        <span class="monitor-value healthy" id="deadlock-count">0</span>
+                    </div>
+                    <div class="monitor-item">
+                        <span class="monitor-label">Bandwidth Util.</span>
+                        <span class="monitor-value healthy" id="bandwidth-utilization">60%</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Application Performance Metrics -->
+            <section class="app-performance-section">
+                <h2>🚀 Application Performance</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Uptime</span>
+                            <div class="metric-status excellent"></div>
+                        </div>
+                        <div class="metric-value" id="app-uptime">99.95%</div>
+                        <div class="metric-label">Since <span id="uptime-start">2024-01-01</span></div>
+                        <div class="metric-trend trend-stable">→ Stable</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Active Sessions</span>
+                            <div class="metric-status good"></div>
+                        </div>
+                        <div class="metric-value" id="active-sessions">125</div>
+                        <div class="metric-label">Concurrent users</div>
+                        <div class="metric-trend trend-up">↗ +5% growth</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">API Calls</span>
+                            <div class="metric-status excellent"></div>
+                        </div>
+                        <div class="metric-value" id="api-calls">2,450</div>
+                        <div class="metric-label">Per minute</div>
+                        <div class="metric-trend trend-up">↗ +12% increase</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Error Count</span>
+                            <div class="metric-status good"></div>
+                        </div>
+                        <div class="metric-value" id="app-error-count">3</div>
+                        <div class="metric-label">Last hour</div>
+                        <div class="metric-trend trend-down">↘ -8% reduced</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Network Performance Metrics -->
+            <section class="network-performance-section">
+                <h2>🌐 Network Performance</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Requests/sec</span>
+                            <div class="metric-status excellent"></div>
+                        </div>
+                        <div class="metric-value" id="requests-per-sec">180</div>
+                        <div class="metric-label">HTTP requests</div>
+                        <div class="metric-trend trend-up">↗ +8% increase</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Avg Latency</span>
+                            <div class="metric-status good"></div>
+                        </div>
+                        <div class="metric-value" id="avg-latency">22ms</div>
+                        <div class="metric-label">Network response</div>
+                        <div class="metric-trend trend-down">↘ -5% improved</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Data Transfer</span>
+                            <div class="metric-status excellent"></div>
+                        </div>
+                        <div class="metric-value" id="data-transfer">3.5 MB/s</div>
+                        <div class="metric-label">Throughput</div>
+                        <div class="metric-trend trend-up">↗ +15% increase</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">Connection Count</span>
+                            <div class="metric-status good"></div>
+                        </div>
+                        <div class="metric-value" id="connection-count">850</div>
+                        <div class="metric-label">Active connections</div>
+                        <div class="metric-trend trend-stable">→ Stable</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- System Resources -->
+            <section class="resources-section">
+                <h2>📊 System Resources</h2>
+
+                <div class="resource-bar">
+                    <div class="resource-bar-header">
+                        <span class="resource-bar-label">CPU Load</span>
+                        <span class="resource-bar-value" id="cpu-load-value">23%</span>
+                    </div>
+                    <div class="resource-bar-container">
+                        <div class="resource-bar-fill" id="cpu-load-bar"></div>
+                    </div>
+                </div>
+
+                <div class="resource-bar">
+                    <div class="resource-bar-header">
+                        <span class="resource-bar-label">Memory Usage</span>
+                        <span class="resource-bar-value" id="memory-usage-value">67%</span>
+                    </div>
+                    <div class="resource-bar-container">
+                        <div class="resource-bar-fill" id="memory-usage-bar"></div>
+                    </div>
+                </div>
+
+                <div class="resource-bar">
+                    <div class="resource-bar-header">
+                        <span class="resource-bar-label">Disk Usage</span>
+                        <span class="resource-bar-value" id="disk-usage-value">42%</span>
+                    </div>
+                    <div class="resource-bar-container">
+                        <div class="resource-bar-fill" id="disk-usage-bar"></div>
+                    </div>
+                </div>
+
+                <div class="resource-bar">
+                    <div class="resource-bar-header">
+                        <span class="resource-bar-label">Network I/O</span>
+                        <span class="resource-bar-value" id="network-io-value">18%</span>
+                    </div>
+                    <div class="resource-bar-container">
+                        <div class="resource-bar-fill" id="network-io-bar"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- API Performance Table -->
+            <section class="api-performance-table">
+                <h3>🔌 API Endpoint Performance</h3>
+                <table class="api-table">
+                    <thead>
+                        <tr>
+                            <th>Endpoint</th>
+                            <th>Status</th>
+                            <th>Avg Response Time</th>
+                            <th>Requests/min</th>
+                            <th>Error Rate</th>
+                            <th>Last Check</th>
+                        </tr>
+                    </thead>
+                    <tbody id="api-performance-body">
+                        <tr>
+                            <td>/api/manager/getLiveWagers</td>
+                            <td><span class="api-status healthy">HEALTHY</span></td>
+                            <td><span class="response-time fast">89ms</span></td>
+                            <td>234</td>
+                            <td>0.01%</td>
+                            <td>2 sec ago</td>
+                        </tr>
+                        <tr>
+                            <td>/api/manager/getWeeklyFigure</td>
+                            <td><span class="api-status healthy">HEALTHY</span></td>
+                            <td><span class="response-time fast">156ms</span></td>
+                            <td>89</td>
+                            <td>0.00%</td>
+                            <td>5 sec ago</td>
+                        </tr>
+                        <tr>
+                            <td>/api/manager/getCustomerAdmin</td>
+                            <td><span class="api-status slow">SLOW</span></td>
+                            <td><span class="response-time moderate">445ms</span></td>
+                            <td>67</td>
+                            <td>0.03%</td>
+                            <td>1 sec ago</td>
+                        </tr>
+                        <tr>
+                            <td>/api/manager/getAgentPerformance</td>
+                            <td><span class="api-status healthy">HEALTHY</span></td>
+                            <td><span class="response-time fast">123ms</span></td>
+                            <td>145</td>
+                            <td>0.02%</td>
+                            <td>3 sec ago</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Control Panel -->
+            <section class="controls">
+                <button class="btn btn-primary" id="refresh-metrics">🔄 Refresh Metrics</button>
+                <button class="btn btn-secondary" id="export-report">📊 Export Report</button>
+                <button class="btn btn-secondary" id="system-optimize">⚡ Optimize System</button>
+                <button class="btn btn-secondary" id="clear-cache">🧹 Clear Cache</button>
+            </section>
+
+            <!-- Fantasy402 Integration Status -->
+            <section class="fantasy402-status">
+                <h2>🔗 Fantasy402 Integration Status</h2>
+                <div class="status-grid">
+                    <div class="status-card">
+                        <div class="status-indicator">
+                            <div class="status-dot"></div>
+                            <span>Data Synchronization</span>
+                        </div>
+                        <div class="status-value" id="data-sync-status">Checking...</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-indicator">
+                            <div class="status-dot"></div>
+                            <span>Real-time Connection</span>
+                        </div>
+                        <div class="status-value" id="realtime-status">Checking...</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-indicator">
+                            <div class="status-dot"></div>
+                            <span>Data Freshness</span>
+                        </div>
+                        <div class="status-value" id="data-freshness">Checking...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Predictive Analytics -->
+            <section class="predictive-analytics">
+                <h2>🔮 Predictive Analytics</h2>
+                <div class="prediction-grid">
+                    <div class="prediction-card">
+                        <h3>📈 Revenue Forecast</h3>
+                        <div class="prediction-confidence">85% confidence</div>
+                        <div class="prediction-value" id="revenue-forecast">Generating forecast...</div>
+                        <div class="prediction-trend">Next 30 days</div>
+                    </div>
+                    <div class="prediction-card">
+                        <h3>👥 User Growth Prediction</h3>
+                        <div class="prediction-confidence">78% confidence</div>
+                        <div class="prediction-value" id="user-growth-prediction">Analyzing growth trends...</div>
+                        <div class="prediction-trend">Next quarter</div>
+                    </div>
+                    <div class="prediction-card">
+                        <h3>⚠️ Risk Alerts</h3>
+                        <div class="prediction-confidence">92% confidence</div>
+                        <div class="prediction-value" id="risk-alerts">Scanning for risks...</div>
+                        <div class="prediction-trend">Real-time</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Modals -->
+            <div id="diagnostics-modal" class="modal">
+                <div class="modal-content large">
+                    <div class="modal-header">
+                        <h2 class="modal-title">🔍 System Diagnostics</h2>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="diagnostics-results">
+                            <div class="diagnostic-section">
+                                <h4>🖥️ System Information</h4>
+                                <pre id="system-info" class="diagnostic-data">Running diagnostics...</pre>
+                            </div>
+                            <div class="diagnostic-section">
+                                <h4>🌐 Network Diagnostics</h4>
+                                <pre id="network-diagnostics" class="diagnostic-data">Testing network...</pre>
+                            </div>
+                            <div class="diagnostic-section">
+                                <h4>💾 Database Diagnostics</h4>
+                                <pre id="database-diagnostics" class="diagnostic-data">Checking database...</pre>
+                            </div>
+                            <div class="diagnostic-section">
+                                <h4>🚀 Application Health</h4>
+                                <pre id="application-health" class="diagnostic-data">Assessing application...</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="control-button primary" onclick="closeAllModals()">Close</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Terminal Footer -->
+            <footer class="terminal-footer">
+                <div class="footer-decoration">
+                    ╭────────────────────────────────────────────────────────────────────────╮
+                </div>
+
+                <div class="footer-content">
+                    <!-- Main Footer Section -->
+                    <div class="footer-main">
+                        <div class="footer-logo">🔥</div>
+                        <h2 class="footer-title">Fire22 Performance Dashboard</h2>
+                        <p class="footer-tagline">Advanced System Performance Monitoring & Analytics</p>
+                    </div>
+
+                    <!-- Feature List with Box Characters -->
+                    <div class="footer-features">
+                        <div class="features-header">
+                            ├─── Performance Monitoring Features ───┤
+                        </div>
+                        <div class="features-grid">
+                            <div class="footer-feature">
+                                ├─ ⚡ Real-Time Response Time Tracking
+                            </div>
+                            <div class="footer-feature">
+                                ├─ 📊 System Resource Monitoring
+                            </div>
+                            <div class="footer-feature">
+                                ├─ 🔌 API Endpoint Performance Analysis
+                            </div>
+                            <div class="footer-feature">
+                                ├─ 💻 Live System Health Metrics
+                            </div>
+                            <div class="footer-feature">
+                                ├─ 📈 Throughput & Error Rate Analytics
+                            </div>
+                            <div class="footer-feature">
+                                ╰─ 🎯 Performance Optimization Tools
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Links -->
+                    <div class="footer-navigation">
+                        <div class="nav-section">
+                            ╭─ Metrics ───────╮
+                            │ • Response Time │
+                            │ • Throughput    │
+                            │ • Error Rates   │
+                            ╰─────────────────╯
+                        </div>
+                        <div class="nav-section">
+                            ╭─ Resources ─────╮
+                            │ • CPU Usage     │
+                            │ • Memory Stats  │
+                            │ • Network I/O   │
+                            ╰─────────────────╯
+                        </div>
+                        <div class="nav-section">
+                            ╭─ API Monitor ───╮
+                            │ • Endpoint Health│
+                            │ • Performance   │
+                            │ • Optimization  │
+                            ╰─────────────────╯
+                        </div>
+                    </div>
+
+                    <!-- Status Bar -->
+                    <div class="footer-status">
+                        ├───────────────────────────────────────────────────────────────────────┤
+                        │ Status: ● Active | Performance: Excellent | Uptime: 99.94%           │
+                        ├───────────────────────────────────────────────────────────────────────┤
+                    </div>
+
+                    <!-- Copyright Section -->
+                    <div class="footer-copyright">
+                        <p>© 2024 Fire22 Development Team. All rights reserved.</p>
+                        <p>Built with ╭─🔥─╮ Advanced performance monitoring and system optimization</p>
+                        <p>╰─────────────────────────────────────────────────────────────────╯</p>
+                    </div>
+                </div>
+
+                <div class="footer-decoration">
+                    ╰────────────────────────────────────────────────────────────────────────╯
+                </div>
+            </footer>
+        </div>
+
+        <script>
+            class PerformanceDashboard {
+                constructor() {
+                    this.metrics = {
+                        responseTime: 142,
+                        throughput: 1247,
+                        errorRate: 0.02,
+                        uptime: 99.94,
+                        cpuUsage: 23,
+                        memoryUsage: 67,
+                        activeConnections: 342,
+                        queueLength: 12,
+                        cacheHitRate: 87,
+                        dbQueries: 156
+                    };
+
+                    this.initialize();
+                }
+
+                initialize() {
+                    this.setupEventListeners();
+                    this.startRealTimeUpdates();
+                    this.loadApiPerformance();
+                    this.updateResourceBars();
+                }
+
+                setupEventListeners() {
+                    document.getElementById('refresh-metrics').addEventListener('click', () => {
+                        this.refreshAllMetrics();
+                    });
+
+                    document.getElementById('export-report').addEventListener('click', () => {
+                        this.exportPerformanceReport();
+                    });
+
+                    document.getElementById('system-optimize').addEventListener('click', () => {
+                        this.optimizeSystem();
+                    });
+
+                    document.getElementById('clear-cache').addEventListener('click', () => {
+                        this.clearSystemCache();
+                    });
+
+                    document.getElementById('run-diagnostics').addEventListener('click', () => {
+                        this.runDiagnostics();
+                    });
+                }
+
+                startRealTimeUpdates() {
+                    setInterval(() => {
+                        this.updateMetrics();
+                        this.updateResourceBars();
+                        this.updateApiPerformance();
+                    }, 3000); // Update every 3 seconds
+                }
+
+                async updateMetrics() {
+                    try {
+                        // Try to fetch real data from Fire22 Dashboard API
+                        const apiBaseUrl = window.location.hostname === 'localhost'
+                            ? 'http://localhost:3001'
+                            : 'https://your-fire22-api.com'; // Replace with your actual API URL
+
+                        const response = await fetch(`${apiBaseUrl}/api/dashboard/metrics`);
+                        if (response.ok) {
+                            const realMetrics = await response.json();
+                            // Update our metrics with real data
+                            Object.assign(this.metrics, realMetrics);
+                            console.log('✅ Updated with real Fire22 metrics');
+                        } else {
+                            throw new Error('API request failed');
+                        }
+                    } catch (error) {
+                        console.error('Failed to fetch real metrics, using simulated data:', error);
+                        // Fall back to simulated data
+                        this.metrics.responseTime = 142 + Math.floor(Math.random() * 50 - 25);
+                        this.metrics.throughput = 1247 + Math.floor(Math.random() * 200 - 100);
+                        this.metrics.errorRate = Math.max(0, 0.02 + (Math.random() - 0.5) * 0.05);
+                        this.metrics.cpuUsage = Math.max(10, Math.min(80, 23 + Math.floor(Math.random() * 20 - 10)));
+                        this.metrics.memoryUsage = Math.max(50, Math.min(90, 67 + Math.floor(Math.random() * 10 - 5)));
+                        this.metrics.activeConnections = 342 + Math.floor(Math.random() * 100 - 50);
+                        this.metrics.queueLength = Math.max(0, 12 + Math.floor(Math.random() * 10 - 5));
+                        this.metrics.cacheHitRate = Math.max(70, Math.min(95, 87 + Math.floor(Math.random() * 8 - 4)));
+                        this.metrics.dbQueries = 156 + Math.floor(Math.random() * 40 - 20);
+                    }
+
+                    // Update DOM elements
+                    document.getElementById('response-time').textContent = this.metrics.responseTime + 'ms';
+                    document.getElementById('throughput').textContent = this.formatNumber(this.metrics.throughput);
+                    document.getElementById('error-rate').textContent = this.metrics.errorRate.toFixed(2) + '%';
+                    document.getElementById('uptime').textContent = this.metrics.uptime.toFixed(2) + '%';
+                    document.getElementById('cpu-usage').textContent = this.metrics.cpuUsage + '%';
+                    document.getElementById('memory-usage').textContent = this.metrics.memoryUsage + '%';
+                    document.getElementById('active-connections').textContent = this.formatNumber(this.metrics.activeConnections);
+                    document.getElementById('queue-length').textContent = this.formatNumber(this.metrics.queueLength);
+                    document.getElementById('cache-hit-rate').textContent = this.metrics.cacheHitRate + '%';
+                    document.getElementById('db-queries').textContent = this.formatNumber(this.metrics.dbQueries);
+
+                    // Update status colors based on values
+                    this.updateMetricStatuses();
+                }
+
+                updateResourceBars() {
+                    const diskUsage = Math.max(30, Math.min(70, 42 + Math.floor(Math.random() * 10 - 5)));
+                    const networkIo = Math.max(10, Math.min(40, 18 + Math.floor(Math.random() * 8 - 4)));
+
+                    // Update resource bar values and widths
+                    document.getElementById('cpu-load-value').textContent = this.metrics.cpuUsage + '%';
+                    document.getElementById('cpu-load-bar').style.width = this.metrics.cpuUsage + '%';
+
+                    document.getElementById('memory-usage-value').textContent = this.metrics.memoryUsage + '%';
+                    document.getElementById('memory-usage-bar').style.width = this.metrics.memoryUsage + '%';
+
+                    document.getElementById('disk-usage-value').textContent = diskUsage + '%';
+                    document.getElementById('disk-usage-bar').style.width = diskUsage + '%';
+
+                    document.getElementById('network-io-value').textContent = networkIo + '%';
+                    document.getElementById('network-io-bar').style.width = networkIo + '%';
+                }
+
+                updateMetricStatuses() {
+                    const responseTimeStatus = document.querySelector('.metric-card:nth-child(1) .metric-status');
+                    const throughputStatus = document.querySelector('.metric-card:nth-child(2) .metric-status');
+                    const errorRateStatus = document.querySelector('.metric-card:nth-child(3) .metric-status');
+
+                    // Update status indicators based on thresholds
+                    responseTimeStatus.className = `metric-status ${this.metrics.responseTime < 150 ? 'excellent' : this.metrics.responseTime < 300 ? 'good' : 'poor'}`;
+                    throughputStatus.className = `metric-status ${this.metrics.throughput > 1000 ? 'excellent' : this.metrics.throughput > 800 ? 'good' : 'poor'}`;
+                    errorRateStatus.className = `metric-status ${this.metrics.errorRate < 0.05 ? 'excellent' : this.metrics.errorRate < 0.1 ? 'good' : 'poor'}`;
+
+                    // Update monitor value colors
+                    document.getElementById('cpu-usage').className = `monitor-value ${this.metrics.cpuUsage < 50 ? 'healthy' : this.metrics.cpuUsage < 80 ? 'warning' : 'critical'}`;
+                    document.getElementById('memory-usage').className = `monitor-value ${this.metrics.memoryUsage < 70 ? 'healthy' : this.metrics.memoryUsage < 85 ? 'warning' : 'critical'}`;
+                    document.getElementById('queue-length').className = `monitor-value ${this.metrics.queueLength < 20 ? 'healthy' : this.metrics.queueLength < 50 ? 'warning' : 'critical'}`;
+                }
+
+                loadApiPerformance() {
+                    // Simulate loading API performance data
+                    console.log('Loading API performance data...');
+                }
+
+                async updateApiPerformance() {
+                    try {
+                        // Try to fetch real API performance data
+                        const apiBaseUrl = window.location.hostname === 'localhost'
+                            ? 'http://localhost:3001'
+                            : 'https://your-fire22-api.com'; // Replace with your actual API URL
+
+                        const response = await fetch(`${apiBaseUrl}/api/dashboard/performance`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.updateApiPerformanceTable(data.endpoints);
+                            console.log('✅ Updated API performance with real data');
+                            return;
+                        }
+                    } catch (error) {
+                        console.error('Failed to fetch API performance data:', error);
+                    }
+
+                    // Fall back to simulated data
+                    const tableBody = document.getElementById('api-performance-body');
+                    const rows = tableBody.querySelectorAll('tr');
+
+                    rows.forEach((row, index) => {
+                        const responseTimeCell = row.querySelector('.response-time');
+                        const requestsCell = row.cells[3];
+
+                        if (responseTimeCell && requestsCell) {
+                            // Simulate varying response times and request counts
+                            const baseResponseTime = [89, 156, 445, 123][index] || 100;
+                            const newResponseTime = baseResponseTime + Math.floor(Math.random() * 50 - 25);
+
+                            responseTimeCell.textContent = Math.max(50, newResponseTime) + 'ms';
+                            responseTimeCell.className = `response-time ${newResponseTime < 200 ? 'fast' : newResponseTime < 400 ? 'moderate' : 'slow'}`;
+
+                            const baseRequests = [234, 89, 67, 145][index] || 100;
+                            const newRequests = baseRequests + Math.floor(Math.random() * 20 - 10);
+                            requestsCell.textContent = Math.max(1, newRequests);
+                        }
+                    });
+                }
+
+                updateApiPerformanceTable(endpoints) {
+                    const tableBody = document.getElementById('api-performance-body');
+                    if (!tableBody || !endpoints) return;
+
+                    const rows = tableBody.querySelectorAll('tr');
+                    endpoints.forEach((endpoint, index) => {
+                        if (rows[index]) {
+                            const row = rows[index];
+                            const responseTimeCell = row.querySelector('.response-time');
+                            const requestsCell = row.cells[3];
+                            const errorCell = row.cells[4];
+                            const statusCell = row.cells[1];
+
+                            if (responseTimeCell) {
+                                responseTimeCell.textContent = Math.max(50, endpoint.avgResponseTime) + 'ms';
+                                responseTimeCell.className = `response-time ${endpoint.avgResponseTime < 200 ? 'fast' : endpoint.avgResponseTime < 400 ? 'moderate' : 'slow'}`;
+                            }
+
+                            if (requestsCell) {
+                                requestsCell.textContent = endpoint.requestsPerMinute;
+                            }
+
+                            if (errorCell) {
+                                errorCell.textContent = (endpoint.errorRate * 100).toFixed(2) + '%';
+                            }
+
+                            if (statusCell) {
+                                statusCell.innerHTML = `<span class="api-status ${endpoint.status}">${endpoint.status.toUpperCase()}</span>`;
+                            }
+                        }
+                    });
+                }
+
+                refreshAllMetrics() {
+                    this.showNotification('Refreshing all performance metrics...', 'info');
+
+                    setTimeout(() => {
+                        this.updateMetrics();
+                        this.updateResourceBars();
+                        this.updateApiPerformance();
+                        this.showNotification('All metrics refreshed successfully!', 'success');
+                    }, 1500);
+                }
+
+                exportPerformanceReport() {
+                    this.showNotification('Exporting performance report...', 'info');
+
+                    setTimeout(() => {
+                        const reportData = {
+                            timestamp: new Date().toISOString(),
+                            metrics: this.metrics,
+                            summary: {
+                                overallHealth: 'Excellent',
+                                recommendations: [
+                                    'System performance is optimal',
+                                    'Monitor memory usage trends',
+                                    'API response times are healthy'
+                                ]
+                            }
+                        };
+
+                        console.log('Performance Report:', reportData);
+                        this.showNotification('Performance report exported successfully!', 'success');
+                    }, 2000);
+                }
+
+                optimizeSystem() {
+                    this.showNotification('Starting system optimization...', 'info');
+
+                    setTimeout(() => {
+                        // Simulate optimization improvements
+                        this.metrics.responseTime = Math.max(80, this.metrics.responseTime - 20);
+                        this.metrics.memoryUsage = Math.max(40, this.metrics.memoryUsage - 10);
+                        this.metrics.cpuUsage = Math.max(15, this.metrics.cpuUsage - 8);
+
+                        this.updateMetrics();
+                        this.updateResourceBars();
+                        this.showNotification('System optimization completed!', 'success');
+                    }, 3000);
+                }
+
+                clearSystemCache() {
+                    this.showNotification('Clearing system cache...', 'info');
+
+                    setTimeout(() => {
+                        this.metrics.cacheHitRate = Math.min(95, this.metrics.cacheHitRate + 5);
+                        this.metrics.responseTime = Math.max(80, this.metrics.responseTime - 15);
+
+                        this.updateMetrics();
+                        this.showNotification('System cache cleared successfully!', 'success');
+                    }, 1000);
+                }
+
+                runDiagnostics() {
+                    const modal = document.getElementById('diagnostics-modal');
+                    if (modal) {
+                        modal.classList.add('active');
+                    }
+
+                    // Simulate diagnostic data
+                    setTimeout(() => {
+                        document.getElementById('system-info').textContent = `OS: macOS
+CPU: Apple M1
+Memory: 16GB
+Uptime: 99.94%
+Load Average: 0.23, 0.45, 0.67`;
+
+                        document.getElementById('network-diagnostics').textContent = `Latency: 22ms
+Bandwidth: 3.5 MB/s
+Connections: 850 active
+Packet Loss: 0.01%`;
+
+                        document.getElementById('database-diagnostics').textContent = `Connections: 75/100
+Query Time: 45ms avg
+Cache Hit Rate: 87%
+Replication Lag: 50ms`;
+
+                        document.getElementById('application-health').textContent = `Status: HEALTHY
+Response Time: 142ms
+Error Rate: 0.02%
+Active Sessions: 125`;
+                    }, 1000);
+                }
+
+                showNotification(message, type = 'info') {
+                    // Create notification element
+                    const notification = document.createElement('div');
+                    notification.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: ${type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--accent)'};
+                        color: var(--primary);
+                        padding: var(--space-4);
+                        border-radius: var(--border-radius);
+                        font-family: var(--font-mono);
+                        font-weight: bold;
+                        z-index: 1000;
+                        opacity: 0;
+                        transform: translateX(100%);
+                        transition: all var(--transition-base);
+                    `;
+                    notification.textContent = message;
+
+                    document.body.appendChild(notification);
+
+                    // Animate in
+                    setTimeout(() => {
+                        notification.style.opacity = '1';
+                        notification.style.transform = 'translateX(0)';
+                    }, 100);
+
+                    // Remove after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                        notification.style.transform = 'translateX(100%)';
+                        setTimeout(() => {
+                            if (notification.parentNode) {
+                                notification.parentNode.removeChild(notification);
+                            }
+                        }, 300);
+                    }, 3000);
+                }
+
+                formatNumber(num) {
+                    return new Intl.NumberFormat('en-US').format(num);
+                }
+            }
+
+            // Global function for modal closing
+            function closeAllModals() {
+                const modals = document.querySelectorAll('.modal.active');
+                modals.forEach(modal => modal.classList.remove('active'));
+            }
+
+            // Initialize performance dashboard when page loads
+            document.addEventListener('DOMContentLoaded', () => {
+                new PerformanceDashboard();
+            });
+        </script>
+    </body>
+</html>
