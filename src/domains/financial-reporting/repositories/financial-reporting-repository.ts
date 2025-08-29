@@ -361,7 +361,16 @@ export class FinancialReportingRepositoryFactory {
     return this.createSQLiteRepository(':memory:');
   }
 
+  static createWithMockDatabase(mockDb: any): FinancialReportingRepository {
+    return new SQLiteFinancialReportingRepository(mockDb);
+  }
+
   private static initializeSchema(db: any): void {
+    // Skip schema initialization for mock databases
+    if (db.constructor.name !== 'Database') {
+      return;
+    }
+
     db.run(`
       CREATE TABLE IF NOT EXISTS financial_reports (
         id TEXT PRIMARY KEY,
