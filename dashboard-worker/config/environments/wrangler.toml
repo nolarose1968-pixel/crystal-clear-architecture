@@ -1,5 +1,5 @@
 name = "dashboard-worker"
-main = "src/worker.ts"
+main = "src/main-worker.ts"
 compatibility_date = "2024-09-23"
 account_id = "80693377f3abb78e00820aa69a415ce4"
 compatibility_flags = ["nodejs_compat"]

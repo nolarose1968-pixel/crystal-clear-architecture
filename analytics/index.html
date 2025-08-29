@@ -13,24 +13,71 @@
     <link rel="stylesheet" href="analytics.css">
 
     <!-- Chart.js for Data Visualization -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script>
+      // Fallback Chart.js loading with error handling
+      (function() {
+        function loadChartJS() {
+          if (typeof Chart === 'undefined') {
+            console.warn('Chart.js CDN failed, loading from fallback...');
+            // Fallback to local Chart.js if available, or show error
+            setTimeout(() => {
+              if (typeof Chart === 'undefined') {
+                console.error('Chart.js could not be loaded from any source');
+                // Show error message in UI
+                document.addEventListener('DOMContentLoaded', function() {
+                  const errorDiv = document.createElement('div');
+                  errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#ef4444;color:white;padding:15px;border-radius:8px;z-index:10000;max-width:300px;';
+                  errorDiv.innerHTML = '<strong>⚠️ Chart Library Error</strong><br>Unable to load Chart.js. Please check your internet connection and refresh the page.';
+                  document.body.appendChild(errorDiv);
+                });
+              }
+            }, 5000);
+          } else {
+            console.log('✅ Chart.js loaded successfully');
+          }
+        }
+
+        // Load Chart.js
+        const script1 = document.createElement('script');
+        script1.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        script1.onload = loadChartJS;
+        script1.onerror = loadChartJS;
+        document.head.appendChild(script1);
+
+        // Load date adapter
+        const script2 = document.createElement('script');
+        script2.src = 'https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns';
+        script2.onerror = function() {
+          console.warn('Chart.js date adapter failed to load, some date features may not work');
+        };
+        document.head.appendChild(script2);
+      })();
+    </script>
 
     <!-- Real-time Updates -->
-    <script src="https://cdn.jsdelivr.net/npm/reconnecting-websocket@4.4.0/dist/reconnecting-websocket.min.js"></script>
+    <script>
+      // Fallback WebSocket loading
+      (function() {
+        function loadWebSocket() {
+          if (typeof ReconnectingWebSocket === 'undefined') {
+            console.warn('ReconnectingWebSocket CDN failed, using native WebSocket');
+            // Define a simple fallback
+            window.ReconnectingWebSocket = window.WebSocket;
+          } else {
+            console.log('✅ ReconnectingWebSocket loaded successfully');
+          }
+        }
 
-    <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
-
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-
-    <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
-
-    <!-- Theme Color -->
-    <meta name="theme-color" content="#58a6ff">
-    <meta name="msapplication-TileColor" content="#0d1117">
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/reconnecting-websocket@4.4.0/dist/reconnecting-websocket.min.js';
+        script.onload = loadWebSocket;
+        script.onerror = function() {
+          console.warn('ReconnectingWebSocket CDN failed, falling back to native WebSocket');
+          window.ReconnectingWebSocket = window.WebSocket;
+        };
+        document.head.appendChild(script);
+      })();
+    </script>
 </head>
 <body>
     <!-- Mobile Navigation -->
@@ -60,454 +107,374 @@
             <a href="../index.html" class="mobile-menu-link">
                 🏠 Home
             </a>
+            <a href="../performance/index.html" class="mobile-menu-link">
+                ⚡ Performance
+            </a>
             <a href="index.html" class="mobile-menu-link active">
                 📊 Analytics Dashboard
-            </a>
-            <a href="../performance-dashboard.html" class="mobile-menu-link">
-                ⚡ Performance Dashboard
             </a>
             <a href="../search/index.html" class="mobile-menu-link">
                 🔍 Search
             </a>
-            <a href="../mobile-experience.html" class="mobile-menu-link">
-                📱 Mobile Experience
-            </a>
-            <a href="../ai-showcase.html" class="mobile-menu-link">
-                🤖 AI Showcase
+            <a href="../collaboration/index.html" class="mobile-menu-link">
+                🤝 Collaborate
             </a>
         </nav>
     </div>
 
-    <!-- Analytics Header -->
-    <header class="analytics-header">
-        <div class="header-content">
-            <div class="header-title">
-                <span>📊</span>
-                Advanced Analytics Dashboard
-            </div>
-            <div class="header-actions">
-                <button class="btn btn-secondary">
-                    📤 Export Report
-                </button>
-                <button class="btn btn-primary">
-                    🔄 Refresh Data
-                </button>
-            </div>
+    <!-- Main Container -->
+    <div class="analytics-container">
+        <div class="analytics-header">
+            <h1>📊 Advanced Analytics Dashboard</h1>
+            <p>Deep insights, ROI tracking, and business intelligence powered by Fantasy402 integration</p>
         </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="content-grid">
-            <!-- System Status Overview -->
-            <section class="status-overview">
-                <div class="status-item">
-                    <div class="status-icon">🏥</div>
-                    <div class="status-info">
-                        <div class="status-label">System Health</div>
-                        <div class="status-value" id="overall-status">Healthy</div>
-                    </div>
-                </div>
-                <div class="status-item">
-                    <div class="status-icon">👥</div>
-                    <div class="status-info">
-                        <div class="status-label">Active Users</div>
-                        <div class="status-value" id="active-users-count">0</div>
-                    </div>
-                </div>
-                <div class="status-item">
-                    <div class="status-icon">🚨</div>
-                    <div class="status-info">
-                        <div class="status-label">Active Alerts</div>
-                        <div class="status-value" id="active-alerts-count">0</div>
-                    </div>
-                </div>
-                <div class="status-item">
-                    <div class="status-icon">⚡</div>
-                    <div class="status-info">
-                        <div class="status-label">System Load</div>
-                        <div class="status-value" id="system-load">Low</div>
-                    </div>
-                </div>
-            </section>
+        <!-- Controls -->
+        <div class="analytics-controls">
+            <div class="control-group">
+                <label for="time-range">📅 Time Range:</label>
+                <select id="time-range" class="control-select">
+                    <option value="hour">Last Hour</option>
+                    <option value="24h" selected>Last 24 Hours</option>
+                    <option value="7d">Last 7 Days</option>
+                    <option value="30d">Last 30 Days</option>
+                    <option value="90d">Last 90 Days</option>
+                    <option value="1y">Last Year</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="data-source">🔗 Data Source:</label>
+                <select id="data-source" class="control-select">
+                    <option value="all" selected>All Sources</option>
+                    <option value="fantasy402">Fantasy402</option>
+                    <option value="crystal-clear">Crystal Clear</option>
+                    <option value="cloudflare">Cloudflare</option>
+                </select>
+            </div>
+            <button id="refresh-data" class="control-button primary">
+                🔄 Refresh
+            </button>
+            <button id="export-data" class="control-button secondary">
+                📤 Export
+            </button>
+        </div>
 
-            <!-- Performance Controls -->
-            <section class="performance-controls">
-                <div class="control-group">
-                    <label for="time-range">Time Range:</label>
-                    <select id="time-range" class="control-select">
-                        <option value="5m">Last 5 Minutes</option>
-                        <option value="15m">Last 15 Minutes</option>
-                        <option value="1h" selected>Last Hour</option>
-                        <option value="6h">Last 6 Hours</option>
-                        <option value="24h">Last 24 Hours</option>
-                        <option value="7d">Last 7 Days</option>
-                        <option value="30d">Last 30 Days</option>
-                        <option value="90d">Last 90 Days</option>
+        <!-- Key Performance Indicators -->
+        <section class="kpi-section">
+            <h2>🎯 Key Performance Indicators</h2>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon">💰</div>
+                    <div class="kpi-content">
+                        <div class="kpi-value" id="total-revenue">$0</div>
+                        <div class="kpi-label">Total Revenue</div>
+                        <div class="kpi-change" id="revenue-change">+0% from last period</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">👥</div>
+                    <div class="kpi-content">
+                        <div class="kpi-value" id="active-users">0</div>
+                        <div class="kpi-label">Active Users</div>
+                        <div class="kpi-change" id="users-change">+0% from last period</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">📈</div>
+                    <div class="kpi-content">
+                        <div class="kpi-value" id="roi-percentage">0%</div>
+                        <div class="kpi-label">ROI</div>
+                        <div class="kpi-change" id="roi-change">+0% from last period</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">⚡</div>
+                    <div class="kpi-content">
+                        <div class="kpi-value" id="performance-score">0</div>
+                        <div class="kpi-label">Performance Score</div>
+                        <div class="kpi-change" id="performance-change">+0% from last period</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fantasy402 Integration Status -->
+        <section class="integration-status">
+            <h2>🔗 Fantasy402 Integration Status</h2>
+            <div class="status-grid">
+                <div class="status-card">
+                    <div class="status-icon">🔄</div>
+                    <div class="status-content">
+                        <div class="status-title">Data Synchronization</div>
+                        <div class="status-value" id="sync-status">Checking...</div>
+                        <div class="status-indicator" id="sync-indicator"></div>
+                    </div>
+                </div>
+                <div class="status-card">
+                    <div class="status-icon">📡</div>
+                    <div class="status-content">
+                        <div class="status-title">Real-time Connection</div>
+                        <div class="status-value" id="realtime-status">Checking...</div>
+                        <div class="status-indicator" id="realtime-indicator"></div>
+                    </div>
+                </div>
+                <div class="status-card">
+                    <div class="status-icon">💾</div>
+                    <div class="status-content">
+                        <div class="status-title">Data Freshness</div>
+                        <div class="status-value" id="data-freshness">Checking...</div>
+                        <div class="status-indicator" id="freshness-indicator"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Detailed Analytics -->
+        <section class="analytics-section">
+            <h2>📊 Detailed Analytics</h2>
+
+            <!-- Revenue Analytics -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>💰 Revenue Analytics</h3>
+                    <select id="revenue-chart-type" class="chart-type-select">
+                        <option value="line" selected>Line Chart</option>
+                        <option value="bar">Bar Chart</option>
+                        <option value="area">Area Chart</option>
                     </select>
                 </div>
-                <div class="control-group">
-                    <label for="refresh-interval">Auto Refresh:</label>
-                    <select id="refresh-interval" class="control-select">
-                        <option value="5000">5 seconds</option>
-                        <option value="10000">10 seconds</option>
-                        <option value="30000" selected>30 seconds</option>
-                        <option value="60000">1 minute</option>
-                        <option value="0">Manual</option>
+                <div class="chart-wrapper">
+                    <canvas id="revenue-chart"></canvas>
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <span>Loading revenue data...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Engagement -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>👥 User Engagement</h3>
+                    <select id="engagement-chart-type" class="chart-type-select">
+                        <option value="doughnut" selected>Doughnut Chart</option>
+                        <option value="pie">Pie Chart</option>
+                        <option value="bar">Bar Chart</option>
                     </select>
                 </div>
-                <button id="refresh-data" class="control-button primary">
-                    🔄 Refresh Now
-                </button>
-                <button id="run-diagnostics" class="control-button secondary">
-                    🔍 Run Diagnostics
-                </button>
-                <button id="export-metrics" class="control-button secondary">
-                    📤 Export Report
-                </button>
-            </section>
-
-            <!-- KPI Cards -->
-            <section class="kpi-grid">
-                <div class="kpi-card" data-kpi="revenue">
-                    <div class="kpi-header">
-                        <span class="kpi-title">Total Revenue</span>
-                        <div class="kpi-status excellent"></div>
+                <div class="chart-wrapper">
+                    <canvas id="engagement-chart"></canvas>
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <span>Loading engagement data...</span>
                     </div>
-                    <div class="kpi-value">$0</div>
-                    <div class="kpi-change positive">+0% from last period</div>
                 </div>
+            </div>
 
-                <div class="kpi-card" data-kpi="users">
-                    <div class="kpi-header">
-                        <span class="kpi-title">Active Users</span>
-                        <div class="kpi-status good"></div>
+            <!-- ROI Tracking -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>📈 ROI Tracking</h3>
+                    <select id="roi-chart-type" class="chart-type-select">
+                        <option value="bar" selected>Bar Chart</option>
+                        <option value="line">Line Chart</option>
+                        <option value="combo">Combo Chart</option>
+                    </select>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="roi-chart"></canvas>
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <span>Loading ROI data...</span>
                     </div>
-                    <div class="kpi-value">0</div>
-                    <div class="kpi-change positive">+0% from last period</div>
                 </div>
+            </div>
 
-                <div class="kpi-card" data-kpi="roi">
-                    <div class="kpi-header">
-                        <span class="kpi-title">ROI</span>
-                        <div class="kpi-status excellent"></div>
+            <!-- Performance Metrics -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>⚡ Performance Metrics</h3>
+                    <select id="performance-chart-type" class="chart-type-select">
+                        <option value="radar" selected>Radar Chart</option>
+                        <option value="bar">Bar Chart</option>
+                        <option value="line">Line Chart</option>
+                    </select>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="performance-chart"></canvas>
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <span>Loading performance data...</span>
                     </div>
-                    <div class="kpi-value">0%</div>
-                    <div class="kpi-change positive">+0% from last period</div>
                 </div>
+            </div>
+        </section>
 
-                <div class="kpi-card" data-kpi="performance">
-                    <div class="kpi-header">
-                        <span class="kpi-title">Performance Score</span>
-                        <div class="kpi-status excellent"></div>
+        <!-- Fantasy402 Business Insights -->
+        <section class="fantasy-insights">
+            <h2>🎯 Fantasy402 Business Insights</h2>
+
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <h3>🎲 Betting Patterns</h3>
+                        <span class="insight-badge">Live Data</span>
                     </div>
-                    <div class="kpi-value">0%</div>
-                    <div class="kpi-change stable">→ Stable</div>
-                </div>
-            </section>
-
-            <!-- Charts Section -->
-            <section class="charts-section">
-                <div class="charts-header">
-                    <h2 class="charts-title">📈 Analytics Overview</h2>
-                    <div class="charts-controls">
-                        <select class="control-select">
-                            <option value="revenue">Revenue Trends</option>
-                            <option value="users">User Growth</option>
-                            <option value="engagement">Engagement</option>
-                            <option value="performance">Performance</option>
-                        </select>
-                        <button class="btn btn-secondary">
-                            📊 Compare
-                        </button>
+                    <div class="insight-content" id="betting-patterns-data">
+                        Loading betting patterns...
                     </div>
                 </div>
 
-                <div class="charts-container">
-                    <div class="chart-container">
-                        <canvas id="revenueChart"></canvas>
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <h3>👑 VIP Performance</h3>
+                        <span class="insight-badge">Real-time</span>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="userEngagementChart"></canvas>
+                    <div class="insight-content" id="vip-performance-data">
+                        Loading VIP performance...
+                    </div>
+                </div>
+
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <h3>👨‍💼 Agent Analytics</h3>
+                        <span class="insight-badge">Updated Hourly</span>
+                    </div>
+                    <div class="insight-content" id="agent-analytics-data">
+                        Loading agent analytics...
                     </div>
                 </div>
 
-                <div class="charts-container">
-                    <div class="chart-container">
-                        <canvas id="roiChart"></canvas>
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <h3>💵 Revenue Breakdown</h3>
+                        <span class="insight-badge">Daily</span>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="performanceChart"></canvas>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Fantasy402 Integration Status -->
-            <section class="fantasy402-status">
-                <h2>🔗 Fantasy402 Integration Status</h2>
-                <div class="status-grid">
-                    <div class="status-card">
-                        <div class="status-indicator" id="data-sync-status">
-                            <div class="status-dot"></div>
-                            <span>Data Synchronization</span>
-                        </div>
-                        <div class="status-value">Checking...</div>
-                    </div>
-                    <div class="status-card">
-                        <div class="status-indicator" id="realtime-status">
-                            <div class="status-dot"></div>
-                            <span>Real-time Connection</span>
-                        </div>
-                        <div class="status-value">Checking...</div>
-                    </div>
-                    <div class="status-card">
-                        <div class="status-indicator" id="data-freshness">
-                            <div class="status-dot"></div>
-                            <span>Data Freshness</span>
-                        </div>
-                        <div class="status-value">Checking...</div>
+                    <div class="insight-content" id="revenue-breakdown-data">
+                        Loading revenue breakdown...
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Fantasy402 Business Insights -->
-            <section class="fantasy402-insights">
-                <h2>🎯 Fantasy402 Business Insights</h2>
-
-                <div class="insights-grid">
-                    <div class="insight-card">
-                        <div class="insight-header">
-                            <div class="insight-icon betting">🎲</div>
-                            <h3 class="insight-title">Betting Patterns</h3>
-                        </div>
-                        <div class="insight-content">
-                            Live betting pattern analysis and trend identification
-                        </div>
-                        <div class="insight-stats">
-                            <div class="insight-value">Loading...</div>
-                            <div class="insight-trend">Real-time</div>
-                        </div>
+        <!-- ROI Calculator -->
+        <section class="roi-calculator">
+            <h2>🧮 ROI Calculator</h2>
+            <div class="calculator-container">
+                <div class="calculator-inputs">
+                    <div class="input-group">
+                        <label for="investment-amount">💰 Investment Amount ($)</label>
+                        <input type="number" id="investment-amount" placeholder="10000" min="0">
                     </div>
-
-                    <div class="insight-card">
-                        <div class="insight-header">
-                            <div class="insight-icon vip">👑</div>
-                            <h3 class="insight-title">VIP Performance</h3>
-                        </div>
-                        <div class="insight-content">
-                            High-value customer analytics and performance metrics
-                        </div>
-                        <div class="insight-stats">
-                            <div class="insight-value">Loading...</div>
-                            <div class="insight-trend">Real-time</div>
-                        </div>
+                    <div class="input-group">
+                        <label for="expected-revenue">📈 Expected Revenue ($)</label>
+                        <input type="number" id="expected-revenue" placeholder="15000" min="0">
                     </div>
-
-                    <div class="insight-card">
-                        <div class="insight-header">
-                            <div class="insight-icon agent">👨‍💼</div>
-                            <h3 class="insight-title">Agent Analytics</h3>
-                        </div>
-                        <div class="insight-content">
-                            Agent performance tracking and commission analytics
-                        </div>
-                        <div class="insight-stats">
-                            <div class="insight-value">Loading...</div>
-                            <div class="insight-trend">Updated Hourly</div>
-                        </div>
+                    <div class="input-group">
+                        <label for="time-period">⏰ Time Period (months)</label>
+                        <input type="number" id="time-period" placeholder="12" min="1" max="60">
                     </div>
-
-                    <div class="insight-card">
-                        <div class="insight-header">
-                            <div class="insight-icon revenue">💵</div>
-                            <h3 class="insight-title">Revenue Breakdown</h3>
-                        </div>
-                        <div class="insight-content">
-                            Detailed revenue analysis by source and category
-                        </div>
-                        <div class="insight-stats">
-                            <div class="insight-value">Loading...</div>
-                            <div class="insight-trend">Daily</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ROI Calculator -->
-            <section class="roi-calculator">
-                <h2>🧮 ROI Calculator</h2>
-                <div class="calculator-grid">
-                    <div class="calculator-field">
-                        <label class="calculator-label" for="investment">💰 Investment Amount ($)</label>
-                        <input type="number" id="investment" class="calculator-input" placeholder="10000">
-                    </div>
-                    <div class="calculator-field">
-                        <label class="calculator-label" for="revenue">📈 Expected Revenue ($)</label>
-                        <input type="number" id="revenue" class="calculator-input" placeholder="25000">
-                    </div>
-                    <div class="calculator-field">
-                        <label class="calculator-label" for="time">⏰ Time Period (months)</label>
-                        <input type="number" id="time" class="calculator-input" placeholder="12" value="12">
-                    </div>
-                    <div class="calculator-field">
-                        <label class="calculator-label" for="costs">💸 Operational Costs ($)</label>
-                        <input type="number" id="costs" class="calculator-input" placeholder="5000">
+                    <div class="input-group">
+                        <label for="operational-costs">💸 Operational Costs ($)</label>
+                        <input type="number" id="operational-costs" placeholder="2000" min="0">
                     </div>
                 </div>
 
                 <div class="calculator-results">
-                    <h3 class="results-title">ROI Percentage</h3>
-                    <div class="results-value" id="roi-percentage">0%</div>
-                    <div class="results-details">
-                        <div class="result-item">
-                            <span>Net Profit:</span>
-                            <span id="net-profit">$0</span>
-                        </div>
-                        <div class="result-item">
-                            <span>Payback Period:</span>
-                            <span id="payback-period">0 months</span>
-                        </div>
-                        <div class="result-item">
-                            <span>Monthly ROI:</span>
-                            <span id="monthly-roi">0%</span>
-                        </div>
+                    <div class="result-item">
+                        <label>ROI Percentage</label>
+                        <div class="result-value" id="roi-result">0%</div>
+                    </div>
+                    <div class="result-item">
+                        <label>Net Profit</label>
+                        <div class="result-value" id="profit-result">$0</div>
+                    </div>
+                    <div class="result-item">
+                        <label>Payback Period</label>
+                        <div class="result-value" id="payback-result">0 months</div>
+                    </div>
+                    <div class="result-item">
+                        <label>Monthly ROI</label>
+                        <div class="result-value" id="monthly-roi-result">0%</div>
                     </div>
                 </div>
 
                 <div class="calculator-actions">
-                    <button class="btn btn-primary" id="calculate-roi">
+                    <button id="calculate-roi" class="control-button primary">
                         Calculate ROI
                     </button>
-                    <button class="btn btn-secondary" id="reset-calculator">
+                    <button id="reset-calculator" class="control-button secondary">
                         🔄 Reset
                     </button>
-                    <button class="btn btn-secondary" id="save-scenario">
+                    <button id="save-scenario" class="control-button secondary">
                         💾 Save Scenario
                     </button>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Predictive Analytics -->
-            <section class="predictive-analytics">
-                <h2>🔮 Predictive Analytics</h2>
-                <div class="prediction-grid">
-                    <div class="prediction-card">
+        <!-- Predictive Analytics -->
+        <section class="predictive-analytics">
+            <h2>🔮 Predictive Analytics</h2>
+            <div class="predictive-grid">
+                <div class="predictive-card">
+                    <div class="predictive-header">
                         <h3>📈 Revenue Forecast</h3>
-                        <div class="prediction-confidence">85% confidence</div>
-                        <div class="prediction-value">Generating forecast...</div>
-                        <div class="prediction-trend">Next 30 days</div>
+                        <span class="confidence-badge">85% confidence</span>
                     </div>
-                    <div class="prediction-card">
+                    <div class="predictive-content">
+                        Generating forecast...
+                    </div>
+                </div>
+
+                <div class="predictive-card">
+                    <div class="predictive-header">
                         <h3>👥 User Growth Prediction</h3>
-                        <div class="prediction-confidence">78% confidence</div>
-                        <div class="prediction-value">Analyzing growth trends...</div>
-                        <div class="prediction-trend">Next quarter</div>
+                        <span class="confidence-badge">78% confidence</span>
                     </div>
-                    <div class="prediction-card">
+                    <div class="predictive-content">
+                        Analyzing growth trends...
+                    </div>
+                </div>
+
+                <div class="predictive-card">
+                    <div class="predictive-header">
                         <h3>⚠️ Risk Alerts</h3>
-                        <div class="prediction-confidence">92% confidence</div>
-                        <div class="prediction-value">Scanning for risks...</div>
-                        <div class="prediction-trend">Real-time</div>
+                        <span class="confidence-badge">92% confidence</span>
+                    </div>
+                    <div class="predictive-content">
+                        Scanning for risks...
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="mobile-toast" id="mobile-toast"></div>
+
+    <!-- Debug Panel (hidden by default) -->
+    <div class="debug-panel" id="debug-panel" style="display: none;">
+        <div class="debug-header">
+            <h3>🔧 Debug Panel</h3>
+            <button onclick="document.getElementById('debug-panel').style.display='none'">×</button>
         </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-main">
-                <div class="footer-logo">📊</div>
-                <h2 class="footer-title">Advanced Analytics Dashboard</h2>
-                <p class="footer-tagline">Enterprise-grade analytics with Fantasy402 integration</p>
-            </div>
-
-            <div class="footer-features">
-                <div class="features-header">
-                    ├─── Analytics Features ───┤
-                </div>
-                <div class="features-grid">
-                    <div class="footer-feature">
-                        ├─ 📊 Real-Time Data Visualization
-                    </div>
-                    <div class="footer-feature">
-                        ├─ 🎯 ROI Tracking & Forecasting
-                    </div>
-                    <div class="footer-feature">
-                        ├─ 🔗 Fantasy402 API Integration
-                    </div>
-                    <div class="footer-feature">
-                        ├─ 📱 Mobile-Responsive Design
-                    </div>
-                    <div class="footer-feature">
-                        ├─ ⚡ Performance Analytics
-                    </div>
-                    <div class="footer-feature">
-                        ╰─ 🤖 Predictive Insights
-                    </div>
-                </div>
-            </div>
-
-            <div class="footer-navigation">
-                <div class="nav-section">
-                    ╭─ Metrics ───────╮
-                    │ • Revenue       │
-                    │ • User Growth   │
-                    │ • ROI Analysis  │
-                    ╰─────────────────╯
-                </div>
-                <div class="nav-section">
-                    ╭─ Integration ───╮
-                    │ • Fantasy402    │
-                    │ • Real-time     │
-                    │ • WebSocket     │
-                    ╰─────────────────╯
-                </div>
-                <div class="nav-section">
-                    ╭─ Tools ─────────╮
-                    │ • ROI Calculator│
-                    │ • Export        │
-                    │ • Diagnostics   │
-                    ╰─────────────────╯
-                </div>
-            </div>
-
-            <div class="footer-status">
-                ├───────────────────────────────────────────────────────────────────────┤
-                │ Status: ● Active | Performance: Excellent | Uptime: 99.94%           │
-                ├───────────────────────────────────────────────────────────────────────┤
-            </div>
-
-            <div class="footer-copyright">
-                <p>© 2024 Crystal Clear Architecture Team. All rights reserved.</p>
-                <p>Built with ╭─📊─╮ Advanced analytics and business intelligence</p>
-                <p>╰─────────────────────────────────────────────────────────────────╯</p>
-            </div>
+        <div class="debug-content">
+            <button onclick="checkAnalyticsHealth()">Run Health Check</button>
+            <button onclick="window.analyticsDashboard?.runHealthCheck()">Force Re-initialize</button>
+            <button onclick="console.clear()">Clear Console</button>
+            <div class="debug-info" id="debug-info"></div>
         </div>
-    </footer>
+    </div>
+
+    <!-- Debug Toggle Button -->
+    <button class="debug-toggle" onclick="document.getElementById('debug-panel').style.display='block'"
+            title="Open Debug Panel (Ctrl+Shift+D)">
+        🐛
+    </button>
 
     <!-- Scripts -->
     <script src="config.js"></script>
     <script src="analytics.js"></script>
-
-    <!-- Additional Scripts for Mobile and Framework -->
-    <script src="../src/scripts/mobile-search.js"></script>
-
-    <!-- PWA Service Worker Registration -->
-    <script>
-        // Register service worker for PWA functionality
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js', { scope: '/analytics/' })
-                    .then(registration => {
-                        console.log('✅ Service Worker registered from HTML:', registration);
-                    })
-                    .catch(error => {
-                        console.error('❌ Service Worker registration failed:', error);
-                    });
-            });
-        }
-    </script>
 </body>
 </html>
