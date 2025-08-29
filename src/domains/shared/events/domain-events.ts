@@ -194,7 +194,10 @@ export abstract class BaseDomainEvent implements DomainEvent {
       causationId?: string;
     }
   ) {
-    this.eventId = crypto.randomUUID();
+    // Fallback for environments without crypto.randomUUID
+    this.eventId = (typeof globalThis !== 'undefined' && globalThis.crypto && globalThis.crypto.randomUUID)
+      ? globalThis.crypto.randomUUID()
+      : `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     this.eventType = eventType;
     this.aggregateId = aggregateId;
     this.aggregateType = aggregateType;
