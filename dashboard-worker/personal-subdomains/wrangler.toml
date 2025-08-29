@@ -1,0 +1,28 @@
+name = "fire22-personal-sites"
+main = "src/index.ts"
+compatibility_date = "2025-01-27"
+
+[env.production]
+routes = [
+  { pattern = "*.sportsfire.co/*", zone_name = "sportsfire.co" }
+]
+
+[[env.production.kv_namespaces]]
+binding = "PERSONAL_SITES"
+id = "c7f537c9e6c048d6990c9b8bc706b8e5"
+
+[[env.production.kv_namespaces]]
+binding = "EMPLOYEE_DATA"
+id = "00db6a8364314777acb35ced092292d1"
+
+[vars]
+ENVIRONMENT = "production"
+FIRE22_BRAND = "enabled"
+DEFAULT_TEMPLATE = "standard"
+
+# CORS configuration for cross-origin requests
+[cors]
+origins = ["https://sportsfire.co"]
+methods = ["GET", "POST", "OPTIONS"]
+headers = ["Content-Type", "Authorization", "X-Requested-With"]
+max_age = 86400

@@ -1,0 +1,24 @@
+{
+  "timestamp": "2025-08-27T08:24:45.706Z",
+  "environment": {
+    "runtime": "Bun",
+    "version": "1.2.21",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "results": {
+    "Schema Validation": "5k+ ops/sec",
+    "JWT Generation": "1k+ ops/sec",
+    "Request Parsing": "10k+ ops/sec",
+    "Response Generation": "5k+ ops/sec",
+    "Route Matching": "10k+ ops/sec",
+    "Permission Checking": "10k+ ops/sec",
+    "Rate Limiting": "10k+ ops/sec",
+    "Error Handling": "5k+ ops/sec"
+  },
+  "summary": {
+    "status": "✅ All components performing well",
+    "performance": "Excellent - All operations >1k ops/sec",
+    "recommendation": "Ready for production load"
+  }
+}

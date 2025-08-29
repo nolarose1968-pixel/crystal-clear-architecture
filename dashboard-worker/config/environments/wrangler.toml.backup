@@ -1,0 +1,352 @@
+name = "dashboard-worker"
+main = "src/worker.ts"
+compatibility_date = "2024-09-23"
+account_id = "80693377f3abb78e00820aa69a415ce4"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "fire22-dashboard"
+database_id = "2420fa98-6168-41de-a41a-7a2bb0a405b1"
+
+# Fire22 Security Registry Database
+[[d1_databases]]
+binding = "REGISTRY_DB"
+database_name = "fire22-registry"
+database_id = "207dd984-2300-4a0b-a040-832d3ba5adae"
+
+# R2 storage for package tarballs
+[[r2_buckets]]
+binding = "REGISTRY_STORAGE"
+bucket_name = "fire22-packages"
+preview_bucket_name = "fire22-packages-preview"
+
+# KV for registry caching
+[[kv_namespaces]]
+binding = "REGISTRY_CACHE"
+id = "cf160b5651134496a20e6d537ab409fc"
+preview_id = "195ceb3e66ed4dd18c3df39403a9492e"
+
+# Environment Variables
+# IMPORTANT: Never commit real secrets to version control
+# Use 'wrangler secret put <KEY>' to set production secrets
+# Or set these via Cloudflare Dashboard > Workers > Settings > Environment Variables
+
+[vars]
+# Development/Demo values only - replace in production
+BOT_TOKEN = "your-telegram-bot-token"
+CASHIER_BOT_TOKEN = "your-cashier-bot-token"
+JWT_SECRET = "your-jwt-secret-min-32-chars"
+ADMIN_PASSWORD = "change-in-production"
+FIRE22_API_URL = "https://api.fire22.com"
+FIRE22_TOKEN = "your-fire22-api-token"
+FIRE22_WEBHOOK_SECRET = "your-webhook-secret-min-32-chars"
+STRIPE_SECRET_KEY = "sk_test_your_stripe_secret_key"
+STRIPE_WEBHOOK_SECRET = "whsec_your_webhook_endpoint_secret"
+SENDGRID_API_KEY = "SG.your_sendgrid_api_key"
+TWILIO_ACCOUNT_SID = "your_twilio_account_sid"
+TWILIO_AUTH_TOKEN = "your_twilio_auth_token"
+CRON_SECRET = "your-cron-secret-min-32-chars"
+
+# Fire22 Security Registry Settings
+SECURITY_SCANNING_ENABLED = "true"
+ALLOWED_SCOPES = "@fire22,@ff,@brendadeeznuts"
+REGISTRY_NAME = "Fire22 Security Registry"
+MIN_SECURITY_SCORE = "50"
+
+# 🔐 Email Security Environment Variables
+EMAIL_SECURITY_ENABLED = "true"
+EMAIL_ENCRYPTION_LEVEL = "AES_256_GCM"
+EMAIL_AUDIT_LOGGING = "true"
+EMAIL_BACKUP_ENABLED = "true"
+EMAIL_COMPLIANCE_MODE = "SOC2_GDPR_SOX"
+EMAIL_SECURITY_CLASSIFICATION = "CONFIDENTIAL"
+EMAIL_ALERT_THRESHOLDS = '{"critical_response_time": 1000, "warning_response_time": 500, "max_failed_auth_attempts": 5, "max_storage_usage_percent": 90, "max_error_rate_percent": 1}'
+
+# 🚀 Fire22 Dashboard Pages Configuration
+# Custom Domain: dashboard.fire22.ag
+# Owner: Chris Brown (CTO) - chris.brown@tech.fire22
+
+# 🏢 Department-Specific Environments
+
+[env.finance]
+[env.finance.vars]
+ENVIRONMENT = "finance"
+DEPARTMENT = "Finance Department"
+DEPARTMENT_COLOR = "#10b981"
+ADMIN_EMAIL = "john.smith@finance.fire22"
+
+[env.support]
+[env.support.vars]
+ENVIRONMENT = "support"
+DEPARTMENT = "Customer Support"
+DEPARTMENT_COLOR = "#3b82f6"
+ADMIN_EMAIL = "emily.davis@support.fire22"
+
+[env.compliance]
+[env.compliance.vars]
+ENVIRONMENT = "compliance"
+DEPARTMENT = "Compliance Department"
+DEPARTMENT_COLOR = "#8b5cf6"
+ADMIN_EMAIL = "lisa.anderson@compliance.fire22"
+
+
+[env.operations]
+[env.operations.vars]
+ENVIRONMENT = "operations"
+DEPARTMENT = "Operations Department"
+DEPARTMENT_COLOR = "#f59e0b"
+ADMIN_EMAIL = "david.martinez@operations.fire22"
+
+
+[env.technology]
+[env.technology.vars]
+ENVIRONMENT = "technology"
+DEPARTMENT = "Technology Department"
+DEPARTMENT_COLOR = "#06b6d4"
+ADMIN_EMAIL = "chris.brown@tech.fire22"
+
+
+[env.marketing]
+[env.marketing.vars]
+ENVIRONMENT = "marketing"
+DEPARTMENT = "Marketing Department"
+DEPARTMENT_COLOR = "#ef4444"
+ADMIN_EMAIL = "michelle.rodriguez@marketing.fire22"
+
+
+[env.management]
+[env.management.vars]
+ENVIRONMENT = "management"
+DEPARTMENT = "Management"
+DEPARTMENT_COLOR = "#6b7280"
+ADMIN_EMAIL = "william.harris@exec.fire22"
+
+
+[env.contributors]
+[env.contributors.vars]
+ENVIRONMENT = "contributors"
+DEPARTMENT = "Team Contributors"
+DEPARTMENT_COLOR = "#40e0d0"
+ADMIN_EMAIL = "jane.smith@team.fire22"
+
+
+[env.design]
+[env.design.vars]
+ENVIRONMENT = "design"
+DEPARTMENT = "Design Team"
+DEPARTMENT_COLOR = "#ec4899"
+ADMIN_EMAIL = "isabella.martinez@design.fire22"
+
+
+[env.communications]
+[env.communications.vars]
+ENVIRONMENT = "communications"
+DEPARTMENT = "Communications Department"
+DEPARTMENT_COLOR = "#6366f1"
+ADMIN_EMAIL = "sarah.martinez@communications.fire22"
+
+[env.vip_management]
+[env.vip_management.vars]
+ENVIRONMENT = "vip_management"
+DEPARTMENT = "VIP Management"
+DEPARTMENT_COLOR = "#ffd700"
+ADMIN_EMAIL = "vinny2times@vip.fire22"
+
+[env.hr]
+[env.hr.vars]
+ENVIRONMENT = "hr"
+DEPARTMENT = "Human Resources"
+DEPARTMENT_COLOR = "#8b5a87"
+ADMIN_EMAIL = "jennifer.adams@hr.fire22"
+
+[env.maintenance]
+[env.maintenance.vars]
+ENVIRONMENT = "maintenance"
+DEPARTMENT = "Maintenance & Operations"
+DEPARTMENT_COLOR = "#6c757d"
+ADMIN_EMAIL = "carlos.santos@maintenance.fire22"
+
+[env.product_management]
+[env.product_management.vars]
+ENVIRONMENT = "product_management"
+DEPARTMENT = "Product Management"
+DEPARTMENT_COLOR = "#f97316"
+ADMIN_EMAIL = "alexandra.kim@product.fire22"
+
+[env.onboarding]
+[env.onboarding.vars]
+ENVIRONMENT = "onboarding"
+DEPARTMENT = "Onboarding Team"
+DEPARTMENT_COLOR = "#10b981"
+ADMIN_EMAIL = "natasha.cooper@onboarding.fire22"
+
+[env.water_system]
+[env.water_system.vars]
+ENVIRONMENT = "water_system"
+DEPARTMENT = "Water System Operations"
+DEPARTMENT_COLOR = "#0ea5e9"
+ADMIN_EMAIL = "aqua.manager@water-system.fire22"
+
+[env.security]
+[env.security.vars]
+ENVIRONMENT = "security"
+DEPARTMENT = "Security Department"
+DEPARTMENT_COLOR = "#dc2626"
+ADMIN_EMAIL = "head@security.fire22"
+
+# 📦 Additional KV Namespaces for Pages
+[[kv_namespaces]]
+binding = "DEPARTMENT_DATA"
+id = "37a53956548e4095bca1182fdf7975a9"
+preview_id = "4f29f6169aff4395be6092f3816c1652"
+
+[[kv_namespaces]]
+binding = "ERROR_CODES"
+id = "4bd6da88738a4a618452154e27962b9c"
+preview_id = "080a36c181344cdb9b598f481b631b93"
+
+[[kv_namespaces]]
+binding = "RSS_FEEDS"
+id = "659da0a7af1746c0993a46adcb1d0c20"
+preview_id = "ceb7960e93b148cbb9b8adf37ebcfe68"
+
+# 🪣 Additional R2 Buckets for department assets
+[[r2_buckets]]
+binding = "DEPARTMENT_ASSETS"
+bucket_name = "fire22-department-assets"
+preview_bucket_name = "fire22-department-assets-preview"
+
+# 🔒 SPECIAL OPS TEAM - DURABLE OBJECTS EMAIL SECURITY
+# OPERATION: SECURE-COMM-22
+# CLASSIFICATION: CONFIDENTIAL - FIRE22 INTERNAL
+
+# 🛡️ Main Email Security Durable Object
+[[durable_objects.bindings]]
+name = "FIRE22_EMAIL_SECURITY"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+# 🏢 Department-Specific Email Security Durable Objects
+[[durable_objects.bindings]]
+name = "EXEC_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+[[durable_objects.bindings]]
+name = "FINANCE_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+[[durable_objects.bindings]]
+name = "COMPLIANCE_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+[[durable_objects.bindings]]
+name = "SUPPORT_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+[[durable_objects.bindings]]
+name = "OPERATIONS_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+[[durable_objects.bindings]]
+name = "COMMUNICATIONS_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+[[durable_objects.bindings]]
+name = "TECHNOLOGY_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+[[durable_objects.bindings]]
+name = "MARKETING_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+[[durable_objects.bindings]]
+name = "DESIGN_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+[[durable_objects.bindings]]
+name = "CONTRIBUTORS_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+# 🏢 Additional Department Email Security Durable Objects
+[[durable_objects.bindings]]
+name = "VIP_MANAGEMENT_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+[[durable_objects.bindings]]
+name = "HR_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+[[durable_objects.bindings]]
+name = "MAINTENANCE_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+[[durable_objects.bindings]]
+name = "PRODUCT_MANAGEMENT_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+[[durable_objects.bindings]]
+name = "ONBOARDING_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+[[durable_objects.bindings]]
+name = "WATER_SYSTEM_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+[[durable_objects.bindings]]
+name = "SECURITY_EMAIL_DO"
+class_name = "Fire22EmailSecurityDO"
+script_name = "fire22-email-security"
+
+# 📊 Email Security Analytics
+[[analytics_engine_datasets]]
+binding = "FIRE22_EMAIL_ANALYTICS"
+dataset = "fire22_email_security_metrics"
+
+# 🔑 Additional KV Namespaces for Email Security
+[[kv_namespaces]]
+binding = "EMAIL_SECURITY_CONFIG"
+id = "17b6fbaa60574acd988ca6f0b8deb9da"
+preview_id = "17b6fbaa60574acd988ca6f0b8deb9da"
+
+[[kv_namespaces]]
+binding = "EMAIL_AUDIT_LOGS"
+id = "6b88317ee2c949ffab69ae0f6caa9a4b"
+preview_id = "6b88317ee2c949ffab69ae0f6caa9a4b"
+
+# 🔄 Cron Triggers for Email Security Automation
+[[triggers.crons]]
+cron = "* * * * *"     # Every minute - Tier 1 (Maximum Security)
+name = "email-backup-tier-1"
+
+[[triggers.crons]]
+cron = "*/5 * * * *"   # Every 5 minutes - Tier 2 (High Security)
+name = "email-backup-tier-2"
+
+[[triggers.crons]]
+cron = "*/15 * * * *"  # Every 15 minutes - Tier 3 (Medium Security)
+name = "email-backup-tier-3"
+
+[[triggers.crons]]
+cron = "0 0 * * *"     # Daily at midnight
+name = "email-security-audit"
+
+[[triggers.crons]]
+cron = "0 2 * * 0"     # Weekly on Sunday at 2 AM
+name = "email-compliance-report"

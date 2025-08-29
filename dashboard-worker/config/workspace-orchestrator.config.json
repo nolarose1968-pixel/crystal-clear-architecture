@@ -1,0 +1,122 @@
+{
+  "workspaces": [
+    {
+      "name": "fire22-core-packages",
+      "description": "Core Fire22 packages for shared functionality",
+      "domain": "core",
+      "packages": [
+        "@fire22/core",
+        "@fire22/env-manager",
+        "@fire22/middleware",
+        "@fire22/testing-framework"
+      ],
+      "dependencies": [],
+      "registry": "npm",
+      "repository": {
+        "url": "https://github.com/fire22/fire22-core-packages",
+        "directory": "../fire22-core-packages"
+      }
+    },
+    {
+      "name": "fire22-benchmarking-suite",
+      "description": "Performance benchmarking and testing suite",
+      "domain": "benchmarking",
+      "packages": [
+        "@fire22/benchmark-suite",
+        "@fire22/performance-monitor"
+      ],
+      "dependencies": [
+        "@fire22/core"
+      ],
+      "registry": "npm",
+      "repository": {
+        "url": "https://github.com/fire22/fire22-benchmarking-suite",
+        "directory": "../fire22-benchmarking-suite"
+      }
+    },
+    {
+      "name": "fire22-wager-system",
+      "description": "Advanced wager processing and risk management",
+      "domain": "wager",
+      "packages": [
+        "@fire22/wager-system"
+      ],
+      "dependencies": [
+        "@fire22/core",
+        "@fire22/middleware"
+      ],
+      "registry": "private",
+      "repository": {
+        "url": "https://github.com/fire22/fire22-wager-system",
+        "directory": "../fire22-wager-system"
+      }
+    }
+  ],
+  "publishing": {
+    "registries": {
+      "npm": {
+        "url": "https://registry.npmjs.org/",
+        "token": "",
+        "access": "public"
+      },
+      "cloudflare": {
+        "url": "https://registry.cloudflare.com/",
+        "token": "",
+        "account_id": ""
+      },
+      "private": {
+        "url": "https://registry.fire22.com/",
+        "token": "",
+        "access": "restricted"
+      }
+    },
+    "publishingStrategy": {
+      "prerelease": [
+        "alpha",
+        "beta",
+        "rc"
+      ],
+      "beta": [
+        "beta",
+        "rc"
+      ],
+      "stable": [
+        "latest"
+      ]
+    }
+  },
+  "benchmarking": {
+    "suites": {
+      "package": [
+        "unit",
+        "integration",
+        "performance"
+      ],
+      "integration": [
+        "cross-package",
+        "end-to-end"
+      ],
+      "deployment": [
+        "cold-start",
+        "memory-usage",
+        "bundle-size"
+      ],
+      "performance": [
+        "throughput",
+        "latency",
+        "resource-usage"
+      ]
+    },
+    "budgets": {
+      "buildTime": 30000,
+      "bundleSize": 1048576,
+      "memoryUsage": 134217728,
+      "cpuUsage": 80
+    },
+    "reporting": {
+      "dashboard": true,
+      "alerts": true,
+      "comparison": true
+    }
+  }
+}

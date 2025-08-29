@@ -1,0 +1,55 @@
+# Fire22 Dashboard - Bun Configuration
+# Production-ready configuration with optimized settings
+
+# Telemetry Configuration
+telemetry = false
+
+[install]
+# Use official NPM registry as primary
+registry = "https://registry.npmjs.org/"
+linker = "hoisted"
+cache = true
+exact = true
+dev = true
+optional = true
+auto = false
+
+# Performance optimizations
+concurrent-scripts = 15  # Increased concurrent installation
+globalCache = true  # Use global cache when available
+
+# Security settings
+[install.security]
+scanner = "@fire22/security-scanner"
+audit = true
+auditLevel = "high"
+
+# Scoped package registries - Production Configuration
+[install.scopes]
+# Fire22 internal packages use our production registry
+"@fire22" = { url = "https://fire22-security-registry.nolarose1968-806.workers.dev/", token = "${FIRE22_REGISTRY_TOKEN}" }
+"@ff" = { url = "https://fire22-security-registry.nolarose1968-806.workers.dev/", token = "${FIRE22_REGISTRY_TOKEN}" }
+"@brendadeeznuts" = { url = "https://fire22-security-registry.nolarose1968-806.workers.dev/", token = "${FIRE22_REGISTRY_TOKEN}" }
+
+# All other scoped packages use npm registry
+"@types" = "https://registry.npmjs.org/"
+"@docusaurus" = "https://registry.npmjs.org/"
+"@mdx-js" = "https://registry.npmjs.org/"
+"@swc" = "https://registry.npmjs.org/"
+"@changesets" = "https://registry.npmjs.org/"
+
+[build]
+target = "bun"
+format = "esm"
+splitting = true
+minify = false
+
+[test]
+coverage = true
+
+[run]
+bun = true
+hot = true
+
+[debug]
+editor = "code"
