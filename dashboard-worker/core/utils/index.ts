@@ -1,17 +1,21 @@
 /**
- * Core Utils Module
- * Utility functions and helpers
+ * Core Utilities
+ * Consolidated exports for all utility functions
  */
 
-export function formatDate(date: Date): string {
-  return date.toISOString();
-}
+// Formatters
+export * from './formatters/date';
 
-export function generateId(): string {
-  return Math.random().toString(36).substring(2, 15);
-}
+// Future additions:
+// export * from './formatters/currency';
+// export * from './formatters/display';
 
-export function validateEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
+// Validators (to be created)
+// export * from './validators/email';
+// export * from './validators/phone';
+// export * from './validators/customer';
+
+// Helpers (to be created)
+// export * from './helpers/array';
+// export * from './helpers/object';
+// export * from './helpers/string';
