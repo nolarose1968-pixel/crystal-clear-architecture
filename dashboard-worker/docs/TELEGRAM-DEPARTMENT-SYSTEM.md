@@ -190,7 +190,7 @@ Agents can escalate inquiries immediately with reasons:
 
 ### Base URL
 ```
-https://dashboard-worker.fire22.workers.dev/api/telegram
+https://api.fire22.ag/api/telegram
 ```
 
 ### Endpoints
@@ -424,13 +424,13 @@ bun run test:telegram-escalation
 
 ```bash
 # Real-time department stats
-curl https://dashboard-worker.fire22.workers.dev/api/telegram/departments/stats
+curl https://api.fire22.ag/api/telegram/departments/stats
 
 # Performance report
-curl https://dashboard-worker.fire22.workers.dev/api/telegram/reports/performance
+curl https://api.fire22.ag/api/telegram/reports/performance
 
 # Test system health
-curl -X POST https://dashboard-worker.fire22.workers.dev/api/telegram/test-inquiry
+curl -X POST https://api.fire22.ag/api/telegram/test-inquiry
 ```
 
 ## Best Practices

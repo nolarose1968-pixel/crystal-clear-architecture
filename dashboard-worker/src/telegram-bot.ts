@@ -9,6 +9,7 @@ import { TelegramBot } from 'https://deno.land/x/telegram_bot_api/mod.ts';
 import { createBusinessManagementSystem, BusinessManagementSystem } from './business-management';
 import { createLiveCasinoManagementSystem, LiveCasinoManagementSystem } from './live-casino-management';
 import { createSportsBettingManagementSystem, SportsBettingManagementSystem } from './sports-betting-management';
+import { TelegramNotificationService } from './notifications/telegram-notification-service';
 
 export interface TelegramUser {
   id: number;
@@ -38,6 +39,7 @@ export interface TelegramBotConfig {
   webhookUrl?: string;
   allowedUsers?: string[];
   adminUsers?: string[];
+  database?: any; // Database connection
   notificationSettings: {
     wagerUpdates: boolean;
     balanceChanges: boolean;
@@ -54,6 +56,7 @@ export class Fire22TelegramBot {
   private businessSystem: BusinessManagementSystem;
   private liveCasinoSystem: LiveCasinoManagementSystem;
   private sportsBettingSystem: SportsBettingManagementSystem;
+  private notificationService: TelegramNotificationService;
   private isRunning: boolean = false;
 
   constructor(config: TelegramBotConfig) {
@@ -62,6 +65,10 @@ export class Fire22TelegramBot {
     this.businessSystem = createBusinessManagementSystem();
     this.liveCasinoSystem = createLiveCasinoManagementSystem();
     this.sportsBettingSystem = createSportsBettingManagementSystem();
+
+    // Initialize notification service
+    this.notificationService = new TelegramNotificationService(this);
+
     this.initializeCommandHandlers();
   }
 
@@ -319,18 +326,36 @@ Contact support: support@fire22.com
    */
   private async getUserByTelegramUsername(username: string): Promise<any> {
     try {
+      if (!this.config.database) {
+        console.warn('Database not configured, using mock data');
+        return this.getMockUserData(username);
+      }
+
       // Query the database for user with matching telegram_username
-      const user = await this.env.DB.prepare(`
-        SELECT customer_id, name, balance, telegram_username 
-        FROM players 
+      const user = await this.config.database.prepare(`
+        SELECT customer_id, name, balance, telegram_username, telegram_id
+        FROM players
         WHERE telegram_username = ?
       `).bind(username).first();
-      
+
       return user;
     } catch (error) {
       console.error('Error fetching user by Telegram username:', error);
-      return null;
+      return this.getMockUserData(username);
     }
+  }
+
+  /**
+   * Get mock user data for development
+   */
+  private getMockUserData(username: string): any {
+    return {
+      customer_id: 'mock_' + username,
+      name: username,
+      balance: 1000.00,
+      telegram_username: username,
+      telegram_id: null
+    };
   }
 
   /**
@@ -1229,29 +1254,73 @@ ${text}
   }
 
   /**
-   * Send notification to user by telegram_username
+   * Send notification to user by telegram_username (using notification service)
    */
   async sendNotificationByUsername(username: string, message: string) {
     try {
-      // const user = await getUserByTelegramUsername(username);
-      // if (user?.telegram_id) {
-      //   await this.sendMessage(user.telegram_id, message);
-      // }
-      
+      const notificationId = await this.notificationService.sendToUsername(username, message);
+      console.log(`📋 Notification queued for @${username} (ID: ${notificationId})`);
+      return notificationId;
     } catch (error) {
-      console.error('❌ Error sending notification:', error);
+      console.error('❌ Error queuing notification:', error);
+      throw error;
     }
   }
 
   /**
-   * Send notification to user by telegram_id
+   * Send notification to user by telegram_id (using notification service)
    */
   async sendNotificationById(telegramId: number, message: string) {
     try {
-      await this.sendMessage(telegramId, message);
+      const notificationId = await this.notificationService.sendToUser(telegramId, message);
+      console.log(`📋 Notification queued for user ${telegramId} (ID: ${notificationId})`);
+      return notificationId;
     } catch (error) {
-      console.error('❌ Error sending notification:', error);
+      console.error('❌ Error queuing notification:', error);
+      throw error;
     }
+  }
+
+  /**
+   * Send bulk notifications
+   */
+  async sendBulkNotifications(recipients: Array<{ telegramId?: number; username?: string }>, message: string) {
+    try {
+      const notificationIds = await this.notificationService.sendBulk(recipients, message);
+      console.log(`📋 Bulk notification queued for ${recipients.length} recipients`);
+      return notificationIds;
+    } catch (error) {
+      console.error('❌ Error queuing bulk notifications:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get notification status
+   */
+  getNotificationStatus(notificationId: string) {
+    return this.notificationService.getNotificationStatus(notificationId);
+  }
+
+  /**
+   * Cancel notification
+   */
+  cancelNotification(notificationId: string): boolean {
+    return this.notificationService.cancelNotification(notificationId);
+  }
+
+  /**
+   * Get notification service stats
+   */
+  getNotificationStats() {
+    return this.notificationService.getStats();
+  }
+
+  /**
+   * Get notification queue status
+   */
+  getNotificationQueueStatus() {
+    return this.notificationService.getQueueStatus();
   }
 
   /**

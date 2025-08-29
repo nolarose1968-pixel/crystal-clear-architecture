@@ -31,7 +31,7 @@ async function main() {
   console.log('👷 Step 4: Deploying Cloudflare Worker...');
   await deployWorker(config);
 
-  // Step 5: Seed employee data
+  // Step 5: Seed employee data (including vinny2times VIP)
   console.log('🌱 Step 5: Seeding employee data...');
   await seedEmployeeData(config);
 

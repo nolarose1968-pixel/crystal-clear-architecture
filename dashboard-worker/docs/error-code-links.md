@@ -111,7 +111,7 @@ try {
     "message": "Unauthorized API request",
     "severity": "WARNING",
     "category": "API",
-    "documentation": "/docs/api/authentication",
+    "documentation": "/crystal-clear-architecture/docs/api/authentication",
     "solutions": [
       "Provide valid API key or token",
       "Check authentication header format",

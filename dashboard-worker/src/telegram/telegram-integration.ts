@@ -290,23 +290,45 @@ export class Fire22TelegramIntegration {
   public async processWebhookUpdate(update: any): Promise<void> {
     try {
       this.systemMetrics.totalMessages++;
-      
-      // Pass to workflow orchestrator for processing
-      // Note: This would need proper integration with Grammy bot instance
-      
+
+      // Process webhook update through workflow orchestrator
+      if (this.workflowOrchestrator && update.message) {
+        await this.workflowOrchestrator.processMessage(update.message);
+      }
+
+      // Also handle through legacy bot if available
+      if (this.telegramBot && update.message) {
+        await this.telegramBot.handleMessage(update.message);
+      }
+
+      console.log(`📨 Webhook update processed: ${update.update_id || 'unknown'}`);
+
     } catch (error) {
       console.error('❌ Error processing webhook update:', error);
       this.systemMetrics.errors++;
+      throw error;
     }
   }
 
   public async sendNotification(userId: string, message: string, options?: any): Promise<void> {
     try {
-      // Use workflow orchestrator to send notifications
-      
+      // Send notification via legacy bot system
+      if (this.telegramBot) {
+        await this.telegramBot.sendNotificationById(parseInt(userId), message);
+      }
+
+      // Send via workflow orchestrator if available
+      if (this.workflowOrchestrator) {
+        await this.workflowOrchestrator.sendNotification(userId, message, options);
+      }
+
+      this.systemMetrics.totalMessages++;
+      console.log(`✅ Notification sent to user ${userId}`);
+
     } catch (error) {
       console.error('❌ Error sending notification:', error);
       this.systemMetrics.errors++;
+      throw error;
     }
   }
 

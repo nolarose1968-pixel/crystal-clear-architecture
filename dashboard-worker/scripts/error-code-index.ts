@@ -199,8 +199,8 @@ export const ERROR_INDEX = {
       "Verify token expiration"
     ],
     links: [
-      { text: "API Authentication", url: "/docs/api/auth" },
-      { text: "Token Management", url: "/docs/api/tokens" }
+      { text: "API Authentication", url: "/crystal-clear-architecture/docs/api/auth" },
+      { text: "Token Management", url: "/crystal-clear-architecture/docs/api/tokens" }
     ],
     occurrences: 0,
     firstSeen: null as Date | null,
@@ -222,10 +222,10 @@ export const ERROR_INDEX = {
       "Review API usage patterns and optimize"
     ],
     links: [
-      { text: "Rate Limiting Guide", url: "/docs/api/rate-limits" },
-      { text: "API Optimization", url: "/docs/api/optimization" },
-      { text: "Caching Strategies", url: "/docs/api/caching" },
-      { text: "Retry Patterns", url: "/docs/api/retry-patterns" }
+      { text: "Rate Limiting Guide", url: "/crystal-clear-architecture/docs/api/rate-limits" },
+      { text: "API Optimization", url: "/crystal-clear-architecture/docs/api/optimization" },
+      { text: "Caching Strategies", url: "/crystal-clear-architecture/docs/api/caching" },
+      { text: "Retry Patterns", url: "/crystal-clear-architecture/docs/api/retry-patterns" }
     ],
     occurrences: 0,
     firstSeen: null as Date | null,

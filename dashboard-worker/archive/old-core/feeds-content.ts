@@ -785,7 +785,7 @@ bun run logs:telegram-bot
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>🏢 Fire22 Team Announcements</title>
-    <link>https://dashboard-worker.fire22.workers.dev/feeds/team-announcements</link>
+    <link>https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements</link>
     <description>Official Fire22 team announcements, leadership appointments, and organizational updates</description>
     <language>en-us</language>
     <lastBuildDate>Wed, 28 Aug 2025 20:00:00 GMT</lastBuildDate>
@@ -795,7 +795,7 @@ bun run logs:telegram-bot
     <category>Leadership</category>
     <category>Organization</category>
     <ttl>60</ttl>
-    <atom:link href="https://dashboard-worker.fire22.workers.dev/feeds/team-announcements-rss.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements-rss.xml" rel="self" type="application/rss+xml" />
 
     <image>
       <url>https://dashboard-worker.nolarose2503.workers.dev/assets/fire22-logo.png</url>
@@ -809,7 +809,7 @@ bun run logs:telegram-bot
     <!-- 👑 NEW APPOINTMENT: Vinny2times as Head of VIP Management -->
     <item>
       <title>👑 NEW APPOINTMENT: Vinny2times Named Head of VIP Management</title>
-      <link>https://dashboard-worker.fire22.workers.dev/announcements/vinny2times-vip-head</link>
+      <link>https://crystal-clear-architecture.fire22.workers.dev/announcements/vinny2times-vip-head</link>
       <description><![CDATA[
         <h2>👑 Leadership Appointment: VIP Management Department</h2>
         
@@ -871,7 +871,7 @@ bun run logs:telegram-bot
     <!-- Welcome Message Template for Future Announcements -->
     <item>
       <title>📋 Team Announcements Feed Active</title>
-      <link>https://dashboard-worker.fire22.workers.dev/feeds/team-announcements</link>
+      <link>https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements</link>
       <description><![CDATA[
         <h2>🏢 Fire22 Team Announcements RSS Feed</h2>
         <p>This feed provides official Fire22 team announcements, leadership appointments, and organizational updates.</p>
@@ -885,7 +885,7 @@ bun run logs:telegram-bot
           <li>📈 Organizational milestones</li>
         </ul>
         
-        <p><strong>Feed URL:</strong> https://dashboard-worker.fire22.workers.dev/feeds/team-announcements-rss.xml</p>
+        <p><strong>Feed URL:</strong> https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements-rss.xml</p>
       ]]></description>
       <pubDate>Wed, 28 Aug 2025 19:00:00 GMT</pubDate>
       <guid>fire22-team-announcements-feed-active-20250828</guid>
@@ -897,9 +897,9 @@ bun run logs:telegram-bot
   'team-announcements-atom.xml': `<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>🏢 Fire22 Team Announcements</title>
-  <link href="https://dashboard-worker.fire22.workers.dev/feeds/team-announcements-atom.xml" rel="self"/>
-  <link href="https://dashboard-worker.fire22.workers.dev/"/>
-  <id>https://dashboard-worker.fire22.workers.dev/feeds/team-announcements</id>
+  <link href="https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements-atom.xml" rel="self"/>
+  <link href="https://crystal-clear-architecture.fire22.workers.dev/"/>
+  <id>https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements</id>
   <updated>2025-08-28T20:00:00Z</updated>
   <subtitle>Official Fire22 team announcements, leadership appointments, and organizational updates</subtitle>
   <generator>Fire22 Communications System v1.0.0</generator>
@@ -910,8 +910,8 @@ bun run logs:telegram-bot
 
   <entry>
     <title>👑 NEW APPOINTMENT: Vinny2times Named Head of VIP Management</title>
-    <link href="https://dashboard-worker.fire22.workers.dev/announcements/vinny2times-vip-head"/>
-    <id>https://dashboard-worker.fire22.workers.dev/announcements/vinny2times-vip-head</id>
+    <link href="https://crystal-clear-architecture.fire22.workers.dev/announcements/vinny2times-vip-head"/>
+    <id>https://crystal-clear-architecture.fire22.workers.dev/announcements/vinny2times-vip-head</id>
     <updated>2025-08-28T20:00:00Z</updated>
     <category term="Leadership Appointments"/>
     <category term="VIP Management"/>
@@ -976,8 +976,8 @@ bun run logs:telegram-bot
 
   <entry>
     <title>📋 Team Announcements Feed Active</title>
-    <link href="https://dashboard-worker.fire22.workers.dev/feeds/team-announcements"/>
-    <id>https://dashboard-worker.fire22.workers.dev/feeds/team-announcements-init</id>
+    <link href="https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements"/>
+    <id>https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements-init</id>
     <updated>2025-08-28T19:00:00Z</updated>
     <category term="System Updates"/>
     <author>
@@ -998,8 +998,8 @@ bun run logs:telegram-bot
         <li>📈 Organizational milestones</li>
       </ul>
       
-      <p><strong>RSS Feed:</strong> https://dashboard-worker.fire22.workers.dev/feeds/team-announcements-rss.xml</p>
-      <p><strong>Atom Feed:</strong> https://dashboard-worker.fire22.workers.dev/feeds/team-announcements-atom.xml</p>
+      <p><strong>RSS Feed:</strong> https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements-rss.xml</p>
+      <p><strong>Atom Feed:</strong> https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements-atom.xml</p>
     ]]></content>
   </entry>
 
@@ -1008,7 +1008,7 @@ bun run logs:telegram-bot
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>🚨 Fire22 Dashboard - Critical Error Alerts</title>
-    <link>https://dashboard-worker.fire22.workers.dev/feeds/critical-errors</link>
+    <link>https://crystal-clear-architecture.fire22.workers.dev/feeds/critical-errors</link>
     <description>Real-time critical error notifications for Fire22 Dashboard Worker system requiring immediate attention</description>
     <language>en-us</language>
     <lastBuildDate>Wed, 28 Aug 2025 19:45:00 GMT</lastBuildDate>
@@ -1016,12 +1016,12 @@ bun run logs:telegram-bot
     <webMaster>tech@fire22.ag (Fire22 Tech Team)</webMaster>
     <category>System Alerts</category>
     <ttl>5</ttl>
-    <atom:link href="https://dashboard-worker.fire22.workers.dev/feeds/critical-errors.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://crystal-clear-architecture.fire22.workers.dev/feeds/critical-errors.xml" rel="self" type="application/rss+xml" />
 
     <!-- 🚨 CRITICAL: Fire22 API Authorization Failure -->
     <item>
       <title>🚨 CRITICAL: E7001 - Fire22 API Unauthorized - Data Extraction Completely Blocked</title>
-      <link>https://dashboard-worker.fire22.workers.dev/error/E7001</link>
+      <link>https://crystal-clear-architecture.fire22.workers.dev/error/E7001</link>
       <description><![CDATA[
         <h2>🚨 URGENT: Fire22 Data Extraction Completely Blocked</h2>
         
@@ -1056,14 +1056,14 @@ bun run logs:telegram-bot
       <category>Fire22</category>
       <category>Authentication</category>
       <category>Data Extraction</category>
-      <guid isPermaLink="true">https://dashboard-worker.fire22.workers.dev/error/E7001</guid>
+      <guid isPermaLink="true">https://crystal-clear-architecture.fire22.workers.dev/error/E7001</guid>
       <pubDate>Wed, 28 Aug 2025 19:45:00 GMT</pubDate>
     </item>
 
     <!-- 🚨 CRITICAL: Credential Storage Failed -->
     <item>
       <title>🚨 CRITICAL: E7002 - Bun.secrets Credential Storage Not Functioning</title>
-      <link>https://dashboard-worker.fire22.workers.dev/error/E7002</link>
+      <link>https://crystal-clear-architecture.fire22.workers.dev/error/E7002</link>
       <description><![CDATA[
         <h2>🔐 CRITICAL: Secure Credential Storage System Down</h2>
         
@@ -1097,14 +1097,14 @@ bun run logs:telegram-bot
       <category>Security</category>
       <category>Credentials</category>
       <category>Infrastructure</category>
-      <guid isPermaLink="true">https://dashboard-worker.fire22.workers.dev/error/E7002</guid>
+      <guid isPermaLink="true">https://crystal-clear-architecture.fire22.workers.dev/error/E7002</guid>
       <pubDate>Wed, 28 Aug 2025 19:44:00 GMT</pubDate>
     </item>
 
     <!-- 🚨 CRITICAL: Database Connection Failed -->
     <item>
       <title>🚨 CRITICAL: E7003 - Fire22 Database Not Connected - Local Storage Blocked</title>
-      <link>https://dashboard-worker.fire22.workers.dev/error/E7003</link>
+      <link>https://crystal-clear-architecture.fire22.workers.dev/error/E7003</link>
       <description><![CDATA[
         <h2>🗄️ CRITICAL: Local Data Storage System Down</h2>
         
@@ -1139,14 +1139,14 @@ bun run logs:telegram-bot
       <category>Database</category>
       <category>SQLite</category>
       <category>Storage</category>
-      <guid isPermaLink="true">https://dashboard-worker.fire22.workers.dev/error/E7003</guid>
+      <guid isPermaLink="true">https://crystal-clear-architecture.fire22.workers.dev/error/E7003</guid>
       <pubDate>Wed, 28 Aug 2025 19:43:00 GMT</pubDate>
     </item>
 
     <!-- ⚠️  ERROR: KV Namespaces Missing -->
     <item>
       <title>⚠️ ERROR: E7004 - Cloudflare KV Namespaces Missing - Performance Impact</title>
-      <link>https://dashboard-worker.fire22.workers.dev/error/E7004</link>
+      <link>https://crystal-clear-architecture.fire22.workers.dev/error/E7004</link>
       <description><![CDATA[
         <h2>⚡ ERROR: Performance Caching System Unavailable</h2>
         
@@ -1180,14 +1180,14 @@ bun run logs:telegram-bot
       <category>Performance</category>
       <category>Cloudflare</category>
       <category>KV Storage</category>
-      <guid isPermaLink="true">https://dashboard-worker.fire22.workers.dev/error/E7004</guid>
+      <guid isPermaLink="true">https://crystal-clear-architecture.fire22.workers.dev/error/E7004</guid>
       <pubDate>Wed, 28 Aug 2025 19:42:00 GMT</pubDate>
     </item>
 
     <!-- 📊 System Status Summary -->
     <item>
       <title>📊 Fire22 Dashboard System Status - Multiple Critical Issues Detected</title>
-      <link>https://dashboard-worker.fire22.workers.dev/status</link>
+      <link>https://crystal-clear-architecture.fire22.workers.dev/status</link>
       <description><![CDATA[
         <h2>🔍 Current System Readiness Assessment</h2>
         
@@ -1226,7 +1226,7 @@ bun run logs:telegram-bot
       <category>System Status</category>
       <category>Critical</category>
       <category>Assessment</category>
-      <guid isPermaLink="true">https://dashboard-worker.fire22.workers.dev/status</guid>
+      <guid isPermaLink="true">https://crystal-clear-architecture.fire22.workers.dev/status</guid>
       <pubDate>Wed, 28 Aug 2025 19:40:00 GMT</pubDate>
     </item>
 

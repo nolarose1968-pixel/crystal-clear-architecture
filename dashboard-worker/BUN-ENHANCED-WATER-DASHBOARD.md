@@ -276,7 +276,7 @@ water-dashboard-macos
 - [Water Dashboard Standards](WATER-DASHBOARD-STANDARDS.md)
 - [HMR Demo Guide](HMR-DEMO-GUIDE.md) 
 - [Data Infrastructure](docs/data-infrastructure.html)
-- [Fire22 API Integration](docs/api/FIRE22-API-ENDPOINTS-IMPLEMENTATION.md)
+- [Fire22 API Integration](../crystal-clear-architecture/docs/api/FIRE22-API-ENDPOINTS-IMPLEMENTATION.md)
 
 **Status**: ✅ Complete with Bun v1.01.04-alpha features  
 **Version**: 2.1.0  

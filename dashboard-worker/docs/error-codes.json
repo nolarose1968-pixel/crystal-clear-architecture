@@ -278,17 +278,17 @@
       "documentation": [
         {
           "title": "API Authentication Guide",
-          "url": "/docs/api/authentication",
+          "url": "/crystal-clear-architecture/docs/api/authentication",
           "type": "guide"
         },
         {
           "title": "Token Management",
-          "url": "/docs/api/token-management",
+          "url": "/crystal-clear-architecture/docs/api/token-management",
           "type": "reference"
         },
         {
           "title": "API Security Best Practices",
-          "url": "/docs/api/security",
+          "url": "/crystal-clear-architecture/docs/api/security",
           "type": "guide"
         }
       ],
@@ -323,22 +323,22 @@
       "documentation": [
         {
           "title": "Rate Limiting Guide",
-          "url": "/docs/api/rate-limits",
+          "url": "/crystal-clear-architecture/docs/api/rate-limits",
           "type": "guide"
         },
         {
           "title": "API Optimization Strategies",
-          "url": "/docs/api/optimization",
+          "url": "/crystal-clear-architecture/docs/api/optimization",
           "type": "guide"
         },
         {
           "title": "Caching Best Practices",
-          "url": "/docs/api/caching",
+          "url": "/crystal-clear-architecture/docs/api/caching",
           "type": "guide"
         },
         {
           "title": "Retry Pattern Implementation",
-          "url": "/docs/api/retry-patterns",
+          "url": "/crystal-clear-architecture/docs/api/retry-patterns",
           "type": "guide"
         }
       ],
@@ -432,7 +432,7 @@
         },
         {
           "title": "Fire22 API Authentication",
-          "url": "/docs/api/fire22-auth",
+          "url": "/crystal-clear-architecture/docs/api/fire22-auth",
           "type": "reference"
         },
         {
@@ -626,7 +626,7 @@
         },
         {
           "title": "Telegram API Reference",
-          "url": "/docs/api/telegram-endpoints",
+          "url": "/crystal-clear-architecture/docs/api/telegram-endpoints",
           "type": "reference"
         }
       ],
@@ -719,7 +719,7 @@
         "error": {
           "code": "E3001",
           "message": "Unauthorized API request",
-          "documentation": "/docs/api/authentication"
+          "documentation": "/crystal-clear-architecture/docs/api/authentication"
         }
       }
     },

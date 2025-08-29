@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>🏢 Fire22 Team Announcements</title>
-    <link>https://dashboard-worker.fire22.workers.dev/feeds/team-announcements</link>
+    <link>https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements</link>
     <description>Official Fire22 team announcements, leadership appointments, and organizational updates</description>
     <language>en-us</language>
     <lastBuildDate>Wed, 28 Aug 2025 20:00:00 GMT</lastBuildDate>
@@ -12,7 +12,7 @@
     <category>Leadership</category>
     <category>Organization</category>
     <ttl>60</ttl>
-    <atom:link href="https://dashboard-worker.fire22.workers.dev/feeds/team-announcements-rss.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements-rss.xml" rel="self" type="application/rss+xml" />
 
     <image>
       <url>https://dashboard-worker.nolarose2503.workers.dev/assets/fire22-logo.png</url>
@@ -26,7 +26,7 @@
     <!-- 👑 NEW APPOINTMENT: Vinny2times as Head of VIP Management -->
     <item>
       <title>👑 NEW APPOINTMENT: Vinny2times Named Head of VIP Management</title>
-      <link>https://dashboard-worker.fire22.workers.dev/announcements/vinny2times-vip-head</link>
+      <link>https://crystal-clear-architecture.fire22.workers.dev/announcements/vinny2times-vip-head</link>
       <description><![CDATA[
         <h2>👑 Leadership Appointment: VIP Management Department</h2>
         
@@ -88,7 +88,7 @@
     <!-- Welcome Message Template for Future Announcements -->
     <item>
       <title>📋 Team Announcements Feed Active</title>
-      <link>https://dashboard-worker.fire22.workers.dev/feeds/team-announcements</link>
+      <link>https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements</link>
       <description><![CDATA[
         <h2>🏢 Fire22 Team Announcements RSS Feed</h2>
         <p>This feed provides official Fire22 team announcements, leadership appointments, and organizational updates.</p>
@@ -102,7 +102,7 @@
           <li>📈 Organizational milestones</li>
         </ul>
         
-        <p><strong>Feed URL:</strong> https://dashboard-worker.fire22.workers.dev/feeds/team-announcements-rss.xml</p>
+        <p><strong>Feed URL:</strong> https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements-rss.xml</p>
       ]]></description>
       <pubDate>Wed, 28 Aug 2025 19:00:00 GMT</pubDate>
       <guid>fire22-team-announcements-feed-active-20250828</guid>

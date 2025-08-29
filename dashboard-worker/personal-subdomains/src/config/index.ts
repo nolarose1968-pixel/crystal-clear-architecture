@@ -7,7 +7,7 @@ import type { CacheConfig, EmployeeTier } from '../types';
 export const CONFIG = {
   // Application
   BRAND_NAME: 'Fire22',
-  DOMAIN: 'sportsfire.co',
+  DOMAIN: 'fire22.workers.dev',
   VERSION: '1.0.0',
 
   // Cache Configuration

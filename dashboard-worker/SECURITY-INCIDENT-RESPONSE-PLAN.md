@@ -198,8 +198,8 @@ async function handleSecurityIncident(incident: SecurityIncident) {
 - **Database Flow**: `/docs/WATER-DASHBOARD-DATABASE-FLOW.md`
 
 ### **API Documentation**
-- **Security Endpoints**: `/docs/api/FIRE22-ENDPOINTS-SECURITY.md`
-- **Rate Limits**: `/docs/api/rate-limits` (referenced)
+- **Security Endpoints**: `/crystal-clear-architecture/docs/api/FIRE22-ENDPOINTS-SECURITY.md`
+- **Rate Limits**: `/crystal-clear-architecture/docs/api/rate-limits` (referenced)
 - **Database Optimization**: `/docs/database/optimization` (referenced)
 
 ## **NEXT STEPS**

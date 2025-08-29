@@ -324,12 +324,12 @@ export const ERROR_MESSAGES = {
   },
   
   API: {
-    INVALID_REQUEST: { code: 'E3003', message: 'Invalid request format', docs: '/docs/api/validation' },
-    UNAUTHORIZED: { code: 'E3001', message: 'Unauthorized access', docs: '/docs/api/authentication' },
-    FORBIDDEN: { code: 'E3004', message: 'Access forbidden', docs: '/docs/api/authorization' },
-    RATE_LIMITED: { code: 'E3002', message: 'Rate limit exceeded', docs: '/docs/api/rate-limits' },
-    NOT_FOUND: { code: 'E3005', message: 'Resource not found', docs: '/docs/api/resources' },
-    VALIDATION_FAILED: { code: 'E3006', message: 'Request validation failed', docs: '/docs/api/validation' }
+    INVALID_REQUEST: { code: 'E3003', message: 'Invalid request format', docs: '/crystal-clear-architecture/docs/api/validation' },
+    UNAUTHORIZED: { code: 'E3001', message: 'Unauthorized access', docs: '/crystal-clear-architecture/docs/api/authentication' },
+    FORBIDDEN: { code: 'E3004', message: 'Access forbidden', docs: '/crystal-clear-architecture/docs/api/authorization' },
+    RATE_LIMITED: { code: 'E3002', message: 'Rate limit exceeded', docs: '/crystal-clear-architecture/docs/api/rate-limits' },
+    NOT_FOUND: { code: 'E3005', message: 'Resource not found', docs: '/crystal-clear-architecture/docs/api/resources' },
+    VALIDATION_FAILED: { code: 'E3006', message: 'Request validation failed', docs: '/crystal-clear-architecture/docs/api/validation' }
   },
   
   BUSINESS: {

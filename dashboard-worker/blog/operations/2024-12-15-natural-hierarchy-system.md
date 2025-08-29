@@ -210,4 +210,4 @@ The hierarchy system provides real-time organizational analytics:
 
 *The Natural Hierarchy Aggregation System represents a new paradigm in organizational data management - preserving the value of existing systems while unlocking the power of unified access.*
 
-**Operations Contact**: Operations Department - `/docs/departments/operations` | **API Documentation**: `/docs/api/hierarchy-endpoints`
+**Operations Contact**: Operations Department - `/docs/departments/operations` | **API Documentation**: `/crystal-clear-architecture/docs/api/hierarchy-endpoints`

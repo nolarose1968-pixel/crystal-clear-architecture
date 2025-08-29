@@ -72,5 +72,5 @@ curl -X POST /api/hierarchy/query \
 ## Related Pages
 
 - [Marketing Live Implementation Links](../../src/departments/marketing-department.html#implementation-links)
-- [Marketing API Documentation](../../docs/api/marketing-endpoints.md)
+- [Marketing API Documentation](../../../crystal-clear-architecture/docs/api/marketing-endpoints.md)
 - [Marketing Performance Analytics](../../src/analytics/marketing.html)

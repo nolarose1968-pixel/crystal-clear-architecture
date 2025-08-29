@@ -6,7 +6,7 @@
  */
 
 // Re-export from the new modular structure
-export { generateContactPage } from '../../../ui/templates/contact-main';
+export { generateContactPage } from '../../ui/templates/contact-main';
 
 // Import shared utilities
-export * from '../../../ui/templates/contact-shared';
+export * from '../../ui/templates/contact-shared';

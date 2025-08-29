@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>🏢 Fire22 Team Announcements</title>
-  <link href="https://dashboard-worker.fire22.workers.dev/feeds/team-announcements-atom.xml" rel="self"/>
-  <link href="https://dashboard-worker.fire22.workers.dev/"/>
-  <id>https://dashboard-worker.fire22.workers.dev/feeds/team-announcements</id>
+  <link href="https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements-atom.xml" rel="self"/>
+  <link href="https://crystal-clear-architecture.fire22.workers.dev/"/>
+  <id>https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements</id>
   <updated>2025-08-28T20:00:00Z</updated>
   <subtitle>Official Fire22 team announcements, leadership appointments, and organizational updates</subtitle>
   <generator>Fire22 Communications System v1.0.0</generator>
@@ -14,8 +14,8 @@
 
   <entry>
     <title>👑 NEW APPOINTMENT: Vinny2times Named Head of VIP Management</title>
-    <link href="https://dashboard-worker.fire22.workers.dev/announcements/vinny2times-vip-head"/>
-    <id>https://dashboard-worker.fire22.workers.dev/announcements/vinny2times-vip-head</id>
+    <link href="https://crystal-clear-architecture.fire22.workers.dev/announcements/vinny2times-vip-head"/>
+    <id>https://crystal-clear-architecture.fire22.workers.dev/announcements/vinny2times-vip-head</id>
     <updated>2025-08-28T20:00:00Z</updated>
     <category term="Leadership Appointments"/>
     <category term="VIP Management"/>
@@ -80,8 +80,8 @@
 
   <entry>
     <title>📋 Team Announcements Feed Active</title>
-    <link href="https://dashboard-worker.fire22.workers.dev/feeds/team-announcements"/>
-    <id>https://dashboard-worker.fire22.workers.dev/feeds/team-announcements-init</id>
+    <link href="https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements"/>
+    <id>https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements-init</id>
     <updated>2025-08-28T19:00:00Z</updated>
     <category term="System Updates"/>
     <author>
@@ -102,8 +102,8 @@
         <li>📈 Organizational milestones</li>
       </ul>
       
-      <p><strong>RSS Feed:</strong> https://dashboard-worker.fire22.workers.dev/feeds/team-announcements-rss.xml</p>
-      <p><strong>Atom Feed:</strong> https://dashboard-worker.fire22.workers.dev/feeds/team-announcements-atom.xml</p>
+      <p><strong>RSS Feed:</strong> https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements-rss.xml</p>
+      <p><strong>Atom Feed:</strong> https://crystal-clear-architecture.fire22.workers.dev/feeds/team-announcements-atom.xml</p>
     ]]></content>
   </entry>
 

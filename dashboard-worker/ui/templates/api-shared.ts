@@ -92,7 +92,7 @@ export async function viewApiLogs(): Promise<void> {
 
 export async function generateApiKey(): Promise<void> {
   const apiKey = 'sk_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  alert(\`🔑 API Key Generated\\\\n\\\\n🔐 New API Key:\\\\n\${apiKey}\\\\n\\\\n⚠️ Important:\\\\n• Keep this key secure\\\\n• Never share in public\\\\n• Rotate regularly\\\\n• Monitor usage\\\\n\\\\n📋 Key Details:\\\\n• Created: \${new Date().toLocaleString()}\\\\n• Expires: Never\\\\n• Rate Limit: 1000/min\\\\n• Permissions: Read/Write\\\\n\\\\n✅ Key copied to clipboard\`);
+  alert(`🔑 API Key Generated\n\n🔐 New API Key:\n${apiKey}\n\n⚠️ Important:\n• Keep this key secure\n• Never share in public\n• Rotate regularly\n• Monitor usage\n\n📋 Key Details:\n• Created: ${new Date().toLocaleString()}\n• Expires: Never\n• Rate Limit: 1000/min\n• Permissions: Read/Write\n\n✅ Key copied to clipboard`);
 }
 
 export async function createNewApi(): Promise<void> {

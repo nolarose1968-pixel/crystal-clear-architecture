@@ -12,6 +12,15 @@ export * from './adjustment/adjustment-controller';
 // Balance Controllers
 export * from './balance/balance-controller';
 
+// Collections Controllers
+export * from './collections/collections.controller';
+
+// Distributions Controllers
+export * from './distributions/distributions.controller';
+
+// Free Play Controllers
+export * from './free-play/free-play.controller';
+
 // Re-export types
 export type * from '../../../core/types/controllers';
 

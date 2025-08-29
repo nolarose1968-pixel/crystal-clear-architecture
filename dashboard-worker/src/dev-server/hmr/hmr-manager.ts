@@ -12,6 +12,12 @@ import type {
   HMRConfig
 } from '../../../core/types/dev-server';
 
+import {
+  PluginManager,
+  createDefaultPluginConfig,
+  type FileChangeResult
+} from '../core/file-watcher-plugin';
+
 export class HMRManager {
   private watchers: Map<string, any> = new Map(); // File watchers
   private clients: Map<string, WebSocketClient> = new Map();
@@ -20,6 +26,7 @@ export class HMRManager {
   private fileHashes: Map<string, string> = new Map();
   private changeQueue: FileChangeEvent[] = [];
   private processingChanges = false;
+  private pluginManager: PluginManager;
 
   constructor(hmrConfig: Partial<HMRConfig> = {}, watchConfig: Partial<WatchConfig> = {}) {
     this.config = {
@@ -40,6 +47,9 @@ export class HMRManager {
       interval: 100,
       ...watchConfig
     };
+
+    // Initialize plugin manager with default configuration
+    this.pluginManager = new PluginManager(createDefaultPluginConfig());
   }
 
   /**
@@ -54,6 +64,9 @@ export class HMRManager {
     console.log('🔥 Initializing HMR system...');
 
     try {
+      // Initialize plugin manager first
+      await this.pluginManager.initialize();
+
       await this.setupFileWatchers();
       this.startHeartbeat();
       console.log('✅ HMR system initialized successfully');
@@ -110,20 +123,71 @@ export class HMRManager {
     this.changeQueue = [];
 
     try {
-      // Filter and validate changes
-      const validChanges = changes.filter(change => this.isValidChange(change));
+      // Process each change through the plugin system
+      const processedChanges: Array<{
+        change: FileChangeEvent;
+        result: FileChangeResult;
+      }> = [];
 
-      if (validChanges.length === 0) {
-        this.processingChanges = false;
-        return;
+      for (const change of changes) {
+        try {
+          // First check if change should be ignored based on watch config
+          if (this.shouldIgnoreChange(change)) {
+            console.log(`⏭️ Ignored: ${change.path} (watch config)`);
+            processedChanges.push({
+              change,
+              result: {
+                success: true,
+                action: 'ignore',
+                data: { reason: 'ignored_by_watch_config' },
+                processedBy: 'watch_config'
+              }
+            });
+            continue;
+          }
+
+          const result = await this.pluginManager.processFileChange(change);
+          processedChanges.push({ change, result });
+
+          if (result.action === 'ignore') {
+            console.log(`⏭️ Ignored: ${change.path} (${result.data?.reason || 'no plugin'})`);
+          }
+        } catch (error) {
+          console.error(`❌ Failed to process change for ${change.path}:`, error);
+          processedChanges.push({
+            change,
+            result: {
+              success: false,
+              action: 'ignore',
+              error: error instanceof Error ? error.message : 'Unknown error',
+              processedBy: 'error'
+            }
+          });
+        }
       }
 
-      // Check for circular dependencies or excessive changes
-      if (validChanges.length > 100) {
-        console.warn('⚠️ Large number of file changes detected, triggering full reload');
-        await this.triggerFullReload(validChanges);
-      } else {
-        await this.triggerHMRUpdate(validChanges);
+      // Separate changes by action type
+      const hmrChanges = processedChanges.filter(pc => pc.result.action === 'hmr');
+      const reloadChanges = processedChanges.filter(pc => pc.result.action === 'reload');
+      const customChanges = processedChanges.filter(pc => pc.result.action === 'custom');
+
+      // Process HMR updates
+      if (hmrChanges.length > 0) {
+        await this.triggerHMRUpdate(hmrChanges.map(pc => pc.change));
+      }
+
+      // Process reloads
+      if (reloadChanges.length > 0) {
+        if (reloadChanges.length > 10) {
+          console.warn('⚠️ Large number of reload-triggering changes detected');
+        }
+        await this.triggerFullReload(reloadChanges.map(pc => pc.change));
+      }
+
+      // Process custom actions
+      for (const customChange of customChanges) {
+        console.log(`🔧 Custom action for ${customChange.change.path}:`, customChange.result.data);
+        // Custom actions can be handled here based on the plugin's data
       }
 
     } catch (error) {
@@ -288,21 +352,16 @@ export class HMRManager {
   }
 
   /**
-   * Check if file change should trigger HMR
+   * Check if file change should be ignored based on watch config
    */
-  private isValidChange(change: FileChangeEvent): boolean {
+  private shouldIgnoreChange(change: FileChangeEvent): boolean {
     // Check if path is ignored
     for (const ignored of this.watchConfig.ignored) {
       if (change.path.includes(ignored)) {
-        return false;
+        return true;
       }
     }
-
-    // Only process certain file types
-    const validExtensions = ['.ts', '.js', '.tsx', '.jsx', '.vue', '.svelte', '.html', '.css'];
-    const ext = change.path.substring(change.path.lastIndexOf('.'));
-
-    return validExtensions.includes(ext);
+    return false;
   }
 
   /**
@@ -355,12 +414,14 @@ export class HMRManager {
     clients: number;
     watchers: number;
     config: HMRConfig;
+    plugins: any; // Plugin manager stats
   } {
     return {
       enabled: this.config.enabled,
       clients: this.clients.size,
       watchers: this.watchers.size,
-      config: { ...this.config }
+      config: { ...this.config },
+      plugins: this.pluginManager.getStats()
     };
   }
 
@@ -391,7 +452,9 @@ export class HMRManager {
   /**
    * Cleanup resources
    */
-  cleanup(): void {
+  async cleanup(): Promise<void> {
+    console.log('🧹 Cleaning up HMR system...');
+
     // Stop watchers
     for (const [path, watcher] of this.watchers) {
       console.log(`🛑 Stopping watcher: ${path}`);
@@ -405,6 +468,9 @@ export class HMRManager {
     }
     this.clients.clear();
 
-    console.log('🧹 HMR system cleaned up');
+    // Cleanup plugin manager
+    await this.pluginManager.cleanup();
+
+    console.log('✅ HMR system cleaned up');
   }
 }
