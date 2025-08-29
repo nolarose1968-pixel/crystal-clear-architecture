@@ -82,11 +82,27 @@ class Fire22VersionManager {
   }
 
   private async updatePackageJson(newVersion: string): Promise<void> {
-    const packageJson = JSON.parse(readFileSync(this.packagePath, 'utf-8'));
-    packageJson.version = newVersion;
+    try {
+      // Use Bun's native package management for version updates
+      await $`bun pm pkg set version="${newVersion}"`;
 
-    writeFileSync(this.packagePath, JSON.stringify(packageJson, null, 2));
-    console.log(`✅ Updated package.json version to: ${newVersion}`);
+      // Verify the update was successful
+      const updatedVersion = await $`bun pm pkg get version`.text().trim();
+      const cleanVersion = updatedVersion.replace(/"/g, '').trim();
+
+      if (cleanVersion !== newVersion) {
+        throw new Error(`Version update failed: expected ${newVersion}, got ${cleanVersion}`);
+      }
+
+      console.log(`✅ Updated package.json version to: ${newVersion} (using Bun native commands)`);
+    } catch (error) {
+      // Fallback to manual file update if Bun commands fail
+      console.log(`⚠️  Falling back to manual package.json update...`);
+      const packageJson = JSON.parse(readFileSync(this.packagePath, 'utf-8'));
+      packageJson.version = newVersion;
+      writeFileSync(this.packagePath, JSON.stringify(packageJson, null, 2));
+      console.log(`✅ Updated package.json version to: ${newVersion} (manual update)`);
+    }
   }
 
   private async updateArchitectureDocuments(newVersion: string): Promise<void> {

@@ -53,7 +53,6 @@
     "serve": "bunx serve build -p 3000",
     "dashboard:dev": "node dashboard-server.js",
     "lighthouse": "bunx lighthouse http://localhost:3000/analytics/ --output=json --output-path=./build/lighthouse-report.json",
-
     "version:major": "bun run scripts/version-manager.ts --bump major",
     "version:minor": "bun run scripts/version-manager.ts --bump minor",
     "version:patch": "bun run scripts/version-manager.ts --bump patch",
@@ -61,9 +60,19 @@
     "version:release": "bun run scripts/version-manager.ts --release",
     "version:status": "bun run scripts/version-manager.ts --status",
     "version:validate": "bun run scripts/version-manager.ts --validate",
+    "version:current": "bun pm pkg get version",
+    "version:info": "bun pm pkg get name description version engines.repository",
+    "version:scripts": "bun pm pkg get scripts",
+    "version:deps": "bun pm pkg get dependencies devDependencies",
+
+    "pkg:get": "bun pm pkg get",
+    "pkg:set": "bun pm pkg set",
+    "pkg:delete": "bun pm pkg delete",
+    "pkg:fix": "bun pm pkg fix",
 
     "release:prepare": "bun run version:validate && bun run build:prod",
     "release:tag": "bun run scripts/version-manager.ts --tag",
-    "release:notes": "bun run scripts/version-manager.ts --changelog"
+    "release:notes": "bun run scripts/version-manager.ts --changelog",
+    "release:verify": "bun run version:current && echo '✅ Version verified'"
   }
 }
