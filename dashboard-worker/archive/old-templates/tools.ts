@@ -74,26 +74,26 @@ function generateFantasy402Content(employee: EmployeeData): string {
     { label: 'Active Markets', value: '1,247', change: '+23', trend: 'up' },
     { label: 'Live Bets Today', value: '15,834', change: '+12.3%', trend: 'up' },
     { label: 'Revenue Today', value: '$247K', change: '+18.7%', trend: 'up' },
-    { label: 'Win Rate', value: '54.2%', change: '+2.1%', trend: 'up' }
+    { label: 'Win Rate', value: '54.2%', change: '+2.1%', trend: 'up' },
   ];
 
   const marketData = [
     { sport: 'NFL', markets: '127', volume: '$2.1M', trend: '+15%' },
     { sport: 'NBA', markets: '89', volume: '$1.8M', trend: '+22%' },
     { sport: 'MLB', markets: '156', volume: '$950K', trend: '+8%' },
-    { sport: 'NHL', markets: '67', volume: '$650K', trend: '+12%' }
+    { sport: 'NHL', markets: '67', volume: '$650K', trend: '+12%' },
   ];
 
   const arbitrageOpportunities = [
     { game: 'Chiefs vs Eagles', profit: '$1,247', confidence: '98%' },
     { game: 'Lakers vs Celtics', profit: '$892', confidence: '95%' },
-    { game: 'Yankees vs Red Sox', profit: '$654', confidence: '92%' }
+    { game: 'Yankees vs Red Sox', profit: '$654', confidence: '92%' },
   ];
 
   const vipBettingActivity = [
     { client: 'Diamond Client #247', bet: '$50K', game: 'NFL Championship', time: '2 min ago' },
     { client: 'Premium Client #189', bet: '$25K', game: 'NBA Finals', time: '5 min ago' },
-    { client: 'VIP Client #456', bet: '$15K', game: 'MLB Playoffs', time: '8 min ago' }
+    { client: 'VIP Client #456', bet: '$15K', game: 'MLB Playoffs', time: '8 min ago' },
   ];
 
   return `
@@ -124,14 +124,18 @@ function generateFantasy402Content(employee: EmployeeData): string {
         </div>
 
         <div class="stats-grid">
-          ${realTimeStats.map(stat => `
+          ${realTimeStats
+            .map(
+              stat => `
             <div class="stat-card ${stat.trend}">
               <div class="stat-icon">${stat.label === 'Active Markets' ? '📊' : stat.label === 'Live Bets Today' ? '🎯' : stat.label === 'Revenue Today' ? '💰' : '📈'}</div>
               <div class="stat-value">${stat.value}</div>
               <div class="stat-label">${stat.label}</div>
               <div class="stat-change ${stat.trend}">${stat.change}</div>
             </div>
-          `).join('')}
+          `
+            )
+            .join('')}
         </div>
       </div>
 
@@ -143,7 +147,9 @@ function generateFantasy402Content(employee: EmployeeData): string {
         </div>
 
         <div class="market-grid">
-          ${marketData.map(market => `
+          ${marketData
+            .map(
+              market => `
             <div class="market-card">
               <div class="market-header">
                 <h3>${market.sport}</h3>
@@ -160,7 +166,9 @@ function generateFantasy402Content(employee: EmployeeData): string {
                 </div>
               </div>
             </div>
-          `).join('')}
+          `
+            )
+            .join('')}
         </div>
       </div>
 
@@ -188,14 +196,18 @@ function generateFantasy402Content(employee: EmployeeData): string {
           </div>
 
           <div class="arbitrage-list">
-            ${arbitrageOpportunities.map(opp => `
+            ${arbitrageOpportunities
+              .map(
+                opp => `
               <div class="arbitrage-item">
                 <div class="arbitrage-game">${opp.game}</div>
                 <div class="arbitrage-profit">$${opp.profit}</div>
                 <div class="arbitrage-confidence">${opp.confidence} confidence</div>
                 <button class="arbitrage-btn" onclick="executeArbitrage('${opp.game}')">Execute Trade</button>
               </div>
-            `).join('')}
+            `
+              )
+              .join('')}
           </div>
         </div>
       </div>
@@ -221,7 +233,9 @@ function generateFantasy402Content(employee: EmployeeData): string {
           </div>
 
           <div class="activity-list">
-            ${vipBettingActivity.map(activity => `
+            ${vipBettingActivity
+              .map(
+                activity => `
               <div class="activity-item">
                 <div class="activity-client">${activity.client}</div>
                 <div class="activity-bet">${activity.bet}</div>
@@ -229,7 +243,9 @@ function generateFantasy402Content(employee: EmployeeData): string {
                 <div class="activity-time">${activity.time}</div>
                 <button class="activity-btn" onclick="viewClientDetails('${activity.client}')">View Details</button>
               </div>
-            `).join('')}
+            `
+              )
+              .join('')}
           </div>
         </div>
       </div>
@@ -2190,7 +2206,7 @@ class VIPCRMService {
           description: `${topClient.name} shows ${topClient.activityIncrease}% increase in betting activity • Recommend premium upgrade`,
           color: '#22c55e',
           timestamp: this.getRelativeTime(new Date()),
-          confidence: Math.floor(Math.random() * 20) + 80 // 80-99%
+          confidence: Math.floor(Math.random() * 20) + 80, // 80-99%
         });
       }
 
@@ -2204,7 +2220,7 @@ class VIPCRMService {
           description: `${riskClient.name} engagement dropped ${riskClient.dropPercent}% • Suggest immediate outreach`,
           color: '#ff6b35',
           timestamp: this.getRelativeTime(new Date()),
-          confidence: Math.floor(Math.random() * 15) + 80 // 80-94%
+          confidence: Math.floor(Math.random() * 15) + 80, // 80-94%
         });
       }
 
@@ -2218,7 +2234,7 @@ class VIPCRMService {
           description: `${opportunity.name} ready for ${opportunity.product} • Expected value: ${opportunity.value}`,
           color: '#40e0d0',
           timestamp: this.getRelativeTime(new Date()),
-          confidence: Math.floor(Math.random() * 12) + 85 // 85-96%
+          confidence: Math.floor(Math.random() * 12) + 85, // 85-96%
         });
       }
 
@@ -2241,7 +2257,7 @@ class VIPCRMService {
         all: ['bet_placed', 'deposit', 'withdrawal', 'login', 'profile_update'],
         vip: ['bet_placed', 'deposit', 'vip_upgrade'],
         'high-value': ['bet_placed', 'deposit', 'large_bet'],
-        'new-clients': ['registration', 'first_deposit', 'first_bet']
+        'new-clients': ['registration', 'first_deposit', 'first_bet'],
       };
 
       const types = activityTypes[filter as keyof typeof activityTypes] || activityTypes.all;
@@ -2252,7 +2268,9 @@ class VIPCRMService {
         activities.push(activity);
       }
 
-      return activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      return activities.sort(
+        (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
     } catch (error) {
       console.error('Error getting client activity:', error);
       return [];
@@ -2275,7 +2293,7 @@ class VIPCRMService {
           borderColor: '#ffd700',
           titleColor: '#ffd700',
           valueColor: '#ffd700',
-          buttonColor: '255, 215, 0'
+          buttonColor: '255, 215, 0',
         },
         {
           id: 'retention-campaign',
@@ -2287,7 +2305,7 @@ class VIPCRMService {
           borderColor: '#ff6b35',
           titleColor: '#ff6b35',
           valueColor: '#ff6b35',
-          buttonColor: '255, 107, 53'
+          buttonColor: '255, 107, 53',
         },
         {
           id: 'sports-preferences',
@@ -2299,7 +2317,7 @@ class VIPCRMService {
           borderColor: '#40e0d0',
           titleColor: '#40e0d0',
           valueColor: '#40e0d0',
-          buttonColor: '64, 224, 208'
+          buttonColor: '64, 224, 208',
         },
         {
           id: 'automated-followup',
@@ -2311,8 +2329,8 @@ class VIPCRMService {
           borderColor: '#22c55e',
           titleColor: '#22c55e',
           valueColor: '#22c55e',
-          buttonColor: '34, 197, 94'
-        }
+          buttonColor: '34, 197, 94',
+        },
       ];
 
       return recommendations;
@@ -2332,7 +2350,7 @@ class VIPCRMService {
         today: 1,
         week: 7,
         month: 30,
-        quarter: 90
+        quarter: 90,
       };
 
       const multiplier = periodMultipliers[period as keyof typeof periodMultipliers] || 1;
@@ -2351,8 +2369,8 @@ class VIPCRMService {
           { name: 'Premium Client #189', tier: 'VIP Gold', revenue: '$67K', growth: 18 },
           { name: 'VIP Client #456', tier: 'VIP Silver', revenue: '$45K', growth: 31 },
           { name: 'High Roller #123', tier: 'VIP Elite', revenue: '$92K', growth: 27 },
-          { name: 'Whale Client #78', tier: 'VIP Gold', revenue: '$78K', growth: 15 }
-        ]
+          { name: 'Whale Client #78', tier: 'VIP Gold', revenue: '$78K', growth: 15 },
+        ],
       };
     } catch (error) {
       console.error('Error generating analytics:', error);
@@ -2366,7 +2384,7 @@ class VIPCRMService {
     return [
       { name: 'Diamond Client #247', activityIncrease: 340, value: '$89K' },
       { name: 'Premium Client #189', activityIncrease: 280, value: '$67K' },
-      { name: 'VIP Client #456', activityIncrease: 195, value: '$45K' }
+      { name: 'VIP Client #456', activityIncrease: 195, value: '$45K' },
     ];
   }
 
@@ -2376,7 +2394,7 @@ class VIPCRMService {
       client: `Client #${Math.floor(Math.random() * 1000)}`,
       amount: Math.floor(Math.random() * 50000) + 1000,
       sport: ['NFL', 'NBA', 'MLB', 'NHL'][Math.floor(Math.random() * 4)],
-      timestamp: new Date(Date.now() - Math.random() * 3600000).toISOString()
+      timestamp: new Date(Date.now() - Math.random() * 3600000).toISOString(),
     }));
   }
 
@@ -2385,7 +2403,7 @@ class VIPCRMService {
     return [
       { name: 'Client XYZ', dropPercent: 67, riskLevel: 'high' },
       { name: 'Client ABC', dropPercent: 45, riskLevel: 'medium' },
-      { name: 'Client DEF', dropPercent: 23, riskLevel: 'low' }
+      { name: 'Client DEF', dropPercent: 23, riskLevel: 'low' },
     ];
   }
 
@@ -2394,12 +2412,17 @@ class VIPCRMService {
     return [
       { name: 'Client 123', product: 'Fantasy402 Premium', value: '$50K/month' },
       { name: 'Client 456', product: 'VIP Elite Upgrade', value: '$75K/month' },
-      { name: 'Client 789', product: 'Sports Analytics Pro', value: '$25K/month' }
+      { name: 'Client 789', product: 'Sports Analytics Pro', value: '$25K/month' },
     ];
   }
 
   private generateActivity(type: string, index: number): any {
-    const clients = ['Diamond Client #247', 'Premium Client #189', 'VIP Client #456', 'High Roller #123'];
+    const clients = [
+      'Diamond Client #247',
+      'Premium Client #189',
+      'VIP Client #456',
+      'High Roller #123',
+    ];
     const client = clients[Math.floor(Math.random() * clients.length)];
 
     const activityConfigs = {
@@ -2408,71 +2431,71 @@ class VIPCRMService {
         action: 'Placed bet on NFL Championship',
         value: `$${Math.floor(Math.random() * 50000) + 5000}`,
         valueColor: '#ffd700',
-        color: '#ffd700'
+        color: '#ffd700',
       },
       deposit: {
         icon: '💰',
         action: 'Made deposit',
         value: `$${Math.floor(Math.random() * 25000) + 1000}`,
         valueColor: '#22c55e',
-        color: '#22c55e'
+        color: '#22c55e',
       },
       withdrawal: {
         icon: '💸',
         action: 'Requested withdrawal',
         value: `$${Math.floor(Math.random() * 20000) + 2000}`,
         valueColor: '#ff6b35',
-        color: '#ff6b35'
+        color: '#ff6b35',
       },
       login: {
         icon: '🔑',
         action: 'Logged into VIP portal',
         value: 'Active',
         valueColor: '#40e0d0',
-        color: '#40e0d0'
+        color: '#40e0d0',
       },
       profile_update: {
         icon: '👤',
         action: 'Updated profile preferences',
         value: 'Updated',
         valueColor: '#a855f7',
-        color: '#a855f7'
+        color: '#a855f7',
       },
       vip_upgrade: {
         icon: '⭐',
         action: 'Upgraded to VIP Elite',
         value: 'Premium',
         valueColor: '#ffd700',
-        color: '#ffd700'
+        color: '#ffd700',
       },
       large_bet: {
         icon: '💎',
         action: 'Placed large bet',
         value: `$${Math.floor(Math.random() * 100000) + 25000}`,
         valueColor: '#ffd700',
-        color: '#ffd700'
+        color: '#ffd700',
       },
       registration: {
         icon: '🎯',
         action: 'Completed registration',
         value: 'New Client',
         valueColor: '#22c55e',
-        color: '#22c55e'
+        color: '#22c55e',
       },
       first_deposit: {
         icon: '💵',
         action: 'Made first deposit',
         value: `$${Math.floor(Math.random() * 10000) + 1000}`,
         valueColor: '#22c55e',
-        color: '#22c55e'
+        color: '#22c55e',
       },
       first_bet: {
         icon: '🎲',
         action: 'Placed first bet',
         value: `$${Math.floor(Math.random() * 5000) + 500}`,
         valueColor: '#40e0d0',
-        color: '#40e0d0'
-      }
+        color: '#40e0d0',
+      },
     };
 
     const config = activityConfigs[type as keyof typeof activityConfigs];
@@ -2486,7 +2509,7 @@ class VIPCRMService {
       valueColor: config.valueColor,
       color: config.color,
       time: this.getRelativeTime(new Date(Date.now() - Math.random() * 3600000)),
-      timestamp: new Date(Date.now() - Math.random() * 3600000).toISOString()
+      timestamp: new Date(Date.now() - Math.random() * 3600000).toISOString(),
     };
   }
 
@@ -2503,15 +2526,17 @@ class VIPCRMService {
   }
 
   private getFallbackInsights(): any[] {
-    return [{
-      id: 'analyzing',
-      icon: '🔄',
-      title: 'Analyzing Client Data',
-      description: 'AI is processing real-time client activity and betting patterns',
-      color: '#ffd700',
-      timestamp: 'Live',
-      confidence: 100
-    }];
+    return [
+      {
+        id: 'analyzing',
+        icon: '🔄',
+        title: 'Analyzing Client Data',
+        description: 'AI is processing real-time client activity and betting patterns',
+        color: '#ffd700',
+        timestamp: 'Live',
+        confidence: 100,
+      },
+    ];
   }
 }
 
@@ -2531,7 +2556,7 @@ export async function handleVIPCRMAPI(request: Request): Promise<Response> {
     if (path === '/api/vip/insights') {
       const insights = await vipCRMService.generateAIInsights();
       return new Response(JSON.stringify(insights), {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
     }
 
@@ -2540,7 +2565,7 @@ export async function handleVIPCRMAPI(request: Request): Promise<Response> {
       const filter = params.get('filter') || 'all';
       const activities = await vipCRMService.getClientActivity(filter);
       return new Response(JSON.stringify(activities), {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
     }
 
@@ -2548,7 +2573,7 @@ export async function handleVIPCRMAPI(request: Request): Promise<Response> {
     if (path === '/api/vip/recommendations') {
       const recommendations = await vipCRMService.generateRecommendations();
       return new Response(JSON.stringify(recommendations), {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
     }
 
@@ -2557,7 +2582,7 @@ export async function handleVIPCRMAPI(request: Request): Promise<Response> {
       const period = params.get('period') || 'today';
       const analytics = await vipCRMService.generateAnalytics(period);
       return new Response(JSON.stringify(analytics), {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
     }
 
@@ -2566,20 +2591,19 @@ export async function handleVIPCRMAPI(request: Request): Promise<Response> {
       const workflowType = path.split('/').pop();
       const workflowConfig = await getWorkflowConfiguration(workflowType);
       return new Response(JSON.stringify(workflowConfig), {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
     }
 
     return new Response(JSON.stringify({ error: 'Endpoint not found' }), {
       status: 404,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     console.error('VIP CRM API Error:', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
@@ -2596,10 +2620,10 @@ async function getWorkflowConfiguration(type?: string): Promise<any> {
         { delay: 0, action: 'Welcome Email', template: 'vip-welcome' },
         { delay: 24, action: 'VIP Portal Tour', template: 'portal-intro' },
         { delay: 72, action: 'Personal Manager Intro', template: 'manager-intro' },
-        { delay: 168, action: 'First Bet Bonus', template: 'bonus-offer' }
+        { delay: 168, action: 'First Bet Bonus', template: 'bonus-offer' },
       ],
       active: true,
-      successRate: '87%'
+      successRate: '87%',
     },
     retention: {
       name: 'Retention Outreach',
@@ -2608,10 +2632,10 @@ async function getWorkflowConfiguration(type?: string): Promise<any> {
         { delay: 0, action: 'Engagement Check', template: 'activity-survey' },
         { delay: 12, action: 'Personalized Offer', template: 'retention-offer' },
         { delay: 48, action: 'Follow-up Call', template: 'phone-script' },
-        { delay: 96, action: 'Loyalty Reward', template: 'loyalty-bonus' }
+        { delay: 96, action: 'Loyalty Reward', template: 'loyalty-bonus' },
       ],
       active: true,
-      successRate: '73%'
+      successRate: '73%',
     },
     upselling: {
       name: 'Premium Upselling',
@@ -2620,11 +2644,11 @@ async function getWorkflowConfiguration(type?: string): Promise<any> {
         { delay: 0, action: 'Usage Analysis', template: 'usage-report' },
         { delay: 24, action: 'Upgrade Proposal', template: 'premium-pitch' },
         { delay: 72, action: 'ROI Demonstration', template: 'value-prop' },
-        { delay: 120, action: 'Limited Time Offer', template: 'special-deal' }
+        { delay: 120, action: 'Limited Time Offer', template: 'special-deal' },
       ],
       active: true,
-      successRate: '65%'
-    }
+      successRate: '65%',
+    },
   };
 
   return configurations[type as keyof typeof configurations] || configurations.welcome;
@@ -3213,20 +3237,20 @@ function generateAnalyticsContent(employee: EmployeeData): string {
     { label: 'Active VIP Clients', value: '1,247', change: '+12.3%', trend: 'up', icon: '👥' },
     { label: 'Monthly Revenue', value: '$2.8M', change: '+18.7%', trend: 'up', icon: '💰' },
     { label: 'Client Satisfaction', value: '4.9/5', change: '+0.2', trend: 'up', icon: '⭐' },
-    { label: 'Response Time', value: '< 3min', change: '-45s', trend: 'down', icon: '⚡' }
+    { label: 'Response Time', value: '< 3min', change: '-45s', trend: 'down', icon: '⚡' },
   ];
 
   const clientSegments = [
     { segment: 'Diamond Club', count: '156', revenue: '$1.2M', retention: '98%' },
     { segment: 'Premium Elite', count: '423', revenue: '$890K', retention: '95%' },
-    { segment: 'VIP Standard', count: '668', revenue: '$710K', retention: '92%' }
+    { segment: 'VIP Standard', count: '668', revenue: '$710K', retention: '92%' },
   ];
 
   const bettingMetrics = [
     { metric: 'Total Bets Placed', value: '15,247', change: '+8.3%', trend: 'up' },
     { metric: 'Win Rate', value: '54.2%', change: '+2.1%', trend: 'up' },
     { metric: 'Average Bet Size', value: '$247', change: '+12.5%', trend: 'up' },
-    { metric: 'Profit Margin', value: '18.7%', change: '+3.2%', trend: 'up' }
+    { metric: 'Profit Margin', value: '18.7%', change: '+3.2%', trend: 'up' },
   ];
 
   return `
@@ -3261,7 +3285,9 @@ function generateAnalyticsContent(employee: EmployeeData): string {
         </div>
 
         <div class="metrics-grid">
-          ${realTimeMetrics.map(metric => `
+          ${realTimeMetrics
+            .map(
+              metric => `
             <div class="metric-card ${metric.trend}" data-metric="${metric.label.toLowerCase().replace(/\s+/g, '-')}">
               <div class="metric-header">
                 <div class="metric-icon">${metric.icon}</div>
@@ -3273,7 +3299,9 @@ function generateAnalyticsContent(employee: EmployeeData): string {
               <div class="metric-label">${metric.label}</div>
               <div class="metric-sparkline" id="sparkline-${metric.label.toLowerCase().replace(/\s+/g, '-')}"></div>
             </div>
-          `).join('')}
+          `
+            )
+            .join('')}
         </div>
       </div>
 
@@ -3288,7 +3316,9 @@ function generateAnalyticsContent(employee: EmployeeData): string {
           <div class="segment-overview">
             <h3>Client Segments</h3>
             <div class="segment-cards">
-              ${clientSegments.map(segment => `
+              ${clientSegments
+                .map(
+                  segment => `
                 <div class="segment-card">
                   <div class="segment-header">
                     <h4>${segment.segment}</h4>
@@ -3308,7 +3338,9 @@ function generateAnalyticsContent(employee: EmployeeData): string {
                     <div class="progress-bar" style="width: ${segment.retention}"></div>
                   </div>
                 </div>
-              `).join('')}
+              `
+                )
+                .join('')}
             </div>
           </div>
 
@@ -3417,13 +3449,17 @@ function generateAnalyticsContent(employee: EmployeeData): string {
           <div class="betting-metrics">
             <h3>Betting Performance</h3>
             <div class="betting-grid">
-              ${bettingMetrics.map(metric => `
+              ${bettingMetrics
+                .map(
+                  metric => `
                 <div class="betting-card">
                   <div class="betting-value">${metric.value}</div>
                   <div class="betting-label">${metric.metric}</div>
                   <div class="betting-change ${metric.trend}">${metric.change}</div>
                 </div>
-              `).join('')}
+              `
+                )
+                .join('')}
             </div>
           </div>
 

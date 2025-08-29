@@ -2,7 +2,7 @@
 
 /**
  * 📊 Fire22 Version Management Diagram Generator
- * 
+ *
  * Generates stunning ANSI-colored ASCII diagrams for:
  * - Version Management System
  * - Build Automation Flow
@@ -68,7 +68,7 @@ class VersionDiagramGenerator {
       outputFormat: 'ansi',
       colorScheme: 'fire22',
       width: 100,
-      height: 30
+      height: 30,
     };
 
     this.tooling = new Fire22DiagramTooling(config, this.getDefaultAnsiConfig(), 'chalk');
@@ -131,7 +131,7 @@ class VersionDiagramGenerator {
       outputFormat: 'ansi',
       colorScheme: 'fire22',
       width: 120,
-      height: 35
+      height: 35,
     };
 
     this.tooling = new Fire22DiagramTooling(config, this.getDefaultAnsiConfig(), 'chalk');
@@ -188,7 +188,7 @@ class VersionDiagramGenerator {
       outputFormat: 'ansi',
       colorScheme: 'fire22',
       width: 100,
-      height: 30
+      height: 30,
     };
 
     this.tooling = new Fire22DiagramTooling(config, this.getDefaultAnsiConfig(), 'chalk');
@@ -254,7 +254,7 @@ class VersionDiagramGenerator {
       outputFormat: 'ansi',
       colorScheme: 'fire22',
       width: 120,
-      height: 35
+      height: 35,
     };
 
     this.tooling = new Fire22DiagramTooling(config, this.getDefaultAnsiConfig(), 'chalk');
@@ -320,7 +320,7 @@ class VersionDiagramGenerator {
       outputFormat: 'ansi',
       colorScheme: 'fire22',
       width: 120,
-      height: 35
+      height: 35,
     };
 
     this.tooling = new Fire22DiagramTooling(config, this.getDefaultAnsiConfig(), 'chalk');
@@ -332,21 +332,21 @@ class VersionDiagramGenerator {
    */
   async generateAllDiagrams(): Promise<void> {
     console.log('🎨 Generating all Fire22 diagrams...\n');
-    
+
     await this.generateVersionFlow();
     await new Promise(resolve => setTimeout(resolve, 3000));
-    
+
     await this.generateBuildArchitecture();
     await new Promise(resolve => setTimeout(resolve, 3000));
-    
+
     await this.generatePackageArchitecture();
     await new Promise(resolve => setTimeout(resolve, 3000));
-    
+
     await this.generateDeploymentPipeline();
     await new Promise(resolve => setTimeout(resolve, 3000));
-    
+
     await this.generateCommandMatrix();
-    
+
     console.log('🎉 All diagrams generated successfully!');
   }
 
@@ -359,7 +359,7 @@ class VersionDiagramGenerator {
       outputFormat: 'ansi',
       colorScheme: 'fire22',
       width: 80,
-      height: 24
+      height: 24,
     };
   }
 
@@ -368,7 +368,7 @@ class VersionDiagramGenerator {
       useUnicode: true,
       colorPalette: 'fire22',
       animation: false,
-      interactive: false
+      interactive: false,
     };
   }
 }
@@ -376,10 +376,10 @@ class VersionDiagramGenerator {
 // CLI Interface
 if (import.meta.main) {
   const generator = new VersionDiagramGenerator();
-  
+
   const args = process.argv.slice(2);
   const command = args[0] || 'all';
-  
+
   switch (command) {
     case 'version':
       await generator.generateVersionFlow();

@@ -2,7 +2,9 @@
 
 ## Overview
 
-Fire22 Dashboard Worker implements a hybrid architecture combining Cloudflare Workers edge computing with traditional server infrastructure, optimized for sports betting operations at scale.
+Fire22 Dashboard Worker implements a hybrid architecture combining Cloudflare
+Workers edge computing with traditional server infrastructure, optimized for
+sports betting operations at scale.
 
 ## System Architecture
 
@@ -53,12 +55,14 @@ Fire22 Dashboard Worker implements a hybrid architecture combining Cloudflare Wo
 **Purpose**: Global edge computing for low latency and high availability
 
 **Components**:
+
 - **Worker Runtime**: V8 isolates for secure execution
 - **KV Storage**: Distributed key-value storage
 - **Durable Objects**: Stateful coordination
 - **R2 Storage**: Object storage for assets
 
 **Configuration**: `wrangler.toml`
+
 ```toml
 name = "fire22-dashboard-worker"
 compatibility_date = "2024-01-01"
@@ -81,6 +85,7 @@ database_name = "fire22-prod"
 **Purpose**: Unified architectural patterns across the codebase
 
 **13 Core Patterns**:
+
 1. **LOADER**: Asset loading and optimization
 2. **STYLER**: CSS-in-JS and theming
 3. **TABULAR**: Data table management
@@ -111,49 +116,50 @@ const workspaces: Workspace[] = [
   {
     name: '@fire22-core-dashboard',
     target: 'cloudflare',
-    deployment: 'edge'
+    deployment: 'edge',
   },
   {
     name: '@fire22-pattern-system',
     target: 'cloudflare',
-    deployment: 'edge'
+    deployment: 'edge',
   },
   {
     name: '@fire22-api-client',
     target: 'cloudflare',
-    deployment: 'edge'
+    deployment: 'edge',
   },
   {
     name: '@fire22-sports-betting',
     target: 'cloudflare',
-    deployment: 'hybrid'
+    deployment: 'hybrid',
   },
   {
     name: '@fire22-telegram-integration',
     target: 'bun',
-    deployment: 'server'
+    deployment: 'server',
   },
   {
     name: '@fire22-build-system',
     target: 'bun',
-    deployment: 'server'
+    deployment: 'server',
   },
   {
     name: '@fire22-api-consolidated',
     target: 'cloudflare',
-    deployment: 'edge'
+    deployment: 'edge',
   },
   {
     name: '@fire22-security-registry',
     target: 'cloudflare',
-    deployment: 'edge'
-  }
+    deployment: 'edge',
+  },
 ];
 ```
 
 ### 4. DNS Optimization System
 
 **Bun-Native DNS Caching**:
+
 ```typescript
 // DNS Prefetching on initialization
 class Fire22Integration {
@@ -162,11 +168,11 @@ class Fire22Integration {
       'fire22.ag',
       'api.fire22.ag',
       'cloud.fire22.ag',
-      'api.cloudflare.com'
+      'api.cloudflare.com',
     ];
     this.initializeDnsPrefetching();
   }
-  
+
   async initializeDnsPrefetching() {
     for (const domain of this.prefetchDomains) {
       dns.lookup(domain, { family: 4 }, () => {});
@@ -176,6 +182,7 @@ class Fire22Integration {
 ```
 
 **Performance Results**:
+
 - Cold start: 50-200ms → 10-50ms
 - API response: 100ms → 1-10ms
 - Cache hit rate: 95%+
@@ -183,6 +190,7 @@ class Fire22Integration {
 ### 5. Build System
 
 **9 Build Profiles**:
+
 ```javascript
 const buildProfiles = {
   development: { minify: false, sourcemap: true },
@@ -193,13 +201,14 @@ const buildProfiles = {
   packages: { workspaces: true },
   docs: { documentation: true },
   version: { bump: true, changelog: true },
-  cloudflare: { workers: true, edge: true }
+  cloudflare: { workers: true, edge: true },
 };
 ```
 
 ## Data Flow
 
 ### 1. Request Flow
+
 ```
 Client → CloudFlare Edge → Worker → Pattern Router → Handler → Response
                               ↓
@@ -215,22 +224,25 @@ Client → CloudFlare Edge → Worker → Pattern Router → Handler → Respons
 ```
 
 ### 2. Real-time Updates (SSE)
+
 ```typescript
 // Server-Sent Events for live updates
 app.get('/api/live', async (req, res) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive'
+    Connection: 'keep-alive',
   });
-  
+
   const interval = setInterval(() => {
-    res.write(`data: ${JSON.stringify({
-      timestamp: Date.now(),
-      metrics: getSystemMetrics()
-    })}\n\n`);
+    res.write(
+      `data: ${JSON.stringify({
+        timestamp: Date.now(),
+        metrics: getSystemMetrics(),
+      })}\n\n`
+    );
   }, 1000);
-  
+
   req.on('close', () => clearInterval(interval));
 });
 ```
@@ -238,6 +250,7 @@ app.get('/api/live', async (req, res) => {
 ### 3. Database Architecture
 
 **PostgreSQL Schema**:
+
 ```sql
 -- Core tables
 CREATE TABLE agents (
@@ -266,26 +279,28 @@ CREATE TABLE wagers (
 ## Security Architecture
 
 ### Authentication Flow
+
 ```typescript
 // JWT-based authentication
 interface AuthToken {
-  sub: string;      // Subject (user ID)
-  iat: number;      // Issued at
-  exp: number;      // Expiration
-  roles: string[];  // User roles
-  tier: number;     // Agent tier
+  sub: string; // Subject (user ID)
+  iat: number; // Issued at
+  exp: number; // Expiration
+  roles: string[]; // User roles
+  tier: number; // Agent tier
 }
 
 // Middleware
 export async function authenticate(req: Request): Promise<AuthToken> {
   const token = req.headers.get('Authorization')?.replace('Bearer ', '');
   if (!token) throw new UnauthorizedError();
-  
+
   return jwt.verify(token, env.JWT_SECRET) as AuthToken;
 }
 ```
 
 ### Security Layers
+
 1. **Edge Security**: Cloudflare WAF, DDoS protection
 2. **Application Security**: JWT auth, rate limiting, input validation
 3. **Data Security**: Encryption at rest, TLS in transit
@@ -294,12 +309,14 @@ export async function authenticate(req: Request): Promise<AuthToken> {
 ## Performance Optimizations
 
 ### 1. Caching Strategy
+
 - **Edge Cache**: 5-minute TTL for static assets
 - **KV Cache**: 1-minute TTL for API responses
 - **Memory Cache**: In-worker caching for hot data
 - **DNS Cache**: Proactive prefetching
 
 ### 2. Bundle Optimization
+
 ```javascript
 // Bun build configuration
 await Bun.build({
@@ -311,12 +328,13 @@ await Bun.build({
   treeshaking: true,
   external: ['cloudflare:*'],
   define: {
-    'process.env.NODE_ENV': JSON.stringify('production')
-  }
+    'process.env.NODE_ENV': JSON.stringify('production'),
+  },
 });
 ```
 
 ### 3. Database Optimization
+
 - Connection pooling (max: 20)
 - Query optimization with indexes
 - Prepared statements
@@ -325,19 +343,21 @@ await Bun.build({
 ## Deployment Architecture
 
 ### Regional Distribution
+
 ```yaml
 regions:
   primary:
-    - us-east-1  # Virginia
-    - us-west-1  # California
+    - us-east-1 # Virginia
+    - us-west-1 # California
   secondary:
-    - eu-west-1  # Ireland
-    - ap-southeast-1  # Singapore
+    - eu-west-1 # Ireland
+    - ap-southeast-1 # Singapore
   edge:
     - 200+ Cloudflare PoPs globally
 ```
 
 ### Progressive Deployment
+
 1. **Canary**: 5% traffic to new version
 2. **Staging**: 25% traffic after validation
 3. **Production**: 100% traffic after monitoring
@@ -346,6 +366,7 @@ regions:
 ## Monitoring & Observability
 
 ### Metrics Collection
+
 ```typescript
 interface SystemMetrics {
   requests: number;
@@ -364,12 +385,13 @@ export function collectMetrics(): SystemMetrics {
     errors: getErrorCount(),
     cache_hits: getCacheHitRate(),
     cpu_usage: process.cpuUsage(),
-    memory_usage: process.memoryUsage()
+    memory_usage: process.memoryUsage(),
   };
 }
 ```
 
 ### Health Checks
+
 - `/health`: System status
 - `/health/db`: Database connectivity
 - `/health/api`: External API status
@@ -378,11 +400,13 @@ export function collectMetrics(): SystemMetrics {
 ## Scaling Strategy
 
 ### Horizontal Scaling
+
 - **Workers**: Auto-scale to 100,000+ requests/second
 - **Database**: Read replicas for query distribution
 - **Cache**: Distributed KV across regions
 
 ### Vertical Scaling
+
 - **Worker Size**: Up to 128MB memory
 - **CPU**: Up to 50ms CPU time per request
 - **Subrequests**: Up to 50 per request
@@ -390,16 +414,19 @@ export function collectMetrics(): SystemMetrics {
 ## Future Architecture Plans
 
 ### Phase 1: Q1 2025
+
 - GraphQL API layer
 - WebSocket support for real-time
 - Enhanced caching with Redis
 
 ### Phase 2: Q2 2025
+
 - Microservices migration
 - Event-driven architecture
 - Machine learning pipeline
 
 ### Phase 3: Q3 2025
+
 - Multi-region active-active
 - Blockchain integration
 - Advanced analytics platform

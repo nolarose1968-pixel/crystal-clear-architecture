@@ -427,7 +427,6 @@ export class LanguageCodeValidator {
       activeAlerts: patternObservability.getActiveAlerts()
     };
   }
-  }
 
   /**
    * Get icon for issue type

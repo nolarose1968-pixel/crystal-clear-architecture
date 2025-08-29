@@ -6,7 +6,8 @@
 [![Bun](https://img.shields.io/badge/bun-%3E%3D1.2.20-f472b6.svg)](https://bun.sh)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-Real-time dashboard integration for Fire22 Telegram system with Server-Sent Events (SSE) and comprehensive widget system.
+Real-time dashboard integration for Fire22 Telegram system with Server-Sent
+Events (SSE) and comprehensive widget system.
 
 ## 📦 Installation
 
@@ -36,7 +37,7 @@ const dashboard = new TelegramDashboardIntegration(env);
 await dashboard.start();
 
 // Subscribe to real-time updates
-dashboard.subscribeToUpdates((data) => {
+dashboard.subscribeToUpdates(data => {
   console.log('Dashboard update:', data);
   updateUI(data);
 });
@@ -51,6 +52,7 @@ const sseEndpoint = dashboard.createSSEEndpoint();
 ## 📈 Dashboard Widgets
 
 ### Bot Status Widget
+
 ```typescript
 {
   title: "🤖 Telegram Bot Status",
@@ -64,6 +66,7 @@ const sseEndpoint = dashboard.createSSEEndpoint();
 ```
 
 ### Queue Status Widget
+
 ```typescript
 {
   title: "🎯 P2P Queue Status",
@@ -78,6 +81,7 @@ const sseEndpoint = dashboard.createSSEEndpoint();
 ```
 
 ### Language Distribution Widget
+
 ```typescript
 {
   title: "🚀 Language Usage",
@@ -91,6 +95,7 @@ const sseEndpoint = dashboard.createSSEEndpoint();
 ```
 
 ### Department Activity Widget
+
 ```typescript
 {
   title: "🛡️ Department Overview",
@@ -138,7 +143,7 @@ interface DashboardTelegramData {
     activeUsers: number;
     messagesPerHour: number;
   };
-  
+
   // Queue Integration
   queueData: {
     pendingWithdrawals: number;
@@ -147,7 +152,7 @@ interface DashboardTelegramData {
     averageWaitTime: number;
     processingRate: number;
   };
-  
+
   // Language Statistics
   languageStats: {
     totalLanguages: number;
@@ -155,14 +160,14 @@ interface DashboardTelegramData {
     translationCacheHits: number;
     translationRequests: number;
   };
-  
+
   // Department Activity
   departmentActivity: {
     customerService: {...};
     finance: {...};
     operations: {...};
   };
-  
+
   // Real-time Metrics
   realTimeMetrics: {
     lastUpdate: Date;
@@ -176,59 +181,63 @@ interface DashboardTelegramData {
 ## 📡 SSE Integration
 
 ### Server Setup
+
 ```typescript
 // Create SSE endpoint
 app.get('/api/telegram/stream', (req, res) => {
   const sseEndpoint = dashboard.createSSEEndpoint();
-  
+
   res.writeHead(200, sseEndpoint.headers);
-  
-  const stream = sseEndpoint.stream((controller) => {
+
+  const stream = sseEndpoint.stream(controller => {
     // Stream logic handled automatically
   });
-  
+
   res.write(stream);
 });
 ```
 
 ### Client Connection
+
 ```html
 <script>
-const eventSource = new EventSource('/api/telegram/stream');
+  const eventSource = new EventSource('/api/telegram/stream');
 
-eventSource.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  if (data.type === 'telegram_update') {
-    updateDashboard(data.data);
-  }
-};
+  eventSource.onmessage = event => {
+    const data = JSON.parse(event.data);
+    if (data.type === 'telegram_update') {
+      updateDashboard(data.data);
+    }
+  };
 
-eventSource.onerror = (error) => {
-  console.error('SSE Error:', error);
-  // Automatic reconnection handled by browser
-};
+  eventSource.onerror = error => {
+    console.error('SSE Error:', error);
+    // Automatic reconnection handled by browser
+  };
 </script>
 ```
 
 ## 🔧 Configuration
 
 ### Update Intervals
+
 ```typescript
 const config = {
-  updateInterval: 30000,      // 30 seconds
-  heartbeatInterval: 30000,   // 30 seconds
-  cleanupInterval: 3600000,   // 1 hour
-  metricsRetention: 86400000  // 24 hours
+  updateInterval: 30000, // 30 seconds
+  heartbeatInterval: 30000, // 30 seconds
+  cleanupInterval: 3600000, // 1 hour
+  metricsRetention: 86400000, // 24 hours
 };
 ```
 
 ### Performance Settings
+
 ```typescript
 const performanceConfig = {
   maxSubscribers: 100,
   batchUpdates: true,
   compressionEnabled: true,
-  cacheEnabled: true
+  cacheEnabled: true,
 };
 ```
 
@@ -262,45 +271,49 @@ bun run typecheck
 ## 📊 Dashboard HTML Example
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <title>Fire22 Telegram Dashboard</title>
-  <script src="https://unpkg.com/alpinejs@3/dist/cdn.min.js"></script>
-</head>
-<body x-data="dashboardApp()">
-  <!-- Bot Status -->
-  <div class="widget">
-    <h3>🤖 Bot Status</h3>
-    <div x-show="data.botStatus.isRunning" class="status-online">Online</div>
-    <div>Active Users: <span x-text="data.botStatus.activeUsers"></span></div>
-    <div>Messages/Hour: <span x-text="data.botStatus.messagesPerHour"></span></div>
-  </div>
-  
-  <!-- Queue Status -->
-  <div class="widget">
-    <h3>🎯 Queue Status</h3>
-    <div>Pending: <span x-text="data.queueData.pendingWithdrawals"></span></div>
-    <div>Matched: <span x-text="data.queueData.matchedPairs"></span></div>
-  </div>
-  
-  <script>
-  function dashboardApp() {
-    return {
-      data: {},
-      init() {
-        const eventSource = new EventSource('/api/telegram/stream');
-        eventSource.onmessage = (event) => {
-          const update = JSON.parse(event.data);
-          if (update.type === 'telegram_update') {
-            this.data = update.data;
-          }
+  <head>
+    <title>Fire22 Telegram Dashboard</title>
+    <script src="https://unpkg.com/alpinejs@3/dist/cdn.min.js"></script>
+  </head>
+  <body x-data="dashboardApp()">
+    <!-- Bot Status -->
+    <div class="widget">
+      <h3>🤖 Bot Status</h3>
+      <div x-show="data.botStatus.isRunning" class="status-online">Online</div>
+      <div>Active Users: <span x-text="data.botStatus.activeUsers"></span></div>
+      <div>
+        Messages/Hour: <span x-text="data.botStatus.messagesPerHour"></span>
+      </div>
+    </div>
+
+    <!-- Queue Status -->
+    <div class="widget">
+      <h3>🎯 Queue Status</h3>
+      <div>
+        Pending: <span x-text="data.queueData.pendingWithdrawals"></span>
+      </div>
+      <div>Matched: <span x-text="data.queueData.matchedPairs"></span></div>
+    </div>
+
+    <script>
+      function dashboardApp() {
+        return {
+          data: {},
+          init() {
+            const eventSource = new EventSource('/api/telegram/stream');
+            eventSource.onmessage = event => {
+              const update = JSON.parse(event.data);
+              if (update.type === 'telegram_update') {
+                this.data = update.data;
+              }
+            };
+          },
         };
       }
-    };
-  }
-  </script>
-</body>
+    </script>
+  </body>
 </html>
 ```
 
@@ -309,29 +322,37 @@ bun run typecheck
 ### Main Classes
 
 #### `TelegramDashboardIntegration`
+
 Main dashboard integration class managing all data flows.
 
 ### Methods
 
 #### `start()`
+
 Start the dashboard integration.
 
 #### `stop()`
+
 Stop the dashboard and cleanup resources.
 
 #### `getDashboardData()`
+
 Get current dashboard data snapshot.
 
 #### `refreshData()`
+
 Force refresh all dashboard data.
 
 #### `subscribeToUpdates(callback)`
+
 Subscribe to real-time data updates.
 
 #### `createSSEEndpoint()`
+
 Create Server-Sent Events endpoint.
 
 #### `getDashboardWidgets()`
+
 Get pre-configured dashboard widgets.
 
 ## 🔗 Dependencies
@@ -353,7 +374,8 @@ MIT © Fire22 Team
 - [@fire22/telegram-bot](../fire22-telegram-bot) - Core bot
 - [@fire22/telegram-workflows](../fire22-telegram-workflows) - Workflows
 - [@fire22/queue-system](../fire22-queue-system) - Queue system
-- [@fire22/telegram-benchmarks](../fire22-telegram-benchmarks) - Performance testing
+- [@fire22/telegram-benchmarks](../fire22-telegram-benchmarks) - Performance
+  testing
 
 ## 📞 Support
 

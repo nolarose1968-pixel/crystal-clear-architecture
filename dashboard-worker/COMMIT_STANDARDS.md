@@ -1,10 +1,13 @@
 # 📝 Commit Standards - Fire22 Dashboard Worker
 
-High-quality commit messages are essential for maintaining a clean project history, enabling effective collaboration, and facilitating automated tooling. This guide outlines our commit message standards and quality practices.
+High-quality commit messages are essential for maintaining a clean project
+history, enabling effective collaboration, and facilitating automated tooling.
+This guide outlines our commit message standards and quality practices.
 
 ## 🎯 Commit Message Format
 
-We follow the **Conventional Commits** specification with Fire22-specific enhancements:
+We follow the **Conventional Commits** specification with Fire22-specific
+enhancements:
 
 ```
 <type>(<scope>): <subject>
@@ -17,39 +20,43 @@ We follow the **Conventional Commits** specification with Fire22-specific enhanc
 ### Required Elements
 
 #### Type (Required)
+
 Describes the kind of change being made:
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `feat` | New feature for the user | `feat(api): add user authentication endpoint` |
-| `fix` | Bug fix for the user | `fix(dashboard): resolve memory leak in updates` |
-| `docs` | Documentation changes | `docs(onboarding): update setup guide` |
-| `style` | Code style changes (formatting, semicolons) | `style(api): fix indentation in user service` |
-| `refactor` | Code refactoring (no new features/bugs) | `refactor(patterns): extract common utilities` |
-| `perf` | Performance improvements | `perf(dashboard): optimize rendering pipeline` |
-| `test` | Adding or updating tests | `test(api): add integration tests for auth` |
-| `chore` | Maintenance tasks, dependency updates | `chore(deps): update bun to 1.2.21` |
-| `build` | Build system changes | `build(webpack): add source map support` |
-| `ci` | CI/CD pipeline changes | `ci(github): add security scanning workflow` |
-| `revert` | Reverting a previous commit | `revert: undo breaking auth changes` |
-| `security` | Security fixes and improvements | `security(auth): fix JWT token validation` |
-| `dept` | Department-specific changes | `dept(marketing): update campaign templates` |
-| `workspace` | Multi-workspace orchestration | `workspace(core): add split/reunify logic` |
-| `registry` | Package registry operations | `registry(auth): implement token rotation` |
-| `dns` | DNS optimization and caching | `dns(performance): add proactive prefetching` |
+| Type        | Description                                 | Example                                          |
+| ----------- | ------------------------------------------- | ------------------------------------------------ |
+| `feat`      | New feature for the user                    | `feat(api): add user authentication endpoint`    |
+| `fix`       | Bug fix for the user                        | `fix(dashboard): resolve memory leak in updates` |
+| `docs`      | Documentation changes                       | `docs(onboarding): update setup guide`           |
+| `style`     | Code style changes (formatting, semicolons) | `style(api): fix indentation in user service`    |
+| `refactor`  | Code refactoring (no new features/bugs)     | `refactor(patterns): extract common utilities`   |
+| `perf`      | Performance improvements                    | `perf(dashboard): optimize rendering pipeline`   |
+| `test`      | Adding or updating tests                    | `test(api): add integration tests for auth`      |
+| `chore`     | Maintenance tasks, dependency updates       | `chore(deps): update bun to 1.2.21`              |
+| `build`     | Build system changes                        | `build(webpack): add source map support`         |
+| `ci`        | CI/CD pipeline changes                      | `ci(github): add security scanning workflow`     |
+| `revert`    | Reverting a previous commit                 | `revert: undo breaking auth changes`             |
+| `security`  | Security fixes and improvements             | `security(auth): fix JWT token validation`       |
+| `dept`      | Department-specific changes                 | `dept(marketing): update campaign templates`     |
+| `workspace` | Multi-workspace orchestration               | `workspace(core): add split/reunify logic`       |
+| `registry`  | Package registry operations                 | `registry(auth): implement token rotation`       |
+| `dns`       | DNS optimization and caching                | `dns(performance): add proactive prefetching`    |
 
 #### Scope (Optional but Recommended)
+
 Indicates the area of the codebase affected:
 
 **Workspace Scopes:**
+
 - `core` - @fire22-core-dashboard
-- `pattern` - @fire22-pattern-system  
+- `pattern` - @fire22-pattern-system
 - `api` - @fire22-api-client
 - `betting` - @fire22-sports-betting
 - `telegram` - @fire22-telegram-integration
 - `build` - @fire22-build-system
 
 **Department Scopes:**
+
 - `communications` - Communications Department (Sarah Martinez)
 - `technology` - Technology Department (Mike Hunt)
 - `marketing` - Marketing Department
@@ -63,6 +70,7 @@ Indicates the area of the codebase affected:
 - `sportsbook-ops` - Sportsbook Operations Department
 
 **Component Scopes:**
+
 - `dashboard` - Dashboard UI components
 - `worker` - Cloudflare Worker logic
 - `db` - Database schemas and migrations
@@ -76,6 +84,7 @@ Indicates the area of the codebase affected:
 - `workspace` - Multi-workspace orchestration
 
 **Infrastructure Scopes:**
+
 - `cf` - Cloudflare specific
 - `monitoring` - Monitoring & observability
 - `logging` - Logging system
@@ -84,7 +93,9 @@ Indicates the area of the codebase affected:
 - `deployment` - Deployment automation
 
 #### Subject (Required)
+
 A brief description of the change:
+
 - Use imperative mood: "add" not "added" or "adds"
 - First letter lowercase (unless proper noun)
 - No period at the end
@@ -148,7 +159,7 @@ Closes #789
 # Too vague
 fix: stuff
 
-# Not descriptive enough  
+# Not descriptive enough
 feat: update
 
 # Wrong tense
@@ -167,6 +178,7 @@ feat: add auth and fix bugs and update docs
 ## 🔧 Commit Quality Tools
 
 ### Git Commit Template
+
 Use our commit message template for consistent formatting:
 
 ```bash
@@ -178,6 +190,7 @@ git commit
 ```
 
 ### Commitlint Validation
+
 Automated commit message validation runs on every commit:
 
 ```bash
@@ -192,6 +205,7 @@ echo "feat(api): add new endpoint" | commitlint
 ```
 
 ### Interactive Commit Tool
+
 For guided commit creation:
 
 ```bash
@@ -207,21 +221,25 @@ npm run commit
 ## 📊 Commit Quality Metrics
 
 ### Frequency Guidelines
+
 - **Small, frequent commits** over large, infrequent ones
 - **Atomic commits**: each commit should represent a single logical change
 - **Complete commits**: don't commit broken code
 
 ### Message Quality Indicators
+
 - **Clarity**: Someone unfamiliar with the change should understand it
 - **Context**: Explain why the change was needed
 - **Impact**: Describe what the change affects
 - **References**: Link to issues, PRs, or documentation
 
 ### Automated Quality Checks
+
 Our pre-commit hooks verify:
+
 - [ ] Commit message follows conventional format
 - [ ] Subject line under 50 characters
-- [ ] Body lines under 72 characters  
+- [ ] Body lines under 72 characters
 - [ ] No trailing whitespace in message
 - [ ] References to issues are properly formatted
 - [ ] Breaking changes are clearly marked
@@ -229,6 +247,7 @@ Our pre-commit hooks verify:
 ## 🚨 Security Considerations
 
 ### Never Include in Commits
+
 - API keys, tokens, or passwords
 - Database connection strings
 - Private keys or certificates
@@ -236,7 +255,9 @@ Our pre-commit hooks verify:
 - Personal information
 
 ### Security-Related Commits
+
 Use the `security` type for:
+
 - Vulnerability fixes
 - Security feature additions
 - Dependency security updates
@@ -257,6 +278,7 @@ Fixes #security-001
 ## 🔄 Advanced Commit Practices
 
 ### Squashing Commits
+
 Before merging, squash related commits:
 
 ```bash
@@ -268,7 +290,7 @@ git commit --amend -m "feat(api): complete user authentication system
 
 Implements JWT-based authentication with:
 - Login/logout endpoints
-- Token refresh mechanism  
+- Token refresh mechanism
 - Password reset flow
 - Rate limiting protection
 
@@ -276,6 +298,7 @@ Includes comprehensive tests and documentation."
 ```
 
 ### Reverting Commits
+
 When reverting, provide context:
 
 ```bash
@@ -291,6 +314,7 @@ Performance report: docs/perf-analysis-2024-12.md
 ```
 
 ### Co-authored Commits
+
 For pair programming:
 
 ```bash
@@ -306,12 +330,14 @@ Co-authored-by: Backend Team Lead <backend@fire22.com>
 ## 🎯 Team Practices
 
 ### Commit Review Process
+
 1. **Self-review**: Check your commit message before pushing
 2. **Peer review**: Team members can flag poor commit messages
 3. **Automated feedback**: Commitlint provides instant feedback
 4. **Learning**: Use reviews as opportunities to improve
 
 ### Commit Message Standards in PRs
+
 - **PR title** should follow commit message format
 - **PR description** should elaborate on the commit body
 - **Squash merge** should result in a well-formatted commit
@@ -319,7 +345,9 @@ Co-authored-by: Backend Team Lead <backend@fire22.com>
 - **Co-author attribution** should include collaborators with company emails
 
 ### Branch Naming Conventions
+
 Align branch names with commit types and departments:
+
 ```bash
 # Feature branches
 feat/user-authentication
@@ -327,7 +355,7 @@ feat/dept-marketing-campaigns
 feat/workspace-orchestration
 
 # Fix branches
-fix/memory-leak-dashboard  
+fix/memory-leak-dashboard
 fix/dns-caching-performance
 fix/registry-auth-tokens
 
@@ -348,6 +376,7 @@ dept/security-scanner-enhancement
 ## 📚 Resources and Training
 
 ### Required Reading
+
 - [Conventional Commits Specification](https://www.conventionalcommits.org/)
 - [How to Write a Git Commit Message](https://chris.beams.io/posts/git-commit/)
 - [Fire22 Commit Template](.gitmessage)
@@ -355,15 +384,17 @@ dept/security-scanner-enhancement
 - [Workspace Orchestration Guide](CLAUDE.md#workspace-orchestration)
 
 ### Tools and Extensions
+
 - **VS Code**: GitLens extension for commit history visualization
 - **Command Line**: git aliases for common commit operations
 - **Browser**: GitHub/GitLab integrations for commit context
 
 ### Git Configuration
+
 ```bash
 # Set up useful aliases
 git config --global alias.co checkout
-git config --global alias.br branch  
+git config --global alias.br branch
 git config --global alias.ci commit
 git config --global alias.st status
 git config --global alias.unstage 'reset HEAD --'
@@ -388,12 +419,14 @@ git config --global trailer.co-authored-by.key "Co-authored-by"
 ## 🏆 Quality Goals
 
 ### Team Metrics (Monthly Review)
+
 - [ ] 95%+ commits follow conventional format
 - [ ] Average commit message quality score > 8/10
 - [ ] Zero commits containing sensitive information
 - [ ] 80%+ commits include proper context/reasoning
 
 ### Individual Goals
+
 - [ ] Write clear, descriptive commit messages
 - [ ] Include context for non-obvious changes
 - [ ] Reference related issues and documentation
@@ -401,9 +434,10 @@ git config --global trailer.co-authored-by.key "Co-authored-by"
 
 ---
 
-**Remember**: Great commit messages are a gift to your future self and your teammates. Take the time to write them well!
+**Remember**: Great commit messages are a gift to your future self and your
+teammates. Take the time to write them well!
 
 **Last Updated**: August 2025  
 **Commit Standards Version**: 4.0.0  
-**Team**: Fire22 Development Team
-**Departments**: 11 active departments with specialized scopes
+**Team**: Fire22 Development Team **Departments**: 11 active departments with
+specialized scopes

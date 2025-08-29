@@ -109,7 +109,6 @@ class EnhancedAuthTestClient {
    * Test basic authentication
    */
   async testBasicAuth(user: TestUser): Promise<boolean> {
-    
     try {
       const response = await this.makeRequest('/auth/login', {
         method: 'POST',
@@ -119,17 +118,16 @@ class EnhancedAuthTestClient {
         }),
       });
 
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
 
       if (response.ok) {
         const authData = data as AuthResponse;
         this.authToken = authData.token;
-        
+
         if (user.role === 'admin') {
           this.adminToken = authData.token;
         }
 
-        
         return true;
       } else {
         return false;
@@ -143,10 +141,9 @@ class EnhancedAuthTestClient {
    * Test protected route access
    */
   async testProtectedRoute(): Promise<boolean> {
-    
     try {
       const response = await this.makeRequest('/protected');
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
 
       if (response.ok) {
         return true;
@@ -162,10 +159,9 @@ class EnhancedAuthTestClient {
    * Test user info endpoint
    */
   async testGetUserInfo(): Promise<boolean> {
-    
     try {
       const response = await this.makeRequest('/auth/me');
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
 
       if (response.ok) {
         return true;
@@ -181,17 +177,16 @@ class EnhancedAuthTestClient {
    * Test token refresh
    */
   async testTokenRefresh(): Promise<boolean> {
-    
     try {
       const response = await this.makeRequest('/auth/refresh', {
         method: 'POST',
       });
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
 
       if (response.ok) {
         const oldToken = this.authToken;
         this.authToken = data.token;
-        
+
         return true;
       } else {
         return false;
@@ -205,12 +200,11 @@ class EnhancedAuthTestClient {
    * Test logout
    */
   async testLogout(): Promise<boolean> {
-    
     try {
       const response = await this.makeRequest('/auth/logout', {
         method: 'POST',
       });
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
 
       if (response.ok) {
         this.authToken = null;
@@ -227,10 +221,9 @@ class EnhancedAuthTestClient {
    * Test rate limiting
    */
   async testRateLimiting(): Promise<boolean> {
-    
     const testUser: TestUser = { username: 'nonexistent', password: 'wrong', role: 'user' };
     let rateLimitHit = false;
-    
+
     // Make multiple failed requests to trigger rate limiting
     for (let i = 1; i <= 15; i++) {
       try {
@@ -238,20 +231,19 @@ class EnhancedAuthTestClient {
           method: 'POST',
           body: JSON.stringify(testUser),
         });
-        
-        const data = await response.json() as any;
-        
+
+        const data = (await response.json()) as any;
+
         if (response.status === 429) {
           rateLimitHit = true;
           break;
         }
-        
+
         if (i > 10) {
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     }
-    
+
     return rateLimitHit;
   }
 
@@ -259,10 +251,9 @@ class EnhancedAuthTestClient {
    * Test account lockout
    */
   async testAccountLockout(): Promise<boolean> {
-    
     const testUser: TestUser = { username: 'admin', password: 'wrongpassword', role: 'admin' };
     let accountLocked = false;
-    
+
     // Make multiple failed login attempts
     for (let i = 1; i <= 6; i++) {
       try {
@@ -270,20 +261,19 @@ class EnhancedAuthTestClient {
           method: 'POST',
           body: JSON.stringify(testUser),
         });
-        
-        const data = await response.json() as any;
-        
+
+        const data = (await response.json()) as any;
+
         if (data.error && data.error.includes('locked')) {
           accountLocked = true;
           break;
         }
-        
+
         if (i === 5) {
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     }
-    
+
     // Test if account is actually locked by trying with correct password
     if (accountLocked) {
       try {
@@ -291,16 +281,15 @@ class EnhancedAuthTestClient {
           method: 'POST',
           body: JSON.stringify({ username: 'admin', password: 'admin123', role: 'admin' }),
         });
-        
-        const data = await response.json() as any;
-        
+
+        const data = (await response.json()) as any;
+
         if (data.error && data.error.includes('locked')) {
         } else {
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     }
-    
+
     return accountLocked;
   }
 
@@ -308,20 +297,17 @@ class EnhancedAuthTestClient {
    * Test audit logs (admin only)
    */
   async testAuditLogs(): Promise<boolean> {
-    
     if (!this.adminToken) {
       return false;
     }
-    
+
     try {
       const response = await this.makeAdminRequest('/admin/audit-logs?limit=10');
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
 
       if (response.ok) {
-        
         if (data.audit_logs && data.audit_logs.length > 0) {
-          data.audit_logs.slice(0, 3).forEach((log: AuditLog, index: number) => {
-          });
+          data.audit_logs.slice(0, 3).forEach((log: AuditLog, index: number) => {});
         } else {
         }
         return true;
@@ -337,20 +323,17 @@ class EnhancedAuthTestClient {
    * Test session management (admin only)
    */
   async testSessionManagement(): Promise<boolean> {
-    
     if (!this.adminToken) {
       return false;
     }
-    
+
     try {
       const response = await this.makeAdminRequest('/admin/sessions');
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
 
       if (response.ok) {
-        
         if (data.sessions && data.sessions.length > 0) {
-          data.sessions.slice(0, 3).forEach((session: Session, index: number) => {
-          });
+          data.sessions.slice(0, 3).forEach((session: Session, index: number) => {});
         } else {
         }
         return true;
@@ -366,55 +349,53 @@ class EnhancedAuthTestClient {
    * Test token revocation (admin only)
    */
   async testTokenRevocation(): Promise<boolean> {
-    
     if (!this.adminToken) {
       return false;
     }
-    
+
     // First, get a regular user token
     const regularUser: TestUser = { username: 'user', password: 'user123', role: 'user' };
     let userToken: string | null = null;
-    
+
     try {
       const response = await this.makeRequest('/auth/login', {
         method: 'POST',
         body: JSON.stringify(regularUser),
       });
-      
+
       if (response.ok) {
-        const data = await response.json() as any;
+        const data = (await response.json()) as any;
         userToken = data.token;
       }
     } catch (error) {
       return false;
     }
-    
+
     if (!userToken) {
       return false;
     }
-    
+
     // Test that the token works
     this.authToken = userToken;
     const protectedAccessBefore = await this.testProtectedRoute();
-    
+
     // Now revoke the token
     try {
       const response = await this.makeAdminRequest('/admin/revoke-token', {
         method: 'POST',
         body: JSON.stringify({ token_to_revoke: userToken }),
       });
-      
-      const data = await response.json() as any;
-      
+
+      const data = (await response.json()) as any;
+
       if (response.ok) {
-        
         // Test that the token no longer works
         const protectedAccessAfter = await this.testProtectedRoute();
-        
+
         if (protectedAccessBefore && !protectedAccessAfter) {
         } else {
         }
-        
+
         return true;
       } else {
         return false;
@@ -428,10 +409,9 @@ class EnhancedAuthTestClient {
    * Test health check
    */
   async testHealthCheck(): Promise<boolean> {
-    
     try {
       const response = await this.makeRequest('/health');
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
 
       if (response.ok) {
         return true;
@@ -447,7 +427,6 @@ class EnhancedAuthTestClient {
    * Run comprehensive security test
    */
   async runComprehensiveSecurityTest(): Promise<void> {
-    
     const testUsers: TestUser[] = [
       { username: 'admin', password: 'admin123', role: 'admin' },
       { username: 'user', password: 'user123', role: 'user' },
@@ -459,7 +438,7 @@ class EnhancedAuthTestClient {
     // Test basic authentication for all users
     for (const user of testUsers) {
       results.push(await this.testBasicAuth(user));
-      
+
       if (this.authToken) {
         results.push(await this.testProtectedRoute());
         results.push(await this.testGetUserInfo());
@@ -470,7 +449,7 @@ class EnhancedAuthTestClient {
 
     // Test security features (using admin user)
     await this.testBasicAuth({ username: 'admin', password: 'admin123', role: 'admin' });
-    
+
     results.push(await this.testRateLimiting());
     results.push(await this.testAccountLockout());
     results.push(await this.testAuditLogs());
@@ -481,34 +460,32 @@ class EnhancedAuthTestClient {
     // Summary
     const passed = results.filter(r => r).length;
     const total = results.length;
-    
-    
+
     if (passed === total) {
     } else {
     }
-    
   }
 
   /**
    * Run quick security test
    */
   async runQuickSecurityTest(): Promise<void> {
-    
     const results: boolean[] = [];
-    
+
     // Test basic authentication
-    results.push(await this.testBasicAuth({ username: 'admin', password: 'admin123', role: 'admin' }));
-    
+    results.push(
+      await this.testBasicAuth({ username: 'admin', password: 'admin123', role: 'admin' })
+    );
+
     if (this.authToken) {
       results.push(await this.testProtectedRoute());
       results.push(await this.testGetUserInfo());
       results.push(await this.testHealthCheck());
     }
-    
+
     const passed = results.filter(r => r).length;
     const total = results.length;
-    
-    
+
     if (passed === total) {
     } else {
     }
@@ -522,7 +499,6 @@ async function main(): Promise<void> {
   const testType = args[0] || 'comprehensive';
 
   const client = new EnhancedAuthTestClient(baseUrl);
-
 
   switch (testType) {
     case 'quick':

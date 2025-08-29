@@ -154,9 +154,9 @@ class EnhancedJWTAuthService {
   private checkRateLimit(ipAddress: string): boolean {
     const now = Date.now();
     const windowStart = now - this.config.rateLimitWindow * 1000;
-    
+
     let rateLimitData = this.rateLimits.get(ipAddress);
-    
+
     if (!rateLimitData || rateLimitData.reset_time < windowStart) {
       rateLimitData = {
         count: 1,
@@ -165,17 +165,24 @@ class EnhancedJWTAuthService {
       this.rateLimits.set(ipAddress, rateLimitData);
       return true;
     }
-    
+
     if (rateLimitData.count >= this.config.rateLimitMax) {
       return false;
     }
-    
+
     rateLimitData.count++;
     return true;
   }
 
   // Audit logging
-  private logAudit(action: string, request: Request, success: boolean, userId?: string, username?: string, details?: any): void {
+  private logAudit(
+    action: string,
+    request: Request,
+    success: boolean,
+    userId?: string,
+    username?: string,
+    details?: any
+  ): void {
     if (!this.config.enableAuditLogging) return;
 
     const auditLog: AuditLog = {
@@ -191,7 +198,7 @@ class EnhancedJWTAuthService {
     };
 
     this.auditLogs.push(auditLog);
-    
+
     // Keep only last 1000 audit logs
     if (this.auditLogs.length > 1000) {
       this.auditLogs = this.auditLogs.slice(-1000);
@@ -221,7 +228,7 @@ class EnhancedJWTAuthService {
     const userAgent = request.headers.get('user-agent') || '';
     const acceptLanguage = request.headers.get('accept-language') || '';
     const acceptEncoding = request.headers.get('accept-encoding') || '';
-    
+
     // Simple fingerprint - in production, use more sophisticated methods
     return btoa(userAgent + acceptLanguage + acceptEncoding).slice(0, 32);
   }
@@ -232,12 +239,12 @@ class EnhancedJWTAuthService {
     if (!user) return false;
 
     user.failed_login_attempts++;
-    
+
     if (user.failed_login_attempts >= this.config.maxLoginAttempts) {
       user.locked_until = new Date(Date.now() + this.config.lockoutDuration * 1000).toISOString();
       return true; // Account locked
     }
-    
+
     return false; // Account not locked yet
   }
 
@@ -252,7 +259,7 @@ class EnhancedJWTAuthService {
   private isAccountLocked(username: string): boolean {
     const user = this.users.get(username);
     if (!user || !user.locked_until) return false;
-    
+
     return new Date(user.locked_until) > new Date();
   }
 
@@ -261,16 +268,16 @@ class EnhancedJWTAuthService {
     const header = {
       alg: 'HS256',
       typ: 'JWT',
-      kid: this.getCurrentKeyId(),           // Key rotation support
+      kid: this.getCurrentKeyId(), // Key rotation support
       x5t: this.getCertificateThumbprint(), // Certificate validation
-      cty: 'application/json',               // Content type specification
-      crit: ['kid', 'x5t'],                 // Critical parameters
-      iss: this.config.issuer,              // Issuer claim
-      aud: this.config.audience,            // Audience claim
-      iat: Math.floor(Date.now() / 1000),   // Issued at timestamp
+      cty: 'application/json', // Content type specification
+      crit: ['kid', 'x5t'], // Critical parameters
+      iss: this.config.issuer, // Issuer claim
+      aud: this.config.audience, // Audience claim
+      iat: Math.floor(Date.now() / 1000), // Issued at timestamp
       exp: Math.floor(Date.now() / 1000) + this.config.tokenExpiry, // Expiration
-      nbf: Math.floor(Date.now() / 1000),   // Not before timestamp
-      jti: crypto.randomUUID(),             // JWT ID for uniqueness
+      nbf: Math.floor(Date.now() / 1000), // Not before timestamp
+      jti: crypto.randomUUID(), // JWT ID for uniqueness
     };
     return this.base64UrlEncode(JSON.stringify(header));
   }
@@ -299,7 +306,7 @@ class EnhancedJWTAuthService {
   private createPayload(user: User, request: Request): string {
     const now = Math.floor(Date.now() / 1000);
     const jti = crypto.randomUUID();
-    
+
     const payload: EnhancedJWTPayload = {
       sub: user.id,
       username: user.username,
@@ -311,7 +318,7 @@ class EnhancedJWTAuthService {
       device_fingerprint: this.generateDeviceFingerprint(request),
       ip_address: request.headers.get('cf-connecting-ip') || 'unknown',
     };
-    
+
     return this.base64UrlEncode(JSON.stringify(payload));
   }
 
@@ -333,21 +340,22 @@ class EnhancedJWTAuthService {
   }
 
   private base64UrlEncode(str: string): string {
-    return btoa(str)
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
+    return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
   }
 
   private base64UrlDecode(str: string): string {
-    str += '='.repeat((4 - str.length % 4) % 4);
+    str += '='.repeat((4 - (str.length % 4)) % 4);
     return atob(str.replace(/-/g, '+').replace(/_/g, '/'));
   }
 
   // Enhanced authentication with security features
-  async authenticate(username: string, password: string, request: Request): Promise<{ user: User; token: string; session: Session } | null> {
+  async authenticate(
+    username: string,
+    password: string,
+    request: Request
+  ): Promise<{ user: User; token: string; session: Session } | null> {
     const ipAddress = request.headers.get('cf-connecting-ip') || 'unknown';
-    
+
     // Rate limiting check
     if (!this.checkRateLimit(ipAddress)) {
       this.logAudit('RATE_LIMIT_EXCEEDED', request, false, undefined, username, { ip: ipAddress });
@@ -369,9 +377,9 @@ class EnhancedJWTAuthService {
 
     if (!this.verifyPassword(password, user.password_hash)) {
       const isLocked = this.handleFailedLogin(username);
-      this.logAudit('LOGIN_FAILED_INVALID_PASSWORD', request, false, user.id, username, { 
+      this.logAudit('LOGIN_FAILED_INVALID_PASSWORD', request, false, user.id, username, {
         failed_attempts: user.failed_login_attempts,
-        account_locked: isLocked 
+        account_locked: isLocked,
       });
       return null;
     }
@@ -389,9 +397,9 @@ class EnhancedJWTAuthService {
     // Create session
     const session = this.createSession(user.id, JSON.parse(payload).jti, request);
 
-    this.logAudit('LOGIN_SUCCESS', request, true, user.id, username, { 
+    this.logAudit('LOGIN_SUCCESS', request, true, user.id, username, {
       session_id: session.id,
-      device_fingerprint: session.device_fingerprint 
+      device_fingerprint: session.device_fingerprint,
     });
 
     return { user, token, session };
@@ -407,11 +415,11 @@ class EnhancedJWTAuthService {
       }
 
       const [header, payload, signature] = token.split('.');
-      
+
       // Verify signature
       const dataToSign = `${header}.${payload}`;
       const expectedSignature = await this.createSignature(dataToSign);
-      
+
       if (signature !== expectedSignature) {
         this.logAudit('TOKEN_INVALID_SIGNATURE', request, false);
         return null;
@@ -429,9 +437,15 @@ class EnhancedJWTAuthService {
       // Verify device fingerprint and IP address (optional security check)
       const currentFingerprint = this.generateDeviceFingerprint(request);
       const currentIp = request.headers.get('cf-connecting-ip') || 'unknown';
-      
+
       if (payloadData.device_fingerprint && payloadData.device_fingerprint !== currentFingerprint) {
-        this.logAudit('TOKEN_DEVICE_MISMATCH', request, false, payloadData.sub, payloadData.username);
+        this.logAudit(
+          'TOKEN_DEVICE_MISMATCH',
+          request,
+          false,
+          payloadData.sub,
+          payloadData.username
+        );
         return null;
       }
 
@@ -441,7 +455,9 @@ class EnhancedJWTAuthService {
       this.logAudit('TOKEN_VERIFIED', request, true, payloadData.sub, payloadData.username);
       return payloadData;
     } catch (error) {
-      this.logAudit('TOKEN_VERIFICATION_ERROR', request, false, undefined, undefined, { error: error instanceof Error ? error.message : 'Unknown error' });
+      this.logAudit('TOKEN_VERIFICATION_ERROR', request, false, undefined, undefined, {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
       return null;
     }
   }
@@ -531,7 +547,9 @@ export class EnhancedAuthWorker {
 
   constructor() {
     const envManager = mainWorkerInstance.getEnvManager();
-    const jwtSecret = envManager.getConfig().envValidation.required.find(v => v === 'JWT_SECRET') ? Bun.env.JWT_SECRET : 'your-secret-key-change-in-production';
+    const jwtSecret = envManager.getConfig().envValidation.required.find(v => v === 'JWT_SECRET')
+      ? Bun.env.JWT_SECRET
+      : 'your-secret-key-change-in-production';
 
     this.authService = new EnhancedJWTAuthService({
       jwtSecret: jwtSecret || 'your-secret-key-change-in-production', // Use environment variables in production
@@ -552,11 +570,11 @@ export class EnhancedAuthWorker {
   private addSecurityHeaders(response: Response): Response {
     const securityHeaders = this.authService.getSecurityHeaders();
     const newHeaders = new Headers(response.headers);
-    
+
     for (const [key, value] of Object.entries(securityHeaders)) {
       newHeaders.set(key, value);
     }
-    
+
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
@@ -574,7 +592,7 @@ export class EnhancedAuthWorker {
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       },
     });
-    
+
     return this.addSecurityHeaders(response);
   }
 
@@ -613,23 +631,26 @@ export class EnhancedAuthWorker {
       }
     } catch (error) {
       console.error('Auth worker error:', error);
-      return this.createCORSResponse({ 
-        error: error instanceof Error ? error.message : 'Internal server error' 
-      }, 500);
+      return this.createCORSResponse(
+        {
+          error: error instanceof Error ? error.message : 'Internal server error',
+        },
+        500
+      );
     }
   }
 
   private async handleLogin(request: Request): Promise<Response> {
     try {
-      const body = await request.json() as { username?: string; password?: string };
+      const body = (await request.json()) as { username?: string; password?: string };
       const { username, password } = body;
-      
+
       if (!username || !password) {
         return this.createCORSResponse({ error: 'Username and password are required' }, 400);
       }
 
       const result = await this.authService.authenticate(username, password, request);
-      
+
       if (!result) {
         return this.createCORSResponse({ error: 'Invalid credentials' }, 401);
       }
@@ -654,9 +675,12 @@ export class EnhancedAuthWorker {
         },
       });
     } catch (error) {
-      return this.createCORSResponse({ 
-        error: error instanceof Error ? error.message : 'Authentication failed' 
-      }, 401);
+      return this.createCORSResponse(
+        {
+          error: error instanceof Error ? error.message : 'Authentication failed',
+        },
+        401
+      );
     }
   }
 
@@ -669,7 +693,7 @@ export class EnhancedAuthWorker {
 
       const token = authHeader.slice(7);
       const payload = await this.authService.verifyToken(token, request);
-      
+
       if (!payload) {
         return this.createCORSResponse({ error: 'Invalid or expired token' }, 401);
       }
@@ -691,9 +715,12 @@ export class EnhancedAuthWorker {
         token: newToken,
       });
     } catch (error) {
-      return this.createCORSResponse({ 
-        error: error instanceof Error ? error.message : 'Token refresh failed' 
-      }, 401);
+      return this.createCORSResponse(
+        {
+          error: error instanceof Error ? error.message : 'Token refresh failed',
+        },
+        401
+      );
     }
   }
 
@@ -706,16 +733,19 @@ export class EnhancedAuthWorker {
 
       const token = authHeader.slice(7);
       const payload = await this.authService.verifyToken(token, request);
-      
+
       if (payload) {
         this.authService.revokeToken(token, request);
       }
 
       return this.createCORSResponse({ message: 'Logout successful' });
     } catch (error) {
-      return this.createCORSResponse({ 
-        error: error instanceof Error ? error.message : 'Logout failed' 
-      }, 500);
+      return this.createCORSResponse(
+        {
+          error: error instanceof Error ? error.message : 'Logout failed',
+        },
+        500
+      );
     }
   }
 
@@ -728,7 +758,7 @@ export class EnhancedAuthWorker {
 
       const token = authHeader.slice(7);
       const payload = await this.authService.verifyToken(token, request);
-      
+
       if (!payload) {
         return this.createCORSResponse({ error: 'Invalid or expired token' }, 401);
       }
@@ -752,9 +782,12 @@ export class EnhancedAuthWorker {
         },
       });
     } catch (error) {
-      return this.createCORSResponse({ 
-        error: error instanceof Error ? error.message : 'Failed to get user info' 
-      }, 500);
+      return this.createCORSResponse(
+        {
+          error: error instanceof Error ? error.message : 'Failed to get user info',
+        },
+        500
+      );
     }
   }
 
@@ -767,7 +800,7 @@ export class EnhancedAuthWorker {
 
       const token = authHeader.slice(7);
       const payload = await this.authService.verifyToken(token, request);
-      
+
       if (!payload) {
         return this.createCORSResponse({ error: 'Invalid or expired token' }, 401);
       }
@@ -786,9 +819,12 @@ export class EnhancedAuthWorker {
         },
       });
     } catch (error) {
-      return this.createCORSResponse({ 
-        error: error instanceof Error ? error.message : 'Access denied' 
-      }, 401);
+      return this.createCORSResponse(
+        {
+          error: error instanceof Error ? error.message : 'Access denied',
+        },
+        401
+      );
     }
   }
 
@@ -801,24 +837,27 @@ export class EnhancedAuthWorker {
 
       const token = authHeader.slice(7);
       const payload = await this.authService.verifyToken(token, request);
-      
+
       if (!payload || payload.role !== 'admin') {
         return this.createCORSResponse({ error: 'Admin access required' }, 403);
       }
 
       const url = new URL(request.url);
       const limit = parseInt(url.searchParams.get('limit') || '100');
-      
+
       const auditLogs = this.authService.getAuditLogs(limit);
-      
+
       return this.createCORSResponse({
         audit_logs: auditLogs,
         total: auditLogs.length,
       });
     } catch (error) {
-      return this.createCORSResponse({ 
-        error: error instanceof Error ? error.message : 'Failed to get audit logs' 
-      }, 500);
+      return this.createCORSResponse(
+        {
+          error: error instanceof Error ? error.message : 'Failed to get audit logs',
+        },
+        500
+      );
     }
   }
 
@@ -831,21 +870,24 @@ export class EnhancedAuthWorker {
 
       const token = authHeader.slice(7);
       const payload = await this.authService.verifyToken(token, request);
-      
+
       if (!payload || payload.role !== 'admin') {
         return this.createCORSResponse({ error: 'Admin access required' }, 403);
       }
 
       const sessions = this.authService.getActiveSessions();
-      
+
       return this.createCORSResponse({
         sessions,
         total: sessions.length,
       });
     } catch (error) {
-      return this.createCORSResponse({ 
-        error: error instanceof Error ? error.message : 'Failed to get sessions' 
-      }, 500);
+      return this.createCORSResponse(
+        {
+          error: error instanceof Error ? error.message : 'Failed to get sessions',
+        },
+        500
+      );
     }
   }
 
@@ -858,25 +900,28 @@ export class EnhancedAuthWorker {
 
       const token = authHeader.slice(7);
       const payload = await this.authService.verifyToken(token, request);
-      
+
       if (!payload || payload.role !== 'admin') {
         return this.createCORSResponse({ error: 'Admin access required' }, 403);
       }
 
-      const body = await request.json() as { token_to_revoke?: string };
+      const body = (await request.json()) as { token_to_revoke?: string };
       const { token_to_revoke } = body;
-      
+
       if (!token_to_revoke) {
         return this.createCORSResponse({ error: 'Token to revoke is required' }, 400);
       }
 
       this.authService.revokeToken(token_to_revoke, request);
-      
+
       return this.createCORSResponse({ message: 'Token revoked successfully' });
     } catch (error) {
-      return this.createCORSResponse({ 
-        error: error instanceof Error ? error.message : 'Failed to revoke token' 
-      }, 500);
+      return this.createCORSResponse(
+        {
+          error: error instanceof Error ? error.message : 'Failed to revoke token',
+        },
+        500
+      );
     }
   }
 
@@ -897,5 +942,5 @@ export default {
   async fetch(request: Request, env: any, ctx: ExecutionContext): Promise<Response> {
     const worker = new EnhancedAuthWorker();
     return worker.handleRequest(request);
-  }
+  },
 };

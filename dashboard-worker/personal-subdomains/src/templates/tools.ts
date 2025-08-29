@@ -1,6 +1,6 @@
 /**
  * Tools Template Entry Point (New Modular Structure)
- * 
+ *
  * This file now imports from the new modular structure.
  * The original 171KB file has been archived in archive/old-templates/
  */

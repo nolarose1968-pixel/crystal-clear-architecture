@@ -29,7 +29,7 @@ Basic system health check endpoint.
 
 Detailed system health information.
 
-## GET /api/health/database  
+## GET /api/health/database
 
 Database connection and performance status.
 

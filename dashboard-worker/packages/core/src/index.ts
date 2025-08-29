@@ -13,7 +13,7 @@ export const VERSION = '1.0.0';
 export const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD'
+    currency: 'USD',
   }).format(amount);
 };
 
@@ -22,7 +22,7 @@ export const formatDate = (date: Date | string): string => {
   return d.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
   });
 };
 
@@ -30,5 +30,5 @@ export const formatDate = (date: Date | string): string => {
 export const config = {
   apiUrl: process.env.FIRE22_API_URL || 'https://api.fire22.com',
   environment: process.env.NODE_ENV || 'development',
-  version: VERSION
+  version: VERSION,
 };

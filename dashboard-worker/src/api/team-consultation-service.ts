@@ -4,10 +4,10 @@
  * Integrates with Design Team, Cloudflare Team, and Special Operations
  */
 
-import { SQL } from "bun";
-import { DesignTeamIntegrationService, DesignReviewRequest } from "./design-team-integration";
-import { TaskService } from "./tasks-enhanced";
-import { TaskEventService } from "./task-events";
+import { SQL } from 'bun';
+import { DesignTeamIntegrationService, DesignReviewRequest } from './design-team-integration';
+import { TaskService } from './tasks-enhanced';
+import { TaskEventService } from './task-events';
 
 export interface ConsultationRequest {
   projectId: string;
@@ -71,7 +71,7 @@ export class TeamConsultationService {
       members: ['isabella-martinez', 'ethan-cooper'],
       emails: ['design@fire22.com'],
       slack: '#design-team',
-      officeHours: 'Tuesdays & Thursdays 2-4 PM'
+      officeHours: 'Tuesdays & Thursdays 2-4 PM',
     },
     cloudflare: {
       name: 'Cloudflare Team',
@@ -81,23 +81,19 @@ export class TeamConsultationService {
         'cloudflare-workers@fire22.ag',
         'cloudflare-r2@fire22.ag',
         'wrangler-support@fire22.ag',
-        'edge-team@fire22.ag'
-      ]
+        'edge-team@fire22.ag',
+      ],
     },
     'special-ops': {
       name: 'Special Operations',
       lead: 'special-ops-team',
       department: 'technology',
       accessLevel: 'TOP_SECRET',
-      permissions: ['read', 'write', 'delete', 'audit', 'backup']
+      permissions: ['read', 'write', 'delete', 'audit', 'backup'],
     },
     infrastructure: {
       name: 'Infrastructure Team',
-      emails: [
-        'infrastructure@fire22.ag',
-        'platform-team@fire22.ag',
-        'head@technology.fire22'
-      ]
+      emails: ['infrastructure@fire22.ag', 'platform-team@fire22.ag', 'head@technology.fire22'],
     },
     ci: {
       name: 'CI Team',
@@ -106,9 +102,9 @@ export class TeamConsultationService {
         'ci-cd@fire22.ag',
         'github-actions@fire22.ag',
         'build-team@fire22.ag',
-        'release-automation@fire22.ag'
-      ]
-    }
+        'release-automation@fire22.ag',
+      ],
+    },
   };
 
   constructor(db: SQL) {
@@ -185,10 +181,12 @@ export class TeamConsultationService {
   /**
    * Create a new team consultation request
    */
-  async createConsultation(request: ConsultationRequest): Promise<{ success: boolean; data?: ConsultationStatus; error?: string }> {
+  async createConsultation(
+    request: ConsultationRequest
+  ): Promise<{ success: boolean; data?: ConsultationStatus; error?: string }> {
     try {
       const consultationId = `consultation_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
+
       console.log(`🤝 Creating team consultation: ${request.projectName}`);
 
       // Insert main consultation record
@@ -232,7 +230,6 @@ export class TeamConsultationService {
 
       console.log(`✅ Team consultation created: ${consultationId}`);
       return { success: true, data: status };
-
     } catch (error) {
       console.error(`❌ Failed to create consultation for ${request.projectName}:`, error);
       return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -280,7 +277,7 @@ ${team.deliverables.map(del => `- ${del}`).join('\n')}
         assigneeId,
         reporterId: request.requesterId,
         dueDate: request.deadline,
-        tags: ['consultation', 'team-coordination', team.reviewType, request.projectId]
+        tags: ['consultation', 'team-coordination', team.reviewType, request.projectId],
       });
     }
   }
@@ -304,11 +301,14 @@ ${team.deliverables.map(del => `- ${del}`).join('\n')}
         deadline: request.deadline,
         requirements: team.requirements,
         deliverables: team.deliverables,
-        teamContacts: teamInfo
+        teamContacts: teamInfo,
       };
 
       // Log for team notification system pickup
-      console.log(`TEAM_CONSULTATION_REQUEST:${team.team.toUpperCase()}:`, JSON.stringify(notification));
+      console.log(
+        `TEAM_CONSULTATION_REQUEST:${team.team.toUpperCase()}:`,
+        JSON.stringify(notification)
+      );
     }
   }
 
@@ -321,7 +321,7 @@ ${team.deliverables.map(del => `- ${del}`).join('\n')}
       const consultationResult = await this.db`
         SELECT * FROM consultations WHERE project_id = ${projectId}
       `;
-      
+
       const consultation = consultationResult[0] as any;
 
       if (!consultation) {
@@ -329,9 +329,9 @@ ${team.deliverables.map(del => `- ${del}`).join('\n')}
       }
 
       // Get team statuses
-      const teamStatuses = await this.db`
+      const teamStatuses = (await this.db`
         SELECT * FROM team_consultation_statuses WHERE consultation_id = ${consultation.id}
-      ` as any[];
+      `) as any[];
 
       const statusMap = new Map<string, TeamConsultationStatus>();
       let approvalCount = 0;
@@ -344,11 +344,11 @@ ${team.deliverables.map(del => `- ${del}`).join('\n')}
           comments: teamStatus.comments ? JSON.parse(teamStatus.comments) : [],
           approvedAt: teamStatus.approved_at,
           requirements: JSON.parse(teamStatus.requirements || '[]'),
-          deliverables: JSON.parse(teamStatus.deliverables || '[]')
+          deliverables: JSON.parse(teamStatus.deliverables || '[]'),
         };
 
         statusMap.set(teamStatus.team, status);
-        
+
         if (status.status === 'approved') {
           approvalCount++;
         }
@@ -375,9 +375,8 @@ ${team.deliverables.map(del => `- ${del}`).join('\n')}
         createdAt: consultation.created_at,
         updatedAt: consultation.updated_at,
         approvalCount,
-        totalTeams
+        totalTeams,
       };
-
     } catch (error) {
       console.error(`❌ Failed to get consultation status for ${projectId}:`, error);
       return null;
@@ -388,8 +387,8 @@ ${team.deliverables.map(del => `- ${del}`).join('\n')}
    * Update team consultation status
    */
   async updateTeamStatus(
-    projectId: string, 
-    team: string, 
+    projectId: string,
+    team: string,
     status: TeamConsultationStatus['status'],
     reviewer?: string,
     comments?: string[]
@@ -412,7 +411,6 @@ ${team.deliverables.map(del => `- ${del}`).join('\n')}
 
       console.log(`✅ Updated consultation status for ${team} on project ${projectId}: ${status}`);
       return { success: true };
-
     } catch (error) {
       console.error(`❌ Failed to update team status for ${projectId}:`, error);
       return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -424,9 +422,9 @@ ${team.deliverables.map(del => `- ${del}`).join('\n')}
    */
   async getPendingConsultations(): Promise<ConsultationStatus[]> {
     try {
-      const consultations = await this.db`
+      const consultations = (await this.db`
         SELECT project_id FROM consultations WHERE status IN ('pending', 'in_progress')
-      ` as any[];
+      `) as any[];
 
       const results: ConsultationStatus[] = [];
       for (const consultation of consultations) {

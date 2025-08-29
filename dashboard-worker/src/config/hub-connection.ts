@@ -1,6 +1,6 @@
 /**
  * Hub Connection Configuration
- * 
+ *
  * Centralizes connections to D1, R2, SQLite, and Language systems
  * through the hub at localhost:3000
  */
@@ -36,16 +36,16 @@ export class HubConnectionManager {
   private config: HubConfig;
   private connections: Map<string, DatabaseConnection> = new Map();
   private r2Client?: BunR2Client;
-  
+
   constructor(config: Partial<HubConfig> = {}) {
     this.config = {
       baseUrl: process.env.HUB_URL || 'http://localhost:3001', // Use 3001 for testing
       timeout: 10000,
       retries: 3,
       enableHealthCheck: true,
-      ...config
+      ...config,
     };
-    
+
     this.initializeConnections();
   }
 
@@ -59,7 +59,7 @@ export class HubConnectionManager {
       type: 'D1',
       binding: 'DB',
       endpoint: `${this.config.baseUrl}/api/d1/fire22-dashboard`,
-      status: 'disconnected'
+      status: 'disconnected',
     });
 
     this.connections.set('fire22-registry', {
@@ -67,7 +67,7 @@ export class HubConnectionManager {
       type: 'D1',
       binding: 'REGISTRY_DB',
       endpoint: `${this.config.baseUrl}/api/d1/fire22-registry`,
-      status: 'disconnected'
+      status: 'disconnected',
     });
 
     // R2 Storage connections
@@ -76,7 +76,7 @@ export class HubConnectionManager {
       type: 'R2',
       binding: 'REGISTRY_STORAGE',
       endpoint: `${this.config.baseUrl}/api/r2/fire22-packages`,
-      status: 'disconnected'
+      status: 'disconnected',
     });
 
     // SQLite connections (local with hub sync)
@@ -84,7 +84,7 @@ export class HubConnectionManager {
       name: 'sqlite-local',
       type: 'SQLite',
       endpoint: `${this.config.baseUrl}/api/sqlite/sync`,
-      status: 'disconnected'
+      status: 'disconnected',
     });
 
     // Telegram Bot Service
@@ -97,8 +97,8 @@ export class HubConnectionManager {
         botToken: process.env.TELEGRAM_BOT_TOKEN,
         webhookUrl: process.env.TELEGRAM_WEBHOOK_URL,
         enableMultilingual: process.env.ENABLE_MULTILINGUAL === 'true',
-        enableNotifications: process.env.ENABLE_NOTIFICATIONS === 'true'
-      }
+        enableNotifications: process.env.ENABLE_NOTIFICATIONS === 'true',
+      },
     });
 
     // Error Management System
@@ -112,23 +112,23 @@ export class HubConnectionManager {
         alertingEnabled: process.env.ERROR_ALERTING_ENABLED !== 'false',
         registryPath: './docs/error-codes.json',
         maxOccurrences: parseInt(process.env.MAX_ERROR_OCCURRENCES || '1000'),
-        retentionDays: parseInt(process.env.ERROR_RETENTION_DAYS || '30')
+        retentionDays: parseInt(process.env.ERROR_RETENTION_DAYS || '30'),
       },
       errorTracking: {
         enabled: true,
-        occurrences: 0
-      }
+        occurrences: 0,
+      },
     });
   }
 
   /**
    * Connect to the hub and test all services
    */
-  async connectToHub(): Promise<{success: boolean, connections: DatabaseConnection[]}> {
+  async connectToHub(): Promise<{ success: boolean; connections: DatabaseConnection[] }> {
     try {
       // Test hub availability
       const hubResponse = await fetch(`${this.config.baseUrl}/health`, {
-        signal: AbortSignal.timeout(this.config.timeout)
+        signal: AbortSignal.timeout(this.config.timeout),
       });
 
       if (!hubResponse.ok) {
@@ -155,18 +155,19 @@ export class HubConnectionManager {
         this.connections.set(connection.name, connection);
       });
 
-      const connectedCount = Array.from(this.connections.values())
-        .filter(conn => conn.status === 'connected').length;
+      const connectedCount = Array.from(this.connections.values()).filter(
+        conn => conn.status === 'connected'
+      ).length;
 
       return {
         success: connectedCount > 0,
-        connections: Array.from(this.connections.values())
+        connections: Array.from(this.connections.values()),
       };
     } catch (error) {
       console.error('Failed to connect to hub:', error);
       return {
         success: false,
-        connections: Array.from(this.connections.values())
+        connections: Array.from(this.connections.values()),
       };
     }
   }
@@ -192,9 +193,9 @@ export class HubConnectionManager {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+          ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
         },
-        signal: AbortSignal.timeout(this.config.timeout)
+        signal: AbortSignal.timeout(this.config.timeout),
       });
 
       return response.ok;
@@ -211,26 +212,26 @@ export class HubConnectionManager {
     try {
       // Test if error registry is accessible
       const registryPath = connection.config?.registryPath || './docs/error-codes.json';
-      
+
       // Try to access error system health endpoint
       const response = await fetch(`${connection.endpoint}/health`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+          ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
         },
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(5000),
       });
 
       if (response.ok) {
         const healthData = await response.json();
-        
+
         // Update error tracking info
         if (connection.errorTracking) {
           connection.errorTracking.occurrences = 0;
           connection.errorTracking.lastError = undefined;
         }
-        
+
         return true;
       } else {
         console.error('Error System health check failed:', response.statusText);
@@ -252,7 +253,7 @@ export class HubConnectionManager {
       // Check if Telegram environment is properly configured
       const { TelegramEnvironment } = await import('../telegram/telegram-env');
       const telegramEnv = TelegramEnvironment.getInstance();
-      
+
       // Validate required secrets
       const validation = telegramEnv.validateRequiredSecrets();
       if (!validation.valid) {
@@ -262,7 +263,7 @@ export class HubConnectionManager {
 
       // Test bot token by making a simple API call
       const response = await fetch(`https://api.telegram.org/bot${telegramEnv.botToken}/getMe`, {
-        signal: AbortSignal.timeout(5000) // Shorter timeout for external API
+        signal: AbortSignal.timeout(5000), // Shorter timeout for external API
       });
 
       if (response.ok) {
@@ -282,7 +283,11 @@ export class HubConnectionManager {
   /**
    * Track connection error for monitoring
    */
-  private trackConnectionError(connection: DatabaseConnection, errorCode: string, message: string): void {
+  private trackConnectionError(
+    connection: DatabaseConnection,
+    errorCode: string,
+    message: string
+  ): void {
     try {
       // Update connection error tracking
       if (connection.errorTracking) {
@@ -296,7 +301,7 @@ export class HubConnectionManager {
           connectionName: connection.name,
           connectionType: connection.type,
           endpoint: connection.endpoint,
-          errorMessage: message
+          errorMessage: message,
         });
       }
 
@@ -308,8 +313,8 @@ export class HubConnectionManager {
             connectionType: connection.type,
             endpoint: connection.endpoint,
             errorMessage: message,
-            timestamp: new Date().toISOString()
-          }
+            timestamp: new Date().toISOString(),
+          },
         });
 
         console.error(`🚨 Connection Error [${errorCode}]:`, errorResponse.error.message);
@@ -333,10 +338,10 @@ export class HubConnectionManager {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+          ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
         },
         body: JSON.stringify({ query, params }),
-        signal: AbortSignal.timeout(this.config.timeout)
+        signal: AbortSignal.timeout(this.config.timeout),
       });
 
       if (!response.ok) {
@@ -368,10 +373,10 @@ export class HubConnectionManager {
       const response = await fetch(`${connection.endpoint}/upload`, {
         method: 'POST',
         headers: {
-          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+          ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
         },
         body: formData,
-        signal: AbortSignal.timeout(this.config.timeout)
+        signal: AbortSignal.timeout(this.config.timeout),
       });
 
       return response.ok;
@@ -394,9 +399,9 @@ export class HubConnectionManager {
       const response = await fetch(`${connection.endpoint}/download/${encodeURIComponent(key)}`, {
         method: 'GET',
         headers: {
-          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+          ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
         },
-        signal: AbortSignal.timeout(this.config.timeout)
+        signal: AbortSignal.timeout(this.config.timeout),
       });
 
       if (!response.ok) {
@@ -423,9 +428,9 @@ export class HubConnectionManager {
       const response = await fetch(`${connection.endpoint}/${bucketName}/${key}`, {
         method: 'DELETE',
         headers: {
-          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+          ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
         },
-        signal: AbortSignal.timeout(this.config.timeout)
+        signal: AbortSignal.timeout(this.config.timeout),
       });
 
       return response.ok;
@@ -438,7 +443,10 @@ export class HubConnectionManager {
   /**
    * List objects in R2 bucket
    */
-  async listR2Objects(bucketName: string, options?: { prefix?: string; limit?: number }): Promise<any[]> {
+  async listR2Objects(
+    bucketName: string,
+    options?: { prefix?: string; limit?: number }
+  ): Promise<any[]> {
     const connection = this.connections.get('r2-storage');
     if (!connection || connection.type !== 'R2') {
       throw new Error('R2 storage connection not configured');
@@ -449,14 +457,17 @@ export class HubConnectionManager {
       if (options?.prefix) params.append('prefix', options.prefix);
       if (options?.limit) params.append('limit', String(options.limit));
 
-      const response = await fetch(`${connection.endpoint}/${bucketName}/list?${params.toString()}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
-        },
-        signal: AbortSignal.timeout(this.config.timeout)
-      });
+      const response = await fetch(
+        `${connection.endpoint}/${bucketName}/list?${params.toString()}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
+          },
+          signal: AbortSignal.timeout(this.config.timeout),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Failed to list R2 objects: ${response.statusText}`);
@@ -484,10 +495,10 @@ export class HubConnectionManager {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+          ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
         },
         body: JSON.stringify({ tableName }),
-        signal: AbortSignal.timeout(this.config.timeout)
+        signal: AbortSignal.timeout(this.config.timeout),
       });
 
       return response.ok;
@@ -510,18 +521,18 @@ export class HubConnectionManager {
           statistics: fire22Language.getStatistics(),
           metadata: {
             lastUpdated: new Date().toISOString(),
-            version: '1.0.0'
-          }
+            version: '1.0.0',
+          },
         };
 
         const response = await fetch(`${this.config.baseUrl}/api/language/sync`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+            ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
           },
           body: JSON.stringify(languageData),
-          signal: AbortSignal.timeout(this.config.timeout)
+          signal: AbortSignal.timeout(this.config.timeout),
         });
 
         return response.ok;
@@ -531,9 +542,9 @@ export class HubConnectionManager {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+            ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
           },
-          signal: AbortSignal.timeout(this.config.timeout)
+          signal: AbortSignal.timeout(this.config.timeout),
         });
 
         if (response.ok) {
@@ -541,7 +552,7 @@ export class HubConnectionManager {
           // Update local language manager with hub data
           if (hubLanguageData.translations) {
             fire22Language.importTranslations(
-              JSON.stringify(hubLanguageData.translations), 
+              JSON.stringify(hubLanguageData.translations),
               fire22Language.getCurrentLanguage()
             );
           }
@@ -566,8 +577,7 @@ export class HubConnectionManager {
    * Get connected services count
    */
   getConnectedServicesCount(): number {
-    return Array.from(this.connections.values())
-      .filter(conn => conn.status === 'connected').length;
+    return Array.from(this.connections.values()).filter(conn => conn.status === 'connected').length;
   }
 
   /**
@@ -581,7 +591,7 @@ export class HubConnectionManager {
   }> {
     const results = await this.connectToHub();
     const serviceStatus: Record<string, boolean> = {};
-    
+
     results.connections.forEach(conn => {
       serviceStatus[conn.name] = conn.status === 'connected';
     });
@@ -590,7 +600,7 @@ export class HubConnectionManager {
       hub: results.success,
       services: serviceStatus,
       totalConnected: this.getConnectedServicesCount(),
-      totalServices: this.connections.size
+      totalServices: this.connections.size,
     };
   }
 
@@ -613,9 +623,9 @@ export class HubConnectionManager {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+          ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
         },
-        signal: AbortSignal.timeout(this.config.timeout)
+        signal: AbortSignal.timeout(this.config.timeout),
       });
 
       if (!response.ok) {
@@ -629,8 +639,8 @@ export class HubConnectionManager {
         features: status.features || {},
         health: {
           timestamp: status.timestamp,
-          status: status.status
-        }
+          status: status.status,
+        },
       };
     } catch (error) {
       console.error('Failed to get Telegram status:', error);
@@ -641,8 +651,8 @@ export class HubConnectionManager {
         health: {
           timestamp: new Date().toISOString(),
           status: 'error',
-          error: error instanceof Error ? error.message : 'Unknown error'
-        }
+          error: error instanceof Error ? error.message : 'Unknown error',
+        },
       };
     }
   }
@@ -666,9 +676,9 @@ export class HubConnectionManager {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+          ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
         },
-        signal: AbortSignal.timeout(this.config.timeout)
+        signal: AbortSignal.timeout(this.config.timeout),
       });
 
       if (!response.ok) {
@@ -682,8 +692,8 @@ export class HubConnectionManager {
         tracking: status.data?.tracking || {},
         health: {
           timestamp: status.data?.timestamp,
-          status: status.success ? 'healthy' : 'degraded'
-        }
+          status: status.success ? 'healthy' : 'degraded',
+        },
       };
     } catch (error) {
       console.error('Failed to get Error System status:', error);
@@ -695,8 +705,8 @@ export class HubConnectionManager {
         health: {
           timestamp: new Date().toISOString(),
           status: 'error',
-          error: error instanceof Error ? error.message : 'Unknown error'
-        }
+          error: error instanceof Error ? error.message : 'Unknown error',
+        },
       };
     }
   }
@@ -715,10 +725,10 @@ export class HubConnectionManager {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+          ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
         },
         body: JSON.stringify({ context: context || {} }),
-        signal: AbortSignal.timeout(this.config.timeout)
+        signal: AbortSignal.timeout(this.config.timeout),
       });
 
       if (response.ok) {
@@ -759,9 +769,9 @@ export class HubConnectionManager {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+          ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
         },
-        signal: AbortSignal.timeout(this.config.timeout)
+        signal: AbortSignal.timeout(this.config.timeout),
       });
 
       if (!response.ok) {
@@ -780,26 +790,30 @@ export class HubConnectionManager {
   /**
    * Send notification via Telegram bot
    */
-  async sendTelegramNotification(userId: number, message: string, options?: {
-    type?: string;
-    priority?: string;
-    data?: any;
-  }): Promise<boolean> {
+  async sendTelegramNotification(
+    userId: number,
+    message: string,
+    options?: {
+      type?: string;
+      priority?: string;
+      data?: any;
+    }
+  ): Promise<boolean> {
     try {
       const response = await fetch(`${this.config.baseUrl}/api/hub/telegram/notify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+          ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
         },
         body: JSON.stringify({
           userId,
           message,
           type: options?.type || 'info',
           priority: options?.priority || 'normal',
-          data: options?.data || {}
+          data: options?.data || {},
         }),
-        signal: AbortSignal.timeout(this.config.timeout)
+        signal: AbortSignal.timeout(this.config.timeout),
       });
 
       if (!response.ok) {
@@ -822,8 +836,10 @@ export const hubConnection = new HubConnectionManager();
 // Auto-initialize connection on import
 if (typeof window === 'undefined') {
   // Server-side initialization
-  hubConnection.connectToHub().then(result => {
-  }).catch(error => {
-    console.error('🚨 Hub connection failed:', error.message);
-  });
+  hubConnection
+    .connectToHub()
+    .then(result => {})
+    .catch(error => {
+      console.error('🚨 Hub connection failed:', error.message);
+    });
 }

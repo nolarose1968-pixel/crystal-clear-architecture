@@ -108,7 +108,7 @@ export class AuthService extends BaseService {
         email: user.email,
         name: user.name,
         role: user.role,
-        permissions: await this.getUserPermissions(user.role)
+        permissions: await this.getUserPermissions(user.role),
       };
     } catch (error) {
       console.error('Token verification failed:', error);
@@ -184,7 +184,7 @@ export class AuthService extends BaseService {
     const rolePermissions: Record<string, string[]> = {
       admin: ['read', 'write', 'delete', 'admin'],
       moderator: ['read', 'write', 'moderate'],
-      user: ['read', 'write']
+      user: ['read', 'write'],
     };
 
     return rolePermissions[role] || ['read'];
@@ -202,7 +202,7 @@ export class AuthService extends BaseService {
       email: user.email,
       role: user.role,
       issuedAt: new Date(),
-      expiresAt
+      expiresAt,
     };
 
     const token = btoa(JSON.stringify(payload)); // Simplified encoding
@@ -210,7 +210,7 @@ export class AuthService extends BaseService {
     return {
       token,
       expiresAt,
-      userId: user.id
+      userId: user.id,
     };
   }
 
@@ -252,22 +252,21 @@ export class AuthService extends BaseService {
       token: token.token,
       userId,
       expiresAt: token.expiresAt,
-      createdAt: new Date()
+      createdAt: new Date(),
     });
   }
 
   private async isTokenBlacklisted(token: string): Promise<boolean> {
-    const result = await this.db.query(
-      'SELECT id FROM blacklisted_tokens WHERE token = ?',
-      [token]
-    );
+    const result = await this.db.query('SELECT id FROM blacklisted_tokens WHERE token = ?', [
+      token,
+    ]);
     return result.length > 0;
   }
 
   private async blacklistToken(token: string): Promise<void> {
     await this.db.insert('blacklisted_tokens', {
       token,
-      blacklistedAt: new Date()
+      blacklistedAt: new Date(),
     });
   }
 

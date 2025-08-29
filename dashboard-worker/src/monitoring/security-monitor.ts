@@ -24,11 +24,11 @@ export class SecurityMonitor {
 
     const enrichedEvent = {
       ...event,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this.securityEvents.push(enrichedEvent);
-    
+
     // Check for suspicious activity
     if (event.severity === 'high' || event.type === 'security') {
       this.suspiciousActivityCount++;
@@ -46,7 +46,7 @@ export class SecurityMonitor {
    */
   getSecurityEvents(hours: number = 24): SecurityEvent[] {
     const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
-    
+
     return this.securityEvents.filter(event => event.timestamp >= cutoff);
   }
 
@@ -69,7 +69,7 @@ export class SecurityMonitor {
     recommendations: string[];
   }> {
     const events = this.getSecurityEvents();
-    
+
     const summary = {
       totalEvents: events.length,
       highSeverity: events.filter(e => e.severity === 'high').length,
@@ -78,7 +78,7 @@ export class SecurityMonitor {
       suspiciousActivity: this.suspiciousActivityCount,
       authenticationEvents: events.filter(e => e.type === 'authentication').length,
       authorizationEvents: events.filter(e => e.type === 'authorization').length,
-      validationEvents: events.filter(e => e.type === 'validation').length
+      validationEvents: events.filter(e => e.type === 'validation').length,
     };
 
     const recommendations = this.generateRecommendations(summary);
@@ -86,7 +86,7 @@ export class SecurityMonitor {
     return {
       events,
       summary,
-      recommendations
+      recommendations,
     };
   }
 
@@ -98,9 +98,9 @@ export class SecurityMonitor {
       this.triggerAlert('SUSPICIOUS_ACTIVITY_DETECTED', {
         count: this.suspiciousActivityCount,
         threshold: this.config.suspiciousActivityThreshold,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-      
+
       // Reset counter after alert
       this.suspiciousActivityCount = 0;
     }
@@ -115,7 +115,7 @@ export class SecurityMonitor {
     // In a real implementation, this would send alerts to various services
     // For now, we'll just log to console
     console.warn(`Security Alert [${type}]:`, details);
-    
+
     // Could integrate with:
     // - Email notifications
     // - Slack/webhook alerts
@@ -127,8 +127,10 @@ export class SecurityMonitor {
    * Cleans up old events based on retention policy
    */
   private cleanupOldEvents(): void {
-    const cutoff = new Date(Date.now() - this.config.securityEventRetention * 24 * 60 * 60 * 1000).toISOString();
-    
+    const cutoff = new Date(
+      Date.now() - this.config.securityEventRetention * 24 * 60 * 60 * 1000
+    ).toISOString();
+
     this.securityEvents = this.securityEvents.filter(event => event.timestamp >= cutoff);
   }
 
@@ -145,7 +147,9 @@ export class SecurityMonitor {
     }
 
     if (summary.suspiciousActivity > this.config.suspiciousActivityThreshold * 0.8) {
-      recommendations.push('Monitor for potential brute force attacks or suspicious activity patterns');
+      recommendations.push(
+        'Monitor for potential brute force attacks or suspicious activity patterns'
+      );
     }
 
     if (summary.authenticationEvents > 100) {
@@ -190,7 +194,7 @@ export class SecurityMonitor {
       totalEvents: this.securityEvents.length,
       suspiciousActivity: this.suspiciousActivityCount,
       lastReset: new Date(this.lastActivityReset).toISOString(),
-      retentionPeriod: this.config.securityEventRetention
+      retentionPeriod: this.config.securityEventRetention,
     };
   }
 }
@@ -219,11 +223,11 @@ export class SecurityMiddleware {
         details: {
           validationType: 'csrf',
           providedToken: token,
-          expectedToken: expectedToken
+          expectedToken: expectedToken,
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-      
+
       throw new Error('Invalid CSRF token');
     }
   }
@@ -251,12 +255,12 @@ export class SecurityMiddleware {
           userId,
           requestCount,
           maxRequests,
-          timeWindow
+          timeWindow,
         },
         userId,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-      
+
       throw new Error('Rate limit exceeded');
     }
   }
@@ -272,8 +276,9 @@ export class SecurityMiddleware {
       email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
       username: /^[a-zA-Z0-9_]{3,20}$/,
       password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/,
-      sqlInjection: /(union|select|insert|update|delete|drop|create|alter|exec|execute|truncate|declare)\s/i,
-      xss: /<script|javascript:|onload=|onerror=|alert\(|eval\(/i
+      sqlInjection:
+        /(union|select|insert|update|delete|drop|create|alter|exec|execute|truncate|declare)\s/i,
+      xss: /<script|javascript:|onload=|onerror=|alert\(|eval\(/i,
     };
 
     // Check for SQL injection
@@ -284,11 +289,11 @@ export class SecurityMiddleware {
         details: {
           violationType: 'sql_injection_attempt',
           inputType,
-          input: input.substring(0, 100) + '...' // Truncate for security
+          input: input.substring(0, 100) + '...', // Truncate for security
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-      
+
       throw new Error('Invalid input: Potential SQL injection detected');
     }
 
@@ -300,11 +305,11 @@ export class SecurityMiddleware {
         details: {
           violationType: 'xss_attempt',
           inputType,
-          input: input.substring(0, 100) + '...' // Truncate for security
+          input: input.substring(0, 100) + '...', // Truncate for security
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-      
+
       throw new Error('Invalid input: Potential XSS attack detected');
     }
 
@@ -316,11 +321,11 @@ export class SecurityMiddleware {
         details: {
           validationType: inputType,
           input,
-          pattern: patterns[inputType].toString()
+          pattern: patterns[inputType].toString(),
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-      
+
       throw new Error(`Invalid ${inputType} format`);
     }
   }
@@ -341,10 +346,10 @@ export class SecurityMiddleware {
       severity: success ? 'low' : 'medium',
       details: {
         success,
-        ...details
+        ...details,
       },
       userId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -367,10 +372,10 @@ export class SecurityMiddleware {
       details: {
         success,
         resource,
-        action
+        action,
       },
       userId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 }
@@ -451,7 +456,7 @@ export class SecurityUtils {
         const mask = parseInt(prefixLength);
         const ipNum = this.ipToNumber(ip);
         const networkNum = this.ipToNumber(network);
-        const maskNum = (0xFFFFFFFF << (32 - mask)) >>> 0;
+        const maskNum = (0xffffffff << (32 - mask)) >>> 0;
         return (ipNum & maskNum) === (networkNum & maskNum);
       } else {
         // Exact match

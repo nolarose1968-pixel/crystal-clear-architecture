@@ -7,7 +7,10 @@
 
 import { createSuccessResponse, createErrorResponse } from '../errors/middleware';
 import { RetryUtils } from '../errors/RetryUtils';
-import { CustomerRepository, CustomerSearchOptions } from '../repositories/fire22/customer-repository';
+import {
+  CustomerRepository,
+  CustomerSearchOptions,
+} from '../repositories/fire22/customer-repository';
 import { AgentRepository, AgentSearchOptions } from '../repositories/fire22/agent-repository';
 
 export interface SearchRequest {
@@ -66,7 +69,7 @@ export class SearchAPI {
    */
   async handleSearch(request: Request): Promise<Response> {
     try {
-      const body = await request.json() as SearchRequest;
+      const body = (await request.json()) as SearchRequest;
       const { query, type = 'all', filters, limit = 10, sortBy, sortOrder } = body;
 
       if (!query || query.trim().length < 2) {
@@ -98,11 +101,10 @@ export class SearchAPI {
         results,
         totalCount: results.length,
         searchTime: Date.now() - startTime,
-        query
+        query,
       };
 
       return createSuccessResponse(response);
-
     } catch (error) {
       console.error('Search API error:', error);
       return createErrorResponse('Search failed: ' + error.message, 500);
@@ -114,7 +116,7 @@ export class SearchAPI {
    */
   async handleCustomerSearch(request: Request): Promise<Response> {
     try {
-      const body = await request.json() as SearchRequest;
+      const body = (await request.json()) as SearchRequest;
       const { query, filters, limit = 10 } = body;
 
       if (!query || query.trim().length < 2) {
@@ -129,11 +131,10 @@ export class SearchAPI {
         results,
         totalCount: results.length,
         searchTime: Date.now() - startTime,
-        query
+        query,
       };
 
       return createSuccessResponse(response);
-
     } catch (error) {
       console.error('Customer search error:', error);
       return createErrorResponse('Customer search failed: ' + error.message, 500);
@@ -145,7 +146,7 @@ export class SearchAPI {
    */
   async handleAgentSearch(request: Request): Promise<Response> {
     try {
-      const body = await request.json() as SearchRequest;
+      const body = (await request.json()) as SearchRequest;
       const { query, filters, limit = 10 } = body;
 
       if (!query || query.trim().length < 2) {
@@ -160,11 +161,10 @@ export class SearchAPI {
         results,
         totalCount: results.length,
         searchTime: Date.now() - startTime,
-        query
+        query,
       };
 
       return createSuccessResponse(response);
-
     } catch (error) {
       console.error('Agent search error:', error);
       return createErrorResponse('Agent search failed: ' + error.message, 500);
@@ -182,7 +182,7 @@ export class SearchAPI {
         searchFields: ['customer_id', 'name', 'phone'],
         limit,
         sortBy: 'name',
-        sortOrder: 'asc'
+        sortOrder: 'asc',
       };
 
       // Apply additional filters
@@ -214,9 +214,8 @@ export class SearchAPI {
         lastActivity: customer.last_login || customer.last_ticket,
         riskLevel: customer.risk_level,
         matchScore: this.calculateMatchScore(query, customer),
-        highlightedFields: this.highlightMatches(query, customer)
+        highlightedFields: this.highlightMatches(query, customer),
       }));
-
     } catch (error) {
       console.error('Customer search error:', error);
       return [];
@@ -234,7 +233,7 @@ export class SearchAPI {
         searchFields: ['agent_id', 'agent_name'],
         limit,
         sortBy: 'agent_name',
-        sortOrder: 'asc'
+        sortOrder: 'asc',
       };
 
       // Apply additional filters
@@ -258,9 +257,8 @@ export class SearchAPI {
         tier: agent.agent_type,
         lastActivity: agent.last_login_at,
         matchScore: this.calculateMatchScore(query, agent),
-        highlightedFields: this.highlightMatches(query, agent)
+        highlightedFields: this.highlightMatches(query, agent),
       }));
-
     } catch (error) {
       console.error('Agent search error:', error);
       return [];
@@ -283,7 +281,8 @@ export class SearchAPI {
 
     // Recent activity bonus
     if (item.lastActivity || item.last_login_at || item.last_login || item.last_ticket) {
-      const lastActivity = item.lastActivity || item.last_login_at || item.last_login || item.last_ticket;
+      const lastActivity =
+        item.lastActivity || item.last_login_at || item.last_login || item.last_ticket;
       if (lastActivity) {
         const daysSinceActivity = Math.floor(
           (Date.now() - new Date(lastActivity).getTime()) / (1000 * 60 * 60 * 24)
@@ -303,10 +302,7 @@ export class SearchAPI {
     Object.keys(item).forEach(key => {
       const value = String(item[key] || '');
       if (value.toLowerCase().includes(queryLower)) {
-        highlighted[key] = value.replace(
-          new RegExp(`(${query})`, 'gi'),
-          '<mark>$1</mark>'
-        );
+        highlighted[key] = value.replace(new RegExp(`(${query})`, 'gi'), '<mark>$1</mark>');
       }
     });
 

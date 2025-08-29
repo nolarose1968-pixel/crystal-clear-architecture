@@ -54,35 +54,38 @@ auto = false
 ```typescript
 // Store private registry credentials securely
 await secrets.set({
-  service: "fire22-registry",
-  name: "auth-token",
-  value: process.env.FIRE22_REGISTRY_TOKEN
+  service: 'fire22-registry',
+  name: 'auth-token',
+  value: process.env.FIRE22_REGISTRY_TOKEN,
 });
 
 // Automatically used during package installation
 const token = await secrets.get({
-  service: "fire22-registry",
-  name: "auth-token"
+  service: 'fire22-registry',
+  name: 'auth-token',
 });
 ```
 
 ## 🛡️ Security Policies by Scope
 
-### @fire22/* (Internal Packages)
+### @fire22/\* (Internal Packages)
+
 - **Trust Level**: Automatic
 - **Scanning**: Skip (pre-vetted)
 - **Registry**: Private (https://fire22.workers.dev/registry)
 - **Updates**: Workspace-controlled
 - **Authentication**: Bearer token via Bun.secrets
 
-### @types/* (TypeScript Definitions)
+### @types/\* (TypeScript Definitions)
+
 - **Trust Level**: High
 - **Scanning**: Minimal (definition files only)
 - **Registry**: Public npm
 - **Updates**: Auto-patch for security
 - **Special**: No executable code
 
-### @cloudflare/* (Platform Integration)
+### @cloudflare/\* (Platform Integration)
+
 - **Trust Level**: High
 - **Scanning**: Standard
 - **Registry**: Public npm
@@ -90,6 +93,7 @@ const token = await secrets.get({
 - **Special**: Workers runtime compatibility
 
 ### Other Scoped Packages
+
 - **Trust Level**: Verify
 - **Scanning**: Full security scan
 - **Registry**: Public npm
@@ -97,6 +101,7 @@ const token = await secrets.get({
 - **Special**: Enhanced typosquatting detection
 
 ### Unscoped Packages
+
 - **Trust Level**: Verify
 - **Scanning**: Comprehensive + policy checks
 - **Registry**: Public npm
@@ -108,6 +113,7 @@ const token = await secrets.get({
 The security scanner automatically detects potential scope squatting attempts:
 
 ### Detection Patterns
+
 - **Hyphenation**: `@fire-22/*` instead of `@fire22/*`
 - **Suffixes**: `@fire22js/*`, `@fire22io/*`
 - **Character Substitution**: `@f1re22/*`, `@fir322/*`
@@ -115,6 +121,7 @@ The security scanner automatically detects potential scope squatting attempts:
 - **Leetspeak**: `@f1r322/*`
 
 ### Protection Measures
+
 ```typescript
 // Automatic detection during installation
 if (isScopeSquat(packageScope, '@fire22')) {
@@ -127,7 +134,8 @@ if (isScopeSquat(packageScope, '@fire22')) {
 
 ## 🏗️ Workspace Protocol Security
 
-### workspace:* Protocol
+### workspace:\* Protocol
+
 ```json
 {
   "dependencies": {
@@ -138,6 +146,7 @@ if (isScopeSquat(packageScope, '@fire22')) {
 ```
 
 ### Security Benefits
+
 - **No Network**: Packages never leave local system
 - **Zero Supply Chain Risk**: No external dependencies
 - **Version Locking**: Precise workspace version control
@@ -147,12 +156,14 @@ if (isScopeSquat(packageScope, '@fire22')) {
 ## 🌐 Private Registry Integration
 
 ### Fire22 Private Registry
+
 - **URL**: https://fire22.workers.dev/registry
-- **Scope**: @fire22/*
+- **Scope**: @fire22/\*
 - **Authentication**: Bearer token (Bun.secrets)
 - **Fallback**: Disabled (no public registry fallback)
 
 ### Security Features
+
 - **Package Signing**: All packages cryptographically signed
 - **Version Pinning**: Exact versions enforced
 - **Audit Trail**: Complete installation history
@@ -161,18 +172,19 @@ if (isScopeSquat(packageScope, '@fire22')) {
 
 ## 📊 Security Scanning Matrix
 
-| Scope | Trust | Scan Level | Registry | Auto-Update | Example |
-|-------|-------|------------|----------|-------------|---------|
-| @fire22/* | Auto | None | Private | No | @fire22/core |
-| @types/* | High | Minimal | Public | Patch | @types/node |
-| @cloudflare/* | High | Standard | Public | No | @cloudflare/workers-types |
-| @aws-sdk/* | Medium | Full | Public | No | @aws-sdk/client-s3 |
-| @* (other) | Low | Full | Public | No | @unknown/package |
-| unscoped | Low | Comprehensive | Public | No | express |
+| Scope          | Trust  | Scan Level    | Registry | Auto-Update | Example                   |
+| -------------- | ------ | ------------- | -------- | ----------- | ------------------------- |
+| @fire22/\*     | Auto   | None          | Private  | No          | @fire22/core              |
+| @types/\*      | High   | Minimal       | Public   | Patch       | @types/node               |
+| @cloudflare/\* | High   | Standard      | Public   | No          | @cloudflare/workers-types |
+| @aws-sdk/\*    | Medium | Full          | Public   | No          | @aws-sdk/client-s3        |
+| @\* (other)    | Low    | Full          | Public   | No          | @unknown/package          |
+| unscoped       | Low    | Comprehensive | Public   | No          | express                   |
 
 ## 🚀 Implementation Examples
 
 ### Secure Package Installation
+
 ```bash
 # Automatically scans based on scope
 bun add @fire22/core        # Skip scan (trusted)
@@ -182,6 +194,7 @@ bun add malicious-package   # Blocked by scanner
 ```
 
 ### Workspace Configuration
+
 ```typescript
 // workspace-config.json
 {
@@ -198,6 +211,7 @@ bun add malicious-package   # Blocked by scanner
 ```
 
 ### CI/CD Integration
+
 ```yaml
 # GitHub Actions Example
 - name: Security Scan
@@ -205,10 +219,10 @@ bun add malicious-package   # Blocked by scanner
     # Configure scanner
     echo '[install.security]' > bunfig.toml
     echo 'scanner = "@fire22/security-scanner"' >> bunfig.toml
-    
+
     # Install with security scanning
     bun install --frozen-lockfile
-    
+
     # Scanner automatically:
     # - Trusts @fire22/* packages
     # - Verifies other scoped packages
@@ -218,13 +232,15 @@ bun add malicious-package   # Blocked by scanner
 ## 🔐 Best Practices
 
 ### For Fire22 Development
+
 1. **Always use @fire22/ scope** for internal packages
 2. **Configure private registry** in bunfig.toml
 3. **Store registry tokens** in Bun.secrets
-4. **Use workspace:*** protocol for local packages
+4. **Use workspace:\*** protocol for local packages
 5. **Enable security scanner** in production
 
 ### For External Dependencies
+
 1. **Prefer scoped packages** from trusted organizations
 2. **Verify scope ownership** before installation
 3. **Review security advisories** for all packages
@@ -232,7 +248,8 @@ bun add malicious-package   # Blocked by scanner
 5. **Regular security audits** with `bun audit`
 
 ### For Package Publishing
-1. **Publish to private registry** for @fire22/* packages
+
+1. **Publish to private registry** for @fire22/\* packages
 2. **Sign packages** with GPG keys
 3. **Include integrity hashes** in package.json
 4. **Document security policies** in README
@@ -261,7 +278,7 @@ bun run workspace:security
 
 Fire22's scoped package security provides:
 
-- **Automatic trust** for @fire22/* internal packages
+- **Automatic trust** for @fire22/\* internal packages
 - **Private registry** integration with secure authentication
 - **Scope squatting** detection and prevention
 - **Granular policies** per package scope
@@ -269,4 +286,5 @@ Fire22's scoped package security provides:
 - **Zero-trust model** for external packages
 - **Enterprise-grade** threat detection
 
-This multi-layered approach ensures maximum security while maintaining developer productivity in the Fire22 workspace ecosystem.
+This multi-layered approach ensures maximum security while maintaining developer
+productivity in the Fire22 workspace ecosystem.

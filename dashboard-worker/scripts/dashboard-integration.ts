@@ -2,7 +2,7 @@
 
 /**
  * Fire22 Dashboard Integration Script
- * 
+ *
  * This script demonstrates how to integrate the build automation dashboard
  * with the actual build system for real-time monitoring and control.
  */
@@ -46,7 +46,7 @@ class DashboardIntegration {
     progress: 0,
     currentStep: '',
     startTime: null,
-    steps: []
+    steps: [],
   };
 
   constructor() {
@@ -62,7 +62,7 @@ class DashboardIntegration {
       { name: 'Documentation Generation', status: 'pending' },
       { name: 'Quality Checks', status: 'pending' },
       { name: 'Final Assembly', status: 'pending' },
-      { name: 'Build Complete', status: 'pending' }
+      { name: 'Build Complete', status: 'pending' },
     ];
   }
 
@@ -75,22 +75,22 @@ class DashboardIntegration {
 
     try {
       const entries = await readdir(packagesDir, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         if (entry.isDirectory()) {
           const packagePath = join(packagesDir, entry.name);
           const packageJsonPath = join(packagePath, 'package.json');
-          
+
           try {
             // Use Bun.file() for cleaner JSON reading
             const packageJson = await Bun.file(packageJsonPath).json();
             const stats = await stat(packagePath);
-            
+
             // Check if package has been built (look for dist directory)
             const distPath = join(packagePath, 'dist');
             let status: 'built' | 'building' | 'pending' | 'error' = 'pending';
             let lastBuilt = 'Never';
-            
+
             try {
               const distStats = await stat(distPath);
               if (distStats.isDirectory()) {
@@ -108,7 +108,7 @@ class DashboardIntegration {
               size: this.formatBytes(stats.size),
               lastBuilt,
               dependencies: Object.keys(packageJson.dependencies || {}).length,
-              path: packagePath
+              path: packagePath,
             });
           } catch (error) {
             console.error(`Error reading package ${entry.name}:`, error);
@@ -142,7 +142,7 @@ class DashboardIntegration {
     this.buildStatus.progress = 0;
     this.buildStatus.startTime = new Date();
     this.buildStatus.currentStep = 'Starting build...';
-    
+
     // Reset step statuses
     this.buildStatus.steps.forEach(step => {
       step.status = 'pending';
@@ -184,18 +184,18 @@ class DashboardIntegration {
       const step = this.buildStatus.steps[i];
       step.status = 'running';
       this.buildStatus.currentStep = step.name;
-      
+
       const startTime = Date.now();
-      
+
       try {
         await this.executeBuildStep(step.name);
-        
+
         step.status = 'completed';
         step.duration = Date.now() - startTime;
         step.output = `${step.name} completed successfully`;
-        
+
         this.buildStatus.progress = ((i + 1) / this.buildStatus.steps.length) * 100;
-        
+
         // Add delay to simulate real build time
         await this.delay(1000);
       } catch (error) {
@@ -212,21 +212,21 @@ class DashboardIntegration {
    */
   private async runQuickBuild(): Promise<void> {
     const quickSteps = ['Pre-build Validation', 'Package Building', 'Final Assembly'];
-    
+
     for (const stepName of quickSteps) {
       const step = this.buildStatus.steps.find(s => s.name === stepName)!;
       step.status = 'running';
       this.buildStatus.currentStep = step.name;
-      
+
       const startTime = Date.now();
-      
+
       try {
         await this.executeBuildStep(step.name);
-        
+
         step.status = 'completed';
         step.duration = Date.now() - startTime;
         step.output = `${step.name} completed successfully`;
-        
+
         this.buildStatus.progress += 33.33;
         await this.delay(500);
       } catch (error) {
@@ -245,16 +245,16 @@ class DashboardIntegration {
     const step = this.buildStatus.steps.find(s => s.name === 'Package Building')!;
     step.status = 'running';
     this.buildStatus.currentStep = step.name;
-    
+
     const startTime = Date.now();
-    
+
     try {
       await this.executeBuildStep('Package Building');
-      
+
       step.status = 'completed';
       step.duration = Date.now() - startTime;
       step.output = 'Package building completed successfully';
-      
+
       this.buildStatus.progress = 100;
     } catch (error) {
       step.status = 'failed';
@@ -271,16 +271,16 @@ class DashboardIntegration {
     const step = this.buildStatus.steps.find(s => s.name === 'Documentation Generation')!;
     step.status = 'running';
     this.buildStatus.currentStep = step.name;
-    
+
     const startTime = Date.now();
-    
+
     try {
       await this.executeBuildStep('Documentation Generation');
-      
+
       step.status = 'completed';
       step.duration = Date.now() - startTime;
       step.output = 'Documentation generation completed successfully';
-      
+
       this.buildStatus.progress = 100;
     } catch (error) {
       step.status = 'failed';
@@ -370,7 +370,7 @@ class DashboardIntegration {
       for (const pkg of this.packages) {
         const packagePath = pkg.path;
         console.log(`Building package: ${pkg.name}`);
-        
+
         // Change to package directory and build
         process.chdir(packagePath);
         await $`bun run build`;
@@ -436,7 +436,7 @@ class DashboardIntegration {
     if (this.buildStatus.isRunning) {
       this.buildStatus.isRunning = false;
       this.buildStatus.currentStep = 'Build stopped by user';
-      
+
       const runningStep = this.buildStatus.steps.find(step => step.status === 'running');
       if (runningStep) {
         runningStep.status = 'failed';
@@ -461,7 +461,7 @@ class DashboardIntegration {
       building: buildingPackages,
       pending: pendingPackages,
       error: errorPackages,
-      successRate: totalPackages > 0 ? (builtPackages / totalPackages) * 100 : 0
+      successRate: totalPackages > 0 ? (builtPackages / totalPackages) * 100 : 0,
     };
   }
 
@@ -490,7 +490,7 @@ class DashboardIntegration {
   private formatTimeAgo(date: Date): string {
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-    
+
     if (diffInSeconds < 60) return 'Just now';
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
@@ -511,19 +511,19 @@ export { DashboardIntegration, PackageInfo, BuildStatus, BuildStep };
 // CLI interface for testing
 if (import.meta.main) {
   const integration = new DashboardIntegration();
-  
+
   console.log('🔥 Fire22 Dashboard Integration Script');
-  console.log('=====================================\n');
-  
+  console.log('!==!==!==!==!==!==!==\n');
+
   // Scan packages
   console.log('Scanning packages...');
   const packages = await integration.scanPackages();
   console.log(`Found ${packages.length} packages:\n`);
-  
+
   packages.forEach(pkg => {
     console.log(`  ${pkg.name}@${pkg.version} - ${pkg.status} (${pkg.size})`);
   });
-  
+
   console.log('\nPackage Statistics:');
   const stats = integration.getPackageStatistics();
   console.log(`  Total: ${stats.total}`);
@@ -532,7 +532,7 @@ if (import.meta.main) {
   console.log(`  Pending: ${stats.pending}`);
   console.log(`  Error: ${stats.error}`);
   console.log(`  Success Rate: ${stats.successRate.toFixed(1)}%`);
-  
+
   console.log('\nTo integrate with the dashboard:');
   console.log('1. Import this class in your dashboard JavaScript');
   console.log('2. Replace simulation calls with real integration methods');

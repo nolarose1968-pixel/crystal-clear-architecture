@@ -4,11 +4,7 @@
  */
 
 import { Fantasy402Auth } from '../../fantasy402-auth';
-import type {
-  AgentPermissions,
-  AgentAccountInfo,
-  DetailedAccountInfo
-} from '../types';
+import type { AgentPermissions, AgentAccountInfo, DetailedAccountInfo } from '../types';
 
 export class Fantasy402AgentClientCore {
   private auth: Fantasy402Auth;
@@ -40,7 +36,6 @@ export class Fantasy402AgentClientCore {
       this.isInitialized = true;
       console.log('✅ Fantasy402 Agent Client initialized successfully');
       return true;
-
     } catch (error) {
       console.error('❌ Failed to initialize Fantasy402 Agent Client:', error);
       return false;
@@ -52,7 +47,11 @@ export class Fantasy402AgentClientCore {
    */
   private async fetchAuthorizations(): Promise<void> {
     try {
-      const response = await this.auth.makeAuthenticatedRequest('/agent/authorizations', 'POST', {});
+      const response = await this.auth.makeAuthenticatedRequest(
+        '/agent/authorizations',
+        'POST',
+        {}
+      );
 
       if (response.success) {
         this.permissions = {
@@ -65,7 +64,7 @@ export class Fantasy402AgentClientCore {
           canDeleteBets: response.data.canDeleteBets || false,
           canViewReports: response.data.canViewReports || false,
           canAccessBilling: response.data.canAccessBilling || false,
-          rawPermissions: response.data
+          rawPermissions: response.data,
         };
 
         // Get account info
@@ -95,7 +94,7 @@ export class Fantasy402AgentClientCore {
           office: response.data.office || '',
           store: response.data.store || '',
           active: response.data.active || false,
-          agentType: response.data.agentType || ''
+          agentType: response.data.agentType || '',
         };
       } else {
         throw new Error('Failed to get account info');
@@ -111,7 +110,11 @@ export class Fantasy402AgentClientCore {
    */
   async getAccountInfoOwner(): Promise<DetailedAccountInfo> {
     try {
-      const response = await this.auth.makeAuthenticatedRequest('/agent/account-info-owner', 'POST', {});
+      const response = await this.auth.makeAuthenticatedRequest(
+        '/agent/account-info-owner',
+        'POST',
+        {}
+      );
 
       if (response.success) {
         return {
@@ -149,7 +152,7 @@ export class Fantasy402AgentClientCore {
           winPercentage: response.data.winPercentage || 0,
           parentAgentID: response.data.parentAgentID || '',
           masterAgentID: response.data.masterAgentID || '',
-          subAgentsCount: response.data.subAgentsCount || 0
+          subAgentsCount: response.data.subAgentsCount || 0,
         };
       } else {
         throw new Error('Failed to get detailed account info');

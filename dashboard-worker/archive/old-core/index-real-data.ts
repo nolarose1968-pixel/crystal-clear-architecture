@@ -111,20 +111,51 @@ async function sql(env: Env, query: string, params: any[] = []) {
 
   if (query.includes('customers')) {
     return [
-      { customer_id: 'DEMO001', username: 'demo_user', agent_id: 'SHOOTS', actual_balance: 100.50, balance: 100.50, transaction_count: 5 },
-      { customer_id: 'DEMO002', username: 'test_user', agent_id: 'SHOOTS', actual_balance: 250.75, balance: 250.75, transaction_count: 12 }
+      {
+        customer_id: 'DEMO001',
+        username: 'demo_user',
+        agent_id: 'SHOOTS',
+        actual_balance: 100.5,
+        balance: 100.5,
+        transaction_count: 5,
+      },
+      {
+        customer_id: 'DEMO002',
+        username: 'test_user',
+        agent_id: 'SHOOTS',
+        actual_balance: 250.75,
+        balance: 250.75,
+        transaction_count: 12,
+      },
     ];
   }
 
   if (query.includes('agents')) {
     return [
-      { AgentID: 'SHOOTS', SeqNumber: 5387, Level: 6, AgentType: 'A', Login: 'SHOOTS', HeadCountRateM: 0, CrashRate: 0 }
+      {
+        AgentID: 'SHOOTS',
+        SeqNumber: 5387,
+        Level: 6,
+        AgentType: 'A',
+        Login: 'SHOOTS',
+        HeadCountRateM: 0,
+        CrashRate: 0,
+      },
     ];
   }
 
   if (query.includes('wagers')) {
     return [
-      { id: 1001, customer_id: 'DEMO001', wager_number: 1001, amount_wagered: 250.00, description: 'Demo Wager', status: 'pending', created_at: new Date().toISOString(), username: 'demo_user' }
+      {
+        id: 1001,
+        customer_id: 'DEMO001',
+        wager_number: 1001,
+        amount_wagered: 250.0,
+        description: 'Demo Wager',
+        status: 'pending',
+        created_at: new Date().toISOString(),
+        username: 'demo_user',
+      },
     ];
   }
 
@@ -137,10 +168,12 @@ class Fire22APIService {
   private baseURL = 'https://fire22.ag/cloud/api/Manager';
   private customerURL = 'https://fire22.ag/cloud/api/Customer';
   // Updated token from your latest request
-  private authToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJCTEFLRVBQSCIsInR5cGUiOjAsImFnIjoiM05PTEFQUEgiLCJpbXAiOiIiLCJvZmYiOiJOT0xBUk9TRSIsInJiIjoiTiIsIm5iZiI6MTc1NjIyNzY2MCwiZXhwIjoxNzU2MjI4OTIwfQ.sjAh_061qTQrgW845QRdfMNHWce4sZ9KL-7sj81uSTc';
+  private authToken =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJCTEFLRVBQSCIsInR5cGUiOjAsImFnIjoiM05PTEFQUEgiLCJpbXAiOiIiLCJvZmYiOiJOT0xBUk9TRSIsInJiIjoiTiIsIm5iZiI6MTc1NjIyNzY2MCwiZXhwIjoxNzU2MjI4OTIwfQ.sjAh_061qTQrgW845QRdfMNHWce4sZ9KL-7sj81uSTc';
 
   // Session cookies from your latest request
-  private sessionCookies = 'PHPSESSID=260jbjghb395ndis4indpkbrla; __cf_bm=3pBtCTR0RSnNycACLULp8hyKp2tzZnESgO66nDql0To-1756227731-1.0.1.1-8YMV7jwrsmV4yMLKaOQyWjQ.fCFulicEPkmjMzeqACkzXdYZS8EGPPCl0B1ySsjY2ETbdZJxjakUH9RN5Cx8_3J_gs7E8x6YNhrZP4qsNAY';
+  private sessionCookies =
+    'PHPSESSID=260jbjghb395ndis4indpkbrla; __cf_bm=3pBtCTR0RSnNycACLULp8hyKp2tzZnESgO66nDql0To-1756227731-1.0.1.1-8YMV7jwrsmV4yMLKaOQyWjQ.fCFulicEPkmjMzeqACkzXdYZS8EGPPCl0B1ySsjY2ETbdZJxjakUH9RN5Cx8_3J_gs7E8x6YNhrZP4qsNAY';
 
   // Advanced caching system
   private cache = new Map<string, CacheEntry<any>>();
@@ -179,9 +212,9 @@ class Fire22APIService {
   private setCache<T>(key: string, data: T, ttl: number = this.defaultTTL): void {
     this.cache.set(key, {
       data,
-      expires: Date.now() + ttl
+      expires: Date.now() + ttl,
     });
-    
+
     // Auto-cleanup expired entries every 30 seconds
     if (!this.cleanupInterval) {
       this.cleanupInterval = setInterval(() => this.cleanup(), 30000);
@@ -207,7 +240,12 @@ class Fire22APIService {
   }
 
   // Enhanced Fire22 API call helper with caching and advanced operations
-  async callFire22API(operation: string, additionalParams: any = {}, useCache: boolean = true, cacheTTL?: number) {
+  async callFire22API(
+    operation: string,
+    additionalParams: any = {},
+    useCache: boolean = true,
+    cacheTTL?: number
+  ) {
     try {
       // Check cache first if enabled
       const cacheKey = this.getCacheKey(operation, additionalParams);
@@ -227,7 +265,7 @@ class Fire22APIService {
         RRO: '1',
         operation: operation,
         token: this.authToken,
-        ...additionalParams
+        ...additionalParams,
       };
 
       // Add operation-specific parameters
@@ -245,19 +283,19 @@ class Fire22APIService {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'Accept': '*/*',
+          Accept: '*/*',
           'Accept-Encoding': 'gzip, deflate, br, zstd',
           'Accept-Language': 'en-US,en;q=0.9,es;q=0.8',
-          'Authorization': `Bearer ${this.authToken}`,
+          Authorization: `Bearer ${this.authToken}`,
           'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive',
+          Connection: 'keep-alive',
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'DNT': '1',
-          'Host': 'fire22.ag',
-          'Origin': 'https://fire22.ag',
-          'Pragma': 'no-cache',
-          'Priority': 'u=1, i',
-          'Referer': `https://fire22.ag/manager.html?v=${Date.now()}`,
+          DNT: '1',
+          Host: 'fire22.ag',
+          Origin: 'https://fire22.ag',
+          Pragma: 'no-cache',
+          Priority: 'u=1, i',
+          Referer: `https://fire22.ag/manager.html?v=${Date.now()}`,
           'Sec-Ch-Ua': '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
           'Sec-Ch-Ua-Mobile': '?0',
           'Sec-Ch-Ua-Platform': '"Windows"',
@@ -265,15 +303,19 @@ class Fire22APIService {
           'Sec-Fetch-Mode': 'cors',
           'Sec-Fetch-Site': 'same-origin',
           'Upgrade-Insecure-Requests': '1',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
           'X-Requested-With': 'XMLHttpRequest',
-          'Cookie': this.sessionCookies
+          Cookie: this.sessionCookies,
         },
-        body: formData
+        body: formData,
       });
 
       console.log(`[DEBUG] Fire22 API Response Status: ${response.status}`);
-      console.log(`[DEBUG] Fire22 API Response Headers:`, Object.fromEntries(response.headers.entries()));
+      console.log(
+        `[DEBUG] Fire22 API Response Headers:`,
+        Object.fromEntries(response.headers.entries())
+      );
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -357,11 +399,13 @@ class Fire22APIService {
           return data.CUSTOMER ? data.CUSTOMER : null;
 
         case 'getTransactions':
-          return data.TRANSACTIONS ? {
-            transactions: data.TRANSACTIONS,
-            total: data.TOTAL || data.TRANSACTIONS.length,
-            page: data.PAGE || 1
-          } : null;
+          return data.TRANSACTIONS
+            ? {
+                transactions: data.TRANSACTIONS,
+                total: data.TOTAL || data.TRANSACTIONS.length,
+                page: data.PAGE || 1,
+              }
+            : null;
 
         case 'getLiveActivity':
           return data.ACTIVITY ? { activities: data.ACTIVITY, count: data.ACTIVITY.length } : null;
@@ -391,8 +435,20 @@ class Fire22APIService {
       // Fallback to mock data
       console.log('Falling back to mock data for customers');
       return [
-        { customer_id: 'DEMO001', name: 'Demo User', agent_id: 'SHOOTS', actual_balance: 100.50, settle_figure: 1000 },
-        { customer_id: 'DEMO002', name: 'Test User', agent_id: 'SHOOTS', actual_balance: 250.75, settle_figure: 5000 }
+        {
+          customer_id: 'DEMO001',
+          name: 'Demo User',
+          agent_id: 'SHOOTS',
+          actual_balance: 100.5,
+          settle_figure: 1000,
+        },
+        {
+          customer_id: 'DEMO002',
+          name: 'Test User',
+          agent_id: 'SHOOTS',
+          actual_balance: 250.75,
+          settle_figure: 5000,
+        },
       ];
     } catch (error) {
       console.error('Error fetching customers:', error);
@@ -415,8 +471,9 @@ class Fire22APIService {
       agent_id: customer.AgentID?.trim() || '',
       agent_login: customer.AgentLogin?.trim() || '',
       master_agent: customer.MasterAgent || '',
-      agent_hierarchy: customer.MasterAgent ?
-        customer.MasterAgent.split(' / ').filter(a => a.trim()) : [],
+      agent_hierarchy: customer.MasterAgent
+        ? customer.MasterAgent.split(' / ').filter(a => a.trim())
+        : [],
       actual_balance: parseFloat(customer.ActualBalance?.toString()) || 0,
       previous_balance: parseFloat(customer.PreviousBalance?.toString()) || 0,
       settle_figure: parseFloat(customer.SettleFigure?.toString()) || 0,
@@ -434,7 +491,7 @@ class Fire22APIService {
       suspected_bot: customer.SuspectedBot === 'Y',
       suspected_bot_type: parseInt(customer.SuspectedBotType?.toString()) || 0,
       zero_balance_flag: customer.ZeroBalanceFlag === 'Y',
-      week_of: customer.WeekOf
+      week_of: customer.WeekOf,
     }));
   }
 
@@ -443,7 +500,7 @@ class Fire22APIService {
     try {
       const fire22Data = await this.callFire22API('getListAgenstByAgent', {
         agentType: 'M',
-        operation: 'getListAgenstByAgent'
+        operation: 'getListAgenstByAgent',
       });
 
       if (fire22Data && fire22Data.agents) {
@@ -454,13 +511,21 @@ class Fire22APIService {
           agent_type: agent.AgentType || '',
           login: agent.Login?.trim() || '',
           head_count_rate: agent.HeadCountRateM || 0,
-          crash_rate: agent.CrashRate || 0
+          crash_rate: agent.CrashRate || 0,
         }));
       }
 
       // Fallback to mock data
       return [
-        { agent_id: 'SHOOTS', seq_number: 5387, level: 6, agent_type: 'A', login: 'SHOOTS', head_count_rate: 0, crash_rate: 0 }
+        {
+          agent_id: 'SHOOTS',
+          seq_number: 5387,
+          level: 6,
+          agent_type: 'A',
+          login: 'SHOOTS',
+          head_count_rate: 0,
+          crash_rate: 0,
+        },
       ];
     } catch (error) {
       console.error('Error fetching agent hierarchy:', error);
@@ -481,13 +546,21 @@ class Fire22APIService {
           amount: parseFloat(wager.Amount?.toString()) || 0,
           description: wager.Description || '',
           status: wager.Status || 'pending',
-          created_at: wager.CreatedAt
+          created_at: wager.CreatedAt,
         }));
       }
 
       // Fallback to mock data
       return [
-        { wager_number: '1001', customer_id: 'DEMO001', agent_id: agentID || 'SHOOTS', amount: 250.00, description: 'Demo Wager', status: 'pending', created_at: new Date().toISOString() }
+        {
+          wager_number: '1001',
+          customer_id: 'DEMO001',
+          agent_id: agentID || 'SHOOTS',
+          amount: 250.0,
+          description: 'Demo Wager',
+          status: 'pending',
+          created_at: new Date().toISOString(),
+        },
       ];
     } catch (error) {
       console.error('Error fetching pending wagers:', error);
@@ -498,7 +571,12 @@ class Fire22APIService {
   // Simplified methods with mock data fallbacks
   async getCustomerDetails(customerID: string) {
     try {
-      const fire22Data = await this.callFire22API('getCustomerDetails', { customerID }, true, 60000);
+      const fire22Data = await this.callFire22API(
+        'getCustomerDetails',
+        { customerID },
+        true,
+        60000
+      );
 
       if (fire22Data) {
         return {
@@ -509,7 +587,7 @@ class Fire22APIService {
           actual_balance: parseFloat(fire22Data.ActualBalance?.toString()) || 0,
           settle_figure: parseFloat(fire22Data.SettleFigure?.toString()) || 0,
           last_ticket: fire22Data.LastTicket,
-          suspected_bot: fire22Data.SuspectedBot === 'Y'
+          suspected_bot: fire22Data.SuspectedBot === 'Y',
         };
       }
 
@@ -519,10 +597,10 @@ class Fire22APIService {
         name: 'Demo Customer',
         phone: '555-0123',
         agent_id: 'SHOOTS',
-        actual_balance: 100.50,
+        actual_balance: 100.5,
         settle_figure: 1000,
         last_ticket: new Date().toISOString(),
-        suspected_bot: false
+        suspected_bot: false,
       };
     } catch (error) {
       console.error('Error fetching customer details:', error);
@@ -532,23 +610,35 @@ class Fire22APIService {
 
   async getCustomerTransactions(customerID: string, page: number = 1, size: number = 20) {
     try {
-      const fire22Data = await this.callFire22API('getTransactions', { customerID, page, size }, true, 30000);
+      const fire22Data = await this.callFire22API(
+        'getTransactions',
+        { customerID, page, size },
+        true,
+        30000
+      );
 
       if (fire22Data && fire22Data.transactions) {
         return {
           transactions: fire22Data.transactions,
           total: fire22Data.total || fire22Data.transactions.length,
-          page: fire22Data.page || page
+          page: fire22Data.page || page,
         };
       }
 
       // Fallback to mock data
       return {
         transactions: [
-          { transaction_id: '1', customer_id: customerID, transaction_type: 'deposit', amount: 100, description: 'Demo deposit', created_at: new Date().toISOString() }
+          {
+            transaction_id: '1',
+            customer_id: customerID,
+            transaction_type: 'deposit',
+            amount: 100,
+            description: 'Demo deposit',
+            created_at: new Date().toISOString(),
+          },
         ],
         total: 1,
-        page
+        page,
       };
     } catch (error) {
       console.error('Error fetching customer transactions:', error);
@@ -566,7 +656,16 @@ class Fire22APIService {
 
       // Fallback to mock data
       return [
-        { activity_id: '1', type: 'wager', customer_id: 'DEMO001', agent_id: 'SHOOTS', amount: 50, description: 'Demo wager', timestamp: new Date().toISOString(), status: 'pending' }
+        {
+          activity_id: '1',
+          type: 'wager',
+          customer_id: 'DEMO001',
+          agent_id: 'SHOOTS',
+          amount: 50,
+          description: 'Demo wager',
+          timestamp: new Date().toISOString(),
+          status: 'pending',
+        },
       ];
     } catch (error) {
       console.error('Error fetching live activity:', error);
@@ -580,12 +679,17 @@ class Fire22APIService {
       const [customers, pending, activity] = await Promise.all([
         this.getRealCustomers(),
         this.getPendingWagers(),
-        this.getLiveActivity(1)
+        this.getLiveActivity(1),
       ]);
 
-      const totalBalance = customers.reduce((sum: number, c: any) => sum + (c.actual_balance || 0), 0);
-      const activeCustomers = customers.filter((c: any) => c.last_ticket &&
-        new Date(c.last_ticket) > new Date(Date.now() - 24 * 60 * 60 * 1000)).length;
+      const totalBalance = customers.reduce(
+        (sum: number, c: any) => sum + (c.actual_balance || 0),
+        0
+      );
+      const activeCustomers = customers.filter(
+        (c: any) =>
+          c.last_ticket && new Date(c.last_ticket) > new Date(Date.now() - 24 * 60 * 60 * 1000)
+      ).length;
 
       return {
         timestamp: new Date().toISOString(),
@@ -595,14 +699,14 @@ class Fire22APIService {
         pendingWagers: pending.length,
         pendingAmount: pending.reduce((sum: number, w: any) => sum + (w.amount || 0), 0).toFixed(2),
         recentActivity: activity.slice(0, 10),
-        lastUpdate: Date.now()
+        lastUpdate: Date.now(),
       };
     } catch (error) {
       console.error('Error generating real-time metrics:', error);
       return {
         timestamp: new Date().toISOString(),
         error: 'Failed to generate metrics',
-        lastUpdate: Date.now()
+        lastUpdate: Date.now(),
       };
     }
   }
@@ -616,15 +720,18 @@ export default {
       return await handleRequest(req, env);
     } catch (err: any) {
       console.error('Worker Error:', err);
-      return new Response(JSON.stringify({
-        error: 'Internal Server Error',
-        message: err.message,
-        stack: err.stack,
-        timestamp: new Date().toISOString()
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Internal Server Error',
+          message: err.message,
+          stack: err.stack,
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
   },
 };
@@ -642,59 +749,59 @@ async function handleRequest(req: Request, env: Env): Promise<Response> {
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
 
-    // Handle preflight requests
-    if (req.method === 'OPTIONS') {
-      return new Response(null, { headers: corsHeaders });
-    }
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
 
-    // Real-time Server-Sent Events endpoint
-    if (url.pathname === '/api/live') {
-      const encoder = new TextEncoder();
+  // Real-time Server-Sent Events endpoint
+  if (url.pathname === '/api/live') {
+    const encoder = new TextEncoder();
 
-      const stream = new ReadableStream({
-        async start(controller) {
-          const sendData = async () => {
-            try {
-              const metrics = await fire22API.generateRealTimeMetrics();
-              const data = `data: ${JSON.stringify(metrics)}\n\n`;
-              controller.enqueue(encoder.encode(data));
-            } catch (error) {
-              console.error('SSE Error:', error);
-              const errorData = `data: ${JSON.stringify({ error: 'Failed to fetch data', timestamp: new Date().toISOString() })}\n\n`;
-              controller.enqueue(encoder.encode(errorData));
-            }
-          };
+    const stream = new ReadableStream({
+      async start(controller) {
+        const sendData = async () => {
+          try {
+            const metrics = await fire22API.generateRealTimeMetrics();
+            const data = `data: ${JSON.stringify(metrics)}\n\n`;
+            controller.enqueue(encoder.encode(data));
+          } catch (error) {
+            console.error('SSE Error:', error);
+            const errorData = `data: ${JSON.stringify({ error: 'Failed to fetch data', timestamp: new Date().toISOString() })}\n\n`;
+            controller.enqueue(encoder.encode(errorData));
+          }
+        };
 
-          // Send initial data
-          await sendData();
+        // Send initial data
+        await sendData();
 
-          // Set up interval for real-time updates
-          const interval = setInterval(sendData, 3000); // Every 3 seconds
+        // Set up interval for real-time updates
+        const interval = setInterval(sendData, 3000); // Every 3 seconds
 
-          // Clean up on abort
-          const abortHandler = () => {
-            clearInterval(interval);
-            controller.close();
-          };
+        // Clean up on abort
+        const abortHandler = () => {
+          clearInterval(interval);
+          controller.close();
+        };
 
-          // Listen for client disconnect
-          req.signal?.addEventListener('abort', abortHandler);
-        },
-      });
+        // Listen for client disconnect
+        req.signal?.addEventListener('abort', abortHandler);
+      },
+    });
 
-      return new Response(stream, {
-        headers: {
-          'Content-Type': 'text/event-stream',
-          'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive',
-          ...corsHeaders
-        },
-      });
-    }
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+        ...corsHeaders,
+      },
+    });
+  }
 
-    // Serve enhanced dashboard with Fire22 integration
-    if (url.pathname === '/dashboard') {
-      const dashboardHtml = `<!DOCTYPE html>
+  // Serve enhanced dashboard with Fire22 integration
+  if (url.pathname === '/dashboard') {
+    const dashboardHtml = `<!DOCTYPE html>
 <html>
 <head>
     <title>Fire22 Dashboard - LIVE DATA + API</title>
@@ -991,69 +1098,78 @@ async function handleRequest(req: Request, env: Env): Promise<Response> {
     </script>
 </body>
 </html>`;
-      
-      return new Response(dashboardHtml, {
-        headers: { 'Content-Type': 'text/html; charset=utf-8' },
-      });
-    }
 
-    // LIVE DATA ENDPOINT - This is the key change!
-    // Simple test endpoint to verify deployment
-    if (url.pathname === '/api/test-deployment') {
-      return new Response(JSON.stringify({
+    return new Response(dashboardHtml, {
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    });
+  }
+
+  // LIVE DATA ENDPOINT - This is the key change!
+  // Simple test endpoint to verify deployment
+  if (url.pathname === '/api/test-deployment') {
+    return new Response(
+      JSON.stringify({
         message: 'Deployment working!',
         timestamp: new Date().toISOString(),
-        version: '2025-08-26-v2'
-      }), {
+        version: '2025-08-26-v2',
+      }),
+      {
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
-      });
-    }
+      }
+    );
+  }
 
-    if (url.pathname === '/api/live-metrics') {
-      // Return mock data directly - no database calls
-      return new Response(JSON.stringify({
+  if (url.pathname === '/api/live-metrics') {
+    // Return mock data directly - no database calls
+    return new Response(
+      JSON.stringify({
         success: true,
         revenue: 12450.75,
         activePlayers: 23,
         totalWagers: 156,
         timestamp: new Date().toISOString(),
-        source: 'mock_data_v2'
-      }), {
+        source: 'mock_data_v2',
+      }),
+      {
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
-      });
-    }
+      }
+    );
+  }
 
-    // Enhanced customers endpoint with Fire22 integration
-    if (url.pathname === '/api/customers') {
-      try {
-        const agent = url.searchParams.get('agent');
-        const page = parseInt(url.searchParams.get('page') || '1');
-        const limit = parseInt(url.searchParams.get('limit') || '50');
+  // Enhanced customers endpoint with Fire22 integration
+  if (url.pathname === '/api/customers') {
+    try {
+      const agent = url.searchParams.get('agent');
+      const page = parseInt(url.searchParams.get('page') || '1');
+      const limit = parseInt(url.searchParams.get('limit') || '50');
 
-        // Try Fire22 API first
-        const fire22Customers = await fire22API.getRealCustomers({ agent });
+      // Try Fire22 API first
+      const fire22Customers = await fire22API.getRealCustomers({ agent });
 
-        if (fire22Customers.length > 0) {
-          // Paginate Fire22 results
-          const startIndex = (page - 1) * limit;
-          const endIndex = startIndex + limit;
-          const paginatedCustomers = fire22Customers.slice(startIndex, endIndex);
+      if (fire22Customers.length > 0) {
+        // Paginate Fire22 results
+        const startIndex = (page - 1) * limit;
+        const endIndex = startIndex + limit;
+        const paginatedCustomers = fire22Customers.slice(startIndex, endIndex);
 
-          return new Response(JSON.stringify({
+        return new Response(
+          JSON.stringify({
             success: true,
             customers: paginatedCustomers,
             total: fire22Customers.length,
             page,
             limit,
-            source: 'fire22'
-          }), {
+            source: 'fire22',
+          }),
+          {
             headers: { 'Content-Type': 'application/json' },
-          });
-        }
+          }
+        );
+      }
 
-        // Fallback to PostgreSQL database
-        const offset = (page - 1) * limit;
-        let query = `
+      // Fallback to PostgreSQL database
+      const offset = (page - 1) * limit;
+      let query = `
           SELECT
             c.customer_id,
             c.username,
@@ -1067,25 +1183,26 @@ async function handleRequest(req: Request, env: Env): Promise<Response> {
           WHERE 1=1
         `;
 
-        const params: any[] = [];
-        let paramIndex = 1;
+      const params: any[] = [];
+      let paramIndex = 1;
 
-        if (agent) {
-          query += ` AND c.agent_id = $${paramIndex}`;
-          params.push(agent);
-          paramIndex++;
-        }
+      if (agent) {
+        query += ` AND c.agent_id = $${paramIndex}`;
+        params.push(agent);
+        paramIndex++;
+      }
 
-        query += `
+      query += `
           GROUP BY c.customer_id, c.username, c.agent_id, c.actual_balance
           ORDER BY COALESCE(c.actual_balance, 0) DESC
           LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
         `;
-        params.push(limit, offset);
+      params.push(limit, offset);
 
-        const customers = await sql(env, query, params);
+      const customers = await sql(env, query, params);
 
-        return new Response(JSON.stringify({
+      return new Response(
+        JSON.stringify({
           success: true,
           customers: customers.map((c: any) => ({
             customer_id: c.customer_id,
@@ -1093,30 +1210,37 @@ async function handleRequest(req: Request, env: Env): Promise<Response> {
             agent_id: c.agent_id,
             actual_balance: parseFloat(c.actual_balance) || 0,
             balance: parseFloat(c.balance) || 0,
-            transaction_count: parseInt(c.transaction_count) || 0
+            transaction_count: parseInt(c.transaction_count) || 0,
           })),
           page,
           limit,
-          source: 'postgresql'
-        }), {
+          source: 'postgresql',
+        }),
+        {
           headers: { 'Content-Type': 'application/json' },
-        });
-      } catch (error) {
-        console.error('Database error:', error);
-        return new Response(JSON.stringify({
+        }
+      );
+    } catch (error) {
+      console.error('Database error:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch customers'
-        }), {
+          error: 'Failed to fetch customers',
+        }),
+        {
           status: 500,
           headers: { 'Content-Type': 'application/json' },
-        });
-      }
+        }
+      );
     }
+  }
 
-    // Get all bets from database
-    if (url.pathname === '/api/bets') {
-      try {
-        const bets = await sql(env, `
+  // Get all bets from database
+  if (url.pathname === '/api/bets') {
+    try {
+      const bets = await sql(
+        env,
+        `
           SELECT 
             b.id,
             c.customer_id,
@@ -1130,9 +1254,11 @@ async function handleRequest(req: Request, env: Env): Promise<Response> {
           JOIN customers c ON b.customer_id = c.id
           ORDER BY b.created_at DESC
           LIMIT 100
-        `);
+        `
+      );
 
-        return new Response(JSON.stringify({
+      return new Response(
+        JSON.stringify({
           success: true,
           bets: bets.map(b => ({
             id: b.id,
@@ -1142,83 +1268,100 @@ async function handleRequest(req: Request, env: Env): Promise<Response> {
             type: b.type,
             status: b.status,
             teams: b.teams,
-            created_at: b.created_at
-          }))
-        }), {
+            created_at: b.created_at,
+          })),
+        }),
+        {
           headers: { 'Content-Type': 'application/json' },
-        });
-      } catch (error) {
-        console.error('Database error:', error);
-        return new Response(JSON.stringify({ 
-          success: false, 
-          error: 'Failed to fetch bets' 
-        }), {
+        }
+      );
+    } catch (error) {
+      console.error('Database error:', error);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to fetch bets',
+        }),
+        {
           status: 500,
           headers: { 'Content-Type': 'application/json' },
-        });
-      }
+        }
+      );
     }
+  }
 
-    // Fire22 Agent Hierarchy endpoint
-    if (url.pathname === '/api/agents/hierarchy') {
-      try {
-        const agents = await fire22API.getAgentHierarchy();
+  // Fire22 Agent Hierarchy endpoint
+  if (url.pathname === '/api/agents/hierarchy') {
+    try {
+      const agents = await fire22API.getAgentHierarchy();
 
-        return new Response(JSON.stringify({
+      return new Response(
+        JSON.stringify({
           success: true,
           agents: agents,
-          total: agents.length
-        }), {
+          total: agents.length,
+        }),
+        {
           headers: { 'Content-Type': 'application/json' },
-        });
-      } catch (error) {
-        console.error('Error fetching agent hierarchy:', error);
-        return new Response(JSON.stringify({
+        }
+      );
+    } catch (error) {
+      console.error('Error fetching agent hierarchy:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch agent hierarchy'
-        }), {
+          error: 'Failed to fetch agent hierarchy',
+        }),
+        {
           status: 500,
           headers: { 'Content-Type': 'application/json' },
-        });
-      }
+        }
+      );
     }
+  }
 
-    // Fire22 Weekly Figures endpoint
-    if (url.pathname === '/api/manager/getWeeklyFigureByAgent' && req.method === 'POST') {
-      try {
-        // Check content type and reject JSON requests
-        const contentType = req.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          return new Response(JSON.stringify({
+  // Fire22 Weekly Figures endpoint
+  if (url.pathname === '/api/manager/getWeeklyFigureByAgent' && req.method === 'POST') {
+    try {
+      // Check content type and reject JSON requests
+      const contentType = req.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return new Response(
+          JSON.stringify({
             success: false,
-            error: 'This endpoint expects form data, not JSON'
-          }), {
+            error: 'This endpoint expects form data, not JSON',
+          }),
+          {
             status: 400,
             headers: { 'Content-Type': 'application/json' },
-          });
-        }
-        
-        const body = await req.text();
-        const params = new URLSearchParams(body);
-        const agentID = params.get('agentID') || 'BLAKEPPH';
+          }
+        );
+      }
 
-        // Try Fire22 API first
-        const fire22Data = await fire22API.callFire22API('getWeeklyFigureByAgentLite', {
-          agentID: agentID
-        });
+      const body = await req.text();
+      const params = new URLSearchParams(body);
+      const agentID = params.get('agentID') || 'BLAKEPPH';
 
-        if (fire22Data) {
-          return new Response(JSON.stringify({
+      // Try Fire22 API first
+      const fire22Data = await fire22API.callFire22API('getWeeklyFigureByAgentLite', {
+        agentID: agentID,
+      });
+
+      if (fire22Data) {
+        return new Response(
+          JSON.stringify({
             success: true,
             data: fire22Data,
-            source: 'fire22'
-          }), {
+            source: 'fire22',
+          }),
+          {
             headers: { 'Content-Type': 'application/json' },
-          });
-        }
+          }
+        );
+      }
 
-        // Fallback to PostgreSQL
-        const weeklyQuery = `
+      // Fallback to PostgreSQL
+      const weeklyQuery = `
           SELECT
             EXTRACT(DOW FROM created_at) as day_num,
             SUM(amount) as handle,
@@ -1232,63 +1375,100 @@ async function handleRequest(req: Request, env: Env): Promise<Response> {
           ORDER BY day_num
         `;
 
-        const weeklyData = await sql(env, weeklyQuery, [agentID]);
+      const weeklyData = await sql(env, weeklyQuery, [agentID]);
 
-        return new Response(JSON.stringify({
+      return new Response(
+        JSON.stringify({
           success: true,
           data: {
             agentID: agentID,
             weeklyFigures: weeklyData,
-            totalHandle: weeklyData.reduce((sum: number, day: any) => sum + parseFloat(day.handle || 0), 0),
-            totalWin: weeklyData.reduce((sum: number, day: any) => sum + parseFloat(day.win || 0), 0),
-            totalVolume: weeklyData.reduce((sum: number, day: any) => sum + parseFloat(day.volume || 0), 0),
-            totalBets: weeklyData.reduce((sum: number, day: any) => sum + parseInt(day.bets || 0), 0)
+            totalHandle: weeklyData.reduce(
+              (sum: number, day: any) => sum + parseFloat(day.handle || 0),
+              0
+            ),
+            totalWin: weeklyData.reduce(
+              (sum: number, day: any) => sum + parseFloat(day.win || 0),
+              0
+            ),
+            totalVolume: weeklyData.reduce(
+              (sum: number, day: any) => sum + parseFloat(day.volume || 0),
+              0
+            ),
+            totalBets: weeklyData.reduce(
+              (sum: number, day: any) => sum + parseInt(day.bets || 0),
+              0
+            ),
           },
-          source: 'postgresql'
-        }), {
+          source: 'postgresql',
+        }),
+        {
           headers: { 'Content-Type': 'application/json' },
-        });
-      } catch (error) {
-        console.error('Error in getWeeklyFigureByAgent:', error);
-        return new Response(JSON.stringify({
+        }
+      );
+    } catch (error) {
+      console.error('Error in getWeeklyFigureByAgent:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch weekly figures'
-        }), {
+          error: 'Failed to fetch weekly figures',
+        }),
+        {
           status: 500,
-          headers: { 'Content-Type': 'application/json' }
-        });
-      }
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
+  }
 
-    // Sync Fire22 customers to PostgreSQL
-    if (url.pathname === '/api/sync/fire22-customers' && req.method === 'POST') {
-      try {
-        const fire22Customers = await fire22API.getRealCustomers();
+  // Sync Fire22 customers to PostgreSQL
+  if (url.pathname === '/api/sync/fire22-customers' && req.method === 'POST') {
+    try {
+      const fire22Customers = await fire22API.getRealCustomers();
 
-        if (fire22Customers.length === 0) {
-          // Return mock data instead of error for testing
-          const mockCustomers = [
-            { customer_id: 'DEMO001', username: 'demo_user', agent_id: 'SHOOTS', actual_balance: 100.50, balance: 100.50, transaction_count: 5 },
-            { customer_id: 'DEMO002', username: 'test_user', agent_id: 'SHOOTS', actual_balance: 250.75, balance: 250.75, transaction_count: 12 }
-          ];
-          
-          return new Response(JSON.stringify({
+      if (fire22Customers.length === 0) {
+        // Return mock data instead of error for testing
+        const mockCustomers = [
+          {
+            customer_id: 'DEMO001',
+            username: 'demo_user',
+            agent_id: 'SHOOTS',
+            actual_balance: 100.5,
+            balance: 100.5,
+            transaction_count: 5,
+          },
+          {
+            customer_id: 'DEMO002',
+            username: 'test_user',
+            agent_id: 'SHOOTS',
+            actual_balance: 250.75,
+            balance: 250.75,
+            transaction_count: 12,
+          },
+        ];
+
+        return new Response(
+          JSON.stringify({
             success: true,
             message: 'Fire22 customers synced successfully (using mock data)',
             syncedCount: mockCustomers.length,
             customers: mockCustomers,
-            source: 'mock_data'
-          }), {
-            headers: { 'Content-Type': 'application/json' }
-          });
-        }
+            source: 'mock_data',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+      }
 
-        let synced = 0;
-        let errors = 0;
+      let synced = 0;
+      let errors = 0;
 
-        for (const customer of fire22Customers) {
-          try {
-            await sql(env, `
+      for (const customer of fire22Customers) {
+        try {
+          await sql(
+            env,
+            `
               INSERT INTO customers (
                 customer_id, name, phone, agent_id, master_agent,
                 actual_balance, settle_figure, last_ticket, suspected_bot
@@ -1303,7 +1483,8 @@ async function handleRequest(req: Request, env: Env): Promise<Response> {
                 last_ticket = EXCLUDED.last_ticket,
                 suspected_bot = EXCLUDED.suspected_bot,
                 updated_at = NOW()
-            `, [
+            `,
+            [
               customer.customer_id,
               (customer as any).name || '',
               (customer as any).phone || '',
@@ -1312,210 +1493,255 @@ async function handleRequest(req: Request, env: Env): Promise<Response> {
               customer.actual_balance,
               customer.settle_figure,
               (customer as any).last_ticket || null,
-              (customer as any).suspected_bot || false
-            ]);
-            synced++;
-          } catch (error) {
-            console.error('Error syncing customer:', customer.customer_id, error);
-            errors++;
-          }
+              (customer as any).suspected_bot || false,
+            ]
+          );
+          synced++;
+        } catch (error) {
+          console.error('Error syncing customer:', customer.customer_id, error);
+          errors++;
         }
+      }
 
-        return new Response(JSON.stringify({
+      return new Response(
+        JSON.stringify({
           success: true,
           synced,
           errors,
           total: fire22Customers.length,
-          message: `Synced ${synced} customers with ${errors} errors`
-        }), {
-          headers: { 'Content-Type': 'application/json' }
-        });
-      } catch (error) {
-        console.error('Error syncing Fire22 customers:', error);
-        return new Response(JSON.stringify({
+          message: `Synced ${synced} customers with ${errors} errors`,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    } catch (error) {
+      console.error('Error syncing Fire22 customers:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to sync Fire22 customers'
-        }), {
+          error: 'Failed to sync Fire22 customers',
+        }),
+        {
           status: 500,
-          headers: { 'Content-Type': 'application/json' }
-        });
-      }
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
+  }
 
-    // Get pending wagers endpoint
-    if (url.pathname === '/api/manager/getPending') {
-      try {
-        const agentID = url.searchParams.get('agentID');
-        const pending = await fire22API.getPendingWagers(agentID || undefined);
+  // Get pending wagers endpoint
+  if (url.pathname === '/api/manager/getPending') {
+    try {
+      const agentID = url.searchParams.get('agentID');
+      const pending = await fire22API.getPendingWagers(agentID || undefined);
 
-        return new Response(JSON.stringify({
+      return new Response(
+        JSON.stringify({
           success: true,
           pending,
           count: pending.length,
-          source: 'fire22'
-        }), {
+          source: 'fire22',
+        }),
+        {
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      } catch (error) {
-        console.error('Error fetching pending wagers:', error);
-        return new Response(JSON.stringify({
+        }
+      );
+    } catch (error) {
+      console.error('Error fetching pending wagers:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch pending wagers'
-        }), {
+          error: 'Failed to fetch pending wagers',
+        }),
+        {
           status: 500,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      }
+        }
+      );
     }
+  }
 
-    // Get customer details endpoint
-    if (url.pathname.startsWith('/api/manager/getCustomerDetails/')) {
-      try {
-        const customerID = url.pathname.split('/').pop();
-        if (!customerID) {
-          return new Response(JSON.stringify({
+  // Get customer details endpoint
+  if (url.pathname.startsWith('/api/manager/getCustomerDetails/')) {
+    try {
+      const customerID = url.pathname.split('/').pop();
+      if (!customerID) {
+        return new Response(
+          JSON.stringify({
             success: false,
-            error: 'Customer ID required'
-          }), {
+            error: 'Customer ID required',
+          }),
+          {
             status: 400,
             headers: { 'Content-Type': 'application/json', ...corsHeaders },
-          });
-        }
+          }
+        );
+      }
 
-        const customer = await fire22API.getCustomerDetails(customerID);
+      const customer = await fire22API.getCustomerDetails(customerID);
 
-        return new Response(JSON.stringify({
+      return new Response(
+        JSON.stringify({
           success: true,
           customer,
-          source: 'fire22'
-        }), {
+          source: 'fire22',
+        }),
+        {
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      } catch (error) {
-        console.error('Error fetching customer details:', error);
-        return new Response(JSON.stringify({
+        }
+      );
+    } catch (error) {
+      console.error('Error fetching customer details:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch customer details'
-        }), {
+          error: 'Failed to fetch customer details',
+        }),
+        {
           status: 500,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      }
+        }
+      );
     }
+  }
 
-    // Get customer transactions endpoint
-    if (url.pathname === '/api/manager/getTransactions') {
-      try {
-        const customerID = url.searchParams.get('customerId');
-        const page = parseInt(url.searchParams.get('page') || '1');
-        const size = parseInt(url.searchParams.get('size') || '20');
+  // Get customer transactions endpoint
+  if (url.pathname === '/api/manager/getTransactions') {
+    try {
+      const customerID = url.searchParams.get('customerId');
+      const page = parseInt(url.searchParams.get('page') || '1');
+      const size = parseInt(url.searchParams.get('size') || '20');
 
-        if (!customerID) {
-          return new Response(JSON.stringify({
+      if (!customerID) {
+        return new Response(
+          JSON.stringify({
             success: false,
-            error: 'Customer ID required'
-          }), {
+            error: 'Customer ID required',
+          }),
+          {
             status: 400,
             headers: { 'Content-Type': 'application/json', ...corsHeaders },
-          });
-        }
+          }
+        );
+      }
 
-        const result = await fire22API.getCustomerTransactions(customerID, page, size);
+      const result = await fire22API.getCustomerTransactions(customerID, page, size);
 
-        return new Response(JSON.stringify({
+      return new Response(
+        JSON.stringify({
           success: true,
           ...result,
-          source: 'fire22'
-        }), {
+          source: 'fire22',
+        }),
+        {
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      } catch (error) {
-        console.error('Error fetching transactions:', error);
-        return new Response(JSON.stringify({
+        }
+      );
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch transactions'
-        }), {
+          error: 'Failed to fetch transactions',
+        }),
+        {
           status: 500,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      }
+        }
+      );
     }
+  }
 
-    // Get live activity endpoint
-    if (url.pathname === '/api/manager/getLiveActivity') {
-      try {
-        const hours = parseInt(url.searchParams.get('hours') || '1');
-        const activity = await fire22API.getLiveActivity(hours);
+  // Get live activity endpoint
+  if (url.pathname === '/api/manager/getLiveActivity') {
+    try {
+      const hours = parseInt(url.searchParams.get('hours') || '1');
+      const activity = await fire22API.getLiveActivity(hours);
 
-        return new Response(JSON.stringify({
+      return new Response(
+        JSON.stringify({
           success: true,
           activity,
           count: activity.length,
           hours,
-          source: 'fire22'
-        }), {
+          source: 'fire22',
+        }),
+        {
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      } catch (error) {
-        console.error('Error fetching live activity:', error);
-        return new Response(JSON.stringify({
+        }
+      );
+    } catch (error) {
+      console.error('Error fetching live activity:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch live activity'
-        }), {
+          error: 'Failed to fetch live activity',
+        }),
+        {
           status: 500,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      }
-    }
-
-    // Background sync endpoint
-    if (url.pathname === '/api/sync/background' && req.method === 'POST') {
-      try {
-        const body = await req.json();
-        const operation = body.operation || 'customers';
-
-        let result;
-        switch (operation) {
-          case 'customers':
-            const customers = await fire22API.getRealCustomers();
-            // Implement incremental sync logic here
-            result = { synced: customers.length, operation: 'customers' };
-            break;
-
-          case 'agents':
-            const agents = await fire22API.getAgentHierarchy();
-            result = { synced: agents.length, operation: 'agents' };
-            break;
-
-          default:
-            throw new Error('Unknown sync operation');
         }
+      );
+    }
+  }
 
-        return new Response(JSON.stringify({
+  // Background sync endpoint
+  if (url.pathname === '/api/sync/background' && req.method === 'POST') {
+    try {
+      const body = await req.json();
+      const operation = body.operation || 'customers';
+
+      let result;
+      switch (operation) {
+        case 'customers':
+          const customers = await fire22API.getRealCustomers();
+          // Implement incremental sync logic here
+          result = { synced: customers.length, operation: 'customers' };
+          break;
+
+        case 'agents':
+          const agents = await fire22API.getAgentHierarchy();
+          result = { synced: agents.length, operation: 'agents' };
+          break;
+
+        default:
+          throw new Error('Unknown sync operation');
+      }
+
+      return new Response(
+        JSON.stringify({
           success: true,
           result,
-          timestamp: new Date().toISOString()
-        }), {
+          timestamp: new Date().toISOString(),
+        }),
+        {
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      } catch (error) {
-        console.error('Error in background sync:', error);
-        return new Response(JSON.stringify({
+        }
+      );
+    } catch (error) {
+      console.error('Error in background sync:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Background sync failed'
-        }), {
+          error: 'Background sync failed',
+        }),
+        {
           status: 500,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      }
+        }
+      );
     }
+  }
 
-    // 1. Agent list (Fire22 format) - Drop-in endpoint
-    if (url.pathname === '/api/manager/getAgents') {
-      try {
-        // Use database if available, otherwise return mock data
-        const rows = env.DATABASE_URL 
-          ? await sql(env, `
+  // 1. Agent list (Fire22 format) - Drop-in endpoint
+  if (url.pathname === '/api/manager/getAgents') {
+    try {
+      // Use database if available, otherwise return mock data
+      const rows = env.DATABASE_URL
+        ? await sql(
+            env,
+            `
               SELECT
                 agent_id      AS "AgentID",
                 seq_number    AS "SeqNumber",
@@ -1534,8 +1760,11 @@ async function handleRequest(req: Request, env: Env): Promise<Response> {
                 crash_rate AS "CrashRate"
               FROM agents
               ORDER BY seq_number
-            `)
-          : await sql(env, `
+            `
+          )
+        : await sql(
+            env,
+            `
               SELECT
                 agent_id      AS "AgentID",
                 seq_number    AS "SeqNumber",
@@ -1554,40 +1783,52 @@ async function handleRequest(req: Request, env: Env): Promise<Response> {
                 crash_rate AS "CrashRate"
               FROM agents
               ORDER BY seq_number
-            `);
+            `
+          );
 
-        return new Response(JSON.stringify({
-          GENERAL: rows
-        }), {
+      return new Response(
+        JSON.stringify({
+          GENERAL: rows,
+        }),
+        {
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      } catch (error) {
-        console.error('Error fetching agents:', error);
-        return new Response(JSON.stringify({
+        }
+      );
+    } catch (error) {
+      console.error('Error fetching agents:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch agents'
-        }), {
+          error: 'Failed to fetch agents',
+        }),
+        {
           status: 500,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      }
+        }
+      );
     }
+  }
 
-    // 2. SHOOTS customers (with balances & settlement) - Drop-in endpoint
-    if (url.pathname === '/api/manager/getCustomersByAgent') {
-      try {
-        const agentID = url.searchParams.get('agentID');
-        if (!agentID) {
-          return new Response(JSON.stringify({
+  // 2. SHOOTS customers (with balances & settlement) - Drop-in endpoint
+  if (url.pathname === '/api/manager/getCustomersByAgent') {
+    try {
+      const agentID = url.searchParams.get('agentID');
+      if (!agentID) {
+        return new Response(
+          JSON.stringify({
             success: false,
-            error: 'agentID parameter required'
-          }), {
+            error: 'agentID parameter required',
+          }),
+          {
             status: 400,
             headers: { 'Content-Type': 'application/json', ...corsHeaders },
-          });
-        }
+          }
+        );
+      }
 
-        const rows = await sql(env, `
+      const rows = await sql(
+        env,
+        `
           SELECT
             c.customer_id as id,
             c.username,
@@ -1599,38 +1840,48 @@ async function handleRequest(req: Request, env: Env): Promise<Response> {
           FROM customers c
           WHERE c.agent_id = $1
           ORDER BY c.username
-        `, [agentID.trim()]);
+        `,
+        [agentID.trim()]
+      );
 
-        return new Response(JSON.stringify(rows), {
-          headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      } catch (error) {
-        console.error('Error fetching customers by agent:', error);
-        return new Response(JSON.stringify({
+      return new Response(JSON.stringify(rows), {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    } catch (error) {
+      console.error('Error fetching customers by agent:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch customers by agent'
-        }), {
+          error: 'Failed to fetch customers by agent',
+        }),
+        {
           status: 500,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      }
+        }
+      );
     }
+  }
 
-    // 3. SHOOTS KPI (live totals) - Drop-in endpoint
-    if (url.pathname === '/api/manager/getAgentKPI') {
-      try {
-        const agentID = url.searchParams.get('agentID');
-        if (!agentID) {
-          return new Response(JSON.stringify({
+  // 3. SHOOTS KPI (live totals) - Drop-in endpoint
+  if (url.pathname === '/api/manager/getAgentKPI') {
+    try {
+      const agentID = url.searchParams.get('agentID');
+      if (!agentID) {
+        return new Response(
+          JSON.stringify({
             success: false,
-            error: 'agentID parameter required'
-          }), {
+            error: 'agentID parameter required',
+          }),
+          {
             status: 400,
             headers: { 'Content-Type': 'application/json', ...corsHeaders },
-          });
-        }
+          }
+        );
+      }
 
-        const rows = await sql(env, `
+      const rows = await sql(
+        env,
+        `
               SELECT
                 COALESCE(SUM(settle_figure),0) AS total_settlement,
                 COUNT(*) AS total_customers,
@@ -1641,51 +1892,61 @@ async function handleRequest(req: Request, env: Env): Promise<Response> {
                 COUNT(*) FILTER (WHERE last_ticket > NOW() - INTERVAL '30 days') AS recent_activity_customers
               FROM customers
               WHERE agent_id = $1
-            `, [agentID.trim()]);
+            `,
+        [agentID.trim()]
+      );
 
-        const kpi = rows[0] || {
-          total_settlement: 0,
-          total_customers: 0,
-          active_customers: 0,
-          high_credit_customers: 0,
-          total_balance: 0,
-          negative_balance_customers: 0,
-          recent_activity_customers: 0
-        };
+      const kpi = rows[0] || {
+        total_settlement: 0,
+        total_customers: 0,
+        active_customers: 0,
+        high_credit_customers: 0,
+        total_balance: 0,
+        negative_balance_customers: 0,
+        recent_activity_customers: 0,
+      };
 
-        return new Response(JSON.stringify(kpi), {
-          headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      } catch (error) {
-        console.error('Error fetching agent KPI:', error);
-        return new Response(JSON.stringify({
+      return new Response(JSON.stringify(kpi), {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    } catch (error) {
+      console.error('Error fetching agent KPI:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch agent KPI'
-        }), {
+          error: 'Failed to fetch agent KPI',
+        }),
+        {
           status: 500,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      }
+        }
+      );
     }
+  }
 
-    // 4. SHOOTS wagers (with settlement amounts) - Drop-in endpoint
-    if (url.pathname === '/api/manager/getWagersByAgent') {
-      try {
-        const agentID = url.searchParams.get('agentID');
-        if (!agentID) {
-          return new Response(JSON.stringify({
+  // 4. SHOOTS wagers (with settlement amounts) - Drop-in endpoint
+  if (url.pathname === '/api/manager/getWagersByAgent') {
+    try {
+      const agentID = url.searchParams.get('agentID');
+      if (!agentID) {
+        return new Response(
+          JSON.stringify({
             success: false,
-            error: 'agentID parameter required'
-          }), {
+            error: 'agentID parameter required',
+          }),
+          {
             status: 400,
             headers: { 'Content-Type': 'application/json', ...corsHeaders },
-          });
-        }
+          }
+        );
+      }
 
-        const limit = parseInt(url.searchParams.get('limit') || '50');
-        const offset = parseInt(url.searchParams.get('offset') || '0');
+      const limit = parseInt(url.searchParams.get('limit') || '50');
+      const offset = parseInt(url.searchParams.get('offset') || '0');
 
-        const rows = await sql(env, `
+      const rows = await sql(
+        env,
+        `
           SELECT
             w.id,
             w.customer_id,
@@ -1701,190 +1962,256 @@ async function handleRequest(req: Request, env: Env): Promise<Response> {
           WHERE c.agent_id = $1
           ORDER BY w.created_at DESC
           LIMIT $2 OFFSET $3
-        `, [agentID.trim(), limit, offset]);
+        `,
+        [agentID.trim(), limit, offset]
+      );
 
-        return new Response(JSON.stringify(rows), {
-          headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      } catch (error) {
-        console.error('Error fetching wagers by agent:', error);
-        return new Response(JSON.stringify({
+      return new Response(JSON.stringify(rows), {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    } catch (error) {
+      console.error('Error fetching wagers by agent:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch wagers by agent'
-        }), {
+          error: 'Failed to fetch wagers by agent',
+        }),
+        {
           status: 500,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      }
+        }
+      );
     }
+  }
 
-    // Test Fire22 API connection
-    if (url.pathname === '/api/test/fire22') {
-      try {
-        const result = await fire22API.callFire22API('getWeeklyFigureByAgentLite');
+  // Test Fire22 API connection
+  if (url.pathname === '/api/test/fire22') {
+    try {
+      const result = await fire22API.callFire22API('getWeeklyFigureByAgentLite');
 
-        return new Response(JSON.stringify({
+      return new Response(
+        JSON.stringify({
           success: true,
           fire22Response: result,
           message: result ? 'Fire22 API working' : 'Fire22 API failed',
           cacheStats: {
             cacheSize: fire22API['cache'].size,
-            operations: ['getWeeklyFigureByAgentLite', 'getPending', 'getCustomerDetails', 'getTransactions', 'getLiveActivity']
-          }
-        }), {
+            operations: [
+              'getWeeklyFigureByAgentLite',
+              'getPending',
+              'getCustomerDetails',
+              'getTransactions',
+              'getLiveActivity',
+            ],
+          },
+        }),
+        {
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      } catch (error) {
-        console.error('Error testing Fire22 API:', error);
-        return new Response(JSON.stringify({
+        }
+      );
+    } catch (error) {
+      console.error('Error testing Fire22 API:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
           error: 'Fire22 API test failed',
-          message: error.message
-        }), {
+          message: error.message,
+        }),
+        {
           status: 500,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      }
+        }
+      );
     }
+  }
 
-    // Authentication endpoints
-    // Authentication endpoints
-    if (url.pathname === '/api/auth/login') {
-      try {
-        const body = await req.json();
-        const { username, password } = body;
-        
-        // Check against ADMIN_PASSWORD secret
-        if (username === 'admin' && password === env.ADMIN_PASSWORD) {
-          // Generate JWT token
-          const token = jwt.sign({ username, role: 'admin' }, env.JWT_SECRET || 'fallback-secret', { expiresIn: '24h' });
-          
-          return new Response(JSON.stringify({
+  // Authentication endpoints
+  // Authentication endpoints
+  if (url.pathname === '/api/auth/login') {
+    try {
+      const body = await req.json();
+      const { username, password } = body;
+
+      // Check against ADMIN_PASSWORD secret
+      if (username === 'admin' && password === env.ADMIN_PASSWORD) {
+        // Generate JWT token
+        const token = jwt.sign({ username, role: 'admin' }, env.JWT_SECRET || 'fallback-secret', {
+          expiresIn: '24h',
+        });
+
+        return new Response(
+          JSON.stringify({
             success: true,
             token,
-            message: 'Login successful'
-          }), {
+            message: 'Login successful',
+          }),
+          {
             headers: { 'Content-Type': 'application/json', ...corsHeaders },
-          });
-        } else {
-          return new Response(JSON.stringify({
+          }
+        );
+      } else {
+        return new Response(
+          JSON.stringify({
             success: false,
-            error: 'Invalid credentials'
-          }), {
+            error: 'Invalid credentials',
+          }),
+          {
             status: 401,
             headers: { 'Content-Type': 'application/json', ...corsHeaders },
-          });
-        }
-      } catch (error) {
-        console.error('Login error:', error);
-        return new Response(JSON.stringify({
+          }
+        );
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Invalid request format'
-        }), {
+          error: 'Invalid request format',
+        }),
+        {
           status: 400,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      }
+        }
+      );
     }
+  }
 
-    if (url.pathname === '/api/auth/verify') {
-      try {
-        const authHeader = req.headers.get('Authorization');
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-          return new Response(JSON.stringify({
+  if (url.pathname === '/api/auth/verify') {
+    try {
+      const authHeader = req.headers.get('Authorization');
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return new Response(
+          JSON.stringify({
             success: false,
-            error: 'No token provided'
-          }), {
+            error: 'No token provided',
+          }),
+          {
             status: 401,
             headers: { 'Content-Type': 'application/json', ...corsHeaders },
-          });
-        }
-        
-        const token = authHeader.substring(7);
-        const decoded = jwt.verify(token, env.JWT_SECRET || 'fallback-secret');
-        
-        return new Response(JSON.stringify({
+          }
+        );
+      }
+
+      const token = authHeader.substring(7);
+      const decoded = jwt.verify(token, env.JWT_SECRET || 'fallback-secret');
+
+      return new Response(
+        JSON.stringify({
           success: true,
           user: decoded,
-          message: 'Token valid'
-        }), {
+          message: 'Token valid',
+        }),
+        {
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      } catch (error) {
-        return new Response(JSON.stringify({
+        }
+      );
+    } catch (error) {
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Invalid token'
-        }), {
+          error: 'Invalid token',
+        }),
+        {
           status: 401,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      }
+        }
+      );
     }
+  }
 
-    // Sync endpoints
-    if (url.pathname === '/api/sync/fire22-customers') {
-      try {
-        // Simulate Fire22 customer sync
-        const mockCustomers = [
-          { customer_id: 'DEMO001', username: 'demo_user', agent_id: 'SHOOTS', actual_balance: 100.50, balance: 100.50, transaction_count: 5 },
-          { customer_id: 'DEMO002', username: 'test_user', agent_id: 'SHOOTS', actual_balance: 250.75, balance: 250.75, transaction_count: 12 }
-        ];
-        
-        return new Response(JSON.stringify({
+  // Sync endpoints
+  if (url.pathname === '/api/sync/fire22-customers') {
+    try {
+      // Simulate Fire22 customer sync
+      const mockCustomers = [
+        {
+          customer_id: 'DEMO001',
+          username: 'demo_user',
+          agent_id: 'SHOOTS',
+          actual_balance: 100.5,
+          balance: 100.5,
+          transaction_count: 5,
+        },
+        {
+          customer_id: 'DEMO002',
+          username: 'test_user',
+          agent_id: 'SHOOTS',
+          actual_balance: 250.75,
+          balance: 250.75,
+          transaction_count: 12,
+        },
+      ];
+
+      return new Response(
+        JSON.stringify({
           success: true,
           message: 'Fire22 customers synced successfully',
           syncedCount: mockCustomers.length,
-          customers: mockCustomers
-        }), {
+          customers: mockCustomers,
+        }),
+        {
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      } catch (error) {
-        console.error('Error syncing Fire22 customers:', error);
-        return new Response(JSON.stringify({
+        }
+      );
+    } catch (error) {
+      console.error('Error syncing Fire22 customers:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
           error: 'Failed to sync Fire22 customers',
-          details: error.message
-        }), {
+          details: error.message,
+        }),
+        {
           status: 500,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      }
+        }
+      );
     }
+  }
 
-    if (url.pathname === '/api/sync/background') {
-      try {
-        const body = await request.json();
-        const { operation } = body;
-        
-        if (!operation) {
-          return new Response(JSON.stringify({
+  if (url.pathname === '/api/sync/background') {
+    try {
+      const body = await request.json();
+      const { operation } = body;
+
+      if (!operation) {
+        return new Response(
+          JSON.stringify({
             success: false,
-            error: 'Operation parameter required'
-          }), {
+            error: 'Operation parameter required',
+          }),
+          {
             status: 400,
             headers: { 'Content-Type': 'application/json', ...corsHeaders },
-          });
-        }
-        
-        // Simulate background sync
-        return new Response(JSON.stringify({
+          }
+        );
+      }
+
+      // Simulate background sync
+      return new Response(
+        JSON.stringify({
           success: true,
           message: `Background sync for ${operation} completed`,
           operation,
-          timestamp: new Date().toISOString()
-        }), {
+          timestamp: new Date().toISOString(),
+        }),
+        {
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      } catch (error) {
-        return new Response(JSON.stringify({
+        }
+      );
+    } catch (error) {
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Invalid request format'
-        }), {
+          error: 'Invalid request format',
+        }),
+        {
           status: 400,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        });
-      }
+        }
+      );
     }
+  }
 
-    return new Response('Not Found', { status: 404 });
+  return new Response('Not Found', { status: 404 });
 }

@@ -5,6 +5,7 @@
 ### 📧 Recipient: Isabella Martinez (isabella.martinez@design.fire22)
 
 ### Task Details:
+
 - **Task ID:** 1 (0198f2c9-9e90-700d-83e9-303ccf24bb7d)
 - **Title:** Fire22 Design System Overhaul
 - **Priority:** 🔴 HIGH
@@ -13,18 +14,18 @@
 - **Notification Type:** STATUS CHANGE
 
 ### 🎯 ACTION REQUIRED:
+
 Acknowledge task status change to: in-progress
 
 ---
 
 ## Notification Details
 
-**Timestamp:** [CDT][2025-08-28T22:25:56.365Z][21.430000ns]
-**Environment:** development
-**Timezone:** America/Chicago
-**Department:** design
+**Timestamp:** [CDT][2025-08-28T22:25:56.365Z][21.430000ns] **Environment:**
+development **Timezone:** America/Chicago **Department:** design
 
 ### Task API Integration:
+
 - **API Endpoint:** `GET /api/departments/design/tasks`
 - **Task UUID:** `0198f2c9-9e90-700d-83e9-303ccf24bb7d`
 - **Update Status:** `POST /api/departments/design/tasks/1/status`
@@ -34,12 +35,14 @@ Acknowledge task status change to: in-progress
 ## Quick Actions:
 
 ### Via Fire22 Dashboard:
+
 1. Navigate to Department Tasks: `/dashboard#tasks-design`
 2. Update task progress or status
 3. Add comments or notes
 4. Set reminders for due dates
 
 ### Via API:
+
 ```bash
 # Get task details
 curl -X GET "http://localhost:3000/api/departments/design/tasks"
@@ -53,14 +56,16 @@ curl -X POST "http://localhost:3000/api/departments/design/tasks/1/status" \
 ---
 
 ## Contact Information:
+
 - **Department Head:** head@design.fire22
 - **Task API Support:** api@fire22.ag
 - **Dashboard Support:** dashboard@fire22.ag
 
 ---
 
-**⚡ This is a HIGH priority task notification requiring attention from design department.**
+**⚡ This is a HIGH priority task notification requiring attention from design
+department.**
 
-*Generated at: [CDT][2025-08-28T22:25:56.365Z][21.430000ns]*
+_Generated at: [CDT][2025-08-28T22:25:56.365Z][21.430000ns]_
 
 🤖 Generated with [Claude Code](https://claude.ai/code)

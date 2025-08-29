@@ -1,10 +1,13 @@
 # Environment Variable Setup Guide
 
-This guide explains how to set up and manage environment variables for the Dashboard Worker project, which supports both local development with Bun and production deployment with Cloudflare Workers.
+This guide explains how to set up and manage environment variables for the
+Dashboard Worker project, which supports both local development with Bun and
+production deployment with Cloudflare Workers.
 
 ## 🚀 Quick Start
 
 1. **Copy the example environment file:**
+
    ```bash
    cp .env.example .env
    ```
@@ -23,7 +26,7 @@ The project supports multiple environment files for different contexts:
 - **`.env`** - Default environment variables (loaded in all environments)
 - **`.env.local`** - Local overrides (not loaded in test mode)
 - **`.env.development`** - Development-specific variables
-- **`.env.production`** - Production-specific variables  
+- **`.env.production`** - Production-specific variables
 - **`.env.test`** - Test-specific variables
 
 ### File Loading Priority (highest to lowest):
@@ -81,42 +84,54 @@ BUN_CONFIG_MAX_HTTP_REQUESTS=256
 The project includes several CLI commands for managing environment variables:
 
 ### Validate Configuration
+
 ```bash
 bun run env:validate
 ```
-Checks that all required environment variables are set and validates their format.
+
+Checks that all required environment variables are set and validates their
+format.
 
 ### List Environment Variables
+
 ```bash
 bun run env:list
 ```
+
 Lists all current environment variables (sensitive values are masked).
 
 ### Check Environment Status
+
 ```bash
 bun run env:check
 ```
+
 Shows detailed information about the current environment setup.
 
 ### Get Help
+
 ```bash
 bun run env:help
 ```
+
 Displays usage information for all environment management commands.
 
 ## 🔒 Security Best Practices
 
 ### 1. Never Commit Secrets
+
 - Add `.env*` files to `.gitignore`
 - Use `.env.example` for documentation
 - Store production secrets in Cloudflare Workers secrets
 
 ### 2. Use Strong Secrets
+
 - JWT_SECRET: At least 32 characters
 - API keys: Use the full key provided by the service
 - Passwords: Use strong, unique passwords
 
 ### 3. Environment-Specific Values
+
 - Use different API keys for development and production
 - Use test databases for development
 - Use sandbox/staging environments for testing
@@ -124,6 +139,7 @@ Displays usage information for all environment management commands.
 ## 🌍 Environment-Specific Configuration
 
 ### Development
+
 ```bash
 NODE_ENV=development
 BUN_CONFIG_VERBOSE_FETCH=1
@@ -131,6 +147,7 @@ BUN_CONFIG_MAX_HTTP_REQUESTS=128
 ```
 
 ### Production
+
 ```bash
 NODE_ENV=production
 BUN_CONFIG_VERBOSE_FETCH=0
@@ -138,6 +155,7 @@ BUN_CONFIG_MAX_HTTP_REQUESTS=256
 ```
 
 ### Testing
+
 ```bash
 NODE_ENV=test
 BUN_CONFIG_VERBOSE_FETCH=0
@@ -160,6 +178,7 @@ DB_URL=postgres://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/mydb
 ```
 
 To disable expansion, escape the `$`:
+
 ```bash
 PRICE=$19.99  # Will expand to: 19.99
 PRICE=\$19.99 # Will remain: $19.99
@@ -174,6 +193,7 @@ When deploying to Cloudflare Workers:
 3. **Database bindings** are configured in `wrangler.toml`
 
 ### Setting Secrets
+
 ```bash
 wrangler secret put JWT_SECRET
 wrangler secret put STRIPE_SECRET_KEY
@@ -181,6 +201,7 @@ wrangler secret put ADMIN_PASSWORD
 ```
 
 ### Environment Variables in wrangler.toml
+
 ```toml
 [vars]
 NODE_ENV = "production"
@@ -201,11 +222,13 @@ During testing (`NODE_ENV=test`):
 ### Common Issues
 
 1. **"Required environment variable X is not set"**
+
    - Check that the variable is defined in your `.env` file
    - Verify the variable name matches exactly (case-sensitive)
    - Ensure the `.env` file is in the project root
 
 2. **Variables not loading**
+
    - Check file permissions on `.env` files
    - Verify `NODE_ENV` is set correctly
    - Restart your development server

@@ -1,10 +1,10 @@
 #!/usr/bin/env bun
 /**
  * 🔌 Fire22 API Testing Suite
- * 
+ *
  * Comprehensive API endpoint testing and validation
  * Tests all endpoints defined in src/api/ with realistic scenarios
- * 
+ *
  * @version 3.0.9
  * @author Fire22 Development Team
  */
@@ -53,9 +53,9 @@ class Fire22APITester {
       retries: 2,
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'Fire22-API-Tester/3.0.9'
+        'User-Agent': 'Fire22-API-Tester/3.0.9',
       },
-      ...config
+      ...config,
     };
   }
 
@@ -65,7 +65,7 @@ class Fire22APITester {
   private async discoverEndpoints(): Promise<EndpointTest[]> {
     const endpoints: EndpointTest[] = [];
     const routesDir = join(process.cwd(), 'src/api/routes');
-    
+
     if (!existsSync(routesDir)) {
       console.warn('⚠️ API routes directory not found');
       return this.getDefaultEndpoints();
@@ -73,7 +73,7 @@ class Fire22APITester {
 
     // Add predefined endpoint tests
     endpoints.push(...this.getDefaultEndpoints());
-    
+
     return endpoints;
   }
 
@@ -88,14 +88,14 @@ class Fire22APITester {
         path: '/api/health',
         description: 'Health check endpoint',
         expectedStatus: 200,
-        expectedFields: ['status', 'timestamp']
+        expectedFields: ['status', 'timestamp'],
       },
       {
         method: 'GET',
         path: '/api/health/detailed',
         description: 'Detailed health check',
         expectedStatus: 200,
-        expectedFields: ['status', 'services', 'uptime']
+        expectedFields: ['status', 'services', 'uptime'],
       },
 
       // Authentication endpoints (public)
@@ -105,17 +105,17 @@ class Fire22APITester {
         description: 'User authentication',
         body: {
           username: 'test-user',
-          password: 'test-password'
+          password: 'test-password',
         },
         expectedStatus: 200,
-        expectedFields: ['token', 'user']
+        expectedFields: ['token', 'user'],
       },
       {
         method: 'POST',
         path: '/api/auth/refresh',
         description: 'Token refresh',
         expectedStatus: 200,
-        auth: true
+        auth: true,
       },
 
       // Manager endpoints (protected)
@@ -125,7 +125,7 @@ class Fire22APITester {
         description: 'Get agent list',
         expectedStatus: 200,
         expectedFields: ['agents'],
-        auth: true
+        auth: true,
       },
       {
         method: 'POST',
@@ -133,11 +133,11 @@ class Fire22APITester {
         description: 'Get live wagers',
         body: {
           agentId: 'test-agent',
-          limit: 10
+          limit: 10,
         },
         expectedStatus: 200,
         expectedFields: ['wagers'],
-        auth: true
+        auth: true,
       },
       {
         method: 'POST',
@@ -146,11 +146,11 @@ class Fire22APITester {
         body: {
           agentId: 'test-agent',
           startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-          endDate: new Date().toISOString()
+          endDate: new Date().toISOString(),
         },
         expectedStatus: 200,
         expectedFields: ['figures'],
-        auth: true
+        auth: true,
       },
 
       // Admin endpoints (protected)
@@ -160,7 +160,7 @@ class Fire22APITester {
         description: 'Get agent configurations',
         expectedStatus: 200,
         expectedFields: ['agents'],
-        auth: true
+        auth: true,
       },
       {
         method: 'GET',
@@ -168,7 +168,7 @@ class Fire22APITester {
         description: 'Get agent configurations for dashboard',
         expectedStatus: 200,
         expectedFields: ['data'],
-        auth: true
+        auth: true,
       },
 
       // Customer endpoints (protected)
@@ -177,7 +177,7 @@ class Fire22APITester {
         path: '/api/customer/profile',
         description: 'Get customer profile',
         expectedStatus: 200,
-        auth: true
+        auth: true,
       },
 
       // Financial endpoints (protected)
@@ -187,7 +187,7 @@ class Fire22APITester {
         description: 'Get account balance',
         expectedStatus: 200,
         expectedFields: ['balance'],
-        auth: true
+        auth: true,
       },
 
       // Other endpoints
@@ -195,8 +195,8 @@ class Fire22APITester {
         method: 'GET',
         path: '/api/other/test',
         description: 'Test endpoint',
-        expectedStatus: 200
-      }
+        expectedStatus: 200,
+      },
     ];
   }
 
@@ -210,9 +210,9 @@ class Fire22APITester {
         headers: this.config.headers,
         body: JSON.stringify({
           username: process.env.TEST_USERNAME || 'admin',
-          password: process.env.TEST_PASSWORD || 'password'
+          password: process.env.TEST_PASSWORD || 'password',
         }),
-        signal: AbortSignal.timeout(this.config.timeout)
+        signal: AbortSignal.timeout(this.config.timeout),
       });
 
       if (response.ok) {
@@ -236,21 +236,21 @@ class Fire22APITester {
   private async testEndpoint(test: EndpointTest): Promise<TestResult> {
     const startTime = performance.now();
     const url = `${this.config.baseUrl}${test.path}`;
-    
+
     // Skip protected endpoints if no auth token
     if (test.auth && !this.authToken) {
       return {
         endpoint: test.path,
         method: test.method,
         status: 'skip',
-        error: 'No authentication token available'
+        error: 'No authentication token available',
       };
     }
 
     // Prepare headers
     const headers = {
       ...this.config.headers,
-      ...test.headers
+      ...test.headers,
     };
 
     if (test.auth && this.authToken) {
@@ -261,7 +261,7 @@ class Fire22APITester {
     const options: RequestInit = {
       method: test.method,
       headers,
-      signal: AbortSignal.timeout(this.config.timeout)
+      signal: AbortSignal.timeout(this.config.timeout),
     };
 
     if (test.body && ['POST', 'PUT', 'PATCH'].includes(test.method)) {
@@ -271,11 +271,13 @@ class Fire22APITester {
     let attempt = 0;
     while (attempt < this.config.retries) {
       try {
-        console.log(`🧪 Testing ${test.method} ${test.path}${attempt > 0 ? ` (retry ${attempt})` : ''}`);
-        
+        console.log(
+          `🧪 Testing ${test.method} ${test.path}${attempt > 0 ? ` (retry ${attempt})` : ''}`
+        );
+
         const response = await fetch(url, options);
         const responseTime = performance.now() - startTime;
-        
+
         // Check status code
         if (response.status !== test.expectedStatus) {
           const responseText = await response.text();
@@ -285,7 +287,7 @@ class Fire22APITester {
             status: 'fail',
             statusCode: response.status,
             responseTime,
-            error: `Expected status ${test.expectedStatus}, got ${response.status}. Response: ${responseText}`
+            error: `Expected status ${test.expectedStatus}, got ${response.status}. Response: ${responseText}`,
           };
         }
 
@@ -310,7 +312,7 @@ class Fire22APITester {
               status: warnings.length > 0 ? 'fail' : 'pass',
               statusCode: response.status,
               responseTime,
-              warnings: warnings.length > 0 ? warnings : undefined
+              warnings: warnings.length > 0 ? warnings : undefined,
             };
           } catch (jsonError) {
             return {
@@ -319,7 +321,7 @@ class Fire22APITester {
               status: 'fail',
               statusCode: response.status,
               responseTime,
-              error: 'Invalid JSON response'
+              error: 'Invalid JSON response',
             };
           }
         }
@@ -329,9 +331,8 @@ class Fire22APITester {
           method: test.method,
           status: 'pass',
           statusCode: response.status,
-          responseTime
+          responseTime,
         };
-
       } catch (error) {
         attempt++;
         if (attempt >= this.config.retries) {
@@ -340,10 +341,10 @@ class Fire22APITester {
             method: test.method,
             status: 'fail',
             responseTime: performance.now() - startTime,
-            error: `Network error: ${error.message}`
+            error: `Network error: ${error.message}`,
           };
         }
-        
+
         // Wait before retry
         await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
       }
@@ -354,7 +355,7 @@ class Fire22APITester {
       endpoint: test.path,
       method: test.method,
       status: 'fail',
-      error: 'Unknown error'
+      error: 'Unknown error',
     };
   }
 
@@ -364,14 +365,14 @@ class Fire22APITester {
   private hasField(obj: any, fieldPath: string): boolean {
     const fields = fieldPath.split('.');
     let current = obj;
-    
+
     for (const field of fields) {
       if (current === null || current === undefined || !(field in current)) {
         return false;
       }
       current = current[field];
     }
-    
+
     return true;
   }
 
@@ -396,28 +397,28 @@ class Fire22APITester {
     for (const endpoint of endpoints) {
       const result = await this.testEndpoint(endpoint);
       this.results.push(result);
-      
+
       // Log result
       const emoji = result.status === 'pass' ? '✅' : result.status === 'fail' ? '❌' : '⏭️';
       const responseTime = result.responseTime ? ` (${result.responseTime.toFixed(2)}ms)` : '';
       console.log(`${emoji} ${result.method} ${result.endpoint}${responseTime}`);
-      
+
       if (result.error) {
         console.log(`   💥 Error: ${result.error}`);
       }
-      
+
       if (result.warnings) {
         result.warnings.forEach(warning => {
           console.log(`   ⚠️ Warning: ${warning}`);
         });
       }
-      
+
       console.log(''); // Empty line for readability
     }
 
     // Print summary
     this.printSummary();
-    
+
     return this.results;
   }
 
@@ -429,19 +430,18 @@ class Fire22APITester {
     const failed = this.results.filter(r => r.status === 'fail').length;
     const skipped = this.results.filter(r => r.status === 'skip').length;
     const total = this.results.length;
-    
-    const avgResponseTime = this.results
-      .filter(r => r.responseTime)
-      .reduce((sum, r) => sum + r.responseTime!, 0) / 
+
+    const avgResponseTime =
+      this.results.filter(r => r.responseTime).reduce((sum, r) => sum + r.responseTime!, 0) /
       this.results.filter(r => r.responseTime).length;
 
     console.log('📊 Test Results Summary');
     console.log('='.repeat(50));
-    console.log(`✅ Passed: ${passed}/${total} (${((passed/total) * 100).toFixed(1)}%)`);
-    console.log(`❌ Failed: ${failed}/${total} (${((failed/total) * 100).toFixed(1)}%)`);
-    console.log(`⏭️ Skipped: ${skipped}/${total} (${((skipped/total) * 100).toFixed(1)}%)`);
+    console.log(`✅ Passed: ${passed}/${total} (${((passed / total) * 100).toFixed(1)}%)`);
+    console.log(`❌ Failed: ${failed}/${total} (${((failed / total) * 100).toFixed(1)}%)`);
+    console.log(`⏭️ Skipped: ${skipped}/${total} (${((skipped / total) * 100).toFixed(1)}%)`);
     console.log(`⏱️ Average Response Time: ${avgResponseTime.toFixed(2)}ms`);
-    
+
     if (failed > 0) {
       console.log('\n❌ Failed Tests:');
       this.results
@@ -450,8 +450,10 @@ class Fire22APITester {
           console.log(`   • ${result.method} ${result.endpoint}: ${result.error}`);
         });
     }
-    
-    console.log(`\n🎯 Overall Status: ${failed === 0 ? '✅ All tests passed!' : '❌ Some tests failed'}`);
+
+    console.log(
+      `\n🎯 Overall Status: ${failed === 0 ? '✅ All tests passed!' : '❌ Some tests failed'}`
+    );
   }
 
   /**
@@ -461,7 +463,7 @@ class Fire22APITester {
     const passed = this.results.filter(r => r.status === 'pass').length;
     const failed = this.results.filter(r => r.status === 'fail').length;
     const skipped = this.results.filter(r => r.status === 'skip').length;
-    
+
     return {
       timestamp: new Date().toISOString(),
       config: this.config,
@@ -471,12 +473,11 @@ class Fire22APITester {
         failed,
         skipped,
         success_rate: passed / this.results.length,
-        average_response_time: this.results
-          .filter(r => r.responseTime)
-          .reduce((sum, r) => sum + r.responseTime!, 0) / 
-          this.results.filter(r => r.responseTime).length || 0
+        average_response_time:
+          this.results.filter(r => r.responseTime).reduce((sum, r) => sum + r.responseTime!, 0) /
+            this.results.filter(r => r.responseTime).length || 0,
       },
-      results: this.results
+      results: this.results,
     };
   }
 }
@@ -484,14 +485,14 @@ class Fire22APITester {
 // CLI interface
 async function main() {
   const args = process.argv.slice(2);
-  
+
   // Parse command line arguments
   const config: Partial<TestConfig> = {};
   let outputFile: string | undefined;
-  
+
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    
+
     switch (arg) {
       case '--base-url':
       case '-u':
@@ -537,11 +538,11 @@ EXAMPLES:
         process.exit(0);
     }
   }
-  
+
   // Run tests
   const tester = new Fire22APITester(config);
   await tester.runTests();
-  
+
   // Save report if requested
   if (outputFile) {
     const report = tester.generateReport();

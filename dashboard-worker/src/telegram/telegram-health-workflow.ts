@@ -13,11 +13,7 @@
 import { Context, InlineKeyboard } from 'grammy';
 import { HealthMonitor, HealthUtils } from '../monitoring/health-check';
 import { WorkflowStep, WorkflowContext } from './telegram-workflow';
-import {
-  UI_ELEMENTS,
-  LANGUAGE_CODES,
-  ACCESS_LEVELS
-} from './telegram-constants';
+import { UI_ELEMENTS, LANGUAGE_CODES, ACCESS_LEVELS } from './telegram-constants';
 
 export interface HealthCheckWorkflowContext extends WorkflowContext {
   healthMonitor?: HealthMonitor;
@@ -37,12 +33,11 @@ export interface HealthAlert {
   severity: 'info' | 'warning' | 'critical';
 }
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🩺 HEALTH CHECK WORKFLOW STEPS
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 export class HealthCheckWorkflowSteps {
-
   /**
    * System Health Check Step
    */
@@ -53,7 +48,9 @@ export class HealthCheckWorkflowSteps {
       description: 'Perform comprehensive system health check',
       handler: async (ctx: Context, workflow: HealthCheckWorkflowContext) => {
         try {
-          const healthMonitor = workflow.healthMonitor || new HealthMonitor(['database', 'api', 'authentication', 'cache', 'monitoring']);
+          const healthMonitor =
+            workflow.healthMonitor ||
+            new HealthMonitor(['database', 'api', 'authentication', 'cache', 'monitoring']);
 
           const healthStatus = await healthMonitor.getSystemHealth();
           workflow.lastHealthCheck = new Date();
@@ -69,15 +66,20 @@ export class HealthCheckWorkflowSteps {
 
           await ctx.reply(healthMessage, {
             reply_markup: keyboard,
-            parse_mode: 'Markdown'
+            parse_mode: 'Markdown',
           });
-
         } catch (error) {
-          await ctx.reply(`❌ Health check failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          await ctx.reply(
+            `❌ Health check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+          );
         }
       },
-      permissions: [ACCESS_LEVELS.OPS_ANALYST, ACCESS_LEVELS.QUEUE_MANAGER, ACCESS_LEVELS.OPS_DIRECTOR],
-      nextSteps: ['health_component_check', 'health_alert_config', 'health_monitoring']
+      permissions: [
+        ACCESS_LEVELS.OPS_ANALYST,
+        ACCESS_LEVELS.QUEUE_MANAGER,
+        ACCESS_LEVELS.OPS_DIRECTOR,
+      ],
+      nextSteps: ['health_component_check', 'health_alert_config', 'health_monitoring'],
     };
   }
 
@@ -96,14 +98,18 @@ export class HealthCheckWorkflowSteps {
 
         components.forEach((component, index) => {
           const emoji = HealthCheckWorkflowSteps.getComponentEmoji(component);
-          keyboard.text(`${emoji} ${component.charAt(0).toUpperCase() + component.slice(1)}`, `health_component_${component}`);
+          keyboard.text(
+            `${emoji} ${component.charAt(0).toUpperCase() + component.slice(1)}`,
+            `health_component_${component}`
+          );
 
           if ((index + 1) % 2 === 0) {
             keyboard.row();
           }
         });
 
-        keyboard.row()
+        keyboard
+          .row()
           .text(`${UI_ELEMENTS.EMOJIS.LOADING} Check All`, 'health_check_all')
           .text(`${UI_ELEMENTS.EMOJIS.BACK} Back`, 'health_back');
 
@@ -111,11 +117,15 @@ export class HealthCheckWorkflowSteps {
           `${UI_ELEMENTS.EMOJIS.TARGET} **Select Component to Check**\n\nChoose a system component to perform detailed health analysis:`,
           {
             reply_markup: keyboard,
-            parse_mode: 'Markdown'
+            parse_mode: 'Markdown',
           }
         );
       },
-      permissions: [ACCESS_LEVELS.OPS_ANALYST, ACCESS_LEVELS.QUEUE_MANAGER, ACCESS_LEVELS.OPS_DIRECTOR]
+      permissions: [
+        ACCESS_LEVELS.OPS_ANALYST,
+        ACCESS_LEVELS.QUEUE_MANAGER,
+        ACCESS_LEVELS.OPS_DIRECTOR,
+      ],
     };
   }
 
@@ -131,7 +141,7 @@ export class HealthCheckWorkflowSteps {
         const currentThresholds = workflow.alertThresholds || {
           responseTime: 200,
           errorRate: 5.0,
-          uptime: 99.5
+          uptime: 99.5,
         };
 
         const configMessage = `
@@ -155,10 +165,10 @@ Configure alert thresholds to receive notifications when system health degrades:
 
         await ctx.reply(configMessage, {
           reply_markup: keyboard,
-          parse_mode: 'Markdown'
+          parse_mode: 'Markdown',
         });
       },
-      permissions: [ACCESS_LEVELS.OPS_DIRECTOR]
+      permissions: [ACCESS_LEVELS.OPS_DIRECTOR],
     };
   }
 
@@ -196,16 +206,20 @@ ${UI_ELEMENTS.EMOJIS.TARGET} Automatic recovery attempts
 
         await ctx.reply(monitoringMessage, {
           reply_markup: keyboard,
-          parse_mode: 'Markdown'
+          parse_mode: 'Markdown',
         });
       },
-      permissions: [ACCESS_LEVELS.OPS_ANALYST, ACCESS_LEVELS.QUEUE_MANAGER, ACCESS_LEVELS.OPS_DIRECTOR]
+      permissions: [
+        ACCESS_LEVELS.OPS_ANALYST,
+        ACCESS_LEVELS.QUEUE_MANAGER,
+        ACCESS_LEVELS.OPS_DIRECTOR,
+      ],
     };
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🛠️ UTILITY METHODS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   /**
    * Format health status for Telegram message
@@ -216,8 +230,12 @@ ${UI_ELEMENTS.EMOJIS.TARGET} Automatic recovery attempts
     let message = `${UI_ELEMENTS.EMOJIS.SHIELD} **System Health Status**\n\n`;
 
     // Overall status
-    const overallEmoji = status === 'healthy' ? UI_ELEMENTS.STATUS_ICONS.COMPLETED :
-                        status === 'degraded' ? UI_ELEMENTS.EMOJIS.WARNING : '❌';
+    const overallEmoji =
+      status === 'healthy'
+        ? UI_ELEMENTS.STATUS_ICONS.COMPLETED
+        : status === 'degraded'
+          ? UI_ELEMENTS.EMOJIS.WARNING
+          : '❌';
     message += `Overall: ${overallEmoji} ${status.charAt(0).toUpperCase() + status.slice(1)}\n\n`;
 
     // Component status
@@ -228,13 +246,13 @@ ${UI_ELEMENTS.EMOJIS.TARGET} Automatic recovery attempts
       { name: 'Authentication', key: 'authentication', emoji: '🔒' },
       { name: 'Database', key: 'database', emoji: '🗄️' },
       { name: 'Cache', key: 'cache', emoji: '⚡' },
-      { name: 'Monitoring', key: 'monitoring', emoji: '📊' }
+      { name: 'Monitoring', key: 'monitoring', emoji: '📊' },
     ];
 
     componentChecks.forEach(check => {
       const component = components[check.key];
-      const statusEmoji = component?.status === 'healthy' ? '✅' :
-                         component?.status === 'degraded' ? '⚠️' : '❌';
+      const statusEmoji =
+        component?.status === 'healthy' ? '✅' : component?.status === 'degraded' ? '⚠️' : '❌';
       message += `${statusEmoji} ${check.emoji} ${check.name}: ${component?.status || 'unknown'}\n`;
     });
 
@@ -248,11 +266,11 @@ ${UI_ELEMENTS.EMOJIS.TARGET} Automatic recovery attempts
    */
   private static getComponentEmoji(component: string): string {
     const emojiMap: Record<string, string> = {
-      'database': '🗄️',
-      'api': '🌐',
-      'authentication': '🔒',
-      'cache': '⚡',
-      'monitoring': '📊'
+      database: '🗄️',
+      api: '🌐',
+      authentication: '🔒',
+      cache: '⚡',
+      monitoring: '📊',
     };
     return emojiMap[component] || '🔧';
   }
@@ -278,22 +296,27 @@ ${UI_ELEMENTS.EMOJIS.TARGET} Automatic recovery attempts
       status: componentHealth?.status || 'unknown',
       message,
       timestamp: new Date(),
-      severity
+      severity,
     };
   }
 }
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🤖 HEALTH CHECK COMMAND HANDLER
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 export class HealthCheckCommandHandler {
-
   private healthMonitor: HealthMonitor;
   private activeMonitors: Map<string, NodeJS.Timeout> = new Map();
 
   constructor() {
-    this.healthMonitor = new HealthMonitor(['database', 'api', 'authentication', 'cache', 'monitoring']);
+    this.healthMonitor = new HealthMonitor([
+      'database',
+      'api',
+      'authentication',
+      'cache',
+      'monitoring',
+    ]);
   }
 
   /**
@@ -352,11 +375,12 @@ export class HealthCheckCommandHandler {
 
       await ctx.reply(message, {
         reply_markup: keyboard,
-        parse_mode: 'Markdown'
+        parse_mode: 'Markdown',
       });
-
     } catch (error) {
-      await ctx.reply(`❌ Health check failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      await ctx.reply(
+        `❌ Health check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -368,8 +392,8 @@ export class HealthCheckCommandHandler {
       const health = await this.healthMonitor.checkComponent(componentName);
 
       const emoji = HealthCheckWorkflowSteps.getComponentEmoji(componentName);
-      const statusEmoji = health.status === 'healthy' ? '✅' :
-                         health.status === 'degraded' ? '⚠️' : '❌';
+      const statusEmoji =
+        health.status === 'healthy' ? '✅' : health.status === 'degraded' ? '⚠️' : '❌';
 
       const message = `
 ${statusEmoji} **${componentName.charAt(0).toUpperCase() + componentName.slice(1)} Health Check**
@@ -377,12 +401,16 @@ ${statusEmoji} **${componentName.charAt(0).toUpperCase() + componentName.slice(1
 ${emoji} Status: ${health.status.toUpperCase()}
 📝 Message: ${health.message}
 
-${health.metrics ? `📊 Metrics:
+${
+  health.metrics
+    ? `📊 Metrics:
 • Response Time: ${health.metrics.responseTime}ms
 • CPU Usage: ${health.metrics.cpuUsage.toFixed(1)}%
 • Memory Usage: ${health.metrics.memoryUsage.toFixed(1)}%
 • Active Connections: ${health.metrics.activeConnections}
-• Timestamp: ${new Date(health.metrics.timestamp).toLocaleTimeString()}` : ''}
+• Timestamp: ${new Date(health.metrics.timestamp).toLocaleTimeString()}`
+    : ''
+}
       `;
 
       const keyboard = new InlineKeyboard()
@@ -391,11 +419,12 @@ ${health.metrics ? `📊 Metrics:
 
       await ctx.reply(message, {
         reply_markup: keyboard,
-        parse_mode: 'Markdown'
+        parse_mode: 'Markdown',
       });
-
     } catch (error) {
-      await ctx.reply(`❌ Component check failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      await ctx.reply(
+        `❌ Component check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -413,20 +442,25 @@ ${health.metrics ? `📊 Metrics:
       }
 
       // Start monitoring every 5 minutes
-      const monitorInterval = setInterval(async () => {
-        try {
-          const healthStatus = await this.healthMonitor.getSystemHealth();
+      const monitorInterval = setInterval(
+        async () => {
+          try {
+            const healthStatus = await this.healthMonitor.getSystemHealth();
 
-          // Check for alerts
-          const alerts = this.checkForAlerts(healthStatus);
-          if (alerts.length > 0) {
-            const alertMessage = alerts.map(alert => alert.message).join('\n');
-            await ctx.reply(`🚨 **Health Alerts**\n\n${alertMessage}`, { parse_mode: 'Markdown' });
+            // Check for alerts
+            const alerts = this.checkForAlerts(healthStatus);
+            if (alerts.length > 0) {
+              const alertMessage = alerts.map(alert => alert.message).join('\n');
+              await ctx.reply(`🚨 **Health Alerts**\n\n${alertMessage}`, {
+                parse_mode: 'Markdown',
+              });
+            }
+          } catch (error) {
+            console.error('Monitoring error:', error);
           }
-        } catch (error) {
-          console.error('Monitoring error:', error);
-        }
-      }, 5 * 60 * 1000); // 5 minutes
+        },
+        5 * 60 * 1000
+      ); // 5 minutes
 
       this.activeMonitors.set(userId, monitorInterval);
 
@@ -434,7 +468,6 @@ ${health.metrics ? `📊 Metrics:
         '✅ Health monitoring started!\n\n📊 Monitoring every 5 minutes\n🔔 You will receive alerts for health issues\n\nUse `/health monitor stop` to stop monitoring.',
         { parse_mode: 'Markdown' }
       );
-
     } else if (action === 'stop') {
       const monitorInterval = this.activeMonitors.get(userId);
       if (monitorInterval) {
@@ -455,8 +488,7 @@ ${health.metrics ? `📊 Metrics:
   private formatQuickHealthMessage(healthStatus: any): string {
     const { status, components } = healthStatus;
 
-    const overallEmoji = status === 'healthy' ? '✅' :
-                        status === 'degraded' ? '⚠️' : '❌';
+    const overallEmoji = status === 'healthy' ? '✅' : status === 'degraded' ? '⚠️' : '❌';
 
     let message = `${overallEmoji} **System Health: ${status.charAt(0).toUpperCase() + status.slice(1)}**\n\n`;
 
@@ -465,13 +497,13 @@ ${health.metrics ? `📊 Metrics:
       { name: 'API', key: 'api', emoji: '🌐' },
       { name: 'DB', key: 'database', emoji: '🗄️' },
       { name: 'Auth', key: 'authentication', emoji: '🔒' },
-      { name: 'Cache', key: 'cache', emoji: '⚡' }
+      { name: 'Cache', key: 'cache', emoji: '⚡' },
     ];
 
     quickComponents.forEach(comp => {
       const component = components[comp.key];
-      const statusEmoji = component?.status === 'healthy' ? '✅' :
-                         component?.status === 'degraded' ? '⚠️' : '❌';
+      const statusEmoji =
+        component?.status === 'healthy' ? '✅' : component?.status === 'degraded' ? '⚠️' : '❌';
       message += `${statusEmoji} ${comp.emoji} ${comp.name}: ${component?.status || 'unknown'}\n`;
     });
 
@@ -509,7 +541,7 @@ ${health.metrics ? `📊 Metrics:
       }
     } else {
       // Clean up all monitors
-      this.activeMonitors.forEach((interval) => clearInterval(interval));
+      this.activeMonitors.forEach(interval => clearInterval(interval));
       this.activeMonitors.clear();
     }
   }

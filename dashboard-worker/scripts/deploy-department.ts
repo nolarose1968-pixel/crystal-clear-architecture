@@ -2,14 +2,14 @@
 
 /**
  * 🚀 Fire22 Department Deployment System
- * 
+ *
  * Deploys department-specific pages to Cloudflare Pages
  * Integrates with existing Bun build system and Wrangler
  */
 
-import { $ } from "bun";
-import { readFileSync, existsSync } from "fs";
-import { join } from "path";
+import { $ } from 'bun';
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 
 interface DeployOptions {
   department?: string;
@@ -31,7 +31,7 @@ interface Department {
 class Fire22DepartmentDeployment {
   private readonly teamDirectory: any;
   private readonly distDir = join(process.cwd(), 'dist', 'pages');
-  
+
   constructor() {
     const teamDirectoryPath = join(process.cwd(), 'src', 'communications', 'team-directory.json');
     this.teamDirectory = JSON.parse(readFileSync(teamDirectoryPath, 'utf-8'));
@@ -42,15 +42,15 @@ class Fire22DepartmentDeployment {
    */
   async deploy(options: DeployOptions = {}): Promise<void> {
     const startTime = Bun.nanoseconds();
-    
+
     console.log('🚀 Fire22 Department Deployment System');
-    console.log('===================================');
-    
+    console.log('!==!==!==!==!==!=====');
+
     const env = options.environment || 'development';
     console.log(`\n🎯 Environment: ${env}`);
     console.log(`🏢 Department: ${options.department || 'ALL'}`);
     console.log(`👁️ Preview Mode: ${options.preview ? 'YES' : 'NO'}`);
-    
+
     if (options.dryRun) {
       console.log('🔍 DRY RUN MODE - No actual deployment');
     }
@@ -58,10 +58,10 @@ class Fire22DepartmentDeployment {
     try {
       // Verify prerequisites
       await this.verifyPrerequisites(options);
-      
+
       // Build pages if not exists
       await this.ensureBuild(options);
-      
+
       if (options.department) {
         // Deploy specific department
         await this.deploySingleDepartment(options.department, options);
@@ -69,19 +69,18 @@ class Fire22DepartmentDeployment {
         // Deploy all departments
         await this.deployAllDepartments(options);
       }
-      
+
       // Deploy feeds and assets
       await this.deployFeeds(options);
-      
+
       // Update deployment status
       await this.updateDeploymentStatus(options);
-      
+
       const deployTime = (Bun.nanoseconds() - startTime) / 1_000_000;
       console.log(`\n✅ Deployment completed in ${deployTime.toFixed(2)}ms`);
-      
+
       // Show deployment URLs
       this.showDeploymentUrls(options);
-      
     } catch (error) {
       console.error('❌ Deployment failed:', error);
       process.exit(1);
@@ -93,7 +92,7 @@ class Fire22DepartmentDeployment {
    */
   private async verifyPrerequisites(options: DeployOptions): Promise<void> {
     console.log('\n✅ Verifying prerequisites...');
-    
+
     // Check if wrangler is available
     try {
       await $`wrangler --version`;
@@ -101,7 +100,7 @@ class Fire22DepartmentDeployment {
     } catch (error) {
       throw new Error('Wrangler CLI not found. Install: npm install -g wrangler');
     }
-    
+
     // Check if authenticated with Cloudflare
     try {
       await $`wrangler whoami`;
@@ -109,13 +108,13 @@ class Fire22DepartmentDeployment {
     } catch (error) {
       throw new Error('Not authenticated with Cloudflare. Run: wrangler login');
     }
-    
+
     // Check if dist directory exists
     if (!existsSync(this.distDir)) {
       throw new Error(`Build directory not found: ${this.distDir}. Run: bun run build:pages`);
     }
     console.log('  ✅ Build directory exists');
-    
+
     // Verify environment configuration
     const wranglerConfigPath = join(process.cwd(), 'wrangler.toml');
     if (!existsSync(wranglerConfigPath)) {
@@ -129,20 +128,18 @@ class Fire22DepartmentDeployment {
    */
   private async ensureBuild(options: DeployOptions): Promise<void> {
     console.log('\n🏗️ Ensuring build is ready...');
-    
+
     const manifestPath = join(this.distDir, 'manifest.json');
-    
+
     if (!existsSync(manifestPath)) {
       console.log('  🔨 Build not found, building pages...');
       if (!options.dryRun) {
-        const buildArgs = [
-          '--env', options.environment || 'development'
-        ];
-        
+        const buildArgs = ['--env', options.environment || 'development'];
+
         if (options.department) {
           buildArgs.push('--dept', options.department);
         }
-        
+
         await $`bun run scripts/build-pages.ts ${buildArgs}`;
       }
       console.log('  ✅ Build completed');
@@ -156,36 +153,40 @@ class Fire22DepartmentDeployment {
    */
   private async deploySingleDepartment(deptId: string, options: DeployOptions): Promise<void> {
     console.log(`\n🏢 Deploying ${deptId} department...`);
-    
+
     const department = this.getDepartment(deptId);
     if (!department) {
       throw new Error(`Department not found: ${deptId}`);
     }
-    
+
     const deptDistPath = join(this.distDir, deptId);
     if (!existsSync(deptDistPath)) {
       throw new Error(`Department build not found: ${deptDistPath}`);
     }
-    
+
     if (!options.dryRun) {
       const deployArgs = [
-        'pages', 'deploy', deptDistPath,
-        '--project-name', 'fire22-dashboard',
-        '--env', deptId
+        'pages',
+        'deploy',
+        deptDistPath,
+        '--project-name',
+        'fire22-dashboard',
+        '--env',
+        deptId,
       ];
-      
+
       if (options.preview) {
         deployArgs.push('--compatibility-date', '2024-01-01');
       }
-      
+
       if (options.verbose) {
         deployArgs.push('--verbose');
       }
-      
+
       console.log(`  🚀 Deploying to ${deptId}.dashboard.fire22.ag...`);
       await $`wrangler ${deployArgs}`;
     }
-    
+
     console.log(`  ✅ ${department.name} deployed successfully`);
   }
 
@@ -194,34 +195,37 @@ class Fire22DepartmentDeployment {
    */
   private async deployAllDepartments(options: DeployOptions): Promise<void> {
     console.log('\n🌐 Deploying all departments...');
-    
+
     const departments = this.getDepartments();
     const deploymentPromises = [];
-    
+
     for (const dept of departments) {
       const deptOptions = { ...options, department: dept.id };
       deploymentPromises.push(
         this.deploySingleDepartment(dept.id, { ...deptOptions, dryRun: options.dryRun })
       );
     }
-    
+
     // Deploy departments in parallel for better performance
     if (!options.dryRun) {
       await Promise.all(deploymentPromises);
     }
-    
+
     // Deploy main site
     console.log('\n🏠 Deploying main dashboard...');
     if (!options.dryRun) {
       const mainDeployArgs = [
-        'pages', 'deploy', this.distDir,
-        '--project-name', 'fire22-dashboard'
+        'pages',
+        'deploy',
+        this.distDir,
+        '--project-name',
+        'fire22-dashboard',
       ];
-      
+
       if (options.environment === 'production') {
         mainDeployArgs.push('--env', 'production');
       }
-      
+
       await $`wrangler ${mainDeployArgs}`;
     }
     console.log('  ✅ Main dashboard deployed');
@@ -232,12 +236,12 @@ class Fire22DepartmentDeployment {
    */
   private async deployFeeds(options: DeployOptions): Promise<void> {
     console.log('\n📡 Deploying RSS feeds...');
-    
+
     const feedsPath = join(this.distDir, 'feeds');
     if (existsSync(feedsPath) && !options.dryRun) {
       // Feeds are included in main deployment, but we can verify they exist
       const feedFiles = ['error-codes-rss.xml', 'error-codes-atom.xml', 'index.html'];
-      
+
       for (const feedFile of feedFiles) {
         const feedPath = join(feedsPath, feedFile);
         if (existsSync(feedPath)) {
@@ -254,7 +258,7 @@ class Fire22DepartmentDeployment {
    */
   private async updateDeploymentStatus(options: DeployOptions): Promise<void> {
     console.log('\n📊 Updating deployment status...');
-    
+
     const deploymentInfo = {
       timestamp: new Date().toISOString(),
       environment: options.environment || 'development',
@@ -262,9 +266,9 @@ class Fire22DepartmentDeployment {
       preview: options.preview || false,
       deployer: process.env.USER || 'unknown',
       commit: await this.getCurrentCommit(),
-      status: 'SUCCESS'
+      status: 'SUCCESS',
     };
-    
+
     console.log(`  📅 Deployment Time: ${deploymentInfo.timestamp}`);
     console.log(`  👤 Deployed By: ${deploymentInfo.deployer}`);
     console.log(`  📝 Commit: ${deploymentInfo.commit}`);
@@ -275,11 +279,11 @@ class Fire22DepartmentDeployment {
    */
   private showDeploymentUrls(options: DeployOptions): void {
     console.log('\n🔗 Deployment URLs:');
-    console.log('==================');
-    
+    console.log('!==!==!====');
+
     if (options.environment === 'production') {
       console.log('🌐 Main Dashboard: https://dashboard.fire22.ag');
-      
+
       if (options.department) {
         const dept = this.getDepartment(options.department);
         console.log(`🏢 ${dept?.name}: https://${options.department}.dashboard.fire22.ag`);
@@ -289,7 +293,7 @@ class Fire22DepartmentDeployment {
           console.log(`🏢 ${dept.name}: https://${dept.id}.dashboard.fire22.ag`);
         });
       }
-      
+
       console.log('📡 RSS Feed: https://dashboard.fire22.ag/feeds/error-codes-rss.xml');
       console.log('⚛️ Atom Feed: https://dashboard.fire22.ag/feeds/error-codes-atom.xml');
     } else {
@@ -303,7 +307,7 @@ class Fire22DepartmentDeployment {
    */
   private getDepartments(): Department[] {
     const departments: Department[] = [];
-    
+
     for (const [key, dept] of Object.entries(this.teamDirectory.departments)) {
       if (dept && typeof dept === 'object' && 'name' in dept) {
         departments.push({
@@ -312,11 +316,11 @@ class Fire22DepartmentDeployment {
           email: dept.email,
           domain: dept.domain,
           color: dept.color,
-          members: dept.members || []
+          members: dept.members || [],
         });
       }
     }
-    
+
     return departments;
   }
 
@@ -347,13 +351,13 @@ async function main() {
     environment: 'development',
     preview: false,
     dryRun: false,
-    verbose: false
+    verbose: false,
   };
-  
+
   // Parse command line arguments
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    
+
     switch (arg) {
       case '--env':
       case '--environment':
@@ -406,7 +410,7 @@ Department Self-Service Examples:
         }
     }
   }
-  
+
   const deployment = new Fire22DepartmentDeployment();
   await deployment.deploy(options);
 }

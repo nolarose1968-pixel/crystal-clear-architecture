@@ -5,6 +5,7 @@
 ### 🗂️ **Files to Organize (89 test files found)**
 
 #### ✅ **Already Organized (in tests/ directory)**
+
 - `tests/unit/api/health.test.ts`
 - `tests/unit/database/customers.test.ts`
 - `tests/unit/patterns/pattern-weaver.test.ts`
@@ -19,26 +20,31 @@
 #### 🔄 **Need to Move/Organize**
 
 ##### **Root Level Test Files (need to move)**
+
 - `complex-test-file.ts` → `tests/integration/complex-scenarios/`
 - `temp-security-test.js` → `tests/security/temp/`
 - `test-agent.js` → `tests/unit/agents/`
 - `test-*.ts` files → appropriate test directories
 
 ##### **Scripts Directory Tests (need to organize)**
+
 - `scripts/api-tester.ts` → `tests/tools/api-testing/`
 - `scripts/auth-test-suite.ts` → `tests/security/auth-suite/`
 - `scripts/fire22-*-test.ts` → `tests/integration/fire22/`
 - `scripts/test-*.ts` → appropriate test directories
 
 ##### **Src Directory Tests (need to move)**
+
 - `src/api/test/*.test.ts` → `tests/unit/api/`
 - `src/utils/*.test.ts` → `tests/unit/utils/`
 - `src/components/*.test.ts` → `tests/unit/components/`
 
 ##### **Old Test Directory (need to consolidate)**
+
 - `test/*` → merge with `tests/`
 
 ##### **Package Tests (need to organize)**
+
 - `packages/*/tests/*.test.ts` → `tests/packages/`
 - `workspaces/*/tests/*.test.ts` → `tests/workspaces/`
 
@@ -147,12 +153,14 @@ tests/
 ## 🔧 **Naming Convention Fixes**
 
 ### 📝 **File Naming Standards**
+
 - **Format**: `{feature-name}.test.ts` or `{component-name}.test.ts`
 - **Case**: kebab-case for file names
 - **Extension**: `.test.ts` for TypeScript, `.test.js` for JavaScript
 - **Descriptive**: Clear indication of what's being tested
 
 ### 🏷️ **Naming Issues to Fix**
+
 1. `complex-test-file.ts` → `complex-scenarios.test.ts`
 2. `temp-security-test.js` → `temp-security.test.ts`
 3. `test-agent.js` → `agent.test.ts`
@@ -163,18 +171,21 @@ tests/
 ## 🎯 **Organization Priorities**
 
 ### 🔥 **High Priority (Immediate)**
+
 1. Move scattered root-level test files
 2. Consolidate duplicate test directories (`test/` vs `tests/`)
 3. Fix naming conventions for clarity
 4. Remove obsolete/duplicate test files
 
 ### 📈 **Medium Priority**
+
 1. Organize scripts directory tests
 2. Move src directory tests to proper locations
 3. Organize package and workspace tests
 4. Create missing test categories
 
 ### 🚀 **Low Priority**
+
 1. Create comprehensive test documentation
 2. Add test coverage reporting
 3. Implement test automation workflows
@@ -191,4 +202,5 @@ tests/
 
 ---
 
-**Target: Transform 89 scattered test files into a professionally organized testing suite!** 🎯
+**Target: Transform 89 scattered test files into a professionally organized
+testing suite!** 🎯

@@ -54,8 +54,8 @@ export class APIVersionManager {
           'Initial API release',
           'Basic CRUD operations for users',
           'Authentication endpoints',
-          'Dashboard data endpoints'
-        ]
+          'Dashboard data endpoints',
+        ],
       },
       {
         version: 'v2',
@@ -67,9 +67,9 @@ export class APIVersionManager {
           'Real-time capabilities added',
           'Improved error handling',
           'Rate limiting implemented',
-          'API documentation with OpenAPI 3.0'
+          'API documentation with OpenAPI 3.0',
         ],
-        migrationGuide: 'https://docs.fire22.com/migration/v1-to-v2'
+        migrationGuide: 'https://docs.fire22.com/migration/v1-to-v2',
       },
       {
         version: 'v3',
@@ -80,9 +80,9 @@ export class APIVersionManager {
           'Advanced analytics endpoints',
           'Bulk operations support',
           'Enhanced filtering and sorting',
-          'GraphQL support (experimental)'
-        ]
-      }
+          'GraphQL support (experimental)',
+        ],
+      },
     ];
 
     // Register versions
@@ -95,7 +95,10 @@ export class APIVersionManager {
   /**
    * Parse API version from request
    */
-  parseVersion(request: Request): { version: string; method: 'header' | 'url' | 'accept' | 'default' } {
+  parseVersion(request: Request): {
+    version: string;
+    method: 'header' | 'url' | 'accept' | 'default';
+  } {
     if (!this.config.enableVersioning) {
       return { version: this.config.defaultVersion, method: 'default' };
     }
@@ -175,8 +178,7 @@ export class APIVersionManager {
    * Check if version is supported
    */
   isValidVersion(version: string): boolean {
-    return this.config.supportedVersions.includes(version) ||
-           this.versions.has(version);
+    return this.config.supportedVersions.includes(version) || this.versions.has(version);
   }
 
   /**
@@ -204,7 +206,7 @@ export class APIVersionManager {
       .filter(([_, info]) => info.status === 'deprecated')
       .map(([version, info]) => ({
         version,
-        sunsetDate: info.sunsetDate
+        sunsetDate: info.sunsetDate,
       }));
   }
 
@@ -240,21 +242,22 @@ export class APIVersionManager {
         defaultVersion: this.config.defaultVersion,
         versionInfo: request.versionInfo,
         timestamp: new Date().toISOString(),
-        requestId: (request as any).requestId || 'unknown'
-      }
+        requestId: (request as any).requestId || 'unknown',
+      },
     };
 
     const headers = {
       'Content-Type': 'application/json',
       'X-API-Version': request.apiVersion,
       'X-Supported-Versions': supportedVersions.join(', '),
-      'X-Default-Version': this.config.defaultVersion
+      'X-Default-Version': this.config.defaultVersion,
     };
 
     // Add deprecation warning
     if (this.isVersionDeprecated(request.apiVersion)) {
       headers['Warning'] = `299 fire22-api "Version ${request.apiVersion} is deprecated"`;
-      headers['X-Deprecation-Notice'] = 'This API version is deprecated and will be sunset soon. Please migrate to a newer version.';
+      headers['X-Deprecation-Notice'] =
+        'This API version is deprecated and will be sunset soon. Please migrate to a newer version.';
     }
 
     return new Response(JSON.stringify(response), { headers });
@@ -276,11 +279,11 @@ export class APIVersionManager {
         details: {
           requestedVersion,
           supportedVersions,
-          defaultVersion: this.config.defaultVersion
-        }
+          defaultVersion: this.config.defaultVersion,
+        },
       },
       timestamp: new Date().toISOString(),
-      requestId: requestId || 'unknown'
+      requestId: requestId || 'unknown',
     };
 
     return new Response(JSON.stringify(error), {
@@ -288,8 +291,8 @@ export class APIVersionManager {
       headers: {
         'Content-Type': 'application/json',
         'X-Supported-Versions': supportedVersions.join(', '),
-        'X-Default-Version': this.config.defaultVersion
-      }
+        'X-Default-Version': this.config.defaultVersion,
+      },
     });
   }
 
@@ -309,7 +312,7 @@ export class APIVersionManager {
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
-      headers
+      headers,
     });
   }
 
@@ -339,15 +342,16 @@ export class APIVersionManager {
       releaseDate: info.releaseDate,
       breaking: info.breaking,
       changes: info.changes,
-      migrationGuide: info.migrationGuide
+      migrationGuide: info.migrationGuide,
     }));
 
     const activeVersions = versionList.filter(v => v.status === 'active').length;
     const deprecatedVersions = versionList.filter(v => v.status === 'deprecated').length;
     const sunsetVersions = versionList.filter(v => v.status === 'sunset').length;
-    const latestVersion = versionList
-      .filter(v => v.status === 'active')
-      .sort((a, b) => b.releaseDate.getTime() - a.releaseDate.getTime())[0]?.version || 'v1';
+    const latestVersion =
+      versionList
+        .filter(v => v.status === 'active')
+        .sort((a, b) => b.releaseDate.getTime() - a.releaseDate.getTime())[0]?.version || 'v1';
 
     return {
       versions: versionList,
@@ -356,8 +360,8 @@ export class APIVersionManager {
         activeVersions,
         deprecatedVersions,
         sunsetVersions,
-        latestVersion
-      }
+        latestVersion,
+      },
     };
   }
 
@@ -418,5 +422,5 @@ export const defaultVersionConfig: VersionConfig = {
   versionHeader: 'X-API-Version',
   enableVersioning: true,
   strictVersioning: false,
-  fallbackToLatest: true
+  fallbackToLatest: true,
 };

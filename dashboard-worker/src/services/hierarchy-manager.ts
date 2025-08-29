@@ -18,7 +18,7 @@ import {
   LevelDescriptors,
   PermissionAction,
   PermissionScope,
-  getEffectiveLevel
+  getEffectiveLevel,
 } from '../types/hierarchy/unified';
 
 export class HierarchyManager {
@@ -26,7 +26,7 @@ export class HierarchyManager {
   private tree: HierarchyTree | null;
   private cache: Map<string, any>;
   private readonly cacheTimeout = 300000; // 5 minutes
-  
+
   constructor() {
     this.nodes = new Map();
     this.tree = null;
@@ -62,7 +62,7 @@ export class HierarchyManager {
     try {
       const response = await fetch('/api/hierarchy/unified');
       if (!response.ok) throw new Error('Failed to fetch hierarchy data');
-      
+
       const data = await response.json();
       this.loadNodes(data.nodes || []);
     } catch (error) {
@@ -85,18 +85,18 @@ export class HierarchyManager {
       if (!node.parentId) {
         root = node;
       }
-      
+
       departments.add(node.department);
-      
+
       // Create edges for reporting relationships
       if (node.parentId) {
         edges.push({
           from: node.parentId,
           to: node.id,
-          type: 'reports_to'
+          type: 'reports_to',
         });
       }
-      
+
       // Calculate max depth
       const depth = this.getNodeDepth(node.id);
       if (depth > maxDepth) maxDepth = depth;
@@ -115,8 +115,8 @@ export class HierarchyManager {
         totalNodes: this.nodes.size,
         maxDepth,
         departments: Array.from(departments),
-        lastUpdated: new Date().toISOString()
-      }
+        lastUpdated: new Date().toISOString(),
+      },
     };
   }
 
@@ -137,7 +137,7 @@ export class HierarchyManager {
       permissions: [],
       reportingTo: [],
       directReports: [],
-      mappings: {}
+      mappings: {},
     };
   }
 
@@ -147,10 +147,10 @@ export class HierarchyManager {
   private getNodeDepth(nodeId: string, visited = new Set<string>()): number {
     if (visited.has(nodeId)) return 0; // Circular reference protection
     visited.add(nodeId);
-    
+
     const node = this.nodes.get(nodeId);
     if (!node || !node.parentId) return 0;
-    
+
     return 1 + this.getNodeDepth(node.parentId, visited);
   }
 
@@ -184,25 +184,25 @@ export class HierarchyManager {
     // Include related nodes
     if (options.includeChildren || options.includeParents) {
       const expanded = new Set<UnifiedHierarchyNode>();
-      
+
       for (const node of results) {
         expanded.add(node);
-        
+
         if (options.includeChildren) {
           this.getDescendants(node.id, options.maxDepth).forEach(n => expanded.add(n));
         }
-        
+
         if (options.includeParents) {
           this.getAncestors(node.id).forEach(n => expanded.add(n));
         }
       }
-      
+
       results = Array.from(expanded);
     }
 
     // Cache results
     this.cache.set(cacheKey, { data: results, timestamp: Date.now() });
-    
+
     return results;
   }
 
@@ -211,12 +211,12 @@ export class HierarchyManager {
    */
   getDescendants(nodeId: string, maxDepth?: number, currentDepth = 0): UnifiedHierarchyNode[] {
     if (maxDepth && currentDepth >= maxDepth) return [];
-    
+
     const node = this.nodes.get(nodeId);
     if (!node) return [];
-    
+
     const descendants: UnifiedHierarchyNode[] = [];
-    
+
     for (const childId of node.children) {
       const child = this.nodes.get(childId);
       if (child) {
@@ -224,7 +224,7 @@ export class HierarchyManager {
         descendants.push(...this.getDescendants(childId, maxDepth, currentDepth + 1));
       }
     }
-    
+
     return descendants;
   }
 
@@ -234,7 +234,7 @@ export class HierarchyManager {
   getAncestors(nodeId: string): UnifiedHierarchyNode[] {
     const ancestors: UnifiedHierarchyNode[] = [];
     let current = this.nodes.get(nodeId);
-    
+
     while (current && current.parentId) {
       const parent = this.nodes.get(current.parentId);
       if (parent) {
@@ -244,7 +244,7 @@ export class HierarchyManager {
         break;
       }
     }
-    
+
     return ancestors;
   }
 
@@ -265,7 +265,7 @@ export class HierarchyManager {
 
     // Apply updates
     const updatedNode = { ...node, ...request.updates };
-    
+
     // Update children if requested
     if (request.updateChildren && request.updates.department) {
       for (const childId of node.children) {
@@ -278,19 +278,22 @@ export class HierarchyManager {
 
     // Save to database
     await this.saveNode(updatedNode, request.auditInfo);
-    
+
     // Update local state
     this.nodes.set(request.nodeId, updatedNode);
     this.clearCache();
     this.buildTree();
-    
+
     return updatedNode;
   }
 
   /**
    * Validate node update
    */
-  private validateUpdate(node: UnifiedHierarchyNode, updates: Partial<UnifiedHierarchyNode>): ValidationResult {
+  private validateUpdate(
+    node: UnifiedHierarchyNode,
+    updates: Partial<UnifiedHierarchyNode>
+  ): ValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -303,7 +306,7 @@ export class HierarchyManager {
           errors.push('Child level must be lower than parent level');
         }
       }
-      
+
       // Ensure no level inversions with children
       for (const childId of node.children) {
         const child = this.nodes.get(childId);
@@ -318,7 +321,7 @@ export class HierarchyManager {
       if (updates.parentId === node.id) {
         errors.push('Node cannot be its own parent');
       }
-      
+
       const ancestors = this.getAncestors(updates.parentId);
       if (ancestors.some(a => a.id === node.id)) {
         errors.push('Update would create circular reference');
@@ -336,9 +339,9 @@ export class HierarchyManager {
       const response = await fetch(`/api/hierarchy/unified/${node.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ node, auditInfo })
+        body: JSON.stringify({ node, auditInfo }),
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to save node');
       }
@@ -354,7 +357,7 @@ export class HierarchyManager {
   async migrate(migration: HierarchyMigration): Promise<void> {
     try {
       migration.status = 'in_progress';
-      
+
       switch (migration.sourceSystem) {
         case 'fire22':
           await this.migrateFire22Hierarchy(migration);
@@ -368,7 +371,7 @@ export class HierarchyManager {
         default:
           throw new Error(`Unknown source system: ${migration.sourceSystem}`);
       }
-      
+
       migration.status = 'completed';
     } catch (error) {
       migration.status = 'failed';
@@ -384,10 +387,10 @@ export class HierarchyManager {
   private async migrateFire22Hierarchy(migration: HierarchyMigration): Promise<void> {
     const response = await fetch('/api/agents/hierarchy');
     const agents = await response.json();
-    
+
     for (const agent of agents) {
       const level = Fire22AgentMapping[agent.level] || UniversalLevel.STAFF;
-      
+
       const node: UnifiedHierarchyNode = {
         id: `fire22_${agent.agentId}`,
         name: agent.name,
@@ -401,10 +404,10 @@ export class HierarchyManager {
         directReports: agent.children || [],
         mappings: {
           fire22AgentLevel: agent.level,
-          customAttributes: agent
-        }
+          customAttributes: agent,
+        },
       };
-      
+
       this.nodes.set(node.id, node);
     }
   }
@@ -430,14 +433,14 @@ export class HierarchyManager {
    */
   private convertPermissions(legacyPermissions: any[]): UnifiedPermission[] {
     if (!legacyPermissions) return [];
-    
+
     return legacyPermissions.map(p => ({
       resource: p.resource || 'unknown',
       actions: p.actions || [PermissionAction.READ],
       scope: p.scope || PermissionScope.SELF,
       conditions: p.conditions,
       inherited: p.inherited || false,
-      expiresAt: p.expiresAt
+      expiresAt: p.expiresAt,
     }));
   }
 
@@ -450,9 +453,9 @@ export class HierarchyManager {
       [UniversalLevel.DIRECTOR]: 0,
       [UniversalLevel.MANAGER]: 0,
       [UniversalLevel.SENIOR_STAFF]: 0,
-      [UniversalLevel.STAFF]: 0
+      [UniversalLevel.STAFF]: 0,
     };
-    
+
     const departmentDistribution: Record<string, number> = {};
     const spanOfControls: number[] = [];
     const orphanedNodes: string[] = [];
@@ -461,21 +464,23 @@ export class HierarchyManager {
     this.nodes.forEach(node => {
       // Level distribution
       levelDistribution[node.level]++;
-      
+
       // Department distribution
-      departmentDistribution[node.department] = 
-        (departmentDistribution[node.department] || 0) + 1;
-      
+      departmentDistribution[node.department] = (departmentDistribution[node.department] || 0) + 1;
+
       // Span of control
       if (node.children.length > 0) {
         spanOfControls.push(node.children.length);
       }
-      
+
       // Orphaned nodes (excluding root)
-      if (!node.parentId && node.id !== 'root' && !this.tree?.root || this.tree?.root.id !== node.id) {
+      if (
+        (!node.parentId && node.id !== 'root' && !this.tree?.root) ||
+        this.tree?.root.id !== node.id
+      ) {
         orphanedNodes.push(node.id);
       }
-      
+
       // Circular references
       const path = this.detectCircularReference(node.id);
       if (path.length > 0) {
@@ -483,9 +488,10 @@ export class HierarchyManager {
       }
     });
 
-    const avgSpanOfControl = spanOfControls.length > 0 
-      ? spanOfControls.reduce((a, b) => a + b, 0) / spanOfControls.length 
-      : 0;
+    const avgSpanOfControl =
+      spanOfControls.length > 0
+        ? spanOfControls.reduce((a, b) => a + b, 0) / spanOfControls.length
+        : 0;
 
     // Calculate compliance score (0-100)
     const complianceScore = this.calculateComplianceScore(orphanedNodes, circularReferences);
@@ -496,24 +502,28 @@ export class HierarchyManager {
       avgSpanOfControl,
       orphanedNodes,
       circularReferences,
-      complianceScore
+      complianceScore,
     };
   }
 
   /**
    * Detect circular references in hierarchy
    */
-  private detectCircularReference(nodeId: string, visited = new Set<string>(), path: string[] = []): string[] {
+  private detectCircularReference(
+    nodeId: string,
+    visited = new Set<string>(),
+    path: string[] = []
+  ): string[] {
     if (visited.has(nodeId)) {
       return [...path, nodeId];
     }
-    
+
     visited.add(nodeId);
     path.push(nodeId);
-    
+
     const node = this.nodes.get(nodeId);
     if (!node || !node.parentId) return [];
-    
+
     return this.detectCircularReference(node.parentId, visited, path);
   }
 
@@ -522,16 +532,16 @@ export class HierarchyManager {
    */
   private calculateComplianceScore(orphanedNodes: string[], circularRefs: any[]): number {
     let score = 100;
-    
+
     // Deduct for orphaned nodes
     score -= orphanedNodes.length * 5;
-    
+
     // Deduct for circular references
     score -= circularRefs.length * 10;
-    
+
     // Deduct if no root
     if (!this.tree?.root) score -= 20;
-    
+
     return Math.max(0, score);
   }
 
@@ -550,7 +560,7 @@ export class HierarchyManager {
       nodes: Array.from(this.nodes.values()),
       tree: this.tree,
       analytics: this.getAnalytics(),
-      exportDate: new Date().toISOString()
+      exportDate: new Date().toISOString(),
     };
   }
 }

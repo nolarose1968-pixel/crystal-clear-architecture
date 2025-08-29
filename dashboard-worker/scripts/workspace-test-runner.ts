@@ -2,17 +2,17 @@
 
 /**
  * 🧪 Fire22 Workspace Test Runner
- * 
+ *
  * Advanced testing framework for workspace operations using Bun's testing capabilities
  * Integrates with the workspace orchestration system for comprehensive validation
- * 
+ *
  * Features:
  * - Memory-efficient testing with --smol
  * - Watch mode for continuous development
  * - Performance regression detection
  * - Cross-workspace integration testing
  * - Real-time progress reporting
- * 
+ *
  * @version 1.0.0
  * @author Fire22 Development Team
  */
@@ -96,16 +96,19 @@ export class WorkspaceTestRunner {
     this.setupTestEnvironment();
     this.setupSignalHandlers();
   }
-  
+
   /**
    * 🌐 Load Pattern Weaver System for advanced testing
    */
-  private async loadPatternWeaver(): Promise<{ weaver: PatternWeaver; registry: PatternRegistry } | null> {
+  private async loadPatternWeaver(): Promise<{
+    weaver: PatternWeaver;
+    registry: PatternRegistry;
+  } | null> {
     try {
       const patterns = await import('../src/patterns/index.ts');
       return {
         weaver: patterns.default.weaver,
-        registry: patterns.default.registry
+        registry: patterns.default.registry,
       };
     } catch (error) {
       console.warn('⚠️  Pattern Weaver System not available for testing');
@@ -119,12 +122,12 @@ export class WorkspaceTestRunner {
   private setupTestEnvironment(): void {
     const testDirs = [
       'test/workspace/unit',
-      'test/workspace/integration', 
+      'test/workspace/integration',
       'test/workspace/performance',
       'test/workspace/e2e',
       'test/fixtures',
       'test/utils',
-      'test/setup'
+      'test/setup',
     ];
 
     testDirs.forEach(dir => {
@@ -161,9 +164,9 @@ export class WorkspaceTestRunner {
   private async gracefulTestShutdown(): Promise<void> {
     try {
       console.log('⏳ Waiting for active tests to complete...');
-      
+
       const shutdownPromise = Promise.allSettled(this.activeTests);
-      const timeoutPromise = new Promise((_, reject) => 
+      const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Test shutdown timeout')), 5000)
       );
 
@@ -206,7 +209,7 @@ export class WorkspaceTestRunner {
       passed: 0,
       failed: 0,
       skipped: 0,
-      duration: '0ms'
+      duration: '0ms',
     };
 
     try {
@@ -216,7 +219,7 @@ export class WorkspaceTestRunner {
 
         console.log(`\n📋 Running ${suite} test suite...`);
         const suiteResult = await this.runTestSuite(suite, options);
-        
+
         totalPassed += suiteResult.passed;
         totalFailed += suiteResult.failed;
         totalSkipped += suiteResult.skipped;
@@ -257,7 +260,9 @@ export class WorkspaceTestRunner {
       console.log(`⏱️  Duration: ${results.duration}`);
 
       if (results.coverage) {
-        console.log(`📊 Coverage: ${results.coverage.lines}% lines, ${results.coverage.functions}% functions`);
+        console.log(
+          `📊 Coverage: ${results.coverage.lines}% lines, ${results.coverage.functions}% functions`
+        );
       }
 
       if (results.performance?.regressions?.length) {
@@ -265,7 +270,6 @@ export class WorkspaceTestRunner {
       }
 
       return results;
-
     } catch (error) {
       console.error('❌ Test suite execution failed:', error);
       results.failed = 1;
@@ -279,7 +283,7 @@ export class WorkspaceTestRunner {
    */
   private async runTestSuite(suite: string, options: TestRunnerOptions): Promise<TestResults> {
     const testPath = join(this.rootPath, 'test', 'workspace', suite);
-    
+
     if (!existsSync(testPath)) {
       console.log(`⚠️  Test suite directory not found: ${testPath}`);
       return { passed: 0, failed: 0, skipped: 0, duration: '0ms' };
@@ -306,8 +310,8 @@ export class WorkspaceTestRunner {
       env: {
         ...process.env,
         BUN_ENV: 'test',
-        NODE_ENV: 'test'
-      }
+        NODE_ENV: 'test',
+      },
     });
 
     const testPromise = this.processTestOutput(testProcess, suite);
@@ -332,7 +336,7 @@ export class WorkspaceTestRunner {
       // Stream stdout in real-time
       for await (const chunk of testProcess.stdout) {
         const output = new TextDecoder().decode(chunk);
-        
+
         // Parse test output for results
         const lines = output.split('\n');
         for (const line of lines) {
@@ -360,18 +364,17 @@ export class WorkspaceTestRunner {
         passed: exitCode === 0 ? Math.max(1, passed) : 0,
         failed: exitCode !== 0 ? Math.max(1, failed) : 0,
         skipped,
-        duration: `${duration}ms`
+        duration: `${duration}ms`,
       };
-
     } catch (error) {
       const duration = Date.now() - startTime;
       console.error(`❌ Error processing ${suite} tests:`, error);
-      
+
       return {
         passed: 0,
         failed: 1,
         skipped: 0,
-        duration: `${duration}ms`
+        duration: `${duration}ms`,
       };
     }
   }
@@ -387,7 +390,7 @@ export class WorkspaceTestRunner {
     // For now, return mock analysis
     return {
       regressions: [],
-      improvements: []
+      improvements: [],
     };
   }
 
@@ -404,7 +407,7 @@ export class WorkspaceTestRunner {
     return {
       lines: 85,
       functions: 90,
-      branches: 75
+      branches: 75,
     };
   }
 
@@ -521,19 +524,23 @@ TEST_NPM_REGISTRY=http://localhost:4873
 if (import.meta.main) {
   const args = process.argv.slice(2);
   const runner = new WorkspaceTestRunner();
-  
+
   const options: TestRunnerOptions = {
-    suites: args.includes('--unit') ? ['unit'] :
-            args.includes('--integration') ? ['integration'] :
-            args.includes('--performance') ? ['performance'] :
-            args.includes('--e2e') ? ['e2e'] :
-            ['unit', 'integration', 'performance'],
+    suites: args.includes('--unit')
+      ? ['unit']
+      : args.includes('--integration')
+        ? ['integration']
+        : args.includes('--performance')
+          ? ['performance']
+          : args.includes('--e2e')
+            ? ['e2e']
+            : ['unit', 'integration', 'performance'],
     watch: args.includes('--watch'),
     coverage: args.includes('--coverage'),
     smol: args.includes('--smol'),
     debug: args.includes('--debug'),
     verbose: args.includes('--verbose'),
-    envFile: '.env.test'
+    envFile: '.env.test',
   };
 
   try {

@@ -5,9 +5,9 @@
  * Syncs GitHub wiki repository with local wiki directory
  */
 
-import { $ } from "bun";
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "fs";
-import { join } from "path";
+import { $ } from 'bun';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
 interface SyncOptions {
   source?: string;
@@ -20,7 +20,7 @@ class WikiSynchronizer {
   private source: string;
   private target: string;
   private options: SyncOptions;
-  
+
   constructor(options: SyncOptions = {}) {
     this.source = options.source || 'wiki-repo';
     this.target = options.target || 'wiki';
@@ -29,10 +29,10 @@ class WikiSynchronizer {
 
   async sync(): Promise<void> {
     console.log('🔄 Wiki Synchronization');
-    console.log('======================');
+    console.log('!==!==!==!===');
     console.log(`📂 Source: ${this.source}`);
     console.log(`📂 Target: ${this.target}`);
-    
+
     if (this.options.dryRun) {
       console.log('🔍 DRY RUN MODE - No files will be modified');
     }
@@ -84,13 +84,13 @@ class WikiSynchronizer {
 
         if (!this.options.dryRun) {
           const content = readFileSync(sourcePath, 'utf-8');
-          
+
           // Process content (add metadata, fix links, etc.)
           const processedContent = this.processWikiContent(content, file);
-          
+
           writeFileSync(targetPath, processedContent);
         }
-        
+
         syncedCount++;
       }
     }
@@ -133,11 +133,11 @@ source: github-wiki
       { id: 'management', name: 'Management' },
       { id: 'hr', name: 'Human Resources' },
       { id: 'qa', name: 'Quality Assurance' },
-      { id: 'contributors', name: 'Team Contributors' }
+      { id: 'contributors', name: 'Team Contributors' },
     ];
 
     const deptDir = join(this.target, 'departments');
-    
+
     if (!existsSync(deptDir)) {
       if (!this.options.dryRun) {
         mkdirSync(deptDir, { recursive: true });
@@ -146,14 +146,14 @@ source: github-wiki
 
     for (const dept of departments) {
       const wikiPath = join(deptDir, `${dept.id}.md`);
-      
+
       if (!existsSync(wikiPath)) {
         const content = this.generateDepartmentWikiContent(dept);
-        
+
         if (this.options.verbose) {
           console.log(`  📝 Creating: departments/${dept.id}.md`);
         }
-        
+
         if (!this.options.dryRun) {
           writeFileSync(wikiPath, content);
         }

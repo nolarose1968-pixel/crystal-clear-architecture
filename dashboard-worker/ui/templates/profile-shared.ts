@@ -24,7 +24,11 @@ export function formatContactInfo(employee: EmployeeData): string {
 export function getEmployeeInitials(employee: EmployeeData): string {
   if (!employee.name) return '??';
   const names = employee.name.split(' ');
-  return names.map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2);
+  return names
+    .map(n => n.charAt(0))
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 }
 
 export function generateProfileMeta(employee: EmployeeData): string {

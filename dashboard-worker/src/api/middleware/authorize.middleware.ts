@@ -1,13 +1,16 @@
 /**
  * Authorization Middleware
- * 
+ *
  * Enforces role-based access control and scope restrictions
  */
 
 import type { AuthenticatedRequest } from './auth.middleware';
 
 class AuthorizationError extends Error {
-  constructor(message: string, public statusCode: number = 403) {
+  constructor(
+    message: string,
+    public statusCode: number = 403
+  ) {
     super(message);
     this.name = 'AuthorizationError';
   }
@@ -21,7 +24,7 @@ function hasPermission(userPermissions: string[], requiredPermission: string): b
   if (userPermissions.includes(requiredPermission)) {
     return true;
   }
-  
+
   // Wildcard match (e.g., 'admin.*' matches 'admin.users.create')
   const permissionParts = requiredPermission.split('.');
   for (let i = 1; i <= permissionParts.length; i++) {
@@ -30,7 +33,7 @@ function hasPermission(userPermissions: string[], requiredPermission: string): b
       return true;
     }
   }
-  
+
   return false;
 }
 
@@ -38,29 +41,22 @@ function hasPermission(userPermissions: string[], requiredPermission: string): b
  * Check if user has all required permissions
  */
 function hasAllPermissions(userPermissions: string[], requiredPermissions: string[]): boolean {
-  return requiredPermissions.every(permission => 
-    hasPermission(userPermissions, permission)
-  );
+  return requiredPermissions.every(permission => hasPermission(userPermissions, permission));
 }
 
 /**
  * Check if user has any of the required permissions
  */
 function hasAnyPermission(userPermissions: string[], requiredPermissions: string[]): boolean {
-  return requiredPermissions.some(permission => 
-    hasPermission(userPermissions, permission)
-  );
+  return requiredPermissions.some(permission => hasPermission(userPermissions, permission));
 }
 
 /**
  * Apply scope restrictions to data access
  */
-function applyScopeRestriction(
-  scope: any,
-  requestParams: any
-): boolean {
+function applyScopeRestriction(scope: any, requestParams: any): boolean {
   if (!scope) return true; // No scope restriction
-  
+
   switch (scope.type) {
     case 'agent':
       // Agent can only access their own customers
@@ -73,7 +69,7 @@ function applyScopeRestriction(
         }
       }
       break;
-      
+
     case 'customer':
       // Customer can only access their own data
       if (scope.restriction === 'self_only') {
@@ -89,7 +85,7 @@ function applyScopeRestriction(
       }
       break;
   }
-  
+
   return true;
 }
 
@@ -102,7 +98,7 @@ function hasMinimumLevel(userLevel: number, requiredLevel: number): boolean {
 
 /**
  * Authorization middleware factory
- * 
+ *
  * @param options Authorization options
  * @param options.permissions Required permissions (AND logic)
  * @param options.anyPermissions Required permissions (OR logic)
@@ -110,75 +106,100 @@ function hasMinimumLevel(userLevel: number, requiredLevel: number): boolean {
  * @param options.minLevel Minimum role level required
  * @param options.checkScope Whether to enforce scope restrictions
  */
-export function authorize(options: {
-  permissions?: string[];
-  anyPermissions?: string[];
-  roles?: string[];
-  minLevel?: number;
-  checkScope?: boolean;
-} | string[]) {
+export function authorize(
+  options:
+    | {
+        permissions?: string[];
+        anyPermissions?: string[];
+        roles?: string[];
+        minLevel?: number;
+        checkScope?: boolean;
+      }
+    | string[]
+) {
   // Handle simple array of permissions (backwards compatibility)
   if (Array.isArray(options)) {
     options = { permissions: options };
   }
-  
+
   return async (request: AuthenticatedRequest): Promise<Response | void> => {
     try {
       // Check if user is authenticated
       if (!request.user) {
-        return new Response(JSON.stringify({
-          error: 'Authentication required',
-          message: 'You must be authenticated to access this resource'
-        }), {
-          status: 401,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        return new Response(
+          JSON.stringify({
+            error: 'Authentication required',
+            message: 'You must be authenticated to access this resource',
+          }),
+          {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
-      
+
       // Check role restrictions
       if (options.roles && !options.roles.includes(request.user.role)) {
-        return new Response(JSON.stringify({
-          error: 'Insufficient role',
-          message: `This resource requires one of the following roles: ${options.roles.join(', ')}`
-        }), {
-          status: 403,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        return new Response(
+          JSON.stringify({
+            error: 'Insufficient role',
+            message: `This resource requires one of the following roles: ${options.roles.join(', ')}`,
+          }),
+          {
+            status: 403,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
-      
+
       // Check minimum level
       if (options.minLevel && !hasMinimumLevel(request.user.level, options.minLevel)) {
-        return new Response(JSON.stringify({
-          error: 'Insufficient access level',
-          message: `This resource requires access level ${options.minLevel} or higher`
-        }), {
-          status: 403,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        return new Response(
+          JSON.stringify({
+            error: 'Insufficient access level',
+            message: `This resource requires access level ${options.minLevel} or higher`,
+          }),
+          {
+            status: 403,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
-      
+
       // Check required permissions (AND logic)
-      if (options.permissions && !hasAllPermissions(request.user.permissions, options.permissions)) {
-        return new Response(JSON.stringify({
-          error: 'Insufficient permissions',
-          message: `This resource requires the following permissions: ${options.permissions.join(', ')}`
-        }), {
-          status: 403,
-          headers: { 'Content-Type': 'application/json' }
-        });
+      if (
+        options.permissions &&
+        !hasAllPermissions(request.user.permissions, options.permissions)
+      ) {
+        return new Response(
+          JSON.stringify({
+            error: 'Insufficient permissions',
+            message: `This resource requires the following permissions: ${options.permissions.join(', ')}`,
+          }),
+          {
+            status: 403,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
-      
+
       // Check any permissions (OR logic)
-      if (options.anyPermissions && !hasAnyPermission(request.user.permissions, options.anyPermissions)) {
-        return new Response(JSON.stringify({
-          error: 'Insufficient permissions',
-          message: `This resource requires at least one of the following permissions: ${options.anyPermissions.join(', ')}`
-        }), {
-          status: 403,
-          headers: { 'Content-Type': 'application/json' }
-        });
+      if (
+        options.anyPermissions &&
+        !hasAnyPermission(request.user.permissions, options.anyPermissions)
+      ) {
+        return new Response(
+          JSON.stringify({
+            error: 'Insufficient permissions',
+            message: `This resource requires at least one of the following permissions: ${options.anyPermissions.join(', ')}`,
+          }),
+          {
+            status: 403,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
-      
+
       // Apply scope restrictions
       if (options.checkScope !== false && request.user.scope) {
         // Get request parameters
@@ -186,39 +207,47 @@ export function authorize(options: {
         const queryParams = Object.fromEntries(url.searchParams);
         const bodyParams = request.body || {};
         const allParams = { ...queryParams, ...bodyParams };
-        
+
         if (!applyScopeRestriction(request.user.scope, allParams)) {
-          return new Response(JSON.stringify({
-            error: 'Access denied',
-            message: 'You can only access resources within your scope'
-          }), {
-            status: 403,
-            headers: { 'Content-Type': 'application/json' }
-          });
+          return new Response(
+            JSON.stringify({
+              error: 'Access denied',
+              message: 'You can only access resources within your scope',
+            }),
+            {
+              status: 403,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
         }
       }
-      
+
       // Authorization successful
       return;
-      
     } catch (error: any) {
       if (error instanceof AuthorizationError) {
-        return new Response(JSON.stringify({
-          error: 'Authorization failed',
-          message: error.message
-        }), {
-          status: error.statusCode,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        return new Response(
+          JSON.stringify({
+            error: 'Authorization failed',
+            message: error.message,
+          }),
+          {
+            status: error.statusCode,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
-      
-      return new Response(JSON.stringify({
-        error: 'Internal error',
-        message: 'Authorization service unavailable'
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
+
+      return new Response(
+        JSON.stringify({
+          error: 'Internal error',
+          message: 'Authorization service unavailable',
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
   };
 }
@@ -244,16 +273,16 @@ export async function canUserAccess(
   action: string
 ): Promise<boolean> {
   if (!user) return false;
-  
+
   // Admin can access everything
   if (user.role === 'admin') return true;
-  
+
   // Check permission for the action
   const permission = `${resource.type}.${action}`;
   if (!hasPermission(user.permissions, permission)) {
     return false;
   }
-  
+
   // Check scope restrictions
   if (user.scope) {
     switch (user.scope.restriction) {
@@ -267,7 +296,7 @@ export async function canUserAccess(
         return true;
     }
   }
-  
+
   return true;
 }
 
@@ -289,9 +318,9 @@ export async function logAuthorizationEvent(
     resource,
     allowed,
     reason,
-    ip: globalThis.clientIP || 'unknown'
+    ip: globalThis.clientIP || 'unknown',
   };
-  
+
   // Log to console for now (implement actual logging later)
   if (!allowed) {
     console.warn('Authorization denied:', event);

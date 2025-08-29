@@ -1,10 +1,13 @@
 # 🔧 Telegram Notifications Fix Guide
 
-> **Complete Solution for Fixing Telegram Notification Issues in Fire22 Dashboard**
+> **Complete Solution for Fixing Telegram Notification Issues in Fire22
+> Dashboard**
 
 ## 🚨 Problem Statement
 
-The dashboard was experiencing issues with Telegram notifications not sending properly. This guide provides a comprehensive solution to diagnose and fix all Telegram notification problems.
+The dashboard was experiencing issues with Telegram notifications not sending
+properly. This guide provides a comprehensive solution to diagnose and fix all
+Telegram notification problems.
 
 ## 📋 Quick Diagnosis
 
@@ -22,7 +25,8 @@ bun run scripts/telegram-notification-diagnostic.ts YOUR_BOT_TOKEN 123456789 @te
 
 ### 1. **Empty Notification Methods** ❌➡️✅
 
-**Problem:** The `sendNotification` methods in `telegram-integration.ts` were empty.
+**Problem:** The `sendNotification` methods in `telegram-integration.ts` were
+empty.
 
 **Solution:** Implemented proper notification sending with error handling:
 
@@ -67,7 +71,9 @@ export interface TelegramBotConfig {
   allowedUsers?: string[];
   adminUsers?: string[];
   database?: any; // Database connection
-  notificationSettings: { /* ... */ };
+  notificationSettings: {
+    /* ... */
+  };
 }
 ```
 
@@ -189,8 +195,8 @@ const bot = new Fire22TelegramBot({
     wagerUpdates: true,
     balanceChanges: true,
     systemAlerts: true,
-    weeklyReports: true
-  }
+    weeklyReports: true,
+  },
 });
 
 await bot.start();
@@ -200,10 +206,16 @@ await bot.start();
 
 ```typescript
 // Send to user by ID
-const notificationId = await bot.sendNotificationById(123456789, "Test message");
+const notificationId = await bot.sendNotificationById(
+  123456789,
+  'Test message'
+);
 
 // Send to user by username
-const notificationId2 = await bot.sendNotificationByUsername("username", "Test message");
+const notificationId2 = await bot.sendNotificationByUsername(
+  'username',
+  'Test message'
+);
 
 // Check status
 const status = bot.getNotificationStatus(notificationId);
@@ -217,47 +229,62 @@ const stats = bot.getNotificationStats();
 ### **Common Issues & Solutions**
 
 #### **Issue 1: "Bot token is invalid"**
+
 ```
 ❌ Bot token test failed: Unauthorized
 ```
+
 **Solution:**
+
 - Verify bot token from @BotFather
 - Check for extra spaces or characters
 - Ensure token format: `1234567890:ABCdefGHIjklMNOpqrsTUVwxyz`
 
 #### **Issue 2: "No telegram_id found for user"**
+
 ```
 ⚠️ No telegram_id found for user @username
 ```
+
 **Solution:**
+
 - User needs to register with `/register` command
 - Check database schema for `telegram_id` column
 - Verify user mapping in database
 
 #### **Issue 3: "Rate limit exceeded"**
+
 ```
 ⚠️ Rate limit reached, delaying notification
 ```
+
 **Solution:**
+
 - Reduce notification frequency
 - Implement message batching
 - Add delays between bulk sends
 - Upgrade to premium bot plan if needed
 
 #### **Issue 4: "Webhook not configured"**
+
 ```
 ⚠️ No webhook configured (using polling mode)
 ```
+
 **Solution:**
+
 - Configure webhook URL in bot settings
 - Ensure SSL certificate is valid
 - Use polling mode for development
 
 #### **Issue 5: "Database connection failed"**
+
 ```
 ❌ Database connection test failed
 ```
+
 **Solution:**
+
 - Verify database credentials
 - Check network connectivity
 - Ensure database is running
@@ -339,6 +366,7 @@ curl http://localhost:3000/api/notifications/stats
 ### **Performance Optimization**
 
 #### **Queue Configuration**
+
 ```typescript
 const notificationService = new TelegramNotificationService(bot, {
   maxRetries: 3,
@@ -346,13 +374,14 @@ const notificationService = new TelegramNotificationService(bot, {
   batchSize: 10,
   rateLimit: {
     messagesPerMinute: 30,
-    messagesPerHour: 1000
+    messagesPerHour: 1000,
   },
-  queueSize: 1000
+  queueSize: 1000,
 });
 ```
 
 #### **Cleanup Old Notifications**
+
 ```typescript
 // Clean up notifications older than 24 hours
 notificationService.cleanup(24 * 60 * 60 * 1000);
@@ -361,6 +390,7 @@ notificationService.cleanup(24 * 60 * 60 * 1000);
 ### **Scaling Considerations**
 
 #### **High Volume Setup**
+
 ```typescript
 // Multiple bot instances for high volume
 const bots = [
@@ -374,6 +404,7 @@ const loadBalancer = new NotificationLoadBalancer(bots);
 ```
 
 #### **Database Optimization**
+
 ```sql
 -- Add indexes for better performance
 CREATE INDEX idx_telegram_username ON players(telegram_username);
@@ -387,6 +418,7 @@ CREATE INDEX idx_notification_created ON notifications(created_at);
 ### **Notification Design**
 
 #### **Message Templates**
+
 ```typescript
 const TEMPLATES = {
   wagerUpdate: (amount, game) => `
@@ -401,23 +433,25 @@ const TEMPLATES = {
 📈 Previous: $${oldBalance}
 📊 Current: $${newBalance}
 ⏰ ${new Date().toLocaleString()}
-  `
+  `,
 };
 ```
 
 #### **Priority Levels**
+
 ```typescript
 enum NotificationPriority {
-  LOW = 'low',        // Bulk messages, reports
-  MEDIUM = 'medium',  // Regular updates, alerts
-  HIGH = 'high',      // Important notifications
-  CRITICAL = 'critical' // System failures, security alerts
+  LOW = 'low', // Bulk messages, reports
+  MEDIUM = 'medium', // Regular updates, alerts
+  HIGH = 'high', // Important notifications
+  CRITICAL = 'critical', // System failures, security alerts
 }
 ```
 
 ### **Error Handling**
 
 #### **Comprehensive Error Recovery**
+
 ```typescript
 try {
   await bot.sendNotificationById(userId, message);
@@ -439,20 +473,25 @@ try {
 ### **Security Considerations**
 
 #### **Access Control**
+
 ```typescript
 // Validate user permissions before sending
-const hasPermission = await checkUserPermission(userId, 'receive_notifications');
+const hasPermission = await checkUserPermission(
+  userId,
+  'receive_notifications'
+);
 if (!hasPermission) {
   throw new Error('User lacks notification permissions');
 }
 ```
 
 #### **Rate Limiting**
+
 ```typescript
 // Implement per-user rate limits
 const userLimits = {
   maxPerHour: 50,
-  maxPerDay: 200
+  maxPerDay: 200,
 };
 
 if (await checkUserRateLimit(userId, userLimits)) {
@@ -466,13 +505,13 @@ if (await checkUserRateLimit(userId, userLimits)) {
 
 ### **Quick Reference**
 
-| Issue | Symptom | Solution |
-|-------|---------|----------|
-| **Bot Token Invalid** | "Unauthorized" errors | Check token from @BotFather |
-| **No User Mapping** | "telegram_id not found" | User needs to `/register` |
-| **Rate Limited** | "Too many requests" | Implement delays/batching |
-| **Webhook Failed** | Messages not received | Check webhook URL/SSL |
-| **Database Error** | "Connection failed" | Verify database credentials |
+| Issue                 | Symptom                 | Solution                    |
+| --------------------- | ----------------------- | --------------------------- |
+| **Bot Token Invalid** | "Unauthorized" errors   | Check token from @BotFather |
+| **No User Mapping**   | "telegram_id not found" | User needs to `/register`   |
+| **Rate Limited**      | "Too many requests"     | Implement delays/batching   |
+| **Webhook Failed**    | Messages not received   | Check webhook URL/SSL       |
+| **Database Error**    | "Connection failed"     | Verify database credentials |
 
 ### **Emergency Contacts**
 
@@ -483,22 +522,24 @@ if (await checkUserRateLimit(userId, userLimits)) {
 
 ### **Performance Benchmarks**
 
-| Metric | Target | Monitoring |
-|--------|--------|------------|
-| **Message Delivery Rate** | >99.5% | Notification stats |
-| **Average Response Time** | <2 seconds | Performance logs |
-| **Queue Processing Time** | <5 seconds | Queue metrics |
-| **Error Rate** | <0.5% | Error monitoring |
+| Metric                    | Target     | Monitoring         |
+| ------------------------- | ---------- | ------------------ |
+| **Message Delivery Rate** | >99.5%     | Notification stats |
+| **Average Response Time** | <2 seconds | Performance logs   |
+| **Queue Processing Time** | <5 seconds | Queue metrics      |
+| **Error Rate**            | <0.5%      | Error monitoring   |
 
 ## 🎉 Success Metrics
 
 ### **Before Fix**
+
 - ❌ Notifications not sending
 - ❌ No error handling
 - ❌ No retry logic
 - ❌ No monitoring
 
 ### **After Fix**
+
 - ✅ 99.5%+ delivery rate
 - ✅ Comprehensive error handling
 - ✅ Automatic retry with backoff
@@ -512,14 +553,17 @@ if (await checkUserRateLimit(userId, userLimits)) {
 
 ## 🚀 **Next Steps**
 
-1. **Run Diagnostic:** `bun run scripts/telegram-notification-diagnostic.ts YOUR_BOT_TOKEN`
+1. **Run Diagnostic:**
+   `bun run scripts/telegram-notification-diagnostic.ts YOUR_BOT_TOKEN`
 2. **Update Configuration:** Add database connection to bot config
 3. **Test Notifications:** Send test messages to verify functionality
 4. **Monitor Performance:** Use built-in stats and monitoring
 5. **Scale as Needed:** Implement load balancing for high volume
 
-**Your Telegram notification system is now enterprise-ready with comprehensive error handling, queuing, monitoring, and diagnostic tools!** 🎯✨
+**Your Telegram notification system is now enterprise-ready with comprehensive
+error handling, queuing, monitoring, and diagnostic tools!** 🎯✨
 
 ---
 
-*This guide provides everything needed to diagnose, fix, and maintain reliable Telegram notifications in your Fire22 dashboard system.*
+_This guide provides everything needed to diagnose, fix, and maintain reliable
+Telegram notifications in your Fire22 dashboard system._

@@ -19,7 +19,11 @@ async function runEnhancedAnalyticsDemo(): Promise<void> {
   const analyticsLogger = new AdvancedAnalyticsLogger();
   const performanceOptimizer = new PerformanceOptimizer(analyticsLogger);
   const cacheMonitor = new CacheMonitor(analyticsLogger);
-  const alertingSystem = new RealTimeAlertingSystem(analyticsLogger, performanceOptimizer, cacheMonitor);
+  const alertingSystem = new RealTimeAlertingSystem(
+    analyticsLogger,
+    performanceOptimizer,
+    cacheMonitor
+  );
 
   console.log('✅ Enhanced Analytics Stack Initialized\n');
 
@@ -39,7 +43,12 @@ async function runEnhancedAnalyticsDemo(): Promise<void> {
   await demonstratePerformanceOptimization(performanceOptimizer);
 
   // Demo 6: Comprehensive Dashboard Data
-  await demonstrateDashboardIntegration(analyticsLogger, performanceOptimizer, cacheMonitor, alertingSystem);
+  await demonstrateDashboardIntegration(
+    analyticsLogger,
+    performanceOptimizer,
+    cacheMonitor,
+    alertingSystem
+  );
 
   console.log('\n🎉 Enhanced Analytics Demo Complete!\n');
 }
@@ -64,8 +73,8 @@ async function demonstrateAdvancedLogging(logger: AdvancedAnalyticsLogger): Prom
         affectedUsers: 450,
         recoveryTime: 89,
         cacheHit: false,
-        cacheType: 'KV' as const
-      }
+        cacheType: 'KV' as const,
+      },
     },
     {
       title: 'Database Timeout Critical',
@@ -78,8 +87,8 @@ async function demonstrateAdvancedLogging(logger: AdvancedAnalyticsLogger): Prom
         impact: 'CRITICAL' as const,
         affectedUsers: 1250,
         recoveryTime: 2340,
-        resolution: 'Increased connection pool size'
-      }
+        resolution: 'Increased connection pool size',
+      },
     },
     {
       title: 'API Rate Limit Breach',
@@ -96,10 +105,10 @@ async function demonstrateAdvancedLogging(logger: AdvancedAnalyticsLogger): Prom
           cpuUsage: 78,
           memoryUsage: 456,
           diskIO: 234,
-          networkIO: 89
-        }
-      }
-    }
+          networkIO: 89,
+        },
+      },
+    },
   ];
 
   console.log('🎯 Generating Advanced Log Entries:');
@@ -111,26 +120,33 @@ async function demonstrateAdvancedLogging(logger: AdvancedAnalyticsLogger): Prom
       scenario.analytics,
       { demoScenario: index + 1 }
     );
-    
-    console.log(`   ${index + 1}. ${scenario.title} (${scenario.analytics.impact} impact, ${scenario.analytics.affectedUsers} users)`);
+
+    console.log(
+      `   ${index + 1}. ${scenario.title} (${scenario.analytics.impact} impact, ${scenario.analytics.affectedUsers} users)`
+    );
   });
 
   // Demonstrate advanced sorting
   console.log('\n🔍 Advanced Sorting Results:');
   const sortedByImpact = logger.getSortedEntries(
     { field: 'affectedUsers', direction: 'desc' },
-    { impactLevels: ['HIGH', 'CRITICAL'], timeRange: { start: new Date(Date.now() - 300000), end: new Date() } }
+    {
+      impactLevels: ['HIGH', 'CRITICAL'],
+      timeRange: { start: new Date(Date.now() - 300000), end: new Date() },
+    }
   );
 
   sortedByImpact.slice(0, 3).forEach((entry, index) => {
     console.log(`   ${index + 1}. ${entry.message}`);
-    console.log(`      Impact: ${entry.impact}, Users: ${entry.affectedUsers}, Recovery: ${entry.recoveryTime}ms`);
+    console.log(
+      `      Impact: ${entry.impact}, Users: ${entry.affectedUsers}, Recovery: ${entry.recoveryTime}ms`
+    );
   });
 
   // Demonstrate actionable insights
   console.log('\n💡 Actionable Insights Generated:');
   const insights = logger.getActionableInsights();
-  
+
   console.log(`   Critical Issues Found: ${insights.criticalIssues.length}`);
   insights.criticalIssues.slice(0, 2).forEach(issue => {
     console.log(`   • ${issue.issue} (${issue.severity})`);
@@ -153,11 +169,38 @@ async function demonstrateCacheMonitoring(cacheMonitor: CacheMonitor): Promise<v
   // Simulate cache operations
   const cacheOperations = [
     { type: 'KV' as const, op: 'GET' as const, key: 'user_profile_12345', hit: true, latency: 15 },
-    { type: 'KV' as const, op: 'GET' as const, key: 'session_token_abc', hit: false, latency: 78, missReason: 'EXPIRED' as const },
+    {
+      type: 'KV' as const,
+      op: 'GET' as const,
+      key: 'session_token_abc',
+      hit: false,
+      latency: 78,
+      missReason: 'EXPIRED' as const,
+    },
     { type: 'R2' as const, op: 'GET' as const, key: 'image_thumbnail_xyz', hit: true, latency: 45 },
-    { type: 'MEMORY' as const, op: 'SET' as const, key: 'calculation_result_789', hit: true, latency: 3 },
-    { type: 'KV' as const, op: 'GET' as const, key: 'config_settings', hit: false, latency: 123, missReason: 'KEY_NOT_FOUND' as const },
-    { type: 'R2' as const, op: 'GET' as const, key: 'large_dataset_456', hit: false, latency: 234, missReason: 'SIZE_LIMIT' as const }
+    {
+      type: 'MEMORY' as const,
+      op: 'SET' as const,
+      key: 'calculation_result_789',
+      hit: true,
+      latency: 3,
+    },
+    {
+      type: 'KV' as const,
+      op: 'GET' as const,
+      key: 'config_settings',
+      hit: false,
+      latency: 123,
+      missReason: 'KEY_NOT_FOUND' as const,
+    },
+    {
+      type: 'R2' as const,
+      op: 'GET' as const,
+      key: 'large_dataset_456',
+      hit: false,
+      latency: 234,
+      missReason: 'SIZE_LIMIT' as const,
+    },
   ];
 
   console.log('📈 Recording Cache Operations:');
@@ -172,18 +215,22 @@ async function demonstrateCacheMonitoring(cacheMonitor: CacheMonitor): Promise<v
       'us-east-1',
       op.missReason
     );
-    
-    console.log(`   ${index + 1}. ${op.type} ${op.op} ${op.key}: ${op.hit ? 'HIT' : 'MISS'} (${op.latency}ms)`);
+
+    console.log(
+      `   ${index + 1}. ${op.type} ${op.op} ${op.key}: ${op.hit ? 'HIT' : 'MISS'} (${op.latency}ms)`
+    );
   });
 
   // Get cache insights
   console.log('\n🔍 Cache Performance Insights:');
   const insights = cacheMonitor.getCacheInsights();
-  
+
   console.log(`   Overall Hit Rate: ${(insights.summary.overallHitRate * 100).toFixed(1)}%`);
   console.log(`   Average Latency: ${insights.summary.averageLatency.toFixed(1)}ms`);
   console.log(`   Total Operations: ${insights.summary.totalOperations}`);
-  console.log(`   Cost Savings Opportunity: $${insights.summary.costSavingsOpportunity.toFixed(2)}`);
+  console.log(
+    `   Cost Savings Opportunity: $${insights.summary.costSavingsOpportunity.toFixed(2)}`
+  );
 
   // Show top issues
   if (insights.topIssues.length > 0) {
@@ -222,25 +269,25 @@ async function demonstrateFailureAnalysis(logger: AdvancedAnalyticsLogger): Prom
       errorType: 'DATABASE_CONNECTION_TIMEOUT',
       rootCause: 'Connection pool exhausted during peak load',
       affectedSystems: ['user-service', 'transaction-processor', 'notification-service'],
-      affectedUsers: 2340
+      affectedUsers: 2340,
     },
     {
       errorType: 'API_RATE_LIMIT_EXCEEDED',
       rootCause: 'Sudden traffic spike from mobile app update',
       affectedSystems: ['api-gateway', 'mobile-backend'],
-      affectedUsers: 567
+      affectedUsers: 567,
     },
     {
       errorType: 'CACHE_CLUSTER_DEGRADATION',
       rootCause: 'Memory pressure causing frequent evictions',
       affectedSystems: ['cache-cluster', 'session-management'],
-      affectedUsers: 890
-    }
+      affectedUsers: 890,
+    },
   ];
 
   console.log('📋 Recording System Failures:');
   const failureIds: string[] = [];
-  
+
   failures.forEach((failure, index) => {
     const failureId = logger.logFailure(
       failure.errorType,
@@ -250,10 +297,12 @@ async function demonstrateFailureAnalysis(logger: AdvancedAnalyticsLogger): Prom
       { component: 'failure-tracker' },
       { severity: 'HIGH', category: 'SYSTEM_FAILURE' }
     );
-    
+
     failureIds.push(failureId);
     console.log(`   ${index + 1}. ${failure.errorType}`);
-    console.log(`      Affected: ${failure.affectedUsers} users, ${failure.affectedSystems.length} systems`);
+    console.log(
+      `      Affected: ${failure.affectedUsers} users, ${failure.affectedSystems.length} systems`
+    );
     console.log(`      Root Cause: ${failure.rootCause}`);
     console.log(`      Failure ID: ${failureId}`);
   });
@@ -263,25 +312,43 @@ async function demonstrateFailureAnalysis(logger: AdvancedAnalyticsLogger): Prom
   failureIds.forEach((failureId, index) => {
     const resolutions = [
       {
-        resolution: 'Increased database connection pool size and implemented connection retry logic',
+        resolution:
+          'Increased database connection pool size and implemented connection retry logic',
         recoveryTime: 1200000, // 20 minutes
-        preventionSteps: ['Implement auto-scaling for connection pools', 'Add connection health monitoring', 'Set up predictive alerts']
+        preventionSteps: [
+          'Implement auto-scaling for connection pools',
+          'Add connection health monitoring',
+          'Set up predictive alerts',
+        ],
       },
       {
         resolution: 'Implemented dynamic rate limiting and added capacity scaling',
         recoveryTime: 480000, // 8 minutes
-        preventionSteps: ['Deploy adaptive rate limiting', 'Add traffic prediction models', 'Implement graceful degradation']
+        preventionSteps: [
+          'Deploy adaptive rate limiting',
+          'Add traffic prediction models',
+          'Implement graceful degradation',
+        ],
       },
       {
         resolution: 'Optimized cache eviction policies and increased cluster capacity',
         recoveryTime: 900000, // 15 minutes
-        preventionSteps: ['Implement intelligent cache warming', 'Add memory usage prediction', 'Deploy cache cluster auto-scaling']
-      }
+        preventionSteps: [
+          'Implement intelligent cache warming',
+          'Add memory usage prediction',
+          'Deploy cache cluster auto-scaling',
+        ],
+      },
     ];
 
     const resolution = resolutions[index];
-    logger.logResolution(failureId, resolution.resolution, resolution.recoveryTime, resolution.preventionSteps);
-    
+    logger.logResolution(
+      failureId,
+      resolution.resolution,
+      resolution.recoveryTime,
+      resolution.preventionSteps
+    );
+
     console.log(`   ${index + 1}. ${failureId.substring(0, 20)}...`);
     console.log(`      Resolution: ${resolution.resolution}`);
     console.log(`      Recovery Time: ${(resolution.recoveryTime / 60000).toFixed(1)} minutes`);
@@ -293,7 +360,9 @@ async function demonstrateFailureAnalysis(logger: AdvancedAnalyticsLogger): Prom
   const failureAnalysis = logger.getFailureAnalysis();
   if (Array.isArray(failureAnalysis) && failureAnalysis.length > 0) {
     console.log(`   Total Failures Tracked: ${failureAnalysis.length}`);
-    console.log(`   Average Recovery Time: ${failureAnalysis.reduce((sum, f) => sum + f.averageRecoveryTime, 0) / failureAnalysis.length / 60000} minutes`);
+    console.log(
+      `   Average Recovery Time: ${failureAnalysis.reduce((sum, f) => sum + f.averageRecoveryTime, 0) / failureAnalysis.length / 60000} minutes`
+    );
     console.log(`   Most Common Issue: ${failureAnalysis[0]?.errorType || 'N/A'}`);
   }
 
@@ -308,7 +377,7 @@ async function demonstrateRealTimeAlerting(alertingSystem: RealTimeAlertingSyste
 
   // Create some test alerts
   console.log('🎯 Creating Sample Alerts:');
-  
+
   const alert1 = alertingSystem.createAlert(
     'CRITICAL',
     'PERFORMANCE',
@@ -321,7 +390,7 @@ async function demonstrateRealTimeAlerting(alertingSystem: RealTimeAlertingSyste
       currentValue: 2340,
       threshold: 2000,
       unit: 'ms',
-      trend: 'INCREASING'
+      trend: 'INCREASING',
     },
     { lKey: 'L3001', entityId: 'API_PERFORMANCE', component: 'api-gateway' }
   );
@@ -338,35 +407,44 @@ async function demonstrateRealTimeAlerting(alertingSystem: RealTimeAlertingSyste
       currentValue: 72,
       threshold: 80,
       unit: '%',
-      trend: 'DECREASING'
+      trend: 'DECREASING',
     },
     { lKey: 'L4001', entityId: 'CACHE_KV', component: 'cache-system' }
   );
 
   console.log(`   1. ${alert1.title} (${alert1.severity})`);
-  console.log(`      Metric: ${alert1.metric.currentValue}${alert1.metric.unit} > ${alert1.metric.threshold}${alert1.metric.unit}`);
+  console.log(
+    `      Metric: ${alert1.metric.currentValue}${alert1.metric.unit} > ${alert1.metric.threshold}${alert1.metric.unit}`
+  );
   console.log(`      Impact: ${alert1.impact.affected.users} users affected`);
   console.log(`      Automatic Actions: ${alert1.automaticActions.length} triggered`);
 
   console.log(`   2. ${alert2.title} (${alert2.severity})`);
-  console.log(`      Metric: ${alert2.metric.currentValue}${alert2.metric.unit} < ${alert2.metric.threshold}${alert2.metric.unit}`);
-  console.log(`      Impact: ${alert2.impact.technical.performanceDegradation * 100}% performance degradation`);
+  console.log(
+    `      Metric: ${alert2.metric.currentValue}${alert2.metric.unit} < ${alert2.metric.threshold}${alert2.metric.unit}`
+  );
+  console.log(
+    `      Impact: ${alert2.impact.technical.performanceDegradation * 100}% performance degradation`
+  );
 
   // Simulate alert acknowledgment and resolution
   console.log('\n👤 Simulating Alert Management:');
-  
+
   alertingSystem.acknowledgeAlert(alert1.id, 'john.doe@example.com');
   console.log(`   Alert ${alert1.id.substring(0, 12)}... acknowledged by john.doe@example.com`);
 
   setTimeout(() => {
-    alertingSystem.resolveAlert(alert1.id, 'Response time normalized after scaling up instances and optimizing database queries');
+    alertingSystem.resolveAlert(
+      alert1.id,
+      'Response time normalized after scaling up instances and optimizing database queries'
+    );
     console.log(`   Alert ${alert1.id.substring(0, 12)}... resolved: Response time normalized`);
   }, 1000);
 
   // Show alert summary
   console.log('\n📊 Alert System Summary:');
   const summary = alertingSystem.getAlertSummary();
-  
+
   console.log(`   Active Alerts: ${summary.totals.active}`);
   console.log(`   By Severity:`);
   Object.entries(summary.totals.bySeverity).forEach(([severity, count]) => {
@@ -378,7 +456,9 @@ async function demonstrateRealTimeAlerting(alertingSystem: RealTimeAlertingSyste
   if (summary.predictions.length > 0) {
     console.log(`   Predictions:`);
     summary.predictions.slice(0, 2).forEach((pred, index) => {
-      console.log(`     ${index + 1}. ${pred.predictedIssue} (${(pred.probability * 100).toFixed(0)}% probability in ${Math.floor(pred.timeToImpact / 60)}min)`);
+      console.log(
+        `     ${index + 1}. ${pred.predictedIssue} (${(pred.probability * 100).toFixed(0)}% probability in ${Math.floor(pred.timeToImpact / 60)}min)`
+      );
     });
   }
 
@@ -394,12 +474,16 @@ async function demonstratePerformanceOptimization(optimizer: PerformanceOptimize
   // Analyze current performance
   console.log('🔍 Analyzing System Performance:');
   const analysis = optimizer.analyzePerformance();
-  
+
   console.log(`   Current Metrics:`);
   console.log(`     Response Time P95: ${analysis.currentMetrics.responseTime.p95.toFixed(1)}ms`);
-  console.log(`     Request Rate: ${analysis.currentMetrics.throughput.requestsPerSecond.toFixed(1)} RPS`);
+  console.log(
+    `     Request Rate: ${analysis.currentMetrics.throughput.requestsPerSecond.toFixed(1)} RPS`
+  );
   console.log(`     Error Rate: ${(analysis.currentMetrics.errorRates.total * 100).toFixed(2)}%`);
-  console.log(`     Cache Hit Rate: ${(analysis.currentMetrics.cachePerformance.overallHitRate * 100).toFixed(1)}%`);
+  console.log(
+    `     Cache Hit Rate: ${(analysis.currentMetrics.cachePerformance.overallHitRate * 100).toFixed(1)}%`
+  );
 
   // Show optimization recommendations
   console.log('\n🚀 Performance Optimization Recommendations:');
@@ -407,12 +491,16 @@ async function demonstratePerformanceOptimization(optimizer: PerformanceOptimize
     console.log(`   ${index + 1}. ${rec.title} (${rec.priority} Priority)`);
     console.log(`      Category: ${rec.category}`);
     console.log(`      Current: ${rec.currentState.value}${rec.currentState.unit}`);
-    console.log(`      Target: ${rec.targetState.value}${rec.targetState.unit} (${rec.targetState.expectedImprovement})`);
+    console.log(
+      `      Target: ${rec.targetState.value}${rec.targetState.unit} (${rec.targetState.expectedImprovement})`
+    );
     console.log(`      Expected Benefits:`);
     console.log(`        • Performance: ${rec.expectedBenefits.performanceGain}`);
     console.log(`        • Cost: ${rec.expectedBenefits.costSavings}`);
     console.log(`        • Risk: ${rec.expectedBenefits.riskReduction}`);
-    console.log(`      Implementation: ${rec.estimatedEffort} effort, ${rec.implementationSteps.length} steps`);
+    console.log(
+      `      Implementation: ${rec.estimatedEffort} effort, ${rec.implementationSteps.length} steps`
+    );
   });
 
   // Show cache optimizations
@@ -430,7 +518,9 @@ async function demonstratePerformanceOptimization(optimizer: PerformanceOptimize
     console.log('\n📈 Performance Trends:');
     analysis.trends.forEach((trend, index) => {
       const arrow = trend.direction === 'up' ? '↗️' : trend.direction === 'down' ? '↘️' : '➡️';
-      console.log(`   ${index + 1}. ${trend.metric}: ${arrow} ${trend.changePercent.toFixed(1)}% (${trend.significance} significance)`);
+      console.log(
+        `   ${index + 1}. ${trend.metric}: ${arrow} ${trend.changePercent.toFixed(1)}% (${trend.significance} significance)`
+      );
     });
   }
 
@@ -450,13 +540,17 @@ async function demonstrateDashboardIntegration(
 
   // Get dashboard data from performance optimizer
   const dashboardData = performanceOptimizer.getDashboardData();
-  
+
   console.log('🎛️ Real-time Dashboard Metrics:');
   console.log(`   Active Users: ${dashboardData.realTimeMetrics.activeUsers.toLocaleString()}`);
   console.log(`   Requests/Sec: ${dashboardData.realTimeMetrics.requestsPerSecond.toFixed(1)}`);
-  console.log(`   Avg Response Time: ${dashboardData.realTimeMetrics.averageResponseTime.toFixed(1)}ms`);
+  console.log(
+    `   Avg Response Time: ${dashboardData.realTimeMetrics.averageResponseTime.toFixed(1)}ms`
+  );
   console.log(`   Error Rate: ${(dashboardData.realTimeMetrics.errorRate * 100).toFixed(3)}%`);
-  console.log(`   Cache Hit Rate: ${(dashboardData.realTimeMetrics.cacheHitRate * 100).toFixed(1)}%`);
+  console.log(
+    `   Cache Hit Rate: ${(dashboardData.realTimeMetrics.cacheHitRate * 100).toFixed(1)}%`
+  );
 
   console.log('\n🚨 Alert Status:');
   console.log(`   Critical: ${dashboardData.alerts.critical}`);
@@ -479,7 +573,14 @@ async function demonstrateDashboardIntegration(
   console.log(`   Overall Health Score: ${dashboardData.systemHealth.overall.toFixed(1)}/100`);
   console.log(`   Component Health:`);
   dashboardData.systemHealth.components.forEach((health, component) => {
-    const status = health >= 90 ? '🟢 Excellent' : health >= 75 ? '🟡 Good' : health >= 60 ? '🟠 Warning' : '🔴 Critical';
+    const status =
+      health >= 90
+        ? '🟢 Excellent'
+        : health >= 75
+          ? '🟡 Good'
+          : health >= 60
+            ? '🟠 Warning'
+            : '🔴 Critical';
     console.log(`     ${component}: ${health.toFixed(1)}/100 ${status}`);
   });
 

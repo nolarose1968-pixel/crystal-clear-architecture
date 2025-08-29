@@ -1,9 +1,12 @@
 # Fire22 Dashboard Database Schemas
 
 ## Overview
-Complete documentation of database schemas, table structures, relationships, and database management for the Fire22 Dashboard system.
+
+Complete documentation of database schemas, table structures, relationships, and
+database management for the Fire22 Dashboard system.
 
 ## Table of Contents
+
 - [Database Overview](#database-overview)
 - [Table Schemas](#table-schemas)
 - [Relationships](#relationships)
@@ -20,12 +23,14 @@ Complete documentation of database schemas, table structures, relationships, and
 ## Database Overview
 
 ### Database Technology
+
 - **Primary Database**: SQLite (Development/Testing)
 - **Production Database**: Cloudflare D1
 - **ORM**: Drizzle ORM
 - **Migration Tool**: Drizzle Kit
 
 ### Database Architecture
+
 ```
 [Application Layer] → [Drizzle ORM] → [SQLite/D1] → [Storage]
        ↓                   ↓              ↓           ↓
@@ -35,7 +40,9 @@ Complete documentation of database schemas, table structures, relationships, and
 ```
 
 ### Database Features
+
 1. **ACID Compliance**
+
    - Atomicity
    - Consistency
    - Isolation
@@ -52,6 +59,7 @@ Complete documentation of database schemas, table structures, relationships, and
 ## Table Schemas
 
 ### Users Table
+
 ```sql
 CREATE TABLE users (
     id TEXT PRIMARY KEY,
@@ -69,6 +77,7 @@ CREATE TABLE users (
 ```
 
 ### Agents Table
+
 ```sql
 CREATE TABLE agents (
     id TEXT PRIMARY KEY,
@@ -84,6 +93,7 @@ CREATE TABLE agents (
 ```
 
 ### Customers Table
+
 ```sql
 CREATE TABLE customers (
     id TEXT PRIMARY KEY,
@@ -102,6 +112,7 @@ CREATE TABLE customers (
 ```
 
 ### Wagers Table
+
 ```sql
 CREATE TABLE wagers (
     id TEXT PRIMARY KEY,
@@ -123,6 +134,7 @@ CREATE TABLE wagers (
 ```
 
 ### Transactions Table
+
 ```sql
 CREATE TABLE transactions (
     id TEXT PRIMARY KEY,
@@ -140,6 +152,7 @@ CREATE TABLE transactions (
 ```
 
 ### Activities Table
+
 ```sql
 CREATE TABLE activities (
     id TEXT PRIMARY KEY,
@@ -154,6 +167,7 @@ CREATE TABLE activities (
 ```
 
 ### KPI Metrics Table
+
 ```sql
 CREATE TABLE kpi_metrics (
     id TEXT PRIMARY KEY,
@@ -168,6 +182,7 @@ CREATE TABLE kpi_metrics (
 ```
 
 ### Weekly Stats Table
+
 ```sql
 CREATE TABLE weekly_stats (
     id TEXT PRIMARY KEY,
@@ -188,6 +203,7 @@ CREATE TABLE weekly_stats (
 ## Relationships
 
 ### Entity Relationship Diagram
+
 ```mermaid
 erDiagram
     USERS ||--o{ ACTIVITIES : "performs"
@@ -197,7 +213,7 @@ erDiagram
     CUSTOMERS ||--o{ WAGERS : "places"
     CUSTOMERS ||--o{ TRANSACTIONS : "has"
     WAGERS ||--o{ TRANSACTIONS : "generates"
-    
+
     USERS {
         text id PK
         text username
@@ -210,7 +226,7 @@ erDiagram
         text last_login
         text agent_id FK
     }
-    
+
     AGENTS {
         text id PK
         text name
@@ -222,7 +238,7 @@ erDiagram
         real total_volume
         integer customer_count
     }
-    
+
     CUSTOMERS {
         text id PK
         text agent_id FK
@@ -236,7 +252,7 @@ erDiagram
         text updated_at
         text last_activity
     }
-    
+
     WAGERS {
         text id PK
         text wager_number
@@ -252,7 +268,7 @@ erDiagram
         text settled_at
         text result
     }
-    
+
     TRANSACTIONS {
         text id PK
         text type
@@ -265,7 +281,7 @@ erDiagram
         text updated_at
         text processed_at
     }
-    
+
     ACTIVITIES {
         text id PK
         text user_id FK
@@ -275,7 +291,7 @@ erDiagram
         text metadata
         text created_at
     }
-    
+
     KPI_METRICS {
         text id PK
         text metric_name
@@ -285,7 +301,7 @@ erDiagram
         text period_end
         text created_at
     }
-    
+
     WEEKLY_STATS {
         text id PK
         text week_start
@@ -300,22 +316,27 @@ erDiagram
 ```
 
 ### Relationship Details
+
 1. **Users → Agents** (Many-to-One)
+
    - Users can be assigned to agents
    - Agent can have multiple users
    - Foreign key: `users.agent_id`
 
 2. **Agents → Customers** (One-to-Many)
+
    - Agent manages multiple customers
    - Customer belongs to one agent
    - Foreign key: `customers.agent_id`
 
 3. **Customers → Wagers** (One-to-Many)
+
    - Customer places multiple wagers
    - Wager belongs to one customer
    - Foreign key: `wagers.customer_id`
 
 4. **Agents → Wagers** (One-to-Many)
+
    - Agent processes multiple wagers
    - Wager processed by one agent
    - Foreign key: `wagers.agent_id`
@@ -330,6 +351,7 @@ erDiagram
 ## Indexes
 
 ### Primary Indexes
+
 ```sql
 -- Users table
 CREATE INDEX idx_users_username ON users(username);
@@ -373,6 +395,7 @@ CREATE INDEX idx_weekly_stats_week_start ON weekly_stats(week_start);
 ```
 
 ### Composite Indexes
+
 ```sql
 -- Wagers by customer and status
 CREATE INDEX idx_wagers_customer_status ON wagers(customer_id, status);
@@ -395,7 +418,9 @@ CREATE INDEX idx_kpi_metrics_period_name ON kpi_metrics(period, metric_name);
 ## Migrations
 
 ### Migration Strategy
+
 1. **Version Control**
+
    - Each migration has a unique version
    - Timestamp-based naming convention
    - Rollback support for each migration
@@ -407,29 +432,26 @@ CREATE INDEX idx_kpi_metrics_period_name ON kpi_metrics(period, metric_name);
    - Constraint updates
 
 ### Migration Files
-```typescript
+
+````typescript
 // Example migration file: 001_initial_schema.ts
 ```javascript
 import { sql } from 'drizzle-orm';
-```
+````
+
 ```javascript
 import { sqliteTable, text, real, integer } from 'drizzle-orm/sqlite-core';
 ```
 
-export async function up(db: any) {
-  // Create tables
-  await db.run(sql`CREATE TABLE users (...)`);
-  await db.run(sql`CREATE TABLE agents (...)`);
-  // ... more tables
-}
+export async function up(db: any) { // Create tables await
+db.run(sql`CREATE TABLE users (...)`); await
+db.run(sql`CREATE TABLE agents (...)`); // ... more tables }
 
-export async function down(db: any) {
-  // Drop tables in reverse order
-  await db.run(sql`DROP TABLE IF EXISTS users`);
-  await db.run(sql`DROP TABLE IF EXISTS agents`);
-  // ... more drops
-}
-```
+export async function down(db: any) { // Drop tables in reverse order await
+db.run(sql`DROP TABLE IF EXISTS users`); await
+db.run(sql`DROP TABLE IF EXISTS agents`); // ... more drops }
+
+````
 
 ### Migration Commands
 ```bash
@@ -444,24 +466,28 @@ bun run drizzle-kit rollback
 
 # Check migration status
 bun run drizzle-kit status
-```
+````
 
 ---
 
 ## Data Types
 
 ### SQLite Data Types
+
 1. **TEXT**
+
    - Strings, dates, JSON
    - Variable length
    - UTF-8 encoding
 
 2. **REAL**
+
    - Floating point numbers
    - 8-byte precision
    - Currency amounts
 
 3. **INTEGER**
+
    - Whole numbers
    - 1, 2, 4, or 8 bytes
    - Counts, IDs
@@ -472,6 +498,7 @@ bun run drizzle-kit status
    - File uploads
 
 ### Type Mapping
+
 ```typescript
 // TypeScript to SQLite mapping
 interface TypeMapping {
@@ -488,6 +515,7 @@ interface TypeMapping {
 ## Constraints
 
 ### Primary Key Constraints
+
 ```sql
 -- Single column primary key
 id TEXT PRIMARY KEY
@@ -497,6 +525,7 @@ PRIMARY KEY (user_id, session_id)
 ```
 
 ### Foreign Key Constraints
+
 ```sql
 -- Reference to parent table
 FOREIGN KEY (agent_id) REFERENCES agents(id)
@@ -509,6 +538,7 @@ FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE SET NULL
 ```
 
 ### Check Constraints
+
 ```sql
 -- Status validation
 status TEXT NOT NULL CHECK (status IN ('active', 'inactive', 'suspended'))
@@ -521,6 +551,7 @@ role TEXT NOT NULL CHECK (role IN ('admin', 'agent', 'customer'))
 ```
 
 ### Unique Constraints
+
 ```sql
 -- Single column unique
 username TEXT UNIQUE NOT NULL
@@ -534,7 +565,9 @@ UNIQUE(metric_name, period, period_start)
 ## Performance
 
 ### Query Optimization
+
 1. **Index Usage**
+
    - Use appropriate indexes
    - Avoid table scans
    - Monitor query plans
@@ -542,10 +575,11 @@ UNIQUE(metric_name, period, period_start)
 2. **Query Structure**
    - Limit result sets
    - Use pagination
-   - Avoid SELECT *
+   - Avoid SELECT \*
    - Use appropriate JOINs
 
 ### Performance Monitoring
+
 ```sql
 -- Check table sizes
 SELECT name, sql FROM sqlite_master WHERE type='table';
@@ -558,7 +592,9 @@ SELECT * FROM sqlite_stat1;
 ```
 
 ### Optimization Strategies
+
 1. **Database Design**
+
    - Normalize appropriately
    - Use proper data types
    - Implement constraints
@@ -573,7 +609,9 @@ SELECT * FROM sqlite_stat1;
 ## Backup and Recovery
 
 ### Backup Strategies
+
 1. **Full Backups**
+
    - Complete database copy
    - Scheduled backups
    - Offsite storage
@@ -584,6 +622,7 @@ SELECT * FROM sqlite_stat1;
    - Less storage space
 
 ### Backup Commands
+
 ```bash
 # SQLite backup
 sqlite3 database.db ".backup backup.db"
@@ -596,7 +635,9 @@ bun run backup:database
 ```
 
 ### Recovery Procedures
+
 1. **Data Recovery**
+
    - Restore from backup
    - Point-in-time recovery
    - Data validation
@@ -611,7 +652,9 @@ bun run backup:database
 ## Security
 
 ### Access Control
+
 1. **User Permissions**
+
    - Role-based access
    - Resource-level permissions
    - Audit logging
@@ -622,7 +665,9 @@ bun run backup:database
    - SQL injection prevention
 
 ### Data Protection
+
 1. **Sensitive Data**
+
    - Encrypt sensitive fields
    - Mask data in logs
    - Implement data retention
@@ -637,7 +682,9 @@ bun run backup:database
 ## Maintenance
 
 ### Regular Maintenance
+
 1. **Database Maintenance**
+
    - VACUUM database
    - Update statistics
    - Check integrity
@@ -648,6 +695,7 @@ bun run backup:database
    - Update indexes
 
 ### Maintenance Commands
+
 ```sql
 -- Vacuum database
 VACUUM;
@@ -667,12 +715,15 @@ PRAGMA optimize;
 ## Future Enhancements
 
 ### Planned Features
+
 1. **Advanced Indexing**
+
    - Partial indexes
    - Expression indexes
    - Covering indexes
 
 2. **Partitioning**
+
    - Time-based partitioning
    - Range partitioning
    - Hash partitioning
@@ -683,6 +734,7 @@ PRAGMA optimize;
    - Failover support
 
 ### Technology Roadmap
+
 - **Short-term**: Performance optimization
 - **Medium-term**: Advanced features
 - **Long-term**: Scalability improvements
@@ -690,6 +742,4 @@ PRAGMA optimize;
 
 ---
 
-*Last Updated: 2024-01-20*
-*Version: 1.0*
-*Maintainer: Fire22 Development Team*
+_Last Updated: 2024-01-20_ _Version: 1.0_ _Maintainer: Fire22 Development Team_

@@ -2,11 +2,11 @@
 
 /**
  * ⚠️ Standardized Error Handler for Fire22 Workspace
- * 
+ *
  * Comprehensive error handling system that provides consistent error
  * management across all workspace orchestration components. Includes
  * error classification, recovery strategies, logging, and monitoring.
- * 
+ *
  * Key Features:
  * - Standardized error types with context information
  * - Automatic error recovery and retry mechanisms
@@ -14,7 +14,7 @@
  * - Performance impact monitoring
  * - Integration with monitoring systems
  * - Graceful degradation strategies
- * 
+ *
  * @version 1.0.0
  * @author Fire22 Development Team
  */
@@ -27,7 +27,7 @@ export enum ErrorSeverity {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
 }
 
 export enum ErrorCategory {
@@ -40,7 +40,7 @@ export enum ErrorCategory {
   CONFIGURATION = 'configuration',
   EXTERNAL_SERVICE = 'external_service',
   USER_INPUT = 'user_input',
-  SYSTEM = 'system'
+  SYSTEM = 'system',
 }
 
 export enum RecoveryStrategy {
@@ -49,7 +49,7 @@ export enum RecoveryStrategy {
   DEGRADE = 'degrade',
   FAIL_FAST = 'fail_fast',
   IGNORE = 'ignore',
-  ESCALATE = 'escalate'
+  ESCALATE = 'escalate',
 }
 
 // === BASE ERROR CLASSES ===
@@ -60,7 +60,7 @@ export abstract class WorkspaceBaseError extends Error {
   public context: Record<string, any>;
   public attempts: number = 0;
   public recovered: boolean = false;
-  
+
   constructor(
     message: string,
     public readonly code: string,
@@ -74,13 +74,13 @@ export abstract class WorkspaceBaseError extends Error {
     this.timestamp = Date.now();
     this.errorId = this.generateErrorId();
     this.context = { ...context };
-    
+
     // Capture stack trace
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
     }
   }
-  
+
   /**
    * Add context information to the error
    */
@@ -88,7 +88,7 @@ export abstract class WorkspaceBaseError extends Error {
     this.context[key] = value;
     return this;
   }
-  
+
   /**
    * Mark this error as recovered
    */
@@ -96,7 +96,7 @@ export abstract class WorkspaceBaseError extends Error {
     this.recovered = true;
     return this;
   }
-  
+
   /**
    * Increment attempt counter
    */
@@ -104,7 +104,7 @@ export abstract class WorkspaceBaseError extends Error {
     this.attempts++;
     return this;
   }
-  
+
   /**
    * Get error details as structured object
    */
@@ -121,10 +121,10 @@ export abstract class WorkspaceBaseError extends Error {
       attempts: this.attempts,
       recovered: this.recovered,
       context: this.context,
-      stack: this.stack
+      stack: this.stack,
     };
   }
-  
+
   private generateErrorId(): string {
     return `${this.category}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
@@ -269,9 +269,12 @@ export interface RecoveryOptions {
 }
 
 export class ErrorRecoverySystem {
-  private static recoveryHandlers = new Map<string, (error: WorkspaceBaseError) => Promise<boolean>>();
+  private static recoveryHandlers = new Map<
+    string,
+    (error: WorkspaceBaseError) => Promise<boolean>
+  >();
   private static errorStats = new Map<string, { count: number; lastOccurred: number }>();
-  
+
   /**
    * Register a recovery handler for a specific error code
    */
@@ -281,7 +284,7 @@ export class ErrorRecoverySystem {
   ): void {
     this.recoveryHandlers.set(errorCode, handler);
   }
-  
+
   /**
    * Attempt to recover from an error using registered handlers
    */
@@ -290,7 +293,7 @@ export class ErrorRecoverySystem {
     if (!handler) {
       return false;
     }
-    
+
     try {
       const recovered = await handler(error);
       if (recovered) {
@@ -301,10 +304,10 @@ export class ErrorRecoverySystem {
     } catch (recoveryError) {
       Logger.error(`Recovery handler failed for ${error.code}`, recoveryError);
     }
-    
+
     return false;
   }
-  
+
   /**
    * Implement retry logic with exponential backoff
    */
@@ -317,41 +320,43 @@ export class ErrorRecoverySystem {
       baseDelay = 1000,
       maxDelay = 30000,
       backoffFactor = 2,
-      jitter = true
+      jitter = true,
     } = options;
-    
+
     let lastError: any;
-    
+
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         return await operation();
       } catch (error) {
         lastError = error;
-        
+
         // Don't retry on the last attempt or for non-retryable errors
         if (attempt === maxRetries || !this.shouldRetry(error)) {
           throw error;
         }
-        
+
         // Calculate delay with exponential backoff and optional jitter
         let delay = Math.min(baseDelay * Math.pow(backoffFactor, attempt), maxDelay);
         if (jitter) {
           delay = delay * (0.5 + Math.random() * 0.5); // ±50% jitter
         }
-        
-        Logger.warn(`Operation failed, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries + 1})`);
+
+        Logger.warn(
+          `Operation failed, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries + 1})`
+        );
         await new Promise(resolve => setTimeout(resolve, delay));
-        
+
         // Increment attempt counter if it's a workspace error
         if (error instanceof WorkspaceBaseError) {
           error.incrementAttempts();
         }
       }
     }
-    
+
     throw lastError;
   }
-  
+
   /**
    * Determine if an error should be retried
    */
@@ -359,15 +364,15 @@ export class ErrorRecoverySystem {
     if (error instanceof WorkspaceBaseError) {
       return error.recoveryStrategy === RecoveryStrategy.RETRY;
     }
-    
+
     // Default retry logic for non-workspace errors
     if (error.code === 'ENOENT' || error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') {
       return true;
     }
-    
+
     return false;
   }
-  
+
   /**
    * Update error statistics
    */
@@ -378,7 +383,7 @@ export class ErrorRecoverySystem {
     stats.lastOccurred = Date.now();
     this.errorStats.set(key, stats);
   }
-  
+
   /**
    * Get error statistics for monitoring
    */
@@ -394,20 +399,23 @@ export class StandardizedErrorHandler {
   private errorBuffer: WorkspaceBaseError[] = [];
   private readonly maxBufferSize = 1000;
   private monitoringCallbacks: Array<(error: WorkspaceBaseError) => void> = [];
-  
+
   static getInstance(): StandardizedErrorHandler {
     if (!StandardizedErrorHandler.instance) {
       StandardizedErrorHandler.instance = new StandardizedErrorHandler();
     }
     return StandardizedErrorHandler.instance;
   }
-  
+
   /**
    * Handle an error with standardized processing
    */
-  async handleError(error: Error | WorkspaceBaseError, context?: Record<string, any>): Promise<void> {
+  async handleError(
+    error: Error | WorkspaceBaseError,
+    context?: Record<string, any>
+  ): Promise<void> {
     let workspaceError: WorkspaceBaseError;
-    
+
     if (error instanceof WorkspaceBaseError) {
       workspaceError = error;
       if (context) {
@@ -419,23 +427,23 @@ export class StandardizedErrorHandler {
       // Convert regular errors to workspace errors
       workspaceError = this.convertToWorkspaceError(error, context);
     }
-    
+
     // Add to error buffer
     this.addToBuffer(workspaceError);
-    
+
     // Log the error
     this.logError(workspaceError);
-    
+
     // Attempt recovery based on strategy
     await this.processRecoveryStrategy(workspaceError);
-    
+
     // Notify monitoring systems
     this.notifyMonitoring(workspaceError);
-    
+
     // Update error statistics
     ErrorRecoverySystem['updateErrorStats'](workspaceError);
   }
-  
+
   /**
    * Convert a regular Error to a WorkspaceBaseError
    */
@@ -445,26 +453,38 @@ export class StandardizedErrorHandler {
     let severity = ErrorSeverity.MEDIUM;
     let recoveryStrategy = RecoveryStrategy.RETRY;
     let code = 'UNKNOWN_ERROR';
-    
+
     // Analyze error to determine appropriate classification
-    if (error.message.toLowerCase().includes('file') || error.message.toLowerCase().includes('directory')) {
+    if (
+      error.message.toLowerCase().includes('file') ||
+      error.message.toLowerCase().includes('directory')
+    ) {
       category = ErrorCategory.FILESYSTEM;
       code = 'FILESYSTEM_ERROR';
-    } else if (error.message.toLowerCase().includes('network') || error.message.toLowerCase().includes('connection')) {
+    } else if (
+      error.message.toLowerCase().includes('network') ||
+      error.message.toLowerCase().includes('connection')
+    ) {
       category = ErrorCategory.NETWORK;
       code = 'NETWORK_ERROR';
-    } else if (error.message.toLowerCase().includes('memory') || error.message.toLowerCase().includes('heap')) {
+    } else if (
+      error.message.toLowerCase().includes('memory') ||
+      error.message.toLowerCase().includes('heap')
+    ) {
       category = ErrorCategory.MEMORY;
       severity = ErrorSeverity.HIGH;
       recoveryStrategy = RecoveryStrategy.DEGRADE;
       code = 'MEMORY_ERROR';
-    } else if (error.message.toLowerCase().includes('permission') || error.message.toLowerCase().includes('access')) {
+    } else if (
+      error.message.toLowerCase().includes('permission') ||
+      error.message.toLowerCase().includes('access')
+    ) {
       category = ErrorCategory.PERMISSION;
       severity = ErrorSeverity.HIGH;
       recoveryStrategy = RecoveryStrategy.ESCALATE;
       code = 'PERMISSION_ERROR';
     }
-    
+
     // Create a generic workspace error
     return new (class extends WorkspaceBaseError {
       constructor() {
@@ -473,26 +493,26 @@ export class StandardizedErrorHandler {
       }
     })();
   }
-  
+
   /**
    * Add error to buffer for analysis
    */
   private addToBuffer(error: WorkspaceBaseError): void {
     this.errorBuffer.push(error);
-    
+
     // Trim buffer if it exceeds max size
     if (this.errorBuffer.length > this.maxBufferSize) {
       this.errorBuffer = this.errorBuffer.slice(-this.maxBufferSize);
     }
   }
-  
+
   /**
    * Log error with appropriate level and formatting
    */
   private logError(error: WorkspaceBaseError): void {
     const logLevel = this.getLogLevel(error.severity);
     const logMessage = `[${error.category.toUpperCase()}] ${error.message} (${error.code})`;
-    
+
     switch (logLevel) {
       case LogLevel.ERROR:
         Logger.error(logMessage, error.toJSON());
@@ -507,7 +527,7 @@ export class StandardizedErrorHandler {
         Logger.debug(logMessage, error.toJSON());
     }
   }
-  
+
   /**
    * Process recovery strategy for the error
    */
@@ -516,29 +536,29 @@ export class StandardizedErrorHandler {
       case RecoveryStrategy.RETRY:
         // Retry is handled by the calling code using ErrorRecoverySystem.executeWithRetry
         break;
-        
+
       case RecoveryStrategy.FALLBACK:
         await this.attemptFallback(error);
         break;
-        
+
       case RecoveryStrategy.DEGRADE:
         await this.performGracefulDegradation(error);
         break;
-        
+
       case RecoveryStrategy.ESCALATE:
         await this.escalateError(error);
         break;
-        
+
       case RecoveryStrategy.IGNORE:
         Logger.info(`Ignoring error as per recovery strategy: ${error.code}`);
         break;
-        
+
       case RecoveryStrategy.FAIL_FAST:
         Logger.error('Failing fast due to critical error', error);
         throw error;
     }
   }
-  
+
   /**
    * Attempt fallback behavior
    */
@@ -546,7 +566,7 @@ export class StandardizedErrorHandler {
     Logger.info(`Attempting fallback for error: ${error.code}`);
     // Fallback logic would be implemented based on error type
   }
-  
+
   /**
    * Perform graceful degradation
    */
@@ -554,7 +574,7 @@ export class StandardizedErrorHandler {
     Logger.warn(`Performing graceful degradation for error: ${error.code}`);
     // Degradation logic would be implemented based on error type
   }
-  
+
   /**
    * Escalate error to higher-level systems
    */
@@ -562,7 +582,7 @@ export class StandardizedErrorHandler {
     Logger.error(`Escalating error: ${error.code}`);
     // Escalation logic would be implemented (alerts, notifications, etc.)
   }
-  
+
   /**
    * Get appropriate log level for error severity
    */
@@ -579,7 +599,7 @@ export class StandardizedErrorHandler {
         return LogLevel.DEBUG;
     }
   }
-  
+
   /**
    * Notify monitoring systems
    */
@@ -592,47 +612,45 @@ export class StandardizedErrorHandler {
       }
     });
   }
-  
+
   /**
    * Register monitoring callback
    */
   registerMonitoringCallback(callback: (error: WorkspaceBaseError) => void): void {
     this.monitoringCallbacks.push(callback);
   }
-  
+
   /**
    * Get error buffer for analysis
    */
   getErrorBuffer(): readonly WorkspaceBaseError[] {
     return [...this.errorBuffer];
   }
-  
+
   /**
    * Clear error buffer
    */
   clearErrorBuffer(): void {
     this.errorBuffer = [];
   }
-  
+
   /**
    * Generate error report for monitoring
    */
   generateErrorReport(): any {
     const now = Date.now();
     const oneHour = 60 * 60 * 1000;
-    
-    const recentErrors = this.errorBuffer.filter(error => 
-      now - error.timestamp < oneHour
-    );
-    
+
+    const recentErrors = this.errorBuffer.filter(error => now - error.timestamp < oneHour);
+
     const errorsByCategory = new Map<ErrorCategory, number>();
     const errorsBySeverity = new Map<ErrorSeverity, number>();
-    
+
     recentErrors.forEach(error => {
       errorsByCategory.set(error.category, (errorsByCategory.get(error.category) || 0) + 1);
       errorsBySeverity.set(error.severity, (errorsBySeverity.get(error.severity) || 0) + 1);
     });
-    
+
     return {
       timestamp: new Date().toISOString(),
       period: '1 hour',
@@ -641,20 +659,20 @@ export class StandardizedErrorHandler {
       errorsBySeverity: Object.fromEntries(errorsBySeverity),
       criticalErrors: recentErrors.filter(e => e.severity === ErrorSeverity.CRITICAL).length,
       recoveredErrors: recentErrors.filter(e => e.recovered).length,
-      topErrors: this.getTopErrors(recentErrors)
+      topErrors: this.getTopErrors(recentErrors),
     };
   }
-  
+
   /**
    * Get most common errors
    */
   private getTopErrors(errors: WorkspaceBaseError[]): Array<{ code: string; count: number }> {
     const errorCounts = new Map<string, number>();
-    
+
     errors.forEach(error => {
       errorCounts.set(error.code, (errorCounts.get(error.code) || 0) + 1);
     });
-    
+
     return Array.from(errorCounts.entries())
       .map(([code, count]) => ({ code, count }))
       .sort((a, b) => b.count - a.count)
@@ -667,7 +685,10 @@ export class StandardizedErrorHandler {
 /**
  * Handle an error with standardized processing
  */
-export async function handleError(error: Error | WorkspaceBaseError, context?: Record<string, any>): Promise<void> {
+export async function handleError(
+  error: Error | WorkspaceBaseError,
+  context?: Record<string, any>
+): Promise<void> {
   const handler = StandardizedErrorHandler.getInstance();
   await handler.handleError(error, context);
 }
@@ -680,7 +701,7 @@ export async function executeWithErrorHandling<T>(
   options: RecoveryOptions & { context?: Record<string, any> } = {}
 ): Promise<T> {
   const { context, ...recoveryOptions } = options;
-  
+
   return ErrorRecoverySystem.executeWithRetry(async () => {
     try {
       return await operation();
@@ -719,18 +740,18 @@ export default {
   MemoryError,
   ConfigurationError,
   ExternalServiceError,
-  
+
   // Enums
   ErrorSeverity,
   ErrorCategory,
   RecoveryStrategy,
-  
+
   // Systems
   ErrorRecoverySystem,
   StandardizedErrorHandler,
-  
+
   // Utilities
   handleError,
   executeWithErrorHandling,
-  createError
+  createError,
 };

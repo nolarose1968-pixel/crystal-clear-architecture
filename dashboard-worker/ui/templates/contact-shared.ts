@@ -42,7 +42,7 @@ export function validateContactForm(formData: FormData): { valid: boolean; error
 
   return {
     valid: errors.length === 0,
-    errors
+    errors,
   };
 }
 

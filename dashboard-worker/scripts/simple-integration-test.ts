@@ -14,12 +14,17 @@ const mockEnv = {
   DB: {
     prepare: (query: string) => ({
       bind: (...args: any[]) => ({
-        first: async () => ({ balance: 1000, credit_limit: 5000, outstanding_balance: 0, available_credit: 5000 }),
+        first: async () => ({
+          balance: 1000,
+          credit_limit: 5000,
+          outstanding_balance: 0,
+          available_credit: 5000,
+        }),
         all: async () => ({ results: [] }),
-        run: async () => ({ meta: { last_row_id: 1 } })
-      })
-    })
-  }
+        run: async () => ({ meta: { last_row_id: 1 } }),
+      }),
+    }),
+  },
 } as any;
 
 // Mock system controller
@@ -32,8 +37,8 @@ const mockSystemController = {
     telegramBot: 'offline',
     database: 'connected',
     notifications: 'active',
-    realTimeUpdates: 'active'
-  })
+    realTimeUpdates: 'active',
+  }),
 };
 
 async function runSimpleIntegrationTest(): Promise<void> {
@@ -43,7 +48,7 @@ async function runSimpleIntegrationTest(): Promise<void> {
   try {
     // Test 1: Unified API Handler
     console.log('\n📋 Test 1: Unified API Handler');
-    
+
     const apiHandler = createUnifiedAPIHandler(mockEnv);
     console.log('   ✅ API handler created');
 
@@ -52,7 +57,7 @@ async function runSimpleIntegrationTest(): Promise<void> {
       method: 'POST',
       path: '/api/auth/login',
       body: { username: 'admin', password: 'Fire22Admin2025!' },
-      systemController: mockSystemController as any
+      systemController: mockSystemController as any,
     });
 
     console.log('   ✅ Login API test passed');
@@ -67,7 +72,7 @@ async function runSimpleIntegrationTest(): Promise<void> {
       method: 'GET',
       path: '/api/user/balance',
       user: { id: 'admin', username: 'admin', isAdmin: true },
-      systemController: mockSystemController as any
+      systemController: mockSystemController as any,
     });
 
     console.log('   ✅ Balance API test passed');
@@ -77,7 +82,7 @@ async function runSimpleIntegrationTest(): Promise<void> {
     const statusResponse = await apiHandler.handleRequest({
       method: 'GET',
       path: '/api/system/status',
-      systemController: mockSystemController as any
+      systemController: mockSystemController as any,
     });
 
     console.log('   ✅ System status API test passed');
@@ -90,10 +95,10 @@ async function runSimpleIntegrationTest(): Promise<void> {
       body: {
         selection: 'Team A to win',
         stake: 50,
-        odds: 2.0
+        odds: 2.0,
       },
       user: { id: 'test_user', username: 'test_user', telegramId: 123456789, isAdmin: false },
-      systemController: mockSystemController as any
+      systemController: mockSystemController as any,
     });
 
     console.log('   ✅ Wager placement test passed');
@@ -105,7 +110,7 @@ async function runSimpleIntegrationTest(): Promise<void> {
       path: '/api/notifications/send',
       body: { message: 'Test notification', target: 'all' },
       user: { id: 'admin', username: 'admin', isAdmin: true },
-      systemController: mockSystemController as any
+      systemController: mockSystemController as any,
     });
 
     console.log('   ✅ Notification API test passed');
@@ -115,7 +120,6 @@ async function runSimpleIntegrationTest(): Promise<void> {
     console.log('🎉 Fire22 core integration is functional');
 
     displayIntegrationSummary();
-
   } catch (error) {
     console.error('\n❌ Integration tests failed:', error);
     process.exit(1);

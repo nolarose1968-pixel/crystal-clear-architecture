@@ -52,11 +52,12 @@ class ErrorTracker {
     if (existsSync(this.dataPath)) {
       try {
         const data = JSON.parse(readFileSync(this.dataPath, 'utf-8'));
-        this.occurrences = data.occurrences?.map((occ: any) => ({
-          ...occ,
-          timestamp: new Date(occ.timestamp)
-        })) || [];
-        
+        this.occurrences =
+          data.occurrences?.map((occ: any) => ({
+            ...occ,
+            timestamp: new Date(occ.timestamp),
+          })) || [];
+
         // Rebuild statistics
         this.rebuildStatistics();
       } catch (error) {
@@ -80,7 +81,7 @@ class ErrorTracker {
       const data = {
         occurrences: this.occurrences.slice(-this.maxOccurrences), // Keep only recent occurrences
         lastUpdated: new Date().toISOString(),
-        totalTracked: this.occurrences.length
+        totalTracked: this.occurrences.length,
       };
 
       writeFileSync(this.dataPath, JSON.stringify(data, null, 2), 'utf-8');
@@ -94,7 +95,7 @@ class ErrorTracker {
    */
   private rebuildStatistics(): void {
     this.statistics.clear();
-    
+
     for (const occurrence of this.occurrences) {
       this.updateStatistics(occurrence);
     }
@@ -105,7 +106,7 @@ class ErrorTracker {
    */
   private updateStatistics(occurrence: ErrorOccurrence): void {
     const existing = this.statistics.get(occurrence.errorCode);
-    
+
     if (existing) {
       existing.occurrences++;
       existing.lastSeen = occurrence.timestamp;
@@ -113,9 +114,10 @@ class ErrorTracker {
       if (occurrence.source && !existing.sources.includes(occurrence.source)) {
         existing.sources.push(occurrence.source);
       }
-      
+
       // Recalculate average frequency
-      const hoursSpan = (existing.lastSeen.getTime() - existing.firstSeen.getTime()) / (1000 * 60 * 60);
+      const hoursSpan =
+        (existing.lastSeen.getTime() - existing.firstSeen.getTime()) / (1000 * 60 * 60);
       existing.avgFrequency = hoursSpan > 0 ? existing.occurrences / hoursSpan : 0;
     } else {
       this.statistics.set(occurrence.errorCode, {
@@ -125,7 +127,7 @@ class ErrorTracker {
         lastSeen: occurrence.timestamp,
         contexts: [occurrence.context || {}],
         sources: occurrence.source ? [occurrence.source] : [],
-        avgFrequency: 0
+        avgFrequency: 0,
       });
     }
   }
@@ -140,7 +142,7 @@ class ErrorTracker {
       errorCode,
       timestamp: new Date(),
       context,
-      source: context?.source as string || 'unknown'
+      source: (context?.source as string) || 'unknown',
     };
 
     this.occurrences.push(occurrence);
@@ -148,7 +150,9 @@ class ErrorTracker {
     this.saveTrackingData();
 
     // Log for monitoring
-    console.log(`📊 Error tracked: ${errorCode} (${this.statistics.get(errorCode)?.occurrences || 1} total)`);
+    console.log(
+      `📊 Error tracked: ${errorCode} (${this.statistics.get(errorCode)?.occurrences || 1} total)`
+    );
   }
 
   /**
@@ -176,9 +180,7 @@ class ErrorTracker {
    * Get occurrences for specific error code
    */
   getOccurrencesForError(errorCode: string, limit: number = 50): ErrorOccurrence[] {
-    return this.occurrences
-      .filter(occ => occ.errorCode === errorCode)
-      .slice(-limit);
+    return this.occurrences.filter(occ => occ.errorCode === errorCode).slice(-limit);
   }
 
   /**
@@ -202,8 +204,11 @@ class ErrorTracker {
       uniqueErrorCodes: this.statistics.size,
       totalOccurrences: this.occurrences.length,
       trackingEnabled: this.trackingEnabled,
-      lastTracked: this.occurrences.length > 0 ? this.occurrences[this.occurrences.length - 1].timestamp : undefined,
-      topErrors
+      lastTracked:
+        this.occurrences.length > 0
+          ? this.occurrences[this.occurrences.length - 1].timestamp
+          : undefined,
+      topErrors,
     };
   }
 

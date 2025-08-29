@@ -4,7 +4,7 @@
  * 🔥 Fire22 API Client v3.0.9
  * Comprehensive client for the Fire22 sportsbook platform with SIMD acceleration
  * Features: Authentication, rate limiting, webhook verification, error handling, SIMD logging
- * 
+ *
  * Built with Bun.build() compilation support
  * Platform: ${globalThis.TARGET_PLATFORM || process.platform}
  * Build time: ${globalThis.BUILD_TIME || new Date().toISOString()}
@@ -19,7 +19,7 @@ logger.info('🚀 Fire22 API Client starting...', {
   userAgent: globalThis.USER_AGENT || 'Fire22-Dashboard/3.0.9',
   simdEnabled: globalThis.ENABLE_SIMD_ANSI || false,
   buildTime: globalThis.BUILD_TIME || new Date().toISOString(),
-  runtimeFlags: globalThis.BUN_RUNTIME_FLAGS || ''
+  runtimeFlags: globalThis.BUN_RUNTIME_FLAGS || '',
 });
 
 // Types for Fire22 API
@@ -139,7 +139,7 @@ export class Fire22ApiClient {
     if (params?.limit) queryParams.append('limit', params.limit.toString());
 
     const url = `${this.config.apiUrl}/agents${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    
+
     return this.makeRequest<Fire22Agent[]>(url, 'GET');
   }
 
@@ -167,7 +167,7 @@ export class Fire22ApiClient {
     if (params?.limit) queryParams.append('limit', params.limit.toString());
 
     const url = `${this.config.apiUrl}/users${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    
+
     return this.makeRequest<Fire22User[]>(url, 'GET');
   }
 
@@ -203,14 +203,16 @@ export class Fire22ApiClient {
     if (params?.limit) queryParams.append('limit', params.limit.toString());
 
     const url = `${this.config.apiUrl}/transactions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    
+
     return this.makeRequest<Fire22Transaction[]>(url, 'GET');
   }
 
   /**
    * Create a new transaction
    */
-  async createTransaction(transaction: Omit<Fire22Transaction, 'id' | 'createdAt' | 'status'>): Promise<Fire22ApiResponse<Fire22Transaction>> {
+  async createTransaction(
+    transaction: Omit<Fire22Transaction, 'id' | 'createdAt' | 'status'>
+  ): Promise<Fire22ApiResponse<Fire22Transaction>> {
     const url = `${this.config.apiUrl}/transactions`;
     return this.makeRequest<Fire22Transaction>(url, 'POST', transaction);
   }
@@ -218,7 +220,11 @@ export class Fire22ApiClient {
   /**
    * Update transaction status
    */
-  async updateTransactionStatus(transactionId: string, status: string, metadata?: Record<string, any>): Promise<Fire22ApiResponse<Fire22Transaction>> {
+  async updateTransactionStatus(
+    transactionId: string,
+    status: string,
+    metadata?: Record<string, any>
+  ): Promise<Fire22ApiResponse<Fire22Transaction>> {
     const url = `${this.config.apiUrl}/transactions/${transactionId}/status`;
     return this.makeRequest<Fire22Transaction>(url, 'PATCH', { status, metadata });
   }
@@ -237,7 +243,7 @@ export class Fire22ApiClient {
     if (params?.agentId) queryParams.append('agentId', params.agentId);
 
     const url = `${this.config.apiUrl}/stats/platform${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    
+
     return this.makeRequest<any>(url, 'GET');
   }
 
@@ -294,11 +300,11 @@ export class Fire22ApiClient {
       const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
 
       const startTime = performance.now();
-      
+
       const response = await fetch(url, {
         method,
         headers: {
-          'Authorization': `Bearer ${this.config.token}`,
+          Authorization: `Bearer ${this.config.token}`,
           'Content-Type': 'application/json',
           'User-Agent': globalThis.USER_AGENT || 'Fire22-Dashboard/3.0.9',
           'X-Fire22-Platform': globalThis.TARGET_PLATFORM || process.platform,
@@ -322,7 +328,6 @@ export class Fire22ApiClient {
 
       const responseData = await response.json();
       return responseData as Fire22ApiResponse<T>;
-
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
@@ -339,7 +344,7 @@ export class Fire22ApiClient {
    */
   private checkRateLimit(): void {
     const now = Date.now();
-    
+
     // Reset counter if window has passed
     if (now - this.lastResetTime >= this.config.rateLimit.windowMs) {
       this.requestCount = 0;
@@ -368,7 +373,7 @@ export class Fire22ApiClient {
    */
   private async handleErrorResponse(response: Response): Promise<never> {
     let errorData: any;
-    
+
     try {
       errorData = await response.json();
     } catch {
@@ -382,7 +387,12 @@ export class Fire22ApiClient {
     // Handle specific error types
     switch (response.status) {
       case 401:
-        throw new Fire22ApiError('Authentication failed', 401, 'AUTHENTICATION_FAILED', errorDetails);
+        throw new Fire22ApiError(
+          'Authentication failed',
+          401,
+          'AUTHENTICATION_FAILED',
+          errorDetails
+        );
       case 403:
         throw new Fire22ApiError('Access denied', 403, 'ACCESS_DENIED', errorDetails);
       case 404:
@@ -404,7 +414,7 @@ export class Fire22ApiClient {
     const encoder = new TextEncoder();
     const key = encoder.encode(this.config.webhookSecret);
     const data = encoder.encode(body);
-    
+
     // Use Bun's crypto for HMAC
     const cryptoKey = crypto.subtle.importKey(
       'raw',
@@ -413,7 +423,7 @@ export class Fire22ApiClient {
       false,
       ['sign']
     );
-    
+
     const signature = crypto.subtle.sign('HMAC', cryptoKey, data);
     return btoa(String.fromCharCode(...new Uint8Array(signature)));
   }
@@ -425,12 +435,12 @@ export class Fire22ApiClient {
     if (a.length !== b.length) {
       return false;
     }
-    
+
     let result = 0;
     for (let i = 0; i < a.length; i++) {
       result |= a.charCodeAt(i) ^ b.charCodeAt(i);
     }
-    
+
     return result === 0;
   }
 
@@ -471,7 +481,7 @@ export class Fire22ApiClient {
     const now = Date.now();
     const resetTime = this.lastResetTime + this.config.rateLimit.windowMs;
     const remaining = Math.max(0, this.config.rateLimit.maxRequests - this.requestCount);
-    
+
     return {
       current: this.requestCount,
       max: this.config.rateLimit.maxRequests,

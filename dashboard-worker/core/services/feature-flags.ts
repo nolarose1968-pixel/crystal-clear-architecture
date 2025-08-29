@@ -41,25 +41,25 @@ export class FeatureFlagsService extends BaseService {
       {
         name: 'new-dashboard',
         enabled: true,
-        description: 'New dashboard interface with enhanced analytics'
+        description: 'New dashboard interface with enhanced analytics',
       },
       {
         name: 'real-time-notifications',
         enabled: false,
         description: 'Real-time notification system',
-        rolloutPercentage: 25
+        rolloutPercentage: 25,
       },
       {
         name: 'advanced-logging',
         enabled: true,
-        description: 'Enhanced logging with detailed analytics'
+        description: 'Enhanced logging with detailed analytics',
       },
       {
         name: 'beta-features',
         enabled: false,
         description: 'Experimental features for beta testing',
-        userWhitelist: ['admin@example.com']
-      }
+        userWhitelist: ['admin@example.com'],
+      },
     ];
 
     defaultFlags.forEach(flag => this.flags.set(flag.name, flag));
@@ -191,7 +191,7 @@ export class FeatureFlagsService extends BaseService {
   private isUserInRollout(userId: string, percentage: number): boolean {
     // Use user ID hash to determine if user is in rollout
     const hash = this.simpleHash(userId);
-    const normalizedHash = (hash % 100 + 100) % 100; // Ensure positive 0-99
+    const normalizedHash = ((hash % 100) + 100) % 100; // Ensure positive 0-99
     return normalizedHash < percentage;
   }
 
@@ -231,7 +231,7 @@ export class FeatureFlagsService extends BaseService {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return hash;

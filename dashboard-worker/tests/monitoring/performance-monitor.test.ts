@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
-import { PerformanceMonitor, RequestTracker, withRequestTracking } from '../../src/monitoring/performance-monitor';
+import {
+  PerformanceMonitor,
+  RequestTracker,
+  withRequestTracking,
+} from '../../src/monitoring/performance-monitor';
 import { MonitoringConfig } from '../../src/types/enhanced-types';
 
 describe('Performance Monitor', () => {
@@ -12,7 +16,7 @@ describe('Performance Monitor', () => {
       logLevel: 'info',
       metricsInterval: 1000,
       securityEventRetention: 1000,
-      healthCheckInterval: 5000
+      healthCheckInterval: 5000,
     };
     monitor = new PerformanceMonitor(config);
   });
@@ -30,9 +34,9 @@ describe('Performance Monitor', () => {
     it('should start and end request tracking', () => {
       const requestId = 'test-request-1';
       monitor.startRequest(requestId);
-      
+
       expect(monitor['activeRequests'].has(requestId)).toBe(true);
-      
+
       const metrics = monitor.endRequest(requestId);
       expect(metrics).toBeDefined();
       expect(metrics?.responseTime).toBeGreaterThan(0);
@@ -60,7 +64,7 @@ describe('Performance Monitor', () => {
     it('should store and retrieve metrics', () => {
       monitor.startRequest('test-request-1');
       monitor.endRequest('test-request-1');
-      
+
       const metrics = monitor.getMetrics(1);
       expect(metrics).toHaveLength(1);
       expect(metrics[0].responseTime).toBeGreaterThan(0);
@@ -72,7 +76,7 @@ describe('Performance Monitor', () => {
         monitor.startRequest(`request-${i}`);
         monitor.endRequest(`request-${i}`);
       }
-      
+
       const metrics = monitor.getMetrics();
       expect(metrics.length).toBeLessThanOrEqual(1000);
     });
@@ -81,10 +85,10 @@ describe('Performance Monitor', () => {
       // Add some metrics with known response times
       monitor.startRequest('request-1');
       monitor.endRequest('request-1');
-      
+
       monitor.startRequest('request-2');
       monitor.endRequest('request-2');
-      
+
       const avgTime = monitor.getAverageResponseTime();
       expect(avgTime).toBeGreaterThan(0);
     });
@@ -98,7 +102,7 @@ describe('Performance Monitor', () => {
       // Add some metrics
       monitor.startRequest('request-1');
       monitor.endRequest('request-1');
-      
+
       const rate = monitor.getRequestRate();
       expect(rate).toBeGreaterThan(0);
     });
@@ -110,10 +114,10 @@ describe('Performance Monitor', () => {
 
     it('should start and stop periodic collection', () => {
       expect(monitor['metricsIntervalId']).toBeUndefined();
-      
+
       monitor.startPeriodicCollection();
       expect(monitor['metricsIntervalId']).toBeDefined();
-      
+
       monitor.stopPeriodicCollection();
       expect(monitor['metricsIntervalId']).toBeUndefined();
     });
@@ -121,17 +125,17 @@ describe('Performance Monitor', () => {
     it('should not start periodic collection twice', () => {
       monitor.startPeriodicCollection();
       const firstId = monitor['metricsIntervalId'];
-      
+
       monitor.startPeriodicCollection();
       const secondId = monitor['metricsIntervalId'];
-      
+
       expect(firstId).toBe(secondId);
     });
 
     it('should get uptime', () => {
       const uptime1 = monitor.getUptime();
       expect(uptime1).toBeGreaterThan(0);
-      
+
       // Wait a bit
       Bun.sleep(10).then(() => {
         const uptime2 = monitor.getUptime();
@@ -142,9 +146,9 @@ describe('Performance Monitor', () => {
     it('should reset metrics', () => {
       monitor.startRequest('test-request');
       monitor.endRequest('test-request');
-      
+
       expect(monitor.getMetrics().length).toBe(1);
-      
+
       monitor.reset();
       expect(monitor.getMetrics().length).toBe(0);
       expect(monitor['activeRequests'].size).toBe(0);
@@ -163,14 +167,14 @@ describe('Performance Monitor', () => {
         method: 'GET',
         headers: new Headers({
           'User-Agent': 'test-agent',
-          'X-Forwarded-For': '192.168.1.1'
-        })
+          'X-Forwarded-For': '192.168.1.1',
+        }),
       });
 
       const requestId = tracker.startTracking(request);
       expect(requestId).toBeDefined();
       expect(requestId).toMatch(/^req_\d+_[a-z0-9]+$/);
-      
+
       const activeRequests = tracker.getActiveRequests();
       expect(activeRequests).toHaveLength(1);
       expect(activeRequests[0].id).toBe(requestId);
@@ -213,24 +217,24 @@ describe('Performance Monitor', () => {
       // Test CF-Connecting-IP
       let request = new Request('http://example.com', {
         headers: new Headers({
-          'CF-Connecting-IP': '203.0.113.1'
-        })
+          'CF-Connecting-IP': '203.0.113.1',
+        }),
       });
       expect(tracker['getClientIP'](request)).toBe('203.0.113.1');
 
       // Test X-Forwarded-For
       request = new Request('http://example.com', {
         headers: new Headers({
-          'X-Forwarded-For': '192.168.1.1, 10.0.0.1'
-        })
+          'X-Forwarded-For': '192.168.1.1, 10.0.0.1',
+        }),
       });
       expect(tracker['getClientIP'](request)).toBe('192.168.1.1');
 
       // Test X-Real-IP
       request = new Request('http://example.com', {
         headers: new Headers({
-          'X-Real-IP': '172.16.0.1'
-        })
+          'X-Real-IP': '172.16.0.1',
+        }),
       });
       expect(tracker['getClientIP'](request)).toBe('172.16.0.1');
 
@@ -247,7 +251,7 @@ describe('Performance Monitor', () => {
       };
 
       const wrappedHandler = withRequestTracking(monitor, handler);
-      
+
       const response = await wrappedHandler(new Request('http://example.com'));
       expect(response.status).toBe(200);
       expect(response.headers.get('X-Request-ID')).toBeDefined();
@@ -259,9 +263,11 @@ describe('Performance Monitor', () => {
       };
 
       const wrappedHandler = withRequestTracking(monitor, handler);
-      
-      await expect(wrappedHandler(new Request('http://example.com'))).rejects.toThrow('Handler error');
-      
+
+      await expect(wrappedHandler(new Request('http://example.com'))).rejects.toThrow(
+        'Handler error'
+      );
+
       // Verify tracking was completed
       const activeRequests = monitor['activeRequests'].size;
       expect(activeRequests).toBe(0);
@@ -277,7 +283,7 @@ describe('Performance Monitor', () => {
       // Each request adds 2% CPU
       monitor.startRequest('request-1');
       monitor.startRequest('request-2');
-      
+
       metrics = monitor.getCurrentMetrics();
       expect(metrics.cpuUsage).toBe(9); // 5 + 2*2
 
@@ -290,7 +296,7 @@ describe('Performance Monitor', () => {
       for (let i = 0; i < 100; i++) {
         monitor.startRequest(`request-${i}`);
       }
-      
+
       const metrics = monitor.getCurrentMetrics();
       expect(metrics.cpuUsage).toBe(100);
     });
@@ -303,7 +309,7 @@ describe('Performance Monitor', () => {
       // Add metrics to increase memory usage
       monitor.startRequest('request-1');
       monitor.endRequest('request-1');
-      
+
       metrics = monitor.getCurrentMetrics();
       expect(metrics.memoryUsage).toBeGreaterThan(30);
     });
@@ -314,7 +320,7 @@ describe('Performance Monitor', () => {
         monitor.startRequest(`request-${i}`);
         monitor.endRequest(`request-${i}`);
       }
-      
+
       const metrics = monitor.getCurrentMetrics();
       expect(metrics.memoryUsage).toBeLessThanOrEqual(100);
     });

@@ -2,14 +2,14 @@
 
 /**
  * 🏢 Fire22 Department Status Monitor
- * 
+ *
  * Monitors deployment status and health for department-specific pages
  * Provides real-time status information for department administrators
  */
 
-import { $ } from "bun";
-import { readFileSync, existsSync } from "fs";
-import { join } from "path";
+import { $ } from 'bun';
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 
 interface StatusOptions {
   department?: string;
@@ -48,7 +48,7 @@ interface DepartmentStatus {
 class Fire22DepartmentStatusMonitor {
   private readonly teamDirectory: any;
   private readonly distDir = join(process.cwd(), 'dist', 'pages');
-  
+
   constructor() {
     const teamDirectoryPath = join(process.cwd(), 'src', 'communications', 'team-directory.json');
     this.teamDirectory = JSON.parse(readFileSync(teamDirectoryPath, 'utf-8'));
@@ -59,11 +59,11 @@ class Fire22DepartmentStatusMonitor {
    */
   async getStatus(options: StatusOptions = {}): Promise<void> {
     const startTime = Bun.nanoseconds();
-    
+
     if (!options.json) {
       console.log('📊 Fire22 Department Status Monitor');
-      console.log('===================================');
-      
+      console.log('!==!==!==!==!==!=====');
+
       const env = options.environment || 'development';
       console.log(`\n🎯 Environment: ${env}`);
       console.log(`🏢 Department: ${options.department || 'ALL'}`);
@@ -71,7 +71,7 @@ class Fire22DepartmentStatusMonitor {
 
     try {
       let statuses: DepartmentStatus[] = [];
-      
+
       if (options.department) {
         // Get single department status
         const status = await this.getDepartmentStatus(options.department, options);
@@ -82,23 +82,22 @@ class Fire22DepartmentStatusMonitor {
         // Get all departments status
         statuses = await this.getAllDepartmentStatuses(options);
       }
-      
+
       if (options.json) {
         console.log(JSON.stringify(statuses, null, 2));
       } else {
         await this.displayStatuses(statuses, options);
       }
-      
+
       if (options.watch) {
         await this.watchStatuses(options);
       }
-      
+
       const statusTime = (Bun.nanoseconds() - startTime) / 1_000_000;
-      
+
       if (!options.json && options.verbose) {
         console.log(`\n⏱️ Status check completed in ${statusTime.toFixed(2)}ms`);
       }
-      
     } catch (error) {
       if (options.json) {
         console.log(JSON.stringify({ error: error.message }, null, 2));
@@ -112,31 +111,34 @@ class Fire22DepartmentStatusMonitor {
   /**
    * 🏢 Get single department status
    */
-  private async getDepartmentStatus(deptId: string, options: StatusOptions): Promise<DepartmentStatus | null> {
+  private async getDepartmentStatus(
+    deptId: string,
+    options: StatusOptions
+  ): Promise<DepartmentStatus | null> {
     const department = this.getDepartment(deptId);
     if (!department) {
       throw new Error(`Department not found: ${deptId}`);
     }
-    
+
     // Check deployment status
     const deploymentStatus = await this.checkDeploymentStatus(deptId, options);
-    
+
     // Check build status
     const buildStatus = await this.checkBuildStatus(deptId);
-    
+
     // Check health status
     const healthStatus = await this.checkHealthStatus(deptId, options);
-    
+
     // Get team status
     const teamStatus = this.getTeamStatus(department);
-    
+
     return {
       id: deptId,
       name: department.name,
       deployment: deploymentStatus,
       build: buildStatus,
       health: healthStatus,
-      team: teamStatus
+      team: teamStatus,
     };
   }
 
@@ -146,14 +148,12 @@ class Fire22DepartmentStatusMonitor {
   private async getAllDepartmentStatuses(options: StatusOptions): Promise<DepartmentStatus[]> {
     const departments = this.getDepartments();
     const statuses: DepartmentStatus[] = [];
-    
+
     // Process departments in parallel for better performance
-    const statusPromises = departments.map(dept => 
-      this.getDepartmentStatus(dept.id, options)
-    );
-    
+    const statusPromises = departments.map(dept => this.getDepartmentStatus(dept.id, options));
+
     const results = await Promise.allSettled(statusPromises);
-    
+
     results.forEach((result, index) => {
       if (result.status === 'fulfilled' && result.value) {
         statuses.push(result.value);
@@ -161,38 +161,41 @@ class Fire22DepartmentStatusMonitor {
         console.error(`Failed to get status for ${departments[index].name}:`, result.reason);
       }
     });
-    
+
     return statuses;
   }
 
   /**
    * 🚀 Check deployment status
    */
-  private async checkDeploymentStatus(deptId: string, options: StatusOptions): Promise<DepartmentStatus['deployment']> {
+  private async checkDeploymentStatus(
+    deptId: string,
+    options: StatusOptions
+  ): Promise<DepartmentStatus['deployment']> {
     const environment = options.environment || 'development';
     const baseUrl = this.getBaseUrl(environment);
     const deptUrl = `${baseUrl}/${deptId}/`;
-    
+
     try {
       // Check if deployed via HTTP request
-      const response = await fetch(deptUrl, { 
+      const response = await fetch(deptUrl, {
         method: 'HEAD',
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(5000),
       });
-      
+
       const status = response.ok ? 'deployed' : 'failed';
-      
+
       return {
         status,
         url: deptUrl,
         environment,
-        lastDeployed: response.headers.get('last-modified') || undefined
+        lastDeployed: response.headers.get('last-modified') || undefined,
       };
     } catch (error) {
       return {
         status: 'not-deployed',
         url: deptUrl,
-        environment
+        environment,
       };
     }
   }
@@ -203,23 +206,23 @@ class Fire22DepartmentStatusMonitor {
   private async checkBuildStatus(deptId: string): Promise<DepartmentStatus['build']> {
     const deptDistPath = join(this.distDir, deptId);
     const indexPath = join(deptDistPath, 'index.html');
-    
+
     if (!existsSync(deptDistPath)) {
       return { status: 'not-built' };
     }
-    
+
     if (!existsSync(indexPath)) {
       return { status: 'failed' };
     }
-    
+
     try {
       const stats = await Bun.file(indexPath).size;
       const lastBuilt = await this.getFileModificationTime(indexPath);
-      
+
       return {
         status: 'built',
         size: this.formatBytes(stats),
-        lastBuilt
+        lastBuilt,
       };
     } catch (error) {
       return { status: 'failed' };
@@ -229,22 +232,25 @@ class Fire22DepartmentStatusMonitor {
   /**
    * 🔍 Check health status
    */
-  private async checkHealthStatus(deptId: string, options: StatusOptions): Promise<DepartmentStatus['health']> {
+  private async checkHealthStatus(
+    deptId: string,
+    options: StatusOptions
+  ): Promise<DepartmentStatus['health']> {
     const environment = options.environment || 'development';
     const baseUrl = this.getBaseUrl(environment);
     const deptUrl = `${baseUrl}/${deptId}/`;
-    
+
     try {
       const startTime = Bun.nanoseconds();
-      
+
       const response = await fetch(deptUrl, {
-        signal: AbortSignal.timeout(10000)
+        signal: AbortSignal.timeout(10000),
       });
-      
+
       const responseTime = (Bun.nanoseconds() - startTime) / 1_000_000; // Convert to ms
-      
+
       let status: 'healthy' | 'degraded' | 'unhealthy';
-      
+
       if (response.ok && responseTime < 1000) {
         status = 'healthy';
       } else if (response.ok && responseTime < 3000) {
@@ -252,17 +258,17 @@ class Fire22DepartmentStatusMonitor {
       } else {
         status = 'unhealthy';
       }
-      
+
       return {
         status,
         responseTime: Math.round(responseTime),
-        uptime: this.calculateUptime(response)
+        uptime: this.calculateUptime(response),
       };
     } catch (error) {
       return {
         status: 'unhealthy',
         responseTime: undefined,
-        uptime: undefined
+        uptime: undefined,
       };
     }
   }
@@ -272,43 +278,56 @@ class Fire22DepartmentStatusMonitor {
    */
   private getTeamStatus(department: any): DepartmentStatus['team'] {
     const members = department.members || [];
-    
+
     // Simulate online status (in real implementation, this would check actual status)
     const onlineMembers = members.filter(() => Math.random() > 0.3).length;
-    
+
     return {
       admin: department.email,
       members: members.length,
-      online: onlineMembers
+      online: onlineMembers,
     };
   }
 
   /**
    * 📋 Display statuses in formatted output
    */
-  private async displayStatuses(statuses: DepartmentStatus[], options: StatusOptions): Promise<void> {
+  private async displayStatuses(
+    statuses: DepartmentStatus[],
+    options: StatusOptions
+  ): Promise<void> {
     console.log('\n📋 Department Status Overview:');
-    console.log('============================');
-    
+    console.log('!==!==!==!==!===');
+
     // Summary header
     const deployed = statuses.filter(s => s.deployment.status === 'deployed').length;
     const healthy = statuses.filter(s => s.health.status === 'healthy').length;
     const totalMembers = statuses.reduce((sum, s) => sum + s.team.members, 0);
-    
-    console.log(`\n📊 Summary: ${deployed}/${statuses.length} deployed, ${healthy}/${statuses.length} healthy, ${totalMembers} team members\n`);
-    
+
+    console.log(
+      `\n📊 Summary: ${deployed}/${statuses.length} deployed, ${healthy}/${statuses.length} healthy, ${totalMembers} team members\n`
+    );
+
     // Department details
     for (const status of statuses) {
       const deploymentIcon = this.getStatusIcon(status.deployment.status);
       const healthIcon = this.getHealthIcon(status.health.status);
       const buildIcon = this.getStatusIcon(status.build.status);
-      
+
       console.log(`🏢 ${status.name} (${status.id})`);
-      console.log(`   ${deploymentIcon} Deployment: ${status.deployment.status.toUpperCase()} - ${status.deployment.url}`);
-      console.log(`   ${buildIcon} Build: ${status.build.status.toUpperCase()}${status.build.size ? ` (${status.build.size})` : ''}`);
-      console.log(`   ${healthIcon} Health: ${status.health.status.toUpperCase()}${status.health.responseTime ? ` (${status.health.responseTime}ms)` : ''}`);
-      console.log(`   👥 Team: ${status.team.online}/${status.team.members} online - ${status.team.admin}`);
-      
+      console.log(
+        `   ${deploymentIcon} Deployment: ${status.deployment.status.toUpperCase()} - ${status.deployment.url}`
+      );
+      console.log(
+        `   ${buildIcon} Build: ${status.build.status.toUpperCase()}${status.build.size ? ` (${status.build.size})` : ''}`
+      );
+      console.log(
+        `   ${healthIcon} Health: ${status.health.status.toUpperCase()}${status.health.responseTime ? ` (${status.health.responseTime}ms)` : ''}`
+      );
+      console.log(
+        `   👥 Team: ${status.team.online}/${status.team.members} online - ${status.team.admin}`
+      );
+
       if (options.verbose) {
         if (status.deployment.lastDeployed) {
           console.log(`      Last Deployed: ${status.deployment.lastDeployed}`);
@@ -317,21 +336,22 @@ class Fire22DepartmentStatusMonitor {
           console.log(`      Last Built: ${status.build.lastBuilt}`);
         }
       }
-      
+
       console.log('');
     }
-    
+
     // Show actions if issues found
-    const issues = statuses.filter(s => 
-      s.deployment.status !== 'deployed' || 
-      s.health.status !== 'healthy' ||
-      s.build.status !== 'built'
+    const issues = statuses.filter(
+      s =>
+        s.deployment.status !== 'deployed' ||
+        s.health.status !== 'healthy' ||
+        s.build.status !== 'built'
     );
-    
+
     if (issues.length > 0) {
       console.log('🔧 Suggested Actions:');
-      console.log('=====================');
-      
+      console.log('!==!==!==!==');
+
       issues.forEach(status => {
         if (status.build.status !== 'built') {
           console.log(`• ${status.name}: Run 'bun run dept:build ${status.id}'`);
@@ -352,18 +372,18 @@ class Fire22DepartmentStatusMonitor {
    */
   private async watchStatuses(options: StatusOptions): Promise<void> {
     console.log('\n👁️ Watching department statuses (Ctrl+C to exit)...\n');
-    
+
     let iteration = 0;
-    
+
     const watchInterval = setInterval(async () => {
       iteration++;
-      
+
       console.log(`\n📊 Status Update #${iteration} - ${new Date().toLocaleTimeString()}`);
       console.log('='.repeat(50));
-      
+
       try {
         let statuses: DepartmentStatus[] = [];
-        
+
         if (options.department) {
           const status = await this.getDepartmentStatus(options.department, options);
           if (status) {
@@ -372,20 +392,21 @@ class Fire22DepartmentStatusMonitor {
         } else {
           statuses = await this.getAllDepartmentStatuses(options);
         }
-        
+
         // Quick status line
         statuses.forEach(status => {
           const deploymentIcon = this.getStatusIcon(status.deployment.status);
           const healthIcon = this.getHealthIcon(status.health.status);
-          
-          console.log(`${deploymentIcon} ${healthIcon} ${status.name}: ${status.deployment.status} | ${status.health.status}${status.health.responseTime ? ` (${status.health.responseTime}ms)` : ''}`);
+
+          console.log(
+            `${deploymentIcon} ${healthIcon} ${status.name}: ${status.deployment.status} | ${status.health.status}${status.health.responseTime ? ` (${status.health.responseTime}ms)` : ''}`
+          );
         });
-        
       } catch (error) {
         console.error('❌ Watch update failed:', error.message);
       }
     }, 30000); // Update every 30 seconds
-    
+
     // Handle Ctrl+C gracefully
     process.on('SIGINT', () => {
       clearInterval(watchInterval);
@@ -399,19 +420,19 @@ class Fire22DepartmentStatusMonitor {
    */
   private getStatusIcon(status: string): string {
     const icons: Record<string, string> = {
-      'deployed': '✅',
-      'built': '✅',
-      'healthy': '✅',
-      'pending': '⏳',
-      'building': '⏳',
-      'degraded': '⚠️',
-      'failed': '❌',
-      'unhealthy': '❌',
+      deployed: '✅',
+      built: '✅',
+      healthy: '✅',
+      pending: '⏳',
+      building: '⏳',
+      degraded: '⚠️',
+      failed: '❌',
+      unhealthy: '❌',
       'not-deployed': '⭕',
       'not-built': '⭕',
-      'unknown': '❓'
+      unknown: '❓',
     };
-    
+
     return icons[status] || '❓';
   }
 
@@ -420,12 +441,12 @@ class Fire22DepartmentStatusMonitor {
    */
   private getHealthIcon(status: string): string {
     const icons: Record<string, string> = {
-      'healthy': '🟢',
-      'degraded': '🟡',
-      'unhealthy': '🔴',
-      'unknown': '⚫'
+      healthy: '🟢',
+      degraded: '🟡',
+      unhealthy: '🔴',
+      unknown: '⚫',
     };
-    
+
     return icons[status] || '⚫';
   }
 
@@ -446,19 +467,19 @@ class Fire22DepartmentStatusMonitor {
   /**
    * 📂 Get departments from team directory
    */
-  private getDepartments(): Array<{id: string, name: string, email: string}> {
-    const departments: Array<{id: string, name: string, email: string}> = [];
-    
+  private getDepartments(): Array<{ id: string; name: string; email: string }> {
+    const departments: Array<{ id: string; name: string; email: string }> = [];
+
     for (const [key, dept] of Object.entries(this.teamDirectory.departments)) {
       if (dept && typeof dept === 'object' && 'name' in dept) {
         departments.push({
           id: key,
           name: dept.name,
-          email: dept.email
+          email: dept.email,
         });
       }
     }
-    
+
     return departments;
   }
 
@@ -487,11 +508,11 @@ class Fire22DepartmentStatusMonitor {
    */
   private formatBytes(bytes: number): string {
     if (bytes === 0) return '0 B';
-    
+
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
+
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   }
 
@@ -507,7 +528,7 @@ class Fire22DepartmentStatusMonitor {
       const now = new Date();
       const uptimeMs = now.getTime() - deployTime.getTime();
       const uptimeHours = Math.floor(uptimeMs / (1000 * 60 * 60));
-      
+
       if (uptimeHours < 24) {
         return `${uptimeHours}h`;
       } else {
@@ -515,7 +536,7 @@ class Fire22DepartmentStatusMonitor {
         return `${uptimeDays}d`;
       }
     }
-    
+
     return 'unknown';
   }
 }
@@ -527,13 +548,13 @@ async function main() {
     verbose: false,
     json: false,
     watch: false,
-    environment: 'development'
+    environment: 'development',
   };
-  
+
   // Parse command line arguments
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    
+
     switch (arg) {
       case '--dept':
       case '--department':
@@ -587,7 +608,7 @@ Department Self-Service Examples:
         }
     }
   }
-  
+
   const monitor = new Fire22DepartmentStatusMonitor();
   await monitor.getStatus(options);
 }

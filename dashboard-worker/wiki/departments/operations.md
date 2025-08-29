@@ -5,30 +5,35 @@
 **Department Lead**: Jennifer Wilson (VP of Operations)  
 **Team Size**: 24 members  
 **Key Metrics**: 99.95% uptime, 92% efficiency, 28% cost reduction  
-**Live Page**: [Operations Department](../../src/departments/operations-department.html)  
+**Live Page**:
+[Operations Department](../../src/departments/operations-department.html)  
 **Full Documentation**: [Operations Docs](../../docs/departments/operations.md)
 
 ## Core Functions
 
 ### Process Management
+
 - Process design and optimization
 - Automation implementation and management
 - Continuous improvement initiatives
 - Process documentation and standardization
 
 ### Quality Assurance
+
 - ISO 9001 quality management system
 - Quality control and compliance monitoring
 - Internal and external audit coordination
 - Performance quality metrics tracking
 
 ### Supply Chain & Logistics
+
 - Vendor relationship management
 - Inventory optimization and warehouse operations
 - Logistics coordination and cost optimization
 - Strategic sourcing and procurement
 
 ### Infrastructure Management
+
 - Facility management and maintenance
 - Security systems and access control
 - Environmental compliance management
@@ -61,6 +66,7 @@ curl -X POST /api/hierarchy/query \
 ```
 
 **Team Structure**:
+
 - **Jennifer Wilson**: VP of Operations (71 implementations, 24 team members)
 - **Primarily Department System**: Focused operational structure
 - **Cross-Department Collaboration**: Works with all departments

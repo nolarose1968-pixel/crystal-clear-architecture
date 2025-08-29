@@ -4,7 +4,8 @@
 [![Bun](https://img.shields.io/badge/bun-%3E%3D1.2.20-f472b6.svg)](https://bun.sh)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-Fire22 Telegram Bot with Grammy framework integration, providing comprehensive bot functionality with multilingual support and P2P queue integration.
+Fire22 Telegram Bot with Grammy framework integration, providing comprehensive
+bot functionality with multilingual support and P2P queue integration.
 
 ## 📦 Installation
 
@@ -15,7 +16,8 @@ bun add @fire22/telegram-bot
 ## 🚀 Features
 
 - **Grammy Framework**: Modern, type-safe Telegram bot framework
-- **Multilingual Support**: Integration with @fire22/multilingual for 4 languages
+- **Multilingual Support**: Integration with @fire22/multilingual for 4
+  languages
 - **Queue Integration**: P2P transaction matching via @fire22/queue-system
 - **Environment Management**: Secure configuration with Zod validation
 - **Constants System**: Centralized bot commands and configuration
@@ -38,8 +40,8 @@ const bot = new Fire22TelegramBot({
     wagerUpdates: true,
     balanceChanges: true,
     systemAlerts: true,
-    weeklyReports: true
-  }
+    weeklyReports: true,
+  },
 });
 
 // Start bot
@@ -72,7 +74,11 @@ FIRE22_API_KEY=your_api_key
 The bot includes a comprehensive constants system:
 
 ```typescript
-import { BOT_COMMANDS, LANGUAGE_CODES, UI_ELEMENTS } from '@fire22/telegram-bot/constants';
+import {
+  BOT_COMMANDS,
+  LANGUAGE_CODES,
+  UI_ELEMENTS,
+} from '@fire22/telegram-bot/constants';
 
 // Access bot commands
 console.log(BOT_COMMANDS.START); // '/start'
@@ -116,12 +122,15 @@ bun run benchmark
 ### Main Classes
 
 #### `Fire22TelegramBot`
+
 Main bot class handling all Telegram interactions.
 
 #### `TelegramEnvironment`
+
 Environment configuration and validation.
 
 #### `TelegramConstants`
+
 Centralized constants and configuration.
 
 ## 🤝 Contributing
@@ -136,9 +145,12 @@ MIT © Fire22 Team
 
 - [@fire22/multilingual](../fire22-multilingual) - Language system
 - [@fire22/queue-system](../fire22-queue-system) - P2P matching
-- [@fire22/telegram-workflows](../fire22-telegram-workflows) - Workflow orchestration
-- [@fire22/telegram-dashboard](../fire22-telegram-dashboard) - Dashboard integration
+- [@fire22/telegram-workflows](../fire22-telegram-workflows) - Workflow
+  orchestration
+- [@fire22/telegram-dashboard](../fire22-telegram-dashboard) - Dashboard
+  integration
 
 ## 📞 Support
 
-For issues and questions, please open an issue on GitHub or contact the Fire22 support team.
+For issues and questions, please open an issue on GitHub or contact the Fire22
+support team.

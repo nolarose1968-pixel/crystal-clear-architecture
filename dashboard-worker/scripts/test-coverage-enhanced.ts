@@ -5,9 +5,9 @@
  * Advanced coverage analysis with quality gates and detailed reporting
  */
 
-import { $ } from "bun";
-import { existsSync, writeFileSync, mkdirSync } from "fs";
-import { join } from "path";
+import { $ } from 'bun';
+import { existsSync, writeFileSync, mkdirSync } from 'fs';
+import { join } from 'path';
 
 interface CoverageThresholds {
   global: {
@@ -65,14 +65,14 @@ class EnhancedCoverageReporter {
         statements: 80,
         branches: 75,
         functions: 80,
-        lines: 80
+        lines: 80,
       },
       individual: {
         statements: 70,
         branches: 60,
         functions: 70,
-        lines: 70
-      }
+        lines: 70,
+      },
     };
   }
 
@@ -83,19 +83,19 @@ class EnhancedCoverageReporter {
   }
 
   async generateCoverageReport(testPaths: string[] = ['tests/']): Promise<CoverageAnalysis> {
-    console.log("📊 Generating enhanced coverage report...");
+    console.log('📊 Generating enhanced coverage report...');
     console.log(`🔧 Runtime: ${this.useBunx ? 'bunx' : 'bun'}`);
     console.log(`🎯 Test paths: ${testPaths.join(', ')}`);
 
     // Run tests with coverage
     const coverageData = await this.runTestsWithCoverage(testPaths);
-    
+
     // Analyze coverage results
     const analysis = await this.analyzeCoverage(coverageData);
-    
+
     // Generate reports
     await this.generateReports(analysis);
-    
+
     // Print summary
     this.printSummary(analysis);
 
@@ -105,31 +105,47 @@ class EnhancedCoverageReporter {
   private async runTestsWithCoverage(testPaths: string[]): Promise<string> {
     try {
       const bunCommand = this.useBunx ? 'bunx' : '/opt/homebrew/bin/bun';
-      const testArgs = this.useBunx 
-        ? ['bun', 'test', ...testPaths, '--coverage', '--coverage-reporter', 'text', '--coverage-reporter', 'json']
-        : ['test', ...testPaths, '--coverage', '--coverage-reporter', 'text', '--coverage-reporter', 'json'];
+      const testArgs = this.useBunx
+        ? [
+            'bun',
+            'test',
+            ...testPaths,
+            '--coverage',
+            '--coverage-reporter',
+            'text',
+            '--coverage-reporter',
+            'json',
+          ]
+        : [
+            'test',
+            ...testPaths,
+            '--coverage',
+            '--coverage-reporter',
+            'text',
+            '--coverage-reporter',
+            'json',
+          ];
 
       const proc = Bun.spawn([bunCommand, ...testArgs], {
-        stdout: "pipe",
-        stderr: "pipe",
+        stdout: 'pipe',
+        stderr: 'pipe',
         env: {
           ...process.env,
-          FORCE_COLOR: "0"
-        }
+          FORCE_COLOR: '0',
+        },
       });
 
       const [stdout, stderr, exitCode] = await Promise.all([
         proc.stdout.text(),
         proc.stderr.text(),
-        proc.exited
+        proc.exited,
       ]);
 
       if (exitCode !== 0) {
-        console.warn("⚠️  Some tests failed, but continuing with coverage analysis");
+        console.warn('⚠️  Some tests failed, but continuing with coverage analysis');
       }
 
       return stdout + stderr;
-
     } catch (error) {
       throw new Error(`Failed to run tests with coverage: ${error.message}`);
     }
@@ -141,22 +157,22 @@ class EnhancedCoverageReporter {
       statements: { covered: 0, total: 0 },
       branches: { covered: 0, total: 0 },
       functions: { covered: 0, total: 0 },
-      lines: { covered: 0, total: 0 }
+      lines: { covered: 0, total: 0 },
     };
 
     // Parse coverage output
     const lines = coverageOutput.split('\n');
     let inCoverageTable = false;
-    
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
-      
+
       // Detect coverage table start
       if (line.includes('File') && line.includes('% Funcs') && line.includes('% Lines')) {
         inCoverageTable = true;
         continue;
       }
-      
+
       // Detect coverage table end
       if (inCoverageTable && line.includes('-----')) {
         if (lines[i + 1]?.includes('All files')) {
@@ -173,7 +189,7 @@ class EnhancedCoverageReporter {
         }
         continue;
       }
-      
+
       // Parse individual file coverage
       if (inCoverageTable && line.length > 0 && !line.includes('File') && !line.includes('-----')) {
         const fileResult = this.parseFileCoverageLine(line);
@@ -185,10 +201,22 @@ class EnhancedCoverageReporter {
 
     // Calculate global percentages
     const globalCoverage = {
-      statements: globalStats.statements.total > 0 ? (globalStats.statements.covered / globalStats.statements.total * 100) : 0,
-      branches: globalStats.branches.total > 0 ? (globalStats.branches.covered / globalStats.branches.total * 100) : 0,
-      functions: globalStats.functions.total > 0 ? (globalStats.functions.covered / globalStats.functions.total * 100) : 0,
-      lines: globalStats.lines.total > 0 ? (globalStats.lines.covered / globalStats.lines.total * 100) : 0
+      statements:
+        globalStats.statements.total > 0
+          ? (globalStats.statements.covered / globalStats.statements.total) * 100
+          : 0,
+      branches:
+        globalStats.branches.total > 0
+          ? (globalStats.branches.covered / globalStats.branches.total) * 100
+          : 0,
+      functions:
+        globalStats.functions.total > 0
+          ? (globalStats.functions.covered / globalStats.functions.total) * 100
+          : 0,
+      lines:
+        globalStats.lines.total > 0
+          ? (globalStats.lines.covered / globalStats.lines.total) * 100
+          : 0,
     };
 
     // Determine quality gates
@@ -202,7 +230,7 @@ class EnhancedCoverageReporter {
       qualityGatesPassed,
       failedFiles,
       recommendations,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -215,7 +243,7 @@ class EnhancedCoverageReporter {
       functions: this.parsePercentage(parts[1]),
       lines: this.parsePercentage(parts[2]),
       statements: this.parsePercentage(parts[2]), // Bun typically combines these
-      branches: this.parsePercentage(parts[1])   // Approximate
+      branches: this.parsePercentage(parts[1]), // Approximate
     };
   }
 
@@ -234,7 +262,7 @@ class EnhancedCoverageReporter {
       branches: { covered: 0, total: 100, percentage: functionsPerc },
       functions: { covered: 0, total: 100, percentage: functionsPerc },
       lines: { covered: 0, total: 100, percentage: linesPerc },
-      uncoveredLines
+      uncoveredLines,
     };
   }
 
@@ -245,10 +273,10 @@ class EnhancedCoverageReporter {
 
   private parseUncoveredLines(text: string): number[] {
     if (!text || text === '') return [];
-    
+
     const lines: number[] = [];
     const parts = text.split(',');
-    
+
     for (const part of parts) {
       const trimmed = part.trim();
       if (trimmed.includes('-')) {
@@ -262,24 +290,25 @@ class EnhancedCoverageReporter {
         lines.push(parseInt(trimmed));
       }
     }
-    
+
     return lines;
   }
 
   private checkQualityGates(globalCoverage: any, fileResults: CoverageResult[]): boolean {
     // Check global thresholds
-    const globalPassed = 
+    const globalPassed =
       globalCoverage.statements >= this.thresholds.global.statements &&
       globalCoverage.branches >= this.thresholds.global.branches &&
       globalCoverage.functions >= this.thresholds.global.functions &&
       globalCoverage.lines >= this.thresholds.global.lines;
 
     // Check individual file thresholds
-    const individualPassed = fileResults.every(file => 
-      file.statements.percentage >= this.thresholds.individual.statements &&
-      file.branches.percentage >= this.thresholds.individual.branches &&
-      file.functions.percentage >= this.thresholds.individual.functions &&
-      file.lines.percentage >= this.thresholds.individual.lines
+    const individualPassed = fileResults.every(
+      file =>
+        file.statements.percentage >= this.thresholds.individual.statements &&
+        file.branches.percentage >= this.thresholds.individual.branches &&
+        file.functions.percentage >= this.thresholds.individual.functions &&
+        file.lines.percentage >= this.thresholds.individual.lines
     );
 
     return globalPassed && individualPassed;
@@ -287,11 +316,12 @@ class EnhancedCoverageReporter {
 
   private getFailedFiles(fileResults: CoverageResult[]): string[] {
     return fileResults
-      .filter(file => 
-        file.statements.percentage < this.thresholds.individual.statements ||
-        file.branches.percentage < this.thresholds.individual.branches ||
-        file.functions.percentage < this.thresholds.individual.functions ||
-        file.lines.percentage < this.thresholds.individual.lines
+      .filter(
+        file =>
+          file.statements.percentage < this.thresholds.individual.statements ||
+          file.branches.percentage < this.thresholds.individual.branches ||
+          file.functions.percentage < this.thresholds.individual.functions ||
+          file.lines.percentage < this.thresholds.individual.lines
       )
       .map(file => file.file);
   }
@@ -301,22 +331,22 @@ class EnhancedCoverageReporter {
 
     // Global recommendations
     if (globalCoverage.lines < 80) {
-      recommendations.push("Increase overall line coverage by adding more comprehensive tests");
+      recommendations.push('Increase overall line coverage by adding more comprehensive tests');
     }
     if (globalCoverage.branches < 75) {
-      recommendations.push("Improve branch coverage by testing edge cases and error conditions");
+      recommendations.push('Improve branch coverage by testing edge cases and error conditions');
     }
     if (globalCoverage.functions < 80) {
-      recommendations.push("Add tests for uncovered functions");
+      recommendations.push('Add tests for uncovered functions');
     }
 
     // File-specific recommendations
-    const lowCoverageFiles = fileResults
-      .filter(f => f.lines.percentage < 70)
-      .slice(0, 5); // Top 5 files needing attention
+    const lowCoverageFiles = fileResults.filter(f => f.lines.percentage < 70).slice(0, 5); // Top 5 files needing attention
 
     if (lowCoverageFiles.length > 0) {
-      recommendations.push(`Priority files needing tests: ${lowCoverageFiles.map(f => f.file).join(', ')}`);
+      recommendations.push(
+        `Priority files needing tests: ${lowCoverageFiles.map(f => f.file).join(', ')}`
+      );
     }
 
     // Files with many uncovered lines
@@ -325,7 +355,9 @@ class EnhancedCoverageReporter {
       .slice(0, 3);
 
     if (filesWithManyUncoveredLines.length > 0) {
-      recommendations.push(`Files with many uncovered lines need refactoring or comprehensive tests: ${filesWithManyUncoveredLines.map(f => f.file).join(', ')}`);
+      recommendations.push(
+        `Files with many uncovered lines need refactoring or comprehensive tests: ${filesWithManyUncoveredLines.map(f => f.file).join(', ')}`
+      );
     }
 
     return recommendations;
@@ -335,12 +367,12 @@ class EnhancedCoverageReporter {
     // Generate JSON report
     const jsonReport = join(this.reportDir, `coverage-${analysis.timestamp.split('T')[0]}.json`);
     writeFileSync(jsonReport, JSON.stringify(analysis, null, 2));
-    
+
     // Generate HTML summary (simple)
     const htmlReport = join(this.reportDir, 'coverage-summary.html');
     const htmlContent = this.generateHtmlReport(analysis);
     writeFileSync(htmlReport, htmlContent);
-    
+
     console.log(`📄 Reports generated:`);
     console.log(`  JSON: ${jsonReport}`);
     console.log(`  HTML: ${htmlReport}`);
@@ -348,7 +380,7 @@ class EnhancedCoverageReporter {
 
   private generateHtmlReport(analysis: CoverageAnalysis): string {
     const { globalCoverage, fileResults, qualityGatesPassed } = analysis;
-    
+
     return `<!DOCTYPE html>
 <html>
 <head>
@@ -408,26 +440,34 @@ class EnhancedCoverageReporter {
                 </tr>
             </thead>
             <tbody>
-                ${fileResults.map(file => `
+                ${fileResults
+                  .map(
+                    file => `
                     <tr>
                         <td>${file.file}</td>
                         <td>${file.lines.percentage.toFixed(1)}%</td>
                         <td>${file.functions.percentage.toFixed(1)}%</td>
                         <td>${file.uncoveredLines.length > 0 ? file.uncoveredLines.slice(0, 10).join(', ') + (file.uncoveredLines.length > 10 ? '...' : '') : 'None'}</td>
                     </tr>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </tbody>
         </table>
     </div>
 
-    ${analysis.recommendations.length > 0 ? `
+    ${
+      analysis.recommendations.length > 0
+        ? `
     <div class="recommendations">
         <h2>Recommendations</h2>
         <ul>
             ${analysis.recommendations.map(rec => `<li>${rec}</li>`).join('')}
         </ul>
     </div>
-    ` : ''}
+    `
+        : ''
+    }
 </body>
 </html>`;
   }
@@ -440,21 +480,29 @@ class EnhancedCoverageReporter {
 
   private printSummary(analysis: CoverageAnalysis): void {
     const { globalCoverage, qualityGatesPassed, failedFiles, recommendations } = analysis;
-    
-    console.log("\n" + "━".repeat(60));
-    console.log("📊 Enhanced Coverage Report Summary");
-    console.log("━".repeat(60));
+
+    console.log('\n' + '━'.repeat(60));
+    console.log('📊 Enhanced Coverage Report Summary');
+    console.log('━'.repeat(60));
 
     // Global metrics
-    console.log("\n📈 Global Coverage:");
-    console.log(`  Lines:      ${globalCoverage.lines.toFixed(1)}% ${this.getCoverageEmoji(globalCoverage.lines)}`);
-    console.log(`  Functions:  ${globalCoverage.functions.toFixed(1)}% ${this.getCoverageEmoji(globalCoverage.functions)}`);
-    console.log(`  Branches:   ${globalCoverage.branches.toFixed(1)}% ${this.getCoverageEmoji(globalCoverage.branches)}`);
-    console.log(`  Statements: ${globalCoverage.statements.toFixed(1)}% ${this.getCoverageEmoji(globalCoverage.statements)}`);
+    console.log('\n📈 Global Coverage:');
+    console.log(
+      `  Lines:      ${globalCoverage.lines.toFixed(1)}% ${this.getCoverageEmoji(globalCoverage.lines)}`
+    );
+    console.log(
+      `  Functions:  ${globalCoverage.functions.toFixed(1)}% ${this.getCoverageEmoji(globalCoverage.functions)}`
+    );
+    console.log(
+      `  Branches:   ${globalCoverage.branches.toFixed(1)}% ${this.getCoverageEmoji(globalCoverage.branches)}`
+    );
+    console.log(
+      `  Statements: ${globalCoverage.statements.toFixed(1)}% ${this.getCoverageEmoji(globalCoverage.statements)}`
+    );
 
     // Quality gates
     console.log(`\n🚪 Quality Gates: ${qualityGatesPassed ? '✅ PASSED' : '❌ FAILED'}`);
-    
+
     if (failedFiles.length > 0) {
       console.log(`\n⚠️  Files below threshold (${failedFiles.length}):`);
       failedFiles.slice(0, 5).forEach(file => console.log(`  • ${file}`));
@@ -465,14 +513,14 @@ class EnhancedCoverageReporter {
 
     // Recommendations
     if (recommendations.length > 0) {
-      console.log("\n💡 Recommendations:");
+      console.log('\n💡 Recommendations:');
       recommendations.forEach(rec => console.log(`  • ${rec}`));
     }
 
     if (qualityGatesPassed) {
-      console.log("\n🎉 Coverage quality gates passed!");
+      console.log('\n🎉 Coverage quality gates passed!');
     } else {
-      console.log("\n⚠️  Coverage quality gates failed. Please improve coverage before merging.");
+      console.log('\n⚠️  Coverage quality gates failed. Please improve coverage before merging.');
     }
   }
 
@@ -490,20 +538,22 @@ async function main() {
   const useBunx = args.includes('--bunx') || process.env.USE_BUNX === 'true';
   const testPaths = args.filter(arg => !arg.startsWith('--'));
 
-  console.log("📊 Enhanced Test Coverage Reporter");
-  console.log("━".repeat(40));
+  console.log('📊 Enhanced Test Coverage Reporter');
+  console.log('━'.repeat(40));
 
   const reporter = new EnhancedCoverageReporter(useBunx);
-  
+
   try {
-    const analysis = await reporter.generateCoverageReport(testPaths.length > 0 ? testPaths : undefined);
-    
+    const analysis = await reporter.generateCoverageReport(
+      testPaths.length > 0 ? testPaths : undefined
+    );
+
     // Exit with error if quality gates failed
     if (!analysis.qualityGatesPassed) {
       process.exit(1);
     }
   } catch (error) {
-    console.error("❌ Coverage report failed:", error.message);
+    console.error('❌ Coverage report failed:', error.message);
     process.exit(1);
   }
 }

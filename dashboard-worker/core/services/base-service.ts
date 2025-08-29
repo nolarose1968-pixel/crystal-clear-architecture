@@ -31,7 +31,7 @@ export abstract class BaseService {
     return {
       status: 'healthy',
       uptime: process.uptime(),
-      lastCheck: new Date()
+      lastCheck: new Date(),
     };
   }
 

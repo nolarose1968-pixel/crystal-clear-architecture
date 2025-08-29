@@ -15,7 +15,7 @@ bun install
 # Build all packages
 bun run build:all
 
-# Test all packages  
+# Test all packages
 bun run test:all
 
 # Publish to private registry
@@ -50,7 +50,7 @@ bun run clean
 # Bump patch version
 bun run version:patch
 
-# Bump minor version  
+# Bump minor version
 bun run version:minor
 
 # Bump major version

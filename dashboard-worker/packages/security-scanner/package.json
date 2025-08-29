@@ -61,8 +61,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/brendadeeznuts1111/fire22-dashboard-worker",
-    "directory": "packages/security-scanner"
+    "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture.git",
+    "directory": "dashboard-worker/packages/security-scanner"
   },
   "engines": {
     "bun": ">=1.2.21",

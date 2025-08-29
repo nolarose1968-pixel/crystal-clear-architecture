@@ -1,19 +1,22 @@
 # Fire22 Terminal Components Library
 
-A comprehensive library of reusable terminal-inspired components for the Fire22 dashboard ecosystem.
+A comprehensive library of reusable terminal-inspired components for the Fire22
+dashboard ecosystem.
 
 ## Overview
 
-This library provides a unified set of terminal-styled components using box-drawing characters, monospace fonts, and Fire22 brand colors to create a cohesive terminal aesthetic across all dashboard applications.
+This library provides a unified set of terminal-styled components using
+box-drawing characters, monospace fonts, and Fire22 brand colors to create a
+cohesive terminal aesthetic across all dashboard applications.
 
 ## Quick Start
 
 ```html
 <!-- Include the terminal framework CSS -->
-<link rel="stylesheet" href="terminal-framework.css">
+<link rel="stylesheet" href="terminal-framework.css" />
 
 <!-- Include the terminal components CSS -->
-<link rel="stylesheet" href="terminal-components.css">
+<link rel="stylesheet" href="terminal-components.css" />
 
 <!-- Include the terminal components JavaScript -->
 <script src="terminal-components.js"></script>
@@ -27,15 +30,16 @@ A branded header component with box-drawing borders and flame animation.
 
 ```html
 <header class="terminal-header terminal-header--fire22">
-    <h1 class="terminal-title">
-        <span class="terminal-logo">🔥</span>
-        Fire22 Dashboard Title
-    </h1>
-    <p class="terminal-subtitle">Dashboard subtitle or description</p>
+  <h1 class="terminal-title">
+    <span class="terminal-logo">🔥</span>
+    Fire22 Dashboard Title
+  </h1>
+  <p class="terminal-subtitle">Dashboard subtitle or description</p>
 </header>
 ```
 
 **Modifiers:**
+
 - `.terminal-header--compact` - Reduced padding for smaller headers
 - `.terminal-header--wide` - Extended width for full-screen headers
 
@@ -45,17 +49,18 @@ A content container with terminal corner decorations.
 
 ```html
 <div class="terminal-card">
-    <div class="terminal-card__header">
-        <h2 class="terminal-card__title">📊 Card Title</h2>
-        <div class="terminal-status-dot terminal-status-dot--active"></div>
-    </div>
-    <div class="terminal-card__content">
-        <p>Card content goes here</p>
-    </div>
+  <div class="terminal-card__header">
+    <h2 class="terminal-card__title">📊 Card Title</h2>
+    <div class="terminal-status-dot terminal-status-dot--active"></div>
+  </div>
+  <div class="terminal-card__content">
+    <p>Card content goes here</p>
+  </div>
 </div>
 ```
 
 **Modifiers:**
+
 - `.terminal-card--compact` - Reduced padding
 - `.terminal-card--interactive` - Hover effects enabled
 - `.terminal-card--accent` - Accent color border
@@ -66,16 +71,17 @@ Styled buttons with terminal decorations and hover effects.
 
 ```html
 <button class="terminal-btn terminal-btn--primary">
-    <span class="terminal-btn__icon">🚀</span>
-    <span class="terminal-btn__text">Primary Action</span>
+  <span class="terminal-btn__icon">🚀</span>
+  <span class="terminal-btn__text">Primary Action</span>
 </button>
 
 <button class="terminal-btn terminal-btn--secondary">
-    <span class="terminal-btn__text">Secondary Action</span>
+  <span class="terminal-btn__text">Secondary Action</span>
 </button>
 ```
 
 **Button Variants:**
+
 - `.terminal-btn--primary` - Fire22 orange primary button
 - `.terminal-btn--secondary` - Accent blue secondary button
 - `.terminal-btn--success` - Green success button
@@ -88,11 +94,11 @@ KPI and metric display components.
 
 ```html
 <div class="terminal-metrics">
-    <div class="terminal-metric">
-        <div class="terminal-metric__value">1,247</div>
-        <div class="terminal-metric__label">Active Users</div>
-        <div class="terminal-metric__trend terminal-metric__trend--up">↗ +12%</div>
-    </div>
+  <div class="terminal-metric">
+    <div class="terminal-metric__value">1,247</div>
+    <div class="terminal-metric__label">Active Users</div>
+    <div class="terminal-metric__trend terminal-metric__trend--up">↗ +12%</div>
+  </div>
 </div>
 ```
 
@@ -102,13 +108,13 @@ Animated progress bars with terminal styling.
 
 ```html
 <div class="terminal-progress">
-    <div class="terminal-progress__header">
-        <span class="terminal-progress__label">CPU Usage</span>
-        <span class="terminal-progress__value">67%</span>
-    </div>
-    <div class="terminal-progress__bar">
-        <div class="terminal-progress__fill" data-progress="67"></div>
-    </div>
+  <div class="terminal-progress__header">
+    <span class="terminal-progress__label">CPU Usage</span>
+    <span class="terminal-progress__value">67%</span>
+  </div>
+  <div class="terminal-progress__bar">
+    <div class="terminal-progress__fill" data-progress="67"></div>
+  </div>
 </div>
 ```
 
@@ -118,8 +124,8 @@ Status dots and badges with pulse animations.
 
 ```html
 <div class="terminal-status">
-    <div class="terminal-status-dot terminal-status-dot--active"></div>
-    <span class="terminal-status__text">System Active</span>
+  <div class="terminal-status-dot terminal-status-dot--active"></div>
+  <span class="terminal-status__text">System Active</span>
 </div>
 
 <span class="terminal-badge terminal-badge--success">HEALTHY</span>
@@ -133,13 +139,10 @@ Navigation components with box-drawing styling.
 
 ```html
 <nav class="terminal-nav">
-    <div class="terminal-nav__section">
-        ╭─ Dashboard ─────╮
-        │ • Overview      │
-        │ • Analytics     │
-        │ • Settings      │
-        ╰─────────────────╯
-    </div>
+  <div class="terminal-nav__section">
+    ╭─ Dashboard ─────╮ │ • Overview │ │ • Analytics │ │ • Settings │
+    ╰─────────────────╯
+  </div>
 </nav>
 ```
 
@@ -149,27 +152,27 @@ Data tables with terminal styling.
 
 ```html
 <div class="terminal-table">
-    <div class="terminal-table__header">
-        <h3 class="terminal-table__title">📋 Data Table</h3>
-    </div>
-    <table class="terminal-table__table">
-        <thead>
-            <tr class="terminal-table__row terminal-table__row--header">
-                <th class="terminal-table__cell">Name</th>
-                <th class="terminal-table__cell">Status</th>
-                <th class="terminal-table__cell">Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="terminal-table__row">
-                <td class="terminal-table__cell">Item 1</td>
-                <td class="terminal-table__cell">
-                    <span class="terminal-badge terminal-badge--success">ACTIVE</span>
-                </td>
-                <td class="terminal-table__cell">100</td>
-            </tr>
-        </tbody>
-    </table>
+  <div class="terminal-table__header">
+    <h3 class="terminal-table__title">📋 Data Table</h3>
+  </div>
+  <table class="terminal-table__table">
+    <thead>
+      <tr class="terminal-table__row terminal-table__row--header">
+        <th class="terminal-table__cell">Name</th>
+        <th class="terminal-table__cell">Status</th>
+        <th class="terminal-table__cell">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="terminal-table__row">
+        <td class="terminal-table__cell">Item 1</td>
+        <td class="terminal-table__cell">
+          <span class="terminal-badge terminal-badge--success">ACTIVE</span>
+        </td>
+        <td class="terminal-table__cell">100</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 ```
 
@@ -179,46 +182,44 @@ Comprehensive footer component with features grid and navigation.
 
 ```html
 <footer class="terminal-footer">
-    <div class="terminal-footer__decoration">
-        ╭────────────────────────────────────────────────────────────────────────╮
+  <div class="terminal-footer__decoration">
+    ╭────────────────────────────────────────────────────────────────────────╮
+  </div>
+
+  <div class="terminal-footer__content">
+    <div class="terminal-footer__main">
+      <div class="terminal-footer__logo">🔥</div>
+      <h2 class="terminal-footer__title">Fire22 Dashboard</h2>
+      <p class="terminal-footer__tagline">Your tagline here</p>
     </div>
-    
-    <div class="terminal-footer__content">
-        <div class="terminal-footer__main">
-            <div class="terminal-footer__logo">🔥</div>
-            <h2 class="terminal-footer__title">Fire22 Dashboard</h2>
-            <p class="terminal-footer__tagline">Your tagline here</p>
-        </div>
-        
-        <div class="terminal-footer__features">
-            <div class="terminal-footer__features-header">
-                ├─── Features ───┤
-            </div>
-            <div class="terminal-footer__features-grid">
-                <div class="terminal-footer__feature">├─ ⚡ Feature 1</div>
-                <div class="terminal-footer__feature">├─ 📊 Feature 2</div>
-                <div class="terminal-footer__feature">╰─ 🎯 Feature 3</div>
-            </div>
-        </div>
-        
-        <div class="terminal-footer__navigation">
-            <!-- Navigation sections -->
-        </div>
-        
-        <div class="terminal-footer__status">
-            ├───────────────────────────────────────────────────────────────────────┤
-            │ Status: ● Active | Version: 1.0.0 | Last Updated: Now                 │
-            ├───────────────────────────────────────────────────────────────────────┤
-        </div>
-        
-        <div class="terminal-footer__copyright">
-            <p>© 2024 Fire22 Development Team. All rights reserved.</p>
-        </div>
+
+    <div class="terminal-footer__features">
+      <div class="terminal-footer__features-header">├─── Features ───┤</div>
+      <div class="terminal-footer__features-grid">
+        <div class="terminal-footer__feature">├─ ⚡ Feature 1</div>
+        <div class="terminal-footer__feature">├─ 📊 Feature 2</div>
+        <div class="terminal-footer__feature">╰─ 🎯 Feature 3</div>
+      </div>
     </div>
-    
-    <div class="terminal-footer__decoration">
-        ╰────────────────────────────────────────────────────────────────────────╯
+
+    <div class="terminal-footer__navigation">
+      <!-- Navigation sections -->
     </div>
+
+    <div class="terminal-footer__status">
+      ├───────────────────────────────────────────────────────────────────────┤
+      │ Status: ● Active | Version: 1.0.0 | Last Updated: Now │
+      ├───────────────────────────────────────────────────────────────────────┤
+    </div>
+
+    <div class="terminal-footer__copyright">
+      <p>© 2024 Fire22 Development Team. All rights reserved.</p>
+    </div>
+  </div>
+
+  <div class="terminal-footer__decoration">
+    ╰────────────────────────────────────────────────────────────────────────╯
+  </div>
 </footer>
 ```
 
@@ -228,18 +229,22 @@ Form inputs with terminal styling.
 
 ```html
 <div class="terminal-form">
-    <div class="terminal-form__group">
-        <label class="terminal-form__label">Agent ID</label>
-        <input class="terminal-form__input" type="text" placeholder="Enter agent ID...">
-    </div>
-    
-    <div class="terminal-form__group">
-        <label class="terminal-form__label">Status</label>
-        <select class="terminal-form__select">
-            <option>Active</option>
-            <option>Inactive</option>
-        </select>
-    </div>
+  <div class="terminal-form__group">
+    <label class="terminal-form__label">Agent ID</label>
+    <input
+      class="terminal-form__input"
+      type="text"
+      placeholder="Enter agent ID..."
+    />
+  </div>
+
+  <div class="terminal-form__group">
+    <label class="terminal-form__label">Status</label>
+    <select class="terminal-form__select">
+      <option>Active</option>
+      <option>Inactive</option>
+    </select>
+  </div>
 </div>
 ```
 
@@ -251,12 +256,12 @@ Responsive grid system for terminal components.
 
 ```html
 <div class="terminal-grid">
-    <div class="terminal-grid__item terminal-grid__item--span-2">
-        <!-- Content spanning 2 columns -->
-    </div>
-    <div class="terminal-grid__item">
-        <!-- Single column content -->
-    </div>
+  <div class="terminal-grid__item terminal-grid__item--span-2">
+    <!-- Content spanning 2 columns -->
+  </div>
+  <div class="terminal-grid__item">
+    <!-- Single column content -->
+  </div>
 </div>
 ```
 
@@ -266,20 +271,22 @@ Main container with consistent spacing.
 
 ```html
 <div class="terminal-container">
-    <div class="terminal-container__inner">
-        <!-- Dashboard content -->
-    </div>
+  <div class="terminal-container__inner">
+    <!-- Dashboard content -->
+  </div>
 </div>
 ```
 
 ## Utility Classes
 
 ### Spacing
+
 - `.terminal-mt-{size}` - Margin top (1-8)
 - `.terminal-mb-{size}` - Margin bottom (1-8)
 - `.terminal-p-{size}` - Padding (1-8)
 
 ### Typography
+
 - `.terminal-text--accent` - Accent color text
 - `.terminal-text--fire` - Fire22 orange text
 - `.terminal-text--success` - Success green text
@@ -288,6 +295,7 @@ Main container with consistent spacing.
 - `.terminal-text--mono` - Monospace font
 
 ### Display
+
 - `.terminal-flex` - Flex display
 - `.terminal-flex--center` - Center alignment
 - `.terminal-flex--between` - Space between
@@ -295,6 +303,7 @@ Main container with consistent spacing.
 - `.terminal-hidden` - Hide element
 
 ### Animations
+
 - `.terminal-pulse` - Pulse animation
 - `.terminal-glow` - Glow effect
 - `.terminal-flame` - Flame flicker animation
@@ -307,9 +316,9 @@ Main container with consistent spacing.
 ```javascript
 // Initialize terminal components
 const terminal = new TerminalComponents({
-    theme: 'fire22',
-    animations: true,
-    realTime: true
+  theme: 'fire22',
+  animations: true,
+  realTime: true,
 });
 
 // Update metrics
@@ -332,13 +341,13 @@ Components can be configured for real-time updates:
 ```javascript
 // Auto-refresh metrics every 5 seconds
 terminal.autoRefresh('.terminal-metric', {
-    interval: 5000,
-    endpoint: '/api/metrics'
+  interval: 5000,
+  endpoint: '/api/metrics',
 });
 
 // Live status updates
 terminal.liveStatus('.terminal-status-dot', {
-    statusEndpoint: '/api/health'
+  statusEndpoint: '/api/health',
 });
 ```
 
@@ -350,23 +359,23 @@ Override theme colors by defining custom properties:
 
 ```css
 :root {
-    --terminal-primary: #your-color;
-    --terminal-fire: #your-brand-color;
-    --terminal-accent: #your-accent-color;
+  --terminal-primary: #your-color;
+  --terminal-fire: #your-brand-color;
+  --terminal-accent: #your-accent-color;
 }
 ```
 
 ### Dark/Light Mode Support
 
 ```css
-[data-theme="dark"] {
-    --terminal-bg: #0d1117;
-    --terminal-text: #f0f6fc;
+[data-theme='dark'] {
+  --terminal-bg: #0d1117;
+  --terminal-text: #f0f6fc;
 }
 
-[data-theme="light"] {
-    --terminal-bg: #ffffff;
-    --terminal-text: #24292f;
+[data-theme='light'] {
+  --terminal-bg: #ffffff;
+  --terminal-text: #24292f;
 }
 ```
 
@@ -380,13 +389,13 @@ All components are responsive and include breakpoints:
 
 ```css
 @media (max-width: 768px) {
-    .terminal-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .terminal-footer__navigation {
-        flex-direction: column;
-    }
+  .terminal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .terminal-footer__navigation {
+    flex-direction: column;
+  }
 }
 ```
 
@@ -401,32 +410,38 @@ All components include accessibility features:
 - Focus indicators
 
 ```html
-<button class="terminal-btn terminal-btn--primary" 
-        role="button" 
-        aria-label="Execute primary action"
-        tabindex="0">
-    Primary Action
+<button
+  class="terminal-btn terminal-btn--primary"
+  role="button"
+  aria-label="Execute primary action"
+  tabindex="0"
+>
+  Primary Action
 </button>
 ```
 
 ## Best Practices
 
 ### 1. Component Naming
+
 - Use BEM methodology: `.terminal-component__element--modifier`
 - Prefix all classes with `terminal-`
 - Use semantic naming for clarity
 
 ### 2. Box-Drawing Characters
+
 - Use consistent characters: `╭ ╮ ╰ ╯ ├ ─ ┤`
 - Test across different fonts and browsers
 - Provide fallbacks for unsupported environments
 
 ### 3. Performance
+
 - Minimize animation usage on low-end devices
 - Use CSS transforms for better performance
 - Implement lazy loading for large datasets
 
 ### 4. Maintenance
+
 - Keep components modular and reusable
 - Document any customizations
 - Test across browsers and devices
@@ -439,7 +454,8 @@ All components include accessibility features:
 - Safari 14+
 - Edge 90+
 
-*Note: Box-drawing characters require proper font support. Fallback fonts are provided.*
+_Note: Box-drawing characters require proper font support. Fallback fonts are
+provided._
 
 ## File Structure
 
@@ -476,4 +492,4 @@ Copyright © 2024 Fire22 Development Team. All rights reserved.
 
 ---
 
-*Built with ╭─🔥─╮ terminal-inspired design for the Fire22 ecosystem*
+_Built with ╭─🔥─╮ terminal-inspired design for the Fire22 ecosystem_

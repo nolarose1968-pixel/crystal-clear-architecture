@@ -5,6 +5,7 @@
 ### ✅ **Correct Link Formats**
 
 #### Internal Documentation Links
+
 ```html
 <!-- ✅ Correct: Use absolute paths -->
 <a href="/docs/packages.html">Package Guide</a>
@@ -16,17 +17,19 @@
 ```
 
 #### CSS and Asset Links
+
 ```html
 <!-- ✅ Correct: Use absolute paths -->
-<link rel="stylesheet" href="/src/styles/framework.css">
-<img src="/static/images/logo.png" alt="Logo">
+<link rel="stylesheet" href="/src/styles/framework.css" />
+<img src="/static/images/logo.png" alt="Logo" />
 
 <!-- ❌ Incorrect: Relative paths -->
-<link rel="stylesheet" href="../src/styles/framework.css">
-<img src="./images/logo.png" alt="Logo">
+<link rel="stylesheet" href="../src/styles/framework.css" />
+<img src="./images/logo.png" alt="Logo" />
 ```
 
 #### API Endpoint Links
+
 ```html
 <!-- ✅ Correct: Use absolute paths -->
 <a href="/api/health">Health Check</a>
@@ -39,6 +42,7 @@
 ## 🏗️ **File Structure Standards**
 
 ### Directory Organization
+
 ```
 docs/
 ├── api/                    # API documentation
@@ -54,6 +58,7 @@ docs/
 ```
 
 ### File Naming Conventions
+
 - Use kebab-case: `environment-variables.html`
 - Be descriptive: `fire22-api-integration.html`
 - Avoid special characters except hyphens
@@ -63,15 +68,17 @@ docs/
 ## 🎨 **Styling Standards**
 
 ### CSS Framework Usage
+
 ```html
 <!-- ✅ Always use the framework CSS -->
-<link rel="stylesheet" href="/src/styles/framework.css">
+<link rel="stylesheet" href="/src/styles/framework.css" />
 
 <!-- Optional: Add Fire22 theme -->
-<link rel="stylesheet" href="/src/styles/themes/fire22.css">
+<link rel="stylesheet" href="/src/styles/themes/fire22.css" />
 ```
 
 ### Component Classes
+
 ```html
 <!-- Use standardized component classes -->
 <div class="container">
@@ -89,6 +96,7 @@ docs/
 ## 🔧 **Constants Usage**
 
 ### Environment-Specific Values
+
 ```javascript
 // ✅ Use constants from config
 import CONSTANTS from '/src/config/constants.js';
@@ -102,6 +110,7 @@ const defaultAgent = 'BLAKEPPH';
 ```
 
 ### URL Generation
+
 ```javascript
 // ✅ Use URL helpers
 import { apiUrl, docsUrl } from '/src/utils/url-helpers.js';
@@ -117,52 +126,55 @@ const packagesUrl = '/docs/packages.html';
 ## 📝 **Content Standards**
 
 ### Page Structure
+
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Page Title - Fire22 Dashboard</title>
-    <link rel="stylesheet" href="/src/styles/framework.css">
-</head>
-<body>
+    <link rel="stylesheet" href="/src/styles/framework.css" />
+  </head>
+  <body>
     <div class="container">
-        <header class="page-header">
-            <h1>Page Title</h1>
-            <p class="page-description">Brief description</p>
-        </header>
-        
-        <nav class="page-nav">
-            <!-- Navigation links -->
-        </nav>
-        
-        <main class="page-content">
-            <!-- Main content -->
-        </main>
-        
-        <footer class="page-footer">
-            <!-- Footer links -->
-        </footer>
+      <header class="page-header">
+        <h1>Page Title</h1>
+        <p class="page-description">Brief description</p>
+      </header>
+
+      <nav class="page-nav">
+        <!-- Navigation links -->
+      </nav>
+
+      <main class="page-content">
+        <!-- Main content -->
+      </main>
+
+      <footer class="page-footer">
+        <!-- Footer links -->
+      </footer>
     </div>
-</body>
+  </body>
 </html>
 ```
 
 ### Navigation Standards
+
 ```html
 <!-- ✅ Standard navigation structure -->
 <nav class="brand-nav">
-    <a href="/docs/packages.html" class="nav-link">📦 Packages</a>
-    <a href="/docs/environment-variables.html" class="nav-link">🌍 Environment</a>
-    <a href="/docs/api-packages.html" class="nav-link">🔌 API</a>
-    <a href="/docs/@packages.html" class="nav-link active">🧪 Testing</a>
+  <a href="/docs/packages.html" class="nav-link">📦 Packages</a>
+  <a href="/docs/environment-variables.html" class="nav-link">🌍 Environment</a>
+  <a href="/docs/api-packages.html" class="nav-link">🔌 API</a>
+  <a href="/docs/@packages.html" class="nav-link active">🧪 Testing</a>
 </nav>
 ```
 
 ## 🧪 **Testing Standards**
 
 ### Link Validation
+
 ```bash
 # Run link validation before committing
 bun run scripts/validate-links.js
@@ -172,6 +184,7 @@ bun run scripts/validate-links.js docs/specific-file.html
 ```
 
 ### Manual Testing Checklist
+
 - [ ] All internal links work
 - [ ] CSS loads correctly
 - [ ] Images display properly
@@ -182,6 +195,7 @@ bun run scripts/validate-links.js docs/specific-file.html
 ## 🚀 **Deployment Standards**
 
 ### Pre-deployment Checklist
+
 - [ ] Run link validation
 - [ ] Test all documentation pages
 - [ ] Verify CSS and assets load
@@ -190,18 +204,19 @@ bun run scripts/validate-links.js docs/specific-file.html
 - [ ] Test API endpoint links
 
 ### Environment Configuration
+
 ```javascript
 // Use environment-specific configurations
 const config = CONSTANTS.getEnvironmentConfig();
 
 // Development
 if (config.DEBUG) {
-    console.log('Debug mode enabled');
+  console.log('Debug mode enabled');
 }
 
 // Production
 if (process.env.NODE_ENV === 'production') {
-    // Production-specific settings
+  // Production-specific settings
 }
 ```
 
@@ -210,15 +225,17 @@ if (process.env.NODE_ENV === 'production') {
 ### Common Issues
 
 #### Broken CSS Links
+
 ```html
 <!-- ❌ Problem -->
-<link rel="stylesheet" href="../src/styles/framework.css">
+<link rel="stylesheet" href="../src/styles/framework.css" />
 
 <!-- ✅ Solution -->
-<link rel="stylesheet" href="/src/styles/framework.css">
+<link rel="stylesheet" href="/src/styles/framework.css" />
 ```
 
 #### Missing Documentation Files
+
 ```bash
 # Check if file exists
 ls -la docs/target-file.html
@@ -228,6 +245,7 @@ curl -I http://localhost:4000/docs/target-file.html
 ```
 
 #### API Endpoint Issues
+
 ```bash
 # Test API endpoints
 curl http://localhost:4000/api/health
@@ -237,11 +255,13 @@ curl http://localhost:4000/api/system/status
 ## 📊 **Validation Tools**
 
 ### Available Scripts
+
 - `scripts/validate-links.js` - Validate all documentation links
 - `scripts/check-constants.js` - Check for hardcoded values
 - `scripts/test-endpoints.js` - Test all API endpoints
 
 ### Continuous Integration
+
 ```yaml
 # Example CI step
 - name: Validate Documentation
@@ -265,4 +285,5 @@ curl http://localhost:4000/api/system/status
 
 ---
 
-*This document should be updated whenever new standards are established or existing ones are modified.*
+_This document should be updated whenever new standards are established or
+existing ones are modified._

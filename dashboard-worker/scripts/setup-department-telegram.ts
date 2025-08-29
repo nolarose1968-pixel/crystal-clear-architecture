@@ -2,14 +2,14 @@
 
 /**
  * 🏗️📱 Fire22 Department Telegram Setup Script
- * 
+ *
  * Automatically sets up all department Telegram channels and configurations
  */
 
 // 1. Create Telegram channels (manual step - requires Telegram admin)
 const channelsToCreate = [
   '@fire22_finance_support',
-  '@fire22_customer_support', 
+  '@fire22_customer_support',
   '@fire22_compliance',
   '@fire22_tech_support',
   '@fire22_operations',
@@ -20,7 +20,7 @@ const channelsToCreate = [
   '@fire22_design',
   '@fire22_emergency',
   '@fire22_escalation',
-  '@fire22_help'
+  '@fire22_help',
 ];
 
 console.log('📱 TELEGRAM CHANNELS TO CREATE:');
@@ -32,10 +32,10 @@ channelsToCreate.forEach(channel => {
 const botCommands = [
   '/setcommands',
   'help - Get help with Fire22 support',
-  'departments - List all support departments', 
+  'departments - List all support departments',
   'status - Check inquiry status',
   'escalate - Escalate your inquiry',
-  'language - Change language (en/es/pt/fr)'
+  'language - Change language (en/es/pt/fr)',
 ];
 
 console.log('\n🤖 BOT COMMANDS TO CONFIGURE:');
@@ -51,8 +51,8 @@ const channelConfig = {
     'Respond within department SLA times',
     'Update inquiry status when resolved',
     'Escalate if unable to resolve within time limit',
-    'Maintain professional, helpful communication'
-  ]
+    'Maintain professional, helpful communication',
+  ],
 };
 
 console.log('\n⚙️ CHANNEL CONFIGURATION:');

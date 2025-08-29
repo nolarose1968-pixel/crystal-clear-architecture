@@ -2,14 +2,14 @@
 
 /**
  * 🚀 Fire22 Script Runner - Performance Wrapper & Execution Engine
- * 
+ *
  * This core utility provides:
  * - Performance monitoring (timing, memory usage)
  * - Standardized error handling
  * - Execution logging and tracking
  * - Resource usage optimization
  * - Script dependency management
- * 
+ *
  * @version 1.0.0
  * @author Fire22 Development Team
  */
@@ -103,7 +103,7 @@ class ScriptRunner {
     const startTime = performance.now();
     const startMemory = process.memoryUsage();
     const startCpu = process.cpuUsage();
-    
+
     const defaultOptions: RunOptions = {
       silent: false,
       timeout: 300000, // 5 minutes
@@ -111,11 +111,11 @@ class ScriptRunner {
       captureOutput: true,
       logLevel: 'info',
       tags: [],
-      metadata: {}
+      metadata: {},
     };
 
     const finalOptions = { ...defaultOptions, ...options };
-    
+
     if (!finalOptions.silent) {
       this.log(`🚀 Executing script: ${scriptName}`, finalOptions.logLevel);
       this.log(`📊 Execution ID: ${executionId}`, finalOptions.logLevel);
@@ -128,12 +128,15 @@ class ScriptRunner {
       try {
         // Set up timeout if specified
         const timeoutPromise = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error(`Script execution timed out after ${finalOptions.timeout}ms`)), finalOptions.timeout);
+          setTimeout(
+            () => reject(new Error(`Script execution timed out after ${finalOptions.timeout}ms`)),
+            finalOptions.timeout
+          );
         });
 
         // Execute the script
         const result = await Promise.race([fn(), timeoutPromise]);
-        
+
         const endTime = performance.now();
         const endMemory = process.memoryUsage();
         const endCpu = process.cpuUsage();
@@ -147,41 +150,49 @@ class ScriptRunner {
               rss: endMemory.rss - startMemory.rss,
               heapUsed: endMemory.heapUsed - startMemory.heapUsed,
               heapTotal: endMemory.heapTotal - startMemory.heapTotal,
-              external: endMemory.external - startMemory.external
+              external: endMemory.external - startMemory.external,
             },
             cpuUsage: {
               user: endCpu.user - startCpu.user,
-              system: endCpu.system - startCpu.system
-            }
+              system: endCpu.system - startCpu.system,
+            },
           },
           metadata: {
             scriptName,
             timestamp: new Date().toISOString(),
             executionId,
             tags: finalOptions.tags || [],
-            retryCount
-          }
+            retryCount,
+          },
         };
 
         // Update metrics
         this.updateMetrics(scriptName, runResult);
-        
+
         // Add to history
         this.addToHistory(runResult);
 
         if (!finalOptions.silent) {
-          this.log(`✅ Script executed successfully in ${runResult.performance.duration.toFixed(2)}ms`, finalOptions.logLevel);
-          this.log(`💾 Memory delta: ${(runResult.performance.memoryDelta.heapUsed / 1024 / 1024).toFixed(2)}MB`, finalOptions.logLevel);
+          this.log(
+            `✅ Script executed successfully in ${runResult.performance.duration.toFixed(2)}ms`,
+            finalOptions.logLevel
+          );
+          this.log(
+            `💾 Memory delta: ${(runResult.performance.memoryDelta.heapUsed / 1024 / 1024).toFixed(2)}MB`,
+            finalOptions.logLevel
+          );
         }
 
         return runResult;
-
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
         retryCount++;
 
         if (retryCount <= finalOptions.retries) {
-          this.log(`⚠️  Script failed, retrying (${retryCount}/${finalOptions.retries})...`, finalOptions.logLevel);
+          this.log(
+            `⚠️  Script failed, retrying (${retryCount}/${finalOptions.retries})...`,
+            finalOptions.logLevel
+          );
           await this.delay(1000 * retryCount); // Exponential backoff
         } else {
           const endTime = performance.now();
@@ -197,30 +208,33 @@ class ScriptRunner {
                 rss: endMemory.rss - startMemory.rss,
                 heapUsed: endMemory.heapUsed - startMemory.heapUsed,
                 heapTotal: endMemory.heapTotal - startMemory.heapTotal,
-                external: endMemory.external - startMemory.external
+                external: endMemory.external - startMemory.external,
               },
               cpuUsage: {
                 user: endCpu.user - startCpu.user,
-                system: endCpu.system - startCpu.system
-              }
+                system: endCpu.system - startCpu.system,
+              },
             },
             metadata: {
               scriptName,
               timestamp: new Date().toISOString(),
               executionId,
               tags: finalOptions.tags || [],
-              retryCount
-            }
+              retryCount,
+            },
           };
 
           // Update metrics
           this.updateMetrics(scriptName, runResult);
-          
+
           // Add to history
           this.addToHistory(runResult);
 
           if (!finalOptions.silent) {
-            this.log(`❌ Script failed after ${finalOptions.retries + 1} attempts`, finalOptions.logLevel);
+            this.log(
+              `❌ Script failed after ${finalOptions.retries + 1} attempts`,
+              finalOptions.logLevel
+            );
             this.log(`💥 Error: ${lastError.message}`, finalOptions.logLevel);
           }
 
@@ -267,14 +281,21 @@ class ScriptRunner {
    * Generate performance report
    */
   generatePerformanceReport(): string {
-    const report = ['📊 Fire22 Script Performance Report', '=====================================\n'];
-    
+    const report = [
+      '📊 Fire22 Script Performance Report',
+      '!==!==!==!==!==!==!==\n',
+    ];
+
     for (const [scriptName, metrics] of this.metrics) {
       report.push(`🔧 ${scriptName}:`);
       report.push(`   📈 Total Executions: ${metrics.totalExecutions}`);
-      report.push(`   ✅ Success Rate: ${((metrics.successfulExecutions / metrics.totalExecutions) * 100).toFixed(1)}%`);
+      report.push(
+        `   ✅ Success Rate: ${((metrics.successfulExecutions / metrics.totalExecutions) * 100).toFixed(1)}%`
+      );
       report.push(`   ⏱️  Average Duration: ${metrics.averageDuration.toFixed(2)}ms`);
-      report.push(`   💾 Average Memory: ${(metrics.averageMemoryUsage / 1024 / 1024).toFixed(2)}MB`);
+      report.push(
+        `   💾 Average Memory: ${(metrics.averageMemoryUsage / 1024 / 1024).toFixed(2)}MB`
+      );
       report.push(`   🕒 Last Executed: ${metrics.lastExecuted}`);
       report.push('');
     }
@@ -297,7 +318,7 @@ class ScriptRunner {
       averageDuration: 0,
       averageMemoryUsage: 0,
       lastExecuted: '',
-      errorRate: 0
+      errorRate: 0,
     };
 
     existing.totalExecutions++;
@@ -310,8 +331,13 @@ class ScriptRunner {
     }
 
     // Update averages
-    existing.averageDuration = (existing.averageDuration * (existing.totalExecutions - 1) + result.performance.duration) / existing.totalExecutions;
-    existing.averageMemoryUsage = (existing.averageMemoryUsage * (existing.totalExecutions - 1) + result.performance.memoryDelta.heapUsed) / existing.totalExecutions;
+    existing.averageDuration =
+      (existing.averageDuration * (existing.totalExecutions - 1) + result.performance.duration) /
+      existing.totalExecutions;
+    existing.averageMemoryUsage =
+      (existing.averageMemoryUsage * (existing.totalExecutions - 1) +
+        result.performance.memoryDelta.heapUsed) /
+      existing.totalExecutions;
     existing.errorRate = (existing.failedExecutions / existing.totalExecutions) * 100;
 
     this.metrics.set(scriptName, existing);
@@ -319,7 +345,7 @@ class ScriptRunner {
 
   private addToHistory(result: RunResult<any>): void {
     this.executionHistory.push(result);
-    
+
     // Maintain history size
     if (this.executionHistory.length > this.maxHistorySize) {
       this.executionHistory = this.executionHistory.slice(-this.maxHistorySize);
@@ -333,7 +359,7 @@ class ScriptRunner {
   private log(message: string, level: string = 'info'): void {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
-    
+
     switch (level) {
       case 'error':
         console.error(`${prefix} ${message}`);

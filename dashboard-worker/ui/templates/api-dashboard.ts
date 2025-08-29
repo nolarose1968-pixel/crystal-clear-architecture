@@ -35,7 +35,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
     { label: 'Total APIs', value: '28', change: '+16', trend: 'up' },
     { label: 'Active Calls', value: '47.2K', change: '+8.3%', trend: 'up' },
     { label: 'Success Rate', value: '99.9%', change: '+0.1%', trend: 'up' },
-    { label: 'Avg Response', value: '142ms', change: '-12ms', trend: 'up' }
+    { label: 'Avg Response', value: '142ms', change: '-12ms', trend: 'up' },
   ];
 
   const apiCategories = [
@@ -46,7 +46,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Health checks, status monitoring, and system diagnostics',
       endpoint: '/api/health',
       status: 'online',
-      metrics: { endpoints: '4', checks: '24/7', uptime: '99.9%' }
+      metrics: { endpoints: '4', checks: '24/7', uptime: '99.9%' },
     },
     {
       icon: '👤',
@@ -54,7 +54,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Employee data, profile information, and organizational details',
       endpoint: '/api/profile',
       status: 'online',
-      metrics: { profiles: '1', fields: '15', updates: '2.1K' }
+      metrics: { profiles: '1', fields: '15', updates: '2.1K' },
     },
     {
       icon: '📊',
@@ -62,7 +62,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Usage analytics, performance metrics, and business intelligence',
       endpoint: '/api/analytics',
       status: 'online',
-      metrics: { reports: '247', metrics: '15', trends: '↗️' }
+      metrics: { reports: '247', metrics: '15', trends: '↗️' },
     },
 
     // Sportsbook Admin APIs
@@ -72,7 +72,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Sportsbook admin dashboard with key metrics and alerts',
       endpoint: '/api/dashboard',
       status: 'online',
-      metrics: { customers: '45K', revenue: '$125K', alerts: '3' }
+      metrics: { customers: '45K', revenue: '$125K', alerts: '3' },
     },
     {
       icon: '💬',
@@ -80,7 +80,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Internal messaging and communication system',
       endpoint: '/api/messaging',
       status: 'online',
-      metrics: { unread: '25', conversations: '500', today: '45' }
+      metrics: { unread: '25', conversations: '500', today: '45' },
     },
     {
       icon: '📈',
@@ -88,7 +88,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Weekly performance and financial reporting',
       endpoint: '/api/weekly-figures',
       status: 'online',
-      metrics: { revenue: '$200K', growth: '+15%', bets: '5K' }
+      metrics: { revenue: '$200K', growth: '+15%', bets: '5K' },
     },
     {
       icon: '⏳',
@@ -96,7 +96,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Pending approvals, reviews, and escalations',
       endpoint: '/api/pending',
       status: 'online',
-      metrics: { approvals: '30', reviews: '15', urgent: '5' }
+      metrics: { approvals: '30', reviews: '15', urgent: '5' },
     },
     {
       icon: '👥',
@@ -104,7 +104,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Customer management and administration',
       endpoint: '/api/customer-admin',
       status: 'online',
-      metrics: { total: '50K', active: '30K', new: '200' }
+      metrics: { total: '50K', active: '30K', new: '200' },
     },
     {
       icon: '👔',
@@ -112,7 +112,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Agent hierarchy and management (Admin Only)',
       endpoint: '/api/agent-admin',
       status: 'online',
-      metrics: { agents: '1K', active: '800', commissions: '$450K' }
+      metrics: { agents: '1K', active: '800', commissions: '$450K' },
     },
     {
       icon: '⚽',
@@ -120,7 +120,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Game and odds management',
       endpoint: '/api/game-admin',
       status: 'online',
-      metrics: { games: '1K', active: '200', sports: '8' }
+      metrics: { games: '1K', active: '200', sports: '8' },
     },
     {
       icon: '💰',
@@ -128,7 +128,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Transaction and cashier management',
       endpoint: '/api/cashier',
       status: 'online',
-      metrics: { transactions: '1K', volume: '$500K', pending: '50' }
+      metrics: { transactions: '1K', volume: '$500K', pending: '50' },
     },
 
     // Business Tools
@@ -138,7 +138,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Business intelligence and comprehensive reporting',
       endpoint: '/api/reporting',
       status: 'online',
-      metrics: { reports: '50', data: '1M', exports: '25' }
+      metrics: { reports: '50', data: '1M', exports: '25' },
     },
     {
       icon: '🛠️',
@@ -146,7 +146,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Administrative tools and system utilities',
       endpoint: '/api/admin-tools',
       status: 'online',
-      metrics: { tools: '8', integrations: '5', usage: '2K' }
+      metrics: { tools: '8', integrations: '5', usage: '2K' },
     },
     {
       icon: '📄',
@@ -154,7 +154,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Agent billing and commission management',
       endpoint: '/api/billing',
       status: 'online',
-      metrics: { invoices: '500', paid: '$150K', pending: '$50K' }
+      metrics: { invoices: '500', paid: '$150K', pending: '$50K' },
     },
 
     // Advanced Features
@@ -164,7 +164,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Business contacts, relationships, and communication data',
       endpoint: '/api/contacts',
       status: 'online',
-      metrics: { contacts: '450', categories: '4', recent: '25' }
+      metrics: { contacts: '450', categories: '4', recent: '25' },
     },
     {
       icon: '📅',
@@ -172,7 +172,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Appointments, meetings, and time management (Premium)',
       endpoint: '/api/schedule',
       status: 'online',
-      metrics: { appointments: '12', thisWeek: '8', today: '3' }
+      metrics: { appointments: '12', thisWeek: '8', today: '3' },
     },
     {
       icon: '📋',
@@ -180,7 +180,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Activity logs, audit trails, and system events (Admin)',
       endpoint: '/api/logs',
       status: 'online',
-      metrics: { entries: '8.5K', today: '234', retention: '90d' }
+      metrics: { entries: '8.5K', today: '234', retention: '90d' },
     },
     {
       icon: '⚙️',
@@ -188,8 +188,8 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       description: 'Cache management, system configuration, and maintenance',
       endpoint: '/api/cache/clear',
       status: 'online',
-      metrics: { operations: '12', cache: '2.1MB', efficiency: '94%' }
-    }
+      metrics: { operations: '12', cache: '2.1MB', efficiency: '94%' },
+    },
   ];
 
   const activeEndpoints = [
@@ -223,7 +223,7 @@ function generateApiOverviewContent(employee: EmployeeData): string {
     { method: 'GET', path: '/api/logs', calls: '89', status: '200' },
     { method: 'POST', path: '/api/cache/clear', calls: '12', status: '200' },
     { method: 'GET', path: '/api/batch', calls: '45', status: '200' },
-    { method: 'GET', path: '/api/versions', calls: '67', status: '200' }
+    { method: 'GET', path: '/api/versions', calls: '67', status: '200' },
   ];
 
   return `
@@ -236,34 +236,42 @@ function generateApiOverviewContent(employee: EmployeeData): string {
       <div class="metrics-overview">
         <h2>📊 Real-Time Metrics</h2>
         <div class="metrics-grid">
-          ${realTimeMetrics.map(metric => `
+          ${realTimeMetrics
+            .map(
+              metric => `
             <div class="metric-card ${metric.trend}">
               <div class="metric-value">${metric.value}</div>
               <div class="metric-label">${metric.label}</div>
               <div class="metric-change">${metric.change}</div>
             </div>
-          `).join('')}
+          `
+            )
+            .join('')}
         </div>
       </div>
 
       <div class="api-categories">
         <h2>🏗️ API Categories</h2>
         <div class="categories-grid">
-          ${apiCategories.map(category => `
+          ${apiCategories
+            .map(
+              category => `
             <div class="category-card ${category.status}" onclick="navigateToEndpoint('${category.endpoint}')">
               <div class="category-icon">${category.icon}</div>
               <div class="category-content">
                 <h3>${category.title}</h3>
                 <p>${category.description}</p>
                 <div class="category-metrics">
-                  ${Object.entries(category.metrics).map(([key, value]) =>
-                    `<span class="metric-item">${key}: ${value}</span>`
-                  ).join('')}
+                  ${Object.entries(category.metrics)
+                    .map(([key, value]) => `<span class="metric-item">${key}: ${value}</span>`)
+                    .join('')}
                 </div>
               </div>
               <div class="category-status">${category.status === 'online' ? '🟢' : '🔴'}</div>
             </div>
-          `).join('')}
+          `
+            )
+            .join('')}
         </div>
       </div>
 
@@ -276,14 +284,18 @@ function generateApiOverviewContent(employee: EmployeeData): string {
             <span>Calls</span>
             <span>Status</span>
           </div>
-          ${activeEndpoints.map(endpoint => `
+          ${activeEndpoints
+            .map(
+              endpoint => `
             <div class="table-row">
               <span class="method ${endpoint.method.toLowerCase()}">${endpoint.method}</span>
               <span class="endpoint">${endpoint.path}</span>
               <span class="calls">${endpoint.calls}</span>
               <span class="status ${endpoint.status === '200' ? 'success' : 'error'}">${endpoint.status}</span>
             </div>
-          `).join('')}
+          `
+            )
+            .join('')}
         </div>
       </div>
 

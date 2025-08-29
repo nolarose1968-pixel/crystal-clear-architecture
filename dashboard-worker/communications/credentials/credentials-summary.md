@@ -1,23 +1,21 @@
 # 🔐 Fire22 Department Head Credentials Summary
 
-**Generated**: 2025-08-28
-**Script Version**: 1.0.0
-**Total Departments**: 10
+**Generated**: 2025-08-28 **Script Version**: 1.0.0 **Total Departments**: 10
 
 ## 📊 Credential Distribution Summary
 
-| Department | Access Level | Security Clearance | API Keys | DB Access | MFA Setup |
-|------------|--------------|-------------------|----------|-----------|----------|
-| **Management Department** | executive | level_4 | ✅ Generated | ✅ Configured | ✅ Setup |
-| **Technology Department** | executive | level_4 | ✅ Generated | ✅ Configured | ✅ Setup |
-| **Security Department** | executive | level_4 | ✅ Generated | ✅ Configured | ✅ Setup |
-| **Finance Department** | executive | level_4 | ✅ Generated | ✅ Configured | ✅ Setup |
-| **Marketing Department** | director | level_3 | ✅ Generated | ✅ Configured | ✅ Setup |
-| **Operations Department** | director | level_3 | ✅ Generated | ✅ Configured | ✅ Setup |
-| **Compliance Department** | director | level_3 | ✅ Generated | ✅ Configured | ✅ Setup |
-| **Customer Support Department** | director | level_2 | ✅ Generated | ✅ Configured | ✅ Setup |
-| **Sportsbook Operations Department** | director | level_4 | ✅ Generated | ✅ Configured | ✅ Setup |
-| **Team Contributors Department** | director | level_3 | ✅ Generated | ✅ Configured | ✅ Setup |
+| Department                           | Access Level | Security Clearance | API Keys     | DB Access     | MFA Setup |
+| ------------------------------------ | ------------ | ------------------ | ------------ | ------------- | --------- |
+| **Management Department**            | executive    | level_4            | ✅ Generated | ✅ Configured | ✅ Setup  |
+| **Technology Department**            | executive    | level_4            | ✅ Generated | ✅ Configured | ✅ Setup  |
+| **Security Department**              | executive    | level_4            | ✅ Generated | ✅ Configured | ✅ Setup  |
+| **Finance Department**               | executive    | level_4            | ✅ Generated | ✅ Configured | ✅ Setup  |
+| **Marketing Department**             | director     | level_3            | ✅ Generated | ✅ Configured | ✅ Setup  |
+| **Operations Department**            | director     | level_3            | ✅ Generated | ✅ Configured | ✅ Setup  |
+| **Compliance Department**            | director     | level_3            | ✅ Generated | ✅ Configured | ✅ Setup  |
+| **Customer Support Department**      | director     | level_2            | ✅ Generated | ✅ Configured | ✅ Setup  |
+| **Sportsbook Operations Department** | director     | level_4            | ✅ Generated | ✅ Configured | ✅ Setup  |
+| **Team Contributors Department**     | director     | level_3            | ✅ Generated | ✅ Configured | ✅ Setup  |
 
 ## 🔑 Security Metrics
 

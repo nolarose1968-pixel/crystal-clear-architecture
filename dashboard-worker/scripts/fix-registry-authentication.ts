@@ -2,7 +2,7 @@
 /**
  * 🔐 Fix Registry Authentication with Bun.secrets
  * Uses Bun's native credential storage for secure registry authentication
- * 
+ *
  * Features:
  * - Native OS credential storage (Keychain/libsecret/CredMan)
  * - Secure token management for private registries
@@ -11,9 +11,9 @@
  * - Security scanner integration
  */
 
-import { secrets } from "bun";
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { secrets } from 'bun';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { join } from 'path';
 
 interface RegistryConfig {
   name: string;
@@ -24,20 +24,20 @@ interface RegistryConfig {
 
 const REGISTRIES: RegistryConfig[] = [
   {
-    name: "fire22-registry",
-    url: "https://fire22.workers.dev/registry/",
-    scope: "@fire22",
-    description: "Fire22 Private Registry (Cloudflare Workers)"
+    name: 'fire22-registry',
+    url: 'https://fire22.workers.dev/registry/',
+    scope: '@fire22',
+    description: 'Fire22 Private Registry (Cloudflare Workers)',
   },
   {
-    name: "npm-registry", 
-    url: "https://registry.npmjs.org/",
-    description: "Official NPM Registry"
-  }
+    name: 'npm-registry',
+    url: 'https://registry.npmjs.org/',
+    description: 'Official NPM Registry',
+  },
 ];
 
 class RegistryAuthManager {
-  private serviceName = "fire22-dashboard-worker";
+  private serviceName = 'fire22-dashboard-worker';
 
   /**
    * Store registry authentication token securely using Bun.secrets
@@ -91,65 +91,67 @@ class RegistryAuthManager {
    * Configure .npmrc with secure authentication
    */
   async configureNpmrc(): Promise<void> {
-    const npmrcPath = join(process.cwd(), ".npmrc");
+    const npmrcPath = join(process.cwd(), '.npmrc');
     const lines: string[] = [
-      "# NPM Configuration for Fire22 Dashboard Worker",
-      "# Managed by fix-registry-authentication.ts with Bun.secrets",
-      "",
-      "# Main Registry (Official NPM)",
-      "registry=https://registry.npmjs.org/",
-      "",
-      "# Package Management",
-      "save-exact=true",
-      "engine-strict=true", 
-      "fund=false",
-      "",
-      "# Security",
-      "audit=true",
-      "audit-level=high",
-      "",
-      "# Performance",
-      "prefer-offline=false",
-      "cache-min=86400",
-      "",
-      "# Logging",
-      "loglevel=warn",
-      "progress=true",
+      '# NPM Configuration for Fire22 Dashboard Worker',
+      '# Managed by fix-registry-authentication.ts with Bun.secrets',
+      '',
+      '# Main Registry (Official NPM)',
+      'registry=https://registry.npmjs.org/',
+      '',
+      '# Package Management',
+      'save-exact=true',
+      'engine-strict=true',
+      'fund=false',
+      '',
+      '# Security',
+      'audit=true',
+      'audit-level=high',
+      '',
+      '# Performance',
+      'prefer-offline=false',
+      'cache-min=86400',
+      '',
+      '# Logging',
+      'loglevel=warn',
+      'progress=true',
     ];
 
     // Add scoped registry configuration if token exists
-    const fire22Token = await this.getToken("fire22-registry");
+    const fire22Token = await this.getToken('fire22-registry');
     if (fire22Token) {
       lines.push(
-        "",
-        "# Fire22 Private Registry (Authenticated)",
-        "@fire22:registry=https://fire22.workers.dev/registry/",
-        "@ff:registry=https://fire22.workers.dev/registry/",
-        "@brendadeeznuts:registry=https://fire22.workers.dev/registry/",
+        '',
+        '# Fire22 Private Registry (Authenticated)',
+        '@fire22:registry=https://fire22.workers.dev/registry/',
+        '@ff:registry=https://fire22.workers.dev/registry/',
+        '@brendadeeznuts:registry=https://fire22.workers.dev/registry/',
         `//fire22.workers.dev/registry/:_authToken=${fire22Token}`,
-        "//fire22.workers.dev/registry/:always-auth=true"
+        '//fire22.workers.dev/registry/:always-auth=true'
       );
     } else {
       lines.push(
-        "",
-        "# Fire22 Private Registry (Disabled - no token)",
-        "# @fire22:registry=https://fire22.workers.dev/registry/",
-        "# @ff:registry=https://fire22.workers.dev/registry/",
-        "# @brendadeeznuts:registry=https://fire22.workers.dev/registry/",
+        '',
+        '# Fire22 Private Registry (Disabled - no token)',
+        '# @fire22:registry=https://fire22.workers.dev/registry/',
+        '# @ff:registry=https://fire22.workers.dev/registry/',
+        '# @brendadeeznuts:registry=https://fire22.workers.dev/registry/',
         "# Run 'bun run registry:auth:setup' to configure authentication"
       );
     }
 
-    writeFileSync(npmrcPath, lines.join("\n") + "\n");
-    console.log(`✅ Updated .npmrc with ${fire22Token ? 'authenticated' : 'unauthenticated'} configuration`);
+    writeFileSync(npmrcPath, lines.join('\n') + '\n');
+    console.log(
+      `✅ Updated .npmrc with ${fire22Token ? 'authenticated' : 'unauthenticated'} configuration`
+    );
   }
 
   /**
    * Configure bunfig.toml with registry settings and security scanner
    */
   async configureBunfig(): Promise<void> {
-    const bunfigPath = join(process.cwd(), "bunfig.toml");
-    let content = existsSync(bunfigPath) ? readFileSync(bunfigPath, "utf-8") : "";
+    const bunfigPath = join(process.cwd(), 'bunfig.toml');
+    let content = existsSync(bunfigPath) ? readFileSync(bunfigPath, 'utf-8') : '';
 
     // Enhanced bunfig.toml with security scanner
     const configContent = `# Fire22 Dashboard - Enhanced Bun Configuration
@@ -229,26 +231,26 @@ plugins = []
 `;
 
     writeFileSync(bunfigPath, configContent);
-    console.log("✅ Updated bunfig.toml with security scanner and scoped registry configuration");
+    console.log('✅ Updated bunfig.toml with security scanner and scoped registry configuration');
   }
 
   /**
    * Test registry connectivity and authentication
    */
   async testRegistryAccess(): Promise<void> {
-    console.log("🔍 Testing registry access...");
-    
+    console.log('🔍 Testing registry access...');
+
     for (const registry of REGISTRIES) {
       try {
         console.log(`\n📡 Testing ${registry.name} (${registry.url})...`);
-        
+
         const response = await fetch(registry.url);
         if (response.ok) {
           console.log(`  ✅ ${registry.name}: Connection successful (${response.status})`);
         } else {
           console.log(`  ⚠️ ${registry.name}: HTTP ${response.status}`);
         }
-        
+
         // Test authentication for private registries
         if (registry.scope) {
           const token = await this.getToken(registry.name);
@@ -268,29 +270,31 @@ plugins = []
    * Interactive setup for registry authentication
    */
   async interactiveSetup(): Promise<void> {
-    console.log("🔐 Fire22 Registry Authentication Setup");
-    console.log("=====================================\n");
-    
-    console.log("This setup will configure secure authentication for Fire22 private registry.");
+    console.log('🔐 Fire22 Registry Authentication Setup');
+    console.log('!==!==!==!==!==!==!==\n');
+
+    console.log('This setup will configure secure authentication for Fire22 private registry.');
     console.log("Tokens will be stored securely using your operating system's credential manager:");
-    console.log("  • macOS: Keychain Services");
-    console.log("  • Linux: libsecret (GNOME Keyring/KWallet)"); 
-    console.log("  • Windows: Credential Manager\n");
+    console.log('  • macOS: Keychain Services');
+    console.log('  • Linux: libsecret (GNOME Keyring/KWallet)');
+    console.log('  • Windows: Credential Manager\n');
 
     // Setup Fire22 registry
-    console.log("📦 Setting up Fire22 Registry Authentication");
-    console.log("URL: https://fire22.workers.dev/registry/");
-    console.log("Scopes: @fire22/*, @ff/*, @brendadeeznuts/*");
-    
-    const hasExistingToken = await this.getToken("fire22-registry");
+    console.log('📦 Setting up Fire22 Registry Authentication');
+    console.log('URL: https://fire22.workers.dev/registry/');
+    console.log('Scopes: @fire22/*, @ff/*, @brendadeeznuts/*');
+
+    const hasExistingToken = await this.getToken('fire22-registry');
     if (hasExistingToken) {
-      console.log("✅ Existing authentication token found");
+      console.log('✅ Existing authentication token found');
     } else {
-      console.log("\n❌ No authentication token found");
-      console.log("To configure authentication:");
-      console.log("1. Deploy the Fire22 registry worker: cd workspaces/@fire22-security-registry && wrangler deploy");
-      console.log("2. Obtain an API token from the deployed registry");
-      console.log("3. Run: bun run registry:auth:setup --token=<your-token>");
+      console.log('\n❌ No authentication token found');
+      console.log('To configure authentication:');
+      console.log(
+        '1. Deploy the Fire22 registry worker: cd workspaces/@fire22-security-registry && wrangler deploy'
+      );
+      console.log('2. Obtain an API token from the deployed registry');
+      console.log('3. Run: bun run registry:auth:setup --token=<your-token>');
     }
 
     await this.configureNpmrc();
@@ -301,14 +305,14 @@ plugins = []
    * Setup authentication with provided token
    */
   async setupWithToken(token: string): Promise<void> {
-    console.log("🔐 Configuring Fire22 registry authentication...");
-    
-    await this.storeToken("fire22-registry", token);
+    console.log('🔐 Configuring Fire22 registry authentication...');
+
+    await this.storeToken('fire22-registry', token);
     await this.configureNpmrc();
     await this.configureBunfig();
-    
-    console.log("✅ Fire22 registry authentication configured successfully");
-    console.log("🧪 Testing registry access...");
+
+    console.log('✅ Fire22 registry authentication configured successfully');
+    console.log('🧪 Testing registry access...');
     await this.testRegistryAccess();
   }
 
@@ -325,24 +329,24 @@ plugins = []
    * Setup demo authentication for development
    */
   async setupDemo(): Promise<void> {
-    console.log("🧪 Setting up demo authentication for development...");
-    
+    console.log('🧪 Setting up demo authentication for development...');
+
     const demoToken = this.generateDemoToken();
-    await this.storeToken("fire22-registry", demoToken);
+    await this.storeToken('fire22-registry', demoToken);
     await this.configureNpmrc();
     await this.configureBunfig();
-    
-    console.log("✅ Demo authentication configured");
+
+    console.log('✅ Demo authentication configured');
     console.log(`🔑 Demo token: ${demoToken}`);
-    console.log("⚠️ This is a demo token. Deploy the registry worker for production use.");
+    console.log('⚠️ This is a demo token. Deploy the registry worker for production use.');
   }
 
   /**
    * Get authentication status for all registries
    */
   async getStatus(): Promise<void> {
-    console.log("🔐 Registry Authentication Status");
-    console.log("================================\n");
+    console.log('🔐 Registry Authentication Status');
+    console.log('!==!==!==!==!==!==\n');
 
     for (const registry of REGISTRIES) {
       console.log(`📦 ${registry.name}`);
@@ -351,7 +355,7 @@ plugins = []
         console.log(`   Scope: ${registry.scope}/*`);
       }
       console.log(`   Description: ${registry.description}`);
-      
+
       if (registry.scope) {
         const token = await this.getToken(registry.name);
         console.log(`   Authentication: ${token ? '✅ Configured' : '❌ Not configured'}`);
@@ -361,71 +365,71 @@ plugins = []
       } else {
         console.log(`   Authentication: ➖ Public registry`);
       }
-      console.log("");
+      console.log('');
     }
-    
-    console.log("🛡️ Security Scanner Status");
-    console.log("bunfig.toml: ✅ Configured with @fire22/security-scanner");
-    console.log("Audit Level: 🔴 High (production setting)");
+
+    console.log('🛡️ Security Scanner Status');
+    console.log('bunfig.toml: ✅ Configured with @fire22/security-scanner');
+    console.log('Audit Level: 🔴 High (production setting)');
   }
 }
 
 // CLI Interface
 async function main() {
   const args = process.argv.slice(2);
-  const command = args[0] || "status";
+  const command = args[0] || 'status';
   const manager = new RegistryAuthManager();
 
   switch (command) {
-    case "setup":
-      const tokenFlag = args.find(arg => arg.startsWith("--token="));
+    case 'setup':
+      const tokenFlag = args.find(arg => arg.startsWith('--token='));
       if (tokenFlag) {
-        const token = tokenFlag.split("=")[1];
+        const token = tokenFlag.split('=')[1];
         await manager.setupWithToken(token);
       } else {
         await manager.interactiveSetup();
       }
       break;
 
-    case "demo":
+    case 'demo':
       await manager.setupDemo();
       break;
 
-    case "test":
+    case 'test':
       await manager.testRegistryAccess();
       break;
 
-    case "fix":
-      console.log("🔧 Fixing registry configuration...");
+    case 'fix':
+      console.log('🔧 Fixing registry configuration...');
       await manager.configureNpmrc();
       await manager.configureBunfig();
       await manager.testRegistryAccess();
       break;
 
-    case "status":
+    case 'status':
       await manager.getStatus();
       break;
 
-    case "delete":
-      const registryName = args[1] || "fire22-registry";
+    case 'delete':
+      const registryName = args[1] || 'fire22-registry';
       await manager.deleteToken(registryName);
       await manager.configureNpmrc();
       break;
 
     default:
-      console.log("🔐 Fire22 Registry Authentication Manager (Bun.secrets)");
-      console.log("Usage:");
-      console.log("  bun run registry:auth:setup [--token=<token>]  # Setup authentication");
-      console.log("  bun run registry:auth:demo                     # Setup demo token");
-      console.log("  bun run registry:auth:test                     # Test registry access");
-      console.log("  bun run registry:auth:fix                      # Fix configuration");
-      console.log("  bun run registry:auth:status                   # Show status");
-      console.log("  bun run registry:auth:delete [registry]        # Delete stored token");
-      console.log("");
-      console.log("🔒 Credentials stored securely using OS-native storage:");
-      console.log("  • macOS: Keychain Services");
-      console.log("  • Linux: libsecret (GNOME Keyring/KWallet)");
-      console.log("  • Windows: Credential Manager");
+      console.log('🔐 Fire22 Registry Authentication Manager (Bun.secrets)');
+      console.log('Usage:');
+      console.log('  bun run registry:auth:setup [--token=<token>]  # Setup authentication');
+      console.log('  bun run registry:auth:demo                     # Setup demo token');
+      console.log('  bun run registry:auth:test                     # Test registry access');
+      console.log('  bun run registry:auth:fix                      # Fix configuration');
+      console.log('  bun run registry:auth:status                   # Show status');
+      console.log('  bun run registry:auth:delete [registry]        # Delete stored token');
+      console.log('');
+      console.log('🔒 Credentials stored securely using OS-native storage:');
+      console.log('  • macOS: Keychain Services');
+      console.log('  • Linux: libsecret (GNOME Keyring/KWallet)');
+      console.log('  • Windows: Credential Manager');
       break;
   }
 }

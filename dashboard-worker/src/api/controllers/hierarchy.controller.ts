@@ -35,7 +35,7 @@ export async function getAggregatedHierarchy(): Promise<HierarchyResponse> {
       return {
         success: false,
         error: 'Hierarchy data not available',
-        code: 'HIERARCHY_NOT_FOUND'
+        code: 'HIERARCHY_NOT_FOUND',
       };
     }
 
@@ -51,15 +51,15 @@ export async function getAggregatedHierarchy(): Promise<HierarchyResponse> {
         crossReferences: aggregated.crossReferences,
         lastUpdated: aggregated.lastUpdated,
         sources: aggregated.sources,
-        note: 'This preserves all existing systems while providing unified access'
-      }
+        note: 'This preserves all existing systems while providing unified access',
+      },
     };
   } catch (error) {
     console.error('Error getting aggregated hierarchy:', error);
     return {
       success: false,
       error: 'Failed to retrieve aggregated hierarchy',
-      code: 'AGGREGATION_ERROR'
+      code: 'AGGREGATION_ERROR',
     };
   }
 }
@@ -78,8 +78,8 @@ export async function queryHierarchy(request: HierarchyQueryRequest): Promise<Hi
         results,
         total: results.length,
         query: request,
-        note: 'Natural query across all hierarchy systems'
-      }
+        note: 'Natural query across all hierarchy systems',
+      },
     };
   } catch (error) {
     console.error('Error querying hierarchy:', error);
@@ -87,7 +87,7 @@ export async function queryHierarchy(request: HierarchyQueryRequest): Promise<Hi
       success: false,
       error: 'Failed to query hierarchy',
       code: 'QUERY_ERROR',
-      details: { originalQuery: request }
+      details: { originalQuery: request },
     };
   }
 }
@@ -104,7 +104,7 @@ export async function getCrossReferences(): Promise<HierarchyResponse> {
       return {
         success: false,
         error: 'Hierarchy data not available',
-        code: 'HIERARCHY_NOT_FOUND'
+        code: 'HIERARCHY_NOT_FOUND',
       };
     }
 
@@ -121,7 +121,7 @@ export async function getCrossReferences(): Promise<HierarchyResponse> {
           person: personName,
           connections: [],
           likely_same_person: false,
-          confidence: 0
+          confidence: 0,
         };
       }
 
@@ -132,7 +132,7 @@ export async function getCrossReferences(): Promise<HierarchyResponse> {
           id: targetNode.id,
           system: targetNode.sourceSystem,
           title: targetNode.title,
-          confidence: ref.confidence
+          confidence: ref.confidence,
         });
 
         // Update overall confidence
@@ -147,15 +147,15 @@ export async function getCrossReferences(): Promise<HierarchyResponse> {
       success: true,
       data: {
         crossReferences: Object.values(personGroups),
-        note: 'Natural connections discovered across systems, not forced'
-      }
+        note: 'Natural connections discovered across systems, not forced',
+      },
     };
   } catch (error) {
     console.error('Error getting cross-references:', error);
     return {
       success: false,
       error: 'Failed to retrieve cross-references',
-      code: 'CROSS_REFERENCE_ERROR'
+      code: 'CROSS_REFERENCE_ERROR',
     };
   }
 }
@@ -175,8 +175,8 @@ export async function getSystemView(system: string): Promise<HierarchyResponse> 
         code: 'SYSTEM_NOT_FOUND',
         details: {
           requestedSystem: system,
-          availableViews: validSystems
-        }
+          availableViews: validSystems,
+        },
       };
     }
 
@@ -186,7 +186,7 @@ export async function getSystemView(system: string): Promise<HierarchyResponse> 
       return {
         success: false,
         error: 'Hierarchy data not available',
-        code: 'HIERARCHY_NOT_FOUND'
+        code: 'HIERARCHY_NOT_FOUND',
       };
     }
 
@@ -215,17 +215,17 @@ export async function getSystemView(system: string): Promise<HierarchyResponse> 
           system: systemName,
           preserves: getSystemDescription(system),
           nodes: system === 'departments' ? undefined : viewData,
-          departments: system === 'departments' ? viewData : undefined
+          departments: system === 'departments' ? viewData : undefined,
         },
-        note: `${systemName} preserved in its natural structure`
-      }
+        note: `${systemName} preserved in its natural structure`,
+      },
     };
   } catch (error) {
     console.error(`Error getting ${system} view:`, error);
     return {
       success: false,
       error: `Failed to retrieve ${system} view`,
-      code: 'SYSTEM_VIEW_ERROR'
+      code: 'SYSTEM_VIEW_ERROR',
     };
   }
 }
@@ -242,7 +242,7 @@ export async function getAgentsHierarchy(): Promise<HierarchyResponse> {
       return {
         success: false,
         error: 'Agent hierarchy data not available',
-        code: 'HIERARCHY_NOT_FOUND'
+        code: 'HIERARCHY_NOT_FOUND',
       };
     }
 
@@ -252,15 +252,15 @@ export async function getAgentsHierarchy(): Promise<HierarchyResponse> {
       data: {
         agents: aggregated.fire22View,
         totalCount: aggregated.fire22View.length,
-        note: 'Fire22 agent hierarchy (use /api/hierarchy/view/fire22 for new API)'
-      }
+        note: 'Fire22 agent hierarchy (use /api/hierarchy/view/fire22 for new API)',
+      },
     };
   } catch (error) {
     console.error('Error getting agents hierarchy:', error);
     return {
       success: false,
       error: 'Failed to retrieve agent hierarchy',
-      code: 'AGENTS_HIERARCHY_ERROR'
+      code: 'AGENTS_HIERARCHY_ERROR',
     };
   }
 }
@@ -277,7 +277,7 @@ export async function getUnifiedHierarchy(): Promise<HierarchyResponse> {
       return {
         success: false,
         error: 'Unified hierarchy data not available',
-        code: 'HIERARCHY_NOT_FOUND'
+        code: 'HIERARCHY_NOT_FOUND',
       };
     }
 
@@ -285,7 +285,7 @@ export async function getUnifiedHierarchy(): Promise<HierarchyResponse> {
     const allNodes = [
       ...aggregated.fire22View,
       ...aggregated.organizationalView,
-      ...Object.values(aggregated.departmentViews).flat()
+      ...Object.values(aggregated.departmentViews).flat(),
     ];
 
     return {
@@ -295,15 +295,15 @@ export async function getUnifiedHierarchy(): Promise<HierarchyResponse> {
         totalCount: allNodes.length,
         sources: aggregated.sources,
         lastUpdated: aggregated.lastUpdated,
-        note: 'Unified hierarchy view (deprecated - use /api/hierarchy/aggregated)'
-      }
+        note: 'Unified hierarchy view (deprecated - use /api/hierarchy/aggregated)',
+      },
     };
   } catch (error) {
     console.error('Error getting unified hierarchy:', error);
     return {
       success: false,
       error: 'Failed to retrieve unified hierarchy',
-      code: 'UNIFIED_HIERARCHY_ERROR'
+      code: 'UNIFIED_HIERARCHY_ERROR',
     };
   }
 }
@@ -314,7 +314,7 @@ function getSystemDescription(system: string): string {
   const descriptions: Record<string, string> = {
     fire22: '8-level agent structure',
     organizational: 'Company org structure',
-    departments: 'Department-specific structures'
+    departments: 'Department-specific structures',
   };
   return descriptions[system] || 'System structure';
 }
@@ -326,6 +326,5 @@ export {
   getCrossReferences,
   getSystemView,
   getAgentsHierarchy,
-  getUnifiedHierarchy
+  getUnifiedHierarchy,
 };
-

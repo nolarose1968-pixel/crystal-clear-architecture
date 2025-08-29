@@ -1,6 +1,6 @@
 /**
  * Worker Entry Point (New Modular Structure)
- * 
+ *
  * This file now imports from the new modular structure.
  * The original 150KB file has been archived in archive/old-core/
  */

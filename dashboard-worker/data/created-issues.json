@@ -9,14 +9,8 @@
     "status": "open",
     "createdAt": "2025-08-28T19:55:21.795Z",
     "updatedAt": "2025-08-28T19:55:21.795Z",
-    "assignees": [
-      "platform-team"
-    ],
-    "labels": [
-      "critical",
-      "system-failure",
-      "auto-created"
-    ],
+    "assignees": ["platform-team"],
+    "labels": ["critical", "system-failure", "auto-created"],
     "priority": "critical"
   },
   "issue-1756410922299": {
@@ -29,14 +23,8 @@
     "status": "open",
     "createdAt": "2025-08-28T19:55:22.299Z",
     "updatedAt": "2025-08-28T19:55:22.299Z",
-    "assignees": [
-      "platform-team"
-    ],
-    "labels": [
-      "critical",
-      "system-failure",
-      "auto-created"
-    ],
+    "assignees": ["platform-team"],
+    "labels": ["critical", "system-failure", "auto-created"],
     "priority": "critical"
   }
 }

@@ -5,6 +5,7 @@
 ### 🎯 Features Tested & Working
 
 #### 1. **Basic --user-agent Flag** ✅
+
 ```bash
 # Default user-agent
 bun test-agent.js
@@ -16,6 +17,7 @@ bun --user-agent "Fire22-Dashboard/3.0.9" test-agent.js
 ```
 
 #### 2. **Embedded Runtime Flags (--compile-exec-argv)** ✅
+
 ```bash
 # Build with embedded user-agent
 bun build ./test-embedded.ts --compile --outfile=dist/my-app \
@@ -29,25 +31,28 @@ bun build ./test-embedded.ts --compile --outfile=dist/my-app \
 ```
 
 #### 3. **ANSI Stripping (Bun.stripANSI)** ✅
+
 - Successfully strips ANSI escape codes
 - Performance: 13,999 chars in 0.018ms
 - 6x-57x faster than npm alternatives
 
 #### 4. **Environment Variable Support** ✅
+
 ```bash
 BUN_USER_AGENT="Fire22-Env/2.0" bun run scripts/test-user-agent.ts env
 # Successfully detects and uses environment variable
 ```
 
 #### 5. **Programmatic Bun.build() API** ✅
+
 ```javascript
 await Bun.build({
-  entrypoints: ["./app.js"],
+  entrypoints: ['./app.js'],
   compile: {
     windows: {
-      title: "Fire22 Dashboard",
-      publisher: "Fire22 Development Team",
-      version: "3.0.9.0",
+      title: 'Fire22 Dashboard',
+      publisher: 'Fire22 Development Team',
+      version: '3.0.9.0',
       // ... metadata successfully configured
     },
   },
@@ -55,6 +60,7 @@ await Bun.build({
 ```
 
 #### 6. **Cross-Platform Compilation** ✅
+
 - Successfully initiates Windows cross-compilation
 - Downloads Windows runtime when targeting Windows from macOS
 

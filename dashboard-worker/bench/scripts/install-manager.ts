@@ -2,7 +2,7 @@
 
 /**
  * 📦 Fire22 Benchmark Installation Manager
- * 
+ *
  * Comprehensive package installation utilities using all Bun flags
  */
 
@@ -10,70 +10,70 @@ import { $ } from 'bun';
 
 interface InstallOptions {
   // General Configuration
-  config?: string;              // --config=<path>
-  cwd?: string;                 // --cwd=<path>
-  
+  config?: string; // --config=<path>
+  cwd?: string; // --cwd=<path>
+
   // Dependency Scope & Management
-  production?: boolean;         // --production
-  noSave?: boolean;            // --no-save
-  save?: boolean;              // --save
-  omit?: ('dev' | 'optional' | 'peer')[];  // --omit=<val>
-  onlyMissing?: boolean;       // --only-missing
-  
+  production?: boolean; // --production
+  noSave?: boolean; // --no-save
+  save?: boolean; // --save
+  omit?: ('dev' | 'optional' | 'peer')[]; // --omit=<val>
+  onlyMissing?: boolean; // --only-missing
+
   // Dependency Type & Versioning
-  dev?: boolean;               // --dev
-  optional?: boolean;          // --optional
-  peer?: boolean;             // --peer
-  exact?: boolean;            // --exact
-  
+  dev?: boolean; // --dev
+  optional?: boolean; // --optional
+  peer?: boolean; // --peer
+  exact?: boolean; // --exact
+
   // Lockfile Control
-  yarn?: boolean;             // --yarn
-  frozenLockfile?: boolean;   // --frozen-lockfile
+  yarn?: boolean; // --yarn
+  frozenLockfile?: boolean; // --frozen-lockfile
   saveTextLockfile?: boolean; // --save-text-lockfile
-  lockfileOnly?: boolean;     // --lockfile-only
-  
+  lockfileOnly?: boolean; // --lockfile-only
+
   // Network & Registry Settings
-  ca?: string;                // --ca=<val>
-  cafile?: string;            // --cafile=<path>
-  registry?: string;          // --registry=<url>
-  
+  ca?: string; // --ca=<val>
+  cafile?: string; // --cafile=<path>
+  registry?: string; // --registry=<url>
+
   // Installation Process Control
-  dryRun?: boolean;           // --dry-run
-  force?: boolean;            // --force
-  global?: boolean;           // --global
-  backend?: 'clonefile' | 'hardlink' | 'symlink' | 'copyfile';  // --backend=<val>
-  filter?: string[];          // --filter=<val>
-  analyze?: boolean;          // --analyze
-  
+  dryRun?: boolean; // --dry-run
+  force?: boolean; // --force
+  global?: boolean; // --global
+  backend?: 'clonefile' | 'hardlink' | 'symlink' | 'copyfile'; // --backend=<val>
+  filter?: string[]; // --filter=<val>
+  analyze?: boolean; // --analyze
+
   // Caching Options
-  cacheDir?: string;          // --cache-dir=<path>
-  noCache?: boolean;          // --no-cache
-  
+  cacheDir?: string; // --cache-dir=<path>
+  noCache?: boolean; // --no-cache
+
   // Output & Logging
-  silent?: boolean;           // --silent
-  verbose?: boolean;          // --verbose
-  noProgress?: boolean;       // --no-progress
-  noSummary?: boolean;        // --no-summary
-  
+  silent?: boolean; // --silent
+  verbose?: boolean; // --verbose
+  noProgress?: boolean; // --no-progress
+  noSummary?: boolean; // --no-summary
+
   // Security & Integrity
-  noVerify?: boolean;         // --no-verify
-  trust?: string[];           // --trust
-  
+  noVerify?: boolean; // --no-verify
+  trust?: string[]; // --trust
+
   // Concurrency & Performance
   concurrentScripts?: number; // --concurrent-scripts=<val>
   networkConcurrency?: number; // --network-concurrency=<val>
-  
+
   // Lifecycle Script Management
-  ignoreScripts?: boolean;    // --ignore-scripts
+  ignoreScripts?: boolean; // --ignore-scripts
 }
 
 interface PublishOptions {
-  access?: 'public' | 'restricted';  // --access
-  tag?: string;                       // --tag
-  dryRun?: boolean;                   // --dry-run
-  gzipLevel?: number;                 // --gzip-level
-  authType?: 'web' | 'legacy';       // --auth-type
-  otp?: string;                       // --otp
+  access?: 'public' | 'restricted'; // --access
+  tag?: string; // --tag
+  dryRun?: boolean; // --dry-run
+  gzipLevel?: number; // --gzip-level
+  authType?: 'web' | 'legacy'; // --auth-type
+  otp?: string; // --otp
 }
 
 export class InstallManager {
@@ -160,7 +160,7 @@ export class InstallManager {
   async install(options: InstallOptions = {}): Promise<void> {
     const args = this.buildInstallCommand(options);
     console.log(`🚀 Running: bun ${args.join(' ')}`);
-    
+
     await $`bun ${args}`;
   }
 
@@ -194,11 +194,13 @@ export class InstallManager {
   /**
    * Update packages with interactive mode
    */
-  async update(options: {
-    interactive?: boolean;
-    latest?: boolean;
-    packages?: string[];
-  } = {}): Promise<void> {
+  async update(
+    options: {
+      interactive?: boolean;
+      latest?: boolean;
+      packages?: string[];
+    } = {}
+  ): Promise<void> {
     const args: string[] = ['update'];
 
     if (options.interactive) args.push('--interactive');
@@ -250,14 +252,14 @@ export class InstallManager {
           production: true,
           frozenLockfile: true,
           omit: ['dev', 'optional'],
-          concurrentScripts: 8
+          concurrentScripts: 8,
         });
         break;
 
       case 'development':
         await this.install({
           force: true,
-          verbose: true
+          verbose: true,
         });
         break;
 
@@ -266,7 +268,7 @@ export class InstallManager {
           frozenLockfile: true,
           ignoreScripts: true,
           noProgress: true,
-          silent: false
+          silent: false,
         });
         break;
 
@@ -274,7 +276,7 @@ export class InstallManager {
         await this.install({
           omit: ['dev', 'optional', 'peer'],
           noCache: false,
-          backend: 'symlink'
+          backend: 'symlink',
         });
         break;
 
@@ -283,7 +285,7 @@ export class InstallManager {
           frozenLockfile: true,
           noVerify: false,
           trust: ['@fire22/benchmark-suite'],
-          ignoreScripts: true
+          ignoreScripts: true,
         });
         break;
 
@@ -292,7 +294,7 @@ export class InstallManager {
           backend: 'clonefile',
           networkConcurrency: 96,
           concurrentScripts: 16,
-          noProgress: true
+          noProgress: true,
         });
         break;
 
@@ -300,7 +302,7 @@ export class InstallManager {
         await this.install({
           frozenLockfile: true,
           noCache: false,
-          networkConcurrency: 0
+          networkConcurrency: 0,
         });
         break;
 
@@ -315,7 +317,7 @@ export class InstallManager {
   listOptions(): void {
     console.log(`
 📦 Bun Installation Options
-===========================
+!==!==!==!==!===
 
 GENERAL CONFIGURATION
   --config=<path>         Specify bunfig.toml path
@@ -381,7 +383,7 @@ LIFECYCLE SCRIPTS
   showWorkspaceCommands(): void {
     console.log(`
 🏗️  Workspace Commands
-======================
+!==!==!==!===
 
 Install specific workspace:
   bun install --filter "@fire22/benchmark-suite"
@@ -408,7 +410,7 @@ Update workspace packages:
   showSpecialDependencies(): void {
     console.log(`
 🔗 Special Dependencies
-=======================
+!==!==!==!====
 
 GIT DEPENDENCIES:
   bun add github:user/repo
@@ -482,7 +484,7 @@ if (import.meta.main) {
     default:
       console.log(`
 🚀 Fire22 Installation Manager
-==============================
+!==!==!==!==!=====
 
 COMMANDS:
   install [scenario]   Run installation scenario

@@ -6,94 +6,93 @@ import { join } from 'path';
 // Department Lead and Team Directory
 const DEPARTMENT_TEAMS = {
   finance: {
-    lead: { name: "John Smith", email: "john.smith@finance.fire22" },
+    lead: { name: 'John Smith', email: 'john.smith@finance.fire22' },
     members: [
-      { name: "Sarah Johnson", email: "sarah.johnson@finance.fire22" },
-      { name: "Mike Chen", email: "mike.chen@finance.fire22" }
+      { name: 'Sarah Johnson', email: 'sarah.johnson@finance.fire22' },
+      { name: 'Mike Chen', email: 'mike.chen@finance.fire22' },
     ],
-    lkeys: ["L-69", "L-627", "L-628", "L-187", "L-202", "L-206"]
+    lkeys: ['L-69', 'L-627', 'L-628', 'L-187', 'L-202', 'L-206'],
   },
   support: {
-    lead: { name: "Emily Davis", email: "emily.davis@support.fire22" },
-    members: [
-      { name: "Alex Wilson", email: "alex.wilson@support.fire22" }
-    ],
-    lkeys: ["L-301", "L-302", "L-303"]
+    lead: { name: 'Emily Davis', email: 'emily.davis@support.fire22' },
+    members: [{ name: 'Alex Wilson', email: 'alex.wilson@support.fire22' }],
+    lkeys: ['L-301', 'L-302', 'L-303'],
   },
   compliance: {
-    lead: { name: "Lisa Anderson", email: "lisa.anderson@compliance.fire22" },
-    members: [
-      { name: "Robert Taylor", email: "robert.taylor@compliance.fire22" }
-    ],
-    lkeys: ["L-401", "L-402", "L-403"]
+    lead: { name: 'Lisa Anderson', email: 'lisa.anderson@compliance.fire22' },
+    members: [{ name: 'Robert Taylor', email: 'robert.taylor@compliance.fire22' }],
+    lkeys: ['L-401', 'L-402', 'L-403'],
   },
   operations: {
-    lead: { name: "David Martinez", email: "david.martinez@operations.fire22" },
-    members: [
-      { name: "Jennifer Lee", email: "jennifer.lee@operations.fire22" }
-    ],
-    lkeys: ["L-12", "L-15", "L-16", "L-85", "L-1390"]
+    lead: { name: 'David Martinez', email: 'david.martinez@operations.fire22' },
+    members: [{ name: 'Jennifer Lee', email: 'jennifer.lee@operations.fire22' }],
+    lkeys: ['L-12', 'L-15', 'L-16', 'L-85', 'L-1390'],
   },
   technology: {
-    lead: { name: "Chris Brown", email: "chris.brown@tech.fire22" },
-    members: [
-      { name: "Amanda Garcia", email: "amanda.garcia@tech.fire22" }
-    ],
-    lkeys: ["L-501", "L-502", "L-503"]
+    lead: { name: 'Chris Brown', email: 'chris.brown@tech.fire22' },
+    members: [{ name: 'Amanda Garcia', email: 'amanda.garcia@tech.fire22' }],
+    lkeys: ['L-501', 'L-502', 'L-503'],
   },
   marketing: {
-    lead: { name: "Michelle Rodriguez", email: "michelle.rodriguez@marketing.fire22" },
-    members: [
-      { name: "Kevin Thompson", email: "kevin.thompson@marketing.fire22" }
-    ],
-    lkeys: ["L-601", "L-602", "L-603"]
+    lead: { name: 'Michelle Rodriguez', email: 'michelle.rodriguez@marketing.fire22' },
+    members: [{ name: 'Kevin Thompson', email: 'kevin.thompson@marketing.fire22' }],
+    lkeys: ['L-601', 'L-602', 'L-603'],
   },
   management: {
-    lead: { name: "William Harris", email: "william.harris@exec.fire22" },
-    members: [
-      { name: "Patricia Clark", email: "patricia.clark@exec.fire22" }
-    ],
-    lkeys: ["L-701", "L-702", "L-703"]
+    lead: { name: 'William Harris', email: 'william.harris@exec.fire22' },
+    members: [{ name: 'Patricia Clark', email: 'patricia.clark@exec.fire22' }],
+    lkeys: ['L-701', 'L-702', 'L-703'],
   },
   contributors: {
-    lead: { name: "Alex Chen", email: "alex.chen@team.fire22" },
+    lead: { name: 'Alex Chen', email: 'alex.chen@team.fire22' },
     members: [
-      { name: "Jordan Taylor", email: "jordan.taylor@team.fire22" },
-      { name: "Sam Wilson", email: "sam.wilson@team.fire22" },
-      { name: "Morgan Lee", email: "morgan.lee@team.fire22" },
-      { name: "Casey Brown", email: "casey.brown@team.fire22" }
+      { name: 'Jordan Taylor', email: 'jordan.taylor@team.fire22' },
+      { name: 'Sam Wilson', email: 'sam.wilson@team.fire22' },
+      { name: 'Morgan Lee', email: 'morgan.lee@team.fire22' },
+      { name: 'Casey Brown', email: 'casey.brown@team.fire22' },
     ],
-    lkeys: ["L-801", "L-802", "L-803"]
-  }
+    lkeys: ['L-801', 'L-802', 'L-803'],
+  },
 };
 
 // Commit types with examples
 const COMMIT_TYPES = {
-  feat: "Add new feature or functionality",
-  fix: "Fix a bug or issue",
-  docs: "Update documentation",
-  style: "Code style changes (formatting, etc.)",
-  refactor: "Code refactoring without behavior change",
-  perf: "Performance improvements",
-  test: "Add or update tests",
-  build: "Build system or dependencies",
-  ci: "CI/CD configuration changes",
-  chore: "Maintenance tasks"
+  feat: 'Add new feature or functionality',
+  fix: 'Fix a bug or issue',
+  docs: 'Update documentation',
+  style: 'Code style changes (formatting, etc.)',
+  refactor: 'Code refactoring without behavior change',
+  perf: 'Performance improvements',
+  test: 'Add or update tests',
+  build: 'Build system or dependencies',
+  ci: 'CI/CD configuration changes',
+  chore: 'Maintenance tasks',
 };
 
-function generateCommitTemplate(department, commitType, description, lkeys = [], contributors = [], customContributors = []) {
+function generateCommitTemplate(
+  department,
+  commitType,
+  description,
+  lkeys = [],
+  contributors = [],
+  customContributors = []
+) {
   const dept = DEPARTMENT_TEAMS[department];
   if (!dept) {
-    throw new Error(`Unknown department: ${department}. Available: ${Object.keys(DEPARTMENT_TEAMS).join(', ')}`);
+    throw new Error(
+      `Unknown department: ${department}. Available: ${Object.keys(DEPARTMENT_TEAMS).join(', ')}`
+    );
   }
 
   if (!COMMIT_TYPES[commitType]) {
-    throw new Error(`Unknown commit type: ${commitType}. Available: ${Object.keys(COMMIT_TYPES).join(', ')}`);
+    throw new Error(
+      `Unknown commit type: ${commitType}. Available: ${Object.keys(COMMIT_TYPES).join(', ')}`
+    );
   }
 
   // Build contributors list
   const contributorsList = [];
-  
+
   // Add specified team members
   contributors.forEach(name => {
     const member = dept.members.find(m => m.name.includes(name) || name.includes(m.name));
@@ -111,14 +110,17 @@ function generateCommitTemplate(department, commitType, description, lkeys = [],
 
   // Build L-Keys section
   const lkeySection = lkeys.length > 0 ? `\nL-Keys: ${lkeys.join(', ')}` : '';
-  
+
   // Build contributors section
-  const contributorsSection = contributorsList.length > 0 ? 
-    `\nContributors: ${contributorsList.join(', ')}` : '';
+  const contributorsSection =
+    contributorsList.length > 0 ? `\nContributors: ${contributorsList.join(', ')}` : '';
 
   const template = `${commitType}(${department}): ${description}
 
-Department: ${dept.lead.name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
+Department: ${dept.lead.name
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')}
 Lead: ${dept.lead.name} <${dept.lead.email}>${contributorsSection}${lkeySection}
 
 🤖 Generated with [Claude Code](https://claude.ai/code)
@@ -145,10 +147,14 @@ Options:
   --help, -h         Show this help
 
 Available Departments:
-${Object.keys(DEPARTMENT_TEAMS).map(d => `  • ${d}`).join('\n')}
+${Object.keys(DEPARTMENT_TEAMS)
+  .map(d => `  • ${d}`)
+  .join('\n')}
 
 Available Commit Types:
-${Object.entries(COMMIT_TYPES).map(([type, desc]) => `  • ${type}: ${desc}`).join('\n')}
+${Object.entries(COMMIT_TYPES)
+  .map(([type, desc]) => `  • ${type}: ${desc}`)
+  .join('\n')}
 
 Examples:
 
@@ -186,11 +192,11 @@ bun run scripts/enhanced-commit-template.js \\
 function parseArgs() {
   const args = process.argv.slice(2);
   const options = {};
-  
+
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     const nextArg = args[i + 1];
-    
+
     switch (arg) {
       case '--help':
       case '-h':
@@ -223,15 +229,20 @@ function parseArgs() {
         i++;
         break;
       case '--custom':
-        options.custom = nextArg ? nextArg.split(',').map(c => {
-          const match = c.match(/(.+)<(.+)>/);
-          return match ? { name: match[1].trim(), email: match[2].trim() } : null;
-        }).filter(Boolean) : [];
+        options.custom = nextArg
+          ? nextArg
+              .split(',')
+              .map(c => {
+                const match = c.match(/(.+)<(.+)>/);
+                return match ? { name: match[1].trim(), email: match[2].trim() } : null;
+              })
+              .filter(Boolean)
+          : [];
         i++;
         break;
     }
   }
-  
+
   return options;
 }
 
@@ -239,7 +250,7 @@ function parseArgs() {
 function main() {
   try {
     const options = parseArgs();
-    
+
     // Validate required options
     if (!options.department) {
       throw new Error('Department is required (use --department or -d)');
@@ -264,15 +275,16 @@ function main() {
     console.log('─'.repeat(50));
     console.log(commitMessage);
     console.log('─'.repeat(50));
-    
+
     console.log('\n📋 To use this commit message:');
     console.log('git add .');
     console.log(`git commit -S -m "${commitMessage.replace(/\n/g, '\\n').replace(/"/g, '\\"')}"`);
-    
-    console.log('\n💾 Or save to file:');
-    console.log('echo "' + commitMessage.replace(/\n/g, '\\n').replace(/"/g, '\\"') + '" > .gitmessage');
-    console.log('git commit -S --file .gitmessage');
 
+    console.log('\n💾 Or save to file:');
+    console.log(
+      'echo "' + commitMessage.replace(/\n/g, '\\n').replace(/"/g, '\\"') + '" > .gitmessage'
+    );
+    console.log('git commit -S --file .gitmessage');
   } catch (error) {
     console.error('❌ Error:', error.message);
     console.log('\nUse --help for usage information');

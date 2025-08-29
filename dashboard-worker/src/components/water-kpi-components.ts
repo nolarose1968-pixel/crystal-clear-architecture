@@ -3,28 +3,24 @@
  * Specialized KPI components for water management and ocean analytics
  */
 
-import { 
-    KPIComponent, 
-    createKPICard, 
-    KPIStyles 
-} from './kpi-component.ts';
+import { KPIComponent, createKPICard, KPIStyles } from './kpi-component.ts';
 
 /**
  * 🌊 Water-Themed KPI Configuration
  */
 export interface WaterKPIConfig {
-    label: string;
-    value: string | number;
-    format?: 'number' | 'currency' | 'percentage' | 'text' | 'temperature' | 'pressure' | 'flow';
-    color?: 'surface' | 'mid-water' | 'deep-water' | 'abyssal' | 'coral' | 'ocean-blue';
-    size?: 'small' | 'medium' | 'large';
-    icon?: string;
-    trend?: 'up' | 'down' | 'neutral';
-    trendValue?: string | number;
-    clickable?: boolean;
-    onClick?: () => void;
-    waterLevel?: 'normal' | 'high' | 'low' | 'critical';
-    pulseEffect?: boolean;
+  label: string;
+  value: string | number;
+  format?: 'number' | 'currency' | 'percentage' | 'text' | 'temperature' | 'pressure' | 'flow';
+  color?: 'surface' | 'mid-water' | 'deep-water' | 'abyssal' | 'coral' | 'ocean-blue';
+  size?: 'small' | 'medium' | 'large';
+  icon?: string;
+  trend?: 'up' | 'down' | 'neutral';
+  trendValue?: string | number;
+  clickable?: boolean;
+  onClick?: () => void;
+  waterLevel?: 'normal' | 'high' | 'low' | 'critical';
+  pulseEffect?: boolean;
 }
 
 /**
@@ -32,46 +28,46 @@ export interface WaterKPIConfig {
  * Enhanced KPI component with water-themed styling and ocean analytics
  */
 export class WaterKPIComponent extends KPIComponent {
-    private waterConfig: WaterKPIConfig;
+  private waterConfig: WaterKPIConfig;
 
-    constructor(config: WaterKPIConfig) {
-        super(config);
-        this.waterConfig = config;
-        this.applyWaterStyling();
+  constructor(config: WaterKPIConfig) {
+    super(config);
+    this.waterConfig = config;
+    this.applyWaterStyling();
+  }
+
+  /**
+   * 🌊 Apply water-themed styling
+   */
+  private applyWaterStyling(): void {
+    const element = this.render();
+
+    // Add water-specific classes
+    element.classList.add('water-kpi');
+    element.classList.add(`water-${this.waterConfig.color || 'ocean-blue'}`);
+
+    if (this.waterConfig.pulseEffect) {
+      element.classList.add('pulse-glow');
     }
 
-    /**
-     * 🌊 Apply water-themed styling
-     */
-    private applyWaterStyling(): void {
-        const element = this.render();
-        
-        // Add water-specific classes
-        element.classList.add('water-kpi');
-        element.classList.add(`water-${this.waterConfig.color || 'ocean-blue'}`);
-        
-        if (this.waterConfig.pulseEffect) {
-            element.classList.add('pulse-glow');
-        }
-        
-        if (this.waterConfig.waterLevel) {
-            element.classList.add(`water-level-${this.waterConfig.waterLevel}`);
-        }
+    if (this.waterConfig.waterLevel) {
+      element.classList.add(`water-level-${this.waterConfig.waterLevel}`);
+    }
+  }
+
+  /**
+   * 🌊 Create water-themed element
+   */
+  protected createElement(): HTMLElement {
+    const kpiCard = document.createElement('div');
+    kpiCard.className = `water-kpi-card water-${this.waterConfig.color || 'ocean-blue'}`;
+
+    if (this.waterConfig.clickable) {
+      kpiCard.classList.add('water-clickable');
+      kpiCard.addEventListener('click', () => this.waterConfig.onClick?.());
     }
 
-    /**
-     * 🌊 Create water-themed element
-     */
-    protected createElement(): HTMLElement {
-        const kpiCard = document.createElement('div');
-        kpiCard.className = `water-kpi-card water-${this.waterConfig.color || 'ocean-blue'}`;
-        
-        if (this.waterConfig.clickable) {
-            kpiCard.classList.add('water-clickable');
-            kpiCard.addEventListener('click', () => this.waterConfig.onClick?.());
-        }
-
-        const content = `
+    const content = `
             ${this.waterConfig.icon ? `<div class="water-kpi-icon">${this.waterConfig.icon}</div>` : ''}
             <div class="water-kpi-value">
                 ${this.formatWaterValue()}
@@ -81,186 +77,195 @@ export class WaterKPIComponent extends KPIComponent {
             ${this.waterConfig.waterLevel ? this.createWaterLevelIndicator() : ''}
         `;
 
-        kpiCard.innerHTML = content;
-        return kpiCard;
-    }
+    kpiCard.innerHTML = content;
+    return kpiCard;
+  }
 
-    /**
-     * 🌊 Format water-specific values
-     */
-    private formatWaterValue(): string {
-        const value = this.waterConfig.value;
-        
-        switch (this.waterConfig.format) {
-            case 'temperature':
-                return typeof value === 'number' ? `${value}°C` : String(value);
-            case 'pressure':
-                return typeof value === 'number' ? `${value} PSI` : String(value);
-            case 'flow':
-                return typeof value === 'number' ? `${value} L/min` : String(value);
-            case 'percentage':
-                return typeof value === 'number' ? `${value.toFixed(2)}%` : String(value);
-            case 'number':
-                return typeof value === 'number' ? value.toLocaleString() : String(value);
-            default:
-                return String(value);
-        }
-    }
+  /**
+   * 🌊 Format water-specific values
+   */
+  private formatWaterValue(): string {
+    const value = this.waterConfig.value;
 
-    /**
-     * 🌊 Create water trend indicator
-     */
-    private createWaterTrendIndicator(): string {
-        if (!this.waterConfig.trend) return '';
-        
-        const trendClass = `water-trend-${this.waterConfig.trend}`;
-        const trendIcon = this.getWaterTrendIcon();
-        const trendValue = this.waterConfig.trendValue ? ` ${this.waterConfig.trendValue}` : '';
-        
-        return `<div class="water-kpi-trend ${trendClass}">${trendIcon}${trendValue}</div>`;
+    switch (this.waterConfig.format) {
+      case 'temperature':
+        return typeof value === 'number' ? `${value}°C` : String(value);
+      case 'pressure':
+        return typeof value === 'number' ? `${value} PSI` : String(value);
+      case 'flow':
+        return typeof value === 'number' ? `${value} L/min` : String(value);
+      case 'percentage':
+        return typeof value === 'number' ? `${value.toFixed(2)}%` : String(value);
+      case 'number':
+        return typeof value === 'number' ? value.toLocaleString() : String(value);
+      default:
+        return String(value);
     }
+  }
 
-    /**
-     * 🌊 Get water-themed trend icons
-     */
-    private getWaterTrendIcon(): string {
-        switch (this.waterConfig.trend) {
-            case 'up': return '🌊';
-            case 'down': return '💧';
-            case 'neutral': return '🌊';
-            default: return '';
-        }
-    }
+  /**
+   * 🌊 Create water trend indicator
+   */
+  private createWaterTrendIndicator(): string {
+    if (!this.waterConfig.trend) return '';
 
-    /**
-     * 🌊 Create water level indicator
-     */
-    private createWaterLevelIndicator(): string {
-        if (!this.waterConfig.waterLevel) return '';
-        
-        const levelClass = `water-level-${this.waterConfig.waterLevel}`;
-        const levelIcon = this.getWaterLevelIcon();
-        
-        return `<div class="water-level-indicator ${levelClass}">${levelIcon}</div>`;
-    }
+    const trendClass = `water-trend-${this.waterConfig.trend}`;
+    const trendIcon = this.getWaterTrendIcon();
+    const trendValue = this.waterConfig.trendValue ? ` ${this.waterConfig.trendValue}` : '';
 
-    /**
-     * 🌊 Get water level icons
-     */
-    private getWaterLevelIcon(): string {
-        switch (this.waterConfig.waterLevel) {
-            case 'normal': return '🌊';
-            case 'high': return '⚠️';
-            case 'low': return '💧';
-            case 'critical': return '🚨';
-            default: return '🌊';
-        }
-    }
+    return `<div class="water-kpi-trend ${trendClass}">${trendIcon}${trendValue}</div>`;
+  }
 
-    /**
-     * 🌊 Update water configuration
-     */
-    public updateWaterConfig(config: Partial<WaterKPIConfig>): void {
-        this.waterConfig = { ...this.waterConfig, ...config };
-        this.update(config);
-        this.applyWaterStyling();
+  /**
+   * 🌊 Get water-themed trend icons
+   */
+  private getWaterTrendIcon(): string {
+    switch (this.waterConfig.trend) {
+      case 'up':
+        return '🌊';
+      case 'down':
+        return '💧';
+      case 'neutral':
+        return '🌊';
+      default:
+        return '';
     }
+  }
 
-    /**
-     * 🌊 Get water level status
-     */
-    public getWaterLevel(): string | undefined {
-        return this.waterConfig.waterLevel;
-    }
+  /**
+   * 🌊 Create water level indicator
+   */
+  private createWaterLevelIndicator(): string {
+    if (!this.waterConfig.waterLevel) return '';
 
-    /**
-     * 🌊 Set water level with visual feedback
-     */
-    public setWaterLevel(level: 'normal' | 'high' | 'low' | 'critical'): void {
-        this.waterConfig.waterLevel = level;
-        this.updateWaterConfig({ waterLevel: level });
+    const levelClass = `water-level-${this.waterConfig.waterLevel}`;
+    const levelIcon = this.getWaterLevelIcon();
+
+    return `<div class="water-level-indicator ${levelClass}">${levelIcon}</div>`;
+  }
+
+  /**
+   * 🌊 Get water level icons
+   */
+  private getWaterLevelIcon(): string {
+    switch (this.waterConfig.waterLevel) {
+      case 'normal':
+        return '🌊';
+      case 'high':
+        return '⚠️';
+      case 'low':
+        return '💧';
+      case 'critical':
+        return '🚨';
+      default:
+        return '🌊';
     }
+  }
+
+  /**
+   * 🌊 Update water configuration
+   */
+  public updateWaterConfig(config: Partial<WaterKPIConfig>): void {
+    this.waterConfig = { ...this.waterConfig, ...config };
+    this.update(config);
+    this.applyWaterStyling();
+  }
+
+  /**
+   * 🌊 Get water level status
+   */
+  public getWaterLevel(): string | undefined {
+    return this.waterConfig.waterLevel;
+  }
+
+  /**
+   * 🌊 Set water level with visual feedback
+   */
+  public setWaterLevel(level: 'normal' | 'high' | 'low' | 'critical'): void {
+    this.waterConfig.waterLevel = level;
+    this.updateWaterConfig({ waterLevel: level });
+  }
 }
 
 /**
  * 🌊 Water KPI Factory Functions
  */
 export const createWaterTemperatureKPI = (temperature: number): HTMLElement => {
-    return createKPICard({
-        label: 'System Temperature',
-        value: temperature,
-        format: 'temperature',
-        color: 'surface',
-        icon: '🌡️',
-        trend: temperature > 20 ? 'up' : 'down'
-    });
+  return createKPICard({
+    label: 'System Temperature',
+    value: temperature,
+    format: 'temperature',
+    color: 'surface',
+    icon: '🌡️',
+    trend: temperature > 20 ? 'up' : 'down',
+  });
 };
 
 export const createWaterPressureKPI = (pressure: number): HTMLElement => {
-    const level = pressure > 120 ? 'high' : pressure < 80 ? 'low' : 'normal';
-    return createKPICard({
-        label: 'Water Pressure',
-        value: pressure,
-        format: 'pressure',
-        color: 'mid-water',
-        icon: '💧',
-        trend: pressure > 120 ? 'up' : pressure < 80 ? 'down' : 'neutral',
-        waterLevel: level
-    });
+  const level = pressure > 120 ? 'high' : pressure < 80 ? 'low' : 'normal';
+  return createKPICard({
+    label: 'Water Pressure',
+    value: pressure,
+    format: 'pressure',
+    color: 'mid-water',
+    icon: '💧',
+    trend: pressure > 120 ? 'up' : pressure < 80 ? 'down' : 'neutral',
+    waterLevel: level,
+  });
 };
 
 export const createWaterFlowRateKPI = (flowRate: number): HTMLElement => {
-    const level = flowRate > 80 ? 'high' : flowRate < 30 ? 'low' : 'normal';
-    return createKPICard({
-        label: 'Flow Rate',
-        value: flowRate,
-        format: 'flow',
-        color: 'deep-water',
-        icon: '🌊',
-        trend: flowRate > 80 ? 'up' : flowRate < 30 ? 'down' : 'neutral',
-        waterLevel: level
-    });
+  const level = flowRate > 80 ? 'high' : flowRate < 30 ? 'low' : 'normal';
+  return createKPICard({
+    label: 'Flow Rate',
+    value: flowRate,
+    format: 'flow',
+    color: 'deep-water',
+    icon: '🌊',
+    trend: flowRate > 80 ? 'up' : flowRate < 30 ? 'down' : 'neutral',
+    waterLevel: level,
+  });
 };
 
 export const createOceanDepthKPI = (depth: number): HTMLElement => {
-    const level = depth > 1000 ? 'abyssal' : depth > 500 ? 'deep-water' : 'mid-water';
-    return createKPICard({
-        label: 'Ocean Depth',
-        value: depth,
-        format: 'number',
-        color: 'abyssal',
-        icon: '🌊',
-        suffix: ' m',
-        trend: depth > 1000 ? 'down' : 'neutral'
-    });
+  const level = depth > 1000 ? 'abyssal' : depth > 500 ? 'deep-water' : 'mid-water';
+  return createKPICard({
+    label: 'Ocean Depth',
+    value: depth,
+    format: 'number',
+    color: 'abyssal',
+    icon: '🌊',
+    suffix: ' m',
+    trend: depth > 1000 ? 'down' : 'neutral',
+  });
 };
 
 export const createSalinityKPI = (salinity: number): HTMLElement => {
-    const level = salinity > 35 ? 'high' : salinity < 30 ? 'low' : 'normal';
-    return createKPICard({
-        label: 'Salinity Level',
-        value: salinity,
-        format: 'number',
-        color: 'coral',
-        icon: '🧂',
-        suffix: ' ppt',
-        trend: salinity > 35 ? 'up' : salinity < 30 ? 'down' : 'neutral',
-        waterLevel: level
-    });
+  const level = salinity > 35 ? 'high' : salinity < 30 ? 'low' : 'normal';
+  return createKPICard({
+    label: 'Salinity Level',
+    value: salinity,
+    format: 'number',
+    color: 'coral',
+    icon: '🧂',
+    suffix: ' ppt',
+    trend: salinity > 35 ? 'up' : salinity < 30 ? 'down' : 'neutral',
+    waterLevel: level,
+  });
 };
 
 export const createTurbidityKPI = (turbidity: number): HTMLElement => {
-    const level = turbidity > 5 ? 'high' : turbidity < 1 ? 'low' : 'normal';
-    return createKPICard({
-        label: 'Water Clarity',
-        value: turbidity,
-        format: 'number',
-        color: 'ocean-blue',
-        icon: '🔍',
-        suffix: ' NTU',
-        trend: turbidity > 5 ? 'down' : turbidity < 1 ? 'up' : 'neutral',
-        waterLevel: level
-    });
+  const level = turbidity > 5 ? 'high' : turbidity < 1 ? 'low' : 'normal';
+  return createKPICard({
+    label: 'Water Clarity',
+    value: turbidity,
+    format: 'number',
+    color: 'ocean-blue',
+    icon: '🔍',
+    suffix: ' NTU',
+    trend: turbidity > 5 ? 'down' : turbidity < 1 ? 'up' : 'neutral',
+    waterLevel: level,
+  });
 };
 
 /**
@@ -473,167 +478,167 @@ export const WaterKPIStyles = `
  * 🌊 Water Dashboard KPI Manager
  */
 export class WaterDashboardKPIManager {
-    private kpis: Map<string, WaterKPIComponent> = new Map();
-    private container: HTMLElement;
-    private updateInterval: number | null = null;
+  private kpis: Map<string, WaterKPIComponent> = new Map();
+  private container: HTMLElement;
+  private updateInterval: number | null = null;
 
-    constructor(containerId: string) {
-        this.container = document.getElementById(containerId) || document.body;
-        this.injectWaterStyles();
+  constructor(containerId: string) {
+    this.container = document.getElementById(containerId) || document.body;
+    this.injectWaterStyles();
+  }
+
+  /**
+   * 🌊 Inject water KPI styles
+   */
+  private injectWaterStyles(): void {
+    if (!document.querySelector('#water-kpi-styles')) {
+      const styleSheet = document.createElement('style');
+      styleSheet.id = 'water-kpi-styles';
+      styleSheet.textContent = WaterKPIStyles;
+      document.head.appendChild(styleSheet);
     }
+  }
 
-    /**
-     * 🌊 Inject water KPI styles
-     */
-    private injectWaterStyles(): void {
-        if (!document.querySelector('#water-kpi-styles')) {
-            const styleSheet = document.createElement('style');
-            styleSheet.id = 'water-kpi-styles';
-            styleSheet.textContent = WaterKPIStyles;
-            document.head.appendChild(styleSheet);
-        }
-    }
-
-    /**
-     * 🌊 Initialize water system KPIs
-     */
-    public initializeWaterKPIs(): void {
-        const kpiGrid = document.createElement('div');
-        kpiGrid.className = 'water-kpi-grid';
-        kpiGrid.style.cssText = `
+  /**
+   * 🌊 Initialize water system KPIs
+   */
+  public initializeWaterKPIs(): void {
+    const kpiGrid = document.createElement('div');
+    kpiGrid.className = 'water-kpi-grid';
+    kpiGrid.style.cssText = `
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
             margin-bottom: 2rem;
         `;
 
-        // Create water system KPIs
-        const temperature = new WaterKPIComponent({
-            label: 'System Temperature',
-            value: 22,
-            format: 'temperature',
-            color: 'surface',
-            icon: '🌡️',
-            trend: 'neutral'
-        });
+    // Create water system KPIs
+    const temperature = new WaterKPIComponent({
+      label: 'System Temperature',
+      value: 22,
+      format: 'temperature',
+      color: 'surface',
+      icon: '🌡️',
+      trend: 'neutral',
+    });
 
-        const pressure = new WaterKPIComponent({
-            label: 'Water Pressure',
-            value: 125,
-            format: 'pressure',
-            color: 'mid-water',
-            icon: '💧',
-            trend: 'up',
-            waterLevel: 'high'
-        });
+    const pressure = new WaterKPIComponent({
+      label: 'Water Pressure',
+      value: 125,
+      format: 'pressure',
+      color: 'mid-water',
+      icon: '💧',
+      trend: 'up',
+      waterLevel: 'high',
+    });
 
-        const flowRate = new WaterKPIComponent({
-            label: 'Flow Rate',
-            value: 75,
-            format: 'flow',
-            color: 'deep-water',
-            icon: '🌊',
-            trend: 'neutral',
-            waterLevel: 'normal'
-        });
+    const flowRate = new WaterKPIComponent({
+      label: 'Flow Rate',
+      value: 75,
+      format: 'flow',
+      color: 'deep-water',
+      icon: '🌊',
+      trend: 'neutral',
+      waterLevel: 'normal',
+    });
 
-        // Store references
-        this.kpis.set('temperature', temperature);
-        this.kpis.set('pressure', pressure);
-        this.kpis.set('flowRate', flowRate);
+    // Store references
+    this.kpis.set('temperature', temperature);
+    this.kpis.set('pressure', pressure);
+    this.kpis.set('flowRate', flowRate);
 
-        // Render KPIs
-        this.kpis.forEach(kpi => {
-            kpiGrid.appendChild(kpi.render());
-        });
+    // Render KPIs
+    this.kpis.forEach(kpi => {
+      kpiGrid.appendChild(kpi.render());
+    });
 
-        this.container.appendChild(kpiGrid);
+    this.container.appendChild(kpiGrid);
+  }
+
+  /**
+   * 🌊 Start water system monitoring
+   */
+  public startWaterMonitoring(intervalMs: number = 3000): void {
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
     }
 
-    /**
-     * 🌊 Start water system monitoring
-     */
-    public startWaterMonitoring(intervalMs: number = 3000): void {
-        if (this.updateInterval) {
-            clearInterval(this.updateInterval);
-        }
+    this.updateInterval = setInterval(() => {
+      this.updateWaterData();
+    }, intervalMs);
+  }
 
-        this.updateInterval = setInterval(() => {
-            this.updateWaterData();
-        }, intervalMs);
+  /**
+   * 🌊 Update water system data
+   */
+  private updateWaterData(): void {
+    // Simulate real-time water system data
+    const temperature = this.kpis.get('temperature');
+    const pressure = this.kpis.get('pressure');
+    const flowRate = this.kpis.get('flowRate');
+
+    if (temperature) {
+      const newTemp = Math.floor(Math.random() * 7) + 18; // 18-24°C
+      temperature.updateWaterConfig({
+        value: newTemp,
+        trend: newTemp > 21 ? 'up' : 'down',
+      });
     }
 
-    /**
-     * 🌊 Update water system data
-     */
-    private updateWaterData(): void {
-        // Simulate real-time water system data
-        const temperature = this.kpis.get('temperature');
-        const pressure = this.kpis.get('pressure');
-        const flowRate = this.kpis.get('flowRate');
-
-        if (temperature) {
-            const newTemp = Math.floor(Math.random() * 7) + 18; // 18-24°C
-            temperature.updateWaterConfig({
-                value: newTemp,
-                trend: newTemp > 21 ? 'up' : 'down'
-            });
-        }
-
-        if (pressure) {
-            const newPressure = Math.floor(Math.random() * 51) + 100; // 100-150 PSI
-            const level = newPressure > 120 ? 'high' : newPressure < 80 ? 'low' : 'normal';
-            pressure.updateWaterConfig({
-                value: newPressure,
-                trend: newPressure > 125 ? 'up' : newPressure < 115 ? 'down' : 'neutral',
-                waterLevel: level
-            });
-        }
-
-        if (flowRate) {
-            const newFlow = Math.floor(Math.random() * 51) + 50; // 50-100 L/min
-            const level = newFlow > 80 ? 'high' : newFlow < 30 ? 'low' : 'normal';
-            flowRate.updateWaterConfig({
-                value: newFlow,
-                trend: newFlow > 75 ? 'up' : newFlow < 65 ? 'down' : 'neutral',
-                waterLevel: level
-            });
-        }
+    if (pressure) {
+      const newPressure = Math.floor(Math.random() * 51) + 100; // 100-150 PSI
+      const level = newPressure > 120 ? 'high' : newPressure < 80 ? 'low' : 'normal';
+      pressure.updateWaterConfig({
+        value: newPressure,
+        trend: newPressure > 125 ? 'up' : newPressure < 115 ? 'down' : 'neutral',
+        waterLevel: level,
+      });
     }
 
-    /**
-     * 🌊 Stop water monitoring
-     */
-    public stopWaterMonitoring(): void {
-        if (this.updateInterval) {
-            clearInterval(this.updateInterval);
-            this.updateInterval = null;
-        }
+    if (flowRate) {
+      const newFlow = Math.floor(Math.random() * 51) + 50; // 50-100 L/min
+      const level = newFlow > 80 ? 'high' : newFlow < 30 ? 'low' : 'normal';
+      flowRate.updateWaterConfig({
+        value: newFlow,
+        trend: newFlow > 75 ? 'up' : newFlow < 65 ? 'down' : 'neutral',
+        waterLevel: level,
+      });
     }
+  }
 
-    /**
-     * 🌊 Get water system status
-     */
-    public getWaterSystemStatus(): any {
-        const status: any = {};
-        this.kpis.forEach((kpi, id) => {
-            status[id] = {
-                value: kpi.getValue(),
-                waterLevel: kpi.getWaterLevel(),
-                label: kpi['config']?.label || 'Unknown'
-            };
-        });
-        return status;
+  /**
+   * 🌊 Stop water monitoring
+   */
+  public stopWaterMonitoring(): void {
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+      this.updateInterval = null;
     }
+  }
 
-    /**
-     * 🌊 Cleanup
-     */
-    public destroy(): void {
-        this.stopWaterMonitoring();
-        this.kpis.forEach(kpi => kpi.destroy());
-        this.kpis.clear();
-    }
+  /**
+   * 🌊 Get water system status
+   */
+  public getWaterSystemStatus(): any {
+    const status: any = {};
+    this.kpis.forEach((kpi, id) => {
+      status[id] = {
+        value: kpi.getValue(),
+        waterLevel: kpi.getWaterLevel(),
+        label: kpi['config']?.label || 'Unknown',
+      };
+    });
+    return status;
+  }
+
+  /**
+   * 🌊 Cleanup
+   */
+  public destroy(): void {
+    this.stopWaterMonitoring();
+    this.kpis.forEach(kpi => kpi.destroy());
+    this.kpis.clear();
+  }
 }
 
 // 🚀 Export for easy importing

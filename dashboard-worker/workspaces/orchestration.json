@@ -4,14 +4,8 @@
   "workspaces": 6,
   "isolation": {
     "type": "bun-isolated",
-    "modes": [
-      "linked",
-      "standalone"
-    ],
-    "deployments": [
-      "development",
-      "production"
-    ],
+    "modes": ["linked", "standalone"],
+    "deployments": ["development", "production"],
     "linker": "isolated"
   },
   "workspaceList": [

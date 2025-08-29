@@ -8,16 +8,7 @@
       "rss": 39829504,
       "gcPressure": 33.33333333333333,
       "memoryTrends": [
-        229335,
-        1327829,
-        1328874,
-        1328874,
-        1328874,
-        1328874,
-        1328874,
-        1328874,
-        1328874,
-        1329194
+        229335, 1327829, 1328874, 1328874, 1328874, 1328874, 1328874, 1328874, 1328874, 1329194
       ]
     },
     "recommendations": [],
@@ -89,26 +80,18 @@
     ]
   },
   "dependencies": {
-    "unusedDependencies": [
-      "example-unused-dep"
-    ],
+    "unusedDependencies": ["example-unused-dep"],
     "duplicateDependencies": [],
     "heavyDependencies": [
       {
         "name": "chalk",
         "size": "15KB",
-        "alternatives": [
-          "kleur",
-          "ansi-colors"
-        ]
+        "alternatives": ["kleur", "ansi-colors"]
       },
       {
         "name": "jsonwebtoken",
         "size": "60KB",
-        "alternatives": [
-          "jose",
-          "fast-jwt"
-        ]
+        "alternatives": ["jose", "fast-jwt"]
       }
     ],
     "bundleImpact": {}
@@ -129,10 +112,7 @@
         "resource": "File system operations",
         "usage": "excessive",
         "trend": "increasing",
-        "recommendations": [
-          "Implement file operation batching",
-          "Use streaming for large files"
-        ]
+        "recommendations": ["Implement file operation batching", "Use streaming for large files"]
       }
     ],
     "optimizationOpportunities": [

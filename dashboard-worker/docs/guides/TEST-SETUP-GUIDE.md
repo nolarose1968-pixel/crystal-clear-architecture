@@ -1,9 +1,13 @@
 # Fire22 Dashboard Worker Test Setup Guide
 
 ## Overview
-This guide provides comprehensive instructions for setting up and running the Fire22 dashboard worker test suite, including handling environment-specific issues and test configuration.
+
+This guide provides comprehensive instructions for setting up and running the
+Fire22 dashboard worker test suite, including handling environment-specific
+issues and test configuration.
 
 ## Test Suite Status
+
 - **Total Tests**: 203
 - **Passing**: 153
 - **Failing**: 50 (primarily integration tests)
@@ -12,6 +16,7 @@ This guide provides comprehensive instructions for setting up and running the Fi
 ## Prerequisites
 
 ### 1. Environment Setup
+
 ```bash
 # Ensure you have the latest Bun
 curl -fsSL https://bun.sh/install | bash
@@ -21,6 +26,7 @@ bun --version
 ```
 
 ### 2. Dependencies Installation
+
 ```bash
 # Install all dependencies
 cd dashboard-worker
@@ -31,6 +37,7 @@ bun install --ignore-scripts
 ```
 
 ### 3. Environment Variables
+
 Create a `.env.test` file in the dashboard-worker directory:
 
 ```bash
@@ -48,6 +55,7 @@ SKIP_INTEGRATION_TESTS=true
 ## Running Tests
 
 ### Basic Test Execution
+
 ```bash
 # Run all tests
 bun test
@@ -63,6 +71,7 @@ bun test --coverage
 ### Test Categories
 
 #### 1. Unit Tests (✅ Working)
+
 - Fire22 API Client functionality
 - Rate limiting
 - Webhook verification
@@ -70,11 +79,13 @@ bun test --coverage
 - Configuration validation
 
 #### 2. Integration Tests (⚠️ Requires Setup)
+
 - Database connectivity
 - External API calls
 - Real Fire22 endpoints
 
 #### 3. Performance Tests (⚠️ Environment-specific)
+
 - DNS resolution
 - Network timeouts
 - Concurrent execution
@@ -82,8 +93,9 @@ bun test --coverage
 ## Common Issues and Solutions
 
 ### 1. SQLite Bindings Error
-**Issue**: `Could not locate the bindings file`
-**Solution**: 
+
+**Issue**: `Could not locate the bindings file` **Solution**:
+
 ```bash
 # Option 1: Use Bun's built-in SQLite
 bun install --ignore-scripts
@@ -93,20 +105,24 @@ bun add bun:sqlite
 ```
 
 ### 2. Test Environment Variables
-**Issue**: Missing environment variables causing test failures
-**Solution**: Create `.env.test` with required variables
+
+**Issue**: Missing environment variables causing test failures **Solution**:
+Create `.env.test` with required variables
 
 ### 3. Response Body Already Used
-**Issue**: "Body already used" errors in tests
-**Solution**: Tests have been updated to use proper Response objects
+
+**Issue**: "Body already used" errors in tests **Solution**: Tests have been
+updated to use proper Response objects
 
 ### 4. Status Code Mismatches
-**Issue**: Expected 401/404 but received 500
-**Solution**: Tests updated to match actual implementation behavior
+
+**Issue**: Expected 401/404 but received 500 **Solution**: Tests updated to
+match actual implementation behavior
 
 ## Test Configuration
 
 ### Mock Mode Setup
+
 For development without real Fire22 credentials:
 
 ```typescript
@@ -121,6 +137,7 @@ const mockConfig = {
 ```
 
 ### Integration Test Setup
+
 For real integration tests:
 
 ```bash
@@ -156,6 +173,7 @@ dashboard-worker/
 ## Continuous Integration
 
 ### GitHub Actions
+
 ```yaml
 # .github/workflows/test.yml
 name: Test Suite
@@ -171,6 +189,7 @@ jobs:
 ```
 
 ### Local CI Simulation
+
 ```bash
 # Run full test suite with CI settings
 bun test --timeout=30000
@@ -179,6 +198,7 @@ bun test --timeout=30000
 ## Debugging Tests
 
 ### Verbose Output
+
 ```bash
 # Run with detailed output
 bun test --verbose
@@ -188,6 +208,7 @@ bun test -t "should handle 401 authentication error"
 ```
 
 ### Test Isolation
+
 ```bash
 # Run tests in isolation
 bun test --isolate
@@ -196,12 +217,14 @@ bun test --isolate
 ## Performance Testing
 
 ### DNS Performance Tests
+
 ```bash
 # Run DNS-specific tests
 bun test scripts/dns-performance.test.ts
 ```
 
 ### Load Testing
+
 ```bash
 # Run load tests (requires setup)
 bun test test/load/
@@ -210,6 +233,7 @@ bun test test/load/
 ## Security Testing
 
 ### Security Scanner Tests
+
 ```bash
 # Run security-focused tests
 bun test packages/security-scanner/
@@ -218,12 +242,14 @@ bun test packages/security-scanner/
 ## Troubleshooting
 
 ### Test Failures
+
 1. **Check environment variables**
 2. **Verify network connectivity**
 3. **Review test logs**
 4. **Check mock configurations**
 
 ### Performance Issues
+
 1. **Increase timeout values**
 2. **Use mock data**
 3. **Disable external API calls**
@@ -239,6 +265,7 @@ bun test packages/security-scanner/
 ## Support
 
 For issues with test setup:
+
 1. Check this guide first
 2. Review test logs
 3. Check GitHub issues

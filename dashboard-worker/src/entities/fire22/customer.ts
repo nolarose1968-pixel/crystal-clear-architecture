@@ -3,11 +3,11 @@
  * Business logic for Fire22 customer operations
  */
 
-import type { 
-  Fire22Customer, 
-  CustomerTier, 
-  CustomerStatus, 
-  KYCStatus 
+import type {
+  Fire22Customer,
+  CustomerTier,
+  CustomerStatus,
+  KYCStatus,
 } from '../../types/fire22/entities';
 import { AuditableEntityClass } from '../base';
 import { FIRE22_BUSINESS_RULES, FIRE22_CONSTRAINTS } from '../../types/fire22/entities';
@@ -20,12 +20,12 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
   public parent_agent?: string;
   public master_agent?: string;
   public login: string = '';
-  
+
   // Customer classification
   public tier: CustomerTier = 'bronze';
   public status: CustomerStatus = 'active';
   public vip_status: boolean = false;
-  
+
   // Financial information
   public balance: number = 0;
   public casino_balance: number = 0;
@@ -34,7 +34,7 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
   public freeplay_pending_balance: number = 0;
   public freeplay_pending_count: number = 0;
   public credit_limit: number = 0;
-  
+
   // Lifetime statistics
   public total_deposits: number = 0;
   public total_withdrawals: number = 0;
@@ -42,25 +42,25 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
   public net_loss: number = 0;
   public total_bets_placed: number = 0;
   public total_bets_won: number = 0;
-  
+
   // Activity tracking
   public last_activity: string = new Date().toISOString();
   public last_login: string = new Date().toISOString();
   public login_count: number = 0;
   public session_count: number = 0;
-  
+
   // Risk and compliance
   public risk_score: number = 0;
   public risk_level: 'low' | 'medium' | 'high' | 'critical' = 'low';
   public kyc_status: KYCStatus = 'pending';
   public kyc_documents: string = '[]';
   public aml_status: 'clear' | 'flagged' | 'under_review' = 'clear';
-  
+
   // Betting preferences and limits
   public betting_limits: string = '{}';
   public favorite_sports: string = '[]';
   public betting_patterns: string = '{}';
-  
+
   // Personal information
   public first_name?: string;
   public last_name?: string;
@@ -71,14 +71,14 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
   public state?: string;
   public city?: string;
   public postal_code?: string;
-  
+
   // Preferences and settings
   public preferences: string = '{}';
   public notifications_enabled: boolean = true;
   public marketing_opt_in: boolean = false;
   public language_preference: string = 'en';
   public timezone: string = 'America/New_York';
-  
+
   // System tracking
   public fire22_synced_at: string = new Date().toISOString();
   public sync_version: number = 1;
@@ -91,7 +91,7 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
     }
   }
 
-  // ===== FINANCIAL OPERATIONS =====
+  // !== FINANCIAL OPERATIONS !==
 
   /**
    * Get total available balance across all accounts
@@ -111,13 +111,16 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
    * Calculate lifetime value
    */
   public getLifetimeValue(): number {
-    return this.net_loss + (this.lifetime_volume * 0.05); // 5% house edge assumption
+    return this.net_loss + this.lifetime_volume * 0.05; // 5% house edge assumption
   }
 
   /**
    * Update balance after transaction
    */
-  public updateBalance(amount: number, balanceType: 'main' | 'casino' | 'sports' | 'freeplay' = 'main'): this {
+  public updateBalance(
+    amount: number,
+    balanceType: 'main' | 'casino' | 'sports' | 'freeplay' = 'main'
+  ): this {
     switch (balanceType) {
       case 'casino':
         this.casino_balance = Math.max(0, this.casino_balance + amount);
@@ -131,7 +134,7 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
       default:
         this.balance = Math.max(0, this.balance + amount);
     }
-    
+
     this.updated_at = new Date().toISOString();
     return this;
   }
@@ -148,7 +151,7 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
     this.total_deposits += amount;
     this.updateTierBasedOnVolume();
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -167,11 +170,11 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
     this.balance = Math.max(0, this.balance - amount);
     this.total_withdrawals += amount;
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
-  // ===== TIER MANAGEMENT =====
+  // !== TIER MANAGEMENT !==
 
   /**
    * Update customer tier based on lifetime volume
@@ -181,7 +184,7 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
     const thresholds = FIRE22_BUSINESS_RULES.VIP_TIER_THRESHOLD;
 
     let newTier: CustomerTier = 'bronze';
-    
+
     if (volume >= thresholds.vip) newTier = 'vip';
     else if (volume >= thresholds.diamond) newTier = 'diamond';
     else if (volume >= thresholds.platinum) newTier = 'platinum';
@@ -206,7 +209,7 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
       min_bet: limits.min,
       max_bet: limits.max,
       daily_max: limits.max * 10,
-      weekly_max: limits.max * 50
+      weekly_max: limits.max * 50,
     };
 
     this.betting_limits = JSON.stringify(bettingLimits);
@@ -220,7 +223,7 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
     return this.vip_status || this.tier === 'vip' || this.tier === 'diamond';
   }
 
-  // ===== BETTING OPERATIONS =====
+  // !== BETTING OPERATIONS !==
 
   /**
    * Check if customer can place bet
@@ -244,7 +247,7 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
 
     // Check daily limits
     // Note: This would need to be enhanced with daily betting history
-    
+
     return true;
   }
 
@@ -267,7 +270,7 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
     this.lifetime_volume += amount;
     this.updateTierBasedOnVolume();
     this.last_activity = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -278,7 +281,7 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
     this.total_bets_won++;
     this.balance += payoutAmount;
     this.last_activity = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -288,11 +291,11 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
   public recordBetLost(wageredAmount: number): this {
     this.net_loss += wageredAmount;
     this.last_activity = new Date().toISOString();
-    
+
     return this;
   }
 
-  // ===== RISK MANAGEMENT =====
+  // !== RISK MANAGEMENT !==
 
   /**
    * Calculate risk score based on betting patterns
@@ -302,26 +305,26 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
 
     // High-volume betting
     if (this.lifetime_volume > 100000) score += 20;
-    
+
     // High frequency betting
     if (this.total_bets_placed > 1000) score += 15;
-    
+
     // Large individual bets relative to balance
     const maxBetRatio = this.getBettingLimits().max_bet / this.getTotalBalance();
     if (maxBetRatio > 0.5) score += 25;
-    
+
     // Recent high activity
     const daysSinceLastActivity = Math.floor(
       (Date.now() - new Date(this.last_activity).getTime()) / (1000 * 60 * 60 * 24)
     );
     if (daysSinceLastActivity < 1 && this.total_bets_placed > 50) score += 10;
-    
+
     // KYC status
     if (this.kyc_status !== 'approved') score += 30;
-    
+
     this.risk_score = Math.min(100, score);
     this.updateRiskLevel();
-    
+
     return this.risk_score;
   }
 
@@ -330,7 +333,7 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
    */
   public updateRiskLevel(): this {
     const thresholds = FIRE22_BUSINESS_RULES.RISK_LEVEL_THRESHOLDS;
-    
+
     if (this.risk_score >= thresholds.critical) {
       this.risk_level = 'critical';
     } else if (this.risk_score >= thresholds.high) {
@@ -340,7 +343,7 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
     } else {
       this.risk_level = 'low';
     }
-    
+
     return this;
   }
 
@@ -348,13 +351,15 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
    * Check if customer requires manual review
    */
   public requiresManualReview(): boolean {
-    return this.risk_level === 'critical' || 
-           this.aml_status === 'flagged' || 
-           this.kyc_status === 'rejected' ||
-           this.getTotalBalance() > 50000;
+    return (
+      this.risk_level === 'critical' ||
+      this.aml_status === 'flagged' ||
+      this.kyc_status === 'rejected' ||
+      this.getTotalBalance() > 50000
+    );
   }
 
-  // ===== ACTIVITY TRACKING =====
+  // !== ACTIVITY TRACKING !==
 
   /**
    * Record login
@@ -363,7 +368,7 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
     this.login_count++;
     this.last_login = new Date().toISOString();
     this.last_activity = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -373,7 +378,7 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
   public recordSession(): this {
     this.session_count++;
     this.last_activity = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -393,21 +398,21 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
     return this.getDaysSinceLastActivity() > 30;
   }
 
-  // ===== KYC/AML OPERATIONS =====
+  // !== KYC/AML OPERATIONS !==
 
   /**
    * Update KYC status
    */
   public updateKycStatus(status: KYCStatus, documents?: string[]): this {
     this.kyc_status = status;
-    
+
     if (documents) {
       this.kyc_documents = JSON.stringify(documents);
     }
-    
+
     // Recalculate risk score when KYC status changes
     this.calculateRiskScore();
-    
+
     return this;
   }
 
@@ -415,9 +420,9 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
    * Check if KYC is required
    */
   public requiresKyc(): boolean {
-    return this.kyc_status === 'pending' || 
-           this.kyc_status === 'expired' ||
-           this.total_deposits > 2000;
+    return (
+      this.kyc_status === 'pending' || this.kyc_status === 'expired' || this.total_deposits > 2000
+    );
   }
 
   /**
@@ -427,64 +432,77 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
     this.aml_status = 'flagged';
     this.notes = this.notes ? `${this.notes}\nAML Flag: ${reason}` : `AML Flag: ${reason}`;
     this.calculateRiskScore();
-    
+
     return this;
   }
 
-  // ===== VALIDATION =====
+  // !== VALIDATION !==
 
   public validate(): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
-    
+
     // Required fields
     if (!this.fire22_customer_id) {
       errors.push('Fire22 customer ID is required');
     }
-    
+
     if (!this.agent_id) {
       errors.push('Agent ID is required');
     }
-    
+
     if (!this.login) {
       errors.push('Login is required');
     }
-    
+
     // Field length validation
     const constraints = FIRE22_CONSTRAINTS;
-    
-    if (this.fire22_customer_id && 
-        (this.fire22_customer_id.length < constraints.CUSTOMER_ID_LENGTH.min ||
-         this.fire22_customer_id.length > constraints.CUSTOMER_ID_LENGTH.max)) {
-      errors.push(`Customer ID must be ${constraints.CUSTOMER_ID_LENGTH.min}-${constraints.CUSTOMER_ID_LENGTH.max} characters`);
+
+    if (
+      this.fire22_customer_id &&
+      (this.fire22_customer_id.length < constraints.CUSTOMER_ID_LENGTH.min ||
+        this.fire22_customer_id.length > constraints.CUSTOMER_ID_LENGTH.max)
+    ) {
+      errors.push(
+        `Customer ID must be ${constraints.CUSTOMER_ID_LENGTH.min}-${constraints.CUSTOMER_ID_LENGTH.max} characters`
+      );
     }
-    
-    if (this.login &&
-        (this.login.length < constraints.LOGIN_LENGTH.min ||
-         this.login.length > constraints.LOGIN_LENGTH.max)) {
-      errors.push(`Login must be ${constraints.LOGIN_LENGTH.min}-${constraints.LOGIN_LENGTH.max} characters`);
+
+    if (
+      this.login &&
+      (this.login.length < constraints.LOGIN_LENGTH.min ||
+        this.login.length > constraints.LOGIN_LENGTH.max)
+    ) {
+      errors.push(
+        `Login must be ${constraints.LOGIN_LENGTH.min}-${constraints.LOGIN_LENGTH.max} characters`
+      );
     }
-    
+
     // Business rule validation
     if (this.balance < 0) {
       errors.push('Balance cannot be negative');
     }
-    
-    if (this.risk_score < constraints.RISK_SCORE.min || this.risk_score > constraints.RISK_SCORE.max) {
-      errors.push(`Risk score must be between ${constraints.RISK_SCORE.min}-${constraints.RISK_SCORE.max}`);
+
+    if (
+      this.risk_score < constraints.RISK_SCORE.min ||
+      this.risk_score > constraints.RISK_SCORE.max
+    ) {
+      errors.push(
+        `Risk score must be between ${constraints.RISK_SCORE.min}-${constraints.RISK_SCORE.max}`
+      );
     }
-    
+
     // Email validation
     if (this.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
       errors.push('Invalid email format');
     }
-    
+
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
-  // ===== SERIALIZATION =====
+  // !== SERIALIZATION !==
 
   public toJSON(): Record<string, any> {
     return {
@@ -498,11 +516,11 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
       days_since_last_activity: this.getDaysSinceLastActivity(),
       is_dormant: this.isDormant(),
       requires_kyc: this.requiresKyc(),
-      requires_manual_review: this.requiresManualReview()
+      requires_manual_review: this.requiresManualReview(),
     };
   }
 
-  // ===== STATIC FACTORY METHODS =====
+  // !== STATIC FACTORY METHODS !==
 
   /**
    * Create new customer with defaults
@@ -525,12 +543,12 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
       risk_level: 'low',
       kyc_status: 'pending',
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     });
 
     // Set initial betting limits
     customer.updateBettingLimits();
-    
+
     return customer;
   }
 
@@ -553,7 +571,7 @@ export class Fire22CustomerEntity extends AuditableEntityClass implements Fire22
       total_withdrawals: parseFloat(apiData.total_withdrawals) || 0,
       lifetime_volume: parseFloat(apiData.lifetime_volume) || 0,
       last_activity: apiData.last_activity || new Date().toISOString(),
-      fire22_synced_at: new Date().toISOString()
+      fire22_synced_at: new Date().toISOString(),
     });
   }
 }

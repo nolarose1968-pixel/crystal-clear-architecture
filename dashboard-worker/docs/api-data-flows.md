@@ -1,9 +1,12 @@
 # Fire22 Dashboard API Data Flows
 
 ## Overview
-Complete documentation of API data flows, endpoints, and data transformation processes in the Fire22 Dashboard system.
+
+Complete documentation of API data flows, endpoints, and data transformation
+processes in the Fire22 Dashboard system.
 
 ## Table of Contents
+
 - [API Architecture Overview](#api-architecture-overview)
 - [Data Flow Patterns](#data-flow-patterns)
 - [Authentication Flow](#authentication-flow)
@@ -22,6 +25,7 @@ Complete documentation of API data flows, endpoints, and data transformation pro
 ## API Architecture Overview
 
 ### System Components
+
 ```
 [Client Applications] → [API Gateway] → [Service Layer] → [Database Layer]
                               ↓
@@ -33,12 +37,15 @@ Complete documentation of API data flows, endpoints, and data transformation pro
 ```
 
 ### API Layers
+
 1. **Presentation Layer**
+
    - REST API endpoints
    - WebSocket connections
    - GraphQL queries (future)
 
 2. **Business Logic Layer**
+
    - Wager processing
    - Commission calculations
    - Risk management
@@ -55,6 +62,7 @@ Complete documentation of API data flows, endpoints, and data transformation pro
 ## Data Flow Patterns
 
 ### Request-Response Pattern
+
 ```
 Client → API Gateway → Service → Database → Service → API Gateway → Client
    ↓         ↓         ↓         ↓         ↓         ↓         ↓
@@ -62,6 +70,7 @@ Request   Auth      Process   Query     Transform  Format   Response
 ```
 
 ### Event-Driven Pattern
+
 ```
 Event Source → Event Bus → Event Handlers → Database → Notifications
      ↓           ↓            ↓            ↓           ↓
@@ -70,6 +79,7 @@ Event Source → Event Bus → Event Handlers → Database → Notifications
 ```
 
 ### WebSocket Pattern
+
 ```
 Client ←→ WebSocket Server ←→ Event System ←→ Database
    ↓           ↓                ↓            ↓
@@ -82,18 +92,19 @@ to Events   Management     Processing    Monitoring
 ## Authentication Flow
 
 ### JWT Token Flow
+
 ```mermaid
 sequenceDiagram
     participant C as Client
     participant A as Auth Service
     participant D as Database
-    
+
     C->>A: Login Request (username/password)
     A->>D: Validate Credentials
     D->>A: User Data + Permissions
     A->>A: Generate JWT Token
     A->>C: JWT Token + User Info
-    
+
     Note over C,A: Subsequent Requests
     C->>A: API Request + JWT Token
     A->>A: Validate JWT Token
@@ -102,12 +113,15 @@ sequenceDiagram
 ```
 
 ### Token Validation Process
+
 1. **Extract Token**
+
    - Parse Authorization header
    - Extract JWT token
    - Validate format
 
 2. **Verify Token**
+
    - Check signature
    - Validate expiration
    - Verify issuer
@@ -122,19 +136,20 @@ sequenceDiagram
 ## Manager API Flows
 
 ### Weekly Analytics Flow
+
 ```mermaid
 sequenceDiagram
     participant M as Manager
     participant A as API
     participant D as Database
     participant C as Cache
-    
+
     M->>A: GET /api/manager/getWeeklyFigureByAgent
     A->>A: Validate JWT Token
     A->>A: Check Manager Permissions
     A->>C: Check Cache for Weekly Data
     C->>A: Return Cached Data (if available)
-    
+
     alt Cache Miss
         A->>D: Query Weekly Statistics
         D->>A: Raw Weekly Data
@@ -148,12 +163,13 @@ sequenceDiagram
 ```
 
 ### Pending Operations Flow
+
 ```mermaid
 sequenceDiagram
     participant M as Manager
     participant A as API
     participant D as Database
-    
+
     M->>A: POST /api/manager/getPending
     A->>A: Validate JWT Token
     A->>A: Check Manager Permissions
@@ -165,18 +181,19 @@ sequenceDiagram
 ```
 
 ### Agent KPI Flow
+
 ```mermaid
 sequenceDiagram
     participant M as Manager
     participant A as API
     participant D as Database
     participant C as Cache
-    
+
     M->>A: GET /api/manager/getAgentKPI
     A->>A: Validate JWT Token
     A->>A: Check Manager Permissions
     A->>C: Check Cache for KPI Data
-    
+
     alt Cache Miss
         A->>D: Query Agent Performance
         D->>A: Raw Performance Data
@@ -194,12 +211,13 @@ sequenceDiagram
 ## Agent API Flows
 
 ### Customer Management Flow
+
 ```mermaid
 sequenceDiagram
     participant AG as Agent
     participant A as API
     participant D as Database
-    
+
     AG->>A: GET /api/agent/getCustomersByAgent
     A->>A: Validate JWT Token
     A->>A: Check Agent Permissions
@@ -211,20 +229,21 @@ sequenceDiagram
 ```
 
 ### Wager Management Flow
+
 ```mermaid
 sequenceDiagram
     participant AG as Agent
     participant A as API
     participant D as Database
     participant R as Risk Engine
-    
+
     AG->>A: POST /api/agent/createWager
     A->>A: Validate JWT Token
     A->>A: Check Agent Permissions
     A->>A: Validate Wager Data
     A->>R: Check Risk Limits
     R->>A: Risk Assessment
-    
+
     alt Risk Acceptable
         A->>D: Create Wager Record
         D->>A: Wager Confirmation
@@ -239,20 +258,21 @@ sequenceDiagram
 ## Customer API Flows
 
 ### Wager Placement Flow
+
 ```mermaid
 sequenceDiagram
     participant C as Customer
     participant A as API
     participant D as Database
     participant B as Balance Service
-    
+
     C->>A: POST /api/customer/placeWager
     A->>A: Validate JWT Token
     A->>A: Check Customer Permissions
     A->>A: Validate Wager Data
     A->>B: Check Account Balance
     B->>A: Balance Information
-    
+
     alt Sufficient Balance
         A->>D: Deduct Balance
         A->>D: Create Wager Record
@@ -264,13 +284,14 @@ sequenceDiagram
 ```
 
 ### Balance Management Flow
+
 ```mermaid
 sequenceDiagram
     participant C as Customer
     participant A as API
     participant D as Database
     participant P as Payment Service
-    
+
     C->>A: POST /api/customer/deposit
     A->>A: Validate JWT Token
     A->>A: Check Customer Permissions
@@ -287,17 +308,18 @@ sequenceDiagram
 ## Webhook Data Flows
 
 ### Stripe Webhook Flow
+
 ```mermaid
 sequenceDiagram
     participant S as Stripe
     participant A as API
     participant D as Database
     participant N as Notification Service
-    
+
     S->>A: Webhook Event
     A->>A: Verify Webhook Signature
     A->>A: Parse Event Data
-    
+
     alt Payment Success
         A->>D: Update Payment Status
         A->>D: Update Account Balance
@@ -311,17 +333,18 @@ sequenceDiagram
 ```
 
 ### Fire22 Webhook Flow
+
 ```mermaid
 sequenceDiagram
     participant F as Fire22
     participant A as API
     participant D as Database
     participant W as WebSocket
-    
+
     F->>A: Webhook Event
     A->>A: Verify Webhook Secret
     A->>A: Parse Event Data
-    
+
     alt Wager Update
         A->>D: Update Wager Status
         A->>W: Broadcast Real-time Update
@@ -338,17 +361,18 @@ sequenceDiagram
 ## Real-Time Data Flows
 
 ### WebSocket Data Flow
+
 ```mermaid
 sequenceDiagram
     participant C as Client
     participant W as WebSocket Server
     participant E as Event System
     participant D as Database
-    
+
     C->>W: Connect WebSocket
     W->>C: Connection Confirmed
     C->>W: Subscribe to Events
-    
+
     loop Real-time Updates
         D->>E: Data Change Event
         E->>W: Broadcast Event
@@ -357,13 +381,16 @@ sequenceDiagram
 ```
 
 ### Real-Time Update Types
+
 1. **KPI Updates**
+
    - Revenue changes
    - Active player count
    - Pending wager count
    - Liability updates
 
 2. **Wager Updates**
+
    - New wager placement
    - Wager status changes
    - Settlement results
@@ -380,6 +407,7 @@ sequenceDiagram
 ## Data Transformation
 
 ### Input Validation
+
 ```typescript
 interface ValidationSchema {
   required: string[];
@@ -390,6 +418,7 @@ interface ValidationSchema {
 ```
 
 ### Data Processing Pipeline
+
 ```
 Raw Input → Validation → Sanitization → Transformation → Storage → Response
     ↓           ↓           ↓            ↓           ↓         ↓
@@ -398,6 +427,7 @@ Raw Input → Validation → Sanitization → Transformation → Storage → Res
 ```
 
 ### Response Formatting
+
 ```typescript
 interface APIResponse<T> {
   success: boolean;
@@ -414,6 +444,7 @@ interface APIResponse<T> {
 ## Error Handling
 
 ### Error Response Structure
+
 ```typescript
 interface ErrorResponse {
   success: false;
@@ -428,7 +459,9 @@ interface ErrorResponse {
 ```
 
 ### Error Categories
+
 1. **Client Errors (4xx)**
+
    - Validation errors
    - Authentication failures
    - Permission denied
@@ -441,6 +474,7 @@ interface ErrorResponse {
    - System overload
 
 ### Error Handling Flow
+
 ```
 Error Occurs → Log Error → Classify Error → Format Response → Send Response
      ↓           ↓          ↓              ↓              ↓
@@ -453,17 +487,20 @@ Error Occurs → Log Error → Classify Error → Format Response → Send Respo
 ## Rate Limiting
 
 ### Rate Limit Strategy
+
 ```typescript
 interface RateLimitConfig {
-  windowMs: number;        // Time window in milliseconds
-  maxRequests: number;     // Maximum requests per window
+  windowMs: number; // Time window in milliseconds
+  maxRequests: number; // Maximum requests per window
   skipSuccessfulRequests: boolean;
   skipFailedRequests: boolean;
 }
 ```
 
 ### Rate Limit Implementation
+
 1. **Token Bucket Algorithm**
+
    - Fixed bucket size
    - Refill rate per second
    - Burst handling
@@ -474,6 +511,7 @@ interface RateLimitConfig {
    - Smooth rate limiting
 
 ### Rate Limit Headers
+
 ```
 X-RateLimit-Limit: 1000
 X-RateLimit-Remaining: 999
@@ -485,12 +523,15 @@ X-RateLimit-Reset: 1642680000
 ## Security Considerations
 
 ### API Security Measures
+
 1. **Authentication**
+
    - JWT token validation
    - Token expiration
    - Refresh token rotation
 
 2. **Authorization**
+
    - Role-based access control
    - Resource-level permissions
    - API endpoint protection
@@ -502,6 +543,7 @@ X-RateLimit-Reset: 1642680000
    - CSRF protection
 
 ### Security Headers
+
 ```
 X-Content-Type-Options: nosniff
 X-Frame-Options: DENY
@@ -514,7 +556,9 @@ Strict-Transport-Security: max-age=31536000
 ## API Monitoring
 
 ### Key Metrics
+
 1. **Performance Metrics**
+
    - Response time
    - Throughput
    - Error rates
@@ -527,6 +571,7 @@ Strict-Transport-Security: max-age=31536000
    - Revenue impact
 
 ### Monitoring Tools
+
 - **Real-time Monitoring**: Live API performance
 - **Alert Systems**: Automated notifications
 - **Logging**: Comprehensive request/response logs
@@ -537,7 +582,9 @@ Strict-Transport-Security: max-age=31536000
 ## API Versioning
 
 ### Versioning Strategy
+
 1. **URL Versioning**
+
    - `/api/v1/endpoint`
    - `/api/v2/endpoint`
    - Clear version separation
@@ -548,6 +595,7 @@ Strict-Transport-Security: max-age=31536000
    - Flexible versioning
 
 ### Migration Strategy
+
 - **Backward Compatibility**: Maintain old versions
 - **Gradual Migration**: Phased rollout
 - **Deprecation Notices**: Clear communication
@@ -558,12 +606,15 @@ Strict-Transport-Security: max-age=31536000
 ## Future API Enhancements
 
 ### Planned Features
+
 1. **GraphQL Support**
+
    - Flexible queries
    - Reduced over-fetching
    - Schema introspection
 
 2. **API Gateway**
+
    - Centralized routing
    - Load balancing
    - Circuit breakers
@@ -574,6 +625,7 @@ Strict-Transport-Security: max-age=31536000
    - Smart caching strategies
 
 ### Technology Roadmap
+
 - **Short-term**: Performance optimization
 - **Medium-term**: New API features
 - **Long-term**: Architecture evolution
@@ -581,6 +633,4 @@ Strict-Transport-Security: max-age=31536000
 
 ---
 
-*Last Updated: 2024-01-20*
-*Version: 1.0*
-*Maintainer: Fire22 Development Team*
+_Last Updated: 2024-01-20_ _Version: 1.0_ _Maintainer: Fire22 Development Team_

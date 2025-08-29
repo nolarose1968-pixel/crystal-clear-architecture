@@ -78,14 +78,18 @@ test('can insert and retrieve data', async () => {
   });
 
   // Retrieve the customer
-  const insertedCustomer = await db.select().from(schema.customers).where(eq(schema.customers.customerId, 'TEST001')).get();
+  const insertedCustomer = await db
+    .select()
+    .from(schema.customers)
+    .where(eq(schema.customers.customerId, 'TEST001'))
+    .get();
   expect(insertedCustomer).toBeDefined();
   expect(insertedCustomer?.username).toBe('testuser');
 
   // Insert a transaction
   await db.insert(schema.transactions).values({
     customerId: 'TEST001',
-    amount: 100.00,
+    amount: 100.0,
     tranCode: 'D',
     tranType: 'Deposit',
     documentNumber: 'DOC001',
@@ -96,7 +100,11 @@ test('can insert and retrieve data', async () => {
   });
 
   // Retrieve the transaction
-  const insertedTransaction = await db.select().from(schema.transactions).where(eq(schema.transactions.documentNumber, 'DOC001')).get();
+  const insertedTransaction = await db
+    .select()
+    .from(schema.transactions)
+    .where(eq(schema.transactions.documentNumber, 'DOC001'))
+    .get();
   expect(insertedTransaction).toBeDefined();
-  expect(insertedTransaction?.amount).toBe(100.00);
+  expect(insertedTransaction?.amount).toBe(100.0);
 });

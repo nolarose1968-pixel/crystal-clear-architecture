@@ -2,7 +2,7 @@
 
 /**
  * 🔥📊 Fire22 Telegram Dashboard Integration
- * 
+ *
  * Integration layer connecting Telegram bot system with main dashboard,
  * providing real-time data flow and unified interface
  */
@@ -11,9 +11,9 @@ import Fire22TelegramIntegration from './telegram-integration';
 import { TelegramEnvironment } from './telegram-env';
 import { API_ENDPOINTS, UI_ELEMENTS } from './telegram-constants';
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🎯 DASHBOARD INTEGRATION INTERFACE
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 export interface DashboardTelegramData {
   // Bot Status
@@ -24,7 +24,7 @@ export interface DashboardTelegramData {
     activeUsers: number;
     messagesPerHour: number;
   };
-  
+
   // Queue Integration
   queueData: {
     pendingWithdrawals: number;
@@ -33,7 +33,7 @@ export interface DashboardTelegramData {
     averageWaitTime: number;
     processingRate: number;
   };
-  
+
   // Language Statistics
   languageStats: {
     totalLanguages: number;
@@ -41,7 +41,7 @@ export interface DashboardTelegramData {
     translationCacheHits: number;
     translationRequests: number;
   };
-  
+
   // Department Activity
   departmentActivity: {
     customerService: {
@@ -60,7 +60,7 @@ export interface DashboardTelegramData {
       performanceScore: number;
     };
   };
-  
+
   // Real-time Metrics
   realTimeMetrics: {
     lastUpdate: Date;
@@ -70,16 +70,16 @@ export interface DashboardTelegramData {
   };
 }
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🔗 DASHBOARD INTEGRATION CLASS
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 export class TelegramDashboardIntegration {
   private telegramIntegration: Fire22TelegramIntegration;
   private environment: TelegramEnvironment;
   private updateInterval: number = 30000; // 30 seconds
   private intervalId: NodeJS.Timeout | null = null;
-  
+
   // Data cache for dashboard
   private dashboardData: DashboardTelegramData;
   private dataUpdateCallbacks: Set<Function> = new Set();
@@ -87,14 +87,14 @@ export class TelegramDashboardIntegration {
   constructor(env: any) {
     this.telegramIntegration = Fire22TelegramIntegration.create(env);
     this.environment = TelegramEnvironment.getInstance(env);
-    
+
     // Initialize dashboard data structure
     this.dashboardData = this.initializeDashboardData();
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 DATA INITIALIZATION
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   private initializeDashboardData(): DashboardTelegramData {
     return {
@@ -144,45 +144,45 @@ export class TelegramDashboardIntegration {
     };
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🚀 START/STOP METHODS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   public async start(): Promise<void> {
     console.log('🔗 Starting Telegram Dashboard Integration...');
-    
+
     // Start telegram integration
     await this.telegramIntegration.start();
-    
+
     // Start data collection
     this.startDataCollection();
-    
+
     console.log('✅ Telegram Dashboard Integration started');
   }
 
   public async stop(): Promise<void> {
     console.log('🛑 Stopping Telegram Dashboard Integration...');
-    
+
     // Stop data collection
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
     }
-    
+
     // Stop telegram integration
     await this.telegramIntegration.stop();
-    
+
     console.log('✅ Telegram Dashboard Integration stopped');
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 DATA COLLECTION
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   private startDataCollection(): void {
     // Initial data collection
     this.collectDashboardData();
-    
+
     // Set up periodic data collection
     this.intervalId = setInterval(() => {
       this.collectDashboardData();
@@ -193,14 +193,17 @@ export class TelegramDashboardIntegration {
     try {
       // Get system status from telegram integration
       const systemStatus = this.telegramIntegration.getSystemStatus();
-      
+
       // Update bot status
       this.dashboardData.botStatus = {
         isRunning: systemStatus.status === 'running',
         uptime: systemStatus.uptime,
         totalUsers: systemStatus.metrics.totalMessages, // Mock calculation
         activeUsers: systemStatus.workflows.active,
-        messagesPerHour: this.calculateMessagesPerHour(systemStatus.metrics.totalMessages, systemStatus.uptime),
+        messagesPerHour: this.calculateMessagesPerHour(
+          systemStatus.metrics.totalMessages,
+          systemStatus.uptime
+        ),
       };
 
       // Update queue data
@@ -228,7 +231,6 @@ export class TelegramDashboardIntegration {
 
       // Notify subscribers
       this.notifyDataUpdateCallbacks();
-
     } catch (error) {
       console.error('❌ Error collecting dashboard data:', error);
       this.dashboardData.realTimeMetrics.errors++;
@@ -279,9 +281,9 @@ export class TelegramDashboardIntegration {
     };
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📡 REAL-TIME UPDATES
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   public subscribeToUpdates(callback: (data: DashboardTelegramData) => void): void {
     this.dataUpdateCallbacks.add(callback);
@@ -301,9 +303,9 @@ export class TelegramDashboardIntegration {
     });
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🎯 PUBLIC API
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   public getDashboardData(): DashboardTelegramData {
     return { ...this.dashboardData }; // Return copy to prevent mutation
@@ -318,33 +320,33 @@ export class TelegramDashboardIntegration {
     return this.telegramIntegration;
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🌐 SSE ENDPOINT HANDLER
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   public createSSEEndpoint() {
     return {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Cache-Control',
       },
-      
+
       stream: (controller: ReadableStreamController) => {
         let isConnected = true;
-        
+
         // Send initial data
         const sendData = (data: DashboardTelegramData) => {
           if (!isConnected) return;
-          
+
           const sseData = `data: ${JSON.stringify({
             type: 'telegram_update',
             timestamp: new Date().toISOString(),
-            data: data
+            data: data,
           })}\n\n`;
-          
+
           try {
             controller.enqueue(new TextEncoder().encode(sseData));
           } catch (error) {
@@ -355,17 +357,17 @@ export class TelegramDashboardIntegration {
 
         // Subscribe to updates
         this.subscribeToUpdates(sendData);
-        
+
         // Send initial data
         sendData(this.dashboardData);
-        
+
         // Send periodic heartbeats
         const heartbeat = setInterval(() => {
           if (!isConnected) {
             clearInterval(heartbeat);
             return;
           }
-          
+
           try {
             controller.enqueue(new TextEncoder().encode(': heartbeat\n\n'));
           } catch (error) {
@@ -380,13 +382,13 @@ export class TelegramDashboardIntegration {
           clearInterval(heartbeat);
           this.unsubscribeFromUpdates(sendData);
         };
-      }
+      },
     };
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 DASHBOARD WIDGET DATA
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   public getDashboardWidgets() {
     return {
@@ -395,32 +397,69 @@ export class TelegramDashboardIntegration {
         title: `${UI_ELEMENTS.EMOJIS.BOT} Telegram Bot Status`,
         status: this.dashboardData.botStatus.isRunning ? 'online' : 'offline',
         metrics: [
-          { label: 'Uptime', value: `${Math.floor(this.dashboardData.botStatus.uptime / 3600)}h`, icon: UI_ELEMENTS.EMOJIS.CLOCK },
-          { label: 'Active Users', value: this.dashboardData.botStatus.activeUsers, icon: UI_ELEMENTS.EMOJIS.TARGET },
-          { label: 'Messages/Hour', value: this.dashboardData.botStatus.messagesPerHour, icon: UI_ELEMENTS.EMOJIS.CHART },
-        ]
+          {
+            label: 'Uptime',
+            value: `${Math.floor(this.dashboardData.botStatus.uptime / 3600)}h`,
+            icon: UI_ELEMENTS.EMOJIS.CLOCK,
+          },
+          {
+            label: 'Active Users',
+            value: this.dashboardData.botStatus.activeUsers,
+            icon: UI_ELEMENTS.EMOJIS.TARGET,
+          },
+          {
+            label: 'Messages/Hour',
+            value: this.dashboardData.botStatus.messagesPerHour,
+            icon: UI_ELEMENTS.EMOJIS.CHART,
+          },
+        ],
       },
 
-      // Queue Status Widget  
+      // Queue Status Widget
       queueStatus: {
         title: `${UI_ELEMENTS.EMOJIS.TARGET} P2P Queue Status`,
         status: this.dashboardData.queueData.matchedPairs > 0 ? 'active' : 'idle',
         metrics: [
-          { label: 'Pending Withdrawals', value: this.dashboardData.queueData.pendingWithdrawals, icon: UI_ELEMENTS.EMOJIS.MONEY },
-          { label: 'Pending Deposits', value: this.dashboardData.queueData.pendingDeposits, icon: UI_ELEMENTS.EMOJIS.CHART },
-          { label: 'Matched Pairs', value: this.dashboardData.queueData.matchedPairs, icon: UI_ELEMENTS.STATUS_ICONS.COMPLETED },
-          { label: 'Avg Wait Time', value: `${this.dashboardData.queueData.averageWaitTime}m`, icon: UI_ELEMENTS.EMOJIS.CLOCK },
-        ]
+          {
+            label: 'Pending Withdrawals',
+            value: this.dashboardData.queueData.pendingWithdrawals,
+            icon: UI_ELEMENTS.EMOJIS.MONEY,
+          },
+          {
+            label: 'Pending Deposits',
+            value: this.dashboardData.queueData.pendingDeposits,
+            icon: UI_ELEMENTS.EMOJIS.CHART,
+          },
+          {
+            label: 'Matched Pairs',
+            value: this.dashboardData.queueData.matchedPairs,
+            icon: UI_ELEMENTS.STATUS_ICONS.COMPLETED,
+          },
+          {
+            label: 'Avg Wait Time',
+            value: `${this.dashboardData.queueData.averageWaitTime}m`,
+            icon: UI_ELEMENTS.EMOJIS.CLOCK,
+          },
+        ],
       },
 
       // Language Distribution Widget
       languageDistribution: {
         title: `${UI_ELEMENTS.EMOJIS.ROCKET} Language Usage`,
-        data: Object.entries(this.dashboardData.languageStats.usersByLanguage).map(([lang, count]) => ({
-          language: lang.toUpperCase(),
-          users: count,
-          percentage: (count / Object.values(this.dashboardData.languageStats.usersByLanguage).reduce((a, b) => a + b, 0) * 100).toFixed(1)
-        }))
+        data: Object.entries(this.dashboardData.languageStats.usersByLanguage).map(
+          ([lang, count]) => ({
+            language: lang.toUpperCase(),
+            users: count,
+            percentage: (
+              (count /
+                Object.values(this.dashboardData.languageStats.usersByLanguage).reduce(
+                  (a, b) => a + b,
+                  0
+                )) *
+              100
+            ).toFixed(1),
+          })
+        ),
       },
 
       // Department Activity Widget
@@ -430,20 +469,20 @@ export class TelegramDashboardIntegration {
           {
             name: 'Customer Service',
             icon: UI_ELEMENTS.DEPARTMENT_ICONS.CUSTOMER_SERVICE,
-            metrics: this.dashboardData.departmentActivity.customerService
+            metrics: this.dashboardData.departmentActivity.customerService,
           },
           {
             name: 'Finance',
             icon: UI_ELEMENTS.DEPARTMENT_ICONS.FINANCE,
-            metrics: this.dashboardData.departmentActivity.finance
+            metrics: this.dashboardData.departmentActivity.finance,
           },
           {
             name: 'Operations',
             icon: UI_ELEMENTS.DEPARTMENT_ICONS.OPERATIONS,
-            metrics: this.dashboardData.departmentActivity.operations
-          }
-        ]
-      }
+            metrics: this.dashboardData.departmentActivity.operations,
+          },
+        ],
+      },
     };
   }
 }

@@ -3,12 +3,12 @@
  * Monitors external API dependencies, third-party services, and integrations
  */
 
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from "axios";
 
 interface ExternalService {
   name: string;
   url: string;
-  type: 'api' | 'database' | 'cache' | 'queue' | 'email' | 'payment' | 'other';
+  type: "api" | "database" | "cache" | "queue" | "email" | "payment" | "other";
   timeout: number;
   expectedStatus: number;
   headers?: Record<string, string>;
@@ -16,7 +16,7 @@ interface ExternalService {
 
 interface ServiceHealth {
   name: string;
-  status: 'healthy' | 'degraded' | 'critical' | 'unknown';
+  status: "healthy" | "degraded" | "critical" | "unknown";
   responseTime: number;
   statusCode?: number;
   error?: string;
@@ -55,8 +55,8 @@ export class ExternalServicesHealthService {
     const services: ExternalService[] = [];
 
     // Check for environment-based service configurations
-    const serviceKeys = Object.keys(process.env).filter(key =>
-      key.startsWith('HEALTH_CHECK_SERVICE_')
+    const serviceKeys = Object.keys(process.env).filter((key) =>
+      key.startsWith("HEALTH_CHECK_SERVICE_"),
     );
 
     for (const key of serviceKeys) {
@@ -65,10 +65,10 @@ export class ExternalServicesHealthService {
         services.push({
           name: serviceConfig.name,
           url: serviceConfig.url,
-          type: serviceConfig.type || 'api',
+          type: serviceConfig.type || "api",
           timeout: serviceConfig.timeout || 5000,
           expectedStatus: serviceConfig.expectedStatus || 200,
-          headers: serviceConfig.headers
+          headers: serviceConfig.headers,
         });
       } catch (error) {
         console.warn(`Invalid service configuration for ${key}:`, error);
@@ -84,26 +84,26 @@ export class ExternalServicesHealthService {
   private getDefaultServices(): ExternalService[] {
     return [
       {
-        name: 'GitHub API',
-        url: 'https://api.github.com/zen',
-        type: 'api',
+        name: "GitHub API",
+        url: "https://api.github.com/zen",
+        type: "api",
         timeout: 5000,
-        expectedStatus: 200
+        expectedStatus: 200,
       },
       {
-        name: 'Node.js Registry',
-        url: 'https://registry.npmjs.org/',
-        type: 'api',
+        name: "Node.js Registry",
+        url: "https://registry.npmjs.org/",
+        type: "api",
         timeout: 5000,
-        expectedStatus: 200
+        expectedStatus: 200,
       },
       {
-        name: 'Google DNS',
-        url: 'https://dns.google/resolve?name=google.com',
-        type: 'api',
+        name: "Google DNS",
+        url: "https://dns.google/resolve?name=google.com",
+        type: "api",
         timeout: 3000,
-        expectedStatus: 200
-      }
+        expectedStatus: 200,
+      },
     ];
   }
 
@@ -123,33 +123,44 @@ export class ExternalServicesHealthService {
     };
   }> {
     const servicesHealth = await Promise.allSettled(
-      this.services.map(service => this.checkServiceHealth(service))
+      this.services.map((service) => this.checkServiceHealth(service)),
     );
 
     const services: ServiceHealth[] = [];
-    let healthy = 0, degraded = 0, critical = 0, unknown = 0;
+    let healthy = 0,
+      degraded = 0,
+      critical = 0,
+      unknown = 0;
 
     servicesHealth.forEach((result, index) => {
-      if (result.status === 'fulfilled') {
+      if (result.status === "fulfilled") {
         const health = result.value;
         services.push(health);
 
         switch (health.status) {
-          case 'healthy': healthy++; break;
-          case 'degraded': degraded++; break;
-          case 'critical': critical++; break;
-          default: unknown++; break;
+          case "healthy":
+            healthy++;
+            break;
+          case "degraded":
+            degraded++;
+            break;
+          case "critical":
+            critical++;
+            break;
+          default:
+            unknown++;
+            break;
         }
       } else {
         // Service check failed
         const failedService = this.services[index];
         const failedHealth: ServiceHealth = {
           name: failedService.name,
-          status: 'critical',
+          status: "critical",
           responseTime: 0,
-          error: result.reason?.message || 'Check failed',
+          error: result.reason?.message || "Check failed",
           timestamp: new Date().toISOString(),
-          type: failedService.type
+          type: failedService.type,
         };
         services.push(failedHealth);
         critical++;
@@ -157,11 +168,11 @@ export class ExternalServicesHealthService {
     });
 
     // Determine overall status
-    let overallStatus = 'healthy';
+    let overallStatus = "healthy";
     if (critical > 0) {
-      overallStatus = 'critical';
+      overallStatus = "critical";
     } else if (degraded > 0 || unknown > 0) {
-      overallStatus = 'degraded';
+      overallStatus = "degraded";
     }
 
     return {
@@ -173,8 +184,8 @@ export class ExternalServicesHealthService {
         healthy,
         degraded,
         critical,
-        unknown
-      }
+        unknown,
+      },
     };
   }
 
@@ -182,22 +193,27 @@ export class ExternalServicesHealthService {
    * Get health status for a specific service
    */
   async getServiceHealth(serviceName: string): Promise<ServiceHealth> {
-    const service = this.services.find(s => s.name.toLowerCase() === serviceName.toLowerCase());
+    const service = this.services.find(
+      (s) => s.name.toLowerCase() === serviceName.toLowerCase(),
+    );
 
     if (!service) {
       return {
         name: serviceName,
-        status: 'unknown',
+        status: "unknown",
         responseTime: 0,
-        error: 'Service not configured',
+        error: "Service not configured",
         timestamp: new Date().toISOString(),
-        type: 'unknown'
+        type: "unknown",
       };
     }
 
     // Check cache first
     const cached = this.healthCache.get(serviceName);
-    if (cached && (Date.now() - new Date(cached.timestamp).getTime()) < this.cacheTimeout) {
+    if (
+      cached &&
+      Date.now() - new Date(cached.timestamp).getTime() < this.cacheTimeout
+    ) {
       return cached;
     }
 
@@ -211,28 +227,30 @@ export class ExternalServicesHealthService {
   /**
    * Check health of a specific service
    */
-  private async checkServiceHealth(service: ExternalService): Promise<ServiceHealth> {
+  private async checkServiceHealth(
+    service: ExternalService,
+  ): Promise<ServiceHealth> {
     const startTime = Date.now();
 
     try {
       const response = await axios.get(service.url, {
         timeout: service.timeout,
         headers: {
-          'User-Agent': 'Crystal-Clear-Health-Check/1.0',
-          ...service.headers
+          "User-Agent": "Crystal-Clear-Health-Check/1.0",
+          ...service.headers,
         },
-        validateStatus: () => true // Don't throw on non-2xx status
+        validateStatus: () => true, // Don't throw on non-2xx status
       });
 
       const responseTime = Date.now() - startTime;
       const isExpectedStatus = response.status === service.expectedStatus;
 
-      let status: ServiceHealth['status'] = 'healthy';
+      let status: ServiceHealth["status"] = "healthy";
 
       if (!isExpectedStatus) {
-        status = 'critical';
+        status = "critical";
       } else if (responseTime > service.timeout * 0.8) {
-        status = 'degraded'; // Slow response
+        status = "degraded"; // Slow response
       }
 
       const health: ServiceHealth = {
@@ -241,7 +259,7 @@ export class ExternalServicesHealthService {
         responseTime,
         statusCode: response.status,
         timestamp: new Date().toISOString(),
-        type: service.type
+        type: service.type,
       };
 
       if (!isExpectedStatus) {
@@ -249,21 +267,26 @@ export class ExternalServicesHealthService {
       }
 
       return health;
-
     } catch (error) {
       const responseTime = Date.now() - startTime;
 
-      let status: ServiceHealth['status'] = 'critical';
-      let errorMessage = 'Request failed';
+      let status: ServiceHealth["status"] = "critical";
+      let errorMessage = "Request failed";
 
       if (error instanceof Error) {
         errorMessage = error.message;
 
         // Determine if it's a network issue vs service issue
-        if (error.message.includes('timeout') || error.message.includes('ECONNREFUSED')) {
-          status = 'critical';
-        } else if (error.message.includes('ENOTFOUND') || error.message.includes('DNS')) {
-          status = 'critical';
+        if (
+          error.message.includes("timeout") ||
+          error.message.includes("ECONNREFUSED")
+        ) {
+          status = "critical";
+        } else if (
+          error.message.includes("ENOTFOUND") ||
+          error.message.includes("DNS")
+        ) {
+          status = "critical";
         }
       }
 
@@ -273,7 +296,7 @@ export class ExternalServicesHealthService {
         responseTime,
         error: errorMessage,
         timestamp: new Date().toISOString(),
-        type: service.type
+        type: service.type,
       };
     }
   }
@@ -283,7 +306,9 @@ export class ExternalServicesHealthService {
    */
   addService(service: ExternalService): void {
     // Check if service already exists
-    const existingIndex = this.services.findIndex(s => s.name === service.name);
+    const existingIndex = this.services.findIndex(
+      (s) => s.name === service.name,
+    );
 
     if (existingIndex >= 0) {
       this.services[existingIndex] = service;
@@ -299,7 +324,7 @@ export class ExternalServicesHealthService {
    * Remove a service from monitoring
    */
   removeService(serviceName: string): boolean {
-    const index = this.services.findIndex(s => s.name === serviceName);
+    const index = this.services.findIndex((s) => s.name === serviceName);
 
     if (index >= 0) {
       this.services.splice(index, 1);
@@ -347,13 +372,13 @@ export class ExternalServicesHealthService {
 
     const entries = Array.from(this.healthCache.values());
     const oldestEntry = entries.reduce((oldest, current) =>
-      current.timestamp < oldest.timestamp ? current : oldest
+      current.timestamp < oldest.timestamp ? current : oldest,
     ).timestamp;
 
     return {
       size,
       hitRate: 1, // Simplified - in real implementation, you'd track hits/misses
-      oldestEntry
+      oldestEntry,
     };
   }
 }

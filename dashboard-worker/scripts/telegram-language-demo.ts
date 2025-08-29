@@ -2,13 +2,20 @@
 
 /**
  * 🤖🌐 Fire22 Telegram Language Integration Demo
- * 
+ *
  * Interactive demonstration of multilingual Telegram bot functionality
  * with real-time language switching and message generation
  */
 
-import { Fire22TelegramIntegration, type Fire22TelegramConfig } from '../src/telegram/fire22-telegram-integration';
-import { MultilingualTelegramBot, type TelegramUser, type NotificationData } from '../src/telegram/multilingual-telegram-bot';
+import {
+  Fire22TelegramIntegration,
+  type Fire22TelegramConfig,
+} from '../src/telegram/fire22-telegram-integration';
+import {
+  MultilingualTelegramBot,
+  type TelegramUser,
+  type NotificationData,
+} from '../src/telegram/multilingual-telegram-bot';
 
 // Mock Telegram Bot API for demonstration
 class MockTelegramBotAPI {
@@ -39,13 +46,13 @@ export class TelegramLanguageDemo {
 
   constructor() {
     this.telegramBot = new MultilingualTelegramBot();
-    
+
     const config: Fire22TelegramConfig = {
       botToken: 'demo_token',
       cashierGroupId: '-1001234567890',
       p2pQueueGroupId: '-1001987654321',
       transactionChannelId: '@fire22_transactions',
-      supportGroupId: '-1001555666777'
+      supportGroupId: '-1001555666777',
     };
 
     this.integration = new Fire22TelegramIntegration(config, new MockTelegramBotAPI() as any);
@@ -56,7 +63,7 @@ export class TelegramLanguageDemo {
    */
   async runDemo(): Promise<void> {
     this.printHeader();
-    
+
     console.log('🚀 Starting Fire22 Telegram Language Integration Demo...\n');
 
     // Demo different user scenarios
@@ -81,7 +88,7 @@ export class TelegramLanguageDemo {
       { id: 123456789, first_name: 'John', last_name: 'Doe', language_code: 'en' },
       { id: 987654321, first_name: 'María', last_name: 'García', language_code: 'es' },
       { id: 555666777, first_name: 'João', last_name: 'Silva', language_code: 'pt' },
-      { id: 111222333, first_name: 'Pierre', last_name: 'Dubois', language_code: 'fr' }
+      { id: 111222333, first_name: 'Pierre', last_name: 'Dubois', language_code: 'fr' },
     ];
 
     for (const user of users) {
@@ -101,15 +108,15 @@ export class TelegramLanguageDemo {
       { id: 123456789, first_name: 'John', language_code: 'en' },
       { id: 987654321, first_name: 'María', language_code: 'es' },
       { id: 555666777, first_name: 'João', language_code: 'pt' },
-      { id: 111222333, first_name: 'Pierre', language_code: 'fr' }
+      { id: 111222333, first_name: 'Pierre', language_code: 'fr' },
     ];
 
     const transactionData: NotificationData = {
       userId: 123456789,
-      amount: 500.00,
+      amount: 500.0,
       type: 'Deposit',
       timestamp: new Date(),
-      reference: 'TXN_20240827_001'
+      reference: 'TXN_20240827_001',
     };
 
     for (const user of users) {
@@ -131,17 +138,17 @@ export class TelegramLanguageDemo {
       matches: [
         { id: 'MATCH_001', amount: 1000, paymentType: 'Bank Transfer', matchScore: 95 },
         { id: 'MATCH_002', amount: 1000, paymentType: 'PayPal', matchScore: 88 },
-        { id: 'MATCH_003', amount: 950, paymentType: 'Crypto', matchScore: 82 }
-      ]
+        { id: 'MATCH_003', amount: 950, paymentType: 'Crypto', matchScore: 82 },
+      ],
     };
 
     // Demo in different languages
     const languages = ['en', 'es', 'pt', 'fr'];
-    
+
     for (const lang of languages) {
       const testUser = { ...user, language_code: lang };
       this.telegramBot.setUserLanguage(testUser.id, lang);
-      
+
       console.log(`🎯 P2P Match notification (${lang}):`);
       const notification = this.telegramBot.generateP2PMatchNotification(testUser, matchData);
       console.log(`   ${notification.text}\n`);
@@ -159,15 +166,15 @@ export class TelegramLanguageDemo {
       id: 12345,
       subject: 'Transaction Issue',
       priority: 'high' as const,
-      serviceLevel: 'premium' as const
+      serviceLevel: 'premium' as const,
     };
 
     const languages = ['en', 'es', 'pt', 'fr'];
-    
+
     for (const lang of languages) {
       const testUser = { ...user, language_code: lang };
       this.telegramBot.setUserLanguage(testUser.id, lang);
-      
+
       console.log(`🎫 Support ticket notification (${lang}):`);
       const notification = this.telegramBot.generateSupportTicketNotification(testUser, ticketData);
       console.log(`   ${notification.text}\n`);
@@ -183,17 +190,17 @@ export class TelegramLanguageDemo {
     const user: TelegramUser = { id: 123456789, first_name: 'John', language_code: 'en' };
     const depositData = {
       operationId: 67890,
-      amount: 750.00,
+      amount: 750.0,
       paymentMethod: 'Credit Card',
-      transactionId: 'DEP_20240827_002'
+      transactionId: 'DEP_20240827_002',
     };
 
     const languages = ['en', 'es', 'pt', 'fr'];
-    
+
     for (const lang of languages) {
       const testUser = { ...user, language_code: lang };
       this.telegramBot.setUserLanguage(testUser.id, lang);
-      
+
       console.log(`💸 Deposit notification (${lang}):`);
       const notification = this.telegramBot.generateDepositNotification(testUser, depositData);
       console.log(`   ${notification.text}\n`);
@@ -217,7 +224,7 @@ export class TelegramLanguageDemo {
 
     console.log('\n🔄 Language Change Confirmations:');
     const languages = ['en', 'es', 'pt', 'fr'];
-    
+
     for (const lang of languages) {
       const confirmation = this.telegramBot.generateLanguageChangeMessage(user.id, lang);
       console.log(`   ${lang.toUpperCase()}: ${confirmation}`);
@@ -232,7 +239,7 @@ export class TelegramLanguageDemo {
     console.log('📊 === SYSTEM STATISTICS DEMO ===\n');
 
     const stats = this.telegramBot.getLanguageSystemStats();
-    
+
     console.log('📊 Fire22 Telegram Language System Statistics:');
     console.log(`   🌐 Total Language Codes: ${stats.totalCodes}`);
     console.log(`   🤖 Telegram-specific Codes: ${stats.telegramCodes}`);
@@ -243,7 +250,7 @@ export class TelegramLanguageDemo {
     // Demo language code usage
     console.log('🔤 Sample Language Code Translations:');
     const sampleCodes = ['L-1500', 'L-1502', 'L-1510', 'L-1514', 'L-1520'];
-    
+
     for (const code of sampleCodes) {
       console.log(`\n   ${code}:`);
       stats.supportedLanguages.forEach(lang => {
@@ -261,15 +268,19 @@ export class TelegramLanguageDemo {
     console.log('❌ === ERROR HANDLING DEMO ===\n');
 
     const user: TelegramUser = { id: 123456789, first_name: 'John', language_code: 'en' };
-    const errorTypes: ('registration' | 'linking' | 'general')[] = ['registration', 'linking', 'general'];
+    const errorTypes: ('registration' | 'linking' | 'general')[] = [
+      'registration',
+      'linking',
+      'general',
+    ];
 
     for (const errorType of errorTypes) {
       console.log(`❌ ${errorType} error messages:`);
-      
+
       ['en', 'es', 'pt', 'fr'].forEach(lang => {
         const testUser = { ...user, language_code: lang };
         this.telegramBot.setUserLanguage(testUser.id, lang);
-        
+
         const errorMsg = this.telegramBot.generateErrorMessage(testUser, errorType);
         console.log(`   ${lang.toUpperCase()}: ${errorMsg}`);
       });
@@ -301,15 +312,33 @@ export class TelegramLanguageDemo {
       const choice = await this.getUserInput('Select an option (0-9): ');
 
       switch (choice.trim()) {
-        case '1': await this.demoWelcomeMessages(); break;
-        case '2': await this.demoTransactionNotifications(); break;
-        case '3': await this.demoP2PMatchNotifications(); break;
-        case '4': await this.demoSupportTickets(); break;
-        case '5': await this.demoDepositNotifications(); break;
-        case '6': await this.demoLanguageSwitching(); break;
-        case '7': await this.demoSystemStats(); break;
-        case '8': await this.demoErrorHandling(); break;
-        case '9': await this.runDemo(); break;
+        case '1':
+          await this.demoWelcomeMessages();
+          break;
+        case '2':
+          await this.demoTransactionNotifications();
+          break;
+        case '3':
+          await this.demoP2PMatchNotifications();
+          break;
+        case '4':
+          await this.demoSupportTickets();
+          break;
+        case '5':
+          await this.demoDepositNotifications();
+          break;
+        case '6':
+          await this.demoLanguageSwitching();
+          break;
+        case '7':
+          await this.demoSystemStats();
+          break;
+        case '8':
+          await this.demoErrorHandling();
+          break;
+        case '9':
+          await this.runDemo();
+          break;
         case '0':
           console.log('\n👋 Thank you for using Fire22 Telegram Language Demo!');
           return;
@@ -359,7 +388,7 @@ export class TelegramLanguageDemo {
 // CLI Interface
 if (import.meta.main) {
   const demo = new TelegramLanguageDemo();
-  
+
   const args = process.argv.slice(2);
   if (args.includes('--interactive')) {
     demo.runInteractiveDemo().catch(console.error);

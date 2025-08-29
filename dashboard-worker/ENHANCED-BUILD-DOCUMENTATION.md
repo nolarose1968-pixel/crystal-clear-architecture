@@ -1,6 +1,7 @@
 # 🔥 Fire22 Enhanced Executable Builder - Complete Documentation
 
 ## 📋 Table of Contents
+
 - [Build Constants & Variables](#build-constants--variables)
 - [User-Agent Configurations](#user-agent-configurations)
 - [Platform-Specific Settings](#platform-specific-settings)
@@ -13,6 +14,7 @@
 ## 🔧 Build Constants & Variables
 
 ### Global Build-Time Constants
+
 These constants are injected at compile time using Bun's `--define` feature:
 
 ```typescript
@@ -37,40 +39,43 @@ These constants are injected at compile time using Bun's `--define` feature:
 ```
 
 ### Runtime Global Variables
+
 These variables are available at runtime via `globalThis`:
 
 ```typescript
 declare global {
-  var ENABLE_SIMD_ANSI: boolean;        // SIMD acceleration flag
-  var USE_FAST_LOGGING: boolean;        // Fast logging mode
-  var USER_AGENT: string;               // HTTP User-Agent string
-  var TARGET_PLATFORM: string;          // Target platform identifier
-  var BUILD_TIME: string;               // Build timestamp
-  var BUN_RUNTIME_FLAGS: string;        // Embedded runtime arguments
-  var PLATFORM_OPTIMIZED: boolean;      // Platform optimization flag
+  var ENABLE_SIMD_ANSI: boolean; // SIMD acceleration flag
+  var USE_FAST_LOGGING: boolean; // Fast logging mode
+  var USER_AGENT: string; // HTTP User-Agent string
+  var TARGET_PLATFORM: string; // Target platform identifier
+  var BUILD_TIME: string; // Build timestamp
+  var BUN_RUNTIME_FLAGS: string; // Embedded runtime arguments
+  var PLATFORM_OPTIMIZED: boolean; // Platform optimization flag
 }
 ```
 
 ## 🌐 User-Agent Configurations
 
 ### Platform-Specific User-Agents
+
 Each platform gets a unique User-Agent string for API identification:
 
 ```typescript
 // Windows User-Agent
-"Fire22-Dashboard/3.0.9 (Windows)"
+'Fire22-Dashboard/3.0.9 (Windows)';
 
-// Linux User-Agent  
-"Fire22-Dashboard/3.0.9 (Linux)"
+// Linux User-Agent
+'Fire22-Dashboard/3.0.9 (Linux)';
 
 // macOS User-Agent
-"Fire22-Dashboard/3.0.9 (macOS)"
+'Fire22-Dashboard/3.0.9 (macOS)';
 
 // Docker User-Agent
-"Fire22-Dashboard/3.0.9 (Docker)"
+'Fire22-Dashboard/3.0.9 (Docker)';
 ```
 
 ### HTTP Headers Configuration
+
 Custom headers sent with every Fire22 API request:
 
 ```typescript
@@ -86,6 +91,7 @@ headers: {
 ## 🖥️ Platform-Specific Settings
 
 ### Windows Configuration
+
 ```typescript
 {
   name: 'windows',
@@ -107,6 +113,7 @@ headers: {
 ```
 
 ### Linux Configuration
+
 ```typescript
 {
   name: 'linux',
@@ -119,6 +126,7 @@ headers: {
 ```
 
 ### macOS Configuration
+
 ```typescript
 {
   name: 'macos',
@@ -130,6 +138,7 @@ headers: {
 ```
 
 ### Docker Configuration
+
 ```typescript
 {
   name: 'docker',
@@ -146,35 +155,44 @@ headers: {
 ### Platform-Specific Runtime Arguments
 
 #### Windows Runtime Flags
+
 ```bash
 --smol --max-http-requests=256
 ```
+
 - `--smol`: Memory-optimized mode for Windows
 - `--max-http-requests=256`: Conservative HTTP limit for Windows systems
 
 #### Linux Runtime Flags
+
 ```bash
 --smol --max-http-requests=512
 ```
+
 - `--smol`: Memory-optimized mode
 - `--max-http-requests=512`: Higher limit for server environments
 
-#### macOS Runtime Flags  
+#### macOS Runtime Flags
+
 ```bash
 --smol --max-http-requests=256
 ```
+
 - `--smol`: Memory-optimized mode for desktop
 - `--max-http-requests=256`: Desktop-appropriate limit
 
 #### Docker Runtime Flags
+
 ```bash
 --smol --max-http-requests=1024 --inspect=0.0.0.0:9229
 ```
+
 - `--smol`: Memory-optimized for containers
 - `--max-http-requests=1024`: High limit for containerized services
 - `--inspect=0.0.0.0:9229`: Debug port for development
 
 ### Runtime Flag Embedding
+
 Runtime flags are embedded into executables at build time:
 
 ```typescript
@@ -189,12 +207,13 @@ compile: {
 ## 🌍 Environment Variables
 
 ### Required Environment Variables
+
 ```bash
 # Authentication
 JWT_SECRET=your_jwt_secret_here
 ADMIN_PASSWORD=your_admin_password
 
-# Payment Integration  
+# Payment Integration
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 
@@ -208,6 +227,7 @@ CRON_SECRET=your_cron_secret
 ```
 
 ### Optional Environment Variables
+
 ```bash
 # Database Configuration
 DATABASE_NAME=fire22-dashboard
@@ -229,10 +249,14 @@ BUN_CONFIG_MAX_HTTP_REQUESTS=512
 ```
 
 ### Environment Variable Utilities
+
 ```typescript
 // Type-safe environment variable access
 export function getEnvVar(name: string): string;
-export function getEnvVarOptional(name: string, defaultValue?: string): string | undefined;
+export function getEnvVarOptional(
+  name: string,
+  defaultValue?: string
+): string | undefined;
 export function getEnvVarNumber(name: string, defaultValue?: number): number;
 export function getEnvVarBoolean(name: string, defaultValue?: boolean): boolean;
 export function validateRequiredEnvVars(vars: string[]): void;
@@ -241,6 +265,7 @@ export function validateRequiredEnvVars(vars: string[]): void;
 ## 🪟 Windows Metadata
 
 ### PE Header Metadata
+
 Windows executables include embedded metadata in the PE header:
 
 ```typescript
@@ -257,7 +282,9 @@ windows: {
 ```
 
 ### Windows File Properties
+
 When viewing executable properties in Windows Explorer:
+
 - **Description**: Fire22 API integration client
 - **Product name**: Fire22 Dashboard System
 - **Product version**: 3.0.9
@@ -268,10 +295,11 @@ When viewing executable properties in Windows Explorer:
 ## ⚡ SIMD & Performance Features
 
 ### SIMD Logger Configuration
+
 ```typescript
 class SIMDLogger {
   private maxBufferSize = 1000; // Buffer size for batch processing
-  
+
   // SIMD-accelerated ANSI stripping
   private stripANSI(text: string): string {
     if (globalThis.ENABLE_SIMD_ANSI && Bun.stripANSI) {
@@ -283,22 +311,24 @@ class SIMDLogger {
 ```
 
 ### Performance Logging Variables
+
 ```typescript
 interface LogEntry {
-  timestamp: number;           // High-resolution timestamp
+  timestamp: number; // High-resolution timestamp
   level: 'debug' | 'info' | 'warn' | 'error';
-  message: string;            // ANSI-stripped message
-  platform: string;          // Target platform identifier
-  userAgent: string;          // HTTP User-Agent string
+  message: string; // ANSI-stripped message
+  platform: string; // Target platform identifier
+  userAgent: string; // HTTP User-Agent string
 }
 ```
 
 ### HTTP Performance Tracking
+
 ```typescript
 // HTTP request performance metrics
 logHttpRequest(method: string, url: string, status: number, duration: number): void {
   const userAgent = globalThis.USER_AGENT || 'Fire22-Dashboard/3.0.9';
-  
+
   this.log('info', `🌐 HTTP ${method} ${url} - ${status} (${duration}ms)`, {
     userAgent,
     platform: globalThis.TARGET_PLATFORM
@@ -309,57 +339,61 @@ logHttpRequest(method: string, url: string, status: number, duration: number): v
 ## 🔧 Build Configuration
 
 ### Bun.build() Configuration
+
 ```typescript
 const buildConfig = {
   entrypoints: [entrypointPath],
   outdir,
   target: 'bun',
   format: 'esm',
-  minify: true,                    // Minification enabled
-  sourcemap: false,                // No source maps for production
-  splitting: false,                // Disabled for executables
-  treeShaking: true,               // Dead code elimination
-  external: [                      // External dependencies
-    'sqlite3', 
-    'better-sqlite3', 
-    'redis', 
-    'ioredis'
+  minify: true, // Minification enabled
+  sourcemap: false, // No source maps for production
+  splitting: false, // Disabled for executables
+  treeShaking: true, // Dead code elimination
+  external: [
+    // External dependencies
+    'sqlite3',
+    'better-sqlite3',
+    'redis',
+    'ioredis',
   ],
   define: {
     // All build-time constants injected here
     'process.env.NODE_ENV': '"production"',
-    'ENABLE_SIMD_ANSI': 'true',
-    'USER_AGENT': '"Fire22-Dashboard/3.0.9 (Linux)"',
+    ENABLE_SIMD_ANSI: 'true',
+    USER_AGENT: '"Fire22-Dashboard/3.0.9 (Linux)"',
     // ... more constants
-  }
+  },
 };
 ```
 
 ### Package.json sideEffects Configuration
+
 ```json
 {
   "sideEffects": [
-    "src/simd-logger.ts",    // Logger has side effects (console output)
-    "src/index.ts",          // Main entry point has side effects
-    "**/*.css",              // CSS files have side effects
-    "**/*.scss",             // SCSS files have side effects  
-    "**/*.html"              // HTML files have side effects
+    "src/simd-logger.ts", // Logger has side effects (console output)
+    "src/index.ts", // Main entry point has side effects
+    "**/*.css", // CSS files have side effects
+    "**/*.scss", // SCSS files have side effects
+    "**/*.html" // HTML files have side effects
   ]
 }
 ```
 
 ### Workspace Configuration
+
 ```json
 {
   "fire22": {
     "workspace": "api-client",
     "isolation": {
-      "standalone": true,        // Can build independently
-      "linked": true,           // Can use workspace references
-      "separateTests": true,    // Isolated test environment
+      "standalone": true, // Can build independently
+      "linked": true, // Can use workspace references
+      "separateTests": true, // Isolated test environment
       "independentDeploy": true // Can deploy independently
     },
-    "bunIsolated": true         // Use Bun isolated installs
+    "bunIsolated": true // Use Bun isolated installs
   }
 }
 ```
@@ -367,6 +401,7 @@ const buildConfig = {
 ## 📂 File Structure & Output
 
 ### Build Output Structure
+
 ```
 dist/executables/
 ├── api-client/
@@ -392,6 +427,7 @@ dist/executables/
 ### Launcher Scripts
 
 #### Windows Launcher (`fire22-dashboard.bat`)
+
 ```batch
 @echo off
 title Fire22 Dashboard Worker
@@ -404,6 +440,7 @@ echo Starting Fire22 Dashboard...
 ```
 
 #### Unix Launcher (`fire22-dashboard.sh`)
+
 ```bash
 #!/bin/bash
 VERSION="3.0.9"
@@ -427,23 +464,25 @@ exec "$BINARY" "$@"
 ## 🔍 Variable Reference Quick Guide
 
 ### Most Important Variables
+
 ```typescript
 // Build-time constants (available via globalThis)
-globalThis.VERSION                 // "3.0.9"
-globalThis.TARGET_PLATFORM         // "windows" | "linux" | "darwin" | "docker"  
-globalThis.USER_AGENT              // "Fire22-Dashboard/3.0.9 (Platform)"
-globalThis.BUILD_TIME              // "2025-08-27T08:31:55.636Z"
-globalThis.ENABLE_SIMD_ANSI        // true | false
-globalThis.BUN_RUNTIME_FLAGS       // "--smol --max-http-requests=256"
+globalThis.VERSION; // "3.0.9"
+globalThis.TARGET_PLATFORM; // "windows" | "linux" | "darwin" | "docker"
+globalThis.USER_AGENT; // "Fire22-Dashboard/3.0.9 (Platform)"
+globalThis.BUILD_TIME; // "2025-08-27T08:31:55.636Z"
+globalThis.ENABLE_SIMD_ANSI; // true | false
+globalThis.BUN_RUNTIME_FLAGS; // "--smol --max-http-requests=256"
 
 // Environment variables (process.env / Bun.env)
-NODE_ENV                           // "production"
-FIRE22_API_URL                     // "https://api.fire22.com"
-JWT_SECRET                         // Authentication secret
-DATABASE_URL                       // Database connection string
+NODE_ENV; // "production"
+FIRE22_API_URL; // "https://api.fire22.com"
+JWT_SECRET; // Authentication secret
+DATABASE_URL; // Database connection string
 ```
 
 ### HTTP Configuration
+
 ```typescript
 // Headers sent with every API request
 'User-Agent': 'Fire22-Dashboard/3.0.9 (Linux)'
@@ -453,4 +492,6 @@ DATABASE_URL                       // Database connection string
 'Content-Type': 'application/json'
 ```
 
-This documentation covers all variables, configurations, and build settings used in the Fire22 Enhanced Executable Builder system. Each platform gets optimized settings for maximum performance and proper identification.
+This documentation covers all variables, configurations, and build settings used
+in the Fire22 Enhanced Executable Builder system. Each platform gets optimized
+settings for maximum performance and proper identification.

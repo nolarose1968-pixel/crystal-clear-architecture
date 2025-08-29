@@ -21,7 +21,7 @@ const htmlFilesWithCodeBlocks = [
   '/Users/nolarose/ff/dashboard-worker/docs/environment-management.html',
   '/Users/nolarose/ff/dashboard-worker/docs/cloudflare-workers-integration.html',
   '/Users/nolarose/ff/dashboard-worker/docs/fire22-dashboard-config.html',
-  '/Users/nolarose/ff/dashboard-worker/docs/sendgrid-email-integration.html'
+  '/Users/nolarose/ff/dashboard-worker/docs/sendgrid-email-integration.html',
 ];
 
 function fixHtmlCodeBlocks(filePath: string) {
@@ -37,16 +37,17 @@ function fixHtmlCodeBlocks(filePath: string) {
 
   lines.forEach((line, index) => {
     // Check for code blocks (HTML code blocks, pre tags, or code-block divs) at odd line numbers
-    const isCodeBlockStart = line.trim().includes('code-block') || 
-                             line.trim().startsWith('<code>') || 
-                             line.trim().startsWith('<pre>');
-    
+    const isCodeBlockStart =
+      line.trim().includes('code-block') ||
+      line.trim().startsWith('<code>') ||
+      line.trim().startsWith('<pre>');
+
     if (isCodeBlockStart && (newLines.length + 1) % 2 !== 0) {
       // Add a blank line to make the code block start at an even line
       newLines.push('');
       modified = true;
     }
-    
+
     newLines.push(line);
   });
 

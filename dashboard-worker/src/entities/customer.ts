@@ -17,32 +17,32 @@ export class CustomerEntity extends AuditableEntityClass implements Customer {
   public email?: string;
   public phone?: string;
   public status: 'active' | 'inactive' | 'suspended';
-  
+
   // Agent relationships
   public agent_id: string;
   public parent_agent?: string;
   public master_agent: string;
-  
+
   // Financial information
   public balance: number;
   public casino_balance: number;
   public sports_balance: number;
   public freeplay_balance: number;
   public credit_limit: number;
-  
+
   // Activity tracking
   public last_login?: string;
   public last_activity?: string;
   public total_deposits: number;
   public total_withdrawals: number;
   public lifetime_volume: number;
-  
+
   // Business rules
   public tier: 'bronze' | 'silver' | 'gold' | 'platinum' | 'vip';
   public betting_limits: Record<string, number>;
   public risk_score: number;
   public vip_status: boolean;
-  
+
   // Metadata
   public notes?: string;
   public preferences?: Record<string, any>;
@@ -51,7 +51,7 @@ export class CustomerEntity extends AuditableEntityClass implements Customer {
 
   constructor(data: Partial<Customer>) {
     super(data);
-    
+
     // Initialize required fields
     this.customer_id = data.customer_id || `CUST_${Date.now()}`;
     this.username = data.username || '';
@@ -61,32 +61,32 @@ export class CustomerEntity extends AuditableEntityClass implements Customer {
     this.email = data.email;
     this.phone = data.phone;
     this.status = data.status || 'active';
-    
+
     // Agent relationships
     this.agent_id = data.agent_id || '';
     this.parent_agent = data.parent_agent;
     this.master_agent = data.master_agent || '';
-    
+
     // Financial information
     this.balance = data.balance || 0;
     this.casino_balance = data.casino_balance || 0;
     this.sports_balance = data.sports_balance || 0;
     this.freeplay_balance = data.freeplay_balance || 0;
     this.credit_limit = data.credit_limit || 0;
-    
+
     // Activity tracking
     this.last_login = data.last_login;
     this.last_activity = data.last_activity;
     this.total_deposits = data.total_deposits || 0;
     this.total_withdrawals = data.total_withdrawals || 0;
     this.lifetime_volume = data.lifetime_volume || 0;
-    
+
     // Business rules
     this.tier = data.tier || 'bronze';
     this.betting_limits = data.betting_limits || BUSINESS.BETTING_LIMITS.DEFAULT;
     this.risk_score = data.risk_score || 0;
     this.vip_status = data.vip_status || false;
-    
+
     // Metadata
     this.notes = data.notes;
     this.preferences = data.preferences || {};
@@ -105,7 +105,7 @@ export class CustomerEntity extends AuditableEntityClass implements Customer {
         required: true,
         type: 'string',
         minLength: 1,
-        maxLength: 50
+        maxLength: 50,
       },
       {
         field: 'username',
@@ -113,54 +113,54 @@ export class CustomerEntity extends AuditableEntityClass implements Customer {
         type: 'string',
         minLength: 3,
         maxLength: 50,
-        pattern: /^[a-zA-Z0-9_-]+$/
+        pattern: /^[a-zA-Z0-9_-]+$/,
       },
       {
         field: 'first_name',
         required: true,
         type: 'string',
         minLength: 1,
-        maxLength: 100
+        maxLength: 100,
       },
       {
         field: 'last_name',
         required: true,
         type: 'string',
         minLength: 1,
-        maxLength: 100
+        maxLength: 100,
       },
       {
         field: 'login',
         required: true,
         type: 'string',
         minLength: 3,
-        maxLength: 50
+        maxLength: 50,
       },
       {
         field: 'email',
         required: false,
         type: 'string',
-        pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
       },
       {
         field: 'balance',
         required: true,
         type: 'number',
-        min: 0
+        min: 0,
       },
       {
         field: 'risk_score',
         required: true,
         type: 'number',
         min: 0,
-        max: 100
+        max: 100,
       },
       {
         field: 'agent_id',
         required: true,
         type: 'string',
-        minLength: 1
-      }
+        minLength: 1,
+      },
     ];
   }
 
@@ -214,7 +214,7 @@ export class CustomerEntity extends AuditableEntityClass implements Customer {
    */
   public addDeposit(amount: number): this {
     if (amount <= 0) throw new Error('Deposit amount must be positive');
-    
+
     this.balance += amount;
     this.total_deposits += amount;
     this.last_activity = new Date().toISOString();
@@ -228,7 +228,7 @@ export class CustomerEntity extends AuditableEntityClass implements Customer {
   public processWithdrawal(amount: number): this {
     if (amount <= 0) throw new Error('Withdrawal amount must be positive');
     if (amount > this.balance) throw new Error('Insufficient balance');
-    
+
     this.balance -= amount;
     this.total_withdrawals += amount;
     this.last_activity = new Date().toISOString();
@@ -241,7 +241,7 @@ export class CustomerEntity extends AuditableEntityClass implements Customer {
    */
   public updateTier(): this {
     const volume = this.lifetime_volume;
-    
+
     if (volume >= BUSINESS.TIER_THRESHOLDS.VIP) {
       this.tier = 'vip';
       this.vip_status = true;
@@ -254,7 +254,7 @@ export class CustomerEntity extends AuditableEntityClass implements Customer {
     } else {
       this.tier = 'bronze';
     }
-    
+
     this.touch();
     return this;
   }
@@ -297,7 +297,7 @@ export class CustomerEntity extends AuditableEntityClass implements Customer {
       id: this.customer_id,
       tier: this.tier,
       balance: this.getTotalBalance(),
-      status: this.status
+      status: this.status,
     };
   }
 }
@@ -306,14 +306,17 @@ export class CustomerProfileService {
   /**
    * Build customer profile with statistics
    */
-  static buildProfile(customer: CustomerEntity, additionalData?: {
-    totalBets?: number;
-    totalWins?: number;
-    totalLosses?: number;
-    recentActivity?: any[];
-  }): CustomerProfile {
+  static buildProfile(
+    customer: CustomerEntity,
+    additionalData?: {
+      totalBets?: number;
+      totalWins?: number;
+      totalLosses?: number;
+      recentActivity?: any[];
+    }
+  ): CustomerProfile {
     const stats = additionalData || {};
-    
+
     return {
       customer,
       statistics: {
@@ -323,9 +326,9 @@ export class CustomerProfileService {
         win_rate: stats.totalBets ? (stats.totalWins || 0) / stats.totalBets : 0,
         profit_loss: customer.calculateProfitLoss(),
         favorite_sports: [],
-        betting_patterns: []
+        betting_patterns: [],
       },
-      recent_activity: stats.recentActivity || []
+      recent_activity: stats.recentActivity || [],
     };
   }
 }

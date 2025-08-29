@@ -17,11 +17,7 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "plugins": [
-    "@typescript-eslint",
-    "import",
-    "security"
-  ],
+  "plugins": ["@typescript-eslint", "import", "security"],
   "rules": {
     // Code Quality
     "no-console": ["warn", { "allow": ["warn", "error", "info"] }],
@@ -31,7 +27,7 @@
     "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "prefer-const": "error",
     "no-var": "error",
-    
+
     // TypeScript Specific
     "@typescript-eslint/explicit-function-return-type": "warn",
     "@typescript-eslint/no-explicit-any": "warn",
@@ -42,19 +38,12 @@
     "@typescript-eslint/prefer-nullish-coalescing": "error",
     "@typescript-eslint/prefer-optional-chain": "error",
     "@typescript-eslint/strict-boolean-expressions": "warn",
-    
+
     // Import Management
     "import/order": [
       "error",
       {
-        "groups": [
-          "builtin",
-          "external",
-          "internal",
-          "parent",
-          "sibling",
-          "index"
-        ],
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
         "newlines-between": "always",
         "alphabetize": {
           "order": "asc",
@@ -66,7 +55,7 @@
     "import/no-cycle": "error",
     "import/no-self-import": "error",
     "import/no-duplicates": "error",
-    
+
     // Security Rules
     "security/detect-object-injection": "warn",
     "security/detect-unsafe-regex": "error",
@@ -80,7 +69,7 @@
     "security/detect-non-literal-require": "error",
     "security/detect-possible-timing-attacks": "warn",
     "security/detect-pseudoRandomBytes": "error",
-    
+
     // Best Practices
     "eqeqeq": ["error", "always"],
     "curly": ["error", "all"],

@@ -5,7 +5,8 @@
 [![Bun](https://img.shields.io/badge/bun-%3E%3D1.2.20-f472b6.svg)](https://bun.sh)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-Comprehensive performance benchmarking suite for the Fire22 Telegram integration system with nanosecond precision.
+Comprehensive performance benchmarking suite for the Fire22 Telegram integration
+system with nanosecond precision.
 
 ## 📦 Installation
 
@@ -52,7 +53,9 @@ bun run compare
 ## 📊 Benchmark Categories
 
 ### 1. Telegram Performance
+
 Tests core Telegram bot operations:
+
 - Message processing speed
 - Command routing efficiency
 - Callback query handling
@@ -60,7 +63,9 @@ Tests core Telegram bot operations:
 - Bot initialization time
 
 ### 2. Queue Matching Performance
+
 Tests P2P queue operations:
+
 - Match scoring algorithm (100,000 ops)
 - Best match finding (1000 ops)
 - Batch matching (100 ops)
@@ -68,7 +73,9 @@ Tests P2P queue operations:
 - Statistics calculation
 
 ### 3. Language Translation Performance
+
 Tests multilingual system:
+
 - Translation lookup (cached) - 100,000 ops
 - Variable interpolation - 50,000 ops
 - Language detection - 50,000 ops
@@ -76,7 +83,9 @@ Tests multilingual system:
 - Cache miss handling - 1000 ops
 
 ### 4. Workflow Orchestration Performance
+
 Tests workflow system:
+
 - Command routing
 - Permission checking
 - State transitions
@@ -84,7 +93,9 @@ Tests workflow system:
 - Workflow initialization
 
 ### 5. Dashboard SSE Performance
+
 Tests real-time dashboard:
+
 - SSE streaming throughput
 - Widget update speed
 - Data aggregation
@@ -92,7 +103,9 @@ Tests real-time dashboard:
 - Concurrent connections
 
 ### 6. Memory Benchmarks
+
 Tests memory usage:
+
 - Baseline memory usage
 - Memory per user session
 - Cache memory consumption
@@ -100,7 +113,9 @@ Tests memory usage:
 - Garbage collection impact
 
 ### 7. Stress Testing
+
 Tests system limits:
+
 - Maximum concurrent users
 - Message burst handling
 - Queue overflow behavior
@@ -182,9 +197,9 @@ Tests system limits:
 
 ```typescript
 const runner = new BenchmarkRunner({
-  warmupIterations: 100,    // Warmup runs
-  testIterations: 10000,    // Test runs
-  verbose: true             // Detailed output
+  warmupIterations: 100, // Warmup runs
+  testIterations: 10000, // Test runs
+  verbose: true, // Detailed output
 });
 ```
 
@@ -197,13 +212,14 @@ const runner = new BenchmarkRunner({ verbose: true });
 
 // Add custom benchmark
 await runner.benchmark(
-  'My Custom Test',        // Name
-  'Custom Category',       // Category
-  async () => {           // Test function
+  'My Custom Test', // Name
+  'Custom Category', // Category
+  async () => {
+    // Test function
     // Your test code here
     await someAsyncOperation();
   },
-  1000                    // Iterations
+  1000 // Iterations
 );
 
 // Print results
@@ -216,6 +232,7 @@ runner.exportJSON('my-results.json');
 ## 📊 Result Analysis
 
 ### JSON Export Format
+
 ```json
 {
   "timestamp": "2024-01-15T10:30:00Z",
@@ -243,6 +260,7 @@ runner.exportJSON('my-results.json');
 ```
 
 ### Comparison Tool
+
 ```bash
 # Compare two benchmark runs
 bun run compare baseline.json latest.json
@@ -300,6 +318,7 @@ Main benchmark execution class.
 ## 🔗 Dependencies
 
 All Fire22 Telegram packages for comprehensive testing:
+
 - `@fire22/telegram-bot`
 - `@fire22/queue-system`
 - `@fire22/multilingual`

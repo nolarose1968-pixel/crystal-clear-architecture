@@ -2,7 +2,7 @@
 
 /**
  * 🚀 Fire22 Benchmarking Suite
- * 
+ *
  * Comprehensive performance testing and analysis tools
  */
 
@@ -27,13 +27,14 @@ import BenchmarkReporter from './benchmark-reporter';
 export async function runCompleteBenchmark() {
   const formatter = new BenchmarkFormatter();
   const reporter = new BenchmarkReporter();
-  
-  console.log(formatter.createBox(
-    '🚀 Fire22 Complete Benchmark Suite\n' +
-    'Running all performance tests...',
-    'BENCHMARKING',
-    'double'
-  ));
+
+  console.log(
+    formatter.createBox(
+      '🚀 Fire22 Complete Benchmark Suite\n' + 'Running all performance tests...',
+      'BENCHMARKING',
+      'double'
+    )
+  );
 
   // 1. Core benchmarks
   console.log('\n' + formatter.formatTitle('Core Performance'));
@@ -53,16 +54,18 @@ export async function runCompleteBenchmark() {
   // 4. Generate report
   const report = suite.generateReport();
   await Bun.write('bench/results/benchmark-report.md', report);
-  
+
   const json = suite.exportJson();
   await Bun.write('bench/results/benchmark-results.json', json);
 
-  console.log('\n' + formatter.createBox(
-    '✅ Benchmarking Complete!\n' +
-    'Reports saved to bench/results/',
-    'SUCCESS',
-    'rounded'
-  ));
+  console.log(
+    '\n' +
+      formatter.createBox(
+        '✅ Benchmarking Complete!\n' + 'Reports saved to bench/results/',
+        'SUCCESS',
+        'rounded'
+      )
+  );
 }
 
 // Run if executed directly

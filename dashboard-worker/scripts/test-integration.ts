@@ -1,10 +1,10 @@
 #!/usr/bin/env bun
 /**
  * 🧪 Fire22 Integration Test Suite
- * 
+ *
  * Tests all integrated tools and commands to ensure they work together
  * Validates the complete Fire22 development environment
- * 
+ *
  * @version 3.0.9
  * @author Fire22 Development Team
  */
@@ -50,122 +50,122 @@ class IntegrationTester {
           { name: 'Fire22 CLI Help', command: 'node', args: ['fire22-cli.js', '--help'] },
           { name: 'Fire22 CLI Version', command: 'node', args: ['fire22-cli.js', '--version'] },
           { name: 'Fire22 Status', command: 'node', args: ['fire22-cli.js', 'status'] },
-        ]
+        ],
       },
       {
         name: 'Health Checks',
         tests: [
-          { 
-            name: 'Matrix Health Check', 
-            command: 'bun', 
+          {
+            name: 'Matrix Health Check',
+            command: 'bun',
             args: ['run', 'scripts/matrix-health.ts'],
-            checkOutput: (output) => output.includes('Matrix Health Score')
+            checkOutput: output => output.includes('Matrix Health Score'),
           },
-          { 
-            name: 'Integrated Health System', 
-            command: 'bun', 
+          {
+            name: 'Integrated Health System',
+            command: 'bun',
             args: ['run', 'scripts/integrated-health-system.ts', '--quick'],
-            timeout: 10000
-          }
-        ]
+            timeout: 10000,
+          },
+        ],
       },
       {
         name: 'Monitoring Tools',
         tests: [
-          { 
-            name: 'Monitor Snapshot', 
-            command: 'bun', 
+          {
+            name: 'Monitor Snapshot',
+            command: 'bun',
             args: ['run', 'scripts/monitor-snapshot.ts'],
-            checkOutput: (output) => output.includes('Fire22 Real-Time Performance Dashboard')
+            checkOutput: output => output.includes('Fire22 Real-Time Performance Dashboard'),
           },
-          { 
-            name: 'Monitor Tree View', 
-            command: 'bun', 
+          {
+            name: 'Monitor Tree View',
+            command: 'bun',
             args: ['run', 'scripts/monitor-snapshot.ts', '--tree'],
-            checkOutput: (output) => output.includes('Fire22 Monitor Component Tree')
+            checkOutput: output => output.includes('Fire22 Monitor Component Tree'),
           },
-          { 
-            name: 'Monitor Capabilities', 
-            command: 'bun', 
+          {
+            name: 'Monitor Capabilities',
+            command: 'bun',
             args: ['run', 'scripts/monitor-snapshot.ts', '--capabilities'],
-            checkOutput: (output) => output.includes('Fire22 Monitor Capabilities')
-          }
-        ]
+            checkOutput: output => output.includes('Fire22 Monitor Capabilities'),
+          },
+        ],
       },
       {
         name: 'Quality Tools',
         tests: [
-          { 
-            name: 'QA Automation Help', 
-            command: 'bun', 
+          {
+            name: 'QA Automation Help',
+            command: 'bun',
             args: ['run', 'scripts/qa-automation.ts', '--help'],
-            checkOutput: (output) => output.includes('Fire22 QA Automation')
+            checkOutput: output => output.includes('Fire22 QA Automation'),
           },
-          { 
-            name: 'Pre-commit Check Help', 
-            command: 'bun', 
+          {
+            name: 'Pre-commit Check Help',
+            command: 'bun',
             args: ['run', 'scripts/pre-commit-check.ts', '--help'],
-            checkOutput: (output) => output.includes('Pre-Commit Quality Gate')
-          }
-        ]
+            checkOutput: output => output.includes('Pre-Commit Quality Gate'),
+          },
+        ],
       },
       {
         name: 'Validation Tools',
         tests: [
-          { 
-            name: 'Dry-Run Validator Help', 
-            command: 'bun', 
+          {
+            name: 'Dry-Run Validator Help',
+            command: 'bun',
             args: ['run', 'scripts/dry-run-validator.ts', '--help'],
-            checkOutput: (output) => output.includes('Fire22 Dry-Run Validator')
-          }
-        ]
+            checkOutput: output => output.includes('Fire22 Dry-Run Validator'),
+          },
+        ],
       },
       {
         name: 'Dashboard & Workflows',
         tests: [
-          { 
-            name: 'Dashboard Help', 
-            command: 'bun', 
+          {
+            name: 'Dashboard Help',
+            command: 'bun',
             args: ['run', 'scripts/fire22-dashboard.ts', '--help'],
-            checkOutput: (output) => output.includes('Fire22 Unified Dashboard')
+            checkOutput: output => output.includes('Fire22 Unified Dashboard'),
           },
-          { 
-            name: 'Workflow List', 
-            command: 'bun', 
+          {
+            name: 'Workflow List',
+            command: 'bun',
             args: ['run', 'scripts/workflow-automation.ts', '--list'],
-            checkOutput: (output) => output.includes('Available Workflows')
+            checkOutput: output => output.includes('Available Workflows'),
           },
-          { 
-            name: 'Workflow Help', 
-            command: 'bun', 
+          {
+            name: 'Workflow Help',
+            command: 'bun',
             args: ['run', 'scripts/workflow-automation.ts', '--help'],
-            checkOutput: (output) => output.includes('Fire22 Workflow Automation')
-          }
-        ]
+            checkOutput: output => output.includes('Fire22 Workflow Automation'),
+          },
+        ],
       },
       {
         name: 'Package.json Scripts',
         tests: [
-          { 
-            name: 'Dashboard Script', 
-            command: 'bun', 
+          {
+            name: 'Dashboard Script',
+            command: 'bun',
             args: ['run', 'dashboard', '--help'],
-            checkOutput: (output) => output.includes('Fire22 Unified Dashboard')
+            checkOutput: output => output.includes('Fire22 Unified Dashboard'),
           },
-          { 
-            name: 'Workflow Script', 
-            command: 'bun', 
+          {
+            name: 'Workflow Script',
+            command: 'bun',
             args: ['run', 'workflow', '--list'],
-            checkOutput: (output) => output.includes('Available Workflows')
+            checkOutput: output => output.includes('Available Workflows'),
           },
-          { 
-            name: 'Monitor Snapshot Script', 
-            command: 'bun', 
+          {
+            name: 'Monitor Snapshot Script',
+            command: 'bun',
             args: ['run', 'monitor:snapshot'],
-            checkOutput: (output) => output.includes('Fire22 Real-Time Performance Dashboard')
-          }
-        ]
-      }
+            checkOutput: output => output.includes('Fire22 Real-Time Performance Dashboard'),
+          },
+        ],
+      },
     ];
   }
 
@@ -174,8 +174,8 @@ class IntegrationTester {
    */
   private async runTest(test: TestDefinition): Promise<TestResult> {
     const startTime = Date.now();
-    
-    return new Promise((resolve) => {
+
+    return new Promise(resolve => {
       const timeout = test.timeout || 5000;
       let output = '';
       let error = '';
@@ -183,7 +183,7 @@ class IntegrationTester {
 
       const child = spawn(test.command, test.args || [], {
         stdio: 'pipe',
-        shell: false
+        shell: false,
       });
 
       const timeoutId = setTimeout(() => {
@@ -194,44 +194,44 @@ class IntegrationTester {
           command: `${test.command} ${test.args?.join(' ') || ''}`,
           success: false,
           error: `Test timed out after ${timeout}ms`,
-          duration: Date.now() - startTime
+          duration: Date.now() - startTime,
         });
       }, timeout);
 
-      child.stdout?.on('data', (data) => {
+      child.stdout?.on('data', data => {
         output += data.toString();
       });
 
-      child.stderr?.on('data', (data) => {
+      child.stderr?.on('data', data => {
         error += data.toString();
       });
 
-      child.on('close', (code) => {
+      child.on('close', code => {
         if (timedOut) return;
         clearTimeout(timeoutId);
 
         const success = code === 0 && (!test.checkOutput || test.checkOutput(output));
-        
+
         resolve({
           name: test.name,
           command: `${test.command} ${test.args?.join(' ') || ''}`,
           success,
           output: output.slice(0, 200), // Limit output size
           error: error ? error.slice(0, 200) : undefined,
-          duration: Date.now() - startTime
+          duration: Date.now() - startTime,
         });
       });
 
-      child.on('error', (err) => {
+      child.on('error', err => {
         if (timedOut) return;
         clearTimeout(timeoutId);
-        
+
         resolve({
           name: test.name,
           command: `${test.command} ${test.args?.join(' ') || ''}`,
           success: false,
           error: err.message,
-          duration: Date.now() - startTime
+          duration: Date.now() - startTime,
         });
       });
     });
@@ -242,7 +242,7 @@ class IntegrationTester {
    */
   async runAllTests(): Promise<void> {
     console.log('🧪 Fire22 Integration Test Suite');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
     console.log('Testing all integrated tools and commands...\n');
 
     const categories = this.getTestCategories();
@@ -256,7 +256,7 @@ class IntegrationTester {
       for (const test of category.tests) {
         totalTests++;
         process.stdout.write(`  Testing ${test.name}... `);
-        
+
         const result = await this.runTest(test);
         this.results.push(result);
 
@@ -284,7 +284,7 @@ class IntegrationTester {
     const duration = Date.now() - this.startTime;
     const passRate = ((passed / total) * 100).toFixed(1);
 
-    console.log('\n' + '=' .repeat(60));
+    console.log('\n' + '='.repeat(60));
     console.log('📊 Test Summary');
     console.log('-'.repeat(60));
     console.log(`Total Tests: ${total}`);
@@ -306,7 +306,7 @@ class IntegrationTester {
     }
 
     // Overall status
-    console.log('\n' + '=' .repeat(60));
+    console.log('\n' + '='.repeat(60));
     if (passed === total) {
       console.log('✅ All integration tests passed! System is ready.');
     } else if (passRate >= '80') {
@@ -325,7 +325,7 @@ class IntegrationTester {
     const criticalTests: TestDefinition[] = [
       { name: 'CLI Available', command: 'node', args: ['fire22-cli.js', '--version'] },
       { name: 'Scripts Directory', command: 'ls', args: ['scripts'] },
-      { name: 'Package.json', command: 'ls', args: ['package.json'] }
+      { name: 'Package.json', command: 'ls', args: ['package.json'] },
     ];
 
     for (const test of criticalTests) {

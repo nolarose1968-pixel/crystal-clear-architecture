@@ -11,8 +11,7 @@ export const asyncUtils = {
   /**
    * Delay execution for specified milliseconds
    */
-  delay: (ms: number): Promise<void> => 
-    new Promise(resolve => setTimeout(resolve, ms)),
+  delay: (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms)),
 
   /**
    * Retry async operation with exponential backoff
@@ -23,22 +22,22 @@ export const asyncUtils = {
     baseDelay: number = SYSTEM_CONFIG.api.retryDelay
   ): Promise<T> => {
     let lastError: Error;
-    
+
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         return await operation();
       } catch (error) {
         lastError = error as Error;
-        
+
         if (attempt === maxAttempts) {
           throw lastError;
         }
-        
+
         const delay = baseDelay * Math.pow(2, attempt - 1);
         await asyncUtils.delay(delay);
       }
     }
-    
+
     throw lastError!;
   },
 
@@ -51,20 +50,23 @@ export const asyncUtils = {
   ): Promise<T[]> => {
     const results: T[] = [];
     const executing: Promise<void>[] = [];
-    
+
     for (const operation of operations) {
       const promise = operation().then(result => {
         results.push(result);
       });
-      
+
       executing.push(promise);
-      
+
       if (executing.length >= maxConcurrent) {
         await Promise.race(executing);
-        executing.splice(executing.findIndex(p => p === promise), 1);
+        executing.splice(
+          executing.findIndex(p => p === promise),
+          1
+        );
       }
     }
-    
+
     await Promise.all(executing);
     return results;
   },
@@ -78,11 +80,11 @@ export const asyncUtils = {
   ): Promise<T> => {
     return Promise.race([
       operation,
-      new Promise<never>((_, reject) => 
+      new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error('Operation timed out')), timeoutMs)
-      )
+      ),
     ]);
-  }
+  },
 };
 
 // 🎨 Styling Utilities
@@ -92,11 +94,9 @@ export const styleUtils = {
    */
   generateCSSVariables: (): string => {
     const variables = Object.entries(COLORS).flatMap(([category, colors]) =>
-      Object.entries(colors).map(([name, value]) => 
-        `--color-${category}-${name}: ${value};`
-      )
+      Object.entries(colors).map(([name, value]) => `--color-${category}-${name}: ${value};`)
     );
-    
+
     return `:root {\n  ${variables.join('\n  ')}\n}`;
   },
 
@@ -109,12 +109,13 @@ export const styleUtils = {
       sm: '640px',
       md: '768px',
       lg: '1024px',
-      xl: '1280px'
+      xl: '1280px',
     };
-    
+
     return Object.entries(breakpoints)
-      .map(([name, width]) => 
-        `@media (min-width: ${width}) {\n  .${name}\\:hidden { display: none; }\n  .${name}\\:block { display: block; }\n}`
+      .map(
+        ([name, width]) =>
+          `@media (min-width: ${width}) {\n  .${name}\\:hidden { display: none; }\n  .${name}\\:block { display: block; }\n}`
       )
       .join('\n\n');
   },
@@ -174,7 +175,7 @@ export const styleUtils = {
     
     .shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); }
     .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-  `
+  `,
 };
 
 // 📊 Data Utilities
@@ -203,10 +204,10 @@ export const dataUtils = {
    */
   deepMerge: <T extends Record<string, any>>(target: T, ...sources: Partial<T>[]): T => {
     if (!sources.length) return target;
-    
+
     const source = sources.shift();
     if (source === undefined) return target;
-    
+
     if (isObject(target) && isObject(source)) {
       for (const key in source) {
         if (isObject(source[key])) {
@@ -217,7 +218,7 @@ export const dataUtils = {
         }
       }
     }
-    
+
     return deepMerge(target, ...sources);
   },
 
@@ -235,13 +236,13 @@ export const dataUtils = {
    */
   formatBytes: (bytes: number, decimals = 2): string => {
     if (bytes === 0) return '0 Bytes';
-    
+
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    
+
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
+
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   },
 
@@ -251,12 +252,12 @@ export const dataUtils = {
   formatTimeAgo: (date: Date): string => {
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-    
+
     if (diffInSeconds < 60) return 'Just now';
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
     if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d ago`;
-    
+
     return date.toLocaleDateString();
   },
 
@@ -273,7 +274,7 @@ export const dataUtils = {
    */
   roundTo: (value: number, decimals: number): number => {
     return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
-  }
+  },
 };
 
 // 🔐 Security Utilities
@@ -312,34 +313,36 @@ export const securityUtils = {
   /**
    * Validate password strength
    */
-  validatePasswordStrength: (password: string): {
+  validatePasswordStrength: (
+    password: string
+  ): {
     isValid: boolean;
     score: number;
     feedback: string[];
   } => {
     const feedback: string[] = [];
     let score = 0;
-    
+
     if (password.length >= VALIDATION.limits.minBet) {
       score += 1;
     } else {
       feedback.push(`Password must be at least ${VALIDATION.limits.minBet} characters long`);
     }
-    
+
     if (/[a-z]/.test(password)) score += 1;
     if (/[A-Z]/.test(password)) score += 1;
     if (/[0-9]/.test(password)) score += 1;
     if (/[^A-Za-z0-9]/.test(password)) score += 1;
-    
+
     const isValid = score >= 3;
-    
+
     if (!isValid) {
       if (score < 2) feedback.push('Password is too weak');
       if (score < 3) feedback.push('Consider adding numbers and special characters');
     }
-    
+
     return { isValid, score, feedback };
-  }
+  },
 };
 
 // 📝 String Utilities
@@ -347,59 +350,55 @@ export const stringUtils = {
   /**
    * Capitalize first letter
    */
-  capitalize: (str: string): string => 
-    str.charAt(0).toUpperCase() + str.slice(1).toLowerCase(),
+  capitalize: (str: string): string => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase(),
 
   /**
    * Convert to kebab case
    */
-  toKebabCase: (str: string): string => 
-    str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase(),
+  toKebabCase: (str: string): string => str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase(),
 
   /**
    * Convert to camel case
    */
-  toCamelCase: (str: string): string => 
+  toCamelCase: (str: string): string =>
     str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase()),
 
   /**
    * Convert to snake case
    */
-  toSnakeCase: (str: string): string => 
-    str.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase(),
+  toSnakeCase: (str: string): string => str.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase(),
 
   /**
    * Convert to title case
    */
-  toTitleCase: (str: string): string => 
+  toTitleCase: (str: string): string =>
     str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()),
 
   /**
    * Truncate string with ellipsis
    */
-  truncate: (str: string, maxLength: number): string => 
+  truncate: (str: string, maxLength: number): string =>
     str.length > maxLength ? str.substring(0, maxLength) + '...' : str,
 
   /**
    * Remove HTML tags
    */
-  stripHtml: (html: string): string => 
-    html.replace(/<[^>]*>/g, ''),
+  stripHtml: (html: string): string => html.replace(/<[^>]*>/g, ''),
 
   /**
    * Escape HTML entities
    */
-  escapeHtml: (str: string): string => 
+  escapeHtml: (str: string): string =>
     str.replace(/[&<>"']/g, char => {
       const entities: Record<string, string> = {
         '&': '&amp;',
         '<': '&lt;',
         '>': '&gt;',
         '"': '&quot;',
-        "'": '&#39;'
+        "'": '&#39;',
       };
       return entities[char];
-    })
+    }),
 };
 
 // 🔍 Validation Utilities
@@ -442,15 +441,18 @@ export const validationUtils = {
   /**
    * Validate required fields
    */
-  validateRequired: (data: Record<string, any>, requiredFields: string[]): {
+  validateRequired: (
+    data: Record<string, any>,
+    requiredFields: string[]
+  ): {
     isValid: boolean;
     missingFields: string[];
   } => {
     const missingFields = requiredFields.filter(field => validationUtils.isEmpty(data[field]));
-    
+
     return {
       isValid: missingFields.length === 0,
-      missingFields
+      missingFields,
     };
   },
 
@@ -468,7 +470,7 @@ export const validationUtils = {
   validateRange: (value: number, min: number, max: number): boolean => {
     if (!validationUtils.isValidNumber(value)) return false;
     return value >= min && value <= max;
-  }
+  },
 };
 
 // 🎯 Status Utilities
@@ -482,21 +484,21 @@ export const statusUtils = {
       case STATUS.build.completed:
       case STATUS.queue.completed:
         return COLORS.accent.success;
-      
+
       case STATUS.health.warning.toLowerCase():
       case STATUS.build.running:
       case STATUS.queue.processing:
         return COLORS.accent.warning;
-      
+
       case STATUS.health.error.toLowerCase():
       case STATUS.build.failed:
       case STATUS.queue.failed:
         return COLORS.accent.error;
-      
+
       case STATUS.build.pending:
       case STATUS.queue.pending:
         return COLORS.accent.info;
-      
+
       default:
         return COLORS.text.muted;
     }
@@ -511,21 +513,21 @@ export const statusUtils = {
       case STATUS.build.completed:
       case STATUS.queue.completed:
         return '✅';
-      
+
       case STATUS.health.warning.toLowerCase():
       case STATUS.build.running:
       case STATUS.queue.processing:
         return '⏳';
-      
+
       case STATUS.health.error.toLowerCase():
       case STATUS.build.failed:
       case STATUS.queue.failed:
         return '❌';
-      
+
       case STATUS.build.pending:
       case STATUS.queue.pending:
         return '⏸️';
-      
+
       default:
         return '❓';
     }
@@ -535,12 +537,9 @@ export const statusUtils = {
    * Check if status is active
    */
   isActiveStatus: (status: string): boolean => {
-    const activeStatuses = [
-      STATUS.build.running,
-      STATUS.queue.processing
-    ];
+    const activeStatuses = [STATUS.build.running, STATUS.queue.processing];
     return activeStatuses.includes(status as any);
-  }
+  },
 };
 
 // Bun-specific utilities
@@ -553,7 +552,7 @@ export const bunUtils = {
   async importHTML(path: string): Promise<string> {
     try {
       // Dynamic import with type: "text" for Bun
-      const html = await import(path, { assert: { type: "text" } });
+      const html = await import(path, { assert: { type: 'text' } });
       return html.default;
     } catch (error) {
       throw new Error(`Failed to import HTML file ${path}: ${error}`);
@@ -567,7 +566,7 @@ export const bunUtils = {
    */
   async importMultipleHTML(paths: string[]): Promise<Record<string, string>> {
     const results: Record<string, string> = {};
-    
+
     for (const path of paths) {
       try {
         const filename = path.split('/').pop()?.replace('.html', '') || 'unknown';
@@ -576,7 +575,7 @@ export const bunUtils = {
         console.warn(`Failed to import ${path}: ${error}`);
       }
     }
-    
+
     return results;
   },
 
@@ -590,7 +589,7 @@ export const bunUtils = {
     // This leverages Bun's built-in watch mode
     // The import will automatically reload when the file changes
     let currentContent = '';
-    
+
     const checkForChanges = async () => {
       try {
         const newContent = await bunUtils.importHTML(path);
@@ -605,7 +604,7 @@ export const bunUtils = {
 
     // Initial load
     checkForChanges();
-    
+
     // Return unwatch function
     return () => {
       // In a real implementation, you might want to use Bun's file watcher
@@ -622,11 +621,11 @@ export const bunUtils = {
   parseHTML(html: string, selector?: string): HTMLElement[] {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
-    
+
     if (selector) {
       return Array.from(doc.querySelectorAll(selector));
     }
-    
+
     return [doc.body];
   },
 
@@ -637,25 +636,27 @@ export const bunUtils = {
    */
   extractHTMLMetadata(html: string): Record<string, string> {
     const metadata: Record<string, string> = {};
-    
+
     // Extract title
     const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
     if (titleMatch) metadata.title = titleMatch[1];
-    
+
     // Extract meta tags
-    const metaMatches = html.matchAll(/<meta[^>]+(?:name|property)=["']([^"']+)["'][^>]+content=["']([^"']+)["'][^>]*>/gi);
+    const metaMatches = html.matchAll(
+      /<meta[^>]+(?:name|property)=["']([^"']+)["'][^>]+content=["']([^"']+)["'][^>]*>/gi
+    );
     for (const match of metaMatches) {
       metadata[match[1]] = match[2];
     }
-    
+
     // Extract CSS links
     const cssMatches = html.matchAll(/<link[^>]+href=["']([^"']+\.css)["'][^>]*>/gi);
     metadata.cssFiles = Array.from(cssMatches, m => m[1]).join(',');
-    
+
     // Extract script tags
     const scriptMatches = html.matchAll(/<script[^>]+src=["']([^"']+)["'][^>]*>/gi);
     metadata.scriptFiles = Array.from(scriptMatches, m => m[1]).join(',');
-    
+
     return metadata;
   },
 
@@ -675,7 +676,7 @@ export const bunUtils = {
       hasSemanticHTML: false,
       accessibilityScore: 0,
       standardizationScore: 0,
-      recommendations: [] as string[]
+      recommendations: [] as string[],
     };
 
     // Check basic HTML structure
@@ -739,11 +740,14 @@ export const bunUtils = {
     // Replace common inline styles with utility classes
     const styleReplacements = [
       { pattern: /style="color:\s*#[a-fA-F0-9]{3,6}"/g, replacement: 'class="text-primary"' },
-      { pattern: /style="background-color:\s*#[a-fA-F0-9]{3,6}"/g, replacement: 'class="bg-primary"' },
+      {
+        pattern: /style="background-color:\s*#[a-fA-F0-9]{3,6}"/g,
+        replacement: 'class="bg-primary"',
+      },
       { pattern: /style="padding:\s*\d+px"/g, replacement: 'class="p-3"' },
       { pattern: /style="margin:\s*\d+px"/g, replacement: 'class="m-3"' },
       { pattern: /style="text-align:\s*center"/g, replacement: 'class="text-center"' },
-      { pattern: /style="font-size:\s*\d+px"/g, replacement: 'class="text-base"' }
+      { pattern: /style="font-size:\s*\d+px"/g, replacement: 'class="text-base"' },
     ];
 
     for (const replacement of styleReplacements) {
@@ -759,7 +763,7 @@ export const bunUtils = {
     }
 
     return transformed;
-  }
+  },
 };
 
 // 🔧 Helper Functions
@@ -769,10 +773,10 @@ function isObject(item: any): item is Record<string, any> {
 
 function deepMerge<T extends Record<string, any>>(target: T, ...sources: Partial<T>[]): T {
   if (!sources.length) return target;
-  
+
   const source = sources.shift();
   if (source === undefined) return target;
-  
+
   if (isObject(target) && isObject(source)) {
     for (const key in source) {
       if (isObject(source[key])) {
@@ -783,7 +787,7 @@ function deepMerge<T extends Record<string, any>>(target: T, ...sources: Partial
       }
     }
   }
-  
+
   return deepMerge(target, ...sources);
 }
 
@@ -796,5 +800,5 @@ export default {
   stringUtils,
   validationUtils,
   statusUtils,
-  bunUtils
+  bunUtils,
 };

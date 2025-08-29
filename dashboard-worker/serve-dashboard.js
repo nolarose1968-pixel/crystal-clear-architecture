@@ -12,7 +12,7 @@ console.log(`📁 Dashboard file: ${DASHBOARD_PATH}`);
 
 const server = http.createServer((req, res) => {
   const url = req.url;
-  
+
   if (url === '/' || url === '/dashboard') {
     try {
       const dashboardHtml = fs.readFileSync(DASHBOARD_PATH, 'utf-8');
@@ -25,11 +25,13 @@ const server = http.createServer((req, res) => {
     }
   } else if (url === '/api/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      server: 'Fire22 Dashboard Server'
-    }));
+    res.end(
+      JSON.stringify({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        server: 'Fire22 Dashboard Server',
+      })
+    );
   } else {
     res.writeHead(404, { 'Content-Type': 'text/plain' });
     res.end('Not Found');

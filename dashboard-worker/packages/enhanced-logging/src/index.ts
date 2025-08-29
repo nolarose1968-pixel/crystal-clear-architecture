@@ -27,7 +27,7 @@ export type {
   RealTimeAlert,
   AlertRule,
   AnomalyDetection,
-  PredictiveAlert
+  PredictiveAlert,
 } from './types';
 
 // Enhanced types exports
@@ -35,25 +35,14 @@ export type {
   FailureAnalysis,
   CacheAnalysis,
   SortingOptions,
-  FilterOptions
+  FilterOptions,
 } from './advanced-analytics-logger';
 
-export type {
-  PerformanceAlert
-} from './performance-optimizer';
+export type { PerformanceAlert } from './performance-optimizer';
 
-export type {
-  CacheType,
-  CacheOperation,
-  CacheMissReason,
-  CacheAlert
-} from './cache-monitor';
+export type { CacheType, CacheOperation, CacheMissReason, CacheAlert } from './cache-monitor';
 
-export type {
-  AlertSeverity,
-  AlertCategory,
-  AlertType
-} from './real-time-alerting';
+export type { AlertSeverity, AlertCategory, AlertType } from './real-time-alerting';
 
 // Main factory function
 export function createFire22Logger(config?: Partial<LoggerConfig>) {
@@ -66,33 +55,42 @@ export function createEnhancedAnalyticsSystem(config?: any) {
   const { PerformanceOptimizer } = require('./performance-optimizer');
   const { CacheMonitor } = require('./cache-monitor');
   const { RealTimeAlertingSystem } = require('./real-time-alerting');
-  
+
   const analyticsLogger = new AdvancedAnalyticsLogger(config);
   const performanceOptimizer = new PerformanceOptimizer(analyticsLogger);
   const cacheMonitor = new CacheMonitor(analyticsLogger);
-  const alertingSystem = new RealTimeAlertingSystem(analyticsLogger, performanceOptimizer, cacheMonitor);
-  
-  return {
+  const alertingSystem = new RealTimeAlertingSystem(
     analyticsLogger,
     performanceOptimizer,
-    cacheMonitor,
-    alertingSystem
-  };
-}
+    cacheMonitor
+  );
 
-// Cloudflare analytics factory
-export function createCloudflareAnalyticsSystem(cloudflareConfig: any, baseConfig?: any) {
-  const { analyticsLogger, performanceOptimizer, cacheMonitor, alertingSystem } = createEnhancedAnalyticsSystem(baseConfig);
-  
-  const { CloudflareAnalyticsIntegration } = require('./cloudflare-analytics-integration');
-  const cloudflareAnalytics = new CloudflareAnalyticsIntegration(cacheMonitor, analyticsLogger, cloudflareConfig);
-  
   return {
     analyticsLogger,
     performanceOptimizer,
     cacheMonitor,
     alertingSystem,
-    cloudflareAnalytics
+  };
+}
+
+// Cloudflare analytics factory
+export function createCloudflareAnalyticsSystem(cloudflareConfig: any, baseConfig?: any) {
+  const { analyticsLogger, performanceOptimizer, cacheMonitor, alertingSystem } =
+    createEnhancedAnalyticsSystem(baseConfig);
+
+  const { CloudflareAnalyticsIntegration } = require('./cloudflare-analytics-integration');
+  const cloudflareAnalytics = new CloudflareAnalyticsIntegration(
+    cacheMonitor,
+    analyticsLogger,
+    cloudflareConfig
+  );
+
+  return {
+    analyticsLogger,
+    performanceOptimizer,
+    cacheMonitor,
+    alertingSystem,
+    cloudflareAnalytics,
   };
 }
 
@@ -103,9 +101,11 @@ export default {
   Fire22Logger: () => import('./logger').then(m => m.Fire22Logger),
   LKeyAuditLogger: () => import('./l-key-audit-logger').then(m => m.LKeyAuditLogger),
   AggregatedLogger: () => import('./aggregated-logger').then(m => m.AggregatedLogger),
-  AdvancedAnalyticsLogger: () => import('./advanced-analytics-logger').then(m => m.AdvancedAnalyticsLogger),
+  AdvancedAnalyticsLogger: () =>
+    import('./advanced-analytics-logger').then(m => m.AdvancedAnalyticsLogger),
   PerformanceOptimizer: () => import('./performance-optimizer').then(m => m.PerformanceOptimizer),
   CacheMonitor: () => import('./cache-monitor').then(m => m.CacheMonitor),
   RealTimeAlertingSystem: () => import('./real-time-alerting').then(m => m.RealTimeAlertingSystem),
-  CloudflareAnalyticsIntegration: () => import('./cloudflare-analytics-integration').then(m => m.CloudflareAnalyticsIntegration)
+  CloudflareAnalyticsIntegration: () =>
+    import('./cloudflare-analytics-integration').then(m => m.CloudflareAnalyticsIntegration),
 };

@@ -25,20 +25,40 @@ export interface EmailValidationOptions {
 
 // Common disposable email domains
 const DISPOSABLE_DOMAINS = new Set([
-  '10minutemail.com', 'guerrillamail.com', 'mailinator.com', 'temp-mail.org',
-  'throwaway.email', 'yopmail.com', 'maildrop.cc', 'tempail.com',
-  'getnada.com', 'tempmail.net', 'fakeinbox.com', 'mail-temporaire.fr',
-  'mytemp.email', 'temp-mail.io', 'dispostable.com', 'tempinbox.co'
+  '10minutemail.com',
+  'guerrillamail.com',
+  'mailinator.com',
+  'temp-mail.org',
+  'throwaway.email',
+  'yopmail.com',
+  'maildrop.cc',
+  'tempail.com',
+  'getnada.com',
+  'tempmail.net',
+  'fakeinbox.com',
+  'mail-temporaire.fr',
+  'mytemp.email',
+  'temp-mail.io',
+  'dispostable.com',
+  'tempinbox.co',
 ]);
 
 // High-risk domains (often associated with spam/fraud)
 const HIGH_RISK_DOMAINS = new Set([
-  'yahoo.com', 'aol.com', 'hotmail.com', 'outlook.com', 'gmail.com',
-  'protonmail.com', 'zoho.com', 'yandex.com', 'mail.ru'
+  'yahoo.com',
+  'aol.com',
+  'hotmail.com',
+  'outlook.com',
+  'gmail.com',
+  'protonmail.com',
+  'zoho.com',
+  'yandex.com',
+  'mail.ru',
 ]);
 
 // RFC 5322 compliant email regex (simplified)
-const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+const EMAIL_REGEX =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
 /**
  * Validate email address with comprehensive checks
@@ -54,7 +74,7 @@ export function validateEmail(
     localPart: '',
     riskLevel: 'low',
     errors: [],
-    suggestions: []
+    suggestions: [],
   };
 
   // Basic validation
@@ -225,7 +245,7 @@ export function generateEmailSuggestions(email: string): string[] {
     'hotmail.co': 'hotmail.com',
     'hotmai.com': 'hotmail.com',
     'outlook.co': 'outlook.com',
-    'outlok.com': 'outlook.com'
+    'outlok.com': 'outlook.com',
   };
 
   // Check for domain corrections
@@ -256,7 +276,7 @@ export function validateEmailDomain(
   return {
     isValid: isValidEmailFormat(email),
     domain,
-    allowed
+    allowed,
   };
 }
 
@@ -289,14 +309,17 @@ export function getEmailValidationStats(results: EmailValidationResult[]): {
     disposable: results.filter(r => r.isDisposable).length,
     highRisk: results.filter(r => r.riskLevel === 'high').length,
     mediumRisk: results.filter(r => r.riskLevel === 'medium').length,
-    lowRisk: results.filter(r => r.riskLevel === 'low').length
+    lowRisk: results.filter(r => r.riskLevel === 'low').length,
   };
 }
 
 /**
  * Sanitize email for display (mask sensitive parts)
  */
-export function sanitizeEmailForDisplay(email: string, options: { maskLocal?: boolean; maskDomain?: boolean } = {}): string {
+export function sanitizeEmailForDisplay(
+  email: string,
+  options: { maskLocal?: boolean; maskDomain?: boolean } = {}
+): string {
   if (!isValidEmailFormat(email)) {
     return email;
   }

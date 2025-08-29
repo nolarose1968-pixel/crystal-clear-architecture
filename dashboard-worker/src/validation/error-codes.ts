@@ -1,6 +1,6 @@
 /**
  * L-Key Telegram Validation Error Codes
- * 
+ *
  * Comprehensive error code system for validation operations
  * with graceful error handling and recovery mechanisms.
  */
@@ -12,7 +12,7 @@ export enum ValidationErrorCode {
   SYSTEM_DEPENDENCY_MISSING = 'VAL_1003',
   SYSTEM_MEMORY_EXHAUSTED = 'VAL_1004',
   SYSTEM_TIMEOUT = 'VAL_1005',
-  
+
   // API Integration Errors (1100-1199)
   FIRE22_API_UNAVAILABLE = 'VAL_1101',
   FIRE22_API_UNAUTHORIZED = 'VAL_1102',
@@ -20,7 +20,7 @@ export enum ValidationErrorCode {
   FIRE22_API_INVALID_RESPONSE = 'VAL_1104',
   FIRE22_API_TIMEOUT = 'VAL_1105',
   FIRE22_API_NETWORK_ERROR = 'VAL_1106',
-  
+
   // Data Validation Errors (1200-1299)
   CUSTOMER_DATA_INVALID = 'VAL_1201',
   CUSTOMER_ID_MISSING = 'VAL_1202',
@@ -30,35 +30,35 @@ export enum ValidationErrorCode {
   LKEY_MISSING = 'VAL_1206',
   LKEY_INVALID_FORMAT = 'VAL_1207',
   LKEY_GENERATION_FAILED = 'VAL_1208',
-  
+
   // Mapping Errors (1300-1399)
   MAPPING_INCONSISTENCY = 'VAL_1301',
   MAPPING_CONFLICT = 'VAL_1302',
   MAPPING_CIRCULAR_REFERENCE = 'VAL_1303',
   MAPPING_DATA_CORRUPTION = 'VAL_1304',
-  
+
   // Auto-Fix Errors (1400-1499)
   AUTOFIX_FAILED = 'VAL_1401',
   AUTOFIX_PARTIAL_SUCCESS = 'VAL_1402',
   AUTOFIX_PERMISSION_DENIED = 'VAL_1403',
   AUTOFIX_DATA_LOCKED = 'VAL_1404',
-  
+
   // Export/Report Errors (1500-1599)
   REPORT_GENERATION_FAILED = 'VAL_1501',
   EXPORT_FORMAT_UNSUPPORTED = 'VAL_1502',
   EXPORT_SIZE_LIMIT_EXCEEDED = 'VAL_1503',
   EXPORT_PERMISSION_DENIED = 'VAL_1504',
-  
+
   // Cache/Storage Errors (1600-1699)
   CACHE_READ_FAILED = 'VAL_1601',
   CACHE_WRITE_FAILED = 'VAL_1602',
   STORAGE_UNAVAILABLE = 'VAL_1603',
   STORAGE_QUOTA_EXCEEDED = 'VAL_1604',
-  
+
   // Unknown/Generic Errors (1900-1999)
   UNKNOWN_ERROR = 'VAL_1901',
   OPERATION_INTERRUPTED = 'VAL_1902',
-  RESOURCE_CLEANUP_FAILED = 'VAL_1903'
+  RESOURCE_CLEANUP_FAILED = 'VAL_1903',
 }
 
 export interface ValidationError {
@@ -82,15 +82,18 @@ export interface ErrorRecoveryStrategy {
 /**
  * Comprehensive error definitions with recovery strategies
  */
-export const ERROR_DEFINITIONS: Record<ValidationErrorCode, {
-  message: string;
-  description: string;
-  recoverable: boolean;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  category: string;
-  suggestions: string[];
-  retryStrategy?: ErrorRecoveryStrategy;
-}> = {
+export const ERROR_DEFINITIONS: Record<
+  ValidationErrorCode,
+  {
+    message: string;
+    description: string;
+    recoverable: boolean;
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    category: string;
+    suggestions: string[];
+    retryStrategy?: ErrorRecoveryStrategy;
+  }
+> = {
   [ValidationErrorCode.SYSTEM_INITIALIZATION_FAILED]: {
     message: 'System initialization failed',
     description: 'The validation system could not be initialized properly',
@@ -100,14 +103,14 @@ export const ERROR_DEFINITIONS: Record<ValidationErrorCode, {
     suggestions: [
       'Check environment variables',
       'Verify system dependencies',
-      'Restart the service'
+      'Restart the service',
     ],
     retryStrategy: {
       code: ValidationErrorCode.SYSTEM_INITIALIZATION_FAILED,
       maxRetries: 3,
       retryDelay: 5000,
-      backoffMultiplier: 2
-    }
+      backoffMultiplier: 2,
+    },
   },
 
   [ValidationErrorCode.SYSTEM_CONFIGURATION_INVALID]: {
@@ -119,8 +122,8 @@ export const ERROR_DEFINITIONS: Record<ValidationErrorCode, {
     suggestions: [
       'Review CLAUDE.md configuration requirements',
       'Check environment variables',
-      'Validate configuration file syntax'
-    ]
+      'Validate configuration file syntax',
+    ],
   },
 
   [ValidationErrorCode.SYSTEM_DEPENDENCY_MISSING]: {
@@ -132,8 +135,8 @@ export const ERROR_DEFINITIONS: Record<ValidationErrorCode, {
     suggestions: [
       'Run bun install --frozen-lockfile',
       'Check package.json dependencies',
-      'Verify Bun runtime version'
-    ]
+      'Verify Bun runtime version',
+    ],
   },
 
   [ValidationErrorCode.FIRE22_API_UNAVAILABLE]: {
@@ -146,14 +149,14 @@ export const ERROR_DEFINITIONS: Record<ValidationErrorCode, {
       'Check Fire22 API status',
       'Verify network connectivity',
       'Switch to demo mode for testing',
-      'Check DNS resolution'
+      'Check DNS resolution',
     ],
     retryStrategy: {
       code: ValidationErrorCode.FIRE22_API_UNAVAILABLE,
       maxRetries: 5,
       retryDelay: 2000,
-      backoffMultiplier: 1.5
-    }
+      backoffMultiplier: 1.5,
+    },
   },
 
   [ValidationErrorCode.FIRE22_API_UNAUTHORIZED]: {
@@ -165,8 +168,8 @@ export const ERROR_DEFINITIONS: Record<ValidationErrorCode, {
     suggestions: [
       'Check FIRE22_TOKEN environment variable',
       'Verify API credentials are current',
-      'Contact Fire22 API support'
-    ]
+      'Contact Fire22 API support',
+    ],
   },
 
   [ValidationErrorCode.FIRE22_API_RATE_LIMITED]: {
@@ -178,14 +181,14 @@ export const ERROR_DEFINITIONS: Record<ValidationErrorCode, {
     suggestions: [
       'Implement request throttling',
       'Use cached data when available',
-      'Wait before retrying'
+      'Wait before retrying',
     ],
     retryStrategy: {
       code: ValidationErrorCode.FIRE22_API_RATE_LIMITED,
       maxRetries: 3,
       retryDelay: 60000, // 1 minute
-      backoffMultiplier: 2
-    }
+      backoffMultiplier: 2,
+    },
   },
 
   [ValidationErrorCode.CUSTOMER_ID_INVALID_FORMAT]: {
@@ -197,8 +200,8 @@ export const ERROR_DEFINITIONS: Record<ValidationErrorCode, {
     suggestions: [
       'Use AL### format for customer IDs',
       'Sanitize customer ID input',
-      'Check data source integrity'
-    ]
+      'Check data source integrity',
+    ],
   },
 
   [ValidationErrorCode.TELEGRAM_ID_INVALID_FORMAT]: {
@@ -210,8 +213,8 @@ export const ERROR_DEFINITIONS: Record<ValidationErrorCode, {
     suggestions: [
       'Verify Telegram ID is numeric',
       'Check for leading/trailing spaces',
-      'Validate against Telegram API'
-    ]
+      'Validate against Telegram API',
+    ],
   },
 
   [ValidationErrorCode.USERNAME_INVALID_FORMAT]: {
@@ -223,8 +226,8 @@ export const ERROR_DEFINITIONS: Record<ValidationErrorCode, {
     suggestions: [
       'Use only alphanumeric characters and underscores',
       'Keep username between 3-32 characters',
-      'Apply automatic sanitization'
-    ]
+      'Apply automatic sanitization',
+    ],
   },
 
   [ValidationErrorCode.LKEY_MISSING]: {
@@ -236,8 +239,8 @@ export const ERROR_DEFINITIONS: Record<ValidationErrorCode, {
     suggestions: [
       'Generate new L-Key for entity type',
       'Check L-Key mapping configuration',
-      'Verify entity type classification'
-    ]
+      'Verify entity type classification',
+    ],
   },
 
   [ValidationErrorCode.LKEY_GENERATION_FAILED]: {
@@ -249,8 +252,8 @@ export const ERROR_DEFINITIONS: Record<ValidationErrorCode, {
     suggestions: [
       'Check L-Key sequence integrity',
       'Verify category mapping exists',
-      'Clear L-Key cache and retry'
-    ]
+      'Clear L-Key cache and retry',
+    ],
   },
 
   [ValidationErrorCode.AUTOFIX_FAILED]: {
@@ -259,11 +262,7 @@ export const ERROR_DEFINITIONS: Record<ValidationErrorCode, {
     recoverable: true,
     severity: 'medium',
     category: 'Auto-Fix',
-    suggestions: [
-      'Review specific error details',
-      'Apply manual fixes',
-      'Check data permissions'
-    ]
+    suggestions: ['Review specific error details', 'Apply manual fixes', 'Check data permissions'],
   },
 
   [ValidationErrorCode.CACHE_READ_FAILED]: {
@@ -275,8 +274,8 @@ export const ERROR_DEFINITIONS: Record<ValidationErrorCode, {
     suggestions: [
       'Clear cache and retry',
       'Check cache service availability',
-      'Fall back to direct API calls'
-    ]
+      'Fall back to direct API calls',
+    ],
   },
 
   [ValidationErrorCode.UNKNOWN_ERROR]: {
@@ -288,9 +287,9 @@ export const ERROR_DEFINITIONS: Record<ValidationErrorCode, {
     suggestions: [
       'Check application logs for details',
       'Retry the operation',
-      'Contact support with error details'
-    ]
-  }
+      'Contact support with error details',
+    ],
+  },
 };
 
 /**
@@ -303,7 +302,7 @@ export class ValidationErrorFactory {
     customMessage?: string
   ): ValidationError {
     const definition = ERROR_DEFINITIONS[code];
-    
+
     if (!definition) {
       // Fallback for unknown error codes
       return {
@@ -312,7 +311,7 @@ export class ValidationErrorFactory {
         details,
         timestamp: new Date(),
         recoverable: true,
-        suggestions: ['Check application logs', 'Contact support']
+        suggestions: ['Check application logs', 'Contact support'],
       };
     }
 
@@ -322,9 +321,10 @@ export class ValidationErrorFactory {
       details,
       timestamp: new Date(),
       recoverable: definition.recoverable,
-      retryAfter: definition.retryStrategy?.retryDelay ? 
-        Math.floor(definition.retryStrategy.retryDelay / 1000) : undefined,
-      suggestions: definition.suggestions
+      retryAfter: definition.retryStrategy?.retryDelay
+        ? Math.floor(definition.retryStrategy.retryDelay / 1000)
+        : undefined,
+      suggestions: definition.suggestions,
     };
   }
 
@@ -354,7 +354,7 @@ export class ValidationErrorRecovery {
   ): Promise<T> {
     const strategy = ValidationErrorFactory.getRetryStrategy(errorCode);
     const id = operationId || `op_${Date.now()}`;
-    
+
     if (!strategy) {
       return operation();
     }
@@ -370,7 +370,7 @@ export class ValidationErrorRecovery {
         return result;
       } catch (error) {
         lastError = error as Error;
-        
+
         if (attempt === strategy.maxRetries) {
           this.retryAttempts.delete(id); // Max retries reached, clear count
           throw lastError;
@@ -378,8 +378,11 @@ export class ValidationErrorRecovery {
 
         // Calculate delay with exponential backoff
         const delay = strategy.retryDelay * Math.pow(strategy.backoffMultiplier, attempt);
-        console.warn(`⚠️ Attempt ${attempt + 1}/${strategy.maxRetries + 1} failed, retrying in ${delay}ms:`, error.message);
-        
+        console.warn(
+          `⚠️ Attempt ${attempt + 1}/${strategy.maxRetries + 1} failed, retrying in ${delay}ms:`,
+          error.message
+        );
+
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }

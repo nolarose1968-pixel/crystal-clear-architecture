@@ -275,7 +275,7 @@ export class FinanceSystem {
       validation: this.getValidationStats(),
       audit: this.getAuditStats(),
       notifications: this.getNotificationStats(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -296,9 +296,9 @@ export class FinanceSystem {
         totalAuditEvents: auditStats.totalEvents,
         totalAlerts: notificationStats.totalAlerts,
         unacknowledgedAlerts: notificationStats.unacknowledgedAlerts,
-        criticalAlerts: notificationStats.criticalAlerts
+        criticalAlerts: notificationStats.criticalAlerts,
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -335,7 +335,7 @@ export class FinanceSystem {
           success: false,
           newBalance: currentBalance,
           validation,
-          error: `Validation failed: ${validation.errors.join(', ')}`
+          error: `Validation failed: ${validation.errors.join(', ')}`,
         };
       }
 
@@ -383,22 +383,27 @@ export class FinanceSystem {
         }
       }
 
-      console.log(`✅ Balance change completed: ${customerId} | ${changeType} | $${changeAmount} | New: $${newBalance}`);
+      console.log(
+        `✅ Balance change completed: ${customerId} | ${changeType} | $${changeAmount} | New: $${newBalance}`
+      );
 
       return {
         success: true,
         newBalance,
         validation,
-        auditEvent
+        auditEvent,
       };
-
     } catch (error) {
       console.error(`❌ Balance change failed: ${customerId}`, error);
       return {
         success: false,
         newBalance: currentBalance,
-        validation: { isValid: false, errors: [error instanceof Error ? error.message : 'Unknown error'], warnings: [] },
-        error: error instanceof Error ? error.message : 'Unknown error'
+        validation: {
+          isValid: false,
+          errors: [error instanceof Error ? error.message : 'Unknown error'],
+          warnings: [],
+        },
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }

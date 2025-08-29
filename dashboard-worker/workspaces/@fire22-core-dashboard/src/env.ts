@@ -39,14 +39,14 @@ export function getEnvVarBoolean(name: string, defaultValue?: boolean): boolean 
 
 export function validateRequiredEnvVars(vars: string[]): void {
   const missing: string[] = [];
-  
+
   for (const varName of vars) {
     const value = process.env[varName] || Bun.env[varName];
     if (!value) {
       missing.push(varName);
     }
   }
-  
+
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }

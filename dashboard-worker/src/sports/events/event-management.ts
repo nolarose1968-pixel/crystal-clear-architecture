@@ -13,7 +13,7 @@ import type {
   EventStatus,
   VIPTier,
   RiskLevel,
-  BaseEntity
+  BaseEntity,
 } from '../core/sports-types';
 
 export class EventManagement {
@@ -35,7 +35,7 @@ export class EventManagement {
       updatedAt: new Date(),
       isActive: true,
       createdBy: 'system',
-      updatedBy: 'system'
+      updatedBy: 'system',
     };
 
     this.events.set(event.id, event);
@@ -62,7 +62,7 @@ export class EventManagement {
       ...event,
       ...updates,
       updatedAt: new Date(),
-      updatedBy: 'system'
+      updatedBy: 'system',
     };
 
     this.events.set(eventId, updatedEvent);
@@ -130,9 +130,8 @@ export class EventManagement {
     }
 
     if (filter.dateRange) {
-      events = events.filter(e =>
-        e.startTime >= filter.dateRange!.start &&
-        e.startTime <= filter.dateRange!.end
+      events = events.filter(
+        e => e.startTime >= filter.dateRange!.start && e.startTime <= filter.dateRange!.end
       );
     }
 
@@ -169,7 +168,7 @@ export class EventManagement {
 
     return this.getEventsByFilter({
       status: 'scheduled',
-      dateRange: { start: now, end: future }
+      dateRange: { start: now, end: future },
     });
   }
 
@@ -182,8 +181,8 @@ export class EventManagement {
       metadata: {
         ...this.events.get(eventId)?.metadata,
         statusChangeNotes: notes,
-        statusChangedAt: new Date()
-      }
+        statusChangedAt: new Date(),
+      },
     });
   }
 
@@ -213,20 +212,26 @@ export class EventManagement {
     return this.updateEvent(eventId, {
       status: 'completed',
       endTime: new Date(),
-      score: finalScore ? {
-        homeScore: finalScore.home,
-        awayScore: finalScore.away,
-        homePeriods: [],
-        awayPeriods: [],
-        isFinal: true,
-        winner: finalScore.home > finalScore.away ? 'home' :
-                finalScore.away > finalScore.home ? 'away' : 'tie'
-      } : undefined,
+      score: finalScore
+        ? {
+            homeScore: finalScore.home,
+            awayScore: finalScore.away,
+            homePeriods: [],
+            awayPeriods: [],
+            isFinal: true,
+            winner:
+              finalScore.home > finalScore.away
+                ? 'home'
+                : finalScore.away > finalScore.home
+                  ? 'away'
+                  : 'tie',
+          }
+        : undefined,
       metadata: {
         ...event.metadata,
         completionNotes: 'Event completed successfully',
-        completedAt: new Date()
-      }
+        completedAt: new Date(),
+      },
     });
   }
 
@@ -256,7 +261,7 @@ export class EventManagement {
       byStatus: {} as Record<EventStatus, number>,
       byLeague: {} as Record<LeagueType, number>,
       liveCount: 0,
-      upcomingCount: 0
+      upcomingCount: 0,
     };
 
     events.forEach(event => {
@@ -282,11 +287,12 @@ export class EventManagement {
    */
   searchEvents(query: string): SportsEvent[] {
     const lowercaseQuery = query.toLowerCase();
-    return this.getAllEvents().filter(event =>
-      event.name.toLowerCase().includes(lowercaseQuery) ||
-      event.homeTeam.toLowerCase().includes(lowercaseQuery) ||
-      event.awayTeam.toLowerCase().includes(lowercaseQuery) ||
-      event.league.toLowerCase().includes(lowercaseQuery)
+    return this.getAllEvents().filter(
+      event =>
+        event.name.toLowerCase().includes(lowercaseQuery) ||
+        event.homeTeam.toLowerCase().includes(lowercaseQuery) ||
+        event.awayTeam.toLowerCase().includes(lowercaseQuery) ||
+        event.league.toLowerCase().includes(lowercaseQuery)
     );
   }
 
@@ -306,29 +312,29 @@ export class EventManagement {
         odds: {
           id: 'odds-nfl-001',
           eventId: 'will-be-set',
-          moneyline: { homeWin: 2.10, awayWin: 1.85 },
+          moneyline: { homeWin: 2.1, awayWin: 1.85 },
           spread: { homeSpread: -3.5, homeOdds: 1.95, awaySpread: 3.5, awayOdds: 1.95 },
-          overUnder: { total: 48.5, overOdds: 1.90, underOdds: 1.90 },
+          overUnder: { total: 48.5, overOdds: 1.9, underOdds: 1.9 },
           specialBets: [
             {
               id: 'sb1',
               name: 'First Touchdown',
               description: 'First TD scorer',
               category: 'player_props',
-              odds: 8.50,
+              odds: 8.5,
               riskLevel: 'medium',
               maxBet: 1000,
               minBet: 10,
-              isLive: false
-            }
+              isLive: false,
+            },
           ],
           lastUpdated: new Date(),
           source: 'internal',
           confidence: 85,
-          movement: []
+          movement: [],
         },
         riskLevel: 'medium',
-        vipAccess: ['bronze', 'silver', 'gold', 'platinum', 'diamond']
+        vipAccess: ['bronze', 'silver', 'gold', 'platinum', 'diamond'],
       },
       {
         name: 'NBA Finals',
@@ -342,29 +348,29 @@ export class EventManagement {
           id: 'odds-nba-001',
           eventId: 'will-be-set',
           moneyline: { homeWin: 1.95, awayWin: 2.05 },
-          spread: { homeSpread: -2.0, homeOdds: 1.90, awaySpread: 2.0, awayOdds: 1.90 },
-          overUnder: { total: 220.5, overOdds: 1.90, underOdds: 1.90 },
+          spread: { homeSpread: -2.0, homeOdds: 1.9, awaySpread: 2.0, awayOdds: 1.9 },
+          overUnder: { total: 220.5, overOdds: 1.9, underOdds: 1.9 },
           specialBets: [
             {
               id: 'sb2',
               name: 'Player Points',
               description: 'LeBron 30+ points',
               category: 'player_props',
-              odds: 4.50,
+              odds: 4.5,
               riskLevel: 'medium',
               maxBet: 1500,
               minBet: 20,
-              isLive: false
-            }
+              isLive: false,
+            },
           ],
           lastUpdated: new Date(),
           source: 'internal',
           confidence: 78,
-          movement: []
+          movement: [],
         },
         riskLevel: 'low',
-        vipAccess: ['bronze', 'silver', 'gold', 'platinum', 'diamond']
-      }
+        vipAccess: ['bronze', 'silver', 'gold', 'platinum', 'diamond'],
+      },
     ];
 
     defaultEvents.forEach(eventData => {
@@ -387,8 +393,24 @@ export class EventManagement {
 
   private initializeEventIndex(): void {
     // Initialize index maps for efficient filtering
-    const sports = ['football', 'basketball', 'baseball', 'soccer', 'tennis', 'golf', 'racing', 'esports'];
-    const statuses: EventStatus[] = ['scheduled', 'live', 'completed', 'cancelled', 'postponed', 'suspended'];
+    const sports = [
+      'football',
+      'basketball',
+      'baseball',
+      'soccer',
+      'tennis',
+      'golf',
+      'racing',
+      'esports',
+    ];
+    const statuses: EventStatus[] = [
+      'scheduled',
+      'live',
+      'completed',
+      'cancelled',
+      'postponed',
+      'suspended',
+    ];
 
     sports.forEach(sport => this.eventIndex.set(`sport_${sport}`, new Set()));
     statuses.forEach(status => this.eventIndex.set(`status_${status}`, new Set()));

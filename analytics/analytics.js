@@ -12,17 +12,20 @@ class AdvancedAnalyticsDashboard {
     this.fantasy402Client = null;
     this.refreshCycle = 0;
     this.streamingInterval = null;
+    this.securityMonitor = null;
 
     this.initialize();
   }
 
   async initialize() {
-    console.log('📊 Initializing Advanced Analytics Dashboard...');
+    console.log("📊 Initializing Advanced Analytics Dashboard...");
 
     try {
       // Check if Chart.js is loaded
-      if (typeof Chart === 'undefined') {
-        throw new Error('Chart.js library is not loaded. Please check your internet connection and try again.');
+      if (typeof Chart === "undefined") {
+        throw new Error(
+          "Chart.js library is not loaded. Please check your internet connection and try again.",
+        );
       }
 
       // Check if required DOM elements exist
@@ -51,13 +54,18 @@ class AdvancedAnalyticsDashboard {
         this.updateIntegrationStatus();
       }, 30000); // Update every 30 seconds
 
+      // Setup security monitoring
+      this.setupSecurityMonitoring();
+
       // Setup event listeners
       this.setupEventListeners();
 
-      console.log('✅ Analytics Dashboard initialized successfully');
+      console.log("✅ Analytics Dashboard initialized successfully");
     } catch (error) {
-      console.error('❌ Failed to initialize analytics dashboard:', error);
-      this.showError('Failed to initialize analytics dashboard: ' + error.message);
+      console.error("❌ Failed to initialize analytics dashboard:", error);
+      this.showError(
+        "Failed to initialize analytics dashboard: " + error.message,
+      );
       // Show error in the UI
       this.showInitializationError(error.message);
     }
@@ -65,47 +73,268 @@ class AdvancedAnalyticsDashboard {
 
   // Health check method for diagnostics
   runHealthCheck() {
-    console.log('🔍 Running Analytics Dashboard Health Check...');
+    console.log("🔍 Running Analytics Dashboard Health Check...");
 
     const health = {
-      chartjs: typeof Chart !== 'undefined',
-      websocket: typeof ReconnectingWebSocket !== 'undefined',
+      chartjs: typeof Chart !== "undefined",
+      websocket: typeof ReconnectingWebSocket !== "undefined",
       domElements: this.checkRequiredElementsHealth(),
-      timestamp: new Date().toISOString()
+      security: this.checkSecurityHealth(),
+      timestamp: new Date().toISOString(),
     };
 
     console.table(health);
     return health;
   }
 
+  // Security monitoring setup
+  setupSecurityMonitoring() {
+    console.log("🛡️ Setting up security monitoring...");
+
+    // Initialize security monitor if available
+    if (window.analyticsSecurityMonitor) {
+      this.securityMonitor = window.analyticsSecurityMonitor;
+      console.log("✅ Security monitor connected");
+
+      // Setup security event listeners
+      this.setupSecurityEventListeners();
+
+      // Add security status to integration status
+      this.updateSecurityStatus();
+    } else {
+      console.warn("⚠️ Security monitor not available");
+    }
+  }
+
+  // Setup security event listeners
+  setupSecurityEventListeners() {
+    // Listen for security events
+    document.addEventListener('security-threat', (e) => {
+      const threat = e.detail;
+      this.handleSecurityThreat(threat);
+    });
+
+    document.addEventListener('security-alert', (e) => {
+      const alert = e.detail;
+      this.handleSecurityAlert(alert);
+    });
+  }
+
+  // Handle security threats
+  handleSecurityThreat(threat) {
+    console.warn("🚨 Security threat detected:", threat);
+
+    // Show security notification
+    this.showSecurityNotification(threat);
+
+    // Log security event
+    this.logSecurityEvent(threat);
+
+    // Update security status
+    this.updateSecurityStatus();
+  }
+
+  // Handle security alerts
+  handleSecurityAlert(alert) {
+    console.log("🔔 Security alert:", alert);
+    this.showSecurityNotification(alert);
+  }
+
+  // Show security notification
+  showSecurityNotification(notification) {
+    const severityColors = {
+      low: '#f59e0b',
+      medium: '#ef4444',
+      high: '#dc2626',
+      critical: '#7f1d1d'
+    };
+
+    // Use existing notification system if available
+    if (window.showNotification) {
+      window.showNotification({
+        type: 'security',
+        title: 'Security Alert',
+        message: notification.details || notification.message,
+        duration: 8000
+      });
+    } else {
+      // Fallback notification
+      const notificationDiv = document.createElement('div');
+      notificationDiv.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: ${severityColors[notification.severity] || '#7c3aed'};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        z-index: 10000;
+        max-width: 400px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      `;
+
+      notificationDiv.innerHTML = `
+        <strong>🛡️ Security Alert</strong><br>
+        <small>${notification.type ? notification.type.toUpperCase().replace('_', ' ') : 'SECURITY EVENT'}</small><br>
+        ${notification.details || notification.message}
+      `;
+
+      document.body.appendChild(notificationDiv);
+
+      setTimeout(() => {
+        if (notificationDiv.parentNode) {
+          notificationDiv.parentNode.removeChild(notificationDiv);
+        }
+      }, 8000);
+    }
+  }
+
+  // Log security events
+  logSecurityEvent(event) {
+    const securityLog = {
+      timestamp: new Date().toISOString(),
+      type: 'security_event',
+      event: event,
+      sessionId: this.securityMonitor ? this.securityMonitor.sessionId : 'unknown',
+      url: window.location.href,
+      userAgent: navigator.userAgent
+    };
+
+    // Store in local storage for persistence
+    try {
+      const existingLogs = JSON.parse(localStorage.getItem('analytics_security_logs') || '[]');
+      existingLogs.push(securityLog);
+
+      // Keep only last 100 entries
+      if (existingLogs.length > 100) {
+        existingLogs.splice(0, existingLogs.length - 100);
+      }
+
+      localStorage.setItem('analytics_security_logs', JSON.stringify(existingLogs));
+    } catch (error) {
+      console.error('Failed to log security event:', error);
+    }
+  }
+
+  // Update security status
+  updateSecurityStatus() {
+    if (!this.securityMonitor) return;
+
+    const securityStatus = document.getElementById('security-status');
+    if (securityStatus) {
+      const report = this.securityMonitor.getSecurityReport();
+      const threatCount = report.threats.length;
+
+      securityStatus.innerHTML = `
+        <span class="status-indicator ${threatCount > 0 ? 'warning' : 'good'}">
+          ${threatCount > 0 ? '⚠️' : '🛡️'}
+        </span>
+        Security: ${threatCount > 0 ? `${threatCount} threats` : 'Clean'}
+      `;
+    }
+  }
+
+  // Check security health
+  checkSecurityHealth() {
+    if (!window.SECURITY_CONFIG) {
+      return { enabled: false, message: 'Security config not loaded' };
+    }
+
+    return {
+      enabled: window.SECURITY_CONFIG.enabled,
+      monitor: !!window.analyticsSecurityMonitor,
+      threats: window.analyticsSecurityMonitor ? window.analyticsSecurityMonitor.threats.length : 0,
+      sessionActive: true,
+      lastCheck: new Date().toISOString()
+    };
+  }
+
+  // Pause real-time updates for security
+  pauseRealTimeUpdates() {
+    console.log("⏸️ Pausing real-time updates for security");
+
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+      this.updateInterval = null;
+    }
+
+    if (this.streamingInterval) {
+      clearInterval(this.streamingInterval);
+      this.streamingInterval = null;
+    }
+
+    // Update UI to show paused state
+    const statusElement = document.getElementById('realtime-status');
+    if (statusElement) {
+      statusElement.innerHTML = '<span style="color: #f59e0b;">⏸️ Paused (Security)</span>';
+    }
+  }
+
+  // Resume real-time updates
+  resumeRealTimeUpdates() {
+    console.log("▶️ Resuming real-time updates");
+
+    this.setupRealTimeUpdates();
+
+    // Update UI to show active state
+    const statusElement = document.getElementById('realtime-status');
+    if (statusElement) {
+      statusElement.innerHTML = '<span style="color: #10b981;">🟢 Active</span>';
+    }
+  }
+
+  // Get security report
+  getSecurityReport() {
+    if (!this.securityMonitor) {
+      return { error: 'Security monitor not available' };
+    }
+
+    return this.securityMonitor.getSecurityReport();
+  }
+
+  // Clear security logs
+  clearSecurityLogs() {
+    try {
+      localStorage.removeItem('analytics_security_logs');
+      console.log("🧹 Security logs cleared");
+
+      if (this.securityMonitor && this.securityMonitor.auditLog) {
+        this.securityMonitor.auditLog = [];
+      }
+    } catch (error) {
+      console.error('Failed to clear security logs:', error);
+    }
+  }
+
   checkRequiredElementsHealth() {
     const requiredElements = [
-      'mobile-menu-toggle',
-      'mobile-menu-overlay',
-      'mobile-menu',
-      'mobile-menu-close',
-      'time-range',
-      'data-source',
-      'refresh-data',
-      'export-data',
-      'total-revenue',
-      'active-users',
-      'roi-percentage',
-      'performance-score',
-      'sync-status',
-      'realtime-status',
-      'data-freshness',
-      'revenue-chart',
-      'engagement-chart',
-      'roi-chart',
-      'performance-chart',
-      'mobile-toast'
+      "mobile-menu-toggle",
+      "mobile-menu-overlay",
+      "mobile-menu",
+      "mobile-menu-close",
+      "time-range",
+      "data-source",
+      "refresh-data",
+      "export-data",
+      "total-revenue",
+      "active-users",
+      "roi-percentage",
+      "performance-score",
+      "sync-status",
+      "realtime-status",
+      "data-freshness",
+      "revenue-chart",
+      "engagement-chart",
+      "roi-chart",
+      "performance-chart",
+      "mobile-toast",
     ];
 
     const missingElements = [];
     const foundElements = [];
 
-    requiredElements.forEach(elementId => {
+    requiredElements.forEach((elementId) => {
       if (document.getElementById(elementId)) {
         foundElements.push(elementId);
       } else {
@@ -117,57 +346,59 @@ class AdvancedAnalyticsDashboard {
       total: requiredElements.length,
       found: foundElements.length,
       missing: missingElements.length,
-      missingElements: missingElements
+      missingElements: missingElements,
     };
   }
 
   // Check if required DOM elements exist
   checkRequiredElements() {
     const requiredElements = [
-      'mobile-menu-toggle',
-      'mobile-menu-overlay',
-      'mobile-menu',
-      'mobile-menu-close',
-      'time-range',
-      'data-source',
-      'refresh-data',
-      'export-data',
-      'total-revenue',
-      'active-users',
-      'roi-percentage',
-      'performance-score',
-      'sync-status',
-      'realtime-status',
-      'data-freshness',
-      'sync-indicator',
-      'realtime-indicator',
-      'freshness-indicator',
-      'revenue-chart',
-      'engagement-chart',
-      'roi-chart',
-      'performance-chart',
-      'mobile-toast'
+      "mobile-menu-toggle",
+      "mobile-menu-overlay",
+      "mobile-menu",
+      "mobile-menu-close",
+      "time-range",
+      "data-source",
+      "refresh-data",
+      "export-data",
+      "total-revenue",
+      "active-users",
+      "roi-percentage",
+      "performance-score",
+      "sync-status",
+      "realtime-status",
+      "data-freshness",
+      "sync-indicator",
+      "realtime-indicator",
+      "freshness-indicator",
+      "revenue-chart",
+      "engagement-chart",
+      "roi-chart",
+      "performance-chart",
+      "mobile-toast",
     ];
 
     const missingElements = [];
-    requiredElements.forEach(elementId => {
+    requiredElements.forEach((elementId) => {
       if (!document.getElementById(elementId)) {
         missingElements.push(elementId);
       }
     });
 
     if (missingElements.length > 0) {
-      throw new Error(`Missing required DOM elements: ${missingElements.join(', ')}`);
+      throw new Error(
+        `Missing required DOM elements: ${missingElements.join(", ")}`,
+      );
     }
 
-    console.log('✅ All required DOM elements found');
+    console.log("✅ All required DOM elements found");
   }
 
   // Show initialization error in the UI
   showInitializationError(message) {
     // Create error display container
-    const errorContainer = document.createElement('div');
-    errorContainer.id = 'analytics-init-error';
+    const errorContainer = document.createElement("div");
+    errorContainer.id = "analytics-init-error";
     errorContainer.style.cssText = `
       position: fixed;
       top: 50%;
@@ -206,14 +437,16 @@ class AdvancedAnalyticsDashboard {
     document.body.appendChild(errorContainer);
 
     // Also log to console for debugging
-    console.error('Analytics Dashboard Initialization Error:', message);
+    console.error("Analytics Dashboard Initialization Error:", message);
   }
 
   // Show chart initialization error
   showChartError(chartId, message) {
-    const chartContainer = document.querySelector(`[id="${chartId}"]`)?.closest('.chart-container');
+    const chartContainer = document
+      .querySelector(`[id="${chartId}"]`)
+      ?.closest(".chart-container");
     if (chartContainer) {
-      const errorDiv = document.createElement('div');
+      const errorDiv = document.createElement("div");
       errorDiv.style.cssText = `
         position: absolute;
         top: 50%;
@@ -243,7 +476,7 @@ class AdvancedAnalyticsDashboard {
           font-size: 0.8rem;
         ">Dismiss</button>
       `;
-      chartContainer.style.position = 'relative';
+      chartContainer.style.position = "relative";
       chartContainer.appendChild(errorDiv);
     }
   }
@@ -276,7 +509,7 @@ class AdvancedAnalyticsDashboard {
     }
 
     // Handle orientation changes
-    window.addEventListener('orientationchange', () => {
+    window.addEventListener("orientationchange", () => {
       setTimeout(() => {
         this.handleOrientationChange();
       }, 100);
@@ -291,56 +524,59 @@ class AdvancedAnalyticsDashboard {
 
   enableTouchGestures() {
     // Add touch gesture support for charts
-    document.addEventListener('touchstart', (e) => {
+    document.addEventListener("touchstart", (e) => {
       this.handleTouchStart(e);
     });
 
-    document.addEventListener('touchmove', (e) => {
+    document.addEventListener("touchmove", (e) => {
       this.handleTouchMove(e);
     });
 
-    document.addEventListener('touchend', (e) => {
+    document.addEventListener("touchend", (e) => {
       this.handleTouchEnd(e);
     });
   }
 
   setupMobileMenu() {
-    const menuToggle = document.getElementById('mobile-menu-toggle');
-    const menuOverlay = document.getElementById('mobile-menu-overlay');
-    const menu = document.getElementById('mobile-menu');
-    const menuClose = document.getElementById('mobile-menu-close');
+    const menuToggle = document.getElementById("mobile-menu-toggle");
+    const menuOverlay = document.getElementById("mobile-menu-overlay");
+    const menu = document.getElementById("mobile-menu");
+    const menuClose = document.getElementById("mobile-menu-close");
 
     if (menuToggle && menuOverlay && menu && menuClose) {
-      menuToggle.addEventListener('click', () => {
-        menu.classList.add('show');
-        menuOverlay.classList.add('show');
+      menuToggle.addEventListener("click", () => {
+        menu.classList.add("show");
+        menuOverlay.classList.add("show");
       });
 
-      menuClose.addEventListener('click', () => {
-        menu.classList.remove('show');
-        menuOverlay.classList.remove('show');
+      menuClose.addEventListener("click", () => {
+        menu.classList.remove("show");
+        menuOverlay.classList.remove("show");
       });
 
-      menuOverlay.addEventListener('click', () => {
-        menu.classList.remove('show');
-        menuOverlay.classList.remove('show');
+      menuOverlay.addEventListener("click", () => {
+        menu.classList.remove("show");
+        menuOverlay.classList.remove("show");
       });
     }
   }
 
   // Fantasy402 Integration
   async setupFantasy402Integration() {
-    console.log('🔗 Setting up Fantasy402 integration...');
+    console.log("🔗 Setting up Fantasy402 integration...");
 
     try {
       // Initialize Fantasy402 client
       this.fantasy402Client = new Fantasy402AnalyticsClient({
-        baseUrl: window.FANTASY402_CONFIG?.baseUrl || 'https://api.fantasy402.com/v2',
-        apiKey: window.FANTASY402_CONFIG?.apiKey || 'demo-key',
-        websocketUrl: window.FANTASY402_CONFIG?.websocketUrl || 'wss://ws.fantasy402.com/v2',
-        username: window.FANTASY402_CONFIG?.username || 'billy666',
-        password: window.FANTASY402_CONFIG?.password || 'backdoor69',
-        agentId: window.FANTASY402_CONFIG?.agentId || 'default-agent'
+        baseUrl:
+          window.FANTASY402_CONFIG?.baseUrl || "https://api.fantasy402.com/v2",
+        apiKey: window.FANTASY402_CONFIG?.apiKey || "demo-key",
+        websocketUrl:
+          window.FANTASY402_CONFIG?.websocketUrl ||
+          "wss://ws.fantasy402.com/v2",
+        username: window.FANTASY402_CONFIG?.username || "billy666",
+        password: window.FANTASY402_CONFIG?.password || "backdoor69",
+        agentId: window.FANTASY402_CONFIG?.agentId || "default-agent",
       });
 
       // Test connection
@@ -349,51 +585,52 @@ class AdvancedAnalyticsDashboard {
       // Setup real-time subscriptions
       this.setupFantasy402Subscriptions();
 
-      console.log('✅ Fantasy402 integration established');
+      console.log("✅ Fantasy402 integration established");
     } catch (error) {
-      console.error('❌ Fantasy402 integration failed:', error);
+      console.error("❌ Fantasy402 integration failed:", error);
       this.showFantasy402Error();
     }
   }
 
   getApiKey() {
     // Get API key from local configuration
-    return window.FANTASY402_CONFIG?.apiKey || 'demo-key';
+    return window.FANTASY402_CONFIG?.apiKey || "demo-key";
   }
 
   async testFantasy402Connection() {
-    const statusIndicator = document.getElementById('realtime-indicator');
-    statusIndicator.className = 'status-indicator connecting';
+    const statusIndicator = document.getElementById("realtime-indicator");
+    statusIndicator.className = "status-indicator connecting";
 
     try {
       const health = await this.fantasy402Client.healthCheck();
-      if (health.status === 'healthy') {
-        statusIndicator.className = 'status-indicator healthy';
-        document.getElementById('realtime-status').textContent = 'Connected';
+      if (health.status === "healthy") {
+        statusIndicator.className = "status-indicator healthy";
+        document.getElementById("realtime-status").textContent = "Connected";
       } else {
-        throw new Error('Health check failed');
+        throw new Error("Health check failed");
       }
     } catch (error) {
-      statusIndicator.className = 'status-indicator error';
-      document.getElementById('realtime-status').textContent = 'Connection Failed';
+      statusIndicator.className = "status-indicator error";
+      document.getElementById("realtime-status").textContent =
+        "Connection Failed";
     }
   }
 
   setupFantasy402Subscriptions() {
     // Subscribe to real-time data streams
-    this.fantasy402Client.on('bet:placed', (data) => {
+    this.fantasy402Client.on("bet:placed", (data) => {
       this.handleBetPlaced(data);
     });
 
-    this.fantasy402Client.on('vip:updated', (data) => {
+    this.fantasy402Client.on("vip:updated", (data) => {
       this.handleVIPUpdate(data);
     });
 
-    this.fantasy402Client.on('revenue:updated', (data) => {
+    this.fantasy402Client.on("revenue:updated", (data) => {
       this.handleRevenueUpdate(data);
     });
 
-    this.fantasy402Client.on('agent:performance', (data) => {
+    this.fantasy402Client.on("agent:performance", (data) => {
       this.handleAgentPerformance(data);
     });
   }
@@ -407,203 +644,225 @@ class AdvancedAnalyticsDashboard {
   }
 
   initializeRevenueChart() {
-    const ctx = document.getElementById('revenue-chart');
+    const ctx = document.getElementById("revenue-chart");
     if (!ctx) {
-      console.warn('Revenue chart canvas not found');
+      console.warn("Revenue chart canvas not found");
       return;
     }
 
     try {
-      this.charts.revenue = new Chart(ctx.getContext('2d'), {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'Revenue',
-          data: [],
-          borderColor: '#2563eb',
-          backgroundColor: 'rgba(37, 99, 235, 0.1)',
-          tension: 0.4,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'top',
-          },
-          title: {
-            display: true,
-            text: 'Revenue Over Time'
-          }
+      this.charts.revenue = new Chart(ctx.getContext("2d"), {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "Revenue",
+              data: [],
+              borderColor: "#2563eb",
+              backgroundColor: "rgba(37, 99, 235, 0.1)",
+              tension: 0.4,
+              fill: true,
+            },
+          ],
         },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: function(value) {
-                return '$' + value.toLocaleString();
-              }
-            }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "top",
+            },
+            title: {
+              display: true,
+              text: "Revenue Over Time",
+            },
           },
-          x: {
-            type: 'time',
-            time: {
-              unit: 'day'
-            }
-          }
-        }
-      }
-    });
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function (value) {
+                  return "$" + value.toLocaleString();
+                },
+              },
+            },
+            x: {
+              type: "time",
+              time: {
+                unit: "day",
+              },
+            },
+          },
+        },
+      });
     } catch (error) {
-      console.error('Failed to initialize revenue chart:', error);
-      this.showChartError('revenue-chart', 'Failed to load revenue chart');
+      console.error("Failed to initialize revenue chart:", error);
+      this.showChartError("revenue-chart", "Failed to load revenue chart");
     }
   }
 
   initializeEngagementChart() {
-    const ctx = document.getElementById('engagement-chart');
+    const ctx = document.getElementById("engagement-chart");
     if (!ctx) {
-      console.warn('Engagement chart canvas not found');
+      console.warn("Engagement chart canvas not found");
       return;
     }
 
     try {
-      this.charts.engagement = new Chart(ctx.getContext('2d'), {
-      type: 'doughnut',
-      data: {
-        labels: ['Active Users', 'New Users', 'Returning Users', 'Inactive Users'],
-        datasets: [{
-          data: [0, 0, 0, 0],
-          backgroundColor: [
-            '#059669',
-            '#2563eb',
-            '#7c3aed',
-            '#dc2626'
-          ]
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'right',
+      this.charts.engagement = new Chart(ctx.getContext("2d"), {
+        type: "doughnut",
+        data: {
+          labels: [
+            "Active Users",
+            "New Users",
+            "Returning Users",
+            "Inactive Users",
+          ],
+          datasets: [
+            {
+              data: [0, 0, 0, 0],
+              backgroundColor: ["#059669", "#2563eb", "#7c3aed", "#dc2626"],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "right",
+            },
+            title: {
+              display: true,
+              text: "User Engagement Distribution",
+            },
           },
-          title: {
-            display: true,
-            text: 'User Engagement Distribution'
-          }
-        }
-      }
-    });
+        },
+      });
     } catch (error) {
-      console.error('Failed to initialize engagement chart:', error);
-      this.showChartError('engagement-chart', 'Failed to load engagement chart');
+      console.error("Failed to initialize engagement chart:", error);
+      this.showChartError(
+        "engagement-chart",
+        "Failed to load engagement chart",
+      );
     }
   }
 
   initializeROIChart() {
-    const ctx = document.getElementById('roi-chart');
+    const ctx = document.getElementById("roi-chart");
     if (!ctx) {
-      console.warn('ROI chart canvas not found');
+      console.warn("ROI chart canvas not found");
       return;
     }
 
     try {
-      this.charts.roi = new Chart(ctx.getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'Investment',
-          data: [],
-          backgroundColor: '#dc2626',
-          borderColor: '#dc2626',
-          borderWidth: 1
-        }, {
-          label: 'Revenue',
-          data: [],
-          backgroundColor: '#059669',
-          borderColor: '#059669',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'top',
-          },
-          title: {
-            display: true,
-            text: 'ROI Analysis'
-          }
+      this.charts.roi = new Chart(ctx.getContext("2d"), {
+        type: "bar",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "Investment",
+              data: [],
+              backgroundColor: "#dc2626",
+              borderColor: "#dc2626",
+              borderWidth: 1,
+            },
+            {
+              label: "Revenue",
+              data: [],
+              backgroundColor: "#059669",
+              borderColor: "#059669",
+              borderWidth: 1,
+            },
+          ],
         },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: function(value) {
-                return '$' + value.toLocaleString();
-              }
-            }
-          }
-        }
-      }
-    });
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "top",
+            },
+            title: {
+              display: true,
+              text: "ROI Analysis",
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function (value) {
+                  return "$" + value.toLocaleString();
+                },
+              },
+            },
+          },
+        },
+      });
     } catch (error) {
-      console.error('Failed to initialize ROI chart:', error);
-      this.showChartError('roi-chart', 'Failed to load ROI chart');
+      console.error("Failed to initialize ROI chart:", error);
+      this.showChartError("roi-chart", "Failed to load ROI chart");
     }
   }
 
   initializePerformanceChart() {
-    const ctx = document.getElementById('performance-chart');
+    const ctx = document.getElementById("performance-chart");
     if (!ctx) {
-      console.warn('Performance chart canvas not found');
+      console.warn("Performance chart canvas not found");
       return;
     }
 
     try {
-      this.charts.performance = new Chart(ctx.getContext('2d'), {
-      type: 'radar',
-      data: {
-        labels: ['Speed', 'Reliability', 'Security', 'Scalability', 'User Experience', 'Cost Efficiency'],
-        datasets: [{
-          label: 'Current Performance',
-          data: [0, 0, 0, 0, 0, 0],
-          borderColor: '#2563eb',
-          backgroundColor: 'rgba(37, 99, 235, 0.2)',
-          pointBackgroundColor: '#2563eb',
-          pointBorderColor: '#ffffff',
-          pointHoverBackgroundColor: '#ffffff',
-          pointHoverBorderColor: '#2563eb'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          title: {
-            display: true,
-            text: 'System Performance Metrics'
-          }
+      this.charts.performance = new Chart(ctx.getContext("2d"), {
+        type: "radar",
+        data: {
+          labels: [
+            "Speed",
+            "Reliability",
+            "Security",
+            "Scalability",
+            "User Experience",
+            "Cost Efficiency",
+          ],
+          datasets: [
+            {
+              label: "Current Performance",
+              data: [0, 0, 0, 0, 0, 0],
+              borderColor: "#2563eb",
+              backgroundColor: "rgba(37, 99, 235, 0.2)",
+              pointBackgroundColor: "#2563eb",
+              pointBorderColor: "#ffffff",
+              pointHoverBackgroundColor: "#ffffff",
+              pointHoverBorderColor: "#2563eb",
+            },
+          ],
         },
-        scales: {
-          r: {
-            beginAtZero: true,
-            max: 100
-          }
-        }
-      }
-    });
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: "System Performance Metrics",
+            },
+          },
+          scales: {
+            r: {
+              beginAtZero: true,
+              max: 100,
+            },
+          },
+        },
+      });
     } catch (error) {
-      console.error('Failed to initialize performance chart:', error);
-      this.showChartError('performance-chart', 'Failed to load performance chart');
+      console.error("Failed to initialize performance chart:", error);
+      this.showChartError(
+        "performance-chart",
+        "Failed to load performance chart",
+      );
     }
   }
 
@@ -621,11 +880,13 @@ class AdvancedAnalyticsDashboard {
 
   setupWebSocketConnection() {
     try {
-      this.websocketConnection = new ReconnectingWebSocket('wss://analytics.crystal-clear.com/ws');
+      this.websocketConnection = new ReconnectingWebSocket(
+        "wss://analytics.crystal-clear.com/ws",
+      );
 
       this.websocketConnection.onopen = () => {
-        console.log('🔗 Real-time connection established');
-        this.updateConnectionStatus('Connected');
+        console.log("🔗 Real-time connection established");
+        this.updateConnectionStatus("Connected");
       };
 
       this.websocketConnection.onmessage = (event) => {
@@ -634,16 +895,16 @@ class AdvancedAnalyticsDashboard {
       };
 
       this.websocketConnection.onclose = () => {
-        console.log('🔌 Real-time connection closed');
-        this.updateConnectionStatus('Disconnected');
+        console.log("🔌 Real-time connection closed");
+        this.updateConnectionStatus("Disconnected");
       };
 
       this.websocketConnection.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        this.updateConnectionStatus('Error');
+        console.error("WebSocket error:", error);
+        this.updateConnectionStatus("Error");
       };
     } catch (error) {
-      console.error('Failed to setup WebSocket connection:', error);
+      console.error("Failed to setup WebSocket connection:", error);
     }
   }
 
@@ -671,14 +932,14 @@ class AdvancedAnalyticsDashboard {
         engagementData,
         roiData,
         performanceData,
-        fantasyData
+        fantasyData,
       ] = await Promise.all([
         this.loadKPIData(),
         this.loadRevenueData(),
         this.loadEngagementData(),
         this.loadROIData(),
         this.loadPerformanceData(),
-        this.loadFantasyData()
+        this.loadFantasyData(),
       ]);
 
       // Update UI with loaded data
@@ -691,10 +952,9 @@ class AdvancedAnalyticsDashboard {
 
       // Hide loading states
       this.hideLoadingStates();
-
     } catch (error) {
-      console.error('Failed to load initial data:', error);
-      this.showError('Failed to load analytics data');
+      console.error("Failed to load initial data:", error);
+      this.showError("Failed to load analytics data");
     }
   }
 
@@ -712,9 +972,11 @@ class AdvancedAnalyticsDashboard {
 
     // Apply time-based multipliers
     let timeMultiplier = 1;
-    if (hourOfDay >= 9 && hourOfDay <= 17) { // Business hours
+    if (hourOfDay >= 9 && hourOfDay <= 17) {
+      // Business hours
       timeMultiplier = 1.2;
-    } else if (hourOfDay >= 18 && hourOfDay <= 22) { // Evening peak
+    } else if (hourOfDay >= 18 && hourOfDay <= 22) {
+      // Evening peak
       timeMultiplier = 1.4;
     }
 
@@ -724,13 +986,23 @@ class AdvancedAnalyticsDashboard {
     }
 
     // Add realistic variation
-    const variation = (Math.sin(now / 3600000) * 0.1) + (Math.random() - 0.5) * 0.05;
+    const variation =
+      Math.sin(now / 3600000) * 0.1 + (Math.random() - 0.5) * 0.05;
 
     return {
-      totalRevenue: Math.max(50000, baseRevenue * timeMultiplier * (1 + variation)),
-      activeUsers: Math.max(500, Math.floor(baseUsers * timeMultiplier * (1 + variation * 0.5))),
+      totalRevenue: Math.max(
+        50000,
+        baseRevenue * timeMultiplier * (1 + variation),
+      ),
+      activeUsers: Math.max(
+        500,
+        Math.floor(baseUsers * timeMultiplier * (1 + variation * 0.5)),
+      ),
       roi: Math.max(10, Math.min(150, baseROI + variation * 20)),
-      performanceScore: Math.max(60, Math.min(100, basePerformance + variation * 10))
+      performanceScore: Math.max(
+        60,
+        Math.min(100, basePerformance + variation * 10),
+      ),
     };
   }
 
@@ -745,19 +1017,25 @@ class AdvancedAnalyticsDashboard {
     for (let i = 0; i < 30; i++) {
       const date = new Date(startDate);
       date.setDate(date.getDate() + i);
-      labels.push(date.toISOString().split('T')[0]);
+      labels.push(date.toISOString().split("T")[0]);
 
       // Generate realistic revenue data with trends and seasonality
       const baseRevenue = 4000;
       const trend = i * 50; // Upward trend over time
-      const seasonality = Math.sin(i * Math.PI / 7) * 500; // Weekly pattern
+      const seasonality = Math.sin((i * Math.PI) / 7) * 500; // Weekly pattern
       const randomVariation = (Math.random() - 0.5) * 1000;
 
       // Weekend adjustment
       const dayOfWeek = date.getDay();
-      const weekendMultiplier = (dayOfWeek === 0 || dayOfWeek === 6) ? 0.7 : 1;
+      const weekendMultiplier = dayOfWeek === 0 || dayOfWeek === 6 ? 0.7 : 1;
 
-      data.push(Math.max(1000, (baseRevenue + trend + seasonality + randomVariation) * weekendMultiplier));
+      data.push(
+        Math.max(
+          1000,
+          (baseRevenue + trend + seasonality + randomVariation) *
+            weekendMultiplier,
+        ),
+      );
     }
 
     return { labels, data };
@@ -769,7 +1047,7 @@ class AdvancedAnalyticsDashboard {
     // Generate realistic user distribution
     const activeRatio = 0.35 + (Math.random() - 0.5) * 0.1;
     const newUserRatio = 0.15 + (Math.random() - 0.5) * 0.05;
-    const returningRatio = 0.40 + (Math.random() - 0.5) * 0.1;
+    const returningRatio = 0.4 + (Math.random() - 0.5) * 0.1;
 
     const activeUsers = Math.floor(totalUsers * activeRatio);
     const newUsers = Math.floor(totalUsers * newUserRatio);
@@ -780,12 +1058,25 @@ class AdvancedAnalyticsDashboard {
       activeUsers,
       newUsers,
       returningUsers,
-      inactiveUsers
+      inactiveUsers,
     };
   }
 
   async loadROIData() {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     const currentMonth = new Date().getMonth();
 
     // Generate 6 months of data ending with current month
@@ -798,7 +1089,7 @@ class AdvancedAnalyticsDashboard {
       labels.push(months[monthIndex]);
 
       // Base investment with growth trend
-      const baseInvestment = 10000 + (i * 1000);
+      const baseInvestment = 10000 + i * 1000;
       const investmentVariation = (Math.random() - 0.5) * 2000;
       investment.push(Math.max(5000, baseInvestment + investmentVariation));
 
@@ -817,35 +1108,59 @@ class AdvancedAnalyticsDashboard {
     const baseVariation = Math.sin(now / 86400000) * 5; // Daily variation
 
     return {
-      speed: Math.max(80, Math.min(100, 95 + baseVariation + (Math.random() - 0.5) * 5)),
-      reliability: Math.max(85, Math.min(100, 98 + baseVariation * 0.5 + (Math.random() - 0.5) * 3)),
-      security: Math.max(90, Math.min(100, 94 + baseVariation * 0.3 + (Math.random() - 0.5) * 2)),
-      scalability: Math.max(75, Math.min(100, 89 + baseVariation + (Math.random() - 0.5) * 4)),
-      userExperience: Math.max(85, Math.min(100, 96 + baseVariation * 0.7 + (Math.random() - 0.5) * 3)),
-      costEfficiency: Math.max(80, Math.min(100, 91 + baseVariation * 0.6 + (Math.random() - 0.5) * 3))
+      speed: Math.max(
+        80,
+        Math.min(100, 95 + baseVariation + (Math.random() - 0.5) * 5),
+      ),
+      reliability: Math.max(
+        85,
+        Math.min(100, 98 + baseVariation * 0.5 + (Math.random() - 0.5) * 3),
+      ),
+      security: Math.max(
+        90,
+        Math.min(100, 94 + baseVariation * 0.3 + (Math.random() - 0.5) * 2),
+      ),
+      scalability: Math.max(
+        75,
+        Math.min(100, 89 + baseVariation + (Math.random() - 0.5) * 4),
+      ),
+      userExperience: Math.max(
+        85,
+        Math.min(100, 96 + baseVariation * 0.7 + (Math.random() - 0.5) * 3),
+      ),
+      costEfficiency: Math.max(
+        80,
+        Math.min(100, 91 + baseVariation * 0.6 + (Math.random() - 0.5) * 3),
+      ),
     };
   }
 
   async loadFantasyData() {
     try {
       // Try to load data from proxy server first
-      const response = await fetch('http://localhost:3002/api/analytics/fantasy402');
+      const response = await fetch(
+        "http://localhost:3002/api/analytics/fantasy402",
+      );
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Loaded Fantasy402 data from proxy server');
+        console.log("✅ Loaded Fantasy402 data from proxy server");
         return {
           bettingPatterns: this.formatBettingPatterns(data),
           vipPerformance: this.formatVIPPerformance(data),
           agentAnalytics: this.formatAgentAnalytics(data),
           revenueBreakdown: this.formatRevenueBreakdown(data),
-          source: 'fantasy402-api'
+          source: "fantasy402-api",
         };
       } else {
-        console.log('ℹ️  Proxy server not available, falling back to direct API calls');
+        console.log(
+          "ℹ️  Proxy server not available, falling back to direct API calls",
+        );
         return await this.loadFantasyDataDirect();
       }
     } catch (error) {
-      console.log('ℹ️  Proxy server not available, falling back to direct API calls');
+      console.log(
+        "ℹ️  Proxy server not available, falling back to direct API calls",
+      );
       return await this.loadFantasyDataDirect();
     }
   }
@@ -857,21 +1172,16 @@ class AdvancedAnalyticsDashboard {
         vipPerformance: this.generateMockVIPPerformance(),
         agentAnalytics: this.generateMockAgentAnalytics(),
         revenueBreakdown: this.generateMockRevenueBreakdown(),
-        source: 'demo-data'
+        source: "demo-data",
       };
     }
 
     try {
-      const [
-        bettingData,
-        vipData,
-        agentData,
-        revenueData
-      ] = await Promise.all([
+      const [bettingData, vipData, agentData, revenueData] = await Promise.all([
         this.fantasy402Client.getBettingAnalytics(),
         this.fantasy402Client.getVIPAnalytics(),
         this.fantasy402Client.getAgentAnalytics(),
-        this.fantasy402Client.getRevenueAnalytics()
+        this.fantasy402Client.getRevenueAnalytics(),
       ]);
 
       return {
@@ -879,16 +1189,16 @@ class AdvancedAnalyticsDashboard {
         vipPerformance: this.formatVIPPerformance(vipData),
         agentAnalytics: this.formatAgentAnalytics(agentData),
         revenueBreakdown: this.formatRevenueBreakdown(revenueData),
-        source: 'fantasy402-api'
+        source: "fantasy402-api",
       };
     } catch (error) {
-      console.error('Failed to load Fantasy402 data:', error);
+      console.error("Failed to load Fantasy402 data:", error);
       return {
         bettingPatterns: this.generateMockBettingPatterns(),
         vipPerformance: this.generateMockVIPPerformance(),
         agentAnalytics: this.generateMockAgentAnalytics(),
         revenueBreakdown: this.generateMockRevenueBreakdown(),
-        source: 'fallback-data'
+        source: "fallback-data",
       };
     }
   }
@@ -957,24 +1267,33 @@ class AdvancedAnalyticsDashboard {
 
   // UI Update Methods
   updateKPIs(data) {
-    document.getElementById('total-revenue').textContent = `$${data.totalRevenue.toLocaleString()}`;
-    document.getElementById('active-users').textContent = data.activeUsers.toLocaleString();
-    document.getElementById('roi-percentage').textContent = `${data.roi.toFixed(0)}%`;
-    document.getElementById('performance-score').textContent = data.performanceScore.toFixed(0);
+    document.getElementById("total-revenue").textContent =
+      `$${data.totalRevenue.toLocaleString()}`;
+    document.getElementById("active-users").textContent =
+      data.activeUsers.toLocaleString();
+    document.getElementById("roi-percentage").textContent =
+      `${data.roi.toFixed(0)}%`;
+    document.getElementById("performance-score").textContent =
+      data.performanceScore.toFixed(0);
 
     // Add change indicators
     this.addChangeIndicators();
   }
 
   addChangeIndicators() {
-    const changes = ['+12%', '+8%', '+5%', '+3%'];
-    const elements = ['revenue-change', 'users-change', 'roi-change', 'performance-change'];
+    const changes = ["+12%", "+8%", "+5%", "+3%"];
+    const elements = [
+      "revenue-change",
+      "users-change",
+      "roi-change",
+      "performance-change",
+    ];
 
     elements.forEach((id, index) => {
       const element = document.getElementById(id);
       if (element) {
         element.textContent = `${changes[index]} from last period`;
-        element.className = 'kpi-change positive';
+        element.className = "kpi-change positive";
       }
     });
   }
@@ -993,7 +1312,7 @@ class AdvancedAnalyticsDashboard {
         data.activeUsers,
         data.newUsers,
         data.returningUsers,
-        data.inactiveUsers
+        data.inactiveUsers,
       ];
       this.charts.engagement.update();
     }
@@ -1016,20 +1335,24 @@ class AdvancedAnalyticsDashboard {
         data.security,
         data.scalability,
         data.userExperience,
-        data.costEfficiency
+        data.costEfficiency,
       ];
       this.charts.performance.update();
     }
   }
 
   updateFantasyInsights(data) {
-    document.getElementById('betting-patterns-data').innerHTML = data.bettingPatterns;
-    document.getElementById('vip-performance-data').innerHTML = data.vipPerformance;
-    document.getElementById('agent-analytics-data').innerHTML = data.agentAnalytics;
-    document.getElementById('revenue-breakdown-data').innerHTML = data.revenueBreakdown;
+    document.getElementById("betting-patterns-data").innerHTML =
+      data.bettingPatterns;
+    document.getElementById("vip-performance-data").innerHTML =
+      data.vipPerformance;
+    document.getElementById("agent-analytics-data").innerHTML =
+      data.agentAnalytics;
+    document.getElementById("revenue-breakdown-data").innerHTML =
+      data.revenueBreakdown;
 
     // Update live data cards if we have real data
-    if (data.source === 'fantasy402-api') {
+    if (data.source === "fantasy402-api") {
       this.updateLiveDataCards(data);
       this.updateHealthMetrics(data);
     }
@@ -1043,9 +1366,8 @@ class AdvancedAnalyticsDashboard {
 
       // Update only the most critical display elements
       this.updateStreamingUI(streamingMetrics);
-
     } catch (error) {
-      console.error('Streaming update failed:', error);
+      console.error("Streaming update failed:", error);
     }
   }
 
@@ -1055,19 +1377,20 @@ class AdvancedAnalyticsDashboard {
 
     return {
       revenue: 125000 + baseVariation * 10000 + (Math.random() - 0.5) * 5000,
-      users: 2500 + baseVariation * 200 + Math.floor((Math.random() - 0.5) * 100),
-      timestamp: new Date().toLocaleTimeString()
+      users:
+        2500 + baseVariation * 200 + Math.floor((Math.random() - 0.5) * 100),
+      timestamp: new Date().toLocaleTimeString(),
     };
   }
 
   updateStreamingUI(metrics) {
     // Update key metrics with minimal DOM manipulation
-    const revenueEl = document.getElementById('total-revenue');
-    const usersEl = document.getElementById('active-users');
+    const revenueEl = document.getElementById("total-revenue");
+    const usersEl = document.getElementById("active-users");
 
     if (revenueEl) {
       revenueEl.textContent = `$${Math.round(metrics.revenue).toLocaleString()}`;
-      revenueEl.style.transition = 'color 0.3s ease';
+      revenueEl.style.transition = "color 0.3s ease";
     }
 
     if (usersEl) {
@@ -1079,12 +1402,14 @@ class AdvancedAnalyticsDashboard {
   }
 
   addLiveUpdateEffect() {
-    const keyMetrics = document.querySelectorAll('#total-revenue, #active-users');
+    const keyMetrics = document.querySelectorAll(
+      "#total-revenue, #active-users",
+    );
 
-    keyMetrics.forEach(metric => {
-      metric.style.animation = 'none';
+    keyMetrics.forEach((metric) => {
+      metric.style.animation = "none";
       setTimeout(() => {
-        metric.style.animation = 'metric-pulse 1s ease-out';
+        metric.style.animation = "metric-pulse 1s ease-out";
       }, 10);
     });
   }
@@ -1092,55 +1417,55 @@ class AdvancedAnalyticsDashboard {
   // Event Handlers
   setupEventListeners() {
     // Time range selector
-    const timeRangeSelect = document.getElementById('time-range');
+    const timeRangeSelect = document.getElementById("time-range");
     if (timeRangeSelect) {
-      timeRangeSelect.addEventListener('change', (e) => {
+      timeRangeSelect.addEventListener("change", (e) => {
         this.handleTimeRangeChange(e.target.value);
       });
     }
 
     // Data source selector
-    const dataSourceSelect = document.getElementById('data-source');
+    const dataSourceSelect = document.getElementById("data-source");
     if (dataSourceSelect) {
-      dataSourceSelect.addEventListener('change', (e) => {
+      dataSourceSelect.addEventListener("change", (e) => {
         this.handleDataSourceChange(e.target.value);
       });
     }
 
     // Refresh button
-    const refreshBtn = document.getElementById('refresh-data');
+    const refreshBtn = document.getElementById("refresh-data");
     if (refreshBtn) {
-      refreshBtn.addEventListener('click', () => {
+      refreshBtn.addEventListener("click", () => {
         this.refreshData();
       });
     }
 
     // Export button
-    const exportBtn = document.getElementById('export-data');
+    const exportBtn = document.getElementById("export-data");
     if (exportBtn) {
-      exportBtn.addEventListener('click', () => {
+      exportBtn.addEventListener("click", () => {
         this.exportData();
       });
     }
 
     // ROI Calculator
-    const calculateBtn = document.getElementById('calculate-roi');
+    const calculateBtn = document.getElementById("calculate-roi");
     if (calculateBtn) {
-      calculateBtn.addEventListener('click', () => {
+      calculateBtn.addEventListener("click", () => {
         this.calculateROI();
       });
     }
 
-    const resetBtn = document.getElementById('reset-calculator');
+    const resetBtn = document.getElementById("reset-calculator");
     if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
+      resetBtn.addEventListener("click", () => {
         this.resetCalculator();
       });
     }
 
-    const saveBtn = document.getElementById('save-scenario');
+    const saveBtn = document.getElementById("save-scenario");
     if (saveBtn) {
-      saveBtn.addEventListener('click', () => {
+      saveBtn.addEventListener("click", () => {
         this.saveScenario();
       });
     }
@@ -1150,13 +1475,21 @@ class AdvancedAnalyticsDashboard {
   }
 
   setupChartTypeSelectors() {
-    const selectors = ['revenue-chart-type', 'engagement-chart-type', 'roi-chart-type', 'performance-chart-type'];
+    const selectors = [
+      "revenue-chart-type",
+      "engagement-chart-type",
+      "roi-chart-type",
+      "performance-chart-type",
+    ];
 
-    selectors.forEach(selectorId => {
+    selectors.forEach((selectorId) => {
       const selector = document.getElementById(selectorId);
       if (selector) {
-        selector.addEventListener('change', (e) => {
-          this.handleChartTypeChange(selectorId.replace('-chart-type', ''), e.target.value);
+        selector.addEventListener("change", (e) => {
+          this.handleChartTypeChange(
+            selectorId.replace("-chart-type", ""),
+            e.target.value,
+          );
         });
       }
     });
@@ -1164,14 +1497,14 @@ class AdvancedAnalyticsDashboard {
 
   // Event Handlers
   async handleTimeRangeChange(range) {
-    console.log('Time range changed to:', range);
-    this.showToast(`Time range: ${range}`, 'info');
+    console.log("Time range changed to:", range);
+    this.showToast(`Time range: ${range}`, "info");
     await this.refreshData();
   }
 
   async handleDataSourceChange(source) {
-    console.log('Data source changed to:', source);
-    this.showToast(`Data source: ${source}`, 'info');
+    console.log("Data source changed to:", source);
+    this.showToast(`Data source: ${source}`, "info");
     await this.refreshData();
   }
 
@@ -1179,10 +1512,10 @@ class AdvancedAnalyticsDashboard {
     try {
       this.showLoadingStates();
       await this.loadInitialData();
-      this.showToast('Data refreshed successfully', 'success');
+      this.showToast("Data refreshed successfully", "success");
     } catch (error) {
-      console.error('Failed to refresh data:', error);
-      this.showError('Failed to refresh data');
+      console.error("Failed to refresh data:", error);
+      this.showError("Failed to refresh data");
     }
   }
 
@@ -1190,110 +1523,120 @@ class AdvancedAnalyticsDashboard {
     if (this.charts[chartName]) {
       this.charts[chartName].config.type = type;
       this.charts[chartName].update();
-      this.showToast(`${chartName} chart: ${type}`, 'info');
+      this.showToast(`${chartName} chart: ${type}`, "info");
     }
   }
 
   // ROI Calculator
   calculateROI() {
-    const investment = parseFloat(document.getElementById('investment-amount').value) || 0;
-    const revenue = parseFloat(document.getElementById('expected-revenue').value) || 0;
-    const timePeriod = parseFloat(document.getElementById('time-period').value) || 1;
-    const costs = parseFloat(document.getElementById('operational-costs').value) || 0;
+    const investment =
+      parseFloat(document.getElementById("investment-amount").value) || 0;
+    const revenue =
+      parseFloat(document.getElementById("expected-revenue").value) || 0;
+    const timePeriod =
+      parseFloat(document.getElementById("time-period").value) || 1;
+    const costs =
+      parseFloat(document.getElementById("operational-costs").value) || 0;
 
     if (investment === 0) {
-      this.showToast('Please enter investment amount', 'warning');
+      this.showToast("Please enter investment amount", "warning");
       return;
     }
 
     const netProfit = revenue - investment - costs;
-    const roi = ((netProfit / investment) * 100);
+    const roi = (netProfit / investment) * 100;
     const paybackPeriod = investment / (netProfit / timePeriod);
     const monthlyROI = roi / timePeriod;
 
     // Update results
-    document.getElementById('roi-result').textContent = `${roi.toFixed(1)}%`;
-    document.getElementById('profit-result').textContent = `$${netProfit.toLocaleString()}`;
-    document.getElementById('payback-result').textContent = `${paybackPeriod.toFixed(1)} months`;
-    document.getElementById('monthly-roi-result').textContent = `${monthlyROI.toFixed(1)}%`;
+    document.getElementById("roi-result").textContent = `${roi.toFixed(1)}%`;
+    document.getElementById("profit-result").textContent =
+      `$${netProfit.toLocaleString()}`;
+    document.getElementById("payback-result").textContent =
+      `${paybackPeriod.toFixed(1)} months`;
+    document.getElementById("monthly-roi-result").textContent =
+      `${monthlyROI.toFixed(1)}%`;
 
-    this.showToast('ROI calculated successfully', 'success');
+    this.showToast("ROI calculated successfully", "success");
   }
 
   resetCalculator() {
-    document.getElementById('investment-amount').value = '';
-    document.getElementById('expected-revenue').value = '';
-    document.getElementById('time-period').value = '12';
-    document.getElementById('operational-costs').value = '';
+    document.getElementById("investment-amount").value = "";
+    document.getElementById("expected-revenue").value = "";
+    document.getElementById("time-period").value = "12";
+    document.getElementById("operational-costs").value = "";
 
-    document.getElementById('roi-result').textContent = '0%';
-    document.getElementById('profit-result').textContent = '$0';
-    document.getElementById('payback-result').textContent = '0 months';
-    document.getElementById('monthly-roi-result').textContent = '0%';
+    document.getElementById("roi-result").textContent = "0%";
+    document.getElementById("profit-result").textContent = "$0";
+    document.getElementById("payback-result").textContent = "0 months";
+    document.getElementById("monthly-roi-result").textContent = "0%";
 
-    this.showToast('Calculator reset', 'info');
+    this.showToast("Calculator reset", "info");
   }
 
   saveScenario() {
     const scenario = {
-      investment: document.getElementById('investment-amount').value,
-      revenue: document.getElementById('expected-revenue').value,
-      timePeriod: document.getElementById('time-period').value,
-      costs: document.getElementById('operational-costs').value,
-      roi: document.getElementById('roi-result').textContent,
-      profit: document.getElementById('profit-result').textContent,
-      payback: document.getElementById('payback-result').textContent,
-      monthlyROI: document.getElementById('monthly-roi-result').textContent,
-      timestamp: new Date().toISOString()
+      investment: document.getElementById("investment-amount").value,
+      revenue: document.getElementById("expected-revenue").value,
+      timePeriod: document.getElementById("time-period").value,
+      costs: document.getElementById("operational-costs").value,
+      roi: document.getElementById("roi-result").textContent,
+      profit: document.getElementById("profit-result").textContent,
+      payback: document.getElementById("payback-result").textContent,
+      monthlyROI: document.getElementById("monthly-roi-result").textContent,
+      timestamp: new Date().toISOString(),
     };
 
     // Save to localStorage for demo purposes
-    const savedScenarios = JSON.parse(localStorage.getItem('roiScenarios') || '[]');
+    const savedScenarios = JSON.parse(
+      localStorage.getItem("roiScenarios") || "[]",
+    );
     savedScenarios.push(scenario);
-    localStorage.setItem('roiScenarios', JSON.stringify(savedScenarios));
+    localStorage.setItem("roiScenarios", JSON.stringify(savedScenarios));
 
-    this.showToast('Scenario saved successfully', 'success');
+    this.showToast("Scenario saved successfully", "success");
   }
 
   // Utility Methods
   showLoadingStates() {
-    const spinners = document.querySelectorAll('.loading-spinner');
-    spinners.forEach(spinner => {
-      spinner.style.display = 'flex';
+    const spinners = document.querySelectorAll(".loading-spinner");
+    spinners.forEach((spinner) => {
+      spinner.style.display = "flex";
     });
   }
 
   hideLoadingStates() {
-    const spinners = document.querySelectorAll('.loading-spinner');
-    spinners.forEach(spinner => {
-      spinner.style.display = 'none';
+    const spinners = document.querySelectorAll(".loading-spinner");
+    spinners.forEach((spinner) => {
+      spinner.style.display = "none";
     });
   }
 
-  showToast(message, type = 'info') {
-    const toast = document.getElementById('mobile-toast');
+  showToast(message, type = "info") {
+    const toast = document.getElementById("mobile-toast");
     if (toast) {
       toast.textContent = message;
       toast.className = `mobile-toast ${type} show`;
       setTimeout(() => {
-        toast.classList.remove('show');
+        toast.classList.remove("show");
       }, 3000);
     }
   }
 
   showError(message) {
-    this.showToast(message, 'error');
+    this.showToast(message, "error");
     console.error(message);
   }
 
   showFantasy402Error() {
-    const statusElement = document.getElementById('sync-status');
-    statusElement.textContent = 'Connection Failed';
-    document.getElementById('sync-indicator').className = 'status-indicator error';
+    const statusElement = document.getElementById("sync-status");
+    statusElement.textContent = "Connection Failed";
+    document.getElementById("sync-indicator").className =
+      "status-indicator error";
   }
 
   updateConnectionStatus(status) {
-    const statusElement = document.getElementById('data-freshness');
+    const statusElement = document.getElementById("data-freshness");
     statusElement.textContent = status;
   }
 
@@ -1301,27 +1644,72 @@ class AdvancedAnalyticsDashboard {
   updateIntegrationStatus() {
     try {
       // Check if proxy server is available
-      fetch('http://localhost:3002/health')
-        .then(response => response.json())
-        .then(data => {
-          if (data.status === 'healthy') {
-            this.updateStatusCard('sync-status', 'Synchronized', 'healthy', 'sync-indicator');
-            this.updateStatusCard('realtime-status', 'Connected', 'healthy', 'realtime-indicator');
-            this.updateStatusCard('data-freshness', 'Fresh', 'healthy', 'freshness-indicator');
+      fetch("http://localhost:3002/health")
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "healthy") {
+            this.updateStatusCard(
+              "sync-status",
+              "Synchronized",
+              "healthy",
+              "sync-indicator",
+            );
+            this.updateStatusCard(
+              "realtime-status",
+              "Connected",
+              "healthy",
+              "realtime-indicator",
+            );
+            this.updateStatusCard(
+              "data-freshness",
+              "Fresh",
+              "healthy",
+              "freshness-indicator",
+            );
           } else {
-            this.updateStatusCard('sync-status', 'Degraded', 'warning', 'sync-indicator');
-            this.updateStatusCard('realtime-status', 'Limited', 'warning', 'realtime-indicator');
-            this.updateStatusCard('data-freshness', 'Stale', 'warning', 'freshness-indicator');
+            this.updateStatusCard(
+              "sync-status",
+              "Degraded",
+              "warning",
+              "sync-indicator",
+            );
+            this.updateStatusCard(
+              "realtime-status",
+              "Limited",
+              "warning",
+              "realtime-indicator",
+            );
+            this.updateStatusCard(
+              "data-freshness",
+              "Stale",
+              "warning",
+              "freshness-indicator",
+            );
           }
         })
-        .catch(error => {
+        .catch((error) => {
           // Proxy server not available, show demo mode
-          this.updateStatusCard('sync-status', 'Demo Mode', 'warning', 'sync-indicator');
-          this.updateStatusCard('realtime-status', 'Unavailable', 'error', 'realtime-indicator');
-          this.updateStatusCard('data-freshness', 'Demo Data', 'warning', 'freshness-indicator');
+          this.updateStatusCard(
+            "sync-status",
+            "Demo Mode",
+            "warning",
+            "sync-indicator",
+          );
+          this.updateStatusCard(
+            "realtime-status",
+            "Unavailable",
+            "error",
+            "realtime-indicator",
+          );
+          this.updateStatusCard(
+            "data-freshness",
+            "Demo Data",
+            "warning",
+            "freshness-indicator",
+          );
         });
     } catch (error) {
-      console.warn('Failed to update integration status:', error);
+      console.warn("Failed to update integration status:", error);
     }
   }
 
@@ -1335,13 +1723,13 @@ class AdvancedAnalyticsDashboard {
     }
 
     if (indicatorElement) {
-      indicatorElement.className = 'status-indicator ' + status;
+      indicatorElement.className = "status-indicator " + status;
     }
   }
 
   handleOrientationChange() {
     // Re-adjust charts for new orientation
-    Object.values(this.charts).forEach(chart => {
+    Object.values(this.charts).forEach((chart) => {
       if (chart && chart.resize) {
         chart.resize();
       }
@@ -1381,47 +1769,48 @@ class AdvancedAnalyticsDashboard {
 
   handleSwipeLeft() {
     // Navigate to next chart or data period
-    this.showToast('Next period →', 'info');
+    this.showToast("Next period →", "info");
   }
 
   handleSwipeRight() {
     // Navigate to previous chart or data period
-    this.showToast('← Previous period', 'info');
+    this.showToast("← Previous period", "info");
   }
 
   exportData() {
     const data = {
       kpis: this.getCurrentKPIs(),
       charts: this.getChartData(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: 'application/json'
+      type: "application/json",
     });
 
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `analytics-export-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `analytics-export-${new Date().toISOString().split("T")[0]}.json`;
     a.click();
 
     URL.revokeObjectURL(url);
-    this.showToast('Data exported successfully', 'success');
+    this.showToast("Data exported successfully", "success");
   }
 
   getCurrentKPIs() {
     return {
-      totalRevenue: document.getElementById('total-revenue').textContent,
-      activeUsers: document.getElementById('active-users').textContent,
-      roi: document.getElementById('roi-percentage').textContent,
-      performanceScore: document.getElementById('performance-score').textContent
+      totalRevenue: document.getElementById("total-revenue").textContent,
+      activeUsers: document.getElementById("active-users").textContent,
+      roi: document.getElementById("roi-percentage").textContent,
+      performanceScore:
+        document.getElementById("performance-score").textContent,
     };
   }
 
   getChartData() {
     const chartData = {};
-    Object.keys(this.charts).forEach(chartName => {
+    Object.keys(this.charts).forEach((chartName) => {
       if (this.charts[chartName]) {
         chartData[chartName] = this.charts[chartName].data;
       }
@@ -1443,13 +1832,13 @@ class AdvancedAnalyticsDashboard {
       clearInterval(this.streamingInterval);
     }
 
-    Object.values(this.charts).forEach(chart => {
+    Object.values(this.charts).forEach((chart) => {
       if (chart && chart.destroy) {
         chart.destroy();
       }
     });
 
-    console.log('Analytics dashboard destroyed');
+    console.log("Analytics dashboard destroyed");
   }
 }
 
@@ -1467,7 +1856,7 @@ class Fantasy402AnalyticsClient {
       const data = await response.json();
       return data;
     } catch (error) {
-      throw new Error('Fantasy402 health check failed');
+      throw new Error("Fantasy402 health check failed");
     }
   }
 
@@ -1480,7 +1869,7 @@ class Fantasy402AnalyticsClient {
 
   emit(event, data) {
     const listeners = this.eventListeners.get(event) || [];
-    listeners.forEach(callback => callback(data));
+    listeners.forEach((callback) => callback(data));
   }
 
   async getBettingAnalytics() {
@@ -1490,7 +1879,7 @@ class Fantasy402AnalyticsClient {
       totalStakes: 250000,
       winRate: 0.45,
       averageStake: 200,
-      popularSports: ['Football', 'Basketball', 'Baseball']
+      popularSports: ["Football", "Basketball", "Baseball"],
     };
   }
 
@@ -1499,7 +1888,7 @@ class Fantasy402AnalyticsClient {
       totalVIPs: 150,
       averageRevenue: 5000,
       retentionRate: 0.85,
-      topTierRevenue: 75000
+      topTierRevenue: 75000,
     };
   }
 
@@ -1508,7 +1897,7 @@ class Fantasy402AnalyticsClient {
       totalAgents: 50,
       activeAgents: 45,
       averageCommission: 1500,
-      topPerformers: 10
+      topPerformers: 10,
     };
   }
 
@@ -1517,25 +1906,25 @@ class Fantasy402AnalyticsClient {
       totalRevenue: 125000,
       commissionRevenue: 25000,
       vipRevenue: 75000,
-      monthlyGrowth: 0.12
+      monthlyGrowth: 0.12,
     };
   }
 }
 
 // Formatters for Fantasy402 data
-AdvancedAnalyticsDashboard.prototype.formatBettingPatterns = function(data) {
+AdvancedAnalyticsDashboard.prototype.formatBettingPatterns = function (data) {
   return `
     <div class="insight-metrics">
       <div class="metric">Total Bets: <strong>${data.totalBets.toLocaleString()}</strong></div>
       <div class="metric">Total Stakes: <strong>$${data.totalStakes.toLocaleString()}</strong></div>
       <div class="metric">Win Rate: <strong>${(data.winRate * 100).toFixed(1)}%</strong></div>
       <div class="metric">Avg Stake: <strong>$${data.averageStake}</strong></div>
-      <div class="metric">Popular Sports: <strong>${data.popularSports.join(', ')}</strong></div>
+      <div class="metric">Popular Sports: <strong>${data.popularSports.join(", ")}</strong></div>
     </div>
   `;
 };
 
-AdvancedAnalyticsDashboard.prototype.formatVIPPerformance = function(data) {
+AdvancedAnalyticsDashboard.prototype.formatVIPPerformance = function (data) {
   return `
     <div class="insight-metrics">
       <div class="metric">Total VIPs: <strong>${data.totalVIPs}</strong></div>
@@ -1546,7 +1935,7 @@ AdvancedAnalyticsDashboard.prototype.formatVIPPerformance = function(data) {
   `;
 };
 
-AdvancedAnalyticsDashboard.prototype.formatAgentAnalytics = function(data) {
+AdvancedAnalyticsDashboard.prototype.formatAgentAnalytics = function (data) {
   return `
     <div class="insight-metrics">
       <div class="metric">Total Agents: <strong>${data.totalAgents}</strong></div>
@@ -1557,7 +1946,7 @@ AdvancedAnalyticsDashboard.prototype.formatAgentAnalytics = function(data) {
   `;
 };
 
-AdvancedAnalyticsDashboard.prototype.formatRevenueBreakdown = function(data) {
+AdvancedAnalyticsDashboard.prototype.formatRevenueBreakdown = function (data) {
   return `
     <div class="insight-metrics">
       <div class="metric">Total Revenue: <strong>$${data.totalRevenue.toLocaleString()}</strong></div>
@@ -1569,7 +1958,7 @@ AdvancedAnalyticsDashboard.prototype.formatRevenueBreakdown = function(data) {
 };
 
 // Initialize dashboard when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   window.analyticsDashboard = new AdvancedAnalyticsDashboard();
 
   // Make health check available globally for debugging
@@ -1577,30 +1966,31 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.analyticsDashboard) {
       return window.analyticsDashboard.runHealthCheck();
     } else {
-      console.error('Analytics dashboard not initialized');
-      return { error: 'Dashboard not initialized' };
+      console.error("Analytics dashboard not initialized");
+      return { error: "Dashboard not initialized" };
     }
   };
 
   // Add keyboard shortcuts for debugging
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener("keydown", (e) => {
     // Ctrl+Shift+H: Health check
-    if (e.ctrlKey && e.shiftKey && e.key === 'H') {
+    if (e.ctrlKey && e.shiftKey && e.key === "H") {
       e.preventDefault();
       window.checkAnalyticsHealth();
     }
 
     // Ctrl+Shift+D: Toggle debug panel
-    if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+    if (e.ctrlKey && e.shiftKey && e.key === "D") {
       e.preventDefault();
-      const debugPanel = document.getElementById('debug-panel');
+      const debugPanel = document.getElementById("debug-panel");
       if (debugPanel) {
-        debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
+        debugPanel.style.display =
+          debugPanel.style.display === "none" ? "block" : "none";
       }
     }
 
     // Ctrl+Shift+R: Force refresh data
-    if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+    if (e.ctrlKey && e.shiftKey && e.key === "R") {
       e.preventDefault();
       if (window.analyticsDashboard) {
         window.analyticsDashboard.refreshData();
@@ -1608,15 +1998,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  console.log('💡 Debug Shortcuts:');
-  console.log('   Ctrl+Shift+H: Health check');
-  console.log('   Ctrl+Shift+D: Toggle debug panel');
-  console.log('   Ctrl+Shift+R: Force refresh data');
-  console.log('   Or run checkAnalyticsHealth() in console');
+  console.log("💡 Debug Shortcuts:");
+  console.log("   Ctrl+Shift+H: Health check");
+  console.log("   Ctrl+Shift+D: Toggle debug panel");
+  console.log("   Ctrl+Shift+R: Force refresh data");
+  console.log("   Or run checkAnalyticsHealth() in console");
 });
 
 // Cleanup on page unload
-window.addEventListener('beforeunload', () => {
+window.addEventListener("beforeunload", () => {
   if (window.analyticsDashboard) {
     window.analyticsDashboard.destroy();
   }

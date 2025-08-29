@@ -16,10 +16,15 @@ import type {
   FilterParams,
   SearchParams,
   SearchResult,
-  QueryResult
+  QueryResult,
 } from '../types/database/base';
 
-import { Entity, AuditableEntityClass, EntityCollection, type ValidationResult } from '../entities/base';
+import {
+  Entity,
+  AuditableEntityClass,
+  EntityCollection,
+  type ValidationResult,
+} from '../entities/base';
 import { DATABASE, ERROR_MESSAGES } from '../constants';
 
 /**
@@ -53,7 +58,7 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
 
     for (const filter of filters) {
       let condition = '';
-      
+
       switch (filter.operator) {
         case 'eq':
           condition = `${filter.field} = $${paramIndex}`;
@@ -84,13 +89,19 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
           params.push(`%${filter.value}%`);
           break;
         case 'in':
-          const placeholders = Array.from({ length: filter.value.length }, (_, i) => `$${paramIndex + i}`).join(', ');
+          const placeholders = Array.from(
+            { length: filter.value.length },
+            (_, i) => `$${paramIndex + i}`
+          ).join(', ');
           condition = `${filter.field} IN (${placeholders})`;
           params.push(...filter.value);
           paramIndex += filter.value.length - 1;
           break;
         case 'not_in':
-          const notPlaceholders = Array.from({ length: filter.value.length }, (_, i) => `$${paramIndex + i}`).join(', ');
+          const notPlaceholders = Array.from(
+            { length: filter.value.length },
+            (_, i) => `$${paramIndex + i}`
+          ).join(', ');
           condition = `${filter.field} NOT IN (${notPlaceholders})`;
           params.push(...filter.value);
           paramIndex += filter.value.length - 1;
@@ -116,7 +127,7 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
 
     return {
       clause: conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '',
-      params
+      params,
     };
   }
 
@@ -135,7 +146,10 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
   /**
    * Build LIMIT and OFFSET clause from pagination
    */
-  protected buildPaginationClause(pagination?: PaginationParams): { clause: string; params: any[] } {
+  protected buildPaginationClause(pagination?: PaginationParams): {
+    clause: string;
+    params: any[];
+  } {
     if (!pagination) {
       return { clause: '', params: [] };
     }
@@ -145,14 +159,17 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
 
     return {
       clause: `LIMIT $1 OFFSET $2`,
-      params: [limit, offset]
+      params: [limit, offset],
     };
   }
 
   /**
    * Execute query and return results
    */
-  protected async executeQuery<T = any>(query: string, params: any[] = []): Promise<QueryResult<T>> {
+  protected async executeQuery<T = any>(
+    query: string,
+    params: any[] = []
+  ): Promise<QueryResult<T>> {
     try {
       // This would be implemented with actual database connection
       // For now, returning mock structure
@@ -161,7 +178,7 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
         rowCount: 0,
         fields: [],
         command: 'SELECT',
-        duration: 0
+        duration: 0,
       } as QueryResult<T>;
     } catch (error) {
       throw new Error(`Database query failed: ${error}`);
@@ -174,7 +191,7 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
   async findById(id: string): Promise<TEntity | null> {
     const query = `SELECT * FROM ${this.tableName} WHERE id = $1 AND deleted_at IS NULL`;
     const result = await this.executeQuery(query, [id]);
-    
+
     if (result.rows.length === 0) {
       return null;
     }
@@ -195,9 +212,9 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
     // Build query parts
     const whereClause = this.buildWhereClause([
       ...(filters || []),
-      { field: 'deleted_at', operator: 'is_null', value: null }
+      { field: 'deleted_at', operator: 'is_null', value: null },
     ]);
-    
+
     const orderByClause = this.buildOrderByClause(sort);
     const paginationClause = this.buildPaginationClause(pagination);
 
@@ -213,12 +230,12 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
       ${orderByClause}
       ${paginationClause.clause}
     `;
-    
+
     const allParams = [...whereClause.params, ...paginationClause.params];
     const dataResult = await this.executeQuery(dataQuery, allParams);
 
     const entities = dataResult.rows.map(row => this.createEntityInstance(row));
-    
+
     const limit = pagination?.limit || DATABASE.PAGINATION.DEFAULT_LIMIT;
     const currentPage = pagination?.page || 1;
 
@@ -229,7 +246,7 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
       limit,
       totalPages: Math.ceil(total / limit),
       hasNext: currentPage * limit < total,
-      hasPrev: currentPage > 1
+      hasPrev: currentPage > 1,
     };
   }
 
@@ -238,18 +255,20 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
    */
   async search(params: SearchParams): Promise<SearchResult<TEntity>> {
     const searchFields = params.fields || ['name', 'description'];
-    const searchConditions = searchFields.map(field => `${field} ILIKE '%' || $1 || '%'`).join(' OR ');
-    
+    const searchConditions = searchFields
+      .map(field => `${field} ILIKE '%' || $1 || '%'`)
+      .join(' OR ');
+
     const filters: FilterParams[] = [
-      ...params.filters || [],
-      { field: 'deleted_at', operator: 'is_null', value: null }
+      ...(params.filters || []),
+      { field: 'deleted_at', operator: 'is_null', value: null },
     ];
 
     // Add search condition to filters
     if (params.query?.trim()) {
       // This would be better implemented with full-text search
       const whereClause = this.buildWhereClause(filters);
-      const searchClause = whereClause.clause 
+      const searchClause = whereClause.clause
         ? `${whereClause.clause} AND (${searchConditions})`
         : `WHERE (${searchConditions})`;
 
@@ -260,17 +279,21 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
         ${this.buildPaginationClause(params.pagination).clause}
       `;
 
-      const allParams = [params.query, ...whereClause.params, ...this.buildPaginationClause(params.pagination).params];
+      const allParams = [
+        params.query,
+        ...whereClause.params,
+        ...this.buildPaginationClause(params.pagination).params,
+      ];
       const result = await this.executeQuery(query, allParams);
-      
+
       const entities = result.rows.map(row => this.createEntityInstance(row));
-      
+
       return {
         data: entities,
         total: result.rowCount || 0,
         query: params.query,
         filters: params.filters || [],
-        executionTime: result.duration || 0
+        executionTime: result.duration || 0,
       };
     }
 
@@ -278,7 +301,7 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
     const findResult = await this.find({
       filters: params.filters,
       sort: params.sort,
-      pagination: params.pagination
+      pagination: params.pagination,
     });
 
     return {
@@ -286,7 +309,7 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
       total: findResult.total,
       query: '',
       filters: params.filters || [],
-      executionTime: 0
+      executionTime: 0,
     };
   }
 
@@ -310,7 +333,7 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
     `;
 
     const result = await this.executeQuery(query, values);
-    
+
     if (result.rows.length === 0) {
       throw new Error('Failed to create entity');
     }
@@ -355,7 +378,7 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
   async delete(id: string, transaction?: DatabaseTransaction): Promise<boolean> {
     const query = `DELETE FROM ${this.tableName} WHERE id = $1`;
     const result = await this.executeQuery(query, [id]);
-    
+
     return (result.rowCount || 0) > 0;
   }
 
@@ -365,7 +388,7 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
   async exists(id: string): Promise<boolean> {
     const query = `SELECT 1 FROM ${this.tableName} WHERE id = $1 AND deleted_at IS NULL LIMIT 1`;
     const result = await this.executeQuery(query, [id]);
-    
+
     return result.rows.length > 0;
   }
 
@@ -375,12 +398,12 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
   async count(filters?: FilterParams[]): Promise<number> {
     const whereClause = this.buildWhereClause([
       ...(filters || []),
-      { field: 'deleted_at', operator: 'is_null', value: null }
+      { field: 'deleted_at', operator: 'is_null', value: null },
     ]);
 
     const query = `SELECT COUNT(*) as total FROM ${this.tableName} ${whereClause.clause}`;
     const result = await this.executeQuery<{ total: number }>(query, whereClause.params);
-    
+
     return result.rows[0]?.total || 0;
   }
 
@@ -389,12 +412,12 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
    */
   async createMany(entities: TEntity[], transaction?: DatabaseTransaction): Promise<TEntity[]> {
     const results: TEntity[] = [];
-    
+
     for (const entity of entities) {
       const result = await this.create(entity, transaction);
       results.push(result);
     }
-    
+
     return results;
   }
 
@@ -403,12 +426,12 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
    */
   async updateMany(entities: TEntity[], transaction?: DatabaseTransaction): Promise<TEntity[]> {
     const results: TEntity[] = [];
-    
+
     for (const entity of entities) {
       const result = await this.update(entity, transaction);
       results.push(result);
     }
-    
+
     return results;
   }
 
@@ -417,11 +440,11 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
    */
   async deleteMany(ids: string[], transaction?: DatabaseTransaction): Promise<number> {
     if (ids.length === 0) return 0;
-    
+
     const placeholders = ids.map((_, i) => `$${i + 1}`).join(', ');
     const query = `DELETE FROM ${this.tableName} WHERE id IN (${placeholders})`;
     const result = await this.executeQuery(query, ids);
-    
+
     return result.rowCount || 0;
   }
 }
@@ -429,14 +452,18 @@ export abstract class BaseRepository<TEntity extends Entity> implements Reposito
 /**
  * Base auditable repository with soft delete support
  */
-export abstract class BaseAuditableRepository<TEntity extends AuditableEntityClass> 
-  extends BaseRepository<TEntity> 
-  implements AuditableRepository<TEntity> {
-
+export abstract class BaseAuditableRepository<TEntity extends AuditableEntityClass>
+  extends BaseRepository<TEntity>
+  implements AuditableRepository<TEntity>
+{
   /**
    * Soft delete entity
    */
-  async softDelete(id: string, deletedBy: string, transaction?: DatabaseTransaction): Promise<boolean> {
+  async softDelete(
+    id: string,
+    deletedBy: string,
+    transaction?: DatabaseTransaction
+  ): Promise<boolean> {
     const entity = await this.findById(id);
     if (!entity) {
       return false;
@@ -444,7 +471,7 @@ export abstract class BaseAuditableRepository<TEntity extends AuditableEntityCla
 
     entity.softDelete(deletedBy);
     await this.update(entity, transaction);
-    
+
     return true;
   }
 
@@ -455,14 +482,14 @@ export abstract class BaseAuditableRepository<TEntity extends AuditableEntityCla
     // Find entity including soft deleted ones
     const query = `SELECT * FROM ${this.tableName} WHERE id = $1`;
     const result = await this.executeQuery(query, [id]);
-    
+
     if (result.rows.length === 0) {
       return null;
     }
 
     const entity = this.createEntityInstance(result.rows[0]);
     entity.restore();
-    
+
     return await this.update(entity, transaction);
   }
 
@@ -493,12 +520,12 @@ export abstract class BaseAuditableRepository<TEntity extends AuditableEntityCla
       ${orderByClause}
       ${paginationClause.clause}
     `;
-    
+
     const allParams = [...whereClause.params, ...paginationClause.params];
     const dataResult = await this.executeQuery(dataQuery, allParams);
 
     const entities = dataResult.rows.map(row => this.createEntityInstance(row));
-    
+
     const limit = pagination?.limit || DATABASE.PAGINATION.DEFAULT_LIMIT;
     const currentPage = pagination?.page || 1;
 
@@ -509,7 +536,7 @@ export abstract class BaseAuditableRepository<TEntity extends AuditableEntityCla
       limit,
       totalPages: Math.ceil(total / limit),
       hasNext: currentPage * limit < total,
-      hasPrev: currentPage > 1
+      hasPrev: currentPage > 1,
     };
   }
 
@@ -522,18 +549,18 @@ export abstract class BaseAuditableRepository<TEntity extends AuditableEntityCla
     pagination?: PaginationParams;
   }): Promise<PaginationResult<TEntity>> {
     const { filters = [], sort, pagination } = params || {};
-    
+
     // Add deleted_at is not null filter
     const deletedFilter: FilterParams = {
       field: 'deleted_at',
       operator: 'is_not_null',
-      value: null
+      value: null,
     };
 
     return await this.findWithDeleted({
       filters: [...filters, deletedFilter],
       sort,
-      pagination
+      pagination,
     });
   }
 

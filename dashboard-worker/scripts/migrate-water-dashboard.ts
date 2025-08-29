@@ -49,14 +49,14 @@ class Fire22WaterDashboardMigration {
       timing: {
         start: new Date(),
         end: new Date(),
-        duration: 0
+        duration: 0,
       },
       statistics: {
         tablesCreated: 0,
         indexesCreated: 0,
         lKeyMappings: 0,
-        sampleDataRows: 0
-      }
+        sampleDataRows: 0,
+      },
     };
 
     // Set database names based on environment
@@ -78,7 +78,7 @@ class Fire22WaterDashboardMigration {
 
   async migrate(): Promise<MigrationResult> {
     console.log(`🔥 Fire22 Water Dashboard Migration - ${this.config.environment.toUpperCase()}`);
-    console.log('=' .repeat(80));
+    console.log('='.repeat(80));
 
     try {
       this.result.timing.start = new Date();
@@ -95,19 +95,19 @@ class Fire22WaterDashboardMigration {
 
       this.result.success = true;
       console.log('\n✅ Water Dashboard Migration Complete!');
-      
     } catch (error) {
       this.result.success = false;
       this.result.errors.push(error.toString());
       console.error('❌ Migration failed:', error);
-      
+
       if (!this.config.dryRun) {
         await this.rollbackOnFailure();
       }
     } finally {
       this.result.timing.end = new Date();
-      this.result.timing.duration = this.result.timing.end.getTime() - this.result.timing.start.getTime();
-      
+      this.result.timing.duration =
+        this.result.timing.end.getTime() - this.result.timing.start.getTime();
+
       await this.generateMigrationReport();
     }
 
@@ -154,17 +154,17 @@ class Fire22WaterDashboardMigration {
     }
 
     this.logOperation('💾 Creating database backup...');
-    
+
     try {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const backupDir = 'temp/backup';
-      
+
       // Ensure backup directory exists
       await $`mkdir -p ${backupDir}`;
-      
+
       // Create backup file
       const backupFile = `${backupDir}/${this.config.environment}_backup_${timestamp}.sql`;
-      
+
       try {
         // Attempt to dump existing data
         await $`wrangler d1 execute ${this.dbName} --command=".dump" > ${backupFile}`;
@@ -173,7 +173,6 @@ class Fire22WaterDashboardMigration {
         // Database might not exist yet, which is okay for initial setup
         this.logOperation(`ℹ️  No existing database to backup: ${this.dbName}`);
       }
-      
     } catch (error) {
       console.warn(`⚠️  Backup failed (continuing anyway): ${error}`);
     }
@@ -181,7 +180,7 @@ class Fire22WaterDashboardMigration {
 
   private async ensureDatabaseExists(): Promise<void> {
     this.logOperation(`📊 Ensuring database exists: ${this.dbName}`);
-    
+
     if (this.config.dryRun) {
       this.logOperation(`🔍 [DRY RUN] Would create database: ${this.dbName}`);
       return;
@@ -192,7 +191,10 @@ class Fire22WaterDashboardMigration {
       await $`wrangler d1 create ${this.dbName}`;
       this.logOperation(`✅ Database created: ${this.dbName}`);
     } catch (error) {
-      if (error.toString().includes('already exists') || error.toString().includes('A database with this name already exists')) {
+      if (
+        error.toString().includes('already exists') ||
+        error.toString().includes('A database with this name already exists')
+      ) {
         this.logOperation(`ℹ️  Database already exists: ${this.dbName}`);
       } else {
         throw new Error(`Failed to create database: ${error}`);
@@ -204,7 +206,7 @@ class Fire22WaterDashboardMigration {
     this.logOperation('🗃️  Running schema migrations...');
 
     const schemaFile = 'data/schemas/fire22-water-dashboard-schema.sql';
-    
+
     if (this.config.dryRun) {
       this.logOperation(`🔍 [DRY RUN] Would apply schema: ${schemaFile}`);
       return;
@@ -213,12 +215,12 @@ class Fire22WaterDashboardMigration {
     try {
       await $`wrangler d1 execute ${this.dbName} --file=${schemaFile}`;
       this.logOperation(`✅ Schema applied: ${schemaFile}`);
-      
+
       // Count tables created
-      const tableCountResult = await $`wrangler d1 execute ${this.dbName} --command="SELECT COUNT(*) as count FROM sqlite_master WHERE type='table'"`.text();
+      const tableCountResult =
+        await $`wrangler d1 execute ${this.dbName} --command="SELECT COUNT(*) as count FROM sqlite_master WHERE type='table'"`.text();
       const tableCount = parseInt(tableCountResult.match(/count\s*\|\s*(\d+)/)?.[1] || '0');
       this.result.statistics.tablesCreated = tableCount;
-      
     } catch (error) {
       throw new Error(`Schema migration failed: ${error}`);
     }
@@ -234,10 +236,11 @@ class Fire22WaterDashboardMigration {
 
     try {
       // Count L-key mappings
-      const mappingCountResult = await $`wrangler d1 execute ${this.dbName} --command="SELECT COUNT(*) as count FROM fire22_lkey_mappings"`.text();
+      const mappingCountResult =
+        await $`wrangler d1 execute ${this.dbName} --command="SELECT COUNT(*) as count FROM fire22_lkey_mappings"`.text();
       const mappingCount = parseInt(mappingCountResult.match(/count\s*\|\s*(\d+)/)?.[1] || '0');
       this.result.statistics.lKeyMappings = mappingCount;
-      
+
       this.logOperation(`✅ Fire22 L-key mappings setup complete: ${mappingCount} mappings`);
     } catch (error) {
       throw new Error(`L-key mapping setup failed: ${error}`);
@@ -254,10 +257,11 @@ class Fire22WaterDashboardMigration {
 
     try {
       // Count indexes created
-      const indexCountResult = await $`wrangler d1 execute ${this.dbName} --command="SELECT COUNT(*) as count FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%'"`.text();
+      const indexCountResult =
+        await $`wrangler d1 execute ${this.dbName} --command="SELECT COUNT(*) as count FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%'"`.text();
       const indexCount = parseInt(indexCountResult.match(/count\s*\|\s*(\d+)/)?.[1] || '0');
       this.result.statistics.indexesCreated = indexCount;
-      
+
       this.logOperation(`✅ Performance indexes created: ${indexCount} indexes`);
     } catch (error) {
       throw new Error(`Index creation failed: ${error}`);
@@ -314,7 +318,6 @@ class Fire22WaterDashboardMigration {
       this.result.statistics.sampleDataRows += 3;
 
       this.logOperation(`✅ Sample data inserted: ${this.result.statistics.sampleDataRows} rows`);
-      
     } catch (error) {
       console.warn(`⚠️  Sample data insertion failed: ${error}`);
       // Don't fail the entire migration for sample data issues
@@ -333,34 +336,36 @@ class Fire22WaterDashboardMigration {
       {
         name: 'Database connection',
         query: 'SELECT 1 as test',
-        expected: (result: string) => result.includes('test')
+        expected: (result: string) => result.includes('test'),
       },
       {
         name: 'Fire22 L-key mappings table',
         query: 'SELECT COUNT(*) as count FROM fire22_lkey_mappings',
-        expected: (result: string) => parseInt(result.match(/count\s*\|\s*(\d+)/)?.[1] || '0') > 0
+        expected: (result: string) => parseInt(result.match(/count\s*\|\s*(\d+)/)?.[1] || '0') > 0,
       },
       {
         name: 'Web logs table structure',
         query: 'PRAGMA table_info(web_logs)',
-        expected: (result: string) => result.includes('customer_id') && result.includes('amount')
+        expected: (result: string) => result.includes('customer_id') && result.includes('amount'),
       },
       {
         name: 'Fire22 customers table',
         query: 'SELECT COUNT(*) as count FROM fire22_customers',
-        expected: (result: string) => result.includes('count')
+        expected: (result: string) => result.includes('count'),
       },
       {
         name: 'Performance indexes',
-        query: "SELECT COUNT(*) as count FROM sqlite_master WHERE type='index' AND name LIKE 'idx_%'",
-        expected: (result: string) => parseInt(result.match(/count\s*\|\s*(\d+)/)?.[1] || '0') > 0
-      }
+        query:
+          "SELECT COUNT(*) as count FROM sqlite_master WHERE type='index' AND name LIKE 'idx_%'",
+        expected: (result: string) => parseInt(result.match(/count\s*\|\s*(\d+)/)?.[1] || '0') > 0,
+      },
     ];
 
     for (const validation of validations) {
       try {
-        const result = await $`wrangler d1 execute ${this.dbName} --command="${validation.query}"`.text();
-        
+        const result =
+          await $`wrangler d1 execute ${this.dbName} --command="${validation.query}"`.text();
+
         if (validation.expected(result)) {
           this.logOperation(`✅ ${validation.name} - valid`);
         } else {
@@ -391,7 +396,7 @@ class Fire22WaterDashboardMigration {
       tables_created: this.result.statistics.tablesCreated,
       indexes_created: this.result.statistics.indexesCreated,
       lkey_mappings: this.result.statistics.lKeyMappings,
-      sample_data_rows: this.result.statistics.sampleDataRows
+      sample_data_rows: this.result.statistics.sampleDataRows,
     };
 
     try {
@@ -408,7 +413,6 @@ class Fire22WaterDashboardMigration {
 
       await $`echo ${metadataSQL} | wrangler d1 execute ${this.dbName} --file=-`;
       this.logOperation('✅ Migration metadata updated');
-      
     } catch (error) {
       console.warn(`⚠️  Failed to update metadata: ${error}`);
     }
@@ -416,7 +420,7 @@ class Fire22WaterDashboardMigration {
 
   private async rollbackOnFailure(): Promise<void> {
     console.log('\n🔄 Attempting rollback...');
-    
+
     try {
       // Look for the most recent backup
       const backupDir = 'temp/backup';
@@ -436,7 +440,6 @@ class Fire22WaterDashboardMigration {
 
       await $`wrangler d1 execute ${this.dbName} --file=${latestBackup}`;
       console.log('✅ Rollback completed');
-      
     } catch (error) {
       console.error('❌ Rollback failed:', error);
     }
@@ -444,14 +447,14 @@ class Fire22WaterDashboardMigration {
 
   private async generateMigrationReport(): Promise<void> {
     const reportFile = `temp/migration-report-${this.config.environment}-${Date.now()}.json`;
-    
+
     const report = {
       ...this.result,
       config: this.config,
       database: {
         binding: this.dbBinding,
-        name: this.dbName
-      }
+        name: this.dbName,
+      },
     };
 
     try {
@@ -463,7 +466,7 @@ class Fire22WaterDashboardMigration {
 
     // Print summary
     console.log('\n📊 Migration Summary:');
-    console.log('=' .repeat(50));
+    console.log('='.repeat(50));
     console.log(`Environment: ${this.config.environment}`);
     console.log(`Database: ${this.dbName}`);
     console.log(`Duration: ${this.result.timing.duration}ms`);
@@ -472,7 +475,7 @@ class Fire22WaterDashboardMigration {
     console.log(`Indexes Created: ${this.result.statistics.indexesCreated}`);
     console.log(`L-key Mappings: ${this.result.statistics.lKeyMappings}`);
     console.log(`Sample Data Rows: ${this.result.statistics.sampleDataRows}`);
-    
+
     if (this.result.errors.length > 0) {
       console.log(`\n❌ Errors (${this.result.errors.length}):`);
       this.result.errors.forEach((error, index) => {
@@ -489,17 +492,19 @@ class Fire22WaterDashboardMigration {
   }
 }
 
-// ========== CLI Interface ==========
+// !==!== CLI Interface !==!==
 
 async function main() {
   const args = process.argv.slice(2);
-  
+
   const config: MigrationConfig = {
-    environment: (args.find(arg => ['development', 'staging', 'production'].includes(arg)) as any) || 'development',
+    environment:
+      (args.find(arg => ['development', 'staging', 'production'].includes(arg)) as any) ||
+      'development',
     dryRun: args.includes('--dry-run'),
     verbose: args.includes('--verbose') || args.includes('-v'),
     skipBackup: args.includes('--skip-backup'),
-    forceRecreate: args.includes('--force-recreate')
+    forceRecreate: args.includes('--force-recreate'),
   };
 
   if (args.includes('--help') || args.includes('-h')) {
@@ -533,7 +538,7 @@ Examples:
   console.log(`🔥 Starting Water Dashboard Migration`);
   console.log(`Environment: ${config.environment}`);
   console.log(`Mode: ${config.dryRun ? 'DRY RUN' : 'LIVE MIGRATION'}`);
-  
+
   if (config.forceRecreate && !config.dryRun) {
     console.log('⚠️  WARNING: --force-recreate will destroy all data!');
     console.log('Press Ctrl+C to cancel, or wait 5 seconds to continue...');
@@ -543,9 +548,8 @@ Examples:
   try {
     const migration = new Fire22WaterDashboardMigration(config);
     const result = await migration.migrate();
-    
+
     process.exit(result.success ? 0 : 1);
-    
   } catch (error) {
     console.error('❌ Migration failed:', error);
     process.exit(1);

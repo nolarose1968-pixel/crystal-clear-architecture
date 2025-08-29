@@ -6,7 +6,7 @@
 import type {
   BalanceThresholdAlert,
   BalanceChangeEvent,
-  RiskLevel
+  RiskLevel,
 } from '../../../core/types/finance';
 
 export interface NotificationChannel {
@@ -64,7 +64,7 @@ export class BalanceNotificationService {
       escalationLevel: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
-      isActive: true
+      isActive: true,
     };
 
     this.alerts.set(alert.id, alert);
@@ -82,7 +82,11 @@ export class BalanceNotificationService {
   /**
    * Acknowledge an alert
    */
-  acknowledgeAlert(alertId: string, acknowledgedBy: string, notes?: string): BalanceThresholdAlert | null {
+  acknowledgeAlert(
+    alertId: string,
+    acknowledgedBy: string,
+    notes?: string
+  ): BalanceThresholdAlert | null {
     const alert = this.alerts.get(alertId);
     if (!alert) {
       console.warn(`⚠️ Alert not found: ${alertId}`);
@@ -120,7 +124,7 @@ export class BalanceNotificationService {
       ...alert.metadata,
       escalationReason: reason,
       escalatedAt: new Date(),
-      previousLevel: alert.escalationLevel
+      previousLevel: alert.escalationLevel,
     };
 
     console.log(`🚨 Alert escalated: ${alertId} to level ${newLevel}`);
@@ -337,7 +341,7 @@ export class BalanceNotificationService {
       alertsByType,
       alertsBySeverity,
       averageResolutionTime: resolvedCount > 0 ? totalResolutionTime / resolvedCount : 0,
-      escalationRate: allAlerts.length > 0 ? (escalatedCount / allAlerts.length) * 100 : 0
+      escalationRate: allAlerts.length > 0 ? (escalatedCount / allAlerts.length) * 100 : 0,
     };
   }
 
@@ -368,11 +372,16 @@ export class BalanceNotificationService {
 
   private escalateSeverity(currentSeverity: string): 'low' | 'medium' | 'high' | 'critical' {
     switch (currentSeverity) {
-      case 'low': return 'medium';
-      case 'medium': return 'high';
-      case 'high': return 'critical';
-      case 'critical': return 'critical';
-      default: return 'high';
+      case 'low':
+        return 'medium';
+      case 'medium':
+        return 'high';
+      case 'high':
+        return 'critical';
+      case 'critical':
+        return 'critical';
+      default:
+        return 'high';
     }
   }
 
@@ -432,7 +441,7 @@ export class BalanceNotificationService {
       triggerAmount: alert.triggerAmount.toLocaleString(),
       alertType: alert.alertType,
       severity: alert.severity,
-      timestamp: alert.createdAt.toISOString()
+      timestamp: alert.createdAt.toISOString(),
     };
 
     for (const [key, value] of Object.entries(variables)) {
@@ -454,7 +463,7 @@ export class BalanceNotificationService {
     const cooldownMs = cooldownMinutes * 60 * 1000;
     const now = Date.now();
 
-    return (now - lastNotification) < cooldownMs;
+    return now - lastNotification < cooldownMs;
   }
 
   private recordNotification(customerId: string, templateId: string): void {
@@ -476,10 +485,10 @@ export class BalanceNotificationService {
         variables: ['customerId', 'threshold', 'currentBalance'],
         channels: [
           { type: 'dashboard', enabled: true, config: {} },
-          { type: 'email', enabled: true, config: { priority: 'normal' } }
+          { type: 'email', enabled: true, config: { priority: 'normal' } },
         ],
         priority: 'medium',
-        cooldownMinutes: 60
+        cooldownMinutes: 60,
       },
       {
         id: 'alert_critical',
@@ -491,10 +500,10 @@ export class BalanceNotificationService {
         channels: [
           { type: 'dashboard', enabled: true, config: {} },
           { type: 'email', enabled: true, config: { priority: 'high' } },
-          { type: 'sms', enabled: true, config: {} }
+          { type: 'sms', enabled: true, config: {} },
         ],
         priority: 'urgent',
-        cooldownMinutes: 15
+        cooldownMinutes: 15,
       },
       {
         id: 'alert_limit_exceeded',
@@ -506,10 +515,10 @@ export class BalanceNotificationService {
         channels: [
           { type: 'dashboard', enabled: true, config: {} },
           { type: 'email', enabled: true, config: { priority: 'urgent' } },
-          { type: 'sms', enabled: true, config: {} }
+          { type: 'sms', enabled: true, config: {} },
         ],
         priority: 'urgent',
-        cooldownMinutes: 5
+        cooldownMinutes: 5,
       },
       {
         id: 'alert_resolved',
@@ -518,11 +527,9 @@ export class BalanceNotificationService {
         subject: 'Balance Alert Resolved',
         body: 'Balance alert for customer ${customerId} has been resolved and acknowledged.',
         variables: ['customerId'],
-        channels: [
-          { type: 'dashboard', enabled: true, config: {} }
-        ],
+        channels: [{ type: 'dashboard', enabled: true, config: {} }],
         priority: 'low',
-        cooldownMinutes: 0
+        cooldownMinutes: 0,
       },
       {
         id: 'alert_escalated',
@@ -534,11 +541,11 @@ export class BalanceNotificationService {
         channels: [
           { type: 'dashboard', enabled: true, config: {} },
           { type: 'email', enabled: true, config: { priority: 'urgent' } },
-          { type: 'sms', enabled: true, config: {} }
+          { type: 'sms', enabled: true, config: {} },
         ],
         priority: 'urgent',
-        cooldownMinutes: 0
-      }
+        cooldownMinutes: 0,
+      },
     ];
 
     templates.forEach(template => {
@@ -547,7 +554,11 @@ export class BalanceNotificationService {
   }
 
   // Mock notification methods (would integrate with actual services)
-  private async sendEmail(alert: BalanceThresholdAlert, message: string, config: any): Promise<void> {
+  private async sendEmail(
+    alert: BalanceThresholdAlert,
+    message: string,
+    config: any
+  ): Promise<void> {
     console.log(`📧 Sending email notification: ${alert.customerId}`);
     // Integration with email service would go here
   }
@@ -557,17 +568,29 @@ export class BalanceNotificationService {
     // Integration with SMS service would go here
   }
 
-  private async sendPush(alert: BalanceThresholdAlert, message: string, config: any): Promise<void> {
+  private async sendPush(
+    alert: BalanceThresholdAlert,
+    message: string,
+    config: any
+  ): Promise<void> {
     console.log(`🔔 Sending push notification: ${alert.customerId}`);
     // Integration with push notification service would go here
   }
 
-  private async sendWebhook(alert: BalanceThresholdAlert, message: string, config: any): Promise<void> {
+  private async sendWebhook(
+    alert: BalanceThresholdAlert,
+    message: string,
+    config: any
+  ): Promise<void> {
     console.log(`🔗 Sending webhook notification: ${alert.customerId}`);
     // Integration with webhook service would go here
   }
 
-  private async sendToDashboard(alert: BalanceThresholdAlert, message: string, config: any): Promise<void> {
+  private async sendToDashboard(
+    alert: BalanceThresholdAlert,
+    message: string,
+    config: any
+  ): Promise<void> {
     console.log(`📊 Sending dashboard notification: ${alert.customerId}`);
     // Dashboard notification logic would go here
   }

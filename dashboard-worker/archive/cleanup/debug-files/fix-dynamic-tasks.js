@@ -6,15 +6,14 @@ import { join } from 'path';
 const departmentsDir = join(process.cwd(), 'src', 'departments');
 
 async function fixDynamicTasks() {
-    const files = await readdir(departmentsDir);
-    const departmentFiles = files.filter(file => 
-        file.endsWith('-department.html') && 
-        !file.includes('template')
-    );
+  const files = await readdir(departmentsDir);
+  const departmentFiles = files.filter(
+    file => file.endsWith('-department.html') && !file.includes('template')
+  );
 
-    console.log(`Found ${departmentFiles.length} department files to fix`);
+  console.log(`Found ${departmentFiles.length} department files to fix`);
 
-    const dynamicTasksHTML = `
+  const dynamicTasksHTML = `
             <!-- Current Tasks Section (Dynamic) -->
             <div class="current-tasks-section" style="margin-top: 40px;">
                 <div id="department-tasks-container" style="padding: 20px; background: rgba(0, 0, 0, 0.2); border-radius: 12px;">
@@ -31,37 +30,37 @@ async function fixDynamicTasks() {
                 }
             </style>`;
 
-    for (const file of departmentFiles) {
-        const filePath = join(departmentsDir, file);
-        console.log(`\nProcessing: ${file}`);
+  for (const file of departmentFiles) {
+    const filePath = join(departmentsDir, file);
+    console.log(`\nProcessing: ${file}`);
 
-        try {
-            let content = await readFile(filePath, 'utf-8');
+    try {
+      let content = await readFile(filePath, 'utf-8');
 
-            // Skip if already has proper dynamic container
-            if (content.includes('id="department-tasks-container"')) {
-                console.log(`  ✓ Already has dynamic task container`);
-                continue;
-            }
+      // Skip if already has proper dynamic container
+      if (content.includes('id="department-tasks-container"')) {
+        console.log(`  ✓ Already has dynamic task container`);
+        continue;
+      }
 
-            // Find and replace the static tasks section
-            const tasksSectionRegex = /<h3[^>]*>📋 Current Tasks[^<]*<\/h3>.*?(?=<div class="implementation-links"|<\/section>|$)/s;
-            
-            if (tasksSectionRegex.test(content)) {
-                content = content.replace(tasksSectionRegex, dynamicTasksHTML);
-                
-                await writeFile(filePath, content, 'utf-8');
-                console.log(`  ✓ Replaced static tasks with dynamic container in ${file}`);
-            } else {
-                console.log(`  ⚠ No tasks section found in ${file}`);
-            }
-            
-        } catch (error) {
-            console.error(`  ✗ Error updating ${file}:`, error.message);
-        }
+      // Find and replace the static tasks section
+      const tasksSectionRegex =
+        /<h3[^>]*>📋 Current Tasks[^<]*<\/h3>.*?(?=<div class="implementation-links"|<\/section>|$)/s;
+
+      if (tasksSectionRegex.test(content)) {
+        content = content.replace(tasksSectionRegex, dynamicTasksHTML);
+
+        await writeFile(filePath, content, 'utf-8');
+        console.log(`  ✓ Replaced static tasks with dynamic container in ${file}`);
+      } else {
+        console.log(`  ⚠ No tasks section found in ${file}`);
+      }
+    } catch (error) {
+      console.error(`  ✗ Error updating ${file}:`, error.message);
     }
+  }
 
-    console.log('\n✅ Finished fixing dynamic task loading');
+  console.log('\n✅ Finished fixing dynamic task loading');
 }
 
 // Run the fix

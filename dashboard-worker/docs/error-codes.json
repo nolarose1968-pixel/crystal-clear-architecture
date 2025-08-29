@@ -4,7 +4,7 @@
   "description": "Comprehensive machine-readable error code documentation and reference system",
   "version": "1.0.0",
   "lastUpdated": "2025-01-28",
-  
+
   "errorCategories": {
     "SYSTEM": {
       "prefix": "E1",
@@ -15,7 +15,7 @@
       "color": "#dc2626"
     },
     "DATABASE": {
-      "prefix": "E2", 
+      "prefix": "E2",
       "name": "Database Errors",
       "description": "Database connection, query, and transaction errors",
       "range": "2000-2999",
@@ -24,7 +24,7 @@
     },
     "API": {
       "prefix": "E3",
-      "name": "API Errors", 
+      "name": "API Errors",
       "description": "REST API, authentication, and validation errors",
       "range": "3000-3999",
       "severity": "MEDIUM",
@@ -33,7 +33,7 @@
     "NETWORK": {
       "prefix": "E4",
       "name": "Network Errors",
-      "description": "DNS, SSL, timeout, and connectivity errors", 
+      "description": "DNS, SSL, timeout, and connectivity errors",
       "range": "4000-4999",
       "severity": "MEDIUM",
       "color": "#f97316"
@@ -58,7 +58,7 @@
       "prefix": "E7",
       "name": "Fire22 Integration Errors",
       "description": "Fire22 API integration and sports betting specific errors",
-      "range": "7000-7999", 
+      "range": "7000-7999",
       "severity": "HIGH",
       "color": "#fdbb2d"
     },
@@ -67,7 +67,7 @@
       "name": "Telegram Integration Errors",
       "description": "Telegram bot and messaging integration errors",
       "range": "8000-8999",
-      "severity": "MEDIUM", 
+      "severity": "MEDIUM",
       "color": "#0088cc"
     }
   },
@@ -119,7 +119,7 @@
     },
 
     "E1002": {
-      "code": "E1002", 
+      "code": "E1002",
       "name": "MEMORY_LIMIT_EXCEEDED",
       "message": "Memory limit exceeded",
       "severity": "ERROR",
@@ -187,7 +187,7 @@
       ],
       "documentation": [
         {
-          "title": "Database Setup Guide", 
+          "title": "Database Setup Guide",
           "url": "/docs/database/setup",
           "type": "guide"
         },
@@ -213,7 +213,7 @@
       "name": "DB_QUERY_TIMEOUT",
       "message": "Database query timeout",
       "severity": "ERROR",
-      "category": "DATABASE", 
+      "category": "DATABASE",
       "httpStatusCode": 504,
       "description": "Database query exceeded maximum execution time, indicating performance issues.",
       "causes": [
@@ -314,7 +314,7 @@
         "Burst traffic without proper throttling"
       ],
       "solutions": [
-        "Implement exponential backoff retry strategy", 
+        "Implement exponential backoff retry strategy",
         "Use request caching to reduce API calls",
         "Implement request queuing and throttling",
         "Review and optimize API usage patterns",
@@ -350,7 +350,7 @@
 
     "E4001": {
       "code": "E4001",
-      "name": "NETWORK_TIMEOUT", 
+      "name": "NETWORK_TIMEOUT",
       "message": "Network request timeout",
       "severity": "ERROR",
       "category": "NETWORK",
@@ -398,7 +398,7 @@
       "name": "FIRE22_API_UNAUTHORIZED",
       "message": "Fire22 API 401 Unauthorized - Data extraction blocked",
       "severity": "CRITICAL",
-      "category": "FIRE22", 
+      "category": "FIRE22",
       "httpStatusCode": 401,
       "description": "Fire22 API returning 401 Unauthorized on all endpoints, completely blocking data extraction. This prevents customer sync, agent data, and all sportsbook operations.",
       "causes": [
@@ -420,7 +420,7 @@
       "affectedOperations": [
         "Customer data sync (2,600+ records)",
         "Agent hierarchy extraction",
-        "Transaction history retrieval", 
+        "Transaction history retrieval",
         "Betting data extraction",
         "Live wager monitoring"
       ],
@@ -495,7 +495,7 @@
     },
 
     "E7003": {
-      "code": "E7003", 
+      "code": "E7003",
       "name": "FIRE22_DATABASE_NOT_CONNECTED",
       "message": "Fire22 database not connected - local data storage blocked",
       "severity": "CRITICAL",
@@ -521,7 +521,7 @@
       "affectedOperations": [
         "Local Fire22 data storage",
         "Customer repository operations",
-        "Agent hierarchy caching", 
+        "Agent hierarchy caching",
         "Transaction logging",
         "Betting data persistence"
       ],
@@ -592,7 +592,7 @@
     },
 
     "E8001": {
-      "code": "E8001", 
+      "code": "E8001",
       "name": "TELEGRAM_BOT_AUTHENTICATION_FAILED",
       "message": "Telegram bot authentication failed",
       "severity": "ERROR",
@@ -608,7 +608,7 @@
       ],
       "solutions": [
         "Verify Telegram bot token validity",
-        "Regenerate bot token if compromised", 
+        "Regenerate bot token if compromised",
         "Check bot token configuration and format",
         "Test connectivity to api.telegram.org",
         "Monitor Telegram API status"
@@ -655,7 +655,7 @@
       "solutions": [
         "Verify directory path exists in filesystem: ls -la /path/to/directory",
         "Check current working directory: pwd",
-        "Create missing directory: mkdir -p /path/to/directory", 
+        "Create missing directory: mkdir -p /path/to/directory",
         "Verify filesystem permissions: ls -ld /path/to/directory",
         "Use absolute paths instead of relative paths",
         "Check for case-sensitive path issues on filesystem"
@@ -673,7 +673,7 @@
         },
         {
           "title": "Path Resolution Troubleshooting",
-          "url": "/docs/system/path-troubleshooting", 
+          "url": "/docs/system/path-troubleshooting",
           "type": "troubleshooting"
         }
       ],
@@ -688,7 +688,7 @@
     "totalErrorCodes": 9,
     "categoryCounts": {
       "SYSTEM": 3,
-      "DATABASE": 2, 
+      "DATABASE": 2,
       "API": 2,
       "NETWORK": 1,
       "FIRE22": 1,
@@ -701,10 +701,31 @@
     },
     "httpStatusCodes": [401, 404, 429, 500, 503, 504, 507],
     "tags": [
-      "api", "authentication", "bot", "connection", "connectivity", 
-      "database", "directory", "filesystem", "fire22", "infrastructure", "integration", "memory",
-      "navigation", "network", "path", "performance", "permissions", "rate-limiting", "resource", "security",
-      "sportsbook", "startup", "system", "telegram", "timeout"
+      "api",
+      "authentication",
+      "bot",
+      "connection",
+      "connectivity",
+      "database",
+      "directory",
+      "filesystem",
+      "fire22",
+      "infrastructure",
+      "integration",
+      "memory",
+      "navigation",
+      "network",
+      "path",
+      "performance",
+      "permissions",
+      "rate-limiting",
+      "resource",
+      "security",
+      "sportsbook",
+      "startup",
+      "system",
+      "telegram",
+      "timeout"
     ]
   },
 
@@ -714,7 +735,7 @@
       "example": "logger.error('Database connection failed', { errorCode: 'E2001', userId: '12345' })"
     },
     "apiResponses": {
-      "description": "Include error codes in API error responses", 
+      "description": "Include error codes in API error responses",
       "example": {
         "error": {
           "code": "E3001",

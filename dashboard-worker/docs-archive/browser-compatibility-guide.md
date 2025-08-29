@@ -1,46 +1,51 @@
 # Fire22 Terminal UI - Browser Compatibility Guide
 
-A comprehensive guide to cross-browser compatibility for the Fire22 Terminal UI component system.
+A comprehensive guide to cross-browser compatibility for the Fire22 Terminal UI
+component system.
 
 ## Overview
 
-The Fire22 Terminal UI system is designed to work across a wide range of browsers and devices while gracefully degrading in older environments. This guide covers compatibility requirements, fallback mechanisms, and testing procedures.
+The Fire22 Terminal UI system is designed to work across a wide range of
+browsers and devices while gracefully degrading in older environments. This
+guide covers compatibility requirements, fallback mechanisms, and testing
+procedures.
 
 ## Browser Support Matrix
 
 ### ✅ Fully Supported (All Features)
 
 | Browser | Version | CSS Variables | Box Drawing | Animations | Grid/Flexbox |
-|---------|---------|---------------|-------------|------------|--------------|
-| Chrome | 90+ | ✅ | ✅ | ✅ | ✅ |
-| Firefox | 88+ | ✅ | ✅ | ✅ | ✅ |
-| Safari | 14+ | ✅ | ✅ | ✅ | ✅ |
-| Edge | 90+ | ✅ | ✅ | ✅ | ✅ |
+| ------- | ------- | ------------- | ----------- | ---------- | ------------ |
+| Chrome  | 90+     | ✅            | ✅          | ✅         | ✅           |
+| Firefox | 88+     | ✅            | ✅          | ✅         | ✅           |
+| Safari  | 14+     | ✅            | ✅          | ✅         | ✅           |
+| Edge    | 90+     | ✅            | ✅          | ✅         | ✅           |
 
 ### ⚠️ Partially Supported (With Fallbacks)
 
-| Browser | Version | CSS Variables | Box Drawing | Animations | Grid/Flexbox |
-|---------|---------|---------------|-------------|------------|--------------|
-| Chrome | 60-89 | ✅ | ⚠️ | ✅ | ✅ |
-| Firefox | 55-87 | ✅ | ⚠️ | ✅ | ✅ |
-| Safari | 12-13 | ✅ | ⚠️ | ✅ | ✅ |
-| Edge Legacy | 16-18 | ✅ | ❌ | ⚠️ | ⚠️ |
-| IE | 11 | ❌ | ❌ | ❌ | ⚠️ |
+| Browser     | Version | CSS Variables | Box Drawing | Animations | Grid/Flexbox |
+| ----------- | ------- | ------------- | ----------- | ---------- | ------------ |
+| Chrome      | 60-89   | ✅            | ⚠️          | ✅         | ✅           |
+| Firefox     | 55-87   | ✅            | ⚠️          | ✅         | ✅           |
+| Safari      | 12-13   | ✅            | ⚠️          | ✅         | ✅           |
+| Edge Legacy | 16-18   | ✅            | ❌          | ⚠️         | ⚠️           |
+| IE          | 11      | ❌            | ❌          | ❌         | ⚠️           |
 
 ### ❌ Limited Support (Basic Functionality Only)
 
-| Browser | Version | Notes |
-|---------|---------|-------|
-| IE | 10 and below | Emergency fallback mode only |
-| Chrome | `< 60 | Basic styling, no terminal decorations |
-| Firefox | < 55 | Basic styling, no terminal decorations |
-| Safari | &lt; 12 | Basic styling, reduced functionality |
+| Browser | Version      | Notes                                  |
+| ------- | ------------ | -------------------------------------- |
+| IE      | 10 and below | Emergency fallback mode only           |
+| Chrome  | `< 60        | Basic styling, no terminal decorations |
+| Firefox | < 55         | Basic styling, no terminal decorations |
+| Safari  | &lt; 12      | Basic styling, reduced functionality   |
 
 ## Feature Detection & Fallbacks
 
 ### Automatic Feature Detection
 
-The system automatically detects browser capabilities and applies appropriate fallbacks:
+The system automatically detects browser capabilities and applies appropriate
+fallbacks:
 
 ```html
 <!-- Include polyfills before other scripts --&gt;`
@@ -57,67 +62,69 @@ Based on detection results, classes are automatically applied to `&lt;html&gt;`:
 ```html
 <!-- Modern browser -->
 <html class="has-css-variables has-flexbox has-grid has-box-drawing">
-
-<!-- Legacy browser -->
-<html class="no-css-variables no-flexbox no-grid no-box-drawing legacy-browser">
+  <!-- Legacy browser -->
+  <html
+    class="no-css-variables no-flexbox no-grid no-box-drawing legacy-browser"
+  ></html>
+</html>
 ```
 
 ## Key Compatibility Areas
 
 ### 1. CSS Custom Properties (Variables)
 
-**Issue**: Not supported in IE and older browsers
-**Solution**: Automatic polyfill and fallback styles
+**Issue**: Not supported in IE and older browsers **Solution**: Automatic
+polyfill and fallback styles
 
 ```css
 /* Fallback for no CSS variables */
 .no-css-variables .terminal-card {
-    background: #161b22;
-    border: 1px solid #30363d;
-    color: #f0f6fc;
+  background: #161b22;
+  border: 1px solid #30363d;
+  color: #f0f6fc;
 }
 ```
 
 ### 2. Box Drawing Characters
 
-**Issue**: Inconsistent rendering across fonts and browsers
-**Solution**: ASCII fallbacks and font detection
+**Issue**: Inconsistent rendering across fonts and browsers **Solution**: ASCII
+fallbacks and font detection
 
 ```css
 /* ASCII fallbacks */
 .no-box-drawing .terminal-card::before {
-    content: '+';  /* Instead of ╭ */
+  content: '+'; /* Instead of ╭ */
 }
 .no-box-drawing .terminal-card::after {
-    content: '+';  /* Instead of ╯ */
+  content: '+'; /* Instead of ╯ */
 }
 ```
 
 ### 3. CSS Grid & Flexbox
 
-**Issue**: Not supported in older browsers
-**Solution**: Float and inline-block fallbacks
+**Issue**: Not supported in older browsers **Solution**: Float and inline-block
+fallbacks
 
 ```css
 .no-grid .terminal-grid {
-    display: block;
+  display: block;
 }
 .no-grid .terminal-grid__item {
-    display: inline-block;
-    width: 48%;
-    margin: 1%;
+  display: inline-block;
+  width: 48%;
+  margin: 1%;
 }
 ```
 
 ### 4. CSS Animations
 
-**Issue**: Performance issues on older devices
-**Solution**: Reduced motion detection and static alternatives
+**Issue**: Performance issues on older devices **Solution**: Reduced motion
+detection and static alternatives
 
 ```css
 .no-animations .terminal-status-dot--active {
-    background: #39ff14;
-    box-shadow: 0 0 4px #39ff14; /* Static glow effect */
+  background: #39ff14;
+  box-shadow: 0 0 4px #39ff14; /* Static glow effect */
 }
 ```
 
@@ -133,6 +140,7 @@ Use the built-in test suite:
 ```
 
 The test suite checks:
+
 - ✅ Box drawing character rendering
 - ✅ CSS custom properties support
 - ✅ Font consistency
@@ -143,6 +151,7 @@ The test suite checks:
 ### 2. Manual Testing Checklist
 
 #### Visual Elements
+
 - [ ] Box drawing characters render correctly
 - [ ] Fonts display consistently across components
 - [ ] Colors match the design system
@@ -150,6 +159,7 @@ The test suite checks:
 - [ ] Animations are smooth (if enabled)
 
 #### Interactive Elements
+
 - [ ] Buttons respond to hover/click
 - [ ] Forms accept input properly
 - [ ] Progress bars animate correctly
@@ -157,12 +167,14 @@ The test suite checks:
 - [ ] Navigation functions work
 
 #### Responsive Design
+
 - [ ] Mobile layout (`&lt; 768px) works
 - [ ] Tablet layout (768px-1024px) works
 - [ ] Desktop layout (&gt;` 1024px) works
 - [ ] Components stack/flow properly
 
 #### Performance
+
 - [ ] Page loads in `&lt; 3 seconds
 - [ ] Animations maintain 30+ FPS
 - [ ] No console errors
@@ -171,12 +183,14 @@ The test suite checks:
 ### 3. Cross-Browser Testing Tools
 
 **Recommended Tools:**
+
 - BrowserStack (cloud testing)
 - LambdaTest (cross-browser testing)
 - Sauce Labs (automated testing)
 - Local VMs with older browsers
 
 **Browser Priority:**
+
 1. Chrome (latest 2 versions)
 2. Firefox (latest 2 versions)
 3. Safari (latest 2 versions)
@@ -194,13 +208,13 @@ The test suite checks:
     <!-- Essential meta tags -->
     `&lt;meta charset="UTF-8"&gt;`
     `&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;`
-    
+
     <!-- Load polyfills first -->
     <script src="terminal-polyfills.js"></script>
-    
+
     <!-- Load fallback styles -->
     <link rel="stylesheet" href="terminal-fallbacks.css">
-    
+
     <!-- Load main styles -->
     <link rel="stylesheet" href="terminal-framework.css">
     <link rel="stylesheet" href="terminal-components.css">
@@ -210,7 +224,7 @@ The test suite checks:
     <div class="terminal-container">
         <!-- Content -->
     </div>
-    
+
     <!-- Load JavaScript last -->
     <script src="terminal-components.js"></script>
 </body>
@@ -224,17 +238,17 @@ Build features progressively based on browser capabilities:
 ```javascript
 // Check if advanced features are available
 if (window.terminalPolyfills) {
-    const features = window.terminalPolyfills.features;
-    
-    if (features.cssVariables) {
-        // Use CSS custom properties
-        document.documentElement.style.setProperty('--primary-color', '#ff6b35');
-    } else {
-        // Use direct styles
-        document.querySelectorAll('.terminal-card').forEach(card => {
-            card.style.backgroundColor = '#161b22';
-        });
-    }
+  const features = window.terminalPolyfills.features;
+
+  if (features.cssVariables) {
+    // Use CSS custom properties
+    document.documentElement.style.setProperty('--primary-color', '#ff6b35');
+  } else {
+    // Use direct styles
+    document.querySelectorAll('.terminal-card').forEach(card => {
+      card.style.backgroundColor = '#161b22';
+    });
+  }
 }
 ```
 
@@ -243,11 +257,11 @@ if (window.terminalPolyfills) {
 Implement graceful error handling:
 
 ```javascript
-window.addEventListener('error', (event) => {
-    if (event.filename && event.filename.includes('terminal')) {
-        console.warn('Terminal component error detected, applying fallbacks');
-        document.documentElement.classList.add('terminal-emergency-fallback');
-    }
+window.addEventListener('error', event => {
+  if (event.filename && event.filename.includes('terminal')) {
+    console.warn('Terminal component error detected, applying fallbacks');
+    document.documentElement.classList.add('terminal-emergency-fallback');
+  }
 });
 ```
 
@@ -259,11 +273,11 @@ Respect user preferences for reduced motion:
 
 ```css
 @media (prefers-reduced-motion: reduce) {
-    .terminal-pulse,
-    .terminal-glow,
-    .terminal-flame {
-        animation: none;
-    }
+  .terminal-pulse,
+  .terminal-glow,
+  .terminal-flame {
+    animation: none;
+  }
 }
 ```
 
@@ -271,7 +285,7 @@ Respect user preferences for reduced motion:
 
 Monitor and adapt to device capabilities:
 
-```javascript
+````javascript
 // Monitor frame rate and disable animations if needed
 let frameCount = 0;
 let lastTime = performance.now();
@@ -288,12 +302,11 @@ function checkPerformance() `{
     }
     requestAnimationFrame(checkPerformance);
 }
-```
+````
 
-if (window.requestAnimationFrame) {
-    requestAnimationFrame(checkPerformance);
-}
-```
+if (window.requestAnimationFrame) { requestAnimationFrame(checkPerformance); }
+
+````
 
 ### 3. Memory Management
 
@@ -306,7 +319,7 @@ window.addEventListener('beforeunload', () =&gt;` {
         window.terminalComponents.destroy();
     }
 });
-```
+````
 
 ## Accessibility Compliance
 
@@ -315,8 +328,8 @@ window.addEventListener('beforeunload', () =&gt;` {
 Ensure components work with screen readers:
 
 ```html
-`&lt;button class="terminal-btn terminal-btn--primary" 
-        role="button" 
+`&lt;button class="terminal-btn terminal-btn--primary"
+        role="button"
         aria-label="Execute primary action"
         tabindex="0"&gt;`
     Primary Action
@@ -330,8 +343,8 @@ Support keyboard navigation:
 ```css
 .terminal-btn:focus,
 .terminal-form__input:focus {
-    outline: 2px solid #58a6ff;
-    outline-offset: 2px;
+  outline: 2px solid #58a6ff;
+  outline-offset: 2px;
 }
 ```
 
@@ -341,14 +354,14 @@ Support high contrast preferences:
 
 ```css
 @media (prefers-contrast: high) {
-    .terminal-card,
-    .terminal-btn {
-        border-width: 2px;
-    }
-    
-    .terminal-status-dot {
-        border: 2px solid currentColor;
-    }
+  .terminal-card,
+  .terminal-btn {
+    border-width: 2px;
+  }
+
+  .terminal-status-dot {
+    border: 2px solid currentColor;
+  }
 }
 ```
 
@@ -356,9 +369,11 @@ Support high contrast preferences:
 
 ### Issue: Box Characters Not Rendering
 
-**Symptoms**: Squares, question marks, or missing characters instead of box drawings
+**Symptoms**: Squares, question marks, or missing characters instead of box
+drawings
 
 **Solutions**:
+
 1. Check font stack includes proper monospace fonts
 2. Test with different fonts (SF Mono, Consolas, etc.)
 3. Enable ASCII fallbacks with `no-box-drawing` class
@@ -367,7 +382,7 @@ Support high contrast preferences:
 ```css
 /* Add to CSS for testing */
 .terminal-test-fonts {
-    font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
 }
 ```
 
@@ -376,6 +391,7 @@ Support high contrast preferences:
 **Symptoms**: Components stack incorrectly, spacing is off
 
 **Solutions**:
+
 1. Enable flexbox polyfills
 2. Use float-based fallbacks
 3. Test with IE11 developer tools
@@ -384,7 +400,7 @@ Support high contrast preferences:
 ```javascript
 // Detect IE and apply fixes
 if (navigator.userAgent.indexOf('Trident') !== -1) {
-    document.documentElement.classList.add('browser-ie', 'legacy-browser');
+  document.documentElement.classList.add('browser-ie', 'legacy-browser');
 }
 ```
 
@@ -393,6 +409,7 @@ if (navigator.userAgent.indexOf('Trident') !== -1) {
 **Symptoms**: Stuttering animations, high CPU usage
 
 **Solutions**:
+
 1. Enable performance monitoring
 2. Disable animations on low-end devices
 3. Use CSS transforms instead of changing layout properties
@@ -401,7 +418,7 @@ if (navigator.userAgent.indexOf('Trident') !== -1) {
 ```javascript
 // Performance-based animation control
 if (window.devicePixelRatio > 2 && window.innerWidth < 768) {
-    document.documentElement.classList.add('no-animations');
+  document.documentElement.classList.add('no-animations');
 }
 ```
 
@@ -410,6 +427,7 @@ if (window.devicePixelRatio > 2 && window.innerWidth < 768) {
 **Symptoms**: Console errors, components not working
 
 **Solutions**:
+
 1. Load polyfills before main scripts
 2. Check for ES6 support
 3. Use try-catch blocks
@@ -418,38 +436,43 @@ if (window.devicePixelRatio > 2 && window.innerWidth < 768) {
 ```javascript
 // Safe feature detection
 try {
-    if (window.terminalComponents) {
-        window.terminalComponents.initialize();
-    }
+  if (window.terminalComponents) {
+    window.terminalComponents.initialize();
+  }
 } catch (error) {
-    console.warn('Terminal components failed to initialize:', error);
-    document.documentElement.classList.add('no-js');
+  console.warn('Terminal components failed to initialize:', error);
+  document.documentElement.classList.add('no-js');
 }
 ```
 
 ## Browser-Specific Notes
 
 ### Chrome/Chromium
+
 - Excellent support for all features
 - Good performance monitoring tools
 - Enable experimental features in chrome://flags for testing
 
 ### Firefox
+
 - Good overall support
 - May need `-moz-` prefixes for some features
 - Use about:config for developer settings
 
 ### Safari
+
 - Good support on recent versions
 - May have font rendering differences
 - Test on both macOS and iOS Safari
 
 ### Edge (Chromium)
+
 - Same support as Chrome
 - Good backward compatibility
 - Test Edge Legacy separately
 
 ### Internet Explorer 11
+
 - Limited support only
 - Requires extensive polyfills
 - Consider dropping support if usage is low
@@ -487,12 +510,12 @@ module.exports = {
   version: 1,
   discovery: {
     allowed_hostnames: ['localhost'],
-    network_idle_timeout: 750
+    network_idle_timeout: 750,
   },
   static_snapshots: {
     base_url: 'http://localhost:3000',
-    snapshot_files: '**/*.html'
-  }
+    snapshot_files: '**/*.html',
+  },
 };
 ```
 
@@ -508,6 +531,7 @@ module.exports = {
 ### 2. Performance Monitoring
 
 Set up monitoring to track:
+
 - Page load times across browsers
 - Animation frame rates
 - JavaScript error rates
@@ -522,7 +546,8 @@ Set up monitoring to track:
 
 ## Conclusion
 
-The Fire22 Terminal UI system provides robust cross-browser compatibility through:
+The Fire22 Terminal UI system provides robust cross-browser compatibility
+through:
 
 1. **Progressive Enhancement**: Core functionality works everywhere
 2. **Graceful Degradation**: Fallbacks maintain usability
@@ -530,14 +555,16 @@ The Fire22 Terminal UI system provides robust cross-browser compatibility throug
 4. **Performance Awareness**: Adapts to device capabilities
 5. **Accessibility First**: Works with assistive technologies
 
-For the best results, test regularly across your target browsers and keep fallbacks updated as the web platform evolves.
+For the best results, test regularly across your target browsers and keep
+fallbacks updated as the web platform evolves.
 
 ---
 
 **Quick Reference:**
+
 - 📋 [Compatibility Test Suite](terminal-browser-compatibility-test.html)
 - 🎨 [Fallback Styles](terminal-fallbacks.css)
 - ⚙️ [Polyfills & Detection](terminal-polyfills.js)
 - 📚 [Component Documentation](terminal-components-library.md)
 
-*Built with ╭─🔥─╮ for maximum browser compatibility*
+_Built with ╭─🔥─╮ for maximum browser compatibility_

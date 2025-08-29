@@ -11,7 +11,7 @@ echo "=============================================="
 # Check if wrangler is installed
 if ! command -v wrangler &> /dev/null; then
     echo "❌ Wrangler CLI not found. Installing..."
-    npm install -g wrangler
+    bun add -g wrangler
 fi
 
 # Check if user is logged in to Cloudflare
@@ -27,15 +27,15 @@ cd docs-worker
 
 # Install dependencies
 echo "📦 Installing dependencies..."
-npm install
+bun install
 
 # Run type check
 echo "🔍 Running type check..."
-npm run typecheck
+bun run typecheck
 
 # Deploy
 echo "🚀 Deploying to Cloudflare Workers..."
-npm run deploy
+bun run deploy
 
 # Verify deployment
 echo "🩺 Verifying deployment..."

@@ -2,10 +2,10 @@
 
 /**
  * ✅ Fire22 Configuration Validator
- * 
+ *
  * Provides comprehensive input validation, configuration checking,
  * and validation rules for all Fire22 scripts
- * 
+ *
  * @version 1.0.0
  * @author Fire22 Development Team
  */
@@ -97,7 +97,7 @@ class ConfigValidator {
     for (const [fieldName, fieldSchema] of Object.entries(schema)) {
       totalChecks++;
       const fieldValue = config[fieldName];
-      
+
       // Check if required field is present
       if (fieldSchema.required && (fieldValue === undefined || fieldValue === null)) {
         errors.push({
@@ -105,7 +105,7 @@ class ConfigValidator {
           message: fieldSchema.message || `Field '${fieldName}' is required`,
           value: fieldValue,
           rule: 'required',
-          severity: 'error'
+          severity: 'error',
         });
         continue;
       }
@@ -120,10 +120,11 @@ class ConfigValidator {
       if (!this.validateType(fieldValue, fieldSchema.type)) {
         errors.push({
           field: fieldName,
-          message: fieldSchema.message || `Field '${fieldName}' must be of type '${fieldSchema.type}'`,
+          message:
+            fieldSchema.message || `Field '${fieldName}' must be of type '${fieldSchema.type}'`,
           value: fieldValue,
           rule: 'type',
-          severity: 'error'
+          severity: 'error',
         });
         continue;
       }
@@ -133,10 +134,11 @@ class ConfigValidator {
         if (fieldSchema.min !== undefined && fieldValue < fieldSchema.min) {
           errors.push({
             field: fieldName,
-            message: fieldSchema.message || `Field '${fieldName}' must be at least ${fieldSchema.min}`,
+            message:
+              fieldSchema.message || `Field '${fieldName}' must be at least ${fieldSchema.min}`,
             value: fieldValue,
             rule: 'min',
-            severity: 'error'
+            severity: 'error',
           });
           continue;
         }
@@ -144,10 +146,11 @@ class ConfigValidator {
         if (fieldSchema.max !== undefined && fieldValue > fieldSchema.max) {
           errors.push({
             field: fieldName,
-            message: fieldSchema.message || `Field '${fieldName}' must be at most ${fieldSchema.max}`,
+            message:
+              fieldSchema.message || `Field '${fieldName}' must be at most ${fieldSchema.max}`,
             value: fieldValue,
             rule: 'max',
-            severity: 'error'
+            severity: 'error',
           });
           continue;
         }
@@ -156,14 +159,16 @@ class ConfigValidator {
       // Length validation for strings and arrays
       if ((fieldSchema.type === 'string' || fieldSchema.type === 'array') && fieldValue) {
         const length = fieldSchema.type === 'string' ? fieldValue.length : fieldValue.length;
-        
+
         if (fieldSchema.min !== undefined && length < fieldSchema.min) {
           errors.push({
             field: fieldName,
-            message: fieldSchema.message || `Field '${fieldName}' must have at least ${fieldSchema.min} characters/items`,
+            message:
+              fieldSchema.message ||
+              `Field '${fieldName}' must have at least ${fieldSchema.min} characters/items`,
             value: fieldValue,
             rule: 'min',
-            severity: 'error'
+            severity: 'error',
           });
           continue;
         }
@@ -171,23 +176,29 @@ class ConfigValidator {
         if (fieldSchema.max !== undefined && length > fieldSchema.max) {
           errors.push({
             field: fieldName,
-            message: fieldSchema.message || `Field '${fieldName}' must have at most ${fieldSchema.max} characters/items`,
+            message:
+              fieldSchema.message ||
+              `Field '${fieldName}' must have at most ${fieldSchema.max} characters/items`,
             value: fieldValue,
             rule: 'max',
-            severity: 'error'
+            severity: 'error',
           });
           continue;
         }
       }
 
       // Pattern validation for strings
-      if (fieldSchema.type === 'string' && fieldSchema.pattern && !fieldSchema.pattern.test(fieldValue)) {
+      if (
+        fieldSchema.type === 'string' &&
+        fieldSchema.pattern &&
+        !fieldSchema.pattern.test(fieldValue)
+      ) {
         errors.push({
           field: fieldName,
           message: fieldSchema.message || `Field '${fieldName}' does not match required pattern`,
           value: fieldValue,
           rule: 'pattern',
-          severity: 'error'
+          severity: 'error',
         });
         continue;
       }
@@ -196,10 +207,12 @@ class ConfigValidator {
       if (fieldSchema.enum && !fieldSchema.enum.includes(fieldValue)) {
         errors.push({
           field: fieldName,
-          message: fieldSchema.message || `Field '${fieldName}' must be one of: ${fieldSchema.enum.join(', ')}`,
+          message:
+            fieldSchema.message ||
+            `Field '${fieldName}' must be one of: ${fieldSchema.enum.join(', ')}`,
           value: fieldValue,
           rule: 'enum',
-          severity: 'error'
+          severity: 'error',
         });
         continue;
       }
@@ -211,7 +224,7 @@ class ConfigValidator {
           message: fieldSchema.message || `Field '${fieldName}' failed custom validation`,
           value: fieldValue,
           rule: 'custom',
-          severity: 'error'
+          severity: 'error',
         });
         continue;
       }
@@ -229,7 +242,7 @@ class ConfigValidator {
           message: `Unknown field '${fieldName}' - this field is not defined in the schema`,
           value: fieldValue,
           rule: 'unknown_field',
-          severity: 'warning'
+          severity: 'warning',
         });
       }
     }
@@ -244,8 +257,8 @@ class ConfigValidator {
         passedChecks,
         failedChecks: totalChecks - passedChecks,
         warningCount: warnings.length,
-        infoCount: info.length
-      }
+        infoCount: info.length,
+      },
     };
 
     // Add to history
@@ -277,7 +290,7 @@ class ConfigValidator {
             message: rule.message,
             value,
             rule: rule.name,
-            severity: 'info'
+            severity: 'info',
           });
         }
       } else {
@@ -288,7 +301,7 @@ class ConfigValidator {
               message: rule.message,
               value,
               rule: rule.name,
-              severity: 'error'
+              severity: 'error',
             });
             break;
           case 'warning':
@@ -297,7 +310,7 @@ class ConfigValidator {
               message: rule.message,
               value,
               rule: rule.name,
-              severity: 'warning'
+              severity: 'warning',
             });
             break;
           case 'info':
@@ -306,7 +319,7 @@ class ConfigValidator {
               message: rule.message,
               value,
               rule: rule.name,
-              severity: 'info'
+              severity: 'info',
             });
             break;
         }
@@ -323,8 +336,8 @@ class ConfigValidator {
         passedChecks,
         failedChecks: totalChecks - passedChecks,
         warningCount: warnings.length,
-        infoCount: info.length
-      }
+        infoCount: info.length,
+      },
     };
 
     this.addToHistory(result);
@@ -341,16 +354,16 @@ class ConfigValidator {
         name: 'nonEmptyString',
         validator: (value: string) => typeof value === 'string' && value.trim().length > 0,
         message: 'Value must be a non-empty string',
-        severity: 'error' as const
+        severity: 'error' as const,
       },
-      
+
       validEmail: {
         name: 'validEmail',
         validator: (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
         message: 'Value must be a valid email address',
-        severity: 'error' as const
+        severity: 'error' as const,
       },
-      
+
       validUrl: {
         name: 'validUrl',
         validator: (value: string) => {
@@ -362,47 +375,48 @@ class ConfigValidator {
           }
         },
         message: 'Value must be a valid URL',
-        severity: 'error' as const
+        severity: 'error' as const,
       },
-      
+
       // Number validations
       positiveNumber: {
         name: 'positiveNumber',
         validator: (value: number) => typeof value === 'number' && value > 0,
         message: 'Value must be a positive number',
-        severity: 'error' as const
+        severity: 'error' as const,
       },
-      
+
       nonNegativeNumber: {
         name: 'nonNegativeNumber',
         validator: (value: number) => typeof value === 'number' && value >= 0,
         message: 'Value must be a non-negative number',
-        severity: 'error' as const
+        severity: 'error' as const,
       },
-      
+
       // Array validations
       nonEmptyArray: {
         name: 'nonEmptyArray',
         validator: (value: any[]) => Array.isArray(value) && value.length > 0,
         message: 'Value must be a non-empty array',
-        severity: 'error' as const
+        severity: 'error' as const,
       },
-      
+
       // Object validations
       nonEmptyObject: {
         name: 'nonEmptyObject',
-        validator: (value: object) => typeof value === 'object' && value !== null && Object.keys(value).length > 0,
+        validator: (value: object) =>
+          typeof value === 'object' && value !== null && Object.keys(value).length > 0,
         message: 'Value must be a non-empty object',
-        severity: 'error' as const
+        severity: 'error' as const,
       },
-      
+
       // Boolean validations
       isBoolean: {
         name: 'isBoolean',
         validator: (value: boolean) => typeof value === 'boolean',
         message: 'Value must be a boolean',
-        severity: 'error' as const
-      }
+        severity: 'error' as const,
+      },
     };
   }
 
@@ -415,20 +429,20 @@ class ConfigValidator {
         name: 'nonEmptyString',
         validator: (value: string) => typeof value === 'string' && value.trim().length > 0,
         message: 'File path must not be empty',
-        severity: 'error' as const
+        severity: 'error' as const,
       },
       {
         name: 'noTraversal',
         validator: (value: string) => !value.includes('..') && !value.includes('~'),
         message: 'File path must not contain directory traversal characters',
-        severity: 'error' as const
+        severity: 'error' as const,
       },
       {
         name: 'validFormat',
         validator: (value: string) => /^[a-zA-Z0-9\/\-_.]+$/.test(value),
         message: 'File path contains invalid characters',
-        severity: 'warning' as const
-      }
+        severity: 'warning' as const,
+      },
     ];
 
     return this.validateValue(path, rules, 'filePath');
@@ -446,18 +460,18 @@ class ConfigValidator {
 
     for (const varName of required) {
       const value = env[varName];
-      
+
       if (!value || value.trim().length === 0) {
         errors.push({
           field: varName,
           message: `Environment variable '${varName}' is required`,
           value: value || 'undefined',
           rule: 'required',
-          severity: 'error'
+          severity: 'error',
         });
       } else {
         passedChecks++;
-        
+
         // Check for common issues
         if (value === 'undefined' || value === 'null') {
           warnings.push({
@@ -465,17 +479,17 @@ class ConfigValidator {
             message: `Environment variable '${varName}' has suspicious value`,
             value,
             rule: 'suspicious_value',
-            severity: 'warning'
+            severity: 'warning',
           });
         }
-        
+
         if (value.length < 3) {
           warnings.push({
             field: varName,
             message: `Environment variable '${varName}' is very short`,
             value,
             rule: 'short_value',
-            severity: 'warning'
+            severity: 'warning',
           });
         }
       }
@@ -491,8 +505,8 @@ class ConfigValidator {
         passedChecks,
         failedChecks: totalChecks - passedChecks,
         warningCount: warnings.length,
-        infoCount: info.length
-      }
+        infoCount: info.length,
+      },
     };
 
     this.addToHistory(result);
@@ -505,7 +519,7 @@ class ConfigValidator {
   generateValidationReport(result: ValidationResult): string {
     const report = [
       '✅ Fire22 Configuration Validation Report',
-      '==========================================\n',
+      '!==!==!==!==!==!==!==!==\n',
       `📊 Summary:`,
       `   Total Checks: ${result.summary.totalChecks}`,
       `   Passed: ${result.summary.passedChecks}`,
@@ -513,7 +527,7 @@ class ConfigValidator {
       `   Warnings: ${result.summary.warningCount}`,
       `   Info: ${result.summary.infoCount}`,
       `   Status: ${result.isValid ? '✅ VALID' : '❌ INVALID'}`,
-      ''
+      '',
     ];
 
     if (result.errors.length > 0) {
@@ -585,7 +599,7 @@ class ConfigValidator {
 
   private addToHistory(result: ValidationResult): void {
     this.validationHistory.push(result);
-    
+
     // Maintain history size
     if (this.validationHistory.length > this.maxHistorySize) {
       this.validationHistory = this.validationHistory.slice(-this.maxHistorySize);
@@ -595,9 +609,16 @@ class ConfigValidator {
 
 // Export the class and convenience functions
 export { ConfigValidator, ValidationResult, ValidationRule, ConfigSchema };
-export const validateConfig = ConfigValidator.getInstance().validateConfig.bind(ConfigValidator.getInstance());
-export const validateValue = ConfigValidator.getInstance().validateValue.bind(ConfigValidator.getInstance());
-export const validateFilePath = ConfigValidator.getInstance().validateFilePath.bind(ConfigValidator.getInstance());
-export const validateEnvironmentVariables = ConfigValidator.getInstance().validateEnvironmentVariables.bind(ConfigValidator.getInstance());
+export const validateConfig = ConfigValidator.getInstance().validateConfig.bind(
+  ConfigValidator.getInstance()
+);
+export const validateValue = ConfigValidator.getInstance().validateValue.bind(
+  ConfigValidator.getInstance()
+);
+export const validateFilePath = ConfigValidator.getInstance().validateFilePath.bind(
+  ConfigValidator.getInstance()
+);
+export const validateEnvironmentVariables =
+  ConfigValidator.getInstance().validateEnvironmentVariables.bind(ConfigValidator.getInstance());
 export const getCommonRules = ConfigValidator.getCommonRules;
 export default ConfigValidator;

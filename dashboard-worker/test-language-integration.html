@@ -1,162 +1,192 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fire22 Language Integration Test</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background: #f5f5f5;
-        }
-        .test-card {
-            background: white;
-            padding: 20px;
-            margin: 10px 0;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .status {
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
-        .warning { background: #fff3cd; color: #856404; }
-        .language-test {
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        select {
-            padding: 8px;
-            margin: 5px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #f5f5f5;
+      }
+      .test-card {
+        background: white;
+        padding: 20px;
+        margin: 10px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .status {
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .language-test {
+        margin: 10px 0;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      select {
+        padding: 8px;
+        margin: 5px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <h1>🌐 Fire22 Language System Integration Test</h1>
-    
+
     <div class="test-card">
-        <h2>Language System Status</h2>
-        <div id="languageStatus" class="status warning">Loading...</div>
-        <div id="languageDetails"></div>
+      <h2>Language System Status</h2>
+      <div id="languageStatus" class="status warning">Loading...</div>
+      <div id="languageDetails"></div>
     </div>
-    
+
     <div class="test-card">
-        <h2>Language Key Tests</h2>
-        <div class="language-test">
-            <h3>Customer Management Keys (L-821, L-1385)</h3>
-            <div>L-821: <span data-language="L-821" data-context="navigation">Loading...</span></div>
-            <div>L-1385: <span data-language="L-1385" data-context="navigation">Loading...</span></div>
-        </div>
-        
-        <div class="language-test">
-            <h3>Template Variables Test</h3>
-            <div>L-834 with variables: <span data-language="L-834" data-variables='{"amount": "5000", "currency": "USD"}'>Loading...</span></div>
-            <div>L-846 with variables: <span data-language="L-846" data-variables='{"amount": "2500.50", "currency": "EUR"}'>Loading...</span></div>
-        </div>
-    </div>
-    
-    <div class="test-card">
-        <h2>Language Switching Test</h2>
+      <h2>Language Key Tests</h2>
+      <div class="language-test">
+        <h3>Customer Management Keys (L-821, L-1385)</h3>
         <div>
-            <label>Select Language:</label>
-            <select id="languageSelector" onchange="testLanguageSwitch()">
-                <option value="en">English</option>
-                <option value="es">Español</option>
-                <option value="pt">Português</option>
-            </select>
+          L-821:
+          <span data-language="L-821" data-context="navigation">Loading...</span>
         </div>
-        
-        <div class="language-test">
-            <h3>Multi-language Display</h3>
-            <div>Customer Profile: <span data-language="L-831">Loading...</span></div>
-            <div>P2P Activity: <span data-language="L-843">Loading...</span></div>
-            <div>Account Actions: <span data-language="L-850">Loading...</span></div>
+        <div>
+          L-1385:
+          <span data-language="L-1385" data-context="navigation">Loading...</span>
         </div>
+      </div>
+
+      <div class="language-test">
+        <h3>Template Variables Test</h3>
+        <div>
+          L-834 with variables:
+          <span data-language="L-834" data-variables='{"amount": "5000", "currency": "USD"}'>Loading...</span>
+        </div>
+        <div>
+          L-846 with variables:
+          <span data-language="L-846" data-variables='{"amount": "2500.50", "currency": "EUR"}'>Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-card">
+      <h2>Language Switching Test</h2>
+      <div>
+        <label>Select Language:</label>
+        <select id="languageSelector" onchange="testLanguageSwitch()">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="pt">Português</option>
+        </select>
+      </div>
+
+      <div class="language-test">
+        <h3>Multi-language Display</h3>
+        <div>
+          Customer Profile:
+          <span data-language="L-831">Loading...</span>
+        </div>
+        <div>
+          P2P Activity:
+          <span data-language="L-843">Loading...</span>
+        </div>
+        <div>
+          Account Actions:
+          <span data-language="L-850">Loading...</span>
+        </div>
+      </div>
     </div>
 
     <script>
-        let languageManager = null;
-        let testResults = {
-            languageDataLoaded: false,
-            languageManagerInitialized: false,
-            keyTranslationWorking: false,
-            languageSwitchingWorking: false,
-            templateVariablesWorking: false
-        };
+      let languageManager = null;
+      let testResults = {
+        languageDataLoaded: false,
+        languageManagerInitialized: false,
+        keyTranslationWorking: false,
+        languageSwitchingWorking: false,
+        templateVariablesWorking: false,
+      };
 
-        // Initialize test
-        document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🧪 Starting Fire22 Language Integration Test');
-            await runLanguageTest();
-        });
+      // Initialize test
+      document.addEventListener('DOMContentLoaded', async () => {
+        console.log('🧪 Starting Fire22 Language Integration Test');
+        await runLanguageTest();
+      });
 
-        async function runLanguageTest() {
-            const statusEl = document.getElementById('languageStatus');
-            const detailsEl = document.getElementById('languageDetails');
-            
-            try {
-                // Test 1: Check if language data is available
-                console.log('📋 Test 1: Loading language data...');
-                const response = await fetch('src/i18n/fire22-language-keys.json');
-                if (!response.ok) throw new Error('Language data not accessible');
-                
-                const languageData = await response.json();
-                console.log('✅ Language data loaded:', languageData.meta);
-                testResults.languageDataLoaded = true;
-                
-                // Test 2: Initialize Fire22 Language Manager  
-                console.log('📋 Test 2: Initializing language manager...');
-                
-                // Load the language manager module
-                const { Fire22LanguageManager, initFire22Language, getLanguageText, switchLanguage, updateLanguageElements } = 
-                    await import('./src/utils/fire22-language-manager.ts');
-                
-                languageManager = Fire22LanguageManager.getInstance();
-                await languageManager.loadLanguages();
-                console.log('✅ Language manager initialized');
-                testResults.languageManagerInitialized = true;
-                
-                // Test 3: Test language key translations
-                console.log('📋 Test 3: Testing language key translations...');
-                const testKey = languageManager.getText('L-821');
-                if (testKey && testKey !== 'L-821') {
-                    console.log('✅ Language key translation working:', testKey);
-                    testResults.keyTranslationWorking = true;
-                }
-                
-                // Test 4: Test template variables
-                console.log('📋 Test 4: Testing template variables...');
-                const templateTest = languageManager.getText('L-834', { amount: '5000', currency: 'USD' });
-                if (templateTest && templateTest.includes('5000') && templateTest.includes('USD')) {
-                    console.log('✅ Template variables working:', templateTest);
-                    testResults.templateVariablesWorking = true;
-                }
-                
-                // Test 5: Update DOM elements
-                console.log('📋 Test 5: Updating DOM elements...');
-                languageManager.updateAllLanguageElements();
-                
-                // Update status
-                const successCount = Object.values(testResults).filter(Boolean).length;
-                const totalTests = Object.keys(testResults).length;
-                
-                if (successCount === totalTests) {
-                    statusEl.className = 'status success';
-                    statusEl.textContent = `✅ All Tests Passed (${successCount}/${totalTests})`;
-                } else {
-                    statusEl.className = 'status warning';
-                    statusEl.textContent = `⚠️ Partial Success (${successCount}/${totalTests})`;
-                }
-                
-                detailsEl.innerHTML = `
+      async function runLanguageTest() {
+        const statusEl = document.getElementById('languageStatus');
+        const detailsEl = document.getElementById('languageDetails');
+
+        try {
+          // Test 1: Check if language data is available
+          console.log('📋 Test 1: Loading language data...');
+          const response = await fetch('src/i18n/fire22-language-keys.json');
+          if (!response.ok) throw new Error('Language data not accessible');
+
+          const languageData = await response.json();
+          console.log('✅ Language data loaded:', languageData.meta);
+          testResults.languageDataLoaded = true;
+
+          // Test 2: Initialize Fire22 Language Manager
+          console.log('📋 Test 2: Initializing language manager...');
+
+          // Load the language manager module
+          const { Fire22LanguageManager, initFire22Language, getLanguageText, switchLanguage, updateLanguageElements } =
+            await import('./src/utils/fire22-language-manager.ts');
+
+          languageManager = Fire22LanguageManager.getInstance();
+          await languageManager.loadLanguages();
+          console.log('✅ Language manager initialized');
+          testResults.languageManagerInitialized = true;
+
+          // Test 3: Test language key translations
+          console.log('📋 Test 3: Testing language key translations...');
+          const testKey = languageManager.getText('L-821');
+          if (testKey && testKey !== 'L-821') {
+            console.log('✅ Language key translation working:', testKey);
+            testResults.keyTranslationWorking = true;
+          }
+
+          // Test 4: Test template variables
+          console.log('📋 Test 4: Testing template variables...');
+          const templateTest = languageManager.getText('L-834', { amount: '5000', currency: 'USD' });
+          if (templateTest && templateTest.includes('5000') && templateTest.includes('USD')) {
+            console.log('✅ Template variables working:', templateTest);
+            testResults.templateVariablesWorking = true;
+          }
+
+          // Test 5: Update DOM elements
+          console.log('📋 Test 5: Updating DOM elements...');
+          languageManager.updateAllLanguageElements();
+
+          // Update status
+          const successCount = Object.values(testResults).filter(Boolean).length;
+          const totalTests = Object.keys(testResults).length;
+
+          if (successCount === totalTests) {
+            statusEl.className = 'status success';
+            statusEl.textContent = `✅ All Tests Passed (${successCount}/${totalTests})`;
+          } else {
+            statusEl.className = 'status warning';
+            statusEl.textContent = `⚠️ Partial Success (${successCount}/${totalTests})`;
+          }
+
+          detailsEl.innerHTML = `
                     <h3>Test Results:</h3>
                     <div>Language Data Loaded: ${testResults.languageDataLoaded ? '✅' : '❌'}</div>
                     <div>Language Manager Initialized: ${testResults.languageManagerInitialized ? '✅' : '❌'}</div>
@@ -169,41 +199,38 @@
                     <div><strong>Total Keys:</strong> ${languageData.meta.totalKeys}</div>
                     <div><strong>Version:</strong> ${languageData.meta.version}</div>
                 `;
-                
-            } catch (error) {
-                console.error('❌ Language integration test failed:', error);
-                statusEl.className = 'status error';
-                statusEl.textContent = '❌ Test Failed';
-                detailsEl.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-            }
+        } catch (error) {
+          console.error('❌ Language integration test failed:', error);
+          statusEl.className = 'status error';
+          statusEl.textContent = '❌ Test Failed';
+          detailsEl.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+        }
+      }
+
+      async function testLanguageSwitch() {
+        if (!languageManager) {
+          console.warn('⚠️ Language manager not initialized');
+          return;
         }
 
-        async function testLanguageSwitch() {
-            if (!languageManager) {
-                console.warn('⚠️ Language manager not initialized');
-                return;
-            }
-            
-            const selector = document.getElementById('languageSelector');
-            const selectedLang = selector.value;
-            
-            console.log(`🔄 Switching to language: ${selectedLang}`);
-            
-            try {
-                await languageManager.switchLanguage(selectedLang);
-                console.log('✅ Language switch successful');
-                testResults.languageSwitchingWorking = true;
-                
-                // Update test results
-                document.getElementById('languageDetails').innerHTML = document.getElementById('languageDetails').innerHTML.replace(
-                    /Language Switching: ❌/,
-                    'Language Switching: ✅'
-                );
-                
-            } catch (error) {
-                console.error('❌ Language switch failed:', error);
-            }
+        const selector = document.getElementById('languageSelector');
+        const selectedLang = selector.value;
+
+        console.log(`🔄 Switching to language: ${selectedLang}`);
+
+        try {
+          await languageManager.switchLanguage(selectedLang);
+          console.log('✅ Language switch successful');
+          testResults.languageSwitchingWorking = true;
+
+          // Update test results
+          document.getElementById('languageDetails').innerHTML = document
+            .getElementById('languageDetails')
+            .innerHTML.replace(/Language Switching: ❌/, 'Language Switching: ✅');
+        } catch (error) {
+          console.error('❌ Language switch failed:', error);
         }
+      }
     </script>
-</body>
+  </body>
 </html>

@@ -28,7 +28,7 @@ declare global {
  */
 export function validateApiKey(req: Request): boolean {
   const apiKey = req.headers['x-api-key'] || req.headers['authorization']?.replace('Bearer ', '');
-  
+
   if (!apiKey) {
     return false;
   }
@@ -39,7 +39,7 @@ export function validateApiKey(req: Request): boolean {
     process.env.API_KEY,
     process.env.MASTER_API_KEY,
     'test_key_123', // For testing
-    CONSTANTS.API_CONFIG.DEFAULT_AGENT_ID // Fallback
+    CONSTANTS.API_CONFIG.DEFAULT_AGENT_ID, // Fallback
   ].filter(Boolean);
 
   return validApiKeys.includes(apiKey as string);
@@ -59,7 +59,7 @@ export function validateAgentId(agentId: string): boolean {
     CONSTANTS.API_CONFIG.DEFAULT_MASTER_AGENT,
     'BLAKEPPH',
     'MASTER',
-    'ADMIN'
+    'ADMIN',
   ];
 
   return validAgentIds.includes(agentId) || agentId.length >= 3;
@@ -71,13 +71,13 @@ export function validateAgentId(agentId: string): boolean {
 export function authenticateApiKey(req: Request, res: Response, next: NextFunction): void {
   try {
     const isValid = validateApiKey(req);
-    
+
     if (!isValid) {
       res.status(401).json({
         success: false,
         error: 'Unauthorized',
         message: 'Invalid or missing API key',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       } as ApiResponse);
       return;
     }
@@ -88,7 +88,7 @@ export function authenticateApiKey(req: Request, res: Response, next: NextFuncti
       username: 'api-user',
       role: 'agent',
       agentId: CONSTANTS.API_CONFIG.DEFAULT_AGENT_ID,
-      permissions: ['read', 'write']
+      permissions: ['read', 'write'],
     };
 
     next();
@@ -98,7 +98,7 @@ export function authenticateApiKey(req: Request, res: Response, next: NextFuncti
       success: false,
       error: 'Authentication error',
       message: 'Failed to authenticate request',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     } as ApiResponse);
   }
 }
@@ -109,25 +109,25 @@ export function authenticateApiKey(req: Request, res: Response, next: NextFuncti
 export function authorizeAgent(req: Request, res: Response, next: NextFunction): void {
   try {
     const agentId = req.body.agentID || req.query.agentID || req.params.agentID;
-    
+
     if (!agentId) {
       res.status(400).json({
         success: false,
         error: 'Bad Request',
         message: 'Agent ID is required',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       } as ApiResponse);
       return;
     }
 
     const isValidAgent = validateAgentId(agentId as string);
-    
+
     if (!isValidAgent) {
       res.status(403).json({
         success: false,
         error: 'Forbidden',
         message: 'Invalid agent ID or insufficient permissions',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       } as ApiResponse);
       return;
     }
@@ -145,7 +145,7 @@ export function authorizeAgent(req: Request, res: Response, next: NextFunction):
       success: false,
       error: 'Authorization error',
       message: 'Failed to authorize agent',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     } as ApiResponse);
   }
 }
@@ -161,19 +161,19 @@ export function authorizeRole(allowedRoles: string[]) {
           success: false,
           error: 'Unauthorized',
           message: 'Authentication required',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         } as ApiResponse);
         return;
       }
 
       const userRole = req.user.role;
-      
+
       if (!allowedRoles.includes(userRole)) {
         res.status(403).json({
           success: false,
           error: 'Forbidden',
           message: `Role '${userRole}' is not authorized for this operation`,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         } as ApiResponse);
         return;
       }
@@ -185,7 +185,7 @@ export function authorizeRole(allowedRoles: string[]) {
         success: false,
         error: 'Authorization error',
         message: 'Failed to authorize role',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       } as ApiResponse);
     }
   };
@@ -202,19 +202,19 @@ export function authorizePermission(requiredPermission: string) {
           success: false,
           error: 'Unauthorized',
           message: 'Authentication required',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         } as ApiResponse);
         return;
       }
 
       const userPermissions = req.user.permissions || [];
-      
+
       if (!userPermissions.includes(requiredPermission) && !userPermissions.includes('admin')) {
         res.status(403).json({
           success: false,
           error: 'Forbidden',
           message: `Permission '${requiredPermission}' is required for this operation`,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         } as ApiResponse);
         return;
       }
@@ -226,7 +226,7 @@ export function authorizePermission(requiredPermission: string) {
         success: false,
         error: 'Authorization error',
         message: 'Failed to authorize permission',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       } as ApiResponse);
     }
   };
@@ -264,7 +264,7 @@ export function rateLimit(maxRequests: number = 100, windowMs: number = 60000) {
           success: false,
           error: 'Too Many Requests',
           message: 'Rate limit exceeded. Please try again later.',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         } as ApiResponse);
         return;
       }
@@ -330,5 +330,5 @@ export default {
   authorizePermission,
   rateLimit,
   logRequest,
-  securityHeaders
+  securityHeaders,
 };

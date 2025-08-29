@@ -67,7 +67,7 @@ class UnifiedDashboard extends EventEmitter {
       winRate: 0,
       systemUptime: 100,
       apiResponseTime: 0,
-      errorRate: 0
+      errorRate: 0,
     };
   }
 
@@ -86,7 +86,7 @@ class UnifiedDashboard extends EventEmitter {
       const wsUrl = `ws://localhost:8787/ws/dashboard`;
       const ws = new WebSocket(wsUrl);
 
-      ws.onmessage = (event) => {
+      ws.onmessage = event => {
         const data = JSON.parse(event.data);
         this.handleRealTimeUpdate(data);
       };
@@ -95,7 +95,6 @@ class UnifiedDashboard extends EventEmitter {
         console.log('🔄 WebSocket connection lost, retrying...');
         setTimeout(() => this.setupWebSocketConnection(), 5000);
       };
-
     } catch (error) {
       console.log('⚠️ WebSocket not available, using polling');
     }
@@ -138,7 +137,7 @@ class UnifiedDashboard extends EventEmitter {
         this.fetchAgentMetrics(),
         this.fetchCustomerMetrics(),
         this.fetchBettingMetrics(),
-        this.fetchSystemHealth()
+        this.fetchSystemHealth(),
       ]);
 
       // Update metrics
@@ -146,12 +145,11 @@ class UnifiedDashboard extends EventEmitter {
         ...agentData,
         ...customerData,
         ...bettingData,
-        ...healthData
+        ...healthData,
       });
 
       this.emit('metrics-updated', this.metrics);
       this.updateActionItems();
-
     } catch (error) {
       console.error('❌ Failed to refresh metrics:', error);
       this.emit('error', error);
@@ -164,13 +162,13 @@ class UnifiedDashboard extends EventEmitter {
       const agents = await response.json();
 
       const activeAgents = agents.filter((a: any) => a.status === 'active').length;
-      const avgPerformance = agents.reduce((sum: number, a: any) =>
-        sum + (a.performance_score || 0), 0) / agents.length;
+      const avgPerformance =
+        agents.reduce((sum: number, a: any) => sum + (a.performance_score || 0), 0) / agents.length;
 
       return {
         totalAgents: agents.length,
         activeAgents,
-        agentPerformance: Math.round(avgPerformance)
+        agentPerformance: Math.round(avgPerformance),
       };
     } catch (error) {
       return { totalAgents: 0, activeAgents: 0, agentPerformance: 0 };
@@ -191,7 +189,7 @@ class UnifiedDashboard extends EventEmitter {
       return {
         totalCustomers,
         activeCustomers,
-        customerRetention: Math.round(retentionRate)
+        customerRetention: Math.round(retentionRate),
       };
     } catch (error) {
       return { totalCustomers: 0, activeCustomers: 4320, customerRetention: 0 };
@@ -206,7 +204,7 @@ class UnifiedDashboard extends EventEmitter {
       return {
         dailyVolume: tickerData.dailyVolume || 0,
         activeBets: tickerData.activeBets || 0,
-        winRate: tickerData.winRate || 0
+        winRate: tickerData.winRate || 0,
       };
     } catch (error) {
       return { dailyVolume: 0, activeBets: 0, winRate: 0 };
@@ -221,7 +219,7 @@ class UnifiedDashboard extends EventEmitter {
       return {
         systemUptime: healthData.uptime || 100,
         apiResponseTime: healthData.avgResponseTime || 0,
-        errorRate: healthData.errorRate || 0
+        errorRate: healthData.errorRate || 0,
       };
     } catch (error) {
       return { systemUptime: 100, apiResponseTime: 0, errorRate: 0 };
@@ -239,7 +237,7 @@ class UnifiedDashboard extends EventEmitter {
         action: 'Review agent performance dashboard',
         impact: 'Commission optimization opportunity',
         assignee: 'Management',
-        dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       },
       {
         id: 'customer_retention_opportunity',
@@ -250,7 +248,7 @@ class UnifiedDashboard extends EventEmitter {
         action: 'Launch customer engagement campaign',
         impact: 'Potential $25K additional monthly revenue',
         assignee: 'Marketing',
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
         id: 'system_performance_maintenance',
@@ -261,7 +259,7 @@ class UnifiedDashboard extends EventEmitter {
         action: 'Implement response caching',
         impact: 'Improved user experience',
         assignee: 'DevOps',
-        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
+        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
       },
       {
         id: 'betting_volume_opportunity',
@@ -272,8 +270,8 @@ class UnifiedDashboard extends EventEmitter {
         action: 'Scale infrastructure resources',
         impact: 'Ensure system stability during peak',
         assignee: 'Operations',
-        dueDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()
-      }
+        dueDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+      },
     ];
   }
 
@@ -284,7 +282,7 @@ class UnifiedDashboard extends EventEmitter {
         id: 'agent_performance_alert',
         priority: 'high',
         title: `Agent Performance: ${this.metrics.agentPerformance}/100`,
-        description: `${Math.round((75 - this.metrics.agentPerformance) / 75 * 100)}% below target`
+        description: `${Math.round(((75 - this.metrics.agentPerformance) / 75) * 100)}% below target`,
       });
     }
 
@@ -295,7 +293,7 @@ class UnifiedDashboard extends EventEmitter {
         priority: 'medium',
         title: `API Performance Issue: ${this.metrics.apiResponseTime}ms`,
         description: 'Response time above 300ms threshold',
-        action: 'Check server resources and optimize queries'
+        action: 'Check server resources and optimize queries',
       });
     }
 
@@ -389,7 +387,10 @@ class UnifiedDashboard extends EventEmitter {
         <div class="action-items-section">
           <h2>🚨 Action Items (${this.actionItems.length})</h2>
           <div class="action-items">
-            ${this.actionItems.slice(0, 5).map(item => `
+            ${this.actionItems
+              .slice(0, 5)
+              .map(
+                item => `
               <div class="action-item priority-${item.priority}">
                 <div class="action-header">
                   <span class="action-priority">${item.priority.toUpperCase()}</span>
@@ -402,7 +403,9 @@ class UnifiedDashboard extends EventEmitter {
                   ${item.action}
                 </button>
               </div>
-            `).join('')}
+            `
+              )
+              .join('')}
           </div>
         </div>
 
@@ -436,17 +439,17 @@ export function initializeUnifiedDashboard(): UnifiedDashboard {
     dashboardInstance = new UnifiedDashboard();
 
     // Setup event listeners
-    dashboardInstance.on('metrics-updated', (metrics) => {
+    dashboardInstance.on('metrics-updated', metrics => {
       console.log('📊 Dashboard metrics updated:', metrics);
       updateDashboardDisplay(metrics);
     });
 
-    dashboardInstance.on('action-items-updated', (actions) => {
+    dashboardInstance.on('action-items-updated', actions => {
       console.log('🚨 Action items updated:', actions.length);
       updateActionItems(actions);
     });
 
-    dashboardInstance.on('error', (error) => {
+    dashboardInstance.on('error', error => {
       console.error('❌ Dashboard error:', error);
       showDashboardError(error);
     });
@@ -474,13 +477,18 @@ function updateDashboardDisplay(metrics: DashboardMetrics): void {
 function updateActionItems(actions: ActionItem[]): void {
   const actionContainer = document.querySelector('.action-items');
   if (actionContainer) {
-    actionContainer.innerHTML = actions.slice(0, 5).map(item => `
+    actionContainer.innerHTML = actions
+      .slice(0, 5)
+      .map(
+        item => `
       <div class="action-item priority-${item.priority}">
         <div class="action-title">${item.title}</div>
         <div class="action-description">${item.description}</div>
         <button onclick="handleAction('${item.id}')">${item.action}</button>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
   }
 }
 

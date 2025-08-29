@@ -1,6 +1,6 @@
 /**
  * Fire22 Registry Server Implementation
- * 
+ *
  * Secure npm-compatible registry with integrated security scanning
  */
 
@@ -48,7 +48,7 @@ export class Fire22RegistryServer {
   private config: RegistryConfig;
   private packages = new Map<string, Map<string, RegistryPackage>>();
   private securityScanner?: any;
-  
+
   constructor(config: RegistryConfig) {
     this.config = config;
   }
@@ -62,16 +62,15 @@ export class Fire22RegistryServer {
       if (this.config.security.scanning) {
         const { SecurityScanner } = await import('../scanner/SecurityScanner');
         this.securityScanner = new SecurityScanner({
-          strict: this.config.security.strict
+          strict: this.config.security.strict,
         });
         console.log('🔍 Security scanner initialized');
       }
-      
+
       // Load existing packages from storage
       await this.loadPackages();
-      
+
       console.log(`🚀 Fire22 Registry Server initialized at ${this.config.url}`);
-      
     } catch (error) {
       throw new Error(`Registry initialization failed: ${error.message}`);
     }
@@ -84,21 +83,21 @@ export class Fire22RegistryServer {
     try {
       // Validate package metadata
       this.validatePackageMetadata(packageData);
-      
+
       // Security scan if enabled
       let securityReport: SecurityReport | null = null;
       if (this.config.security.scanning && this.securityScanner) {
         securityReport = await this.scanPackageForSecurity(packageData, tarball);
-        
+
         // Block publishing if security score is too low
         if (this.config.security.strict && securityReport.score < 50) {
           throw new Error(`Package rejected: Security score too low (${securityReport.score}/100)`);
         }
       }
-      
+
       // Calculate integrity hashes
       const integrity = await this.calculateIntegrity(tarball);
-      
+
       // Create package record
       const registryPackage: RegistryPackage = {
         name: packageData.name,
@@ -118,19 +117,18 @@ export class Fire22RegistryServer {
           scannedAt: securityReport?.timestamp || new Date().toISOString(),
           score: securityReport?.score || 100,
           vulnerabilities: securityReport?.vulnerabilities.length || 0,
-          riskLevel: securityReport?.riskLevel || 'low'
+          riskLevel: securityReport?.riskLevel || 'low',
         },
-        integrity
+        integrity,
       };
-      
+
       // Store package
       await this.storePackage(registryPackage, tarball);
-      
+
       console.log(`📦 Package published: ${packageData.name}@${packageData.version}`);
       console.log(`🔐 Security score: ${registryPackage.security.score}/100`);
-      
+
       return registryPackage;
-      
     } catch (error) {
       throw new Error(`Package publishing failed: ${error.message}`);
     }
@@ -142,12 +140,12 @@ export class Fire22RegistryServer {
   async getPackage(name: string): Promise<{ versions: Record<string, RegistryPackage> } | null> {
     const packageVersions = this.packages.get(name);
     if (!packageVersions) return null;
-    
+
     const versions: Record<string, RegistryPackage> = {};
     for (const [version, pkg] of packageVersions.entries()) {
       versions[version] = pkg;
     }
-    
+
     return { versions };
   }
 
@@ -157,7 +155,7 @@ export class Fire22RegistryServer {
   async getPackageVersion(name: string, version: string): Promise<RegistryPackage | null> {
     const packageVersions = this.packages.get(name);
     if (!packageVersions) return null;
-    
+
     return packageVersions.get(version) || null;
   }
 
@@ -167,10 +165,10 @@ export class Fire22RegistryServer {
   async downloadPackage(name: string, version: string): Promise<ArrayBuffer | null> {
     const pkg = await this.getPackageVersion(name, version);
     if (!pkg) return null;
-    
+
     // Increment download counter
     pkg.downloads++;
-    
+
     // Load tarball from storage
     return this.loadPackageTarball(name, version);
   }
@@ -178,40 +176,43 @@ export class Fire22RegistryServer {
   /**
    * Search packages
    */
-  async searchPackages(query: string, options: {
-    limit?: number;
-    offset?: number;
-    includePrerelease?: boolean;
-  } = {}): Promise<RegistryPackage[]> {
+  async searchPackages(
+    query: string,
+    options: {
+      limit?: number;
+      offset?: number;
+      includePrerelease?: boolean;
+    } = {}
+  ): Promise<RegistryPackage[]> {
     const results: RegistryPackage[] = [];
     const queryLower = query.toLowerCase();
-    
+
     for (const [name, versions] of this.packages.entries()) {
       // Check if package name or description matches query
       const latestVersion = this.getLatestVersion(versions);
       if (!latestVersion) continue;
-      
-      const matches = 
+
+      const matches =
         name.toLowerCase().includes(queryLower) ||
         latestVersion.description?.toLowerCase().includes(queryLower) ||
         latestVersion.keywords?.some(k => k.toLowerCase().includes(queryLower));
-      
+
       if (matches) {
         results.push(latestVersion);
       }
     }
-    
+
     // Sort by relevance (downloads, security score, etc.)
     results.sort((a, b) => {
       const scoreA = a.downloads * 0.6 + a.security.score * 0.4;
       const scoreB = b.downloads * 0.6 + b.security.score * 0.4;
       return scoreB - scoreA;
     });
-    
+
     // Apply pagination
     const offset = options.offset || 0;
     const limit = options.limit || 20;
-    
+
     return results.slice(offset, offset + limit);
   }
 
@@ -226,42 +227,43 @@ export class Fire22RegistryServer {
     let scannedPackages = 0;
     let vulnerablePackages = 0;
     const recentPublishes: RegistryPackage[] = [];
-    
+
     for (const [name, versions] of this.packages.entries()) {
       totalPackages++;
-      
+
       for (const [version, pkg] of versions.entries()) {
         totalVersions++;
         totalDownloads += pkg.downloads;
-        
+
         if (pkg.security.score > 0) {
           totalSecurityScore += pkg.security.score;
           scannedPackages++;
         }
-        
+
         if (pkg.security.vulnerabilities > 0) {
           vulnerablePackages++;
         }
-        
+
         recentPublishes.push(pkg);
       }
     }
-    
+
     // Sort recent publishes by date
-    recentPublishes.sort((a, b) => 
-      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    recentPublishes.sort(
+      (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     );
-    
+
     return {
       totalPackages,
       totalVersions,
       totalDownloads,
       securityStats: {
         scannedPackages,
-        avgSecurityScore: scannedPackages > 0 ? Math.round(totalSecurityScore / scannedPackages) : 100,
-        vulnerablePackages
+        avgSecurityScore:
+          scannedPackages > 0 ? Math.round(totalSecurityScore / scannedPackages) : 100,
+        vulnerablePackages,
       },
-      recentPublishes: recentPublishes.slice(0, 10)
+      recentPublishes: recentPublishes.slice(0, 10),
     };
   }
 
@@ -272,20 +274,18 @@ export class Fire22RegistryServer {
     if (!packageData.name || typeof packageData.name !== 'string') {
       throw new Error('Package name is required and must be a string');
     }
-    
+
     if (!packageData.version || typeof packageData.version !== 'string') {
       throw new Error('Package version is required and must be a string');
     }
-    
+
     // Check if package name matches allowed scopes
-    const isValidScope = this.config.scopes.some(scope => 
-      packageData.name.startsWith(scope)
-    );
-    
+    const isValidScope = this.config.scopes.some(scope => packageData.name.startsWith(scope));
+
     if (!isValidScope) {
       throw new Error(`Package name must start with one of: ${this.config.scopes.join(', ')}`);
     }
-    
+
     // Validate version format (semver)
     const semverRegex = /^\d+\.\d+\.\d+(-[\w.-]+)?(\+[\w.-]+)?$/;
     if (!semverRegex.test(packageData.version)) {
@@ -296,27 +296,29 @@ export class Fire22RegistryServer {
   /**
    * Scan package for security vulnerabilities
    */
-  private async scanPackageForSecurity(packageData: any, tarball: ArrayBuffer): Promise<SecurityReport> {
+  private async scanPackageForSecurity(
+    packageData: any,
+    tarball: ArrayBuffer
+  ): Promise<SecurityReport> {
     if (!this.securityScanner) {
       throw new Error('Security scanner not initialized');
     }
-    
+
     // Create temporary directory for scanning
     const tempDir = `/tmp/fire22-scan-${Date.now()}`;
-    
+
     try {
       // Extract tarball to temporary directory
       await this.extractTarball(tarball, tempDir);
-      
+
       // Run security scan
       const report = await this.securityScanner.scan({
         path: tempDir,
         packageName: packageData.name,
-        version: packageData.version
+        version: packageData.version,
       });
-      
+
       return report;
-      
     } finally {
       // Clean up temporary directory
       await this.cleanupTempDir(tempDir);
@@ -326,13 +328,15 @@ export class Fire22RegistryServer {
   /**
    * Calculate integrity hashes for tarball
    */
-  private async calculateIntegrity(tarball: ArrayBuffer): Promise<{ sha256: string; sha512: string }> {
+  private async calculateIntegrity(
+    tarball: ArrayBuffer
+  ): Promise<{ sha256: string; sha512: string }> {
     const sha256 = await crypto.subtle.digest('SHA-256', tarball);
     const sha512 = await crypto.subtle.digest('SHA-512', tarball);
-    
+
     return {
       sha256: this.arrayBufferToHex(sha256),
-      sha512: this.arrayBufferToHex(sha512)
+      sha512: this.arrayBufferToHex(sha512),
     };
   }
 
@@ -353,13 +357,13 @@ export class Fire22RegistryServer {
     if (!this.packages.has(pkg.name)) {
       this.packages.set(pkg.name, new Map());
     }
-    
+
     const versions = this.packages.get(pkg.name)!;
     versions.set(pkg.version, pkg);
-    
+
     // Store tarball (in production, this would go to object storage)
     await this.storeTarball(pkg.name, pkg.version, tarball);
-    
+
     // Save registry state
     await this.savePackages();
   }
@@ -370,14 +374,14 @@ export class Fire22RegistryServer {
   private getLatestVersion(versions: Map<string, RegistryPackage>): RegistryPackage | null {
     const versionArray = Array.from(versions.values());
     if (versionArray.length === 0) return null;
-    
+
     // Sort versions and return latest
     versionArray.sort((a, b) => {
       const aDate = new Date(a.publishedAt).getTime();
       const bDate = new Date(b.publishedAt).getTime();
       return bDate - aDate;
     });
-    
+
     return versionArray[0];
   }
 

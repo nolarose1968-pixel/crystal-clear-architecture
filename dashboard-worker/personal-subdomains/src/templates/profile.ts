@@ -1,6 +1,6 @@
 /**
  * Profile Template Entry Point (New Modular Structure)
- * 
+ *
  * This file now imports from the new modular structure.
  * The original large file has been archived in archive/old-templates/
  */

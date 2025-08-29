@@ -56,7 +56,9 @@ export class EnvironmentManager {
     try {
       // Check if current environment is supported
       if (!this.config.envFiles[currentEnv]) {
-        errors.push(`Environment '${currentEnv}' is not supported. Supported: ${Object.keys(this.config.envFiles).join(', ')}`);
+        errors.push(
+          `Environment '${currentEnv}' is not supported. Supported: ${Object.keys(this.config.envFiles).join(', ')}`
+        );
       }
 
       // Validate required environment variables
@@ -72,8 +74,10 @@ export class EnvironmentManager {
       // Check optional variables
       for (const optionalVar of this.config.envValidation.optional) {
         const value = Bun.env[optionalVar];
-        if (value && value.includes('dev_') || value?.includes('test_')) {
-          warnings.push(`Optional variable '${optionalVar}' contains development/test pattern: ${value}`);
+        if ((value && value.includes('dev_')) || value?.includes('test_')) {
+          warnings.push(
+            `Optional variable '${optionalVar}' contains development/test pattern: ${value}`
+          );
         }
       }
 
@@ -98,12 +102,12 @@ export class EnvironmentManager {
         errors,
         warnings,
         environment: currentEnv,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       // Cache result
       this.validationCache.set(currentEnv, result);
-      
+
       return result;
     } catch (error) {
       const accessTime = performance.now() - startTime;
@@ -114,7 +118,7 @@ export class EnvironmentManager {
         errors: [`Validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`],
         warnings: [],
         environment: currentEnv,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -136,18 +140,18 @@ export class EnvironmentManager {
               severity: 'high',
               message: `Secret '${secretVar}' is too short (${value.length} chars)`,
               variable: secretVar,
-              recommendation: 'Generate a secret with at least 32 characters'
+              recommendation: 'Generate a secret with at least 32 characters',
             });
             score -= 20;
           }
-          
+
           if (value === 'your-secret-key' || value === 'dev_secret') {
             issues.push({
               type: 'default_value',
               severity: 'critical',
               message: `Secret '${secretVar}' contains default value`,
               variable: secretVar,
-              recommendation: 'Replace with a strong, unique secret'
+              recommendation: 'Replace with a strong, unique secret',
             });
             score -= 30;
           }
@@ -157,7 +161,7 @@ export class EnvironmentManager {
             severity: 'critical',
             message: `Required secret '${secretVar}' is not set`,
             variable: secretVar,
-            recommendation: 'Set this environment variable with a strong secret'
+            recommendation: 'Set this environment variable with a strong secret',
           });
           score -= 25;
         }
@@ -171,7 +175,7 @@ export class EnvironmentManager {
             severity: 'critical',
             message: `Live API key detected in '${key}'`,
             variable: key,
-            recommendation: 'Use test keys in development environments'
+            recommendation: 'Use test keys in development environments',
           });
           score -= 25;
         }
@@ -184,7 +188,7 @@ export class EnvironmentManager {
         success: score >= 70,
         score: Math.max(0, score),
         issues,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       const accessTime = performance.now() - startTime;
@@ -193,13 +197,15 @@ export class EnvironmentManager {
       return {
         success: false,
         score: 0,
-        issues: [{
-          type: 'exposed_pattern',
-          severity: 'critical',
-          message: `Security audit failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-          recommendation: 'Check system configuration and try again'
-        }],
-        timestamp: new Date().toISOString()
+        issues: [
+          {
+            type: 'exposed_pattern',
+            severity: 'critical',
+            message: `Security audit failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            recommendation: 'Check system configuration and try again',
+          },
+        ],
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -211,14 +217,16 @@ export class EnvironmentManager {
     }
 
     const latest = this.performanceMetrics[this.performanceMetrics.length - 1];
-    const avgAccessTime = this.performanceMetrics.reduce((sum, m) => sum + m.accessTime, 0) / this.performanceMetrics.length;
+    const avgAccessTime =
+      this.performanceMetrics.reduce((sum, m) => sum + m.accessTime, 0) /
+      this.performanceMetrics.length;
     const opsPerSecond = 1000 / avgAccessTime; // Rough calculation
 
     return {
       accessTime: avgAccessTime,
       operationsPerSecond: opsPerSecond,
       memoryUsage: performance.memory?.usedJSHeapSize || 0,
-      timestamp: latest.timestamp
+      timestamp: latest.timestamp,
     };
   }
 
@@ -228,7 +236,7 @@ export class EnvironmentManager {
       accessTime,
       operationsPerSecond: 0, // Will be calculated when retrieved
       memoryUsage: performance.memory?.usedJSHeapSize || 0,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     // Keep only last 1000 metrics
@@ -267,13 +275,13 @@ const defaultConfig: EnvironmentConfig = {
     development: '.env.development',
     staging: '.env.staging',
     production: '.env.production',
-    test: '.env.test'
+    test: '.env.test',
   },
   envValidation: {
     required: ['JWT_SECRET', 'ADMIN_PASSWORD'],
     optional: ['BOT_TOKEN', 'DEMO_MODE'],
-    secrets: ['JWT_SECRET', 'ADMIN_PASSWORD']
-  }
+    secrets: ['JWT_SECRET', 'ADMIN_PASSWORD'],
+  },
 };
 
 // Export default instance

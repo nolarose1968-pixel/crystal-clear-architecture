@@ -13,7 +13,7 @@ import type {
   RiskLevel,
   AgentLevel,
   SportType,
-  EventStatus
+  EventStatus,
 } from '../../constants';
 
 // === CUSTOMER ENTITIES ===
@@ -29,27 +29,27 @@ export interface Customer extends AuditableEntity {
   agent_id: string;
   parent_agent?: string;
   master_agent: string;
-  
+
   // Financial information
   balance: number;
   casino_balance: number;
   sports_balance: number;
   freeplay_balance: number;
   credit_limit: number;
-  
+
   // Activity tracking
   last_login?: string;
   last_activity?: string;
   total_deposits: number;
   total_withdrawals: number;
   lifetime_volume: number;
-  
+
   // Business rules
   tier: CustomerTier;
   betting_limits: Record<string, number>;
   risk_score: number;
   vip_status: boolean;
-  
+
   // Metadata
   notes?: string;
   preferences?: Record<string, any>;
@@ -91,30 +91,30 @@ export interface Agent extends AuditableEntity {
   parent_agent?: string;
   master_agent: string;
   level: AgentLevel;
-  
+
   // Business information
   commission_rate: number;
   status: DatabaseStatus;
   territory?: string;
   specializations: string[];
-  
+
   // Performance tracking
   total_customers: number;
   active_customers: number;
   total_volume: number;
   total_commission: number;
   performance_score: number;
-  
+
   // Access and permissions
   permissions: string[];
   access_level: number;
   allowed_sports: string[];
   max_bet_limit: number;
-  
+
   // Activity
   last_login?: string;
   login_count: number;
-  
+
   // Metadata
   contact_info?: {
     email?: string;
@@ -141,34 +141,34 @@ export interface Transaction extends AuditableEntity {
   tran_code: string;
   document_number?: string;
   reference?: string;
-  
+
   // Description and details
   short_desc: string;
   long_desc?: string;
-  
+
   // Processing information
   status: 'pending' | 'completed' | 'failed' | 'cancelled';
   processed_at?: string;
   processor?: string;
   external_reference?: string;
-  
+
   // Balance tracking
   balance_before: number;
   balance_after: number;
   freeplay_balance: number;
   freeplay_pending_balance: number;
   freeplay_pending_count: number;
-  
+
   // Audit information
   entered_by: string;
   approved_by?: string;
   grade_num?: number;
   tran_datetime: string;
-  
+
   // Related entities
   wager_id?: string;
   parent_transaction_id?: string;
-  
+
   // Metadata
   metadata?: Record<string, any>;
   fees?: {
@@ -183,53 +183,53 @@ export interface Wager extends AuditableEntity {
   wager_number: string;
   customer_id: string;
   agent_id: string;
-  
+
   // Bet details
   amount_wagered: number;
   to_win_amount: number;
   actual_win_amount?: number;
   odds: number;
   original_odds: number;
-  
+
   // Event information
   event_id?: string;
   sport: SportType;
   league: string;
   teams: string;
   event_datetime: string;
-  
+
   // Bet specifics
   bet_type: BetType;
   wager_type: string;
   line?: number;
   total?: number;
   selection: string;
-  
+
   // Status and processing
   status: WagerStatus;
   result?: 'win' | 'loss' | 'push' | 'void';
   graded_at?: string;
   graded_by?: string;
   settlement_datetime?: string;
-  
+
   // Business rules
   risk_level: RiskLevel;
   max_payout: number;
   commission_rate: number;
   volume_amount: number;
-  
+
   // Additional information
   ticket_writer: string;
   short_desc: string;
   notes?: string;
   vip: boolean;
   live_bet: boolean;
-  
+
   // Parlay information (if applicable)
   is_parlay: boolean;
   parlay_legs?: WagerLeg[];
   parlay_odds?: number;
-  
+
   // Metadata
   external_bet_id?: string;
   source: 'web' | 'mobile' | 'agent' | 'api';
@@ -253,47 +253,47 @@ export interface WagerLeg {
 export interface SportEvent extends BaseEntity {
   event_id: string;
   external_id?: string;
-  
+
   // Basic information
   name: string;
   sport: SportType;
   league: string;
   season?: string;
   week?: number;
-  
+
   // Teams
   home_team: string;
   away_team: string;
   home_team_id?: string;
   away_team_id?: string;
-  
+
   // Timing
   event_date: string;
   start_time: string;
   end_time?: string;
   timezone: string;
-  
+
   // Status
   status: EventStatus;
   live: boolean;
   in_play: boolean;
-  
+
   // Scores
   home_score?: number;
   away_score?: number;
   period?: string;
   time_remaining?: string;
-  
+
   // Betting
   markets: BettingMarket[];
   total_handle: number;
   total_bets: number;
-  
+
   // Risk management
   risk_level: RiskLevel;
   max_exposure: number;
   auto_grade: boolean;
-  
+
   // Metadata
   venue?: string;
   weather?: Record<string, any>;
@@ -304,28 +304,28 @@ export interface SportEvent extends BaseEntity {
 export interface BettingMarket extends BaseEntity {
   market_id: string;
   event_id: string;
-  
+
   // Market details
   name: string;
   type: BetType;
   category: string;
-  
+
   // Status
   status: 'open' | 'closed' | 'suspended';
   enabled: boolean;
-  
+
   // Lines and odds
   lines: BettingLine[];
-  
+
   // Limits
   min_bet: number;
   max_bet: number;
   max_payout: number;
-  
+
   // Business rules
   commission_rate: number;
   risk_limit: number;
-  
+
   // Metadata
   display_order: number;
   description?: string;
@@ -335,28 +335,28 @@ export interface BettingMarket extends BaseEntity {
 export interface BettingLine extends BaseEntity {
   line_id: string;
   market_id: string;
-  
+
   // Line details
   selection: string;
   odds: number;
   american_odds: number;
   decimal_odds: number;
   line_value?: number; // for spreads, totals
-  
+
   // Status
   status: 'open' | 'closed' | 'suspended';
   enabled: boolean;
-  
+
   // Movement tracking
   opening_odds: number;
   previous_odds: number;
   move_count: number;
   last_moved: string;
-  
+
   // Volume
   bet_count: number;
   total_handle: number;
-  
+
   // Risk
   liability: number;
   max_liability: number;
@@ -366,23 +366,30 @@ export interface BettingLine extends BaseEntity {
 export interface Activity extends BaseEntity {
   user_id: string;
   user_type: 'customer' | 'agent' | 'admin';
-  
+
   // Activity details
-  type: 'login' | 'logout' | 'bet_placed' | 'bet_settled' | 'deposit' | 'withdrawal' | 'profile_update';
+  type:
+    | 'login'
+    | 'logout'
+    | 'bet_placed'
+    | 'bet_settled'
+    | 'deposit'
+    | 'withdrawal'
+    | 'profile_update';
   action: string;
   description: string;
-  
+
   // Context
   amount?: number;
   entity_type?: string;
   entity_id?: string;
-  
+
   // Technical details
   ip_address?: string;
   user_agent?: string;
   device_type?: string;
   location?: string;
-  
+
   // Metadata
   metadata?: Record<string, any>;
   success: boolean;
@@ -418,23 +425,23 @@ export interface AuditLog extends BaseEntity {
 export interface Notification extends BaseEntity {
   recipient_id: string;
   recipient_type: 'customer' | 'agent' | 'admin';
-  
+
   // Content
   title: string;
   message: string;
   type: 'info' | 'warning' | 'error' | 'success';
   priority: 'low' | 'normal' | 'high' | 'urgent';
-  
+
   // Status
   status: 'pending' | 'sent' | 'delivered' | 'read' | 'failed';
   sent_at?: string;
   read_at?: string;
-  
+
   // Delivery
   channels: ('email' | 'sms' | 'push' | 'in_app')[];
   delivery_attempts: number;
   max_attempts: number;
-  
+
   // Metadata
   metadata?: Record<string, any>;
   template_id?: string;
@@ -446,27 +453,27 @@ export interface Report extends BaseEntity {
   name: string;
   description?: string;
   type: 'financial' | 'customer' | 'agent' | 'risk' | 'operational';
-  
+
   // Configuration
   query: string;
   parameters: Record<string, any>;
   schedule?: string; // cron expression
-  
+
   // Access
   created_by: string;
   visibility: 'private' | 'team' | 'organization';
   allowed_users: string[];
   allowed_roles: string[];
-  
+
   // Status
   status: 'active' | 'inactive' | 'draft';
   last_run?: string;
   next_run?: string;
-  
+
   // Output
   format: 'json' | 'csv' | 'pdf' | 'excel';
   email_recipients?: string[];
-  
+
   // Metadata
   tags: string[];
   category: string;
@@ -489,5 +496,5 @@ export type {
   SystemConfig,
   AuditLog,
   Notification,
-  Report
+  Report,
 };

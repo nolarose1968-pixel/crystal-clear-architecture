@@ -95,7 +95,12 @@
         {
           "step": 4,
           "action": "Distribute emergency communications",
-          "channels": ["emergency@fire22.com", "#emergencies", "sms-alerts", "external-notifications"],
+          "channels": [
+            "emergency@fire22.com",
+            "#emergencies",
+            "sms-alerts",
+            "external-notifications"
+          ],
           "owner": "communications-team"
         },
         {
@@ -163,7 +168,12 @@
         {
           "name": "audience",
           "type": "multiselect",
-          "options": ["all-employees", "department-specific", "leadership-only", "external-stakeholders"],
+          "options": [
+            "all-employees",
+            "department-specific",
+            "leadership-only",
+            "external-stakeholders"
+          ],
           "required": true
         },
         {
@@ -239,13 +249,23 @@
             "title": "Incident Analysis",
             "required": true,
             "format": "incident-analysis",
-            "fields": ["incident-count", "resolution-time", "root-cause-analysis", "preventive-measures"]
+            "fields": [
+              "incident-count",
+              "resolution-time",
+              "root-cause-analysis",
+              "preventive-measures"
+            ]
           },
           {
             "title": "Maintenance Summary",
             "required": true,
             "format": "maintenance-summary",
-            "fields": ["completed-maintenance", "scheduled-maintenance", "maintenance-costs", "equipment-health"]
+            "fields": [
+              "completed-maintenance",
+              "scheduled-maintenance",
+              "maintenance-costs",
+              "equipment-health"
+            ]
           },
           {
             "title": "Infrastructure Updates",
@@ -257,10 +277,19 @@
             "title": "Compliance & Safety",
             "required": true,
             "format": "compliance-report",
-            "fields": ["regulatory-compliance", "safety-audits", "training-completion", "incident-prevention"]
+            "fields": [
+              "regulatory-compliance",
+              "safety-audits",
+              "training-completion",
+              "incident-prevention"
+            ]
           }
         ],
-        "recipients": ["communications@fire22.com", "operations@fire22.com", "compliance@fire22.com"],
+        "recipients": [
+          "communications@fire22.com",
+          "operations@fire22.com",
+          "compliance@fire22.com"
+        ],
         "deadline": "Friday 2PM weekly"
       },
       "water-system-emergency-alert": {
@@ -276,22 +305,41 @@
             "title": "Safety Instructions",
             "required": true,
             "format": "safety-instructions",
-            "fields": ["evacuation-requirements", "safety-zones", "protective-measures", "emergency-contacts"]
+            "fields": [
+              "evacuation-requirements",
+              "safety-zones",
+              "protective-measures",
+              "emergency-contacts"
+            ]
           },
           {
             "title": "Response Actions",
             "required": true,
             "format": "response-actions",
-            "fields": ["immediate-actions", "response-team", "estimated-resolution", "status-updates"]
+            "fields": [
+              "immediate-actions",
+              "response-team",
+              "estimated-resolution",
+              "status-updates"
+            ]
           },
           {
             "title": "Communication Plan",
             "required": true,
             "format": "communication-plan",
-            "fields": ["notification-channels", "update-frequency", "stakeholder-communications", "external-notifications"]
+            "fields": [
+              "notification-channels",
+              "update-frequency",
+              "stakeholder-communications",
+              "external-notifications"
+            ]
           }
         ],
-        "recipients": ["emergency@fire22.com", "communications@fire22.com", "operations@fire22.com"],
+        "recipients": [
+          "emergency@fire22.com",
+          "communications@fire22.com",
+          "operations@fire22.com"
+        ],
         "deadline": "Immediate upon incident detection"
       }
     }

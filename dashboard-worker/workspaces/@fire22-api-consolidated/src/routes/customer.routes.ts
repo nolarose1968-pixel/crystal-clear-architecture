@@ -12,9 +12,6 @@ import * as schemas from '@fire22/validator/schemas';
 const router = Router({ base: '/customer' });
 
 // /api/customer/getHeriarchy (from server.js:954)
-router.post('/getHeriarchy',
-  authorize(["customer.*"]),
-  controller.getHeriarchy
-);
+router.post('/getHeriarchy', authorize(['customer.*']), controller.getHeriarchy);
 
 export const customerRoutes = router;

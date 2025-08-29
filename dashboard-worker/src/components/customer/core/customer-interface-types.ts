@@ -3,7 +3,10 @@
  * Shared types and interfaces for customer interface modules
  */
 
-import type { CustomerProfile, CustomerSearchFilters } from '../../services/customer-information-service';
+import type {
+  CustomerProfile,
+  CustomerSearchFilters,
+} from '../../services/customer-information-service';
 
 export interface CustomerInterfaceOptions {
   container: HTMLElement;
@@ -52,7 +55,13 @@ export interface CustomerAction {
 }
 
 export interface CustomerInterfaceEvent {
-  type: 'view-changed' | 'customer-selected' | 'customer-updated' | 'search-performed' | 'form-submitted' | 'error-occurred';
+  type:
+    | 'view-changed'
+    | 'customer-selected'
+    | 'customer-updated'
+    | 'search-performed'
+    | 'form-submitted'
+    | 'error-occurred';
   data?: any;
   timestamp: Date;
 }
@@ -165,7 +174,13 @@ export interface CustomerNotification {
 // Utility types for internal use
 export type CustomerFormMode = 'create' | 'edit' | 'view';
 export type CustomerDisplayMode = 'list' | 'grid' | 'table';
-export type CustomerSortField = 'name' | 'email' | 'createdAt' | 'lastLogin' | 'balance' | 'vipTier';
+export type CustomerSortField =
+  | 'name'
+  | 'email'
+  | 'createdAt'
+  | 'lastLogin'
+  | 'balance'
+  | 'vipTier';
 export type CustomerFilterType = 'text' | 'select' | 'date' | 'number' | 'boolean';
 
 // Export default configuration
@@ -183,7 +198,7 @@ export const DEFAULT_CUSTOMER_INTERFACE_OPTIONS: Partial<CustomerInterfaceOption
   enableAdvancedFilters: true,
   enableQuickActions: true,
   theme: 'auto',
-  language: 'en'
+  language: 'en',
 };
 
 export const DEFAULT_CUSTOMER_QUICK_ACTIONS: CustomerQuickAction[] = [
@@ -193,7 +208,7 @@ export const DEFAULT_CUSTOMER_QUICK_ACTIONS: CustomerQuickAction[] = [
     icon: 'user',
     action: 'view-customer',
     requiresSelection: true,
-    requiresConfirmation: false
+    requiresConfirmation: false,
   },
   {
     id: 'edit-customer',
@@ -201,7 +216,7 @@ export const DEFAULT_CUSTOMER_QUICK_ACTIONS: CustomerQuickAction[] = [
     icon: 'edit',
     action: 'edit-customer',
     requiresSelection: true,
-    requiresConfirmation: false
+    requiresConfirmation: false,
   },
   {
     id: 'view-transactions',
@@ -209,7 +224,7 @@ export const DEFAULT_CUSTOMER_QUICK_ACTIONS: CustomerQuickAction[] = [
     icon: 'credit-card',
     action: 'view-transactions',
     requiresSelection: true,
-    requiresConfirmation: false
+    requiresConfirmation: false,
   },
   {
     id: 'send-message',
@@ -217,8 +232,8 @@ export const DEFAULT_CUSTOMER_QUICK_ACTIONS: CustomerQuickAction[] = [
     icon: 'message',
     action: 'send-message',
     requiresSelection: true,
-    requiresConfirmation: false
-  }
+    requiresConfirmation: false,
+  },
 ];
 
 export const DEFAULT_CUSTOMER_BULK_OPERATIONS: CustomerBulkOperation[] = [
@@ -229,7 +244,7 @@ export const DEFAULT_CUSTOMER_BULK_OPERATIONS: CustomerBulkOperation[] = [
     action: 'bulk-export',
     requiresConfirmation: false,
     maxItems: 1000,
-    supportedViews: ['list', 'search']
+    supportedViews: ['list', 'search'],
   },
   {
     id: 'bulk-status-update',
@@ -238,7 +253,7 @@ export const DEFAULT_CUSTOMER_BULK_OPERATIONS: CustomerBulkOperation[] = [
     action: 'bulk-status-update',
     requiresConfirmation: true,
     maxItems: 100,
-    supportedViews: ['list', 'search']
+    supportedViews: ['list', 'search'],
   },
   {
     id: 'bulk-delete',
@@ -247,6 +262,6 @@ export const DEFAULT_CUSTOMER_BULK_OPERATIONS: CustomerBulkOperation[] = [
     action: 'bulk-delete',
     requiresConfirmation: true,
     maxItems: 50,
-    supportedViews: ['list', 'search']
-  }
+    supportedViews: ['list', 'search'],
+  },
 ];

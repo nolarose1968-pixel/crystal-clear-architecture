@@ -35,7 +35,7 @@ const employees: EmployeeData[] = [
     phone: '+1-555-0101',
     slack: 'william.harris',
     telegram: '@williamharris_ceo',
-    bio: 'Visionary leader driving Fire22\'s mission to revolutionize the industry through innovative technology and exceptional service. 15+ years of executive experience in high-growth companies.',
+    bio: "Visionary leader driving Fire22's mission to revolutionize the industry through innovative technology and exceptional service. 15+ years of executive experience in high-growth companies.",
     tier: 1,
     template: 'executive',
     features: ['scheduling', 'analytics', 'team-management', 'advanced-tools'],

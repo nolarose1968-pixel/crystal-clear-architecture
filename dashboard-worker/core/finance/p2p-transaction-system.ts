@@ -8,7 +8,12 @@ import { DepositWithdrawalSystem } from './deposit-withdrawal-system';
 
 export interface P2PTransaction {
   transactionId: string;
-  transactionType: 'direct_transfer' | 'escrow_deal' | 'marketplace_sale' | 'service_payment' | 'loan_repayment';
+  transactionType:
+    | 'direct_transfer'
+    | 'escrow_deal'
+    | 'marketplace_sale'
+    | 'service_payment'
+    | 'loan_repayment';
   senderCustomerId: string;
   receiverCustomerId: string;
   amount: number;
@@ -110,7 +115,12 @@ export interface P2PTransaction {
   notifications: Array<{
     notificationId: string;
     recipientId: string;
-    type: 'transaction_created' | 'payment_received' | 'dispute_opened' | 'item_shipped' | 'service_delivered';
+    type:
+      | 'transaction_created'
+      | 'payment_received'
+      | 'dispute_opened'
+      | 'item_shipped'
+      | 'service_delivered';
     message: string;
     sentAt: string;
     readAt?: string;
@@ -123,7 +133,13 @@ export interface P2PDispute {
   transactionId: string;
   initiatedBy: string;
   respondentId: string;
-  reason: 'item_not_received' | 'item_not_as_described' | 'service_not_delivered' | 'payment_not_received' | 'unauthorized_charge' | 'other';
+  reason:
+    | 'item_not_received'
+    | 'item_not_as_described'
+    | 'service_not_delivered'
+    | 'payment_not_received'
+    | 'unauthorized_charge'
+    | 'other';
   description: string;
   evidence: Array<{
     evidenceId: string;
@@ -160,7 +176,15 @@ export interface P2PMarketplaceItem {
   sellerId: string;
   title: string;
   description: string;
-  category: 'electronics' | 'clothing' | 'books' | 'sports' | 'gaming' | 'collectibles' | 'services' | 'other';
+  category:
+    | 'electronics'
+    | 'clothing'
+    | 'books'
+    | 'sports'
+    | 'gaming'
+    | 'collectibles'
+    | 'services'
+    | 'other';
   price: number;
   currency: string;
   images: string[];
@@ -187,7 +211,10 @@ export class P2PTransactionSystem {
   private transactionCounter = 1000000;
   private disputeCounter = 1000;
 
-  constructor(customerManager: CustomerDatabaseManagement, financialSystem: DepositWithdrawalSystem) {
+  constructor(
+    customerManager: CustomerDatabaseManagement,
+    financialSystem: DepositWithdrawalSystem
+  ) {
     this.customerManager = customerManager;
     this.financialSystem = financialSystem;
   }
@@ -195,7 +222,18 @@ export class P2PTransactionSystem {
   /**
    * Create a P2P transaction
    */
-  async createTransaction(transactionData: Omit<P2PTransaction, 'transactionId' | 'status' | 'createdAt' | 'updatedAt' | 'messages' | 'auditTrail' | 'notifications'>): Promise<P2PTransaction> {
+  async createTransaction(
+    transactionData: Omit<
+      P2PTransaction,
+      | 'transactionId'
+      | 'status'
+      | 'createdAt'
+      | 'updatedAt'
+      | 'messages'
+      | 'auditTrail'
+      | 'notifications'
+    >
+  ): Promise<P2PTransaction> {
     // Validate participants
     const sender = this.customerManager.getCustomerProfile(transactionData.senderCustomerId);
     const receiver = this.customerManager.getCustomerProfile(transactionData.receiverCustomerId);
@@ -204,12 +242,17 @@ export class P2PTransactionSystem {
       throw new Error('Invalid sender or receiver');
     }
 
-    if (sender.accountInfo.accountStatus !== 'active' || receiver.accountInfo.accountStatus !== 'active') {
+    if (
+      sender.accountInfo.accountStatus !== 'active' ||
+      receiver.accountInfo.accountStatus !== 'active'
+    ) {
       throw new Error('Sender or receiver account is not active');
     }
 
     // Check sender balance
-    const senderBalance = await this.financialSystem.getCustomerBalance(transactionData.senderCustomerId);
+    const senderBalance = await this.financialSystem.getCustomerBalance(
+      transactionData.senderCustomerId
+    );
     if (senderBalance.availableBalance < transactionData.amount) {
       throw new Error('Insufficient funds');
     }
@@ -226,25 +269,30 @@ export class P2PTransactionSystem {
       updatedAt: new Date().toISOString(),
       riskAssessment,
       messages: [],
-      auditTrail: [{
-        timestamp: new Date().toISOString(),
-        action: 'transaction_created',
-        performedBy: transactionData.senderCustomerId,
-        details: 'P2P transaction created',
-        metadata: { transactionType: transactionData.transactionType }
-      }],
+      auditTrail: [
+        {
+          timestamp: new Date().toISOString(),
+          action: 'transaction_created',
+          performedBy: transactionData.senderCustomerId,
+          details: 'P2P transaction created',
+          metadata: { transactionType: transactionData.transactionType },
+        },
+      ],
       notifications: [],
-      externalReferences: {}
+      externalReferences: {},
     };
 
     // Handle escrow for certain transaction types
-    if (transactionData.transactionType === 'escrow_deal' || transactionData.transactionType === 'marketplace_sale') {
+    if (
+      transactionData.transactionType === 'escrow_deal' ||
+      transactionData.transactionType === 'marketplace_sale'
+    ) {
       transaction.escrowDetails = {
         escrowAgentId: 'system',
         releaseConditions: this.getReleaseConditions(transactionData.transactionType),
         autoReleaseDate: this.calculateAutoReleaseDate(),
         manualReleaseRequired: transactionData.transactionType === 'marketplace_sale',
-        disputeWindowDays: 7
+        disputeWindowDays: 7,
       };
     }
 
@@ -283,9 +331,10 @@ export class P2PTransactionSystem {
         itemId: item.itemId,
         itemName: item.title,
         category: item.category,
-        shippingRequired: item.shippingOptions.shippingCost !== undefined && item.shippingOptions.shippingCost > 0,
-        shippingAddress: undefined // To be provided by buyer
-      }
+        shippingRequired:
+          item.shippingOptions.shippingCost !== undefined && item.shippingOptions.shippingCost > 0,
+        shippingAddress: undefined, // To be provided by buyer
+      },
     });
 
     // Update item status
@@ -300,7 +349,11 @@ export class P2PTransactionSystem {
   /**
    * Release escrow funds
    */
-  async releaseEscrowFunds(transactionId: string, releasedBy: string, reason?: string): Promise<boolean> {
+  async releaseEscrowFunds(
+    transactionId: string,
+    releasedBy: string,
+    reason?: string
+  ): Promise<boolean> {
     const transaction = this.transactions.get(transactionId);
     if (!transaction) {
       throw new Error('Transaction not found');
@@ -315,8 +368,12 @@ export class P2PTransactionSystem {
     }
 
     // Transfer funds from escrow to receiver
-    const senderBalance = await this.financialSystem.getCustomerBalance(transaction.senderCustomerId);
-    const receiverBalance = await this.financialSystem.getCustomerBalance(transaction.receiverCustomerId);
+    const senderBalance = await this.financialSystem.getCustomerBalance(
+      transaction.senderCustomerId
+    );
+    const receiverBalance = await this.financialSystem.getCustomerBalance(
+      transaction.receiverCustomerId
+    );
 
     // Update balances (this would integrate with actual payment processing)
     transaction.status = 'completed';
@@ -329,7 +386,7 @@ export class P2PTransactionSystem {
       action: 'escrow_released',
       performedBy: releasedBy,
       details: reason || 'Escrow funds released',
-      metadata: { escrowAgentId: transaction.escrowDetails.escrowAgentId }
+      metadata: { escrowAgentId: transaction.escrowDetails.escrowAgentId },
     });
 
     // Send notifications
@@ -341,7 +398,12 @@ export class P2PTransactionSystem {
   /**
    * Create a dispute for a transaction
    */
-  async createDispute(transactionId: string, initiatedBy: string, reason: P2PDispute['reason'], description: string): Promise<P2PDispute> {
+  async createDispute(
+    transactionId: string,
+    initiatedBy: string,
+    reason: P2PDispute['reason'],
+    description: string
+  ): Promise<P2PDispute> {
     const transaction = this.transactions.get(transactionId);
     if (!transaction) {
       throw new Error('Transaction not found');
@@ -351,13 +413,17 @@ export class P2PTransactionSystem {
       throw new Error('Can only dispute completed transactions');
     }
 
-    if (initiatedBy !== transaction.senderCustomerId && initiatedBy !== transaction.receiverCustomerId) {
+    if (
+      initiatedBy !== transaction.senderCustomerId &&
+      initiatedBy !== transaction.receiverCustomerId
+    ) {
       throw new Error('Only transaction participants can create disputes');
     }
 
-    const respondentId = initiatedBy === transaction.senderCustomerId
-      ? transaction.receiverCustomerId
-      : transaction.senderCustomerId;
+    const respondentId =
+      initiatedBy === transaction.senderCustomerId
+        ? transaction.receiverCustomerId
+        : transaction.senderCustomerId;
 
     // Update transaction status
     transaction.status = 'disputed';
@@ -374,15 +440,17 @@ export class P2PTransactionSystem {
       evidence: [],
       status: 'open',
       priority: this.calculateDisputePriority(transaction, reason),
-      messages: [{
-        messageId: this.generateMessageId(),
-        senderId: initiatedBy,
-        message: description,
-        timestamp: new Date().toISOString(),
-        isInternal: false
-      }],
+      messages: [
+        {
+          messageId: this.generateMessageId(),
+          senderId: initiatedBy,
+          message: description,
+          timestamp: new Date().toISOString(),
+          isInternal: false,
+        },
+      ],
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.disputes.set(dispute.disputeId, dispute);
@@ -393,7 +461,7 @@ export class P2PTransactionSystem {
       initiatedBy,
       reason,
       description,
-      status: 'open'
+      status: 'open',
     };
 
     // Send notifications
@@ -405,7 +473,11 @@ export class P2PTransactionSystem {
   /**
    * Resolve a dispute
    */
-  async resolveDispute(disputeId: string, resolution: P2PDispute['resolution'], resolvedBy: string): Promise<boolean> {
+  async resolveDispute(
+    disputeId: string,
+    resolution: P2PDispute['resolution'],
+    resolvedBy: string
+  ): Promise<boolean> {
     const dispute = this.disputes.get(disputeId);
     if (!dispute) {
       throw new Error('Dispute not found');
@@ -449,7 +521,10 @@ export class P2PTransactionSystem {
   /**
    * Add evidence to a dispute
    */
-  async addDisputeEvidence(disputeId: string, evidence: Omit<P2PDispute['evidence'][0], 'evidenceId' | 'uploadedAt'>): Promise<boolean> {
+  async addDisputeEvidence(
+    disputeId: string,
+    evidence: Omit<P2PDispute['evidence'][0], 'evidenceId' | 'uploadedAt'>
+  ): Promise<boolean> {
     const dispute = this.disputes.get(disputeId);
     if (!dispute) {
       throw new Error('Dispute not found');
@@ -462,7 +537,7 @@ export class P2PTransactionSystem {
     const newEvidence = {
       ...evidence,
       evidenceId: this.generateEvidenceId(),
-      uploadedAt: new Date().toISOString()
+      uploadedAt: new Date().toISOString(),
     };
 
     dispute.evidence.push(newEvidence);
@@ -474,7 +549,12 @@ export class P2PTransactionSystem {
   /**
    * Send message in transaction
    */
-  async sendTransactionMessage(transactionId: string, senderId: string, message: string, attachments?: string[]): Promise<boolean> {
+  async sendTransactionMessage(
+    transactionId: string,
+    senderId: string,
+    message: string,
+    attachments?: string[]
+  ): Promise<boolean> {
     const transaction = this.transactions.get(transactionId);
     if (!transaction) {
       throw new Error('Transaction not found');
@@ -490,7 +570,7 @@ export class P2PTransactionSystem {
       message,
       timestamp: new Date().toISOString(),
       attachments,
-      systemGenerated: false
+      systemGenerated: false,
     };
 
     transaction.messages.push(messageObj);
@@ -510,8 +590,7 @@ export class P2PTransactionSystem {
     location?: string;
     sellerId?: string;
   }): P2PMarketplaceItem[] {
-    let items = Array.from(this.marketplaceItems.values())
-      .filter(item => item.status === 'active');
+    let items = Array.from(this.marketplaceItems.values()).filter(item => item.status === 'active');
 
     if (filters) {
       if (filters.category) {
@@ -540,7 +619,9 @@ export class P2PTransactionSystem {
   /**
    * Create marketplace item
    */
-  async createMarketplaceItem(itemData: Omit<P2PMarketplaceItem, 'itemId' | 'createdAt' | 'updatedAt'>): Promise<P2PMarketplaceItem> {
+  async createMarketplaceItem(
+    itemData: Omit<P2PMarketplaceItem, 'itemId' | 'createdAt' | 'updatedAt'>
+  ): Promise<P2PMarketplaceItem> {
     // Validate seller
     const seller = this.customerManager.getCustomerProfile(itemData.sellerId);
     if (!seller || seller.accountInfo.accountStatus !== 'active') {
@@ -551,7 +632,7 @@ export class P2PTransactionSystem {
       ...itemData,
       itemId: this.generateItemId(),
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.marketplaceItems.set(item.itemId, item);
@@ -611,7 +692,20 @@ export class P2PTransactionSystem {
     return `ITEM_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
   }
 
-  private async assessTransactionRisk(transaction: Omit<P2PTransaction, 'transactionId' | 'status' | 'createdAt' | 'updatedAt' | 'messages' | 'auditTrail' | 'notifications'>, sender: any, receiver: any): Promise<P2PTransaction['riskAssessment']> {
+  private async assessTransactionRisk(
+    transaction: Omit<
+      P2PTransaction,
+      | 'transactionId'
+      | 'status'
+      | 'createdAt'
+      | 'updatedAt'
+      | 'messages'
+      | 'auditTrail'
+      | 'notifications'
+    >,
+    sender: any,
+    receiver: any
+  ): Promise<P2PTransaction['riskAssessment']> {
     let senderRisk = sender.financialProfile?.riskScore || 50;
     let receiverRisk = receiver.financialProfile?.riskScore || 50;
     let transactionRisk = 0;
@@ -650,7 +744,7 @@ export class P2PTransactionSystem {
       receiverRiskScore: receiverRisk,
       transactionRiskScore: overallRisk,
       flagged: overallRisk > 70,
-      flags
+      flags,
     };
   }
 
@@ -660,13 +754,13 @@ export class P2PTransactionSystem {
         return [
           'Both parties confirm satisfaction',
           'No disputes raised within 7 days',
-          'All deliverables received'
+          'All deliverables received',
         ];
       case 'marketplace_sale':
         return [
           'Buyer confirms item received',
           'Item matches description',
-          'No disputes raised within 7 days'
+          'No disputes raised within 7 days',
         ];
       default:
         return ['Transaction completed successfully'];
@@ -683,7 +777,10 @@ export class P2PTransactionSystem {
     return Math.max(amount * 0.05, 2.99); // 5% fee, minimum $2.99
   }
 
-  private calculateDisputePriority(transaction: P2PTransaction, reason: P2PDispute['reason']): 'low' | 'medium' | 'high' | 'urgent' {
+  private calculateDisputePriority(
+    transaction: P2PTransaction,
+    reason: P2PDispute['reason']
+  ): 'low' | 'medium' | 'high' | 'urgent' {
     if (reason === 'payment_not_received' && transaction.amount > 1000) {
       return 'urgent';
     }
@@ -706,7 +803,10 @@ export class P2PTransactionSystem {
     return Math.floor((now.getTime() - regDate.getTime()) / (1000 * 60 * 60 * 24));
   }
 
-  private async sendTransactionNotifications(transaction: P2PTransaction, type: string): Promise<void> {
+  private async sendTransactionNotifications(
+    transaction: P2PTransaction,
+    type: string
+  ): Promise<void> {
     const notifications = [
       {
         notificationId: this.generateMessageId(),
@@ -714,7 +814,7 @@ export class P2PTransactionSystem {
         type: type as any,
         message: `Transaction ${transaction.transactionId} ${type.replace('_', ' ')}`,
         sentAt: new Date().toISOString(),
-        method: 'email' as const
+        method: 'email' as const,
       },
       {
         notificationId: this.generateMessageId(),
@@ -722,8 +822,8 @@ export class P2PTransactionSystem {
         type: type as any,
         message: `Transaction ${transaction.transactionId} ${type.replace('_', ' ')}`,
         sentAt: new Date().toISOString(),
-        method: 'email' as const
-      }
+        method: 'email' as const,
+      },
     ];
 
     transaction.notifications.push(...notifications);
@@ -761,7 +861,9 @@ export class P2PTransactionSystem {
     const completedTransactions = transactions.filter(t => t.status === 'completed').length;
     const disputedTransactions = transactions.filter(t => t.status === 'disputed').length;
     const totalVolume = transactions.reduce((sum, t) => sum + t.amount, 0);
-    const activeDisputes = disputes.filter(d => d.status === 'open' || d.status === 'under_review').length;
+    const activeDisputes = disputes.filter(
+      d => d.status === 'open' || d.status === 'under_review'
+    ).length;
     const marketplaceItems = this.marketplaceItems.size;
     const averageTransactionSize = totalTransactions > 0 ? totalVolume / totalTransactions : 0;
     const resolvedDisputes = disputes.filter(d => d.status === 'resolved').length;
@@ -776,7 +878,7 @@ export class P2PTransactionSystem {
       activeDisputes,
       marketplaceItems,
       averageTransactionSize,
-      disputeResolutionRate
+      disputeResolutionRate,
     };
   }
 }

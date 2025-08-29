@@ -627,9 +627,9 @@ Need help? Contact support!`;
     session.pendingRequest = undefined;
     session.context = {};
 
-    return "✅ **Request Cancelled**
+    return `✅ **Request Cancelled**
 
-Your current operation has been cancelled. You can start a new request with /deposit or /withdraw.";
+Your current operation has been cancelled. You can start a new request with /deposit or /withdraw.`;
   }
 
   // Helper methods

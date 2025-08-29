@@ -2,17 +2,22 @@
 
 ## Overview
 
-The Enhanced JWT Authentication System is a comprehensive, production-ready authentication solution for Cloudflare Workers with advanced security features including rate limiting, audit logging, session management, and robust protection against common security threats.
+The Enhanced JWT Authentication System is a comprehensive, production-ready
+authentication solution for Cloudflare Workers with advanced security features
+including rate limiting, audit logging, session management, and robust
+protection against common security threats.
 
 ## Features
 
 ### 🔐 Core Authentication
+
 - **JWT Token Generation & Verification**: Secure HMAC-SHA256 based tokens
 - **Password Hashing**: Bcrypt-compatible password hashing (simulated for demo)
 - **User Management**: Role-based access control (admin, user)
 - **Token Refresh**: Secure token renewal without re-authentication
 
 ### 🛡️ Security Features
+
 - **Rate Limiting**: Configurable request rate limiting per IP address
 - **Account Lockout**: Automatic account lockout after failed login attempts
 - **Audit Logging**: Comprehensive logging of all authentication events
@@ -21,6 +26,7 @@ The Enhanced JWT Authentication System is a comprehensive, production-ready auth
 - **Security Headers**: Complete security header implementation
 
 ### 📊 Monitoring & Management
+
 - **Health Check**: System health monitoring with statistics
 - **Admin Endpoints**: Secure admin-only management interfaces
 - **Audit Trail**: Complete audit log access for administrators
@@ -69,9 +75,11 @@ bun jwt-auth-test-client-enhanced.ts comprehensive
 ### Authentication Endpoints
 
 #### POST `/auth/login`
+
 Authenticate user and receive JWT token.
 
 **Request:**
+
 ```json
 {
   "username": "admin",
@@ -80,6 +88,7 @@ Authenticate user and receive JWT token.
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Authentication successful",
@@ -101,35 +110,43 @@ Authenticate user and receive JWT token.
 ```
 
 #### POST `/auth/refresh`
+
 Refresh an existing JWT token.
 
 **Request:**
+
 ```json
 {}
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <existing-token>
 ```
 
 #### POST `/auth/logout`
+
 Invalidate current session and token.
 
 **Request:**
+
 ```json
 {}
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <token-to-invalidate>
 ```
 
 #### GET `/auth/me`
+
 Get current user information.
 
 **Headers:**
+
 ```
 Authorization: Bearer <valid-token>
 ```
@@ -137,14 +154,17 @@ Authorization: Bearer <valid-token>
 ### Protected Endpoints
 
 #### GET `/protected`
+
 Access protected resource (requires valid JWT).
 
 **Headers:**
+
 ```
 Authorization: Bearer <valid-token>
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Access granted to protected resource",
@@ -164,17 +184,21 @@ Authorization: Bearer <valid-token>
 ### Admin Endpoints (Require Admin Role)
 
 #### GET `/admin/audit-logs`
+
 Retrieve audit logs.
 
 **Query Parameters:**
+
 - `limit` (optional): Number of logs to retrieve (default: 100)
 
 **Headers:**
+
 ```
 Authorization: Bearer <admin-token>
 ```
 
 **Response:**
+
 ```json
 {
   "audit_logs": [
@@ -194,14 +218,17 @@ Authorization: Bearer <admin-token>
 ```
 
 #### GET `/admin/sessions`
+
 Retrieve active sessions.
 
 **Headers:**
+
 ```
 Authorization: Bearer <admin-token>
 ```
 
 **Response:**
+
 ```json
 {
   "sessions": [
@@ -223,9 +250,11 @@ Authorization: Bearer <admin-token>
 ```
 
 #### POST `/admin/revoke-token`
+
 Revoke a specific JWT token.
 
 **Request:**
+
 ```json
 {
   "token_to_revoke": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
@@ -233,6 +262,7 @@ Revoke a specific JWT token.
 ```
 
 **Headers:**
+
 ```
 Authorization: Bearer <admin-token>
 ```
@@ -240,9 +270,11 @@ Authorization: Bearer <admin-token>
 ### System Endpoints
 
 #### GET `/health`
+
 System health check and statistics.
 
 **Response:**
+
 ```json
 {
   "status": "healthy",
@@ -260,70 +292,75 @@ System health check and statistics.
 
 ```typescript
 const config = {
-  jwtSecret: "your-secret-key-change-in-production",
-  issuer: "fire22-auth",
-  audience: "fire22-api",
-  tokenExpiry: 3600,        // 1 hour in seconds
+  jwtSecret: 'your-secret-key-change-in-production',
+  issuer: 'fire22-auth',
+  audience: 'fire22-api',
+  tokenExpiry: 3600, // 1 hour in seconds
   refreshTokenExpiry: 86400, // 24 hours in seconds
-  maxLoginAttempts: 5,      // Maximum failed login attempts
-  lockoutDuration: 900,     // 15 minutes in seconds
-  rateLimitWindow: 60,      // 1 minute in seconds
-  rateLimitMax: 10,         // 10 requests per window
+  maxLoginAttempts: 5, // Maximum failed login attempts
+  lockoutDuration: 900, // 15 minutes in seconds
+  rateLimitWindow: 60, // 1 minute in seconds
+  rateLimitMax: 10, // 10 requests per window
   enableAuditLogging: true, // Enable audit logging
-  enableMFA: false,         // Enable multi-factor authentication
-  bcryptRounds: 12,         // Bcrypt hashing rounds
+  enableMFA: false, // Enable multi-factor authentication
+  bcryptRounds: 12, // Bcrypt hashing rounds
 };
 ```
 
 ### Environment Variables
 
-| Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `JWT_SECRET` | JWT signing secret | - | Yes (Production) |
-| `AUTH_BASE_URL` | Base URL for auth service | `http://localhost:8788` | No |
-| `PERMISSIONS_TEST_TIMEOUT` | Request timeout in ms | `10000` | No |
-| `PERMISSIONS_TEST_RETRIES` | Number of retry attempts | `3` | No |
-| `PERMISSIONS_TEST_VERBOSE` | Enable verbose logging | `false` | No |
+| Variable                   | Description               | Default                 | Required         |
+| -------------------------- | ------------------------- | ----------------------- | ---------------- |
+| `JWT_SECRET`               | JWT signing secret        | -                       | Yes (Production) |
+| `AUTH_BASE_URL`            | Base URL for auth service | `http://localhost:8788` | No               |
+| `PERMISSIONS_TEST_TIMEOUT` | Request timeout in ms     | `10000`                 | No               |
+| `PERMISSIONS_TEST_RETRIES` | Number of retry attempts  | `3`                     | No               |
+| `PERMISSIONS_TEST_VERBOSE` | Enable verbose logging    | `false`                 | No               |
 
 ## Default Users
 
 The system comes with pre-configured users for testing:
 
-| Username | Password | Role | Description |
-|----------|----------|------|-------------|
-| `admin` | `admin123` | admin | Administrator with full access |
-| `user` | `user123` | user | Regular user with basic access |
-| `TITTYB69` | `test123` | user | Test user for specific scenarios |
+| Username   | Password   | Role  | Description                      |
+| ---------- | ---------- | ----- | -------------------------------- |
+| `admin`    | `admin123` | admin | Administrator with full access   |
+| `user`     | `user123`  | user  | Regular user with basic access   |
+| `TITTYB69` | `test123`  | user  | Test user for specific scenarios |
 
 **⚠️ Security Note:** Change these default passwords in production!
 
 ## Security Features
 
 ### Rate Limiting
+
 - **Window**: 60 seconds
 - **Max Requests**: 10 per IP address
 - **Response**: HTTP 429 with error message
 - **Reset**: Automatic reset after window expires
 
 ### Account Lockout
+
 - **Max Attempts**: 5 failed login attempts
 - **Lockout Duration**: 15 minutes
 - **Behavior**: Account locked even with correct password
 - **Reset**: Automatic after lockout duration
 
 ### Audit Logging
+
 - **Events Tracked**: Login attempts, token operations, admin actions
 - **Data Stored**: User info, IP addresses, timestamps, success/failure
 - **Retention**: Last 1000 events (configurable)
 - **Access**: Admin-only endpoint for retrieval
 
 ### Session Management
+
 - **Device Fingerprinting**: Unique identifier per device/browser
 - **Session Tracking**: Creation, expiration, last access times
 - **Automatic Cleanup**: Expired sessions removed automatically
 - **Admin Monitoring**: Real-time session visibility
 
 ### Token Security
+
 - **Algorithm**: HMAC-SHA256
 - **Payload**: Enhanced with session ID, device fingerprint, IP address
 - **Expiration**: Configurable token lifetime
@@ -365,17 +402,19 @@ The comprehensive test suite validates:
 ### Cloudflare Workers Deployment
 
 1. **Configure Wrangler:**
+
    ```toml
    # wrangler.toml
    name = "enhanced-auth-worker"
    main = "jwt-auth-worker-enhanced.ts"
    compatibility_date = "2025-01-01"
-   
+
    [env.production]
    vars = { JWT_SECRET = "your-production-secret" }
    ```
 
 2. **Deploy:**
+
    ```bash
    wrangler deploy
    ```
@@ -428,7 +467,7 @@ class AuthClient {
   async getProtectedData() {
     const response = await fetch(`${this.baseUrl}/protected`, {
       headers: {
-        'Authorization': `Bearer ${this.token}`,
+        Authorization: `Bearer ${this.token}`,
       },
     });
 
@@ -445,21 +484,26 @@ class AuthClient {
 
 ```typescript
 // Middleware to verify JWT tokens
-async function verifyToken(request: Request): Promise<EnhancedJWTPayload | null> {
+async function verifyToken(
+  request: Request
+): Promise<EnhancedJWTPayload | null> {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return null;
   }
 
   const token = authHeader.slice(7);
-  
+
   // Verify token with auth service
-  const response = await fetch('https://your-auth-worker.workers.dev/auth/verify', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  });
+  const response = await fetch(
+    'https://your-auth-worker.workers.dev/auth/verify',
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
   if (!response.ok) {
     return null;
@@ -470,9 +514,13 @@ async function verifyToken(request: Request): Promise<EnhancedJWTPayload | null>
 
 // Example protected route
 export default {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx: ExecutionContext
+  ): Promise<Response> {
     const payload = await verifyToken(request);
-    
+
     if (!payload) {
       return new Response('Unauthorized', { status: 401 });
     }
@@ -488,16 +536,19 @@ export default {
 ### Production Deployment
 
 1. **Environment Variables:**
+
    - Use strong, randomly generated JWT secrets
    - Store secrets in Cloudflare Workers secrets or environment variables
    - Never commit secrets to version control
 
 2. **Network Security:**
+
    - Use HTTPS in production
    - Configure proper CORS policies
    - Implement additional WAF rules if needed
 
 3. **Monitoring:**
+
    - Enable audit logging
    - Monitor failed login attempts
    - Set up alerts for suspicious activities
@@ -510,11 +561,13 @@ export default {
 ### Performance Considerations
 
 1. **Token Expiration:**
+
    - Balance security and user experience
    - Short-lived access tokens (1-2 hours)
    - Longer-lived refresh tokens (24-48 hours)
 
 2. **Rate Limiting:**
+
    - Adjust limits based on your usage patterns
    - Monitor for abuse and adjust accordingly
    - Consider different limits for different user types
@@ -529,6 +582,7 @@ export default {
 ### Common Issues
 
 #### Token Verification Fails
+
 ```bash
 # Check JWT secret consistency
 echo $JWT_SECRET
@@ -538,6 +592,7 @@ echo $JWT_SECRET
 ```
 
 #### Rate Limiting Errors
+
 ```bash
 # Check current rate limit status
 curl -I https://your-auth-worker.workers.dev/auth/login
@@ -547,6 +602,7 @@ curl -I https://your-auth-worker.workers.dev/auth/login
 ```
 
 #### Account Lockout
+
 ```bash
 # Check if account is locked
 curl -X POST https://your-auth-worker.workers.dev/auth/login \
@@ -571,17 +627,20 @@ bun jwt-auth-test-client-enhanced.ts comprehensive
 ### Development Setup
 
 1. **Clone Repository:**
+
    ```bash
    git clone <repository-url>
    cd dashboard-worker
    ```
 
 2. **Install Dependencies:**
+
    ```bash
    bun install
    ```
 
 3. **Run Tests:**
+
    ```bash
    bun test
    bun jwt-auth-test-client-enhanced.ts comprehensive
@@ -602,11 +661,13 @@ bun jwt-auth-test-client-enhanced.ts comprehensive
 
 ## License
 
-This project is part of the Fire22 ecosystem. See the main repository for licensing information.
+This project is part of the Fire22 ecosystem. See the main repository for
+licensing information.
 
 ## Support
 
 For issues and questions:
+
 1. Check the troubleshooting section
 2. Review the test client output
 3. Consult the audit logs for authentication events
@@ -614,4 +675,5 @@ For issues and questions:
 
 ---
 
-**🔐 Remember: Security is an ongoing process. Regular security audits and updates are essential for maintaining a secure authentication system.**
+**🔐 Remember: Security is an ongoing process. Regular security audits and
+updates are essential for maintaining a secure authentication system.**

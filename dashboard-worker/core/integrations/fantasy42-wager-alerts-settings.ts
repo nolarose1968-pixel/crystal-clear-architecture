@@ -9,456 +9,459 @@ import { Fantasy42AgentClient } from '../../src/api/fantasy42-agent-client';
 import { Fantasy42UnifiedIntegration } from './fantasy42-unified-integration';
 
 export interface WagerAlertSettings {
-	id: string;
-	userId: string;
-	enabled: boolean;
-	alertChannels: {
-	telegram: boolean;
-	signal: boolean;
-	email: boolean;
-	sms: boolean;
-	push: boolean;
-	};
-	alertThresholds: {
-	amountThreshold: number;
-	riskThreshold: number;
-	frequencyThreshold: number;
-	timeThreshold: number;
-	sportSpecificThresholds: Record<string, number>;
-	};
-	alertTypes: {
-	highAmount: boolean;
-	highRisk: boolean;
-	unusualPattern: boolean;
-	vipClient: boolean;
-	firstTime: boolean;
-	locationChange: boolean;
-	deviceChange: boolean;
-	timeAnomaly: boolean;
-	};
-	notificationPreferences: {
-	immediateAlerts: boolean;
-	batchAlerts: boolean;
-	summaryAlerts: boolean;
-	quietHours: {
-	  enabled: boolean;
-	  startTime: string;
-	  endTime: string;
-	};
-	alertFrequency: 'immediate' | '5min' | '15min' | '1hour';
-	alertPriority: 'low' | 'medium' | 'high' | 'critical';
-	};
-	riskAssessment: {
-	enabled: boolean;
-	riskLevels: {
-	  low: { minScore: 0, maxScore: 0.3, action: 'monitor' };
-	  medium: { minScore: 0.3, maxScore: 0.7, action: 'alert' };
-	  high: { minScore: 0.7, maxScore: 0.9, action: 'review' };
-	  critical: { minScore: 0.9, maxScore: 1.0, action: 'block' };
-	};
-	autoEscalation: boolean;
-	manualReview: boolean;
-	};
-	alertFilters: {
-	sports: string[];
-	leagues: string[];
-	betTypes: string[];
-	customerTiers: string[];
-	excludedCustomers: string[];
-	includedCustomers: string[];
-	};
-	escalationRules: {
-	enabled: boolean;
-	escalationLevels: Array<{
-	  level: number;
-	  threshold: number;
-	  channels: string[];
-	  recipients: string[];
-	  autoAction: string;
-	}>;
-	};
-	reporting: {
-	enabled: boolean;
-	reportFrequency: 'daily' | 'weekly' | 'monthly';
-	includeMetrics: boolean;
-	includeTrends: boolean;
-	recipients: string[];
-	};
-	createdAt: string;
-	updatedAt: string;
+  id: string;
+  userId: string;
+  enabled: boolean;
+  alertChannels: {
+    telegram: boolean;
+    signal: boolean;
+    email: boolean;
+    sms: boolean;
+    push: boolean;
+  };
+  alertThresholds: {
+    amountThreshold: number;
+    riskThreshold: number;
+    frequencyThreshold: number;
+    timeThreshold: number;
+    sportSpecificThresholds: Record<string, number>;
+  };
+  alertTypes: {
+    highAmount: boolean;
+    highRisk: boolean;
+    unusualPattern: boolean;
+    vipClient: boolean;
+    firstTime: boolean;
+    locationChange: boolean;
+    deviceChange: boolean;
+    timeAnomaly: boolean;
+  };
+  notificationPreferences: {
+    immediateAlerts: boolean;
+    batchAlerts: boolean;
+    summaryAlerts: boolean;
+    quietHours: {
+      enabled: boolean;
+      startTime: string;
+      endTime: string;
+    };
+    alertFrequency: 'immediate' | '5min' | '15min' | '1hour';
+    alertPriority: 'low' | 'medium' | 'high' | 'critical';
+  };
+  riskAssessment: {
+    enabled: boolean;
+    riskLevels: {
+      low: { minScore: 0; maxScore: 0.3; action: 'monitor' };
+      medium: { minScore: 0.3; maxScore: 0.7; action: 'alert' };
+      high: { minScore: 0.7; maxScore: 0.9; action: 'review' };
+      critical: { minScore: 0.9; maxScore: 1.0; action: 'block' };
+    };
+    autoEscalation: boolean;
+    manualReview: boolean;
+  };
+  alertFilters: {
+    sports: string[];
+    leagues: string[];
+    betTypes: string[];
+    customerTiers: string[];
+    excludedCustomers: string[];
+    includedCustomers: string[];
+  };
+  escalationRules: {
+    enabled: boolean;
+    escalationLevels: Array<{
+      level: number;
+      threshold: number;
+      channels: string[];
+      recipients: string[];
+      autoAction: string;
+    }>;
+  };
+  reporting: {
+    enabled: boolean;
+    reportFrequency: 'daily' | 'weekly' | 'monthly';
+    includeMetrics: boolean;
+    includeTrends: boolean;
+    recipients: string[];
+  };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AlertConfiguration {
-	globalSettings: {
-	masterSwitch: boolean;
-	defaultThresholds: {
-	  amount: number;
-	  risk: number;
-	  frequency: number;
-	};
-	systemWideChannels: string[];
-	emergencyContacts: string[];
-	};
-	channelConfigurations: {
-	telegram: {
-	  enabled: boolean;
-	  botToken: string;
-	  chatIds: string[];
-	  messageTemplates: Record<string, string>;
-	  retryAttempts: number;
-	  retryDelay: number;
-	};
-	signal: {
-	  enabled: boolean;
-	  phoneNumber: string;
-	  recipients: string[];
-	  messageTemplates: Record<string, string>;
-	  encryption: boolean;
-	};
-	email: {
-	  enabled: boolean;
-	  smtpServer: string;
-	  smtpPort: number;
-	  username: string;
-	  password: string;
-	  fromAddress: string;
-	  recipients: string[];
-	  templates: Record<string, string>;
-	};
-	sms: {
-	  enabled: boolean;
-	  provider: string;
-	  apiKey: string;
-	  senderId: string;
-	  recipients: string[];
-	  templates: Record<string, string>;
-	};
-	push: {
-	  enabled: boolean;
-	  fcmServerKey: string;
-	  deviceTokens: string[];
-	  notificationTemplates: Record<string, string>;
-	};
-	};
-	alertTemplates: {
-	highAmount: string;
-	highRisk: string;
-	unusualPattern: string;
-	vipClient: string;
-	systemAlert: string;
-	emergencyAlert: string;
-	};
-	maintenance: {
-	lastTest: string;
-	testResults: Record<string, boolean>;
-	backupChannels: string[];
-	failoverEnabled: boolean;
-	};
+  globalSettings: {
+    masterSwitch: boolean;
+    defaultThresholds: {
+      amount: number;
+      risk: number;
+      frequency: number;
+    };
+    systemWideChannels: string[];
+    emergencyContacts: string[];
+  };
+  channelConfigurations: {
+    telegram: {
+      enabled: boolean;
+      botToken: string;
+      chatIds: string[];
+      messageTemplates: Record<string, string>;
+      retryAttempts: number;
+      retryDelay: number;
+    };
+    signal: {
+      enabled: boolean;
+      phoneNumber: string;
+      recipients: string[];
+      messageTemplates: Record<string, string>;
+      encryption: boolean;
+    };
+    email: {
+      enabled: boolean;
+      smtpServer: string;
+      smtpPort: number;
+      username: string;
+      password: string;
+      fromAddress: string;
+      recipients: string[];
+      templates: Record<string, string>;
+    };
+    sms: {
+      enabled: boolean;
+      provider: string;
+      apiKey: string;
+      senderId: string;
+      recipients: string[];
+      templates: Record<string, string>;
+    };
+    push: {
+      enabled: boolean;
+      fcmServerKey: string;
+      deviceTokens: string[];
+      notificationTemplates: Record<string, string>;
+    };
+  };
+  alertTemplates: {
+    highAmount: string;
+    highRisk: string;
+    unusualPattern: string;
+    vipClient: string;
+    systemAlert: string;
+    emergencyAlert: string;
+  };
+  maintenance: {
+    lastTest: string;
+    testResults: Record<string, boolean>;
+    backupChannels: string[];
+    failoverEnabled: boolean;
+  };
 }
 
 export interface AlertAnalytics {
-	alerts: {
-	totalSent: number;
-	totalDelivered: number;
-	totalFailed: number;
-	deliveryRate: number;
-	averageResponseTime: number;
-	alertsByType: Record<string, number>;
-	alertsByChannel: Record<string, number>;
-	alertsByTime: Record<string, number>;
-	};
-	performance: {
-	systemLoad: number;
-	processingTime: number;
-	queueLength: number;
-	errorRate: number;
-	uptime: number;
-	};
-	effectiveness: {
-	falsePositives: number;
-	truePositives: number;
-	responseRate: number;
-	resolutionTime: number;
-	customerSatisfaction: number;
-	};
-	trends: {
-	alertVolume: Array<{ date: string; count: number }>;
-	alertTypes: Array<{ type: string; trend: number }>;
-	channelPerformance: Array<{ channel: string; performance: number }>;
-	riskDetection: Array<{ level: string; accuracy: number }>;
-	};
+  alerts: {
+    totalSent: number;
+    totalDelivered: number;
+    totalFailed: number;
+    deliveryRate: number;
+    averageResponseTime: number;
+    alertsByType: Record<string, number>;
+    alertsByChannel: Record<string, number>;
+    alertsByTime: Record<string, number>;
+  };
+  performance: {
+    systemLoad: number;
+    processingTime: number;
+    queueLength: number;
+    errorRate: number;
+    uptime: number;
+  };
+  effectiveness: {
+    falsePositives: number;
+    truePositives: number;
+    responseRate: number;
+    resolutionTime: number;
+    customerSatisfaction: number;
+  };
+  trends: {
+    alertVolume: Array<{ date: string; count: number }>;
+    alertTypes: Array<{ type: string; trend: number }>;
+    channelPerformance: Array<{ channel: string; performance: number }>;
+    riskDetection: Array<{ level: string; accuracy: number }>;
+  };
 }
 
 export class Fantasy42WagerAlertSettings {
-	private xpathHandler: XPathElementHandler;
-	private fantasyClient: Fantasy42AgentClient;
-	private unifiedIntegration: Fantasy42UnifiedIntegration;
+  private xpathHandler: XPathElementHandler;
+  private fantasyClient: Fantasy42AgentClient;
+  private unifiedIntegration: Fantasy42UnifiedIntegration;
 
-	private alertSettings: Map<string, WagerAlertSettings> = new Map();
-	private alertConfiguration: AlertConfiguration;
-	private analytics: AlertAnalytics;
-	private isInitialized: boolean = false;
+  private alertSettings: Map<string, WagerAlertSettings> = new Map();
+  private alertConfiguration: AlertConfiguration;
+  private analytics: AlertAnalytics;
+  private isInitialized: boolean = false;
 
-	private eventListeners: Map<string, EventListener> = new Map();
-	private observers: Map<string, MutationObserver> = new Map();
-	private timers: Map<string, NodeJS.Timeout> = new Map();
-	private alertQueue: Array<any> = [];
-	private processingTimer: NodeJS.Timeout | null = null;
+  private eventListeners: Map<string, EventListener> = new Map();
+  private observers: Map<string, MutationObserver> = new Map();
+  private timers: Map<string, NodeJS.Timeout> = new Map();
+  private alertQueue: Array<any> = [];
+  private processingTimer: NodeJS.Timeout | null = null;
 
-	constructor(
-	fantasyClient: Fantasy42AgentClient,
-	unifiedIntegration: Fantasy42UnifiedIntegration,
-	config?: Partial<AlertConfiguration>
-	) {
-	this.xpathHandler = XPathElementHandler.getInstance();
-	this.fantasyClient = fantasyClient;
-	this.unifiedIntegration = unifiedIntegration;
+  constructor(
+    fantasyClient: Fantasy42AgentClient,
+    unifiedIntegration: Fantasy42UnifiedIntegration,
+    config?: Partial<AlertConfiguration>
+  ) {
+    this.xpathHandler = XPathElementHandler.getInstance();
+    this.fantasyClient = fantasyClient;
+    this.unifiedIntegration = unifiedIntegration;
 
-	this.alertConfiguration = this.createDefaultConfiguration();
-	if (config) {
-	  this.alertConfiguration = { ...this.alertConfiguration, ...config };
-	}
+    this.alertConfiguration = this.createDefaultConfiguration();
+    if (config) {
+      this.alertConfiguration = { ...this.alertConfiguration, ...config };
+    }
 
-	this.analytics = this.initializeAnalytics();
-	}
+    this.analytics = this.initializeAnalytics();
+  }
 
-	/**
-	 * Initialize Fantasy42 wager alert settings system
-	 */
-	async initialize(): Promise<boolean> {
-	try {
-	  console.log('🚨 Initializing Fantasy42 Wager Alert Settings System...');
+  /**
+   * Initialize Fantasy42 wager alert settings system
+   */
+  async initialize(): Promise<boolean> {
+    try {
+      console.log('🚨 Initializing Fantasy42 Wager Alert Settings System...');
 
-	  // Detect wager alert settings modal
-	  await this.detectAlertSettingsModal();
+      // Detect wager alert settings modal
+      await this.detectAlertSettingsModal();
 
-	  // Initialize alert configuration management
-	  await this.initializeAlertConfiguration();
+      // Initialize alert configuration management
+      await this.initializeAlertConfiguration();
 
-	  // Setup alert processing system
-	  await this.initializeAlertProcessing();
+      // Setup alert processing system
+      await this.initializeAlertProcessing();
 
-	  // Setup channel management
-	  await this.initializeChannelManagement();
+      // Setup channel management
+      await this.initializeChannelManagement();
 
-	  // Setup threshold management
-	  await this.initializeThresholdManagement();
+      // Setup threshold management
+      await this.initializeThresholdManagement();
 
-	  // Setup analytics and reporting
-	  if (this.alertConfiguration.reporting?.enabled) {
-	    await this.initializeAnalyticsReporting();
-	  }
+      // Setup analytics and reporting
+      if (this.alertConfiguration.reporting?.enabled) {
+        await this.initializeAnalyticsReporting();
+      }
 
-	  this.isInitialized = true;
-	  console.log('✅ Fantasy42 Wager Alert Settings System initialized');
+      this.isInitialized = true;
+      console.log('✅ Fantasy42 Wager Alert Settings System initialized');
 
-	  return true;
-	} catch (error) {
-	  console.error('❌ Failed to initialize wager alert settings system:', error);
-	  return false;
-	}
-	}
+      return true;
+    } catch (error) {
+      console.error('❌ Failed to initialize wager alert settings system:', error);
+      return false;
+    }
+  }
 
-	/**
-	 * Create default alert configuration
-	 */
-	private createDefaultConfiguration(): AlertConfiguration {
-	return {
-	  globalSettings: {
-	    masterSwitch: true,
-	    defaultThresholds: {
-	      amount: 1000,
-	      risk: 0.7,
-	      frequency: 5
-	    },
-	    systemWideChannels: ['telegram', 'email'],
-	    emergencyContacts: []
-	  },
-	  channelConfigurations: {
-	    telegram: {
-	      enabled: true,
-	      botToken: '',
-	      chatIds: [],
-	      messageTemplates: {
-	        highAmount: '🚨 HIGH AMOUNT ALERT: ${customer} placed $${amount} wager on ${event}',
-	        highRisk: '⚠️ HIGH RISK ALERT: ${customer} risk score ${score} for $${amount} wager',
-	        systemAlert: '🔧 SYSTEM ALERT: ${message}'
-	      },
-	      retryAttempts: 3,
-	      retryDelay: 5000
-	    },
-	    signal: {
-	      enabled: false,
-	      phoneNumber: '',
-	      recipients: [],
-	      messageTemplates: {
-	        highAmount: 'HIGH AMOUNT ALERT: Customer ${customer} placed ${amount} wager',
-	        highRisk: 'HIGH RISK ALERT: Customer ${customer} risk score ${score}',
-	        systemAlert: 'SYSTEM ALERT: ${message}'
-	      },
-	      encryption: true
-	    },
-	    email: {
-	      enabled: true,
-	      smtpServer: '',
-	      smtpPort: 587,
-	      username: '',
-	      password: '',
-	      fromAddress: '',
-	      recipients: [],
-	      templates: {
-	        highAmount: 'High Amount Alert: Customer ${customer} placed a $${amount} wager on ${event}',
-	        highRisk: 'High Risk Alert: Customer ${customer} has risk score ${score}',
-	        systemAlert: 'System Alert: ${message}'
-	      }
-	    },
-	    sms: {
-	      enabled: false,
-	      provider: '',
-	      apiKey: '',
-	      senderId: '',
-	      recipients: [],
-	      templates: {
-	        highAmount: 'ALERT: $${amount} wager by ${customer}',
-	        highRisk: 'RISK: ${customer} score ${score}',
-	        systemAlert: 'SYS: ${message}'
-	      }
-	    },
-	    push: {
-	      enabled: false,
-	      fcmServerKey: '',
-	      deviceTokens: [],
-	      notificationTemplates: {
-	        highAmount: 'High Amount Wager Alert',
-	        highRisk: 'High Risk Customer Alert',
-	        systemAlert: 'System Notification'
-	      }
-	    }
-	  },
-	  alertTemplates: {
-	    highAmount: '🚨 High Amount Alert: ${customer} placed $${amount} wager',
-	    highRisk: '⚠️ High Risk Alert: ${customer} risk score ${score}',
-	    unusualPattern: '🔍 Unusual Pattern: ${customer} showing ${pattern}',
-	    vipClient: '👑 VIP Alert: ${customer} activity detected',
-	    systemAlert: '🔧 System Alert: ${message}',
-	    emergencyAlert: '🚨 EMERGENCY: ${message}'
-	  },
-	  maintenance: {
-	    lastTest: '',
-	    testResults: {},
-	    backupChannels: ['email'],
-	    failoverEnabled: true
-	  }
-	};
-	}
+  /**
+   * Create default alert configuration
+   */
+  private createDefaultConfiguration(): AlertConfiguration {
+    return {
+      globalSettings: {
+        masterSwitch: true,
+        defaultThresholds: {
+          amount: 1000,
+          risk: 0.7,
+          frequency: 5,
+        },
+        systemWideChannels: ['telegram', 'email'],
+        emergencyContacts: [],
+      },
+      channelConfigurations: {
+        telegram: {
+          enabled: true,
+          botToken: '',
+          chatIds: [],
+          messageTemplates: {
+            highAmount: '🚨 HIGH AMOUNT ALERT: ${customer} placed $${amount} wager on ${event}',
+            highRisk: '⚠️ HIGH RISK ALERT: ${customer} risk score ${score} for $${amount} wager',
+            systemAlert: '🔧 SYSTEM ALERT: ${message}',
+          },
+          retryAttempts: 3,
+          retryDelay: 5000,
+        },
+        signal: {
+          enabled: false,
+          phoneNumber: '',
+          recipients: [],
+          messageTemplates: {
+            highAmount: 'HIGH AMOUNT ALERT: Customer ${customer} placed ${amount} wager',
+            highRisk: 'HIGH RISK ALERT: Customer ${customer} risk score ${score}',
+            systemAlert: 'SYSTEM ALERT: ${message}',
+          },
+          encryption: true,
+        },
+        email: {
+          enabled: true,
+          smtpServer: '',
+          smtpPort: 587,
+          username: '',
+          password: '',
+          fromAddress: '',
+          recipients: [],
+          templates: {
+            highAmount:
+              'High Amount Alert: Customer ${customer} placed a $${amount} wager on ${event}',
+            highRisk: 'High Risk Alert: Customer ${customer} has risk score ${score}',
+            systemAlert: 'System Alert: ${message}',
+          },
+        },
+        sms: {
+          enabled: false,
+          provider: '',
+          apiKey: '',
+          senderId: '',
+          recipients: [],
+          templates: {
+            highAmount: 'ALERT: $${amount} wager by ${customer}',
+            highRisk: 'RISK: ${customer} score ${score}',
+            systemAlert: 'SYS: ${message}',
+          },
+        },
+        push: {
+          enabled: false,
+          fcmServerKey: '',
+          deviceTokens: [],
+          notificationTemplates: {
+            highAmount: 'High Amount Wager Alert',
+            highRisk: 'High Risk Customer Alert',
+            systemAlert: 'System Notification',
+          },
+        },
+      },
+      alertTemplates: {
+        highAmount: '🚨 High Amount Alert: ${customer} placed $${amount} wager',
+        highRisk: '⚠️ High Risk Alert: ${customer} risk score ${score}',
+        unusualPattern: '🔍 Unusual Pattern: ${customer} showing ${pattern}',
+        vipClient: '👑 VIP Alert: ${customer} activity detected',
+        systemAlert: '🔧 System Alert: ${message}',
+        emergencyAlert: '🚨 EMERGENCY: ${message}',
+      },
+      maintenance: {
+        lastTest: '',
+        testResults: {},
+        backupChannels: ['email'],
+        failoverEnabled: true,
+      },
+    };
+  }
 
-	/**
-	 * Initialize analytics
-	 */
-	private initializeAnalytics(): AlertAnalytics {
-	return {
-	  alerts: {
-	    totalSent: 0,
-	    totalDelivered: 0,
-	    totalFailed: 0,
-	    deliveryRate: 0,
-	    averageResponseTime: 0,
-	    alertsByType: {},
-	    alertsByChannel: {},
-	    alertsByTime: {}
-	  },
-	  performance: {
-	    systemLoad: 0,
-	    processingTime: 0,
-	    queueLength: 0,
-	    errorRate: 0,
-	    uptime: 0
-	  },
-	  effectiveness: {
-	    falsePositives: 0,
-	    truePositives: 0,
-	    responseRate: 0,
-	    resolutionTime: 0,
-	    customerSatisfaction: 0
-	  },
-	  trends: {
-	    alertVolume: [],
-	    alertTypes: [],
-	    channelPerformance: [],
-	    riskDetection: []
-	  }
-	};
-	}
+  /**
+   * Initialize analytics
+   */
+  private initializeAnalytics(): AlertAnalytics {
+    return {
+      alerts: {
+        totalSent: 0,
+        totalDelivered: 0,
+        totalFailed: 0,
+        deliveryRate: 0,
+        averageResponseTime: 0,
+        alertsByType: {},
+        alertsByChannel: {},
+        alertsByTime: {},
+      },
+      performance: {
+        systemLoad: 0,
+        processingTime: 0,
+        queueLength: 0,
+        errorRate: 0,
+        uptime: 0,
+      },
+      effectiveness: {
+        falsePositives: 0,
+        truePositives: 0,
+        responseRate: 0,
+        resolutionTime: 0,
+        customerSatisfaction: 0,
+      },
+      trends: {
+        alertVolume: [],
+        alertTypes: [],
+        channelPerformance: [],
+        riskDetection: [],
+      },
+    };
+  }
 
-	/**
-	 * Detect wager alert settings modal
-	 */
-	private async detectAlertSettingsModal(): Promise<void> {
-	const modalSelectors = [
-	  'h4[data-language="L-831"]',
-	  '.modal-title[data-language="L-831"]',
-	  '#myModalLabel20',
-	  '[data-language*="wager"][data-language*="alert"]',
-	  '[data-language*="alert"][data-language*="settings"]'
-	];
+  /**
+   * Detect wager alert settings modal
+   */
+  private async detectAlertSettingsModal(): Promise<void> {
+    const modalSelectors = [
+      'h4[data-language="L-831"]',
+      '.modal-title[data-language="L-831"]',
+      '#myModalLabel20',
+      '[data-language*="wager"][data-language*="alert"]',
+      '[data-language*="alert"][data-language*="settings"]',
+    ];
 
-	let modalTitle: Element | null = null;
+    let modalTitle: Element | null = null;
 
-	for (const selector of modalSelectors) {
-	  const elements = document.querySelectorAll(selector);
-	  for (const element of elements) {
-	    if (element.textContent?.toLowerCase().includes('wager') &&
-	        element.textContent?.toLowerCase().includes('alert')) {
-	      modalTitle = element;
-	      console.log('✅ Found wager alert settings modal:', selector);
-	      this.setupAlertSettingsModal(modalTitle as HTMLHeadingElement);
-	      break;
-	    }
-	  }
-	  if (modalTitle) break;
-	}
+    for (const selector of modalSelectors) {
+      const elements = document.querySelectorAll(selector);
+      for (const element of elements) {
+        if (
+          element.textContent?.toLowerCase().includes('wager') &&
+          element.textContent?.toLowerCase().includes('alert')
+        ) {
+          modalTitle = element;
+          console.log('✅ Found wager alert settings modal:', selector);
+          this.setupAlertSettingsModal(modalTitle as HTMLHeadingElement);
+          break;
+        }
+      }
+      if (modalTitle) break;
+    }
 
-	if (!modalTitle) {
-	  console.log('⚠️ Wager alert settings modal not found, system will initialize on demand');
-	}
-	}
+    if (!modalTitle) {
+      console.log('⚠️ Wager alert settings modal not found, system will initialize on demand');
+    }
+  }
 
-	/**
-	 * Setup wager alert settings modal
-	 */
-	private setupAlertSettingsModal(modalTitle: HTMLHeadingElement): void {
-	// Find the parent modal
-	const modal = modalTitle.closest('.modal, .modal-dialog, [role="dialog"]');
-	if (!modal) {
-	  console.warn('⚠️ Parent modal not found for alert settings');
-	  return;
-	}
+  /**
+   * Setup wager alert settings modal
+   */
+  private setupAlertSettingsModal(modalTitle: HTMLHeadingElement): void {
+    // Find the parent modal
+    const modal = modalTitle.closest('.modal, .modal-dialog, [role="dialog"]');
+    if (!modal) {
+      console.warn('⚠️ Parent modal not found for alert settings');
+      return;
+    }
 
-	// Add click event listener to modal title
-	const clickHandler = (e: Event) => {
-	  e.preventDefault();
-	  this.handleModalOpen(modal as HTMLElement);
-	};
+    // Add click event listener to modal title
+    const clickHandler = (e: Event) => {
+      e.preventDefault();
+      this.handleModalOpen(modal as HTMLElement);
+    };
 
-	modalTitle.addEventListener('click', clickHandler);
-	this.eventListeners.set('modal-title-click', clickHandler);
+    modalTitle.addEventListener('click', clickHandler);
+    this.eventListeners.set('modal-title-click', clickHandler);
 
-	// Setup modal content enhancement
-	this.enhanceAlertSettingsModal(modal as HTMLElement);
+    // Setup modal content enhancement
+    this.enhanceAlertSettingsModal(modal as HTMLElement);
 
-	// Initialize modal content
-	this.initializeModalContent(modal as HTMLElement);
+    // Initialize modal content
+    this.initializeModalContent(modal as HTMLElement);
 
-	console.log('✅ Wager alert settings modal setup complete');
-	}
+    console.log('✅ Wager alert settings modal setup complete');
+  }
 
-	/**
-	 * Enhance alert settings modal
-	 */
-	private enhanceAlertSettingsModal(modal: HTMLElement): void {
-	// Add CSS enhancements
-	const style = document.createElement('style');
-	style.textContent = `
+  /**
+   * Enhance alert settings modal
+   */
+  private enhanceAlertSettingsModal(modal: HTMLElement): void {
+    // Add CSS enhancements
+    const style = document.createElement('style');
+    style.textContent = `
 	  .wager-alert-settings-modal .modal-content {
 	    border-radius: 12px;
 	    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -762,40 +765,40 @@ export class Fantasy42WagerAlertSettings {
 	  }
 	`;
 
-	document.head.appendChild(style);
+    document.head.appendChild(style);
 
-	// Add modal class
-	modal.classList.add('wager-alert-settings-modal');
-	}
+    // Add modal class
+    modal.classList.add('wager-alert-settings-modal');
+  }
 
-	/**
-	 * Initialize modal content
-	 */
-	private initializeModalContent(modal: HTMLElement): void {
-	const modalBody = modal.querySelector('.modal-body');
-	if (!modalBody) return;
+  /**
+   * Initialize modal content
+   */
+  private initializeModalContent(modal: HTMLElement): void {
+    const modalBody = modal.querySelector('.modal-body');
+    if (!modalBody) return;
 
-	// Create tabbed interface
-	const content = this.createSettingsTabs();
-	modalBody.innerHTML = content;
+    // Create tabbed interface
+    const content = this.createSettingsTabs();
+    modalBody.innerHTML = content;
 
-	// Setup tab functionality
-	this.setupTabFunctionality(modal);
+    // Setup tab functionality
+    this.setupTabFunctionality(modal);
 
-	// Load current settings
-	this.loadCurrentSettings(modal);
+    // Load current settings
+    this.loadCurrentSettings(modal);
 
-	// Setup form event listeners
-	this.setupFormEventListeners(modal);
+    // Setup form event listeners
+    this.setupFormEventListeners(modal);
 
-	console.log('✅ Modal content initialized');
-	}
+    console.log('✅ Modal content initialized');
+  }
 
-	/**
-	 * Create settings tabs
-	 */
-	private createSettingsTabs(): string {
-	return `
+  /**
+   * Create settings tabs
+   */
+  private createSettingsTabs(): string {
+    return `
 	  <div class="settings-tabs">
 	    <button class="settings-tab active" data-tab="general">General</button>
 	    <button class="settings-tab" data-tab="thresholds">Thresholds</button>
@@ -829,13 +832,13 @@ export class Fantasy42WagerAlertSettings {
 	    ${this.createTestingContent()}
 	  </div>
 	`;
-	}
+  }
 
-	/**
-	 * Create general settings
-	 */
-	private createGeneralSettings(): string {
-	return `
+  /**
+   * Create general settings
+   */
+  private createGeneralSettings(): string {
+    return `
 	  <div class="alert-settings-section">
 	    <h5>🎛️ General Settings</h5>
 
@@ -908,13 +911,13 @@ export class Fantasy42WagerAlertSettings {
 	    </div>
 	  </div>
 	`;
-	}
+  }
 
-	/**
-	 * Create threshold settings
-	 */
-	private createThresholdSettings(): string {
-	return `
+  /**
+   * Create threshold settings
+   */
+  private createThresholdSettings(): string {
+    return `
 	  <div class="alert-settings-section">
 	    <h5>📊 Alert Thresholds</h5>
 
@@ -985,13 +988,13 @@ export class Fantasy42WagerAlertSettings {
 	    </div>
 	  </div>
 	`;
-	}
+  }
 
-	/**
-	 * Create channel settings
-	 */
-	private createChannelSettings(): string {
-	return `
+  /**
+   * Create channel settings
+   */
+  private createChannelSettings(): string {
+    return `
 	  <div class="alert-settings-section">
 	    <h5>📱 Alert Channels</h5>
 
@@ -1072,13 +1075,13 @@ export class Fantasy42WagerAlertSettings {
 	    </div>
 	  </div>
 	`;
-	}
+  }
 
-	/**
-	 * Create template settings
-	 */
-	private createTemplateSettings(): string {
-	return `
+  /**
+   * Create template settings
+   */
+  private createTemplateSettings(): string {
+    return `
 	  <div class="alert-settings-section">
 	    <h5>📝 Alert Templates</h5>
 
@@ -1121,13 +1124,13 @@ export class Fantasy42WagerAlertSettings {
 	    </div>
 	  </div>
 	`;
-	}
+  }
 
-	/**
-	 * Create analytics content
-	 */
-	private createAnalyticsContent(): string {
-	return `
+  /**
+   * Create analytics content
+   */
+  private createAnalyticsContent(): string {
+    return `
 	  <div class="alert-settings-section">
 	    <h5>📊 Alert Analytics</h5>
 
@@ -1172,13 +1175,13 @@ export class Fantasy42WagerAlertSettings {
 	    </div>
 	  </div>
 	`;
-	}
+  }
 
-	/**
-	 * Create testing content
-	 */
-	private createTestingContent(): string {
-	return `
+  /**
+   * Create testing content
+   */
+  private createTestingContent(): string {
+    return `
 	  <div class="alert-settings-section">
 	    <h5>🧪 Alert System Testing</h5>
 
@@ -1209,387 +1212,418 @@ export class Fantasy42WagerAlertSettings {
 	    </div>
 	  </div>
 	`;
-	}
+  }
 
-	/**
-	 * Setup tab functionality
-	 */
-	private setupTabFunctionality(modal: HTMLElement): void {
-	const tabs = modal.querySelectorAll('.settings-tab');
-	const contents = modal.querySelectorAll('.tab-content');
+  /**
+   * Setup tab functionality
+   */
+  private setupTabFunctionality(modal: HTMLElement): void {
+    const tabs = modal.querySelectorAll('.settings-tab');
+    const contents = modal.querySelectorAll('.tab-content');
 
-	tabs.forEach(tab => {
-	  tab.addEventListener('click', () => {
-	    // Remove active class from all tabs
-	    tabs.forEach(t => t.classList.remove('active'));
-	    contents.forEach(c => c.classList.remove('active'));
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
 
-	    // Add active class to clicked tab
-	    tab.classList.add('active');
-	    const tabId = tab.getAttribute('data-tab');
-	    const content = modal.querySelector(`#${tabId}`);
-	    if (content) {
-	      content.classList.add('active');
-	    }
-	  });
-	});
-	}
+        // Add active class to clicked tab
+        tab.classList.add('active');
+        const tabId = tab.getAttribute('data-tab');
+        const content = modal.querySelector(`#${tabId}`);
+        if (content) {
+          content.classList.add('active');
+        }
+      });
+    });
+  }
 
-	/**
-	 * Load current settings
-	 */
-	private loadCurrentSettings(modal: HTMLElement): void {
-	// Load settings from configuration
-	this.populateFormFields(modal);
+  /**
+   * Load current settings
+   */
+  private loadCurrentSettings(modal: HTMLElement): void {
+    // Load settings from configuration
+    this.populateFormFields(modal);
 
-	console.log('✅ Current settings loaded');
-	}
+    console.log('✅ Current settings loaded');
+  }
 
-	/**
-	 * Populate form fields
-	 */
-	private populateFormFields(modal: HTMLElement): void {
-	const config = this.alertConfiguration;
+  /**
+   * Populate form fields
+   */
+  private populateFormFields(modal: HTMLElement): void {
+    const config = this.alertConfiguration;
 
-	// General settings
-	const masterSwitch = modal.querySelector('#master-switch') as HTMLInputElement;
-	if (masterSwitch) masterSwitch.checked = config.globalSettings.masterSwitch;
+    // General settings
+    const masterSwitch = modal.querySelector('#master-switch') as HTMLInputElement;
+    if (masterSwitch) masterSwitch.checked = config.globalSettings.masterSwitch;
 
-	// Alert types
-	const alertTypes = ['high-amount', 'high-risk', 'unusual-pattern', 'vip-client'];
-	alertTypes.forEach(type => {
-	  const checkbox = modal.querySelector(`#alert-${type}`) as HTMLInputElement;
-	  if (checkbox) checkbox.checked = true; // Default to checked
-	});
+    // Alert types
+    const alertTypes = ['high-amount', 'high-risk', 'unusual-pattern', 'vip-client'];
+    alertTypes.forEach(type => {
+      const checkbox = modal.querySelector(`#alert-${type}`) as HTMLInputElement;
+      if (checkbox) checkbox.checked = true; // Default to checked
+    });
 
-	// Thresholds
-	const amountThreshold = modal.querySelector('#amount-threshold') as HTMLInputElement;
-	if (amountThreshold) amountThreshold.value = config.globalSettings.defaultThresholds.amount.toString();
+    // Thresholds
+    const amountThreshold = modal.querySelector('#amount-threshold') as HTMLInputElement;
+    if (amountThreshold)
+      amountThreshold.value = config.globalSettings.defaultThresholds.amount.toString();
 
-	const riskThreshold = modal.querySelector('#risk-threshold') as HTMLInputElement;
-	if (riskThreshold) riskThreshold.value = config.globalSettings.defaultThresholds.risk.toString();
+    const riskThreshold = modal.querySelector('#risk-threshold') as HTMLInputElement;
+    if (riskThreshold)
+      riskThreshold.value = config.globalSettings.defaultThresholds.risk.toString();
 
-	const frequencyThreshold = modal.querySelector('#frequency-threshold') as HTMLInputElement;
-	if (frequencyThreshold) frequencyThreshold.value = config.globalSettings.defaultThresholds.frequency.toString();
+    const frequencyThreshold = modal.querySelector('#frequency-threshold') as HTMLInputElement;
+    if (frequencyThreshold)
+      frequencyThreshold.value = config.globalSettings.defaultThresholds.frequency.toString();
 
-	// Channel settings
-	const telegramEnabled = modal.querySelector('#telegram-enabled') as HTMLInputElement;
-	if (telegramEnabled) telegramEnabled.checked = config.channelConfigurations.telegram.enabled;
+    // Channel settings
+    const telegramEnabled = modal.querySelector('#telegram-enabled') as HTMLInputElement;
+    if (telegramEnabled) telegramEnabled.checked = config.channelConfigurations.telegram.enabled;
 
-	const emailEnabled = modal.querySelector('#email-enabled') as HTMLInputElement;
-	if (emailEnabled) emailEnabled.checked = config.channelConfigurations.email.enabled;
+    const emailEnabled = modal.querySelector('#email-enabled') as HTMLInputElement;
+    if (emailEnabled) emailEnabled.checked = config.channelConfigurations.email.enabled;
 
-	console.log('✅ Form fields populated');
-	}
+    console.log('✅ Form fields populated');
+  }
 
-	/**
-	 * Setup form event listeners
-	 */
-	private setupFormEventListeners(modal: HTMLElement): void {
-	// Channel toggle listeners
-	this.setupChannelToggles(modal);
+  /**
+   * Setup form event listeners
+   */
+  private setupFormEventListeners(modal: HTMLElement): void {
+    // Channel toggle listeners
+    this.setupChannelToggles(modal);
 
-	// Template preview listeners
-	this.setupTemplatePreviews(modal);
+    // Template preview listeners
+    this.setupTemplatePreviews(modal);
 
-	// Test button listeners
-	this.setupTestButtons(modal);
+    // Test button listeners
+    this.setupTestButtons(modal);
 
-	// Save settings listener
-	this.setupSaveSettings(modal);
+    // Save settings listener
+    this.setupSaveSettings(modal);
 
-	console.log('✅ Form event listeners setup');
-	}
+    console.log('✅ Form event listeners setup');
+  }
 
-	/**
-	 * Setup channel toggles
-	 */
-	private setupChannelToggles(modal: HTMLElement): void {
-	const channels = ['telegram', 'signal', 'email', 'sms'];
+  /**
+   * Setup channel toggles
+   */
+  private setupChannelToggles(modal: HTMLElement): void {
+    const channels = ['telegram', 'signal', 'email', 'sms'];
 
-	channels.forEach(channel => {
-	  const toggle = modal.querySelector(`#${channel}-enabled`) as HTMLInputElement;
-	  const settings = modal.querySelector(`#${channel}-settings`);
+    channels.forEach(channel => {
+      const toggle = modal.querySelector(`#${channel}-enabled`) as HTMLInputElement;
+      const settings = modal.querySelector(`#${channel}-settings`);
 
-	  if (toggle && settings) {
-	    toggle.addEventListener('change', () => {
-	      if (toggle.checked) {
-	        settings.classList.remove('hidden');
-	      } else {
-	        settings.classList.add('hidden');
-	      }
-	    });
-	  }
-	});
-	}
+      if (toggle && settings) {
+        toggle.addEventListener('change', () => {
+          if (toggle.checked) {
+            settings.classList.remove('hidden');
+          } else {
+            settings.classList.add('hidden');
+          }
+        });
+      }
+    });
+  }
 
-	/**
-	 * Setup template previews
-	 */
-	private setupTemplatePreviews(modal: HTMLElement): void {
-	const templates = [
-	  { id: 'template-high-amount', preview: 'preview-high-amount' },
-	  { id: 'template-high-risk', preview: 'preview-high-risk' },
-	  { id: 'template-unusual-pattern', preview: 'preview-unusual-pattern' },
-	  { id: 'template-system-alert', preview: 'preview-system-alert' }
-	];
+  /**
+   * Setup template previews
+   */
+  private setupTemplatePreviews(modal: HTMLElement): void {
+    const templates = [
+      { id: 'template-high-amount', preview: 'preview-high-amount' },
+      { id: 'template-high-risk', preview: 'preview-high-risk' },
+      { id: 'template-unusual-pattern', preview: 'preview-unusual-pattern' },
+      { id: 'template-system-alert', preview: 'preview-system-alert' },
+    ];
 
-	templates.forEach(({ id, preview }) => {
-	  const textarea = modal.querySelector(`#${id}`) as HTMLTextAreaElement;
-	  const previewDiv = modal.querySelector(`#${preview}`);
+    templates.forEach(({ id, preview }) => {
+      const textarea = modal.querySelector(`#${id}`) as HTMLTextAreaElement;
+      const previewDiv = modal.querySelector(`#${preview}`);
 
-	  if (textarea && previewDiv) {
-	    textarea.addEventListener('input', () => {
-	      this.updateTemplatePreview(textarea, previewDiv);
-	    });
-	  }
-	});
-	}
+      if (textarea && previewDiv) {
+        textarea.addEventListener('input', () => {
+          this.updateTemplatePreview(textarea, previewDiv);
+        });
+      }
+    });
+  }
 
-	/**
-	 * Update template preview
-	 */
-	private updateTemplatePreview(textarea: HTMLTextAreaElement, previewDiv: Element): void {
-	const template = textarea.value;
-	// Simple template replacement for demo
-	const preview = template
-	  .replace('${customer}', 'John Doe')
-	  .replace('${amount}', '2500')
-	  .replace('${event}', 'Chiefs vs Eagles')
-	  .replace('${score}', '0.85')
-	  .replace('${pattern}', 'high-frequency')
-	  .replace('${message}', 'High system load detected');
+  /**
+   * Update template preview
+   */
+  private updateTemplatePreview(textarea: HTMLTextAreaElement, previewDiv: Element): void {
+    const template = textarea.value;
+    // Simple template replacement for demo
+    const preview = template
+      .replace('${customer}', 'John Doe')
+      .replace('${amount}', '2500')
+      .replace('${event}', 'Chiefs vs Eagles')
+      .replace('${score}', '0.85')
+      .replace('${pattern}', 'high-frequency')
+      .replace('${message}', 'High system load detected');
 
-	previewDiv.textContent = preview;
-	}
+    previewDiv.textContent = preview;
+  }
 
-	/**
-	 * Setup test buttons
-	 */
-	private setupTestButtons(modal: HTMLElement): void {
-	const testAllBtn = modal.querySelector('#test-all-channels') as HTMLButtonElement;
-	const testSingleBtn = modal.querySelector('#test-single-channel') as HTMLButtonElement;
+  /**
+   * Setup test buttons
+   */
+  private setupTestButtons(modal: HTMLElement): void {
+    const testAllBtn = modal.querySelector('#test-all-channels') as HTMLButtonElement;
+    const testSingleBtn = modal.querySelector('#test-single-channel') as HTMLButtonElement;
 
-	if (testAllBtn) {
-	  testAllBtn.addEventListener('click', () => {
-	    this.testAllChannels(modal);
-	  });
-	}
+    if (testAllBtn) {
+      testAllBtn.addEventListener('click', () => {
+        this.testAllChannels(modal);
+      });
+    }
 
-	if (testSingleBtn) {
-	  testSingleBtn.addEventListener('click', () => {
-	    const channelSelect = modal.querySelector('#test-channel-select') as HTMLSelectElement;
-	    if (channelSelect) {
-	      this.testSingleChannel(modal, channelSelect.value);
-	    }
-	  });
-	}
-	}
+    if (testSingleBtn) {
+      testSingleBtn.addEventListener('click', () => {
+        const channelSelect = modal.querySelector('#test-channel-select') as HTMLSelectElement;
+        if (channelSelect) {
+          this.testSingleChannel(modal, channelSelect.value);
+        }
+      });
+    }
+  }
 
-	/**
-	 * Setup save settings
-	 */
-	private setupSaveSettings(modal: HTMLElement): void {
-	const saveBtn = modal.querySelector('.btn-primary') as HTMLButtonElement;
-	if (saveBtn) {
-	  saveBtn.addEventListener('click', () => {
-	    this.saveSettings(modal);
-	  });
-	}
-	}
+  /**
+   * Setup save settings
+   */
+  private setupSaveSettings(modal: HTMLElement): void {
+    const saveBtn = modal.querySelector('.btn-primary') as HTMLButtonElement;
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => {
+        this.saveSettings(modal);
+      });
+    }
+  }
 
-	/**
-	 * Handle modal open
-	 */
-	private handleModalOpen(modal: HTMLElement): void {
-	// Refresh settings when modal opens
-	this.loadCurrentSettings(modal);
+  /**
+   * Handle modal open
+   */
+  private handleModalOpen(modal: HTMLElement): void {
+    // Refresh settings when modal opens
+    this.loadCurrentSettings(modal);
 
-	console.log('🚨 Wager alert settings modal opened');
-	}
+    console.log('🚨 Wager alert settings modal opened');
+  }
 
-	/**
-	 * Save settings
-	 */
-	private saveSettings(modal: HTMLElement): void {
-	// Collect form data
-	const settings = this.collectFormData(modal);
+  /**
+   * Save settings
+   */
+  private saveSettings(modal: HTMLElement): void {
+    // Collect form data
+    const settings = this.collectFormData(modal);
 
-	// Validate settings
-	if (!this.validateSettings(settings)) {
-	  return;
-	}
+    // Validate settings
+    if (!this.validateSettings(settings)) {
+      return;
+    }
 
-	// Save to configuration
-	this.updateConfiguration(settings);
+    // Save to configuration
+    this.updateConfiguration(settings);
 
-	// Show success message
-	this.showSaveSuccess(modal);
+    // Show success message
+    this.showSaveSuccess(modal);
 
-	// Track analytics
-	this.trackAnalytics('settings_saved', {
-	  timestamp: new Date().toISOString(),
-	  settingsCount: Object.keys(settings).length
-	});
+    // Track analytics
+    this.trackAnalytics('settings_saved', {
+      timestamp: new Date().toISOString(),
+      settingsCount: Object.keys(settings).length,
+    });
 
-	console.log('✅ Settings saved successfully');
-	}
+    console.log('✅ Settings saved successfully');
+  }
 
-	/**
-	 * Collect form data
-	 */
-	private collectFormData(modal: HTMLElement): any {
-	const data: any = {
-	  general: {},
-	  thresholds: {},
-	  channels: {},
-	  templates: {}
-	};
+  /**
+   * Collect form data
+   */
+  private collectFormData(modal: HTMLElement): any {
+    const data: any = {
+      general: {},
+      thresholds: {},
+      channels: {},
+      templates: {},
+    };
 
-	// General settings
-	data.general.masterSwitch = (modal.querySelector('#master-switch') as HTMLInputElement)?.checked || false;
-	data.general.alertTypes = {
-	  highAmount: (modal.querySelector('#alert-high-amount') as HTMLInputElement)?.checked || false,
-	  highRisk: (modal.querySelector('#alert-high-risk') as HTMLInputElement)?.checked || false,
-	  unusualPattern: (modal.querySelector('#alert-unusual-pattern') as HTMLInputElement)?.checked || false,
-	  vipClient: (modal.querySelector('#alert-vip-client') as HTMLInputElement)?.checked || false
-	};
+    // General settings
+    data.general.masterSwitch =
+      (modal.querySelector('#master-switch') as HTMLInputElement)?.checked || false;
+    data.general.alertTypes = {
+      highAmount: (modal.querySelector('#alert-high-amount') as HTMLInputElement)?.checked || false,
+      highRisk: (modal.querySelector('#alert-high-risk') as HTMLInputElement)?.checked || false,
+      unusualPattern:
+        (modal.querySelector('#alert-unusual-pattern') as HTMLInputElement)?.checked || false,
+      vipClient: (modal.querySelector('#alert-vip-client') as HTMLInputElement)?.checked || false,
+    };
 
-	// Thresholds
-	data.thresholds.amountThreshold = parseFloat((modal.querySelector('#amount-threshold') as HTMLInputElement)?.value || '1000');
-	data.thresholds.riskThreshold = parseFloat((modal.querySelector('#risk-threshold') as HTMLInputElement)?.value || '0.7');
-	data.thresholds.frequencyThreshold = parseInt((modal.querySelector('#frequency-threshold') as HTMLInputElement)?.value || '5');
+    // Thresholds
+    data.thresholds.amountThreshold = parseFloat(
+      (modal.querySelector('#amount-threshold') as HTMLInputElement)?.value || '1000'
+    );
+    data.thresholds.riskThreshold = parseFloat(
+      (modal.querySelector('#risk-threshold') as HTMLInputElement)?.value || '0.7'
+    );
+    data.thresholds.frequencyThreshold = parseInt(
+      (modal.querySelector('#frequency-threshold') as HTMLInputElement)?.value || '5'
+    );
 
-	// Channels
-	data.channels.telegram = {
-	  enabled: (modal.querySelector('#telegram-enabled') as HTMLInputElement)?.checked || false,
-	  botToken: (modal.querySelector('#telegram-bot-token') as HTMLInputElement)?.value || '',
-	  chatIds: (modal.querySelector('#telegram-chat-ids') as HTMLInputElement)?.value || ''
-	};
+    // Channels
+    data.channels.telegram = {
+      enabled: (modal.querySelector('#telegram-enabled') as HTMLInputElement)?.checked || false,
+      botToken: (modal.querySelector('#telegram-bot-token') as HTMLInputElement)?.value || '',
+      chatIds: (modal.querySelector('#telegram-chat-ids') as HTMLInputElement)?.value || '',
+    };
 
-	data.channels.email = {
-	  enabled: (modal.querySelector('#email-enabled') as HTMLInputElement)?.checked || false,
-	  smtpServer: (modal.querySelector('#email-smtp') as HTMLInputElement)?.value || '',
-	  fromAddress: (modal.querySelector('#email-from') as HTMLInputElement)?.value || '',
-	  recipients: (modal.querySelector('#email-recipients') as HTMLInputElement)?.value || ''
-	};
+    data.channels.email = {
+      enabled: (modal.querySelector('#email-enabled') as HTMLInputElement)?.checked || false,
+      smtpServer: (modal.querySelector('#email-smtp') as HTMLInputElement)?.value || '',
+      fromAddress: (modal.querySelector('#email-from') as HTMLInputElement)?.value || '',
+      recipients: (modal.querySelector('#email-recipients') as HTMLInputElement)?.value || '',
+    };
 
-	// Templates
-	data.templates.highAmount = (modal.querySelector('#template-high-amount') as HTMLTextAreaElement)?.value || '';
-	data.templates.highRisk = (modal.querySelector('#template-high-risk') as HTMLTextAreaElement)?.value || '';
-	data.templates.unusualPattern = (modal.querySelector('#template-unusual-pattern') as HTMLTextAreaElement)?.value || '';
-	data.templates.systemAlert = (modal.querySelector('#template-system-alert') as HTMLTextAreaElement)?.value || '';
+    // Templates
+    data.templates.highAmount =
+      (modal.querySelector('#template-high-amount') as HTMLTextAreaElement)?.value || '';
+    data.templates.highRisk =
+      (modal.querySelector('#template-high-risk') as HTMLTextAreaElement)?.value || '';
+    data.templates.unusualPattern =
+      (modal.querySelector('#template-unusual-pattern') as HTMLTextAreaElement)?.value || '';
+    data.templates.systemAlert =
+      (modal.querySelector('#template-system-alert') as HTMLTextAreaElement)?.value || '';
 
-	return data;
-	}
+    return data;
+  }
 
-	/**
-	 * Validate settings
-	 */
-	private validateSettings(settings: any): boolean {
-	// Basic validation
-	if (!settings.general.masterSwitch) {
-	  this.showValidationError('Please enable the wager alert system');
-	  return false;
-	}
+  /**
+   * Validate settings
+   */
+  private validateSettings(settings: any): boolean {
+    // Basic validation
+    if (!settings.general.masterSwitch) {
+      this.showValidationError('Please enable the wager alert system');
+      return false;
+    }
 
-	// Check if at least one alert type is enabled
-	const alertTypesEnabled = Object.values(settings.general.alertTypes).some((enabled: any) => enabled);
-	if (!alertTypesEnabled) {
-	  this.showValidationError('Please enable at least one alert type');
-	  return false;
-	}
+    // Check if at least one alert type is enabled
+    const alertTypesEnabled = Object.values(settings.general.alertTypes).some(
+      (enabled: any) => enabled
+    );
+    if (!alertTypesEnabled) {
+      this.showValidationError('Please enable at least one alert type');
+      return false;
+    }
 
-	// Validate thresholds
-	if (settings.thresholds.amountThreshold < 100) {
-	  this.showValidationError('Amount threshold must be at least $100');
-	  return false;
-	}
+    // Validate thresholds
+    if (settings.thresholds.amountThreshold < 100) {
+      this.showValidationError('Amount threshold must be at least $100');
+      return false;
+    }
 
-	if (settings.thresholds.riskThreshold < 0 || settings.thresholds.riskThreshold > 1) {
-	  this.showValidationError('Risk threshold must be between 0 and 1');
-	  return false;
-	}
+    if (settings.thresholds.riskThreshold < 0 || settings.thresholds.riskThreshold > 1) {
+      this.showValidationError('Risk threshold must be between 0 and 1');
+      return false;
+    }
 
-	// Validate channels
-	const channelsEnabled = Object.values(settings.channels).some((channel: any) => channel.enabled);
-	if (!channelsEnabled) {
-	  this.showValidationError('Please enable at least one alert channel');
-	  return false;
-	}
+    // Validate channels
+    const channelsEnabled = Object.values(settings.channels).some(
+      (channel: any) => channel.enabled
+    );
+    if (!channelsEnabled) {
+      this.showValidationError('Please enable at least one alert channel');
+      return false;
+    }
 
-	// Validate enabled channels have required fields
-	for (const [channelName, channel] of Object.entries(settings.channels) as [string, any][]) {
-	  if (channel.enabled) {
-	    if (channelName === 'telegram' && (!channel.botToken || !channel.chatIds)) {
-	      this.showValidationError(`Please fill in all required fields for ${channelName}`);
-	      return false;
-	    }
-	    if (channelName === 'email' && (!channel.smtpServer || !channel.fromAddress || !channel.recipients)) {
-	      this.showValidationError(`Please fill in all required fields for ${channelName}`);
-	      return false;
-	    }
-	  }
-	}
+    // Validate enabled channels have required fields
+    for (const [channelName, channel] of Object.entries(settings.channels) as [string, any][]) {
+      if (channel.enabled) {
+        if (channelName === 'telegram' && (!channel.botToken || !channel.chatIds)) {
+          this.showValidationError(`Please fill in all required fields for ${channelName}`);
+          return false;
+        }
+        if (
+          channelName === 'email' &&
+          (!channel.smtpServer || !channel.fromAddress || !channel.recipients)
+        ) {
+          this.showValidationError(`Please fill in all required fields for ${channelName}`);
+          return false;
+        }
+      }
+    }
 
-	return true;
-	}
+    return true;
+  }
 
-	/**
-	 * Update configuration
-	 */
-	private updateConfiguration(settings: any): void {
-	// Update global settings
-	this.alertConfiguration.globalSettings.masterSwitch = settings.general.masterSwitch;
-	this.alertConfiguration.globalSettings.defaultThresholds.amount = settings.thresholds.amountThreshold;
-	this.alertConfiguration.globalSettings.defaultThresholds.risk = settings.thresholds.riskThreshold;
-	this.alertConfiguration.globalSettings.defaultThresholds.frequency = settings.thresholds.frequencyThreshold;
+  /**
+   * Update configuration
+   */
+  private updateConfiguration(settings: any): void {
+    // Update global settings
+    this.alertConfiguration.globalSettings.masterSwitch = settings.general.masterSwitch;
+    this.alertConfiguration.globalSettings.defaultThresholds.amount =
+      settings.thresholds.amountThreshold;
+    this.alertConfiguration.globalSettings.defaultThresholds.risk =
+      settings.thresholds.riskThreshold;
+    this.alertConfiguration.globalSettings.defaultThresholds.frequency =
+      settings.thresholds.frequencyThreshold;
 
-	// Update channel configurations
-	if (settings.channels.telegram) {
-	  this.alertConfiguration.channelConfigurations.telegram.enabled = settings.channels.telegram.enabled;
-	  if (settings.channels.telegram.botToken) {
-	    this.alertConfiguration.channelConfigurations.telegram.botToken = settings.channels.telegram.botToken;
-	  }
-	  if (settings.channels.telegram.chatIds) {
-	    this.alertConfiguration.channelConfigurations.telegram.chatIds = settings.channels.telegram.chatIds.split(',');
-	  }
-	}
+    // Update channel configurations
+    if (settings.channels.telegram) {
+      this.alertConfiguration.channelConfigurations.telegram.enabled =
+        settings.channels.telegram.enabled;
+      if (settings.channels.telegram.botToken) {
+        this.alertConfiguration.channelConfigurations.telegram.botToken =
+          settings.channels.telegram.botToken;
+      }
+      if (settings.channels.telegram.chatIds) {
+        this.alertConfiguration.channelConfigurations.telegram.chatIds =
+          settings.channels.telegram.chatIds.split(',');
+      }
+    }
 
-	if (settings.channels.email) {
-	  this.alertConfiguration.channelConfigurations.email.enabled = settings.channels.email.enabled;
-	  if (settings.channels.email.smtpServer) {
-	    this.alertConfiguration.channelConfigurations.email.smtpServer = settings.channels.email.smtpServer;
-	  }
-	  if (settings.channels.email.fromAddress) {
-	    this.alertConfiguration.channelConfigurations.email.fromAddress = settings.channels.email.fromAddress;
-	  }
-	  if (settings.channels.email.recipients) {
-	    this.alertConfiguration.channelConfigurations.email.recipients = settings.channels.email.recipients.split(',');
-	  }
-	}
+    if (settings.channels.email) {
+      this.alertConfiguration.channelConfigurations.email.enabled = settings.channels.email.enabled;
+      if (settings.channels.email.smtpServer) {
+        this.alertConfiguration.channelConfigurations.email.smtpServer =
+          settings.channels.email.smtpServer;
+      }
+      if (settings.channels.email.fromAddress) {
+        this.alertConfiguration.channelConfigurations.email.fromAddress =
+          settings.channels.email.fromAddress;
+      }
+      if (settings.channels.email.recipients) {
+        this.alertConfiguration.channelConfigurations.email.recipients =
+          settings.channels.email.recipients.split(',');
+      }
+    }
 
-	// Update templates
-	if (settings.templates) {
-	  this.alertConfiguration.alertTemplates.highAmount = settings.templates.highAmount;
-	  this.alertConfiguration.alertTemplates.highRisk = settings.templates.highRisk;
-	  this.alertConfiguration.alertTemplates.unusualPattern = settings.templates.unusualPattern;
-	  this.alertConfiguration.alertTemplates.systemAlert = settings.templates.systemAlert;
-	}
+    // Update templates
+    if (settings.templates) {
+      this.alertConfiguration.alertTemplates.highAmount = settings.templates.highAmount;
+      this.alertConfiguration.alertTemplates.highRisk = settings.templates.highRisk;
+      this.alertConfiguration.alertTemplates.unusualPattern = settings.templates.unusualPattern;
+      this.alertConfiguration.alertTemplates.systemAlert = settings.templates.systemAlert;
+    }
 
-	console.log('⚙️ Configuration updated');
-	}
+    console.log('⚙️ Configuration updated');
+  }
 
-	/**
-	 * Show validation error
-	 */
-	private showValidationError(message: string): void {
-	// Create or update error message
-	let errorDiv = document.querySelector('.settings-validation-error') as HTMLElement;
-	if (!errorDiv) {
-	  errorDiv = document.createElement('div');
-	  errorDiv.className = 'settings-validation-error';
-	  errorDiv.style.cssText = `
+  /**
+   * Show validation error
+   */
+  private showValidationError(message: string): void {
+    // Create or update error message
+    let errorDiv = document.querySelector('.settings-validation-error') as HTMLElement;
+    if (!errorDiv) {
+      errorDiv = document.createElement('div');
+      errorDiv.className = 'settings-validation-error';
+      errorDiv.style.cssText = `
 	    position: fixed;
 	    top: 20px;
 	    right: 20px;
@@ -1601,25 +1635,25 @@ export class Fantasy42WagerAlertSettings {
 	    z-index: 10000;
 	    max-width: 300px;
 	  `;
-	  document.body.appendChild(errorDiv);
-	}
+      document.body.appendChild(errorDiv);
+    }
 
-	errorDiv.textContent = message;
+    errorDiv.textContent = message;
 
-	// Auto-hide after 5 seconds
-	setTimeout(() => {
-	  if (errorDiv && errorDiv.parentElement) {
-	    errorDiv.remove();
-	  }
-	}, 5000);
-	}
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      if (errorDiv && errorDiv.parentElement) {
+        errorDiv.remove();
+      }
+    }, 5000);
+  }
 
-	/**
-	 * Show save success
-	 */
-	private showSaveSuccess(modal: HTMLElement): void {
-	const successDiv = document.createElement('div');
-	successDiv.style.cssText = `
+  /**
+   * Show save success
+   */
+  private showSaveSuccess(modal: HTMLElement): void {
+    const successDiv = document.createElement('div');
+    successDiv.style.cssText = `
 	  position: fixed;
 	  top: 20px;
 	  right: 20px;
@@ -1630,322 +1664,332 @@ export class Fantasy42WagerAlertSettings {
 	  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 	  z-index: 10000;
 	`;
-	successDiv.textContent = '✅ Settings saved successfully!';
+    successDiv.textContent = '✅ Settings saved successfully!';
 
-	document.body.appendChild(successDiv);
+    document.body.appendChild(successDiv);
 
-	setTimeout(() => {
-	  successDiv.remove();
-	}, 3000);
-	}
+    setTimeout(() => {
+      successDiv.remove();
+    }, 3000);
+  }
 
-	/**
-	 * Test all channels
-	 */
-	private async testAllChannels(modal: HTMLElement): Promise<void> {
-	const resultsDiv = modal.querySelector('#test-results') as HTMLElement;
-	if (!resultsDiv) return;
+  /**
+   * Test all channels
+   */
+  private async testAllChannels(modal: HTMLElement): Promise<void> {
+    const resultsDiv = modal.querySelector('#test-results') as HTMLElement;
+    if (!resultsDiv) return;
 
-	resultsDiv.innerHTML = '<h6>Testing all channels...</h6>';
+    resultsDiv.innerHTML = '<h6>Testing all channels...</h6>';
 
-	const channels = ['telegram', 'email', 'signal', 'sms'];
-	const results: any[] = [];
+    const channels = ['telegram', 'email', 'signal', 'sms'];
+    const results: any[] = [];
 
-	for (const channel of channels) {
-	  const result = await this.testChannel(channel);
-	  results.push({ channel, ...result });
-	}
+    for (const channel of channels) {
+      const result = await this.testChannel(channel);
+      results.push({ channel, ...result });
+    }
 
-	// Display results
-	this.displayTestResults(resultsDiv, results);
+    // Display results
+    this.displayTestResults(resultsDiv, results);
 
-	console.log('🧪 All channels tested');
-	}
+    console.log('🧪 All channels tested');
+  }
 
-	/**
-	 * Test single channel
-	 */
-	private async testSingleChannel(modal: HTMLElement, channel: string): Promise<void> {
-	const resultsDiv = modal.querySelector('#test-results') as HTMLElement;
-	if (!resultsDiv) return;
+  /**
+   * Test single channel
+   */
+  private async testSingleChannel(modal: HTMLElement, channel: string): Promise<void> {
+    const resultsDiv = modal.querySelector('#test-results') as HTMLElement;
+    if (!resultsDiv) return;
 
-	resultsDiv.innerHTML = `<h6>Testing ${channel}...</h6>`;
+    resultsDiv.innerHTML = `<h6>Testing ${channel}...</h6>`;
 
-	const result = await this.testChannel(channel);
-	this.displayTestResults(resultsDiv, [{ channel, ...result }]);
+    const result = await this.testChannel(channel);
+    this.displayTestResults(resultsDiv, [{ channel, ...result }]);
 
-	console.log(`🧪 ${channel} channel tested`);
-	}
+    console.log(`🧪 ${channel} channel tested`);
+  }
 
-	/**
-	 * Test channel
-	 */
-	private async testChannel(channel: string): Promise<any> {
-	// Simulate channel testing
-	return new Promise((resolve) => {
-	  setTimeout(() => {
-	    resolve({
-	      success: Math.random() > 0.2, // 80% success rate for demo
-	      responseTime: Math.floor(Math.random() * 2000) + 500,
-	      message: Math.random() > 0.2 ? 'Test message sent successfully' : 'Failed to send test message'
-	    });
-	  }, Math.random() * 2000 + 500);
-	});
-	}
+  /**
+   * Test channel
+   */
+  private async testChannel(channel: string): Promise<any> {
+    // Simulate channel testing
+    return new Promise(resolve => {
+      setTimeout(
+        () => {
+          resolve({
+            success: Math.random() > 0.2, // 80% success rate for demo
+            responseTime: Math.floor(Math.random() * 2000) + 500,
+            message:
+              Math.random() > 0.2
+                ? 'Test message sent successfully'
+                : 'Failed to send test message',
+          });
+        },
+        Math.random() * 2000 + 500
+      );
+    });
+  }
 
-	/**
-	 * Display test results
-	 */
-	private displayTestResults(container: HTMLElement, results: any[]): void {
-	container.innerHTML = '<h6>Test Results:</h6>';
+  /**
+   * Display test results
+   */
+  private displayTestResults(container: HTMLElement, results: any[]): void {
+    container.innerHTML = '<h6>Test Results:</h6>';
 
-	results.forEach(result => {
-	  const resultDiv = document.createElement('div');
-	  resultDiv.className = `test-result ${result.success ? 'success' : 'error'}`;
+    results.forEach(result => {
+      const resultDiv = document.createElement('div');
+      resultDiv.className = `test-result ${result.success ? 'success' : 'error'}`;
 
-	  resultDiv.innerHTML = `
+      resultDiv.innerHTML = `
 	    <span><strong>${result.channel.toUpperCase()}</strong>: ${result.message}</span>
 	    <span>${result.responseTime}ms</span>
 	  `;
 
-	  container.appendChild(resultDiv);
-	});
+      container.appendChild(resultDiv);
+    });
 
-	// Update last test time
-	const lastTestTime = document.querySelector('#last-test-time');
-	if (lastTestTime) {
-	  lastTestTime.textContent = new Date().toLocaleString();
-	}
-	}
+    // Update last test time
+    const lastTestTime = document.querySelector('#last-test-time');
+    if (lastTestTime) {
+      lastTestTime.textContent = new Date().toLocaleString();
+    }
+  }
 
-	/**
-	 * Initialize alert configuration
-	 */
-	private async initializeAlertConfiguration(): Promise<void> {
-	// Setup alert configuration management
-	console.log('⚙️ Alert configuration initialized');
-	}
+  /**
+   * Initialize alert configuration
+   */
+  private async initializeAlertConfiguration(): Promise<void> {
+    // Setup alert configuration management
+    console.log('⚙️ Alert configuration initialized');
+  }
 
-	/**
-	 * Initialize alert processing
-	 */
-	private async initializeAlertProcessing(): Promise<void> {
-	// Setup alert processing system
-	this.startAlertProcessing();
+  /**
+   * Initialize alert processing
+   */
+  private async initializeAlertProcessing(): Promise<void> {
+    // Setup alert processing system
+    this.startAlertProcessing();
 
-	console.log('⚙️ Alert processing initialized');
-	}
+    console.log('⚙️ Alert processing initialized');
+  }
 
-	/**
-	 * Initialize channel management
-	 */
-	private async initializeChannelManagement(): Promise<void> {
-	// Setup channel management
-	console.log('📱 Channel management initialized');
-	}
+  /**
+   * Initialize channel management
+   */
+  private async initializeChannelManagement(): Promise<void> {
+    // Setup channel management
+    console.log('📱 Channel management initialized');
+  }
 
-	/**
-	 * Initialize threshold management
-	 */
-	private async initializeThresholdManagement(): Promise<void> {
-	// Setup threshold management
-	console.log('📊 Threshold management initialized');
-	}
+  /**
+   * Initialize threshold management
+   */
+  private async initializeThresholdManagement(): Promise<void> {
+    // Setup threshold management
+    console.log('📊 Threshold management initialized');
+  }
 
-	/**
-	 * Initialize analytics reporting
-	 */
-	private async initializeAnalyticsReporting(): Promise<void> {
-	// Setup analytics reporting
-	console.log('📈 Analytics reporting initialized');
-	}
+  /**
+   * Initialize analytics reporting
+   */
+  private async initializeAnalyticsReporting(): Promise<void> {
+    // Setup analytics reporting
+    console.log('📈 Analytics reporting initialized');
+  }
 
-	/**
-	 * Start alert processing
-	 */
-	private startAlertProcessing(): void {
-	this.processingTimer = setInterval(() => {
-	  this.processAlertQueue();
-	}, 5000); // Process every 5 seconds
-	}
+  /**
+   * Start alert processing
+   */
+  private startAlertProcessing(): void {
+    this.processingTimer = setInterval(() => {
+      this.processAlertQueue();
+    }, 5000); // Process every 5 seconds
+  }
 
-	/**
-	 * Process alert queue
-	 */
-	private processAlertQueue(): void {
-	if (this.alertQueue.length === 0) return;
+  /**
+   * Process alert queue
+   */
+  private processAlertQueue(): void {
+    if (this.alertQueue.length === 0) return;
 
-	const alert = this.alertQueue.shift();
-	if (alert) {
-	  this.sendAlert(alert);
-	}
-	}
+    const alert = this.alertQueue.shift();
+    if (alert) {
+      this.sendAlert(alert);
+    }
+  }
 
-	/**
-	 * Send alert
-	 */
-	private async sendAlert(alert: any): Promise<void> {
-	// Send alert through configured channels
-	console.log('📤 Sending alert:', alert);
-	}
+  /**
+   * Send alert
+   */
+  private async sendAlert(alert: any): Promise<void> {
+    // Send alert through configured channels
+    console.log('📤 Sending alert:', alert);
+  }
 
-	/**
-	 * Track analytics
-	 */
-	private trackAnalytics(event: string, data: any): void {
-	console.log('📊 Analytics tracked:', event, data);
-	}
+  /**
+   * Track analytics
+   */
+  private trackAnalytics(event: string, data: any): void {
+    console.log('📊 Analytics tracked:', event, data);
+  }
 
-	/**
-	 * Get status
-	 */
-	getStatus(): {
-	isInitialized: boolean;
-	activeSettings: number;
-	alertsQueued: number;
-	analytics: AlertAnalytics;
-	} {
-	return {
-	  isInitialized: this.isInitialized,
-	  activeSettings: this.alertSettings.size,
-	  alertsQueued: this.alertQueue.length,
-	  analytics: { ...this.analytics }
-	};
-	}
+  /**
+   * Get status
+   */
+  getStatus(): {
+    isInitialized: boolean;
+    activeSettings: number;
+    alertsQueued: number;
+    analytics: AlertAnalytics;
+  } {
+    return {
+      isInitialized: this.isInitialized,
+      activeSettings: this.alertSettings.size,
+      alertsQueued: this.alertQueue.length,
+      analytics: { ...this.analytics },
+    };
+  }
 
-	/**
-	 * Get alert settings
-	 */
-	getAlertSettings(userId?: string): WagerAlertSettings[] {
-	if (userId) {
-	  const settings = this.alertSettings.get(userId);
-	  return settings ? [settings] : [];
-	}
-	return Array.from(this.alertSettings.values());
-	}
+  /**
+   * Get alert settings
+   */
+  getAlertSettings(userId?: string): WagerAlertSettings[] {
+    if (userId) {
+      const settings = this.alertSettings.get(userId);
+      return settings ? [settings] : [];
+    }
+    return Array.from(this.alertSettings.values());
+  }
 
-	/**
-	 * Update alert settings
-	 */
-	updateAlertSettings(userId: string, settings: Partial<WagerAlertSettings>): boolean {
-	const existing = this.alertSettings.get(userId);
-	if (existing) {
-	  this.alertSettings.set(userId, { ...existing, ...settings, updatedAt: new Date().toISOString() });
-	  return true;
-	}
-	return false;
-	}
+  /**
+   * Update alert settings
+   */
+  updateAlertSettings(userId: string, settings: Partial<WagerAlertSettings>): boolean {
+    const existing = this.alertSettings.get(userId);
+    if (existing) {
+      this.alertSettings.set(userId, {
+        ...existing,
+        ...settings,
+        updatedAt: new Date().toISOString(),
+      });
+      return true;
+    }
+    return false;
+  }
 
-	/**
-	 * Create alert settings
-	 */
-	createAlertSettings(settings: WagerAlertSettings): boolean {
-	if (this.alertSettings.has(settings.userId)) {
-	  return false; // Already exists
-	}
+  /**
+   * Create alert settings
+   */
+  createAlertSettings(settings: WagerAlertSettings): boolean {
+    if (this.alertSettings.has(settings.userId)) {
+      return false; // Already exists
+    }
 
-	this.alertSettings.set(settings.userId, {
-	  ...settings,
-	  createdAt: new Date().toISOString(),
-	  updatedAt: new Date().toISOString()
-	});
+    this.alertSettings.set(settings.userId, {
+      ...settings,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
 
-	return true;
-	}
+    return true;
+  }
 
-	/**
-	 * Delete alert settings
-	 */
-	deleteAlertSettings(userId: string): boolean {
-	return this.alertSettings.delete(userId);
-	}
+  /**
+   * Delete alert settings
+   */
+  deleteAlertSettings(userId: string): boolean {
+    return this.alertSettings.delete(userId);
+  }
 
-	/**
-	 * Get configuration
-	 */
-	getConfiguration(): AlertConfiguration {
-	return { ...this.alertConfiguration };
-	}
+  /**
+   * Get configuration
+   */
+  getConfiguration(): AlertConfiguration {
+    return { ...this.alertConfiguration };
+  }
 
-	/**
-	 * Update configuration
-	 */
-	updateConfiguration(newConfig: Partial<AlertConfiguration>): void {
-	this.alertConfiguration = { ...this.alertConfiguration, ...newConfig };
-	console.log('⚙️ Alert configuration updated');
-	}
+  /**
+   * Update configuration
+   */
+  updateConfiguration(newConfig: Partial<AlertConfiguration>): void {
+    this.alertConfiguration = { ...this.alertConfiguration, ...newConfig };
+    console.log('⚙️ Alert configuration updated');
+  }
 
-	/**
-	 * Queue alert
-	 */
-	queueAlert(alert: any): void {
-	this.alertQueue.push(alert);
-	console.log('📋 Alert queued:', alert);
-	}
+  /**
+   * Queue alert
+   */
+  queueAlert(alert: any): void {
+    this.alertQueue.push(alert);
+    console.log('📋 Alert queued:', alert);
+  }
 
-	/**
-	 * Export settings
-	 */
-	exportSettings(): string {
-	const exportData = {
-	  alertSettings: Array.from(this.alertSettings.values()),
-	  configuration: this.alertConfiguration,
-	  analytics: this.analytics,
-	  exportDate: new Date().toISOString()
-	};
+  /**
+   * Export settings
+   */
+  exportSettings(): string {
+    const exportData = {
+      alertSettings: Array.from(this.alertSettings.values()),
+      configuration: this.alertConfiguration,
+      analytics: this.analytics,
+      exportDate: new Date().toISOString(),
+    };
 
-	return JSON.stringify(exportData, null, 2);
-	}
+    return JSON.stringify(exportData, null, 2);
+  }
 
-	/**
-	 * Cleanup resources
-	 */
-	cleanup(): void {
-	// Clear timers
-	if (this.processingTimer) {
-	  clearInterval(this.processingTimer);
-	}
-	this.timers.forEach(timer => clearTimeout(timer));
-	this.timers.clear();
+  /**
+   * Cleanup resources
+   */
+  cleanup(): void {
+    // Clear timers
+    if (this.processingTimer) {
+      clearInterval(this.processingTimer);
+    }
+    this.timers.forEach(timer => clearTimeout(timer));
+    this.timers.clear();
 
-	// Clear queue
-	this.alertQueue.length = 0;
+    // Clear queue
+    this.alertQueue.length = 0;
 
-	// Disconnect observers
-	this.observers.forEach(observer => observer.disconnect());
-	this.observers.clear();
+    // Disconnect observers
+    this.observers.forEach(observer => observer.disconnect());
+    this.observers.clear();
 
-	// Remove event listeners
-	this.eventListeners.forEach((listener, key) => {
-	  // Note: Can't easily remove listeners without references
-	});
-	this.eventListeners.clear();
+    // Remove event listeners
+    this.eventListeners.forEach((listener, key) => {
+      // Note: Can't easily remove listeners without references
+    });
+    this.eventListeners.clear();
 
-	this.isInitialized = false;
-	console.log('🧹 Wager alert settings system cleaned up');
-	}
+    this.isInitialized = false;
+    console.log('🧹 Wager alert settings system cleaned up');
+  }
 
-	// Private properties
-	private sortDirection: 'asc' | 'desc' = 'desc';
-	private currentSort: string = 'closingLine';
+  // Private properties
+  private sortDirection: 'asc' | 'desc' = 'desc';
+  private currentSort: string = 'closingLine';
 }
 
 // Convenience functions
 export const createFantasy42WagerAlertSettings = (
-	fantasyClient: Fantasy42AgentClient,
-	unifiedIntegration: Fantasy42UnifiedIntegration,
-	config?: Partial<AlertConfiguration>
+  fantasyClient: Fantasy42AgentClient,
+  unifiedIntegration: Fantasy42UnifiedIntegration,
+  config?: Partial<AlertConfiguration>
 ): Fantasy42WagerAlertSettings => {
-	return new Fantasy42WagerAlertSettings(fantasyClient, unifiedIntegration, config);
+  return new Fantasy42WagerAlertSettings(fantasyClient, unifiedIntegration, config);
 };
 
 export const initializeFantasy42WagerAlertSettings = async (
-	fantasyClient: Fantasy42AgentClient,
-	unifiedIntegration: Fantasy42UnifiedIntegration,
-	config?: Partial<AlertConfiguration>
+  fantasyClient: Fantasy42AgentClient,
+  unifiedIntegration: Fantasy42UnifiedIntegration,
+  config?: Partial<AlertConfiguration>
 ): Promise<boolean> => {
-	const alertSettings = new Fantasy42WagerAlertSettings(fantasyClient, unifiedIntegration, config);
-	return await alertSettings.initialize();
+  const alertSettings = new Fantasy42WagerAlertSettings(fantasyClient, unifiedIntegration, config);
+  return await alertSettings.initialize();
 };
 
 // Export types

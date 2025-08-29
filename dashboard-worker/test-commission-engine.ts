@@ -18,8 +18,8 @@ async function testCommissionEngine() {
     'agent_001',
     10000, // handle
     50000, // volume
-    0.95,  // risk score
-    100,   // compliance score
+    0.95, // risk score
+    100, // compliance score
     { newCustomers: 15 }
   );
 
@@ -38,14 +38,16 @@ async function testCommissionEngine() {
     { balance: 5000, volume: 25000, expected: 'Silver VIP' },
     { balance: 15000, volume: 100000, expected: 'Gold VIP' },
     { balance: 50000, volume: 500000, expected: 'Platinum VIP' },
-    { balance: 100, volume: 100, expected: 'None' }
+    { balance: 100, volume: 100, expected: 'None' },
   ];
 
   testCases.forEach(({ balance, volume, expected }) => {
     const tier = bms.getVIPTier(balance, volume);
     const actual = tier?.name || 'None';
     const status = actual === expected ? '✅' : '❌';
-    console.log(`${status} Balance: ${balance}, Volume: ${volume} → ${actual} (expected: ${expected})`);
+    console.log(
+      `${status} Balance: ${balance}, Volume: ${volume} → ${actual} (expected: ${expected})`
+    );
   });
   console.log('');
 

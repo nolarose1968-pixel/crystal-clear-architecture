@@ -26,14 +26,16 @@ export class Fantasy402Auth {
   private apiUrl = 'https://fantasy402.com/cloud/api';
   private session: SessionData | null = null;
 
-  constructor(private username: string, private password: string) {}
+  constructor(
+    private username: string,
+    private password: string
+  ) {}
 
   /**
    * Authenticate with Fantasy402 API
    */
   async login(): Promise<AuthResponse> {
     try {
-
       // Prepare the form data exactly as shown in the cURL
       const formData = new URLSearchParams({
         customerID: this.username.toUpperCase(), // Convert to uppercase like BILLY666
@@ -45,7 +47,7 @@ export class Fantasy402Auth {
         domain: 'fantasy402.com',
         redirect_uri: 'fantasy402.com',
         operation: 'authenticateCustomer',
-        RRO: '1'
+        RRO: '1',
       });
 
       // Make the authentication request
@@ -53,17 +55,16 @@ export class Fantasy402Auth {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'Accept': 'application/json, text/javascript, */*; q=0.01',
+          Accept: 'application/json, text/javascript, */*; q=0.01',
           'Accept-Language': 'en-US,en;q=0.9',
-          'Origin': this.baseUrl,
-          'Referer': `${this.baseUrl}/manager.html`,
+          Origin: this.baseUrl,
+          Referer: `${this.baseUrl}/manager.html`,
           'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
           'X-Requested-With': 'XMLHttpRequest',
           // Don't send Bearer undefined, just skip it for initial auth
         },
-        body: formData.toString()
+        body: formData.toString(),
       });
-
 
       // Extract cookies from response headers
       const cookies: string[] = [];
@@ -80,7 +81,7 @@ export class Fantasy402Auth {
       // Get response body
       const responseText = await response.text();
       let responseData: any;
-      
+
       try {
         responseData = JSON.parse(responseText);
       } catch {
@@ -94,14 +95,14 @@ export class Fantasy402Auth {
           cfClearance,
           cfBm,
           customerId: this.username.toUpperCase(),
-          expiresAt: Date.now() + (20 * 60 * 1000) // JWT expires in ~20 minutes
+          expiresAt: Date.now() + 20 * 60 * 1000, // JWT expires in ~20 minutes
         };
 
         // Extract JWT from the "code" field
         if (responseData && typeof responseData === 'object') {
           if (responseData.code) {
             this.session.bearerToken = responseData.code;
-            
+
             // Decode JWT to get expiration
             try {
               const [, payload] = responseData.code.split('.');
@@ -109,10 +110,9 @@ export class Fantasy402Auth {
               if (decoded.exp) {
                 this.session.expiresAt = decoded.exp * 1000; // Convert to milliseconds
               }
-            } catch (e) {
-            }
+            } catch (e) {}
           }
-          
+
           // Also check for other token fields (fallback)
           if (!this.session.bearerToken && responseData.token) {
             this.session.bearerToken = responseData.token;
@@ -122,26 +122,25 @@ export class Fantasy402Auth {
           }
         }
 
-
         return {
           success: true,
           sessionId: this.session.phpSessionId,
           token: this.session.bearerToken,
           cookies,
-          data: responseData
+          data: responseData,
         };
       } else {
         console.error(`❌ Login failed with status ${response.status}`);
         return {
           success: false,
-          error: `Login failed: ${response.status} - ${responseText.slice(0, 200)}`
+          error: `Login failed: ${response.status} - ${responseText.slice(0, 200)}`,
         };
       }
     } catch (error) {
       console.error('❌ Login error:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -162,12 +161,12 @@ export class Fantasy402Auth {
 
     const headers: HeadersInit = {
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-      'Accept': 'application/json, text/javascript, */*; q=0.01',
-      'Origin': this.baseUrl,
-      'Referer': `${this.baseUrl}/manager.html`,
+      Accept: 'application/json, text/javascript, */*; q=0.01',
+      Origin: this.baseUrl,
+      Referer: `${this.baseUrl}/manager.html`,
       'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
       'X-Requested-With': 'XMLHttpRequest',
-      'Cookie': cookieHeader
+      Cookie: cookieHeader,
     };
 
     // Add Bearer token if available
@@ -176,10 +175,10 @@ export class Fantasy402Auth {
     }
 
     const url = endpoint.startsWith('http') ? endpoint : `${this.apiUrl}/${endpoint}`;
-    
+
     const options: RequestInit = {
       method,
-      headers
+      headers,
     };
 
     if (data && method !== 'GET') {
@@ -207,7 +206,7 @@ export class Fantasy402Auth {
     return this.request('Manager/getCustomersList', 'POST', {
       agentID: this.username.toUpperCase(),
       sessionID: this.session?.phpSessionId || '',
-      top: '10'
+      top: '10',
     });
   }
 
@@ -225,7 +224,7 @@ export class Fantasy402Auth {
     agentSite?: string;
   }): Promise<any> {
     const agentID = this.username.toUpperCase();
-    
+
     return this.request('Manager/getWeeklyFigureByAgent', 'POST', {
       agentID,
       week: params?.week || '0',
@@ -236,10 +235,10 @@ export class Fantasy402Auth {
       RRO: params?.RRO || '1',
       agentOwner: params?.agentOwner || agentID,
       agentSite: params?.agentSite || '1',
-      operation: 'getWeeklyFigureByAgent'
+      operation: 'getWeeklyFigureByAgent',
     });
   }
-  
+
   /**
    * Get weekly figures lite version with full parameters
    */
@@ -254,7 +253,7 @@ export class Fantasy402Auth {
     agentSite?: string;
   }): Promise<any> {
     const agentID = this.username.toUpperCase();
-    
+
     return this.request('Manager/getWeeklyFigureByAgentLite', 'POST', {
       agentID,
       week: params?.week || '0',
@@ -265,7 +264,7 @@ export class Fantasy402Auth {
       RRO: params?.RRO || '1',
       agentOwner: params?.agentOwner || agentID,
       agentSite: params?.agentSite || '1',
-      operation: 'getWeeklyFigureByAgentLite'
+      operation: 'getWeeklyFigureByAgentLite',
     });
   }
 
@@ -274,10 +273,10 @@ export class Fantasy402Auth {
    */
   async getCustomerBalance(): Promise<any> {
     return this.request('Customer/getBalance', 'POST', {
-      customerID: this.username.toUpperCase()
+      customerID: this.username.toUpperCase(),
     });
   }
-  
+
   /**
    * Get customer transactions
    */
@@ -288,15 +287,15 @@ export class Fantasy402Auth {
   }): Promise<any> {
     const today = new Date().toISOString().split('T')[0];
     const lastWeek = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    
+
     return this.request('Customer/getTransactions', 'POST', {
       customerID: this.username.toUpperCase(),
       start: params?.start || lastWeek,
       end: params?.end || today,
-      limit: params?.limit?.toString() || '100'
+      limit: params?.limit?.toString() || '100',
     });
   }
-  
+
   /**
    * Get customer wagers
    */
@@ -308,25 +307,25 @@ export class Fantasy402Auth {
   }): Promise<any> {
     const today = new Date().toISOString().split('T')[0];
     const lastWeek = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    
+
     return this.request('Customer/getWagers', 'POST', {
       customerID: this.username.toUpperCase(),
       start: params?.start || lastWeek,
       end: params?.end || today,
       limit: params?.limit?.toString() || '100',
-      ...(params?.status && { status: params.status })
+      ...(params?.status && { status: params.status }),
     });
   }
-  
+
   /**
    * Get customer live wagers
    */
   async getCustomerLiveWagers(): Promise<any> {
     return this.request('Customer/getLiveWagers', 'POST', {
-      customerID: this.username.toUpperCase()
+      customerID: this.username.toUpperCase(),
     });
   }
-  
+
   /**
    * Get sub-agents list
    */
@@ -337,7 +336,7 @@ export class Fantasy402Auth {
       operation: 'getListAgenstByAgent',
       RRO: '1',
       agentOwner: this.username.toUpperCase(),
-      agentSite: '1'
+      agentSite: '1',
     });
   }
 
@@ -346,7 +345,7 @@ export class Fantasy402Auth {
    */
   private extractCookie(setCookieHeader: string | null, cookieName: string): string | undefined {
     if (!setCookieHeader) return undefined;
-    
+
     const regex = new RegExp(`${cookieName}=([^;]+)`);
     const match = setCookieHeader.match(regex);
     return match ? match[1] : undefined;
@@ -357,9 +356,9 @@ export class Fantasy402Auth {
    */
   private buildCookieHeader(): string {
     if (!this.session) return '';
-    
+
     const cookies: string[] = [];
-    
+
     if (this.session.phpSessionId) {
       cookies.push(`PHPSESSID=${this.session.phpSessionId}`);
     }
@@ -369,7 +368,7 @@ export class Fantasy402Auth {
     if (this.session.cfBm) {
       cookies.push(`__cf_bm=${this.session.cfBm}`);
     }
-    
+
     return cookies.join('; ');
   }
 

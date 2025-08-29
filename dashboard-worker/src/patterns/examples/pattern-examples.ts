@@ -32,7 +32,10 @@ export class PatternExamples {
    */
   static async buildWithVersion(config: any): Promise<any> {
     const results = await PatternUtils.parallel(
-      { pattern: 'VERSIONER', context: { type: 'increment', version: config.version, release: 'patch' } },
+      {
+        pattern: 'VERSIONER',
+        context: { type: 'increment', version: config.version, release: 'patch' },
+      },
       { pattern: 'BUILDER', context: config }
     );
     return results;
@@ -72,11 +75,7 @@ export class PatternExamples {
     const pipeline = PatternUtils.pipeline('SHELL', 'BUNX', 'TIMING', 'TABULAR');
     return await pipeline.execute({
       type: 'pipeline',
-      commands: [
-        'bun install',
-        'bunx eslint . --fix',
-        'bun test'
-      ]
+      commands: ['bun install', 'bunx eslint . --fix', 'bun test'],
     });
   }
 
@@ -119,14 +118,14 @@ export class PatternExamples {
         context: {
           type: 'single',
           prompt: 'Enter command: ',
-          handler: (input: string) => `Command received: ${input}`
-        }
+          handler: (input: string) => `Command received: ${input}`,
+        },
       },
       {
         pattern: 'STREAM',
         context: {
-          processor: (text: string) => ({ wordCount: text.split(/\s+/).length })
-        }
+          processor: (text: string) => ({ wordCount: text.split(/\s+/).length }),
+        },
       }
     );
     return results;
@@ -136,11 +135,7 @@ export class PatternExamples {
    * File system validation example
    */
   static async validateProjectFiles(): Promise<any> {
-    const criticalFiles = [
-      'package.json',
-      'src/index.ts',
-      'src/patterns/pattern-weaver.ts'
-    ];
+    const criticalFiles = ['package.json', 'src/index.ts', 'src/patterns/pattern-weaver.ts'];
 
     const result = await this.simulateFileValidation(criticalFiles);
     return result;
@@ -166,15 +161,15 @@ export class PatternExamples {
         pattern: 'FILESYSTEM',
         context: {
           operation: 'exists',
-          paths: ['package.json', 'bunfig.toml', 'src/']
-        }
+          paths: ['package.json', 'bunfig.toml', 'src/'],
+        },
       },
       {
         pattern: 'FILESYSTEM',
         context: {
           operation: 'validate',
-          paths: ['src/index.ts', 'src/patterns/']
-        }
+          paths: ['src/index.ts', 'src/patterns/'],
+        },
       }
     );
 
@@ -191,16 +186,16 @@ export class PatternExamples {
         context: {
           operation: 'stringWidth',
           input: text,
-          options: { countAnsiEscapeCodes: false }
-        }
+          options: { countAnsiEscapeCodes: false },
+        },
       },
       {
         pattern: 'UTILITIES',
-        context: { operation: 'stripANSI', input: text }
+        context: { operation: 'stripANSI', input: text },
       },
       {
         pattern: 'UTILITIES',
-        context: { operation: 'escapeHTML', input: text }
+        context: { operation: 'escapeHTML', input: text },
       }
     );
 
@@ -208,7 +203,7 @@ export class PatternExamples {
       original: text,
       width: results[0].data,
       stripped: results[1].data,
-      escaped: results[2].data
+      escaped: results[2].data,
     };
   }
 
@@ -238,8 +233,9 @@ export class PatternExamples {
     return {
       originalSize: buffer.length,
       compressedSize: results[0].data.length,
-      compressionRatio: ((buffer.length - results[0].data.length) / buffer.length * 100).toFixed(2) + '%',
-      decompressed: new TextDecoder().decode(results[1].data)
+      compressionRatio:
+        (((buffer.length - results[0].data.length) / buffer.length) * 100).toFixed(2) + '%',
+      decompressed: new TextDecoder().decode(results[1].data),
     };
   }
 
@@ -255,15 +251,15 @@ export class PatternExamples {
         context: {
           operation: 'resolveSync',
           input: './package.json',
-          options: { root: process.cwd() }
-        }
+          options: { root: process.cwd() },
+        },
       }
     );
 
     return {
       bunInfo: results[0].data,
       bunPath: results[1].data,
-      packagePath: results[2].data
+      packagePath: results[2].data,
     };
   }
 
@@ -278,14 +274,14 @@ export class PatternExamples {
 
       memoryResults.push({
         object: obj.constructor?.name || typeof obj,
-        ...memory
+        ...memory,
       });
     }
 
     return {
       individual: memoryResults,
       table: this.createTableFromResults(memoryResults),
-      totalBytes: memoryResults.reduce((sum, r) => sum + r.bytes, 0)
+      totalBytes: memoryResults.reduce((sum, r) => sum + r.bytes, 0),
     };
   }
 
@@ -298,23 +294,23 @@ export class PatternExamples {
       { name: 'Bob', age: 25, city: 'San Francisco', salary: 85000, department: 'Engineering' },
       { name: 'Charlie', age: 35, city: 'Austin', salary: 65000, department: 'Marketing' },
       { name: 'Diana', age: 28, city: 'Seattle', salary: 90000, department: 'Engineering' },
-      { name: 'Eve', age: 32, city: 'Boston', salary: 70000, department: 'Sales' }
+      { name: 'Eve', age: 32, city: 'Boston', salary: 70000, department: 'Sales' },
     ];
 
     const results = {
       fullTable: this.createTableFromData(sampleData, { colors: true }),
       nameAndSalary: this.createTableFromData(sampleData, {
         properties: ['name', 'salary'],
-        colors: true
+        colors: true,
       }),
       engineeringOnly: this.createTableFromData(
         sampleData.filter(person => person.department === 'Engineering'),
         { properties: ['name', 'city', 'salary'], colors: true }
       ),
-      departmentSummary: this.createTableFromData(
-        this.calculateDepartmentSummary(sampleData),
-        { properties: ['department', 'count', 'avgSalary'], colors: true }
-      )
+      departmentSummary: this.createTableFromData(this.calculateDepartmentSummary(sampleData), {
+        properties: ['department', 'count', 'avgSalary'],
+        colors: true,
+      }),
     };
 
     return results;
@@ -329,12 +325,12 @@ export class PatternExamples {
       { operation: 'Shell Command', time: '45.8ms', pattern: 'SHELL', status: '✅' },
       { operation: 'Package Exec', time: '12.3ms', pattern: 'BUNX', status: '✅' },
       { operation: 'Data Table', time: '8.7ms', pattern: 'TABULAR', status: '✅' },
-      { operation: 'Timing', time: '0.1ms', pattern: 'TIMING', status: '✅' }
+      { operation: 'Timing', time: '0.1ms', pattern: 'TIMING', status: '✅' },
     ];
 
     return this.createTableFromData(metrics, {
       properties: ['operation', 'time', 'pattern', 'status'],
-      colors: true
+      colors: true,
     });
   }
 
@@ -345,11 +341,7 @@ export class PatternExamples {
       type: 'interactive',
       session: 'simulated',
       commands: ['status', 'help', 'exit'],
-      responses: [
-        'System status: OK',
-        'Available commands: status, help, exit',
-        'Goodbye!'
-      ]
+      responses: ['System status: OK', 'Available commands: status, help, exit', 'Goodbye!'],
     };
   }
 
@@ -357,14 +349,14 @@ export class PatternExamples {
     const chunks = [
       { lineCount: 15, hasJSON: true, size: 1024, processed: Date.now() },
       { lineCount: 23, hasJSON: false, size: 2048, processed: Date.now() },
-      { lineCount: 8, hasJSON: true, size: 512, processed: Date.now() }
+      { lineCount: 8, hasJSON: true, size: 512, processed: Date.now() },
     ];
 
     return {
       chunks,
       totalLines: chunks.reduce((sum, c) => sum + c.lineCount, 0),
       jsonChunks: chunks.filter(c => c.hasJSON).length,
-      totalSize: chunks.reduce((sum, c) => sum + c.size, 0)
+      totalSize: chunks.reduce((sum, c) => sum + c.size, 0),
     };
   }
 
@@ -373,20 +365,20 @@ export class PatternExamples {
       path: file,
       exists: Math.random() > 0.2, // 80% exist
       size: Math.floor(Math.random() * 10000) + 100,
-      modified: new Date(Date.now() - Math.random() * 86400000)
+      modified: new Date(Date.now() - Math.random() * 86400000),
     }));
 
     return {
       results,
       allExist: results.every(r => r.exists),
-      totalSize: results.reduce((sum, r) => sum + r.size, 0)
+      totalSize: results.reduce((sum, r) => sum + r.size, 0),
     };
   }
 
   private static async simulateUUIDGeneration(encoding: string): Promise<string> {
-    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-      const r = Math.random() * 16 | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
       return v.toString(16);
     });
 
@@ -400,15 +392,17 @@ export class PatternExamples {
     return JSON.stringify(obj1) === JSON.stringify(obj2);
   }
 
-  private static async simulateMemoryEstimation(obj: any): Promise<{ bytes: number; breakdown: any }> {
+  private static async simulateMemoryEstimation(
+    obj: any
+  ): Promise<{ bytes: number; breakdown: any }> {
     const size = JSON.stringify(obj).length * 2; // Rough estimation
     return {
       bytes: size,
       breakdown: {
         string: typeof obj === 'string' ? size : 0,
         number: typeof obj === 'number' ? 8 : 0,
-        object: typeof obj === 'object' ? size : 0
-      }
+        object: typeof obj === 'object' ? size : 0,
+      },
     };
   }
 
@@ -427,8 +421,8 @@ export class PatternExamples {
       formatted: this.formatTable(headers, rows, options.colors),
       summary: {
         totalRows: data.length,
-        totalColumns: headers.length
-      }
+        totalColumns: headers.length,
+      },
     };
   }
 
@@ -438,13 +432,13 @@ export class PatternExamples {
       r.pattern,
       r.success ? '✅' : '❌',
       `${r.executionTime}ms`,
-      typeof r.data === 'object' ? JSON.stringify(r.data).slice(0, 50) + '...' : String(r.data)
+      typeof r.data === 'object' ? JSON.stringify(r.data).slice(0, 50) + '...' : String(r.data),
     ]);
 
     return {
       headers,
       rows,
-      formatted: this.formatTable(headers, rows, true)
+      formatted: this.formatTable(headers, rows, true),
     };
   }
 
@@ -460,7 +454,7 @@ export class PatternExamples {
       return {
         department: dept,
         count: deptData.length,
-        avgSalary
+        avgSalary,
       };
     });
   }

@@ -14,6 +14,7 @@ A beautiful terminal-based water system monitoring interface that displays real-
 ## 🚀 Quick Start
 
 ### 1. Simple Display
+
 ```bash
 # Show current water system metrics once
 bun water-system-cli.js
@@ -27,6 +28,7 @@ bun water-system-cli.js
 ```
 
 ### 2. Real-time Monitoring
+
 ```bash
 # Start monitoring with 5-second updates
 bun water-system-cli.js --monitor
@@ -36,7 +38,9 @@ bun water-system-cli.js -m 3000
 ```
 
 ### 3. Web Interface
+
 Open `water-system-terminal.html` in your browser for an interactive web version with:
+
 - Hover effects and animations
 - Real-time metric updates
 - Responsive design
@@ -45,11 +49,13 @@ Open `water-system-terminal.html` in your browser for an interactive web version
 ## 📁 Files Overview
 
 ### Core Components
+
 - **`water-system-cli.js`** - Main CLI application with monitoring capabilities
 - **`water-system-integration.js`** - Integration utilities for existing systems
 - **`water-system-terminal.html`** - Interactive web interface
 
 ### Integration Files
+
 - **`dashboard-worker/src/terminal-dashboard.html`** - Main terminal dashboard (water system section added)
 - **`dashboard-worker/src/components/water-kpi-components.ts`** - Water KPI components
 - **`dashboard-worker/src/components/water-dashboard-integration.ts`** - Dashboard integration utilities
@@ -92,7 +98,7 @@ bun water-system-integration.js --monitor 3000
 The water system can be easily integrated into existing terminal dashboards:
 
 ```javascript
-import { WaterSystemIntegrator } from './water-system-integration.js';
+import { WaterSystemIntegrator } from "./water-system-integration.js";
 
 const waterSystem = new WaterSystemIntegrator();
 
@@ -100,11 +106,11 @@ const waterSystem = new WaterSystemIntegrator();
 const metrics = waterSystem.getMetrics();
 
 // Generate display
-const display = waterSystem.generateDisplay('box');
+const display = waterSystem.generateDisplay("box");
 
 // Start monitoring
 waterSystem.startMonitoring(5000, (updatedMetrics) => {
-    console.log(waterSystem.generateDisplay());
+  console.log(waterSystem.generateDisplay());
 });
 ```
 
@@ -113,7 +119,7 @@ waterSystem.startMonitoring(5000, (updatedMetrics) => {
 The water system components are designed to work with the existing Fire22 dashboard infrastructure:
 
 ```typescript
-import { WaterDashboardKPIManager } from './components/water-kpi-components.ts';
+import { WaterDashboardKPIManager } from "./components/water-kpi-components.ts";
 
 const waterManager = new WaterDashboardKPIManager(containerId);
 waterManager.initializeWaterKPIs();
@@ -125,6 +131,7 @@ waterManager.startWaterMonitoring(3000);
 ### Colors and Styling
 
 The water system uses a consistent color scheme:
+
 - **Primary**: Ocean blue (#87ceeb)
 - **Accent**: Deep blue (#4682b4)
 - **Flow Rate**: Green (#4ade80)
@@ -134,6 +141,7 @@ The water system uses a consistent color scheme:
 ### Display Formats
 
 Multiple display formats are supported:
+
 - **Box**: Traditional terminal box with borders
 - **Simple**: Clean text without borders
 - **JSON**: Structured data for API integration
@@ -141,11 +149,13 @@ Multiple display formats are supported:
 ## 📊 Metrics
 
 ### Current Metrics
+
 - **Flow Rate**: 85 L/min (range: 50-120 L/min)
 - **Temperature**: 22°C (range: 18-26°C)
 - **Pressure**: 120 PSI (range: 100-140 PSI)
 
 ### Status Indicators
+
 - **Flow**: HIGH (>80), NORMAL (30-80), LOW (<30)
 - **Temperature**: WARM (>24°C), NORMAL (20-24°C), COOL (<20°C)
 - **Pressure**: HIGH (>130 PSI), NORMAL (110-130 PSI), LOW (<110 PSI)
@@ -153,18 +163,21 @@ Multiple display formats are supported:
 ## 🚀 Advanced Features
 
 ### Real-time Updates
+
 - Configurable update intervals
 - Simulated metric variations
 - Graceful shutdown handling
 - Event-driven callbacks
 
 ### Integration APIs
+
 - Metric retrieval and updates
 - Status monitoring
 - Display generation
 - Control functions
 
 ### Web Interface Features
+
 - Responsive design
 - Hover effects and animations
 - Real-time updates
@@ -181,6 +194,7 @@ Multiple display formats are supported:
 ### Debug Mode
 
 Enable debug output by setting environment variables:
+
 ```bash
 DEBUG=water-system bun water-system-cli.js
 ```
@@ -208,6 +222,7 @@ This project is part of the Fire22 ecosystem and follows the same licensing term
 ## 🌊 Water System Aesthetics
 
 The water system interface is designed with ocean-inspired aesthetics:
+
 - Smooth, flowing box characters
 - Ocean blue color palette
 - Wave-like animations and effects

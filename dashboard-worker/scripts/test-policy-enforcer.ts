@@ -2,7 +2,7 @@
 
 /**
  * Fire22 Test Policy Enforcer
- * 
+ *
  * This script enforces test execution policies by running pre-checks
  * before allowing any test suite to execute. If any check fails,
  * test execution is immediately terminated.
@@ -43,7 +43,7 @@ class TestPolicyEnforcer {
 
   private loadPolicy(): TestPolicy {
     const policyPath = join(this.projectRoot, '.testpolicy');
-    
+
     if (!existsSync(policyPath)) {
       console.error('❌ ERROR: .testpolicy file not found. Test execution blocked.');
       process.exit(1);
@@ -56,11 +56,11 @@ class TestPolicyEnforcer {
     policyContent.split('\n').forEach(line => {
       line = line.trim();
       if (line.startsWith('#') || !line.includes('=')) return;
-      
+
       const [key, value] = line.split('=');
       const cleanKey = key.trim() as keyof TestPolicy;
       const cleanValue = value.trim();
-      
+
       if (cleanValue === 'true' || cleanValue === 'false') {
         (policy as any)[cleanKey] = cleanValue === 'true';
       } else {
@@ -73,28 +73,28 @@ class TestPolicyEnforcer {
 
   private log(message: string, type: 'info' | 'error' | 'warning' = 'info') {
     if (!this.policy.LOG_POLICY_ENFORCEMENT) return;
-    
+
     const prefix = {
       info: '📋',
       error: '❌',
-      warning: '⚠️'
+      warning: '⚠️',
     }[type];
-    
+
     console.log(`${prefix} [TEST-POLICY] ${message}`);
   }
 
   private async runCommand(command: string, description: string): Promise<boolean> {
     this.log(`Running ${description}...`);
-    
+
     try {
       const proc = Bun.spawn(['bun', 'run', command], {
         stdout: 'pipe',
         stderr: 'pipe',
-        cwd: this.projectRoot
+        cwd: this.projectRoot,
       });
-      
+
       const exitCode = await proc.exited;
-      
+
       if (exitCode === 0) {
         this.log(`✅ ${description} passed`, 'info');
         return true;
@@ -125,19 +125,19 @@ class TestPolicyEnforcer {
 
   private async checkSyntaxValidation(): Promise<boolean> {
     if (!this.policy.REQUIRE_SYNTAX_VALIDATION) return true;
-    
+
     this.log('Running syntax validation...');
-    
+
     try {
       // Use Bun's built-in syntax checking
       const proc = Bun.spawn(['bun', 'build', '--target=bun', '--no-bundle', 'src/index.ts'], {
         stdout: 'pipe',
         stderr: 'pipe',
-        cwd: this.projectRoot
+        cwd: this.projectRoot,
       });
-      
+
       const exitCode = await proc.exited;
-      
+
       if (exitCode === 0) {
         this.log('✅ Syntax validation passed', 'info');
         return true;
@@ -163,18 +163,18 @@ class TestPolicyEnforcer {
 
   private async checkDependencyAudit(): Promise<boolean> {
     if (!this.policy.REQUIRE_DEPENDENCY_AUDIT) return true;
-    
+
     this.log('Running dependency audit...');
-    
+
     try {
       const proc = Bun.spawn(['bun', 'audit', '--audit-level=high'], {
         stdout: 'pipe',
         stderr: 'pipe',
-        cwd: this.projectRoot
+        cwd: this.projectRoot,
       });
-      
+
       const exitCode = await proc.exited;
-      
+
       if (exitCode === 0) {
         this.log('✅ Dependency audit passed', 'info');
         return true;
@@ -195,37 +195,37 @@ class TestPolicyEnforcer {
 
   private checkBypassConditions(): boolean {
     if (!this.policy.ALLOW_BYPASS_WITH_FLAG) return false;
-    
+
     const args = process.argv;
     const hasBypassFlag = args.includes(this.policy.BYPASS_FLAG);
-    
+
     if (hasBypassFlag) {
       this.log(`⚠️ BYPASS FLAG DETECTED: ${this.policy.BYPASS_FLAG}`, 'warning');
-      
+
       if (this.policy.BYPASS_REQUIRES_CONFIRMATION) {
         this.log('Bypass requires manual confirmation. Proceeding with bypass...', 'warning');
       }
-      
+
       if (this.policy.LOG_BYPASS_ATTEMPTS) {
         this.log(`🚨 SECURITY: Test policy bypassed at ${new Date().toISOString()}`, 'warning');
       }
-      
+
       return true;
     }
-    
+
     return false;
   }
 
   private displayFailureDetails(): void {
     if (!this.policy.SHOW_FAILURE_DETAILS || this.failureDetails.length === 0) return;
-    
+
     console.error('\n🚨 PRE-CHECK FAILURE DETAILS:');
     console.error('═'.repeat(60));
-    
+
     this.failureDetails.forEach((detail, index) => {
       console.error(`\n${index + 1}. ${detail}`);
     });
-    
+
     console.error('\n═'.repeat(60));
     console.error('🛑 All failures must be resolved before tests can run.');
   }
@@ -237,7 +237,7 @@ class TestPolicyEnforcer {
     }
 
     this.log(`Enforcing test policy v${this.policy.POLICY_VERSION}`);
-    
+
     // Check for bypass conditions first
     if (this.checkBypassConditions()) {
       this.log('Policy bypassed. Allowing test execution.', 'warning');
@@ -245,23 +245,23 @@ class TestPolicyEnforcer {
     }
 
     this.log('Running pre-checks before allowing test execution...');
-    
+
     const checks = [
       { name: 'Code Linting', check: () => this.checkCodeLinting() },
       { name: 'Type Checking', check: () => this.checkTypeScript() },
       { name: 'Syntax Validation', check: () => this.checkSyntaxValidation() },
       { name: 'Security Scan', check: () => this.checkSecurity() },
-      { name: 'Dependency Audit', check: () => this.checkDependencyAudit() }
+      { name: 'Dependency Audit', check: () => this.checkDependencyAudit() },
     ];
 
     let allPassed = true;
 
     for (const { name, check } of checks) {
       const passed = await check();
-      
+
       if (!passed) {
         allPassed = false;
-        
+
         if (this.policy.FAIL_FAST && this.policy.EXIT_ON_FIRST_FAILURE) {
           this.log(`❌ ${name} failed. Terminating immediately due to FAIL_FAST policy.`, 'error');
           this.displayFailureDetails();

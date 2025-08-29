@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
  * @fire22/version-manager CLI Entry Point
- * 
+ *
  * Primary CLI binary for bunx --package usage
  * Supports all version management operations
  */
@@ -57,17 +57,17 @@ async function statusCommand() {
   const manager = new BunVersionManager({ current: '4.0.0-staging' });
   const current = manager.getCurrentVersion();
   const parsed = VersionUtils.parse(current);
-  
+
   console.log('🏷️ Version Status');
   console.log(`Current: ${current}`);
   console.log(`Major: ${parsed.major}`);
   console.log(`Minor: ${parsed.minor}`);
   console.log(`Patch: ${parsed.patch}`);
-  
+
   if (parsed.prerelease.length > 0) {
     console.log(`Prerelease: ${parsed.prerelease.join('.')}`);
   }
-  
+
   const suggestions = manager.getNextVersionSuggestions();
   console.log('\n📈 Next Versions:');
   console.log(`Patch: ${suggestions.patch}`);
@@ -78,47 +78,47 @@ async function statusCommand() {
 async function bumpCommand() {
   const strategy = args[args.indexOf('--strategy') + 1] || args[1] || 'patch';
   const reason = args[args.indexOf('--reason') + 1] || 'Version bump via CLI';
-  
+
   const manager = new BunVersionManager({ current: '4.0.0-staging' });
-  
+
   console.log(`🚀 Bumping version (${strategy})...`);
-  
+
   const newVersion = await manager.bumpVersion(strategy as any, {
     author: 'bunx-cli',
     changes: [reason],
     breaking: strategy === 'major',
-    dryRun: args.includes('--dry-run')
+    dryRun: args.includes('--dry-run'),
   });
-  
+
   console.log(`✅ Version bumped to: ${newVersion}`);
 }
 
 async function compareCommand() {
   const v1 = args[1];
   const v2 = args[2];
-  
+
   if (!v1 || !v2) {
     console.error('Usage: compare <version1> <version2>');
     process.exit(1);
   }
-  
+
   const result = VersionUtils.compare(v1, v2);
   const symbol = result > 0 ? '>' : result < 0 ? '<' : '=';
-  
+
   console.log(`${v1} ${symbol} ${v2}`);
 }
 
 async function validateCommand() {
   const version = args[1];
-  
+
   if (!version) {
     console.error('Usage: validate <version>');
     process.exit(1);
   }
-  
+
   const isValid = VersionUtils.isValid(version);
   console.log(isValid ? '✅ Valid' : '❌ Invalid');
-  
+
   if (isValid) {
     const parsed = VersionUtils.parse(version);
     console.log(`Formatted: ${parsed.format()}`);
@@ -128,36 +128,36 @@ async function validateCommand() {
 async function satisfiesCommand() {
   const version = args[1];
   const range = args[2];
-  
+
   if (!version || !range) {
     console.error('Usage: satisfies <version> <range>');
     process.exit(1);
   }
-  
+
   const satisfies = VersionUtils.satisfies(version, range);
   console.log(satisfies ? '✅ Satisfies' : '❌ Does not satisfy');
 }
 
 async function workspaceCommand() {
   const workspace = new WorkspaceVersionManager('4.0.0-staging');
-  
+
   // Add some demo packages
   workspace.addWorkspace('@fire22/wager-system', '3.1.0');
   workspace.addWorkspace('@fire22/env-manager', '2.1.0');
   workspace.addWorkspace('@fire22/version-manager', '3.1.0');
-  
+
   const consistency = workspace.checkConsistency();
-  
+
   console.log('🔄 Workspace Status:');
   console.log(`Consistent: ${consistency.consistent ? '✅' : '❌'}`);
-  
+
   if (!consistency.consistent) {
     console.log('\n⚠️ Inconsistencies:');
     for (const issue of consistency.inconsistencies) {
       console.log(`- ${issue.package}: ${issue.version} (expected: ${issue.expected})`);
     }
   }
-  
+
   const versions = workspace.getWorkspaceVersions();
   console.log('\n📦 Package Versions:');
   for (const [pkg, version] of Object.entries(versions)) {

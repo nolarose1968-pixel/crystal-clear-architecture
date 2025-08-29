@@ -4,7 +4,7 @@
  * Enhanced dependency management with editor integration
  */
 
-import { parseArgs } from "util";
+import { parseArgs } from 'util';
 
 // Color codes for console output
 const colors = {
@@ -45,7 +45,7 @@ const { values: args, positionals } = parseArgs({
 
 function showHelp() {
   colorLog('blue', '📝 Fire22 Editor Integration Tool');
-  console.log('====================================');
+  console.log('!==!==!==!==!==!=====');
   console.log('');
   console.log('Usage: bun run editor [command] [options]');
   console.log('');
@@ -79,11 +79,11 @@ function showHelp() {
 async function openInEditor(filePath: string, options: EditorOptions = {}) {
   try {
     colorLog('green', `📂 Opening: ${filePath}`);
-    
+
     if (options.line || options.column) {
       colorLog('cyan', `   Position: Line ${options.line || 1}, Column ${options.column || 1}`);
     }
-    
+
     if (options.editor) {
       colorLog('blue', `   Editor: ${options.editor}`);
     }
@@ -112,9 +112,9 @@ async function openInEditor(filePath: string, options: EditorOptions = {}) {
 
 async function listProjectFiles() {
   colorLog('blue', '📋 Common Project Files');
-  console.log('========================');
+  console.log('!==!==!==!====');
   console.log('');
-  
+
   const commonFiles = [
     // Configuration files
     { path: 'package.json', description: 'Package configuration' },
@@ -122,17 +122,17 @@ async function listProjectFiles() {
     { path: 'tsconfig.json', description: 'TypeScript configuration' },
     { path: '.env', description: 'Environment variables' },
     { path: '.env.example', description: 'Environment template' },
-    
+
     // Main source files
     { path: 'src/index.ts', description: 'Main entry point' },
     { path: 'src/config.ts', description: 'Application configuration' },
     { path: 'src/env.ts', description: 'Environment configuration' },
-    
+
     // Documentation
     { path: 'README.md', description: 'Project documentation' },
     { path: 'DEPENDENCY-MANAGEMENT-ENHANCED.md', description: 'Dependency management guide' },
     { path: 'WORKSPACE-DEVELOPMENT-GUIDE.md', description: 'Workspace development guide' },
-    
+
     // Scripts
     { path: 'scripts/analyze-deps.sh', description: 'Dependency analysis script' },
     { path: 'scripts/manage-package.sh', description: 'Package management script' },
@@ -147,12 +147,12 @@ async function listProjectFiles() {
 
 async function openConfigFiles() {
   colorLog('blue', '⚙️ Opening Configuration Files');
-  console.log('===============================');
+  console.log('!==!==!==!==!==!==');
   console.log('');
 
   const configFiles = [
     'package.json',
-    'bunfig.toml', 
+    'bunfig.toml',
     'tsconfig.json',
     '.env.example',
     'lefthook.yml',
@@ -168,7 +168,7 @@ async function openConfigFiles() {
 
 async function openScriptDirectory() {
   colorLog('blue', '📜 Opening Script Files');
-  console.log('=======================');
+  console.log('!==!==!==!====');
   console.log('');
 
   const scriptFiles = [
@@ -187,7 +187,7 @@ async function openScriptDirectory() {
 
 async function openWorkspaceFiles(workspaceName: string) {
   colorLog('blue', `🏢 Opening Workspace: ${workspaceName}`);
-  console.log('================================');
+  console.log('!==!==!==!==!==!==');
   console.log('');
 
   const workspacePath = `workspaces/@fire22-${workspaceName}`;
@@ -195,7 +195,7 @@ async function openWorkspaceFiles(workspaceName: string) {
 
   if (await Bun.file(packageJsonPath).exists()) {
     await openInEditor(packageJsonPath);
-    
+
     // Try to open main source file
     const srcFiles = [
       `${workspacePath}/src/index.ts`,
@@ -218,13 +218,13 @@ async function openWorkspaceFiles(workspaceName: string) {
   } else {
     colorLog('red', `❌ Workspace not found: ${workspaceName}`);
     colorLog('yellow', '💡 Available workspaces:');
-    
+
     // List available workspaces
     const workspaceDir = 'workspaces';
     try {
       const glob = new Bun.Glob('@fire22-*');
       const workspaces = Array.from(glob.scanSync({ cwd: workspaceDir }));
-      
+
       workspaces.sort().forEach(ws => {
         console.log(`     → ${ws.replace('@fire22-', '')}`);
       });
@@ -236,7 +236,7 @@ async function openWorkspaceFiles(workspaceName: string) {
 
 async function openFilesWithTypeScriptErrors() {
   colorLog('blue', '🔍 Finding TypeScript Errors...');
-  console.log('=================================');
+  console.log('!==!==!==!==!==!===');
   console.log('');
 
   try {
@@ -247,7 +247,7 @@ async function openFilesWithTypeScriptErrors() {
     });
 
     const output = await new Response(proc.stderr).text();
-    
+
     if (!output.trim()) {
       colorLog('green', '✅ No TypeScript errors found!');
       return;
@@ -263,7 +263,7 @@ async function openFilesWithTypeScriptErrors() {
         const [, filePath, lineStr, columnStr] = match;
         const line = parseInt(lineStr);
         const column = parseInt(columnStr);
-        
+
         if (!fileErrors.has(filePath)) {
           fileErrors.set(filePath, []);
         }
@@ -284,16 +284,15 @@ async function openFilesWithTypeScriptErrors() {
     for (const [filePath, errors] of fileErrors) {
       const firstError = errors[0];
       colorLog('cyan', `📂 ${filePath} (${errors.length} error${errors.length > 1 ? 's' : ''})`);
-      
+
       await openInEditor(filePath, {
         line: firstError.line,
         column: firstError.column,
       });
-      
+
       // Small delay between file opens
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
-
   } catch (error) {
     colorLog('red', `❌ Error running TypeScript check: ${error}`);
   }
@@ -312,7 +311,9 @@ async function main() {
       const filePath = args.file || positionals[1];
       if (!filePath) {
         colorLog('red', '❌ File path required');
-        console.log('Usage: bun run editor open <file> [--line <n>] [--column <n>] [--editor <editor>]');
+        console.log(
+          'Usage: bun run editor open <file> [--line <n>] [--column <n>] [--editor <editor>]'
+        );
         process.exit(1);
       }
 
@@ -365,7 +366,7 @@ async function main() {
 }
 
 // Run the main function
-main().catch((error) => {
+main().catch(error => {
   colorLog('red', `❌ Unexpected error: ${error}`);
   process.exit(1);
 });

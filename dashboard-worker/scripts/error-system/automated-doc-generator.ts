@@ -30,14 +30,17 @@ interface ErrorCode {
 }
 
 interface ErrorRegistry {
-  errorCategories: Record<string, {
-    prefix: string;
-    name: string;
-    description: string;
-    range: string;
-    severity: string;
-    color: string;
-  }>;
+  errorCategories: Record<
+    string,
+    {
+      prefix: string;
+      name: string;
+      description: string;
+      range: string;
+      severity: string;
+      color: string;
+    }
+  >;
   errorCodes: Record<string, ErrorCode>;
   metadata: {
     totalErrorCodes: number;
@@ -59,7 +62,7 @@ class AutomatedDocGenerator {
 
   private loadRegistry(): void {
     const registryPath = join(this.projectRoot, 'docs', 'error-codes.json');
-    
+
     if (!existsSync(registryPath)) {
       throw new Error(`Error registry not found at: ${registryPath}`);
     }
@@ -67,7 +70,9 @@ class AutomatedDocGenerator {
     try {
       const content = readFileSync(registryPath, 'utf-8');
       this.registry = JSON.parse(content);
-      console.log(`✅ Loaded error registry with ${this.registry.metadata.totalErrorCodes} error codes`);
+      console.log(
+        `✅ Loaded error registry with ${this.registry.metadata.totalErrorCodes} error codes`
+      );
     } catch (error) {
       throw new Error(`Failed to parse error registry: ${error.message}`);
     }
@@ -78,7 +83,7 @@ class AutomatedDocGenerator {
    */
   generateMarkdownDocumentation(): string {
     const { errorCategories, errorCodes, metadata } = this.registry;
-    
+
     let markdown = `# Fire22 Dashboard - Automated Error Code Documentation
 
 *🤖 This documentation is automatically generated from \`docs/error-codes.json\`*  
@@ -316,10 +321,14 @@ This documentation is automatically generated from \`docs/error-codes.json\`.
  */
 
 // Error Categories
-export type ErrorCategory = ${Object.keys(errorCategories).map(cat => `'${cat}'`).join(' | ')};
+export type ErrorCategory = ${Object.keys(errorCategories)
+      .map(cat => `'${cat}'`)
+      .join(' | ')};
 
 // Error Codes  
-export type ErrorCode = ${Object.keys(errorCodes).map(code => `'${code}'`).join(' | ')};
+export type ErrorCode = ${Object.keys(errorCodes)
+      .map(code => `'${code}'`)
+      .join(' | ')};
 
 // Error Severities
 export type ErrorSeverity = 'CRITICAL' | 'ERROR' | 'WARNING' | 'INFO';
@@ -503,7 +512,6 @@ export const ERROR_HTTP_CODES = {
       console.log(`   • Categories: ${Object.keys(this.registry.errorCategories).length}`);
       console.log(`   • Generated Files: 3`);
       console.log(`   • Generated At: ${new Date().toLocaleString()}`);
-
     } catch (error) {
       console.error('❌ Documentation generation failed:', error);
       throw error;
@@ -514,7 +522,7 @@ export const ERROR_HTTP_CODES = {
 // CLI execution
 if (import.meta.main) {
   const generator = new AutomatedDocGenerator();
-  
+
   try {
     await generator.generate();
   } catch (error) {

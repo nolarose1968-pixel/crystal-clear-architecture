@@ -2,7 +2,7 @@
 
 /**
  * 🔍📱 Fire22 Department Telegram Setup Verification
- * 
+ *
  * Verifies all departments are properly configured for Telegram support
  */
 
@@ -64,13 +64,13 @@ async function verifyDepartmentTelegramSetup(): Promise<{
   for (const deptName of expectedDepartments) {
     const teamDept: TeamDirectoryDepartment = teamDirectory.departments[deptName];
     const botDept = configuredDepartments.find(d => d.name === deptName);
-    
+
     const verification: DepartmentVerification = {
       name: deptName,
       configured: !!botDept,
       channel: botDept?.channel || 'NOT_CONFIGURED',
       issues: [],
-      recommendations: []
+      recommendations: [],
     };
 
     // Check if department is configured in bot
@@ -83,14 +83,17 @@ async function verifyDepartmentTelegramSetup(): Promise<{
     const telegramChannels = teamDirectory.communicationChannels?.telegram?.channels;
     if (telegramChannels && !telegramChannels[deptName]) {
       verification.issues.push('No Telegram channel defined in team directory');
-      verification.recommendations.push(`Add '${deptName}' channel to communicationChannels.telegram.channels`);
+      verification.recommendations.push(
+        `Add '${deptName}' channel to communicationChannels.telegram.channels`
+      );
     }
 
     // Check if department members have Telegram quick actions
-    const membersWithTelegram = teamDept.members.filter(member => 
-      member.quickActions.includes('telegram') || member.quickActions.includes('telegram-dm')
+    const membersWithTelegram = teamDept.members.filter(
+      member =>
+        member.quickActions.includes('telegram') || member.quickActions.includes('telegram-dm')
     );
-    
+
     if (membersWithTelegram.length === 0) {
       verification.issues.push('No team members configured with Telegram quick actions');
       verification.recommendations.push('Add telegram/telegram-dm to member quickActions');
@@ -108,7 +111,7 @@ async function verifyDepartmentTelegramSetup(): Promise<{
     const status = verification.configured ? '✅' : '❌';
     const issueCount = verification.issues.length;
     const issueText = issueCount > 0 ? ` (${issueCount} issues)` : '';
-    
+
     console.log(`${status} ${deptName.toUpperCase()}: ${verification.channel}${issueText}`);
     if (verification.issues.length > 0) {
       verification.issues.forEach(issue => console.log(`   ⚠️ ${issue}`));
@@ -116,8 +119,8 @@ async function verifyDepartmentTelegramSetup(): Promise<{
   }
 
   // Check for extra departments in bot not in team directory
-  const extraDepartments = configuredDepartments.filter(botDept => 
-    !expectedDepartments.includes(botDept.name)
+  const extraDepartments = configuredDepartments.filter(
+    botDept => !expectedDepartments.includes(botDept.name)
   );
 
   if (extraDepartments.length > 0) {
@@ -139,21 +142,17 @@ async function verifyDepartmentTelegramSetup(): Promise<{
   }
 
   if (totalIssues > 0) {
-    overallRecommendations.push(
-      `Resolve ${totalIssues} configuration issues across departments`
-    );
+    overallRecommendations.push(`Resolve ${totalIssues} configuration issues across departments`);
   }
 
   // Check if all essential departments are covered
   const essentialDepartments = ['finance', 'support', 'compliance', 'technology', 'operations'];
-  const missingEssential = essentialDepartments.filter(dept => 
-    !verificationResults.find(v => v.name === dept && v.configured)
+  const missingEssential = essentialDepartments.filter(
+    dept => !verificationResults.find(v => v.name === dept && v.configured)
   );
 
   if (missingEssential.length > 0) {
-    overallRecommendations.push(
-      `Configure essential departments: ${missingEssential.join(', ')}`
-    );
+    overallRecommendations.push(`Configure essential departments: ${missingEssential.join(', ')}`);
   }
 
   // Check for 24/7 support coverage
@@ -189,7 +188,7 @@ async function verifyDepartmentTelegramSetup(): Promise<{
     configuredDepartments: configuredCount,
     verificationResults,
     overallStatus,
-    recommendations: overallRecommendations
+    recommendations: overallRecommendations,
   };
 }
 
@@ -272,29 +271,28 @@ async function testSystemIntegration(): Promise<void> {
 
   try {
     const bot = new DepartmentalTelegramBot();
-    
+
     // Test department stats
     const stats = bot.getDepartmentStats();
     console.log(`✅ Department stats: ${stats.size} departments tracked`);
-    
+
     // Test performance report
     const report = bot.generatePerformanceReport();
     console.log(`✅ Performance report: ${report.length} characters generated`);
-    
+
     // Test sample inquiry routing
     const testUser = {
       id: 99999,
       username: 'test_user',
       first_name: 'Test',
-      language_code: 'en'
+      language_code: 'en',
     };
-    
+
     const testMessage = 'I need help with my payment withdrawal';
     const result = await bot.routeCustomerInquiry(testUser, testMessage, 'normal');
-    
+
     console.log(`✅ Inquiry routing: ${result.inquiryId} → ${result.department} dept`);
     console.log(`   Wait time: ${result.estimatedWaitTime} minutes`);
-    
   } catch (error) {
     console.error(`❌ Integration test failed: ${error.message}`);
   }
@@ -304,28 +302,27 @@ async function testSystemIntegration(): Promise<void> {
 async function main() {
   console.log('🔥📱 FIRE22 DEPARTMENT TELEGRAM VERIFICATION');
   console.log('='.repeat(50));
-  
+
   try {
     // Run verification
     const results = await verifyDepartmentTelegramSetup();
-    
+
     // Generate setup script
     await generateSetupScript();
-    
+
     // Test system integration
     await testSystemIntegration();
-    
+
     console.log('\n🎉 VERIFICATION COMPLETE!');
     console.log('='.repeat(50));
-    
+
     if (results.overallStatus === 'complete') {
       console.log('✅ All departments properly configured for Telegram support');
     } else {
       console.log(`⚠️ Setup is ${results.overallStatus} - see recommendations above`);
     }
-    
+
     return results;
-    
   } catch (error) {
     console.error('❌ Verification failed:', error.message);
     process.exit(1);

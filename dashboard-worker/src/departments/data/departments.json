@@ -5,15 +5,8 @@
     "email": "mike.hunt@technology.fire22",
     "internalId": "DEPT-TECH-001",
     "headEmployeeId": "EMP-TECH-001",
-    "packages": [
-      "@fire22/core-dashboard",
-      "@fire22/pattern-system"
-    ],
-    "dependencies": [
-      "typescript",
-      "@types/bun",
-      "eslint"
-    ],
+    "packages": ["@fire22/core-dashboard", "@fire22/pattern-system"],
+    "dependencies": ["typescript", "@types/bun", "eslint"],
     "maintenanceResponsibilities": [
       "@fire22/core-dashboard",
       "@fire22/pattern-system",
@@ -28,13 +21,9 @@
     "email": "head@marketing.fire22",
     "internalId": "DEPT-MARK-002",
     "headEmployeeId": "TBD",
-    "packages": [
-      "@fire22/marketing-tools"
-    ],
+    "packages": ["@fire22/marketing-tools"],
     "dependencies": [],
-    "maintenanceResponsibilities": [
-      "@fire22/telegram-integration"
-    ],
+    "maintenanceResponsibilities": ["@fire22/telegram-integration"],
     "status": "pending"
   },
   {
@@ -43,13 +32,9 @@
     "email": "head@security.fire22",
     "internalId": "DEPT-SEC-003",
     "headEmployeeId": "TBD",
-    "packages": [
-      "@fire22/security-scanner"
-    ],
+    "packages": ["@fire22/security-scanner"],
     "dependencies": [],
-    "maintenanceResponsibilities": [
-      "@fire22/security-scanner"
-    ],
+    "maintenanceResponsibilities": ["@fire22/security-scanner"],
     "status": "pending"
   },
   {
@@ -58,13 +43,9 @@
     "email": "head@finance.fire22",
     "internalId": "DEPT-FIN-004",
     "headEmployeeId": "TBD",
-    "packages": [
-      "@fire22/financial-reporting"
-    ],
+    "packages": ["@fire22/financial-reporting"],
     "dependencies": [],
-    "maintenanceResponsibilities": [
-      "@fire22/financial-reporting"
-    ],
+    "maintenanceResponsibilities": ["@fire22/financial-reporting"],
     "status": "pending"
   },
   {
@@ -73,13 +54,9 @@
     "email": "head@operations.fire22",
     "internalId": "DEPT-OPS-005",
     "headEmployeeId": "TBD",
-    "packages": [
-      "@fire22/ops-tools"
-    ],
+    "packages": ["@fire22/ops-tools"],
     "dependencies": [],
-    "maintenanceResponsibilities": [
-      "@fire22/sports-betting"
-    ],
+    "maintenanceResponsibilities": ["@fire22/sports-betting"],
     "status": "pending"
   },
   {
@@ -88,13 +65,9 @@
     "email": "head@legal.fire22",
     "internalId": "DEPT-LEG-006",
     "headEmployeeId": "TBD",
-    "packages": [
-      "@fire22/compliance-tools"
-    ],
+    "packages": ["@fire22/compliance-tools"],
     "dependencies": [],
-    "maintenanceResponsibilities": [
-      "@fire22/compliance-tools"
-    ],
+    "maintenanceResponsibilities": ["@fire22/compliance-tools"],
     "status": "pending"
   }
 ]

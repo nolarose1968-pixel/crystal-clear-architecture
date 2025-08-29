@@ -16,7 +16,7 @@ function fixSecurityGuide() {
       newLines.push('');
       modified = true;
     }
-    
+
     newLines.push(line);
   });
 

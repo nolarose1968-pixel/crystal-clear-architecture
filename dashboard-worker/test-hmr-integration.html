@@ -1,221 +1,230 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HMR Water Dashboard Test</title>
     <style>
-        body {
-            font-family: monospace;
-            background: linear-gradient(135deg, #0a0e27 0%, #151932 100%);
-            color: #e0e6ed;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-        }
-        .test-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: rgba(20, 25, 50, 0.8);
-            border-radius: 12px;
-            padding: 30px;
-            border: 1px solid rgba(64, 224, 208, 0.3);
-        }
-        .test-section {
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(0, 30, 60, 0.5);
-            border-radius: 8px;
-            border-left: 4px solid #40e0d0;
-        }
-        .status {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 12px;
-        }
-        .status.success { background: #10b981; color: white; }
-        .status.warning { background: #f59e0b; color: white; }
-        .status.error { background: #ef4444; color: white; }
-        .test-counter {
-            font-size: 24px;
-            color: #40e0d0;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        button {
-            background: linear-gradient(135deg, #40e0d0, #1e90ff);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            margin: 5px;
-        }
+      body {
+        font-family: monospace;
+        background: linear-gradient(135deg, #0a0e27 0%, #151932 100%);
+        color: #e0e6ed;
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+      }
+      .test-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(20, 25, 50, 0.8);
+        border-radius: 12px;
+        padding: 30px;
+        border: 1px solid rgba(64, 224, 208, 0.3);
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 15px;
+        background: rgba(0, 30, 60, 0.5);
+        border-radius: 8px;
+        border-left: 4px solid #40e0d0;
+      }
+      .status {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 12px;
+      }
+      .status.success {
+        background: #10b981;
+        color: white;
+      }
+      .status.warning {
+        background: #f59e0b;
+        color: white;
+      }
+      .status.error {
+        background: #ef4444;
+        color: white;
+      }
+      .test-counter {
+        font-size: 24px;
+        color: #40e0d0;
+        font-weight: bold;
+        margin: 10px 0;
+      }
+      button {
+        background: linear-gradient(135deg, #40e0d0, #1e90ff);
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        margin: 5px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="test-container">
-        <h1>🔥 HMR Water Dashboard Integration Test</h1>
-        
-        <div class="test-section">
-            <h3>HMR Status</h3>
-            <div id="hmr-status">
-                <span class="status warning">Checking...</span>
-            </div>
-            <div id="hmr-info"></div>
+      <h1>🔥 HMR Water Dashboard Integration Test</h1>
+
+      <div class="test-section">
+        <h3>HMR Status</h3>
+        <div id="hmr-status">
+          <span class="status warning">Checking...</span>
         </div>
-        
-        <div class="test-section">
-            <h3>State Preservation Test</h3>
-            <div class="test-counter" id="counter">0</div>
-            <button onclick="incrementCounter()">Increment Counter</button>
-            <button onclick="setTestMessage()">Set Test Message</button>
-            <div id="test-message" style="margin-top: 10px; color: #4ade80;"></div>
+        <div id="hmr-info"></div>
+      </div>
+
+      <div class="test-section">
+        <h3>State Preservation Test</h3>
+        <div class="test-counter" id="counter">0</div>
+        <button onclick="incrementCounter()">Increment Counter</button>
+        <button onclick="setTestMessage()">Set Test Message</button>
+        <div id="test-message" style="margin-top: 10px; color: #4ade80"></div>
+      </div>
+
+      <div class="test-section">
+        <h3>Test Instructions</h3>
+        <ol style="line-height: 1.6">
+          <li>Click "Increment Counter" a few times</li>
+          <li>Set a test message</li>
+          <li>Edit this file (change the version comment below)</li>
+          <li>Save the file to trigger HMR</li>
+          <li>Verify that counter and message are preserved!</li>
+        </ol>
+      </div>
+
+      <div class="test-section">
+        <h3>Fire22 Language Integration Test</h3>
+        <div id="language-status">
+          <span class="status warning">Testing...</span>
         </div>
-        
-        <div class="test-section">
-            <h3>Test Instructions</h3>
-            <ol style="line-height: 1.6;">
-                <li>Click "Increment Counter" a few times</li>
-                <li>Set a test message</li>
-                <li>Edit this file (change the version comment below)</li>
-                <li>Save the file to trigger HMR</li>
-                <li>Verify that counter and message are preserved!</li>
-            </ol>
+        <div id="language-info"></div>
+      </div>
+
+      <div class="test-section">
+        <h3>HMR Events Log</h3>
+        <div id="hmr-log" style="font-family: monospace; font-size: 11px; max-height: 200px; overflow-y: auto">
+          <!-- HMR events will be logged here -->
         </div>
-        
-        <div class="test-section">
-            <h3>Fire22 Language Integration Test</h3>
-            <div id="language-status">
-                <span class="status warning">Testing...</span>
-            </div>
-            <div id="language-info"></div>
-        </div>
-        
-        <div class="test-section">
-            <h3>HMR Events Log</h3>
-            <div id="hmr-log" style="font-family: monospace; font-size: 11px; max-height: 200px; overflow-y: auto;">
-                <!-- HMR events will be logged here -->
-            </div>
-        </div>
+      </div>
     </div>
 
     <script type="module">
-        // Version: 1.0.0 - Edit this comment to test HMR!
-        
-        // State that should persist across HMR updates
-        let testCounter = import.meta.hot?.data?.testCounter ?? 0;
-        let testMessage = import.meta.hot?.data?.testMessage ?? '';
-        let hmrUpdateCount = import.meta.hot?.data?.hmrUpdateCount ?? 0;
+      // Version: 1.0.0 - Edit this comment to test HMR!
 
-        // Initialize UI
+      // State that should persist across HMR updates
+      let testCounter = import.meta.hot?.data?.testCounter ?? 0;
+      let testMessage = import.meta.hot?.data?.testMessage ?? '';
+      let hmrUpdateCount = import.meta.hot?.data?.hmrUpdateCount ?? 0;
+
+      // Initialize UI
+      document.getElementById('counter').textContent = testCounter;
+      document.getElementById('test-message').textContent = testMessage;
+
+      // Global functions for buttons
+      window.incrementCounter = () => {
+        testCounter++;
         document.getElementById('counter').textContent = testCounter;
+        logEvent(`Counter incremented to ${testCounter}`);
+      };
+
+      window.setTestMessage = () => {
+        testMessage = `Test message set at ${new Date().toLocaleTimeString()}`;
         document.getElementById('test-message').textContent = testMessage;
+        logEvent('Test message updated');
+      };
 
-        // Global functions for buttons
-        window.incrementCounter = () => {
-            testCounter++;
-            document.getElementById('counter').textContent = testCounter;
-            logEvent(`Counter incremented to ${testCounter}`);
-        };
+      function logEvent(message) {
+        const log = document.getElementById('hmr-log');
+        const timestamp = new Date().toLocaleTimeString();
+        log.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+        log.scrollTop = log.scrollHeight;
+      }
 
-        window.setTestMessage = () => {
-            testMessage = `Test message set at ${new Date().toLocaleTimeString()}`;
-            document.getElementById('test-message').textContent = testMessage;
-            logEvent('Test message updated');
-        };
+      function updateHMRStatus() {
+        const statusEl = document.getElementById('hmr-status');
+        const infoEl = document.getElementById('hmr-info');
 
-        function logEvent(message) {
-            const log = document.getElementById('hmr-log');
-            const timestamp = new Date().toLocaleTimeString();
-            log.innerHTML += `<div>[${timestamp}] ${message}</div>`;
-            log.scrollTop = log.scrollHeight;
-        }
-
-        function updateHMRStatus() {
-            const statusEl = document.getElementById('hmr-status');
-            const infoEl = document.getElementById('hmr-info');
-            
-            if (import.meta.hot) {
-                statusEl.innerHTML = '<span class="status success">🔥 HMR Active</span>';
-                infoEl.innerHTML = `
+        if (import.meta.hot) {
+          statusEl.innerHTML = '<span class="status success">🔥 HMR Active</span>';
+          infoEl.innerHTML = `
                     <div style="margin-top: 10px;">
                         <div>Updates: ${hmrUpdateCount}</div>
                         <div>Counter preserved: ${testCounter}</div>
                         <div>Message preserved: ${testMessage ? 'Yes' : 'No'}</div>
                     </div>
                 `;
-            } else {
-                statusEl.innerHTML = '<span class="status error">❌ HMR Not Available</span>';
-                infoEl.innerHTML = '<div>Running in production mode</div>';
-            }
+        } else {
+          statusEl.innerHTML = '<span class="status error">❌ HMR Not Available</span>';
+          infoEl.innerHTML = '<div>Running in production mode</div>';
         }
+      }
 
-        function testFire22Language() {
-            const statusEl = document.getElementById('language-status');
-            const infoEl = document.getElementById('language-info');
-            
-            if (window.Fire22Language) {
-                statusEl.innerHTML = '<span class="status success">✅ Fire22 Language System Available</span>';
-                infoEl.innerHTML = '<div>Language system integrated successfully</div>';
-                logEvent('Fire22 Language system detected');
-            } else if (window.initFire22Language) {
-                statusEl.innerHTML = '<span class="status warning">⚡ Fire22 Language Loading</span>';
-                infoEl.innerHTML = '<div>Language system initializing...</div>';
-                logEvent('Fire22 Language system initializing');
-            } else {
-                statusEl.innerHTML = '<span class="status warning">⚠️ Fire22 Language Not Found</span>';
-                infoEl.innerHTML = '<div>Language system not available in test mode</div>';
-                logEvent('Fire22 Language system not found');
-            }
+      function testFire22Language() {
+        const statusEl = document.getElementById('language-status');
+        const infoEl = document.getElementById('language-info');
+
+        if (window.Fire22Language) {
+          statusEl.innerHTML = '<span class="status success">✅ Fire22 Language System Available</span>';
+          infoEl.innerHTML = '<div>Language system integrated successfully</div>';
+          logEvent('Fire22 Language system detected');
+        } else if (window.initFire22Language) {
+          statusEl.innerHTML = '<span class="status warning">⚡ Fire22 Language Loading</span>';
+          infoEl.innerHTML = '<div>Language system initializing...</div>';
+          logEvent('Fire22 Language system initializing');
+        } else {
+          statusEl.innerHTML = '<span class="status warning">⚠️ Fire22 Language Not Found</span>';
+          infoEl.innerHTML = '<div>Language system not available in test mode</div>';
+          logEvent('Fire22 Language system not found');
         }
+      }
 
-        // HMR Event Handlers
-        if (import.meta.hot) {
-            logEvent('🔥 HMR enabled for test page');
-            
-            // Before update - preserve state
-            import.meta.hot.on("bun:beforeUpdate", () => {
-                import.meta.hot.data.testCounter = testCounter;
-                import.meta.hot.data.testMessage = testMessage;
-                import.meta.hot.data.hmrUpdateCount = hmrUpdateCount;
-                logEvent('📦 State preserved before HMR update');
-            });
-            
-            // After update - restore state and increment counter
-            import.meta.hot.on("bun:afterUpdate", () => {
-                hmrUpdateCount++;
-                logEvent(`🎉 HMR update #${hmrUpdateCount} applied - state restored!`);
-                updateHMRStatus();
-            });
-            
-            // WebSocket events
-            import.meta.hot.on("bun:ws:connect", () => {
-                logEvent('🟢 HMR WebSocket connected');
-            });
-            
-            import.meta.hot.on("bun:ws:disconnect", () => {
-                logEvent('🔴 HMR WebSocket disconnected');
-            });
-            
-            // Error handling
-            import.meta.hot.on("bun:error", (error) => {
-                logEvent(`❌ HMR Error: ${error.message}`);
-            });
-            
-            // Accept hot updates
-            import.meta.hot.accept();
-        }
+      // HMR Event Handlers
+      if (import.meta.hot) {
+        logEvent('🔥 HMR enabled for test page');
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            updateHMRStatus();
-            testFire22Language();
-            logEvent('Test page initialized');
+        // Before update - preserve state
+        import.meta.hot.on('bun:beforeUpdate', () => {
+          import.meta.hot.data.testCounter = testCounter;
+          import.meta.hot.data.testMessage = testMessage;
+          import.meta.hot.data.hmrUpdateCount = hmrUpdateCount;
+          logEvent('📦 State preserved before HMR update');
         });
+
+        // After update - restore state and increment counter
+        import.meta.hot.on('bun:afterUpdate', () => {
+          hmrUpdateCount++;
+          logEvent(`🎉 HMR update #${hmrUpdateCount} applied - state restored!`);
+          updateHMRStatus();
+        });
+
+        // WebSocket events
+        import.meta.hot.on('bun:ws:connect', () => {
+          logEvent('🟢 HMR WebSocket connected');
+        });
+
+        import.meta.hot.on('bun:ws:disconnect', () => {
+          logEvent('🔴 HMR WebSocket disconnected');
+        });
+
+        // Error handling
+        import.meta.hot.on('bun:error', error => {
+          logEvent(`❌ HMR Error: ${error.message}`);
+        });
+
+        // Accept hot updates
+        import.meta.hot.accept();
+      }
+
+      // Initialize
+      document.addEventListener('DOMContentLoaded', () => {
+        updateHMRStatus();
+        testFire22Language();
+        logEvent('Test page initialized');
+      });
     </script>
-</body>
+  </body>
 </html>

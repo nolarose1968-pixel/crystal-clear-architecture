@@ -21,7 +21,7 @@ export class EnhancedError extends Error {
     this.details = details || {};
     this.timestamp = new Date().toISOString();
     this.requestId = generateRequestId();
-    
+
     // Ensure proper prototype chain
     Object.setPrototypeOf(this, EnhancedError.prototype);
   }
@@ -57,8 +57,8 @@ export function formatErrorResponse(error: EnhancedError): ErrorResponse {
       message: error.message,
       details: error.details,
       timestamp: error.timestamp,
-      requestId: error.requestId
-    }
+      requestId: error.requestId,
+    },
   };
 }
 
@@ -76,11 +76,11 @@ export function handleApiError(error: unknown): Response {
         'Content-Type': 'application/json',
         'X-Error-Code': error.code,
         'X-Request-ID': error.requestId || '',
-        'X-Timestamp': error.timestamp
-      }
+        'X-Timestamp': error.timestamp,
+      },
     });
   }
-  
+
   // Handle unknown errors
   const unknownError = createEnhancedError(
     'INTERNAL_ERROR',
@@ -88,7 +88,7 @@ export function handleApiError(error: unknown): Response {
     { originalError: error instanceof Error ? error.message : String(error) },
     500
   );
-  
+
   const errorResponse = formatErrorResponse(unknownError);
   return new Response(JSON.stringify(errorResponse), {
     status: 500,
@@ -96,8 +96,8 @@ export function handleApiError(error: unknown): Response {
       'Content-Type': 'application/json',
       'X-Error-Code': 'INTERNAL_ERROR',
       'X-Request-ID': unknownError.requestId || '',
-      'X-Timestamp': unknownError.timestamp
-    }
+      'X-Timestamp': unknownError.timestamp,
+    },
   });
 }
 
@@ -115,15 +115,16 @@ export function withErrorHandling<T extends (...args: any[]) => Promise<any>>(
     try {
       return await fn(...args);
     } catch (error) {
-      const enhancedError = error instanceof EnhancedError 
-        ? error 
-        : createEnhancedError(
-            'HANDLER_ERROR',
-            `Error in ${context}: ${error instanceof Error ? error.message : String(error)}`,
-            { originalError: error instanceof Error ? error.stack : undefined },
-            (error as EnhancedError)?.httpStatus || 500
-          );
-      
+      const enhancedError =
+        error instanceof EnhancedError
+          ? error
+          : createEnhancedError(
+              'HANDLER_ERROR',
+              `Error in ${context}: ${error instanceof Error ? error.message : String(error)}`,
+              { originalError: error instanceof Error ? error.stack : undefined },
+              (error as EnhancedError)?.httpStatus || 500
+            );
+
       throw enhancedError;
     }
   };
@@ -145,7 +146,7 @@ export function validateRequiredFields(
     const value = data[field];
     return value === undefined || value === null || value === '';
   });
-  
+
   if (missingFields.length > 0) {
     throw createEnhancedError(
       'VALIDATION_ERROR',
@@ -169,23 +170,21 @@ export function validateDataTypes(
   context: string = 'Type Validation'
 ): void {
   const errors: string[] = [];
-  
+
   for (const [field, expectedType] of Object.entries(schema)) {
     const value = data[field];
-    
+
     if (value === undefined || value === null) {
       continue; // Required field validation should be done separately
     }
-    
+
     const actualType = typeof value;
-    
+
     if (actualType !== expectedType) {
-      errors.push(
-        `Field '${field}' expected type '${expectedType}' but got '${actualType}'`
-      );
+      errors.push(`Field '${field}' expected type '${expectedType}' but got '${actualType}'`);
     }
   }
-  
+
   if (errors.length > 0) {
     throw createEnhancedError(
       'TYPE_VALIDATION_ERROR',
@@ -213,30 +212,30 @@ export const ErrorCodes = {
   AUTH_INVALID: 'AUTH_INVALID',
   TOKEN_EXPIRED: 'TOKEN_EXPIRED',
   TOKEN_INVALID: 'TOKEN_INVALID',
-  
+
   // Authorization errors
   FORBIDDEN: 'FORBIDDEN',
   INSUFFICIENT_PERMISSIONS: 'INSUFFICIENT_PERMISSIONS',
-  
+
   // Validation errors
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   TYPE_VALIDATION_ERROR: 'TYPE_VALIDATION_ERROR',
   INVALID_INPUT: 'INVALID_INPUT',
-  
+
   // API errors
   API_ERROR: 'API_ERROR',
   API_TIMEOUT: 'API_TIMEOUT',
   API_UNAVAILABLE: 'API_UNAVAILABLE',
-  
+
   // System errors
   INTERNAL_ERROR: 'INTERNAL_ERROR',
   SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
-  
+
   // Security errors
   SECURITY_VIOLATION: 'SECURITY_VIOLATION',
   SUSPICIOUS_ACTIVITY: 'SUSPICIOUS_ACTIVITY',
-  INVALID_CSRF_TOKEN: 'INVALID_CSRF_TOKEN'
+  INVALID_CSRF_TOKEN: 'INVALID_CSRF_TOKEN',
 } as const;
 
 /**
@@ -252,5 +251,5 @@ export const HttpStatusCodes = {
   429: 'TOO_MANY_REQUESTS',
   500: 'INTERNAL_SERVER_ERROR',
   502: 'BAD_GATEWAY',
-  503: 'SERVICE_UNAVAILABLE'
+  503: 'SERVICE_UNAVAILABLE',
 } as const;

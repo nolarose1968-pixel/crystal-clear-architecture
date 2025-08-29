@@ -1,6 +1,6 @@
 /**
  * Fire22 API Test Suite
- * 
+ *
  * Comprehensive tests for the consolidated API implementation
  */
 
@@ -13,13 +13,13 @@ const baseURL = 'http://localhost:8787';
 beforeAll(async () => {
   // Import the API router
   const { default: api } = await import('../index.ts');
-  
+
   // Create test server
   server = Bun.serve({
     port: 8787,
-    fetch: api.handle
+    fetch: api.handle,
   });
-  
+
   // Wait for server to be ready
   await new Promise(resolve => setTimeout(resolve, 100));
 });
@@ -35,62 +35,62 @@ describe('Fire22 API Integration Tests', () => {
     test('GET /api/health - should return healthy status', async () => {
       const response = await fetch(`${baseURL}/api/health`);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(data.status).toBe('healthy');
       expect(data.timestamp).toBeDefined();
       expect(data.version).toBeDefined();
     });
-    
+
     test('GET /api/health/status - should return detailed status', async () => {
       const response = await fetch(`${baseURL}/api/health/status`);
       const data = await response.json();
-      
+
       expect(response.status).toBe(200);
       expect(data.status).toBe('healthy');
       expect(data.services).toBeDefined();
       expect(data.performance).toBeDefined();
     });
   });
-  
+
   describe('Authentication Endpoints', () => {
     test('POST /api/auth/login - should reject without credentials', async () => {
       const response = await fetch(`${baseURL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
+        body: JSON.stringify({}),
       });
-      
+
       expect(response.status).toBe(400);
     });
-    
+
     test('POST /api/auth/login - should accept valid credentials', async () => {
       const response = await fetch(`${baseURL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username: 'testuser',
-          password: 'testpass'
-        })
+          password: 'testpass',
+        }),
       });
-      
+
       const data = await response.json();
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
       expect(data.data.tokens.accessToken).toBeDefined();
       expect(data.data.user.role).toBeDefined();
     });
-    
+
     test('GET /api/auth/verify - should reject without token', async () => {
       const response = await fetch(`${baseURL}/api/auth/verify`);
-      
+
       expect(response.status).toBe(401);
     });
   });
-  
+
   describe('Manager Endpoints (Protected)', () => {
     let authToken: string;
-    
+
     beforeAll(async () => {
       // Get auth token for protected endpoints
       const loginResponse = await fetch(`${baseURL}/api/auth/login`, {
@@ -98,45 +98,45 @@ describe('Fire22 API Integration Tests', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username: 'manager',
-          password: 'testpass'
-        })
+          password: 'testpass',
+        }),
       });
-      
+
       const loginData = await loginResponse.json();
       authToken = loginData.data.tokens.accessToken;
     });
-    
+
     test('GET /api/manager/getLiveWagers - should require authentication', async () => {
       const response = await fetch(`${baseURL}/api/manager/getLiveWagers`);
-      
+
       expect(response.status).toBe(401);
     });
-    
+
     test('GET /api/manager/getLiveWagers - should work with valid token', async () => {
       const response = await fetch(`${baseURL}/api/manager/getLiveWagers?agentID=TEST001`, {
         headers: {
-          'Authorization': `Bearer ${authToken}`
-        }
+          Authorization: `Bearer ${authToken}`,
+        },
       });
-      
+
       expect(response.status).toBe(200);
     });
   });
-  
+
   describe('Error Handling', () => {
     test('should return 404 for unknown endpoints', async () => {
       const response = await fetch(`${baseURL}/api/nonexistent`);
-      
+
       expect(response.status).toBe(404);
     });
-    
+
     test('should handle malformed JSON gracefully', async () => {
       const response = await fetch(`${baseURL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: 'invalid json'
+        body: 'invalid json',
       });
-      
+
       expect(response.status).toBe(400);
     });
   });
@@ -148,28 +148,28 @@ describe('Performance Tests', () => {
     const start = Date.now();
     const response = await fetch(`${baseURL}/api/health`);
     const end = Date.now();
-    
+
     expect(response.status).toBe(200);
     expect(end - start).toBeLessThan(100); // Should respond within 100ms
   });
-  
+
   test('concurrent requests handling', async () => {
     const concurrentRequests = 10; // Reduced for testing
     const requests = [];
-    
+
     for (let i = 0; i < concurrentRequests; i++) {
       requests.push(fetch(`${baseURL}/api/health`));
     }
-    
+
     const start = Date.now();
     const responses = await Promise.all(requests);
     const end = Date.now();
-    
+
     // All requests should succeed
     responses.forEach(response => {
       expect(response.status).toBe(200);
     });
-    
+
     // Should handle concurrent requests efficiently
     expect(end - start).toBeLessThan(1000); // Within 1 second
   });
@@ -186,7 +186,7 @@ describe('Customer API', () => {
     initialBalance: 100,
     currency: 'USD',
     telegramId: '@testuser',
-    referralCode: 'TEST123'
+    referralCode: 'TEST123',
   };
 
   test('POST /api/customers - create customer with valid data', async () => {
@@ -194,9 +194,9 @@ describe('Customer API', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer test-token' // Mock token for testing
+        Authorization: 'Bearer test-token', // Mock token for testing
       },
-      body: JSON.stringify(testCustomer)
+      body: JSON.stringify(testCustomer),
     });
 
     // Note: This test will fail until authentication is properly mocked
@@ -216,16 +216,16 @@ describe('Customer API', () => {
     const invalidCustomer = {
       name: '', // Invalid: empty name
       email: 'invalid-email', // Invalid: bad email format
-      customerType: 'INVALID_TYPE' // Invalid: wrong enum value
+      customerType: 'INVALID_TYPE', // Invalid: wrong enum value
     };
 
     const response = await fetch(`${baseURL}/api/customers`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer test-token'
+        Authorization: 'Bearer test-token',
       },
-      body: JSON.stringify(invalidCustomer)
+      body: JSON.stringify(invalidCustomer),
     });
 
     expect([400, 401, 403]).toContain(response.status); // Accept auth errors for now
@@ -239,7 +239,7 @@ describe('Customer API', () => {
 
   test('POST /api/customers - missing required fields', async () => {
     const incompleteCustomer = {
-      name: 'Test Customer'
+      name: 'Test Customer',
       // Missing email and customerType
     };
 
@@ -247,9 +247,9 @@ describe('Customer API', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer test-token'
+        Authorization: 'Bearer test-token',
       },
-      body: JSON.stringify(incompleteCustomer)
+      body: JSON.stringify(incompleteCustomer),
     });
 
     expect([400, 401, 403]).toContain(response.status); // Accept auth errors for now

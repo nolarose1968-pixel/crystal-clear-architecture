@@ -18,7 +18,28 @@ export type PatternType =
   | 'FILESYSTEM'
   | 'UTILITIES';
 
-export type PatternContext = 'API' | 'DATABASE' | 'BUILD' | 'AUTH' | 'STYLES' | 'CONFIG' | 'MONITORING' | 'REPORTS' | 'AUTOMATION' | 'DEPLOYMENT' | 'DEVELOPMENT' | 'TOOLS' | 'CLI' | 'PIPES' | 'INPUT' | 'VALIDATION' | 'FILES' | 'TEXT' | 'COMPRESSION' | 'DEBUGGING' | 'PERFORMANCE';
+export type PatternContext =
+  | 'API'
+  | 'DATABASE'
+  | 'BUILD'
+  | 'AUTH'
+  | 'STYLES'
+  | 'CONFIG'
+  | 'MONITORING'
+  | 'REPORTS'
+  | 'AUTOMATION'
+  | 'DEPLOYMENT'
+  | 'DEVELOPMENT'
+  | 'TOOLS'
+  | 'CLI'
+  | 'PIPES'
+  | 'INPUT'
+  | 'VALIDATION'
+  | 'FILES'
+  | 'TEXT'
+  | 'COMPRESSION'
+  | 'DEBUGGING'
+  | 'PERFORMANCE';
 
 export interface PatternDefinition {
   name: PatternType;
@@ -119,7 +140,10 @@ export interface PatternSystemHealth {
 }
 
 // Utility types
-export type PatternHandler<T = any> = (context: any, options?: PatternExecutionOptions) => Promise<PatternResult<T>>;
+export type PatternHandler<T = any> = (
+  context: any,
+  options?: PatternExecutionOptions
+) => Promise<PatternResult<T>>;
 export type PatternValidator = (context: any) => PatternValidationResult;
 export type PatternFormatter<T = any> = (result: PatternResult<T>) => string | TabularResult;
 
@@ -137,7 +161,7 @@ export const DEFAULT_PATTERN_CONFIG: Record<PatternType, PatternConfig> = {
   INTERACTIVE: { enabled: true, priority: 4, cache: false },
   STREAM: { enabled: true, priority: 2, cache: false },
   FILESYSTEM: { enabled: true, priority: 1, cache: true },
-  UTILITIES: { enabled: true, priority: 5, cache: true }
+  UTILITIES: { enabled: true, priority: 5, cache: true },
 };
 
 export const PATTERN_DESCRIPTIONS: Record<PatternType, { description: string; emoji: string }> = {
@@ -153,5 +177,5 @@ export const PATTERN_DESCRIPTIONS: Record<PatternType, { description: string; em
   INTERACTIVE: { description: 'Interactive CLI', emoji: '🎯' },
   STREAM: { description: 'Stream Processing', emoji: '🌊' },
   FILESYSTEM: { description: 'File System Operations', emoji: '📁' },
-  UTILITIES: { description: 'Utility Functions', emoji: '🔧' }
+  UTILITIES: { description: 'Utility Functions', emoji: '🔧' },
 };

@@ -3,11 +3,24 @@
  * Provides comprehensive cashier services with intelligent peer matching and risk management
  */
 
-import { CustomerDatabaseManagement, CustomerProfile } from '../customers/customer-database-management';
+import {
+  CustomerDatabaseManagement,
+  CustomerProfile,
+} from '../customers/customer-database-management';
 import { P2PPaymentMatching, P2PPaymentRequest } from '../payments/p2p-payment-matching';
-import { CustomerPaymentValidation, PaymentValidationResult } from '../payments/customer-payment-validation';
-import { DepositWithdrawalSystem, FinancialTransaction } from '../finance/deposit-withdrawal-system';
-import { PeerGroupManager, PeerGroup, PeerMatchRecommendation } from '../peer-network/peer-group-manager';
+import {
+  CustomerPaymentValidation,
+  PaymentValidationResult,
+} from '../payments/customer-payment-validation';
+import {
+  DepositWithdrawalSystem,
+  FinancialTransaction,
+} from '../finance/deposit-withdrawal-system';
+import {
+  PeerGroupManager,
+  PeerGroup,
+  PeerMatchRecommendation,
+} from '../peer-network/peer-group-manager';
 
 export interface CashierSession {
   sessionId: string;
@@ -133,7 +146,7 @@ export class EnhancedCashierSystem {
       status: 'active',
       ipAddress: options.ipAddress,
       deviceInfo: options.deviceInfo,
-      riskAssessments: [initialRisk]
+      riskAssessments: [initialRisk],
     };
 
     this.activeSessions.set(sessionId, session);
@@ -186,7 +199,7 @@ export class EnhancedCashierSystem {
       createdAt: new Date().toISOString(),
       validationResult: validation,
       riskScore: validation.validationScore,
-      agentId: session.agentId
+      agentId: session.agentId,
     };
 
     // Try P2P matching if preferred and validation allows
@@ -205,7 +218,7 @@ export class EnhancedCashierSystem {
             peerId: peerMatch.peerId,
             groupId: peerMatch.groupId,
             matchScore: peerMatch.matchScore,
-            trustScore: peerMatch.trustScore
+            trustScore: peerMatch.trustScore,
           };
           transaction.status = 'processing';
         }
@@ -275,7 +288,7 @@ export class EnhancedCashierSystem {
       createdAt: new Date().toISOString(),
       validationResult: validation,
       riskScore: validation.validationScore,
-      agentId: session.agentId
+      agentId: session.agentId,
     };
 
     // Add to session and queue
@@ -338,7 +351,7 @@ export class EnhancedCashierSystem {
       recentTransactions,
       pendingApprovals,
       riskSummary,
-      performance
+      performance,
     };
   }
 
@@ -477,7 +490,7 @@ export class EnhancedCashierSystem {
         return {
           peerId: bestMatch.peerId,
           matchScore: bestMatch.matchScore,
-          trustScore: bestMatch.trustScore
+          trustScore: bestMatch.trustScore,
         };
       }
 
@@ -510,7 +523,8 @@ export class EnhancedCashierSystem {
       }
 
       // Check recent activity
-      const recentTransactions = this.financialSystem.getCustomerTransactions(customerId)
+      const recentTransactions = this.financialSystem
+        .getCustomerTransactions(customerId)
         .filter(t => new Date(t.createdAt) > new Date(Date.now() - 24 * 60 * 60 * 1000));
 
       if (recentTransactions.length > 10) {
@@ -551,7 +565,7 @@ export class EnhancedCashierSystem {
       riskScore,
       factors,
       recommendations,
-      automatedActions
+      automatedActions,
     };
   }
 
@@ -601,7 +615,8 @@ export class EnhancedCashierSystem {
 
     // Check daily limits
     const today = new Date().toDateString();
-    const todayTransactions = this.financialSystem.getCustomerTransactions(customerId)
+    const todayTransactions = this.financialSystem
+      .getCustomerTransactions(customerId)
       .filter(t => new Date(t.createdAt).toDateString() === today);
 
     const todayVolume = todayTransactions
@@ -644,13 +659,12 @@ export class EnhancedCashierSystem {
           type: transaction.type as any,
           amount: transaction.amount,
           paymentMethod: transaction.paymentMethod,
-          paymentDetails: transaction.paymentDetails
+          paymentDetails: transaction.paymentDetails,
         });
       }
 
       transaction.status = 'completed';
       transaction.processedAt = new Date().toISOString();
-
     } catch (error) {
       transaction.status = 'failed';
       transaction.notes = `Processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
@@ -725,7 +739,7 @@ export class EnhancedCashierSystem {
     return {
       overallRisk: latestAssessment?.riskLevel || 'unknown',
       recentAssessments: session.riskAssessments.slice(-5),
-      recommendations: latestAssessment?.recommendations || []
+      recommendations: latestAssessment?.recommendations || [],
     };
   }
 
@@ -742,15 +756,16 @@ export class EnhancedCashierSystem {
       .filter(t => t.processedAt)
       .map(t => new Date(t.processedAt!).getTime() - new Date(t.createdAt).getTime());
 
-    const averageProcessingTime = processingTimes.length > 0
-      ? processingTimes.reduce((sum, time) => sum + time, 0) / processingTimes.length
-      : 0;
+    const averageProcessingTime =
+      processingTimes.length > 0
+        ? processingTimes.reduce((sum, time) => sum + time, 0) / processingTimes.length
+        : 0;
 
     return {
       sessionUptime: Math.round(uptime / 1000), // seconds
       transactionsProcessed: completedTransactions,
       successRate: Math.round(successRate * 100) / 100,
-      averageProcessingTime: Math.round(averageProcessingTime / 1000) // seconds
+      averageProcessingTime: Math.round(averageProcessingTime / 1000), // seconds
     };
   }
 
@@ -789,9 +804,10 @@ export class EnhancedCashierSystem {
       .filter(t => t.processedAt)
       .map(t => new Date(t.processedAt!).getTime() - new Date(t.createdAt).getTime());
 
-    const averageProcessingTime = processingTimes.length > 0
-      ? processingTimes.reduce((sum, time) => sum + time, 0) / processingTimes.length
-      : 0;
+    const averageProcessingTime =
+      processingTimes.length > 0
+        ? processingTimes.reduce((sum, time) => sum + time, 0) / processingTimes.length
+        : 0;
 
     // Risk distribution
     const riskDistribution: Record<string, number> = {};
@@ -828,7 +844,7 @@ export class EnhancedCashierSystem {
       averageProcessingTime,
       riskDistribution,
       popularPaymentMethods,
-      peakHours
+      peakHours,
     };
   }
 }

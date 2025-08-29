@@ -22,9 +22,13 @@ export function validateCreateCustomerRequest(data: any): ValidationResult {
   } else if (typeof data.customerID !== 'string') {
     errors.push('Customer ID must be a string');
   } else if (data.customerID.length < CONSTANTS.VALIDATION.CUSTOMER_ID.MIN_LENGTH) {
-    errors.push(`Customer ID must be at least ${CONSTANTS.VALIDATION.CUSTOMER_ID.MIN_LENGTH} characters`);
+    errors.push(
+      `Customer ID must be at least ${CONSTANTS.VALIDATION.CUSTOMER_ID.MIN_LENGTH} characters`
+    );
   } else if (data.customerID.length > CONSTANTS.VALIDATION.CUSTOMER_ID.MAX_LENGTH) {
-    errors.push(`Customer ID must be no more than ${CONSTANTS.VALIDATION.CUSTOMER_ID.MAX_LENGTH} characters`);
+    errors.push(
+      `Customer ID must be no more than ${CONSTANTS.VALIDATION.CUSTOMER_ID.MAX_LENGTH} characters`
+    );
   } else if (!CONSTANTS.VALIDATION.CUSTOMER_ID.PATTERN.test(data.customerID)) {
     errors.push('Customer ID must contain only uppercase letters and numbers');
   }
@@ -96,7 +100,7 @@ export function validateCreateCustomerRequest(data: any): ValidationResult {
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
@@ -144,7 +148,7 @@ export function validateCustomerAdminRequest(data: any): ValidationResult {
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
@@ -193,7 +197,7 @@ export function validateDepositRequest(data: any): ValidationResult {
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
@@ -230,7 +234,7 @@ export function validateAgentPerformanceRequest(data: any): ValidationResult {
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
@@ -278,7 +282,7 @@ export function validateLiveWagersRequest(data: any): ValidationResult {
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
@@ -308,7 +312,7 @@ export function validateRequest(data: any, requestType: string): ValidationResul
     default:
       return {
         isValid: false,
-        errors: [`Unknown request type: ${requestType}`]
+        errors: [`Unknown request type: ${requestType}`],
       };
   }
 }
@@ -319,5 +323,5 @@ export default {
   validateCustomerAdminRequest,
   validateDepositRequest,
   validateAgentPerformanceRequest,
-  validateLiveWagersRequest
+  validateLiveWagersRequest,
 };

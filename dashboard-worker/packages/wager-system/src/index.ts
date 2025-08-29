@@ -125,26 +125,26 @@ export interface Agent {
 }
 
 export interface Wager {
-  // ===== CORE IDENTIFICATION =====
+  // !== CORE IDENTIFICATION !==
   wagerNumber: number;
   customerId: string;
   agentId: string;
   ticketWriter: string;
-  
-  // ===== EVENT & SPORTS DETAILS =====
+
+  // !== EVENT & SPORTS DETAILS !==
   eventId: string;
   sportId: string;
   leagueId: string;
   betTypeId: string;
-  
-  // ===== BETTING DETAILS =====
+
+  // !== BETTING DETAILS !==
   selections: Selection[];
   betType: 'straight' | 'parlay' | 'teaser' | 'if_bet' | 'reverse';
   amountWagered: number;
   toWinAmount: number;
   riskAmount: number;
-  
-  // ===== ODDS & LINES =====
+
+  // !== ODDS & LINES !==
   odds: {
     american: number;
     decimal: number;
@@ -159,22 +159,22 @@ export interface Wager {
       reason: string;
     }>;
   };
-  
-  // ===== TIMING =====
+
+  // !== TIMING !==
   insertDateTime: string;
   eventDate: string;
   betCloseTime: string;
   settlementDate?: string;
-  
-  // ===== STATUS & RESULTS =====
+
+  // !== STATUS & RESULTS !==
   status: 'pending' | 'active' | 'settled' | 'cancelled' | 'void';
   result?: 'win' | 'loss' | 'push' | 'void' | 'partial';
   settlementAmount?: number;
   settlementMethod?: 'automatic' | 'manual' | 'partial';
   settlementNotes?: string;
   settledBy?: string;
-  
-  // ===== FINANCIAL DETAILS =====
+
+  // !== FINANCIAL DETAILS !==
   volumeAmount: number;
   commission: {
     agentCommission: number;
@@ -187,8 +187,8 @@ export interface Wager {
     taxAmount: number;
     fees: number;
   };
-  
-  // ===== RISK MANAGEMENT =====
+
+  // !== RISK MANAGEMENT !==
   riskMetrics: {
     exposure: number;
     liability: number;
@@ -201,8 +201,8 @@ export interface Wager {
     dailyLimit: number;
     weeklyLimit: number;
   };
-  
-  // ===== VALIDATION & COMPLIANCE =====
+
+  // !== VALIDATION & COMPLIANCE !==
   validation: {
     isValid: boolean;
     validationRules: string[];
@@ -218,8 +218,8 @@ export interface Wager {
     responsibleGaming: boolean;
     regulatoryCompliance: boolean;
   };
-  
-  // ===== INTEGRATION & REFERENCES =====
+
+  // !== INTEGRATION & REFERENCES !==
   externalReferences: {
     fire22Id?: string;
     stripePaymentId?: string;
@@ -232,8 +232,8 @@ export interface Wager {
     details: string;
     changes?: Record<string, any>;
   }>;
-  
-  // ===== NOTIFICATIONS & ALERTS =====
+
+  // !== NOTIFICATIONS & ALERTS !==
   notifications: Array<{
     type: 'bet_placed' | 'odds_change' | 'settlement' | 'risk_alert';
     sentAt: string;
@@ -242,8 +242,8 @@ export interface Wager {
     content: string;
     status: 'sent' | 'delivered' | 'failed';
   }>;
-  
-  // ===== PERFORMANCE METRICS =====
+
+  // !== PERFORMANCE METRICS !==
   performance: {
     timeToSettlement: number;
     customerSatisfaction?: number;
@@ -335,8 +335,8 @@ export class WagerSystem {
   private selections = new Map<string, Selection>();
   private wagerCounter = 1000000;
 
-  // ===== WAGER CREATION & VALIDATION =====
-  
+  // !== WAGER CREATION & VALIDATION !==
+
   async createWager(request: WagerRequest): Promise<Wager> {
     // Validate request
     const validation = await this.validateWager(request);
@@ -350,7 +350,7 @@ export class WagerSystem {
     // Calculate once and reuse
     const commissionStructure = await this.calculateCommission(request);
     const riskMetricsData = await this.calculateRiskMetrics(request);
-    
+
     // Create wager
     const wager: Wager = {
       wagerNumber: this.generateWagerNumber(),
@@ -370,7 +370,7 @@ export class WagerSystem {
       lineMovement: {
         openingOdds: 0,
         currentOdds: 0,
-        lineChanges: []
+        lineChanges: [],
       },
       insertDateTime: new Date().toISOString(),
       eventDate: await this.getEventDate(request.eventId),
@@ -380,19 +380,19 @@ export class WagerSystem {
       commission: {
         agentCommission: commissionStructure.calculation.baseCommission,
         platformFee: commissionStructure.calculation.riskAdjustment,
-        totalCommission: commissionStructure.calculation.totalCommission
+        totalCommission: commissionStructure.calculation.totalCommission,
       },
       payout: {
         grossAmount: 0,
         netAmount: 0,
         taxAmount: 0,
-        fees: 0
+        fees: 0,
       },
       riskMetrics: {
         exposure: riskMetricsData.totalExposure,
         liability: riskMetricsData.maxLiability,
         margin: 0, // Simplified
-        riskScore: riskMetricsData.riskScore
+        riskScore: riskMetricsData.riskScore,
       },
       limits: await this.getCustomerLimits(request.customerId),
       validation: {
@@ -402,24 +402,26 @@ export class WagerSystem {
         errors: [],
         approvalRequired: validation.approvalRequired,
         approvedBy: undefined,
-        approvalNotes: undefined
+        approvalNotes: undefined,
       },
       compliance: await this.checkCompliance(request),
       externalReferences: {},
-      auditTrail: [{
-        timestamp: new Date().toISOString(),
-        action: 'wager_created',
-        performedBy: request.agentId,
-        details: 'Wager created successfully',
-        changes: {}
-      }],
+      auditTrail: [
+        {
+          timestamp: new Date().toISOString(),
+          action: 'wager_created',
+          performedBy: request.agentId,
+          details: 'Wager created successfully',
+          changes: {},
+        },
+      ],
       notifications: [],
       performance: {
         timeToSettlement: 0,
         customerSatisfaction: undefined,
         agentPerformance: 0,
-        riskAdjustedReturn: 0
-      }
+        riskAdjustedReturn: 0,
+      },
     };
 
     // Store wager
@@ -434,7 +436,7 @@ export class WagerSystem {
     return wager;
   }
 
-  // ===== VALIDATION METHODS =====
+  // !== VALIDATION METHODS !==
 
   async validateWager(request: WagerRequest): Promise<WagerValidation> {
     const errors: string[] = [];
@@ -504,11 +506,11 @@ export class WagerSystem {
       riskScore,
       approvalRequired,
       limits: limitCheck.limits,
-      recommendations: this.generateRecommendations(request, riskScore)
+      recommendations: this.generateRecommendations(request, riskScore),
     };
   }
 
-  // ===== SETTLEMENT METHODS =====
+  // !== SETTLEMENT METHODS !==
 
   async settleWager(request: SettlementRequest): Promise<SettlementResult> {
     const wager = this.wagers.get(request.wagerNumber);
@@ -553,7 +555,7 @@ export class WagerSystem {
       grossAmount: settlementAmount,
       netAmount: payout,
       taxAmount: 0, // Tax calculation would go here
-      fees: commission
+      fees: commission,
     };
 
     // Add to audit trail
@@ -565,8 +567,8 @@ export class WagerSystem {
       changes: {
         status: 'settled',
         result: request.settlementType,
-        settlementAmount
-      }
+        settlementAmount,
+      },
     });
 
     // Send notifications
@@ -583,11 +585,11 @@ export class WagerSystem {
       balanceAfter,
       commission,
       payout,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
-  // ===== RISK MANAGEMENT =====
+  // !== RISK MANAGEMENT !==
 
   async calculateRiskMetrics(request: WagerRequest): Promise<RiskMetrics> {
     let totalExposure = 0;
@@ -638,11 +640,11 @@ export class WagerSystem {
       riskScore: Math.min(riskScore, 100),
       concentrationRisk: this.calculateConcentrationRisk(request),
       correlationRisk: this.calculateCorrelationRisk(request),
-      recommendations: this.generateRiskRecommendations(riskScore)
+      recommendations: this.generateRiskRecommendations(riskScore),
     };
   }
 
-  // ===== COMMISSION CALCULATION =====
+  // !== COMMISSION CALCULATION !==
 
   async calculateCommission(request: WagerRequest): Promise<CommissionStructure> {
     const agent = await this.getAgent(request.agentId);
@@ -669,16 +671,18 @@ export class WagerSystem {
         volumeBonus,
         performanceBonus,
         riskAdjustment,
-        totalCommission
-      }
+        totalCommission,
+      },
     };
   }
 
-  // ===== UTILITY METHODS =====
+  // !== UTILITY METHODS !==
 
-  private async buildSelections(selectionRequests: Array<{ selectionId: string; odds: number; line?: number }>): Promise<Selection[]> {
+  private async buildSelections(
+    selectionRequests: Array<{ selectionId: string; odds: number; line?: number }>
+  ): Promise<Selection[]> {
     const selections: Selection[] = [];
-    
+
     for (const request of selectionRequests) {
       const selection = await this.getSelection(request.selectionId);
       if (selection) {
@@ -688,22 +692,22 @@ export class WagerSystem {
           odds: {
             american: request.odds,
             decimal: this.americanToDecimal(request.odds),
-            fractional: this.americanToFractional(request.odds)
+            fractional: this.americanToFractional(request.odds),
           },
-          line: request.line
+          line: request.line,
         };
         selections.push(wagerSelection);
       }
     }
-    
+
     return selections;
   }
 
   private americanToDecimal(american: number): number {
     if (american > 0) {
-      return (american / 100) + 1;
+      return american / 100 + 1;
     } else {
-      return (100 / Math.abs(american)) + 1;
+      return 100 / Math.abs(american) + 1;
     }
   }
 
@@ -740,7 +744,11 @@ export class WagerSystem {
     return request.amountWagered;
   }
 
-  private calculateCombinedOdds(request: WagerRequest): { american: number; decimal: number; fractional: string } {
+  private calculateCombinedOdds(request: WagerRequest): {
+    american: number;
+    decimal: number;
+    fractional: string;
+  } {
     // Implementation would calculate combined odds for parlays
     return { american: 100, decimal: 2.0, fractional: '1/1' };
   }
@@ -798,7 +806,7 @@ export class WagerSystem {
 
   private generateRiskRecommendations(riskScore: number): string[] {
     const recommendations: string[] = [];
-    
+
     if (riskScore > 75) {
       recommendations.push('Require manual approval');
       recommendations.push('Consider reducing bet amount');
@@ -817,15 +825,15 @@ export class WagerSystem {
 
   private generateRecommendations(request: WagerRequest, riskScore: number): string[] {
     const recommendations: string[] = [];
-    
+
     if (riskScore > 75) {
       recommendations.push('High risk wager - manual review required');
     }
-    
+
     if (request.amountWagered > 5000) {
       recommendations.push('Large wager - verify customer funds');
     }
-    
+
     if (request.betType === 'parlay' && request.selections.length > 3) {
       recommendations.push('Complex parlay - verify all selections');
     }
@@ -833,7 +841,7 @@ export class WagerSystem {
     return recommendations;
   }
 
-  // ===== DATA ACCESS METHODS =====
+  // !== DATA ACCESS METHODS !==
 
   async getCustomer(customerId: string): Promise<Customer | undefined> {
     return this.customers.get(customerId);
@@ -869,7 +877,7 @@ export class WagerSystem {
   async getBetCloseTime(eventId: string): Promise<string> {
     const event = await this.getEvent(eventId);
     if (!event) return '';
-    
+
     // Close betting 5 minutes before event starts
     const eventTime = new Date(event.startTime);
     const closeTime = new Date(eventTime.getTime() - 5 * 60 * 1000);
@@ -887,7 +895,7 @@ export class WagerSystem {
       kycVerified: true, // Simplified
       amlCheck: true, // Simplified
       responsibleGaming: true, // Simplified
-      regulatoryCompliance: true // Simplified
+      regulatoryCompliance: true, // Simplified
     };
   }
 
@@ -900,22 +908,22 @@ export class WagerSystem {
         customerLimit: 10000,
         agentLimit: 50000,
         dailyLimit: 100000,
-        weeklyLimit: 500000
-      }
+        weeklyLimit: 500000,
+      },
     };
   }
 
   private assessRisk(request: WagerRequest): number {
     let risk = 0;
-    
+
     if (request.amountWagered > 1000) risk += 10;
     if (request.betType === 'parlay') risk += 15;
     if (request.selections.length > 2) risk += 5;
-    
+
     return risk;
   }
 
-  // ===== METRICS & NOTIFICATIONS =====
+  // !== METRICS & NOTIFICATIONS !==
 
   async updateMetrics(wager: Wager): Promise<void> {
     // Update customer metrics
@@ -928,7 +936,8 @@ export class WagerSystem {
     const agent = await this.getAgent(wager.agentId);
     if (agent) {
       agent.performance.totalVolume += wager.volumeAmount;
-      agent.performance.averageBet = agent.performance.totalVolume / agent.performance.customerCount;
+      agent.performance.averageBet =
+        agent.performance.totalVolume / agent.performance.customerCount;
     }
   }
 
@@ -940,13 +949,13 @@ export class WagerSystem {
       recipient: wager.customerId,
       method: 'telegram' as any,
       content: `Your wager #${wager.wagerNumber} has been ${type}`,
-      status: 'sent' as any
+      status: 'sent' as any,
     };
 
     wager.notifications.push(notification);
   }
 
-  // ===== QUERY METHODS =====
+  // !== QUERY METHODS !==
 
   async getWager(wagerNumber: number): Promise<Wager | undefined> {
     return this.wagers.get(wagerNumber);
@@ -972,12 +981,18 @@ export class WagerSystem {
     return Array.from(this.wagers.values()).filter(w => w.status === 'settled');
   }
 
-  // ===== SYSTEM STATISTICS =====
+  // !== SYSTEM STATISTICS !==
 
   async getSystemStats(): Promise<any> {
     const totalWagers = this.wagers.size;
-    const totalVolume = Array.from(this.wagers.values()).reduce((sum, w) => sum + w.volumeAmount, 0);
-    const totalExposure = Array.from(this.wagers.values()).reduce((sum, w) => sum + w.riskMetrics.exposure, 0);
+    const totalVolume = Array.from(this.wagers.values()).reduce(
+      (sum, w) => sum + w.volumeAmount,
+      0
+    );
+    const totalExposure = Array.from(this.wagers.values()).reduce(
+      (sum, w) => sum + w.riskMetrics.exposure,
+      0
+    );
     const pendingWagers = await this.getPendingWagers();
     const activeWagers = await this.getActiveWagers();
 
@@ -988,7 +1003,7 @@ export class WagerSystem {
       pendingWagers: pendingWagers.length,
       activeWagers: activeWagers.length,
       averageWager: totalVolume / totalWagers || 0,
-      riskScore: this.calculateSystemRiskScore()
+      riskScore: this.calculateSystemRiskScore(),
     };
   }
 

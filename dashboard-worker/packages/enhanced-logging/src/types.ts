@@ -7,7 +7,7 @@ export enum LogLevel {
   INFO = 1,
   WARN = 2,
   ERROR = 3,
-  CRITICAL = 4
+  CRITICAL = 4,
 }
 
 export interface LogContext {
@@ -163,7 +163,13 @@ export interface LogFilter {
 // Enhanced Analytics Types (placeholder exports - actual implementations are in respective files)
 export interface AnalyticsLogEntry extends LKeyLogEntry {
   errorCode?: string;
-  errorType?: 'CACHE_MISS' | 'DB_TIMEOUT' | 'API_FAILURE' | 'VALIDATION_ERROR' | 'NETWORK_ERROR' | 'MEMORY_ERROR';
+  errorType?:
+    | 'CACHE_MISS'
+    | 'DB_TIMEOUT'
+    | 'API_FAILURE'
+    | 'VALIDATION_ERROR'
+    | 'NETWORK_ERROR'
+    | 'MEMORY_ERROR';
   resolution?: string;
   impact?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   affectedUsers?: number;

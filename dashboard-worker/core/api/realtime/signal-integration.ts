@@ -81,7 +81,7 @@ export class SignalIntegration {
         role: 'CEO',
         isAdmin: true,
         isBlocked: false,
-        lastSeen: new Date()
+        lastSeen: new Date(),
       },
       {
         number: '+15550102',
@@ -90,7 +90,7 @@ export class SignalIntegration {
         role: 'COO',
         isAdmin: true,
         isBlocked: false,
-        lastSeen: new Date()
+        lastSeen: new Date(),
       },
       {
         number: '+15550601',
@@ -99,8 +99,8 @@ export class SignalIntegration {
         role: 'Head of VIP',
         isAdmin: true,
         isBlocked: false,
-        lastSeen: new Date()
-      }
+        lastSeen: new Date(),
+      },
     ];
 
     defaultContacts.forEach(contact => {
@@ -120,7 +120,7 @@ export class SignalIntegration {
         admins: ['+15550101'], // CEO
         description: 'Executive leadership discussions and decisions',
         department: 'Management',
-        created: new Date('2024-01-01')
+        created: new Date('2024-01-01'),
       },
       {
         id: 'security',
@@ -129,7 +129,7 @@ export class SignalIntegration {
         admins: ['+15551601'],
         description: 'Security incidents, threats, and operations',
         department: 'Security',
-        created: new Date('2024-01-01')
+        created: new Date('2024-01-01'),
       },
       {
         id: 'vip_operations',
@@ -138,7 +138,7 @@ export class SignalIntegration {
         admins: ['+15550601'],
         description: 'High-value client operations and escalations',
         department: 'VIP Management',
-        created: new Date('2024-01-01')
+        created: new Date('2024-01-01'),
       },
       {
         id: 'compliance',
@@ -147,7 +147,7 @@ export class SignalIntegration {
         admins: ['+15550801'],
         description: 'Compliance issues, legal matters, regulatory updates',
         department: 'Compliance',
-        created: new Date('2024-01-01')
+        created: new Date('2024-01-01'),
       },
       {
         id: 'finance_security',
@@ -156,8 +156,8 @@ export class SignalIntegration {
         admins: ['+15550501'],
         description: 'Financial security, fraud detection, payment security',
         department: 'Finance',
-        created: new Date('2024-01-01')
-      }
+        created: new Date('2024-01-01'),
+      },
     ];
 
     departmentGroups.forEach(group => {
@@ -216,7 +216,7 @@ export class SignalIntegration {
     const fullMessage: SignalMessage = {
       ...message,
       id: messageId,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     // Add to queue for processing
@@ -229,9 +229,12 @@ export class SignalIntegration {
   /**
    * Send message to department group
    */
-  async sendToDepartment(department: string, message: string, priority: 'normal' | 'urgent' = 'normal'): Promise<string> {
-    const group = Array.from(this.groups.values())
-      .find(g => g.department === department);
+  async sendToDepartment(
+    department: string,
+    message: string,
+    priority: 'normal' | 'urgent' = 'normal'
+  ): Promise<string> {
+    const group = Array.from(this.groups.values()).find(g => g.department === department);
 
     if (!group) {
       throw new Error(`Department group not found: ${department}`);
@@ -246,8 +249,8 @@ export class SignalIntegration {
       metadata: {
         department,
         priority,
-        sentBy: 'system'
-      }
+        sentBy: 'system',
+      },
     };
 
     return await this.sendMessage(signalMessage);
@@ -284,15 +287,19 @@ IMMEDIATE ATTENTION REQUIRED
       metadata: {
         alertType,
         security: true,
-        urgent: true
-      }
+        urgent: true,
+      },
     });
   }
 
   /**
    * Send VIP escalation
    */
-  async sendVIPEscalation(clientName: string, issue: string, priority: 'high' | 'critical' = 'high'): Promise<string> {
+  async sendVIPEscalation(
+    clientName: string,
+    issue: string,
+    priority: 'high' | 'critical' = 'high'
+  ): Promise<string> {
     const escalationMessage = `
 👑 VIP ESCALATION
 ━━━━━━━━━━━━━━━━━━━━━━
@@ -319,8 +326,8 @@ Requires immediate attention
       metadata: {
         vip: true,
         escalation: true,
-        priority
-      }
+        priority,
+      },
     });
   }
 
@@ -353,8 +360,8 @@ REGULATORY ATTENTION REQUIRED
       metadata: {
         compliance: true,
         regulatory: true,
-        urgent: true
-      }
+        urgent: true,
+      },
     });
   }
 
@@ -369,7 +376,7 @@ REGULATORY ATTENTION REQUIRED
       members,
       admins: [this.config.phoneNumber], // Creator is admin
       department,
-      created: new Date()
+      created: new Date(),
     };
 
     this.groups.set(groupId, group);
@@ -394,8 +401,8 @@ Please accept the invitation in your Signal app.
         type: 'text',
         metadata: {
           groupInvitation: true,
-          groupId
-        }
+          groupId,
+        },
       });
     }
 
@@ -431,8 +438,8 @@ You have been added to group: ${group.name}
         groupId,
         metadata: {
           groupUpdate: true,
-          action: 'added'
-        }
+          action: 'added',
+        },
       });
     }
 
@@ -468,8 +475,8 @@ You have been removed from group: ${group.name}
         type: 'text',
         metadata: {
           groupUpdate: true,
-          action: 'removed'
-        }
+          action: 'removed',
+        },
       });
     }
 
@@ -517,7 +524,7 @@ You have been removed from group: ${group.name}
       connected: this.isConnected,
       messageQueueLength: this.messageQueue.length,
       activeGroups: this.groups.size,
-      totalContacts: this.contacts.size
+      totalContacts: this.contacts.size,
     };
   }
 
@@ -599,7 +606,7 @@ export const defaultSignalConfig: SignalConfig = {
   trustStore: '/etc/signal/truststore',
   deviceName: 'Fire22-Server',
   maxRetries: 3,
-  retryDelay: 30000 // 30 seconds
+  retryDelay: 30000, // 30 seconds
 };
 
 // Export main instance

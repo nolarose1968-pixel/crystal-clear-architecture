@@ -7,7 +7,7 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
-import { color } from "bun" with { type: "macro" };
+import { color } from 'bun' with { type: 'macro' };
 
 interface IssueTemplate {
   id: string;
@@ -119,7 +119,7 @@ class AutomatedIssueCreator {
    */
   private loadErrorRegistry(): void {
     const registryPath = join(process.cwd(), 'docs', 'error-codes.json');
-    
+
     if (existsSync(registryPath)) {
       const content = readFileSync(registryPath, 'utf-8');
       this.errorRegistry = JSON.parse(content);
@@ -133,23 +133,25 @@ class AutomatedIssueCreator {
     if (existsSync(this.configPath)) {
       try {
         const config = JSON.parse(readFileSync(this.configPath, 'utf-8'));
-        
+
         // Load templates
         config.templates?.forEach((template: IssueTemplate) => {
           this.templates.set(template.id, template);
         });
-        
+
         // Load rules
         config.rules?.forEach((rule: IssueCreationRule) => {
           this.rules.set(rule.id, rule);
         });
-        
+
         // Load providers
         config.providers?.forEach((provider: IssueProvider & { id: string }) => {
           this.providers.set(provider.id, provider);
         });
-        
-        console.log(`✅ Loaded ${this.templates.size} templates, ${this.rules.size} rules, ${this.providers.size} providers`);
+
+        console.log(
+          `✅ Loaded ${this.templates.size} templates, ${this.rules.size} rules, ${this.providers.size} providers`
+        );
       } catch (error) {
         console.warn(`⚠️ Failed to load issue configuration: ${error.message}`);
         this.createDefaultConfiguration();
@@ -166,15 +168,15 @@ class AutomatedIssueCreator {
     if (existsSync(this.dataPath)) {
       try {
         const data = JSON.parse(readFileSync(this.dataPath, 'utf-8'));
-        
+
         Object.entries(data).forEach(([id, issue]: [string, any]) => {
           this.createdIssues.set(id, {
             ...issue,
             createdAt: new Date(issue.createdAt),
-            updatedAt: new Date(issue.updatedAt)
+            updatedAt: new Date(issue.updatedAt),
           });
         });
-        
+
         console.log(`✅ Loaded ${this.createdIssues.size} created issues`);
       } catch (error) {
         console.warn(`⚠️ Failed to load created issues: ${error.message}`);
@@ -241,7 +243,7 @@ class AutomatedIssueCreator {
         labels: ['critical', 'system-failure', 'auto-created'],
         assignees: ['platform-team'],
         priority: 'critical',
-        provider: 'github'
+        provider: 'github',
       },
       {
         id: 'database-connectivity-issue',
@@ -280,7 +282,7 @@ If this issue persists for more than 30 minutes, escalate to:
         labels: ['database', 'connectivity', 'infrastructure'],
         assignees: ['database-team'],
         priority: 'high',
-        provider: 'github'
+        provider: 'github',
       },
       {
         id: 'security-incident',
@@ -334,7 +336,7 @@ If this issue persists for more than 30 minutes, escalate to:
         labels: ['security', 'incident', 'urgent', 'auto-created'],
         assignees: ['security-team'],
         priority: 'critical',
-        provider: 'github'
+        provider: 'github',
       },
       {
         id: 'fire22-integration-failure',
@@ -391,8 +393,8 @@ If this issue persists for more than 30 minutes, escalate to:
         labels: ['fire22', 'integration', 'sportsbook', 'revenue-impact'],
         assignees: ['fire22-integration-team'],
         priority: 'high',
-        provider: 'github'
-      }
+        provider: 'github',
+      },
     ];
 
     const defaultRules: IssueCreationRule[] = [
@@ -406,8 +408,8 @@ If this issue persists for more than 30 minutes, escalate to:
             type: 'occurrence_count',
             operator: 'greater_than',
             value: 1,
-            timeWindow: '5m'
-          }
+            timeWindow: '5m',
+          },
         ],
         template: 'critical-system-failure',
         cooldown: '30m',
@@ -415,8 +417,8 @@ If this issue persists for more than 30 minutes, escalate to:
         escalation: {
           afterHours: 2,
           escalateTo: ['engineering-manager', 'cto'],
-          actions: ['slack-ping', 'email-alert']
-        }
+          actions: ['slack-ping', 'email-alert'],
+        },
       },
       {
         id: 'database-connection-failures',
@@ -428,12 +430,12 @@ If this issue persists for more than 30 minutes, escalate to:
             type: 'occurrence_count',
             operator: 'greater_than',
             value: 3,
-            timeWindow: '10m'
-          }
+            timeWindow: '10m',
+          },
         ],
         template: 'database-connectivity-issue',
         cooldown: '1h',
-        autoAssign: true
+        autoAssign: true,
       },
       {
         id: 'security-incidents',
@@ -445,8 +447,8 @@ If this issue persists for more than 30 minutes, escalate to:
             type: 'occurrence_count',
             operator: 'greater_than',
             value: 5,
-            timeWindow: '5m'
-          }
+            timeWindow: '5m',
+          },
         ],
         template: 'security-incident',
         cooldown: '15m',
@@ -454,8 +456,8 @@ If this issue persists for more than 30 minutes, escalate to:
         escalation: {
           afterHours: 1,
           escalateTo: ['security-lead', 'ciso'],
-          actions: ['page-security-team', 'create-incident']
-        }
+          actions: ['page-security-team', 'create-incident'],
+        },
       },
       {
         id: 'fire22-integration-failures',
@@ -467,18 +469,18 @@ If this issue persists for more than 30 minutes, escalate to:
             type: 'occurrence_count',
             operator: 'greater_than',
             value: 10,
-            timeWindow: '15m'
+            timeWindow: '15m',
           },
           {
             type: 'business_hours',
             operator: 'equals',
-            value: 'true'
-          }
+            value: 'true',
+          },
         ],
         template: 'fire22-integration-failure',
         cooldown: '2h',
-        autoAssign: true
-      }
+        autoAssign: true,
+      },
     ];
 
     const defaultProviders: (IssueProvider & { id: string })[] = [
@@ -489,16 +491,16 @@ If this issue persists for more than 30 minutes, escalate to:
           owner: 'fire22-company',
           repo: 'dashboard-worker',
           token: process.env.GITHUB_TOKEN || 'github_pat_xxx',
-          apiUrl: 'https://api.github.com'
-        }
-      }
+          apiUrl: 'https://api.github.com',
+        },
+      },
     ];
 
     // Save default configuration
     const config = {
       templates: defaultTemplates,
       rules: defaultRules,
-      providers: defaultProviders
+      providers: defaultProviders,
     };
 
     writeFileSync(this.configPath, JSON.stringify(config, null, 2), 'utf-8');
@@ -508,7 +510,9 @@ If this issue persists for more than 30 minutes, escalate to:
     defaultRules.forEach(r => this.rules.set(r.id, r));
     defaultProviders.forEach(p => this.providers.set(p.id, p));
 
-    console.log(`✅ Created default configuration with ${defaultTemplates.length} templates and ${defaultRules.length} rules`);
+    console.log(
+      `✅ Created default configuration with ${defaultTemplates.length} templates and ${defaultRules.length} rules`
+    );
   }
 
   /**
@@ -541,13 +545,13 @@ If this issue persists for more than 30 minutes, escalate to:
       if (recentIssues.length > 0) continue;
 
       // Evaluate conditions
-      const conditionsMet = rule.conditions.every(condition => 
+      const conditionsMet = rule.conditions.every(condition =>
         this.evaluateCondition(condition, {
           errorCode,
           occurrenceCount,
           timeWindow,
           context,
-          errorDetails
+          errorDetails,
         })
       );
 
@@ -590,7 +594,7 @@ If this issue persists for more than 30 minutes, escalate to:
       case 'context_match':
         if (!data.context) return false;
         const contextValue = String(data.context[String(condition.value)] || '');
-        
+
         switch (condition.operator) {
           case 'contains':
             return contextValue.includes(String(condition.value));
@@ -610,7 +614,9 @@ If this issue persists for more than 30 minutes, escalate to:
 
       case 'user_impact':
         // Simplified user impact assessment
-        return condition.operator === 'greater_than' && data.occurrenceCount > Number(condition.value);
+        return (
+          condition.operator === 'greater_than' && data.occurrenceCount > Number(condition.value)
+        );
 
       default:
         return false;
@@ -651,13 +657,13 @@ If this issue persists for more than 30 minutes, escalate to:
       occurrenceCount,
       timeWindow,
       context,
-      ruleId
+      ruleId,
     });
 
     // Create issue using appropriate provider
     const providerId = this.getProviderForTemplate(template);
     const provider = this.providers.get(providerId);
-    
+
     if (!provider) {
       console.error(`❌ Provider not found: ${providerId}`);
       return null;
@@ -665,7 +671,7 @@ If this issue persists for more than 30 minutes, escalate to:
 
     try {
       const createdIssue = await this.createIssueWithProvider(provider, issueData);
-      
+
       // Store created issue
       this.createdIssues.set(createdIssue.id, createdIssue);
       this.saveCreatedIssues();
@@ -715,7 +721,8 @@ If this issue persists for more than 30 minutes, escalate to:
       businessImpact: data.context?.businessImpact || 'To be determined',
       estimatedResolutionTime: this.estimateResolutionTime(data.errorDetails?.severity),
       firstSeen: data.context?.recentOccurrences?.[0]?.timestamp || new Date().toISOString(),
-      lastSeen: data.context?.recentOccurrences?.slice(-1)[0]?.timestamp || new Date().toISOString()
+      lastSeen:
+        data.context?.recentOccurrences?.slice(-1)[0]?.timestamp || new Date().toISOString(),
     };
 
     return {
@@ -723,7 +730,7 @@ If this issue persists for more than 30 minutes, escalate to:
       body: this.renderTemplate(template.body, templateData),
       labels: template.labels,
       assignees: template.assignees || [],
-      priority: template.priority
+      priority: template.priority,
     };
   }
 
@@ -740,22 +747,27 @@ If this issue persists for more than 30 minutes, escalate to:
     });
 
     // Handle arrays (simplified Handlebars-like syntax)
-    rendered = rendered.replace(/{{#each (\w+)}}(.*?){{\/each}}/gs, (match, arrayKey, itemTemplate) => {
-      const array = data[arrayKey];
-      if (!Array.isArray(array)) return '';
-      
-      return array.map(item => {
-        if (typeof item === 'object') {
-          let itemRendered = itemTemplate;
-          Object.entries(item).forEach(([prop, val]) => {
-            itemRendered = itemRendered.replace(new RegExp(`{{${prop}}}`, 'g'), String(val));
-          });
-          return itemRendered;
-        } else {
-          return itemTemplate.replace(/{{this}}/g, String(item));
-        }
-      }).join('');
-    });
+    rendered = rendered.replace(
+      /{{#each (\w+)}}(.*?){{\/each}}/gs,
+      (match, arrayKey, itemTemplate) => {
+        const array = data[arrayKey];
+        if (!Array.isArray(array)) return '';
+
+        return array
+          .map(item => {
+            if (typeof item === 'object') {
+              let itemRendered = itemTemplate;
+              Object.entries(item).forEach(([prop, val]) => {
+                itemRendered = itemRendered.replace(new RegExp(`{{${prop}}}`, 'g'), String(val));
+              });
+              return itemRendered;
+            } else {
+              return itemTemplate.replace(/{{this}}/g, String(item));
+            }
+          })
+          .join('');
+      }
+    );
 
     return rendered;
   }
@@ -765,10 +777,14 @@ If this issue persists for more than 30 minutes, escalate to:
    */
   private estimateResolutionTime(severity?: string): string {
     switch (severity) {
-      case 'CRITICAL': return '2-4 hours';
-      case 'ERROR': return '4-8 hours';
-      case 'WARNING': return '1-2 days';
-      default: return '2-5 days';
+      case 'CRITICAL':
+        return '2-4 hours';
+      case 'ERROR':
+        return '4-8 hours';
+      case 'WARNING':
+        return '1-2 days';
+      default:
+        return '2-5 days';
     }
   }
 
@@ -783,9 +799,12 @@ If this issue persists for more than 30 minutes, escalate to:
   /**
    * Create issue with provider (mock implementation)
    */
-  private async createIssueWithProvider(provider: IssueProvider, issueData: any): Promise<CreatedIssue> {
+  private async createIssueWithProvider(
+    provider: IssueProvider,
+    issueData: any
+  ): Promise<CreatedIssue> {
     const issueId = `issue-${Date.now()}`;
-    
+
     // Mock external API call
     console.log(color('#0088cc', 'css') + `🔗 Creating issue with ${provider.type} provider...`);
     console.log(`   Title: ${issueData.title}`);
@@ -809,7 +828,7 @@ If this issue persists for more than 30 minutes, escalate to:
       updatedAt: new Date(),
       assignees: issueData.assignees,
       labels: issueData.labels,
-      priority: issueData.priority
+      priority: issueData.priority,
     };
 
     // Simulate API delay
@@ -824,11 +843,11 @@ If this issue persists for more than 30 minutes, escalate to:
   private parseTimeWindow(timeWindow: string): number {
     const match = timeWindow.match(/^(\d+)([smhd])$/);
     if (!match) return 1800000; // Default 30 minutes
-    
+
     const value = parseInt(match[1]);
     const unit = match[2];
-    
-    const multipliers = { 's': 1000, 'm': 60000, 'h': 3600000, 'd': 86400000 };
+
+    const multipliers = { s: 1000, m: 60000, h: 3600000, d: 86400000 };
     return value * multipliers[unit];
   }
 
@@ -841,7 +860,7 @@ If this issue persists for more than 30 minutes, escalate to:
       this.createdIssues.forEach((issue, id) => {
         data[id] = issue;
       });
-      
+
       writeFileSync(this.dataPath, JSON.stringify(data, null, 2), 'utf-8');
     } catch (error) {
       console.error(`❌ Failed to save created issues: ${error.message}`);
@@ -859,22 +878,31 @@ If this issue persists for more than 30 minutes, escalate to:
     issuesByErrorCode: Record<string, number>;
   } {
     const issues = Array.from(this.createdIssues.values());
-    
+
     return {
       totalIssues: issues.length,
       openIssues: issues.filter(i => i.status === 'open').length,
-      issuesByProvider: issues.reduce((acc, issue) => {
-        acc[issue.provider] = (acc[issue.provider] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>),
-      issuesByPriority: issues.reduce((acc, issue) => {
-        acc[issue.priority] = (acc[issue.priority] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>),
-      issuesByErrorCode: issues.reduce((acc, issue) => {
-        acc[issue.errorCode] = (acc[issue.errorCode] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>)
+      issuesByProvider: issues.reduce(
+        (acc, issue) => {
+          acc[issue.provider] = (acc[issue.provider] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
+      issuesByPriority: issues.reduce(
+        (acc, issue) => {
+          acc[issue.priority] = (acc[issue.priority] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
+      issuesByErrorCode: issues.reduce(
+        (acc, issue) => {
+          acc[issue.errorCode] = (acc[issue.errorCode] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
     };
   }
 
@@ -883,40 +911,45 @@ If this issue persists for more than 30 minutes, escalate to:
    */
   displayDashboard(): void {
     const stats = this.getStatistics();
-    
+
     console.log('\n🎫 AUTOMATED ISSUE CREATION DASHBOARD');
     console.log('='.repeat(80));
-    
+
     console.log('\n📊 Overview:');
     console.log(`   Total Issues Created: ${stats.totalIssues}`);
     console.log(`   Open Issues: ${stats.openIssues}`);
     console.log(`   Issue Creation Rules: ${this.rules.size}`);
     console.log(`   Issue Templates: ${this.templates.size}`);
-    
+
     if (Object.keys(stats.issuesByProvider).length > 0) {
       console.log('\n🔧 Issues by Provider:');
       Object.entries(stats.issuesByProvider).forEach(([provider, count]) => {
         console.log(`   ${provider}: ${count}`);
       });
     }
-    
+
     if (Object.keys(stats.issuesByPriority).length > 0) {
       console.log('\n⚠️ Issues by Priority:');
       Object.entries(stats.issuesByPriority).forEach(([priority, count]) => {
-        const priorityColor = priority === 'critical' ? color('#ef4444', 'css') :
-                             priority === 'high' ? color('#f97316', 'css') :
-                             priority === 'medium' ? color('#f59e0b', 'css') : color('#10b981', 'css');
+        const priorityColor =
+          priority === 'critical'
+            ? color('#ef4444', 'css')
+            : priority === 'high'
+              ? color('#f97316', 'css')
+              : priority === 'medium'
+                ? color('#f59e0b', 'css')
+                : color('#10b981', 'css');
         console.log(`   ${priorityColor}${priority}${color('#ffffff', 'css')}: ${count}`);
       });
     }
-    
+
     if (Object.keys(stats.issuesByErrorCode).length > 0) {
       console.log('\n🔥 Issues by Error Code:');
       Object.entries(stats.issuesByErrorCode).forEach(([errorCode, count]) => {
         console.log(`   ${errorCode}: ${count} issues`);
       });
     }
-    
+
     console.log('\n' + '='.repeat(80));
   }
 }
@@ -924,51 +957,51 @@ If this issue persists for more than 30 minutes, escalate to:
 // CLI execution and demo
 if (import.meta.main) {
   const issueCreator = new AutomatedIssueCreator();
-  
+
   console.log('🎫 DEMO: Simulating automated issue creation...\n');
-  
+
   // Test critical error issue creation
   const criticalRules = issueCreator.evaluateIssueCreation('E1001', 2, '5m', {
     systemComponent: 'database-connector',
-    errorMessage: 'Failed to initialize connection pool'
+    errorMessage: 'Failed to initialize connection pool',
   });
-  
+
   if (criticalRules.length > 0) {
     await issueCreator.createIssue(criticalRules[0], 'E1001', 2, '5m', {
       alertId: 'alert-critical-001',
       affectedUsers: 500,
-      businessImpact: 'Complete system outage'
+      businessImpact: 'Complete system outage',
     });
   }
-  
+
   // Test database issue creation
   const databaseRules = issueCreator.evaluateIssueCreation('E2001', 5, '10m', {
     query: 'SELECT * FROM customers',
-    duration: 30000
+    duration: 30000,
   });
-  
+
   if (databaseRules.length > 0) {
     await issueCreator.createIssue(databaseRules[0], 'E2001', 5, '10m', {
       alertId: 'alert-db-001',
       affectedUsers: 100,
-      businessImpact: 'Customer data access impaired'
+      businessImpact: 'Customer data access impaired',
     });
   }
-  
+
   // Test security incident creation
   const securityRules = issueCreator.evaluateIssueCreation('E6001', 15, '5m', {
     sourceIP: '203.0.113.42',
-    attackType: 'brute_force'
+    attackType: 'brute_force',
   });
-  
+
   if (securityRules.length > 0) {
     await issueCreator.createIssue(securityRules[0], 'E6001', 15, '5m', {
       alertId: 'alert-security-001',
       affectedUsers: 0,
-      businessImpact: 'Potential security breach'
+      businessImpact: 'Potential security breach',
     });
   }
-  
+
   // Display dashboard
   setTimeout(() => {
     issueCreator.displayDashboard();

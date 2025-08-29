@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
  * Department Communications Audit Outreach Sender
- * 
+ *
  * Sends comprehensive communications audit requests to all department heads
  * to gather information about team communications, RSS feeds, blogs, and data accuracy
  */
@@ -38,29 +38,29 @@ class DepartmentCommunicationsAuditSender {
   private auditContent: string;
   private departments: DepartmentHead[];
   private teamDirectory: any;
-  
+
   constructor() {
     this.loadData();
   }
-  
+
   private loadData() {
     // Load the comprehensive audit document
     this.auditContent = readFileSync(
-      join(process.cwd(), 'src/communications/department-head-outreach.md'), 
+      join(process.cwd(), 'src/communications/department-head-outreach.md'),
       'utf-8'
     );
-    
+
     // Load department data
     this.departments = JSON.parse(
       readFileSync(join(process.cwd(), 'src/departments/data/departments.json'), 'utf-8')
     );
-    
+
     // Load team directory for additional context
     this.teamDirectory = JSON.parse(
       readFileSync(join(process.cwd(), 'src/communications/team-directory.json'), 'utf-8')
     );
   }
-  
+
   private generatePersonalizedAuditEmail(department: DepartmentHead): {
     to: string;
     cc: string[];
@@ -69,13 +69,19 @@ class DepartmentCommunicationsAuditSender {
     priority: 'immediate' | 'high' | 'standard';
   } {
     const priority = this.determinePriority(department);
-    const urgencyLabel = priority === 'immediate' ? '🚨 CRITICAL PRIORITY' : 
-                        priority === 'high' ? '🟡 HIGH PRIORITY' : '📋 STANDARD PRIORITY';
-    
+    const urgencyLabel =
+      priority === 'immediate'
+        ? '🚨 CRITICAL PRIORITY'
+        : priority === 'high'
+          ? '🟡 HIGH PRIORITY'
+          : '📋 STANDARD PRIORITY';
+
     // Get team members from directory if available
     const teamInfo = this.getTeamInfo(department.name.toLowerCase());
-    const teamMembersText = teamInfo ? this.formatTeamMembers(teamInfo) : 'Team information pending verification.';
-    
+    const teamMembersText = teamInfo
+      ? this.formatTeamMembers(teamInfo)
+      : 'Team information pending verification.';
+
     const personalizedBody = `${urgencyLabel} - Department Communications Audit
 
 Dear ${department.head === 'TBD' ? `${department.name} Department Team` : department.head},
@@ -139,11 +145,15 @@ ${teamMembersText}
 
 ## ⚡ Action Items Required
 
-${department.status === 'pending' ? `
+${
+  department.status === 'pending'
+    ? `
 ### 🔴 IMMEDIATE PRIORITY:
 1. **Assign Department Head** - Critical for ${department.name} Department operations
 2. **Establish Leadership Contact** - Primary communication point needed
-` : ''}
+`
+    : ''
+}
 
 ### 📋 All Departments:
 1. **Verify Team Data** - Confirm accuracy of current team information
@@ -171,16 +181,22 @@ calendar.fire22.com/schedule/sarah-martinez
 
 ## ⏰ Response Timeline
 
-${priority === 'immediate' ? `
+${
+  priority === 'immediate'
+    ? `
 ### 🚨 CRITICAL PRIORITY (24 hours):
 - Department head assignment and initial communication setup required
-` : priority === 'high' ? `
+`
+    : priority === 'high'
+      ? `
 ### 🟡 HIGH PRIORITY (48 hours):
 - Department head confirmation and communication audit completion
-` : `
+`
+      : `
 ### 📅 STANDARD PRIORITY (1 week):
 - Complete communications audit and enhancement recommendations
-`}
+`
+}
 
 ---
 
@@ -233,72 +249,91 @@ Internal ID: ${department.internalId}`;
       cc: [
         'sarah.martinez@communications.fire22',
         'communications@fire22.com',
-        ...(department.status === 'pending' ? ['heads@fire22.com'] : [])
+        ...(department.status === 'pending' ? ['heads@fire22.com'] : []),
       ],
       subject: `${urgencyLabel} - Fire22 Communications Infrastructure Audit Request - ${department.name} Department`,
       body: personalizedBody,
-      priority
+      priority,
     };
   }
-  
+
   private determinePriority(department: DepartmentHead): 'immediate' | 'high' | 'standard' {
     if (department.name === 'Security' && department.status === 'pending') return 'immediate';
-    if (department.status === 'pending' && ['Finance', 'Operations', 'Marketing', 'Legal'].includes(department.name)) return 'high';
+    if (
+      department.status === 'pending' &&
+      ['Finance', 'Operations', 'Marketing', 'Legal'].includes(department.name)
+    )
+      return 'high';
     return 'standard';
   }
-  
+
   private getTeamInfo(departmentName: string): any {
     const deptKey = departmentName === 'legal' ? 'compliance' : departmentName;
     return this.teamDirectory.departments[deptKey];
   }
-  
+
   private formatTeamMembers(teamInfo: any): string {
     if (!teamInfo?.members) return 'No team information available.';
-    
-    return teamInfo.members.map((member: TeamMember) => 
-      `• **${member.name}** - ${member.role}\n  └─ ${member.email} | Status: ${member.status}`
-    ).join('\n');
+
+    return teamInfo.members
+      .map(
+        (member: TeamMember) =>
+          `• **${member.name}** - ${member.role}\n  └─ ${member.email} | Status: ${member.status}`
+      )
+      .join('\n');
   }
-  
+
   async sendAuditRequests(): Promise<NotificationResult[]> {
     console.log('🚀 Starting Department Communications Audit Outreach...\n');
-    
+
     const results: NotificationResult[] = [];
-    
+
     // Send to all department heads
     for (const department of this.departments) {
       const email = this.generatePersonalizedAuditEmail(department);
-      
-      console.log(`📧 Sending ${email.priority.toUpperCase()} audit request to: ${department.name} Department`);
+
+      console.log(
+        `📧 Sending ${email.priority.toUpperCase()} audit request to: ${department.name} Department`
+      );
       console.log(`   └─ Head: ${department.head}`);
       console.log(`   └─ Email: ${email.to}`);
       console.log(`   └─ Status: ${department.status}`);
-      
+
       // Simulate sending (in real environment, integrate with email service)
       const result: NotificationResult = {
         to: email.to,
         subject: email.subject,
         status: 'sent',
         timestamp: new Date().toISOString(),
-        priority: email.priority
+        priority: email.priority,
       };
-      
+
       results.push(result);
       console.log(`   ✅ ${email.priority === 'immediate' ? 'CRITICAL' : 'SENT'}\n`);
     }
-    
+
     // Summary
     console.log('📊 **Audit Request Summary**:');
     console.log(`   └─ Total Departments: ${this.departments.length}`);
-    console.log(`   └─ Active Departments: ${this.departments.filter(d => d.status === 'active').length}`);
-    console.log(`   └─ Pending Assignments: ${this.departments.filter(d => d.status === 'pending').length}`);
-    console.log(`   └─ Critical Priority: ${results.filter(r => r.priority === 'immediate').length}`);
+    console.log(
+      `   └─ Active Departments: ${this.departments.filter(d => d.status === 'active').length}`
+    );
+    console.log(
+      `   └─ Pending Assignments: ${this.departments.filter(d => d.status === 'pending').length}`
+    );
+    console.log(
+      `   └─ Critical Priority: ${results.filter(r => r.priority === 'immediate').length}`
+    );
     console.log(`   └─ High Priority: ${results.filter(r => r.priority === 'high').length}`);
-    console.log(`   └─ Standard Priority: ${results.filter(r => r.priority === 'standard').length}\n`);
-    
+    console.log(
+      `   └─ Standard Priority: ${results.filter(r => r.priority === 'standard').length}\n`
+    );
+
     console.log('✅ All department head audit requests have been sent successfully!');
-    console.log('📋 Next: Monitor responses and process feedback for communications enhancement.\n');
-    
+    console.log(
+      '📋 Next: Monitor responses and process feedback for communications enhancement.\n'
+    );
+
     return results;
   }
 }
@@ -308,16 +343,17 @@ async function main() {
   try {
     const auditSender = new DepartmentCommunicationsAuditSender();
     const results = await auditSender.sendAuditRequests();
-    
+
     // Save results for tracking
     const timestamp = new Date().toISOString().split('T')[0];
     await Bun.write(
-      `./src/communications/audit-outreach-results-${timestamp}.json`, 
+      `./src/communications/audit-outreach-results-${timestamp}.json`,
       JSON.stringify(results, null, 2)
     );
-    
-    console.log(`📁 Results saved to: ./src/communications/audit-outreach-results-${timestamp}.json`);
-    
+
+    console.log(
+      `📁 Results saved to: ./src/communications/audit-outreach-results-${timestamp}.json`
+    );
   } catch (error) {
     console.error('❌ Error sending audit requests:', error);
     process.exit(1);

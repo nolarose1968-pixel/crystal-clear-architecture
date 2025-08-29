@@ -30,92 +30,94 @@ class DeploymentValidator {
       name: 'Local Environment',
       description: 'Verify local development environment',
       validator: this.checkLocalEnvironment.bind(this),
-      critical: true
+      critical: true,
     },
     {
       name: 'Package.json Validation',
       description: 'Validate package.json structure and bun pm pkg compatibility',
       validator: this.checkPackageJson.bind(this),
-      critical: true
+      critical: true,
     },
     {
       name: 'Dependencies',
       description: 'Check all required dependencies are installed',
       validator: this.checkDependencies.bind(this),
-      critical: true
+      critical: true,
     },
     {
       name: 'Configuration',
       description: 'Validate wrangler.toml and environment configuration',
       validator: this.checkConfiguration.bind(this),
-      critical: true
+      critical: true,
     },
     {
       name: 'Environment Variables',
       description: 'Verify all required environment variables are set',
       validator: this.checkEnvironmentVariables.bind(this),
-      critical: true
+      critical: true,
     },
     {
       name: 'Secrets',
       description: 'Verify all required secrets are set',
       validator: this.checkSecrets.bind(this),
-      critical: true
+      critical: true,
     },
     {
       name: 'Database',
       description: 'Test D1 database connectivity and schema',
       validator: this.checkDatabase.bind(this),
-      critical: true
+      critical: true,
     },
     {
       name: 'Code Quality',
       description: 'Run TypeScript compilation and linting checks',
       validator: this.checkCodeQuality.bind(this),
-      critical: false
+      critical: false,
     },
     {
       name: 'Test Suite',
       description: 'Run full test suite to ensure 100% pass rate',
       validator: this.runFullTestSuite.bind(this),
-      critical: true
+      critical: true,
     },
     {
       name: 'Performance',
       description: 'Validate response times and performance metrics',
       validator: this.checkPerformance.bind(this),
-      critical: false
+      critical: false,
     },
     {
       name: 'Security',
       description: 'Verify authentication and authorization systems',
       validator: this.checkSecurity.bind(this),
-      critical: true
+      critical: true,
     },
     {
       name: 'Fire22 Integration',
       description: 'Test Fire22 API integration and configuration',
       validator: this.checkFire22Integration.bind(this),
-      critical: true
+      critical: true,
     },
     {
       name: 'Integration',
       description: 'Test Fire22 API integration and fallback systems',
       validator: this.checkIntegration.bind(this),
-      critical: true
+      critical: true,
     },
     {
       name: 'Documentation',
       description: 'Verify all documentation files are present and accessible',
       validator: this.checkDocumentation.bind(this),
-      critical: false
-    }
+      critical: false,
+    },
   ];
 
   async runValidation(): Promise<void> {
     console.log('🚀 Starting Pre-Deployment Validation...\n');
     console.log(`⏰ ${new Date().toISOString()}\n`);
-    console.log('This validation ensures your dashboard worker is ready for production deployment.\n');
+    console.log(
+      'This validation ensures your dashboard worker is ready for production deployment.\n'
+    );
     console.log('🔍 Enhanced validation includes:\n');
     console.log('   • Package.json structure and bun pm pkg compatibility');
     console.log('   • Environment variables validation');
@@ -125,7 +127,7 @@ class DeploymentValidator {
 
     for (const step of this.validationSteps) {
       console.log(`🔍 ${step.name}: ${step.description}`);
-      
+
       const stepStart = Date.now();
       const passed = await step.validator();
       const duration = Date.now() - stepStart;
@@ -135,7 +137,7 @@ class DeploymentValidator {
         status: passed ? 'PASS' : 'FAIL',
         details: passed ? 'Validation passed' : 'Validation failed',
         duration,
-        critical: step.critical
+        critical: step.critical,
       };
 
       this.results.push(result);
@@ -160,7 +162,7 @@ class DeploymentValidator {
       // Check if we're in the right directory
       const packageJson = await Bun.file('package.json').text();
       const pkg = JSON.parse(packageJson);
-      
+
       if (pkg.name !== 'fire22-dashboard-worker') {
         throw new Error('Not in fire22-dashboard-worker directory');
       }
@@ -186,7 +188,7 @@ class DeploymentValidator {
     try {
       const packageJson = await Bun.file('package.json').text();
       const pkg = JSON.parse(packageJson);
-      
+
       // Check required fields
       const requiredFields = ['name', 'version', 'description', 'main', 'type'];
       for (const field of requiredFields) {
@@ -239,7 +241,7 @@ class DeploymentValidator {
       // Check critical dependencies in package.json
       const packageJson = await Bun.file('package.json').text();
       const pkg = JSON.parse(packageJson);
-      
+
       const criticalDeps = ['wrangler', 'jsonwebtoken'];
       for (const dep of criticalDeps) {
         if (!pkg.dependencies[dep] && !pkg.devDependencies[dep]) {
@@ -271,7 +273,11 @@ class DeploymentValidator {
       }
 
       // Check source files exist
-      const sourceFiles = ['src/worker.ts', 'src/errors/ErrorHandler.ts', 'src/errors/middleware.ts'];
+      const sourceFiles = [
+        'src/worker.ts',
+        'src/errors/ErrorHandler.ts',
+        'src/errors/middleware.ts',
+      ];
       for (const file of sourceFiles) {
         if (!(await Bun.file(file).exists())) {
           throw new Error(`Source file missing: ${file}`);
@@ -290,10 +296,10 @@ class DeploymentValidator {
       // Check required environment variables from package.json config
       const packageJson = await Bun.file('package.json').text();
       const pkg = JSON.parse(packageJson);
-      
+
       const requiredVars = pkg.config?.envValidation?.required || [];
       const missingVars: string[] = [];
-      
+
       for (const varName of requiredVars) {
         if (!Bun.env[varName]) {
           missingVars.push(varName);
@@ -307,7 +313,7 @@ class DeploymentValidator {
       // Check optional but recommended variables
       const optionalVars = pkg.config?.envValidation?.optional || [];
       const missingOptional: string[] = [];
-      
+
       for (const varName of optionalVars) {
         if (!Bun.env[varName]) {
           missingOptional.push(varName);
@@ -319,7 +325,9 @@ class DeploymentValidator {
       }
 
       console.log(`   ✅ Required environment variables: ${requiredVars.length} present`);
-      console.log(`   ✅ Optional environment variables: ${optionalVars.length - missingOptional.length}/${optionalVars.length} present`);
+      console.log(
+        `   ✅ Optional environment variables: ${optionalVars.length - missingOptional.length}/${optionalVars.length} present`
+      );
 
       return true;
     } catch (error) {
@@ -333,10 +341,10 @@ class DeploymentValidator {
       // Check secret environment variables from package.json config
       const packageJson = await Bun.file('package.json').text();
       const pkg = JSON.parse(packageJson);
-      
+
       const secretVars = pkg.config?.envValidation?.secrets || [];
       const missingSecrets: string[] = [];
-      
+
       for (const varName of secretVars) {
         if (!Bun.env[varName]) {
           missingSecrets.push(varName);
@@ -344,7 +352,9 @@ class DeploymentValidator {
           // Check secret strength (minimum 32 characters)
           const secret = Bun.env[varName];
           if (secret && secret.length < 32) {
-            console.log(`   ⚠️  Weak secret detected: ${varName} (${secret.length} chars, minimum 32)`);
+            console.log(
+              `   ⚠️  Weak secret detected: ${varName} (${secret.length} chars, minimum 32)`
+            );
           }
         }
       }
@@ -421,9 +431,11 @@ class DeploymentValidator {
       }
 
       // Test error handling with non-existent endpoint
-      const errorResponse = await fetch('https://dashboard-worker.nolarose1968-806.workers.dev/nonexistent');
+      const errorResponse = await fetch(
+        'https://dashboard-worker.nolarose1968-806.workers.dev/nonexistent'
+      );
       const errorData = await errorResponse.json();
-      
+
       if (!errorData.error || !errorData.error.correlationId) {
         throw new Error('Error handling system not working properly');
       }
@@ -440,7 +452,7 @@ class DeploymentValidator {
       // Check Fire22 configuration from package.json
       const packageJson = await Bun.file('package.json').text();
       const pkg = JSON.parse(packageJson);
-      
+
       // Check if Fire22 integration metadata exists
       const fire22Integration = pkg.metadata?.environment?.integrations?.fire22;
       if (!fire22Integration) {
@@ -450,7 +462,7 @@ class DeploymentValidator {
       // Check Fire22 environment variables
       const fire22Vars = ['FIRE22_API_URL', 'FIRE22_TOKEN', 'FIRE22_WEBHOOK_SECRET'];
       const missingFire22Vars: string[] = [];
-      
+
       for (const varName of fire22Vars) {
         if (!Bun.env[varName]) {
           missingFire22Vars.push(varName);
@@ -484,8 +496,10 @@ class DeploymentValidator {
   private async checkIntegration(): Promise<boolean> {
     try {
       // Test Fire22 integration - use agent management API as integration test
-      const response = await fetch('https://dashboard-worker.nolarose1968-806.workers.dev/api/agents/test');
-      
+      const response = await fetch(
+        'https://dashboard-worker.nolarose1968-806.workers.dev/api/agents/test'
+      );
+
       if (!response.ok) {
         throw new Error('Fire22 integration test failed');
       }
@@ -509,9 +523,9 @@ class DeploymentValidator {
         'docs/environment-variables.html',
         'docs/packages.html',
         'docs/@packages.html',
-        'docs/api-packages.html'
+        'docs/api-packages.html',
       ];
-      
+
       const missingDocs: string[] = [];
       for (const doc of requiredDocs) {
         if (!(await Bun.file(doc).exists())) {
@@ -526,10 +540,10 @@ class DeploymentValidator {
       // Check package.json documentation scripts
       const packageJson = await Bun.file('package.json').text();
       const pkg = JSON.parse(packageJson);
-      
+
       const docScripts = ['env:docs', 'pkg:docs', 'api:docs'];
       const missingScripts: string[] = [];
-      
+
       for (const script of docScripts) {
         if (!pkg.scripts[script]) {
           missingScripts.push(script);
@@ -540,8 +554,12 @@ class DeploymentValidator {
         console.log(`   ⚠️  Missing documentation scripts: ${missingScripts.join(', ')}`);
       }
 
-      console.log(`   ✅ Documentation files: ${requiredDocs.length - missingDocs.length}/${requiredDocs.length} present`);
-      console.log(`   ✅ Documentation scripts: ${docScripts.length - missingScripts.length}/${docScripts.length} present`);
+      console.log(
+        `   ✅ Documentation files: ${requiredDocs.length - missingDocs.length}/${requiredDocs.length} present`
+      );
+      console.log(
+        `   ✅ Documentation scripts: ${docScripts.length - missingScripts.length}/${docScripts.length} present`
+      );
 
       return true;
     } catch (error) {
@@ -571,16 +589,20 @@ class DeploymentValidator {
     // Show failed validations
     if (failed > 0) {
       console.log('\n❌ FAILED VALIDATIONS:');
-      this.results.filter(r => r.status === 'FAIL').forEach(result => {
-        const criticalFlag = result.critical ? ' [CRITICAL]' : '';
-        console.log(`   - ${result.step}${criticalFlag}: ${result.details}`);
-      });
+      this.results
+        .filter(r => r.status === 'FAIL')
+        .forEach(result => {
+          const criticalFlag = result.critical ? ' [CRITICAL]' : '';
+          console.log(`   - ${result.step}${criticalFlag}: ${result.details}`);
+        });
     }
 
     // Deployment recommendation
     if (criticalFailed === 0 && failed === 0) {
       console.log('\n🎉 DEPLOYMENT APPROVED!');
-      console.log('All validations passed. Your dashboard worker is ready for production deployment.');
+      console.log(
+        'All validations passed. Your dashboard worker is ready for production deployment.'
+      );
       console.log('\n🚀 Next Steps:');
       console.log('   1. Run: wrangler deploy');
       console.log('   2. Verify deployment: bun run test:quick');
@@ -592,17 +614,21 @@ class DeploymentValidator {
       console.log('Critical validations passed, but some non-critical issues exist.');
       console.log('Consider fixing non-critical issues before deployment.');
       console.log('\n🔧 Recommended fixes:');
-      this.results.filter(r => r.status === 'FAIL' && !r.critical).forEach(result => {
-        console.log(`   - ${result.step}: ${result.details}`);
-      });
+      this.results
+        .filter(r => r.status === 'FAIL' && !r.critical)
+        .forEach(result => {
+          console.log(`   - ${result.step}: ${result.details}`);
+        });
     } else {
       console.log('\n🚫 DEPLOYMENT BLOCKED');
       console.log('Critical validation failures detected. Deployment is not allowed.');
       console.log('Fix all critical issues before attempting deployment again.');
       console.log('\n🚨 Critical issues to fix:');
-      this.results.filter(r => r.status === 'FAIL' && r.critical).forEach(result => {
-        console.log(`   - ${result.step}: ${result.details}`);
-      });
+      this.results
+        .filter(r => r.status === 'FAIL' && r.critical)
+        .forEach(result => {
+          console.log(`   - ${result.step}: ${result.details}`);
+        });
     }
 
     // Performance summary
@@ -622,14 +648,16 @@ class DeploymentValidator {
 // Main execution
 async function main() {
   const validator = new DeploymentValidator();
-  
+
   try {
     await validator.runValidation();
-    
+
     // Exit with appropriate code for CI/CD systems
-    const hasCriticalFailures = validator.exportResults().some(r => r.status === 'FAIL' && r.critical);
+    const hasCriticalFailures = validator
+      .exportResults()
+      .some(r => r.status === 'FAIL' && r.critical);
     const hasFailures = validator.exportResults().some(r => r.status === 'FAIL');
-    
+
     if (hasCriticalFailures) {
       process.exit(2); // Critical failures - block deployment
     } else if (hasFailures) {

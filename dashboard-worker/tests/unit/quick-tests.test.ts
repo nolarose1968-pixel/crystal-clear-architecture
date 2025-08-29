@@ -3,7 +3,7 @@
 /**
  * ⚡ Quick Test Script for Critical Endpoints
  * Fast validation of essential functionality
- * 
+ *
  * ✅ FULLY ALIGNED with production health monitoring system
  * 🏥 Critical health checks match monitor-health.bun.ts priorities
  * 🎯 Covers essential endpoints: permissions, matrix, system health, dashboard
@@ -13,22 +13,22 @@ const BASE_URL = 'https://dashboard-worker.brendawill2233.workers.dev';
 
 async function quickTest() {
   console.log('⚡ Quick Test - Critical Endpoints\n');
-  
+
   const tests = [
     {
       name: 'Worker Accessibility',
       endpoint: '/api/test-deployment',
-      expected: 'message'
+      expected: 'message',
     },
     {
       name: 'Live Metrics',
       endpoint: '/api/live-metrics',
-      expected: 'success'
+      expected: 'success',
     },
     {
       name: 'Customers Endpoint',
       endpoint: '/api/customers',
-      expected: 'success'
+      expected: 'success',
     },
     {
       name: 'Fire22 API Integration',
@@ -39,62 +39,78 @@ async function quickTest() {
         const hasFire22Response = data.fire22Response !== undefined;
         const hasValidMessage = data.message && data.message.includes('Fire22 API');
         const hasSuccessStatus = data.success === true;
-        
+
         // Additional Fire22-specific checks
         const hasValidResponseStructure = data.fire22Response !== undefined; // Allow any value, just check existence
-        const hasWorkingStatus = data.message && (
-          data.message.includes('working') || 
-          data.message.includes('success') || 
-          data.message.includes('operational') ||
-          data.message.includes('fallback') // Allow fallback messages as valid
-        );
-        
+        const hasWorkingStatus =
+          data.message &&
+          (data.message.includes('working') ||
+            data.message.includes('success') ||
+            data.message.includes('operational') ||
+            data.message.includes('fallback')); // Allow fallback messages as valid
+
         // Enhanced Fire22 insights
         if (data.message && data.message.includes('fallback')) {
           console.log(`  🔄 Fire22 Status: Using D1 fallback (API may be temporarily unavailable)`);
         } else if (data.message && data.message.includes('working')) {
           console.log(`  ✅ Fire22 Status: API operational and responding`);
         }
-        
+
         // Log detailed validation info for debugging
-        if (!hasFire22Response || !hasValidMessage || !hasSuccessStatus || !hasValidResponseStructure || !hasWorkingStatus) {
+        if (
+          !hasFire22Response ||
+          !hasValidMessage ||
+          !hasSuccessStatus ||
+          !hasValidResponseStructure ||
+          !hasWorkingStatus
+        ) {
           console.log(`  🔍 Fire22 Validation Details:`);
-          console.log(`     - fire22Response: ${hasFire22Response ? '✅' : '❌'} (${data.fire22Response !== undefined ? 'Present' : 'Missing'})`);
-          console.log(`     - message: ${hasValidMessage ? '✅' : '❌'} (${data.message || 'Missing'})`);
+          console.log(
+            `     - fire22Response: ${hasFire22Response ? '✅' : '❌'} (${data.fire22Response !== undefined ? 'Present' : 'Missing'})`
+          );
+          console.log(
+            `     - message: ${hasValidMessage ? '✅' : '❌'} (${data.message || 'Missing'})`
+          );
           console.log(`     - success: ${hasSuccessStatus ? '✅' : '❌'} (${data.success})`);
           console.log(`     - response structure: ${hasValidResponseStructure ? '✅' : '❌'}`);
           console.log(`     - working status: ${hasWorkingStatus ? '✅' : '❌'}`);
         }
-        
-        return hasFire22Response && hasValidMessage && hasSuccessStatus && hasValidResponseStructure && hasWorkingStatus;
-      }
+
+        return (
+          hasFire22Response &&
+          hasValidMessage &&
+          hasSuccessStatus &&
+          hasValidResponseStructure &&
+          hasWorkingStatus
+        );
+      },
     },
     {
       name: 'Agent Hierarchy',
       endpoint: '/api/agents/hierarchy',
-      expected: 'success'
+      expected: 'success',
     },
     // 🆕 NEW: Critical Health Checks
     {
       name: 'Permissions Health',
       endpoint: '/api/health/permissions',
-      expected: 'success'
+      expected: 'success',
     },
     {
       name: 'Permissions Matrix Health',
       endpoint: '/api/health/permissions-matrix',
-      expected: 'success'
+      expected: 'success',
     },
     {
       name: 'System Health',
       endpoint: '/api/health/system',
-      expected: 'success'
+      expected: 'success',
     },
     {
       name: 'Dashboard Access',
       endpoint: '/dashboard',
-      expected: 'html' // Special case for HTML response
-    }
+      expected: 'html', // Special case for HTML response
+    },
   ];
 
   let passed = 0;
@@ -105,14 +121,14 @@ async function quickTest() {
       const start = Date.now();
       const response = await fetch(`${BASE_URL}${test.endpoint}`);
       const duration = Date.now() - start;
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
 
       let data;
       let isValid = false;
-      
+
       if (test.expected === 'html') {
         // Special case for HTML responses
         const text = await response.text();
@@ -123,12 +139,12 @@ async function quickTest() {
         data = await response.json();
         isValid = data[test.expected];
       }
-      
+
       // Apply custom validation if available
       if (test.validate && typeof test.validate === 'function') {
         isValid = test.validate(data);
       }
-      
+
       if (isValid) {
         // Enhanced feedback for health endpoints
         if (test.name.includes('Health')) {
@@ -137,15 +153,19 @@ async function quickTest() {
             const score = data.health_score || 'N/A';
             const totalAgents = data.total_agents || 'N/A';
             const agentsWithErrors = data.agents_with_errors || 'N/A';
-            console.log(`✅ ${test.name} - ${status} (Score: ${score}%, Agents: ${totalAgents}, Errors: ${agentsWithErrors}) - ${duration}ms`);
+            console.log(
+              `✅ ${test.name} - ${status} (Score: ${score}%, Agents: ${totalAgents}, Errors: ${agentsWithErrors}) - ${duration}ms`
+            );
           } else if (test.name === 'Permissions Matrix Health') {
             const status = data.status || 'UNKNOWN';
             const score = data.matrix_health_score || 'N/A';
             const dataCompleteness = data.matrix_stats?.data_completeness || 'N/A';
             const permissionCoverage = data.matrix_stats?.permission_coverage || 'N/A';
             const agentQuality = data.matrix_stats?.agent_data_quality || 'N/A';
-            console.log(`✅ ${test.name} - ${status} (Score: ${score}%, Data: ${dataCompleteness}%, Coverage: ${permissionCoverage}%, Quality: ${agentQuality}%) - ${duration}ms`);
-            
+            console.log(
+              `✅ ${test.name} - ${status} (Score: ${score}%, Data: ${dataCompleteness}%, Coverage: ${permissionCoverage}%, Quality: ${agentQuality}%) - ${duration}ms`
+            );
+
             // Show matrix insights if available
             if (data.matrix_issues && data.matrix_issues.length > 0) {
               console.log(`  ⚠️  Matrix Issues: ${data.matrix_issues.length} detected`);
@@ -155,7 +175,9 @@ async function quickTest() {
             const score = data.system_health_score || 'N/A';
             const healthyComponents = data.summary?.healthy || 'N/A';
             const totalComponents = data.summary?.total || 'N/A';
-            console.log(`✅ ${test.name} - ${status} (Score: ${score}%, Components: ${healthyComponents}/${totalComponents}) - ${duration}ms`);
+            console.log(
+              `✅ ${test.name} - ${status} (Score: ${score}%, Components: ${healthyComponents}/${totalComponents}) - ${duration}ms`
+            );
           } else {
             console.log(`✅ ${test.name} - ${duration}ms`);
           }
@@ -174,7 +196,7 @@ async function quickTest() {
   }
 
   console.log(`\n📊 Quick Test Results: ${passed}/${passed + failed} passed`);
-  
+
   if (failed === 0) {
     console.log('🎉 All critical endpoints working!');
     console.log('💡 System is ready for deployment.');
@@ -182,13 +204,11 @@ async function quickTest() {
     console.log('⚠️  Some critical endpoints failed. Run full test suite for details.');
     console.log('🔍 Run: bun run test:checklist');
   }
-  
+
   // Health check summary
   const healthTests = tests.filter(t => t.name.includes('Health'));
-  const healthPassed = healthTests.filter(t => 
-    tests.indexOf(t) < tests.length - failed
-  ).length;
-  
+  const healthPassed = healthTests.filter(t => tests.indexOf(t) < tests.length - failed).length;
+
   if (healthTests.length > 0) {
     console.log(`\n🏥 Health Check Summary: ${healthPassed}/${healthTests.length} healthy`);
     if (healthPassed === healthTests.length) {

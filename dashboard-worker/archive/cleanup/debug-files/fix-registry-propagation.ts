@@ -20,7 +20,7 @@ class RegistryPropagationFixer {
   private readonly configFiles = {
     npmrc: '.npmrc',
     bunfig: 'bunfig.toml',
-    packageJson: 'package.json'
+    packageJson: 'package.json',
   };
 
   async fixRegistryPropagation(): Promise<void> {
@@ -38,7 +38,7 @@ class RegistryPropagationFixer {
 
   private async analyzeCurrentConfig(): Promise<void> {
     console.log('\n📊 Current Configuration Analysis:');
-    
+
     // Check .npmrc
     if (existsSync(this.configFiles.npmrc)) {
       const npmrc = readFileSync(this.configFiles.npmrc, 'utf-8');
@@ -49,7 +49,7 @@ class RegistryPropagationFixer {
     // Check bunfig.toml
     if (existsSync(this.configFiles.bunfig)) {
       const bunfig = readFileSync(this.configFiles.bunfig, 'utf-8');
-      const hasCorrectScopes = this.scopes.every(scope => 
+      const hasCorrectScopes = this.scopes.every(scope =>
         bunfig.includes(`"${scope}" = "${this.targetRegistry}"`)
       );
       console.log(`  bunfig.toml: ${hasCorrectScopes ? '✅ Correct scopes' : '⚠️  Scope issues'}`);
@@ -65,7 +65,7 @@ class RegistryPropagationFixer {
 
   private async fixNpmrcConfig(): Promise<void> {
     console.log('\n🔧 Fixing .npmrc configuration...');
-    
+
     const npmrcContent = `# NPM Configuration for Fire22 Dashboard Worker
 # Managed by fix-registry-propagation.ts
 
@@ -101,7 +101,7 @@ ${this.scopes.map(scope => `${scope}:registry=${this.targetRegistry}`).join('\n'
 
   private async fixBunfigConfig(): Promise<void> {
     console.log('\n🔧 Fixing bunfig.toml configuration...');
-    
+
     const bunfigContent = `# Fire22 Dashboard - Enhanced Bun Configuration
 # Production-ready configuration with fixed registry propagation
 
@@ -175,28 +175,30 @@ plugins = []
 
   private async fixPackageJsonOverrides(): Promise<void> {
     console.log('\n🔧 Fixing package.json overrides...');
-    
+
     if (!existsSync(this.configFiles.packageJson)) {
       console.log('  ⚠️  package.json not found');
       return;
     }
 
     const pkg = JSON.parse(readFileSync(this.configFiles.packageJson, 'utf-8'));
-    
+
     // Remove problematic overrides that might cause registry conflicts
     if (pkg.overrides) {
       const originalOverrides = { ...pkg.overrides };
-      
+
       // Remove overrides that could interfere with registry resolution
       delete pkg.overrides['@types/node'];
       delete pkg.overrides['@types/bun'];
-      
+
       // Clean empty overrides
       if (Object.keys(pkg.overrides).length === 0) {
         delete pkg.overrides;
       }
-      
-      console.log(`  📦 Removed ${Object.keys(originalOverrides).length - (pkg.overrides ? Object.keys(pkg.overrides).length : 0)} problematic overrides`);
+
+      console.log(
+        `  📦 Removed ${Object.keys(originalOverrides).length - (pkg.overrides ? Object.keys(pkg.overrides).length : 0)} problematic overrides`
+      );
     }
 
     // Ensure publishConfig is correct
@@ -210,16 +212,16 @@ plugins = []
 
   private async validateConfiguration(): Promise<void> {
     console.log('\n✅ Configuration Validation:');
-    
+
     // Test registry resolution
     console.log('  🔍 Testing registry resolution...');
-    
+
     try {
       // Check if Fire22 registry is accessible
       const response = await fetch(this.targetRegistry);
       const isAccessible = response.ok;
       console.log(`  🌐 Fire22 registry: ${isAccessible ? '✅ Accessible' : '❌ Not accessible'}`);
-      
+
       if (isAccessible) {
         const data = await response.json();
         console.log(`  📊 Registry status: ${data.status || 'unknown'}`);
@@ -231,14 +233,14 @@ plugins = []
     // Verify configuration files
     const npmrc = readFileSync(this.configFiles.npmrc, 'utf-8');
     const bunfig = readFileSync(this.configFiles.bunfig, 'utf-8');
-    
-    const npmrcValid = this.scopes.every(scope => 
+
+    const npmrcValid = this.scopes.every(scope =>
       npmrc.includes(`${scope}:registry=${this.targetRegistry}`)
     );
-    const bunfigValid = this.scopes.every(scope => 
+    const bunfigValid = this.scopes.every(scope =>
       bunfig.includes(`"${scope}" = "${this.targetRegistry}"`)
     );
-    
+
     console.log(`  📄 .npmrc validity: ${npmrcValid ? '✅ Valid' : '❌ Invalid'}`);
     console.log(`  📄 bunfig.toml validity: ${bunfigValid ? '✅ Valid' : '❌ Invalid'}`);
   }

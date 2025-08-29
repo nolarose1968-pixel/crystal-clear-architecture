@@ -7,7 +7,7 @@ import type {
   BalanceChangeEvent,
   BalanceChangeCreate,
   TransactionType,
-  BalanceChangeReason
+  BalanceChangeReason,
 } from '../../../core/types/finance';
 
 export class BalanceAuditTrail {
@@ -47,12 +47,12 @@ export class BalanceAuditTrail {
         ipAddress: metadata?.ipAddress,
         userAgent: metadata?.userAgent,
         sessionId: metadata?.sessionId,
-        deviceId: metadata?.deviceId
+        deviceId: metadata?.deviceId,
       },
       riskScore: this.calculateRiskScore(changeAmount, changeType, previousBalance),
       createdAt: new Date(),
       updatedAt: new Date(),
-      isActive: true
+      isActive: true,
     };
 
     // Store event
@@ -66,7 +66,9 @@ export class BalanceAuditTrail {
     // Cleanup old events
     this.cleanupOldEvents(customerId);
 
-    console.log(`💰 Balance change recorded: ${customerId} | ${changeType} | $${changeAmount} | ${reason}`);
+    console.log(
+      `💰 Balance change recorded: ${customerId} | ${changeType} | $${changeAmount} | ${reason}`
+    );
 
     return event;
   }
@@ -160,7 +162,10 @@ export class BalanceAuditTrail {
   /**
    * Get events for a specific date
    */
-  getDailyEvents(date: string, options?: { limit?: number; offset?: number }): BalanceChangeEvent[] {
+  getDailyEvents(
+    date: string,
+    options?: { limit?: number; offset?: number }
+  ): BalanceChangeEvent[] {
     const eventIds = this.dailyEvents.get(date) || [];
     let events = eventIds
       .map(id => this.events.get(id))
@@ -177,17 +182,20 @@ export class BalanceAuditTrail {
   /**
    * Search events by criteria
    */
-  searchEvents(criteria: {
-    customerId?: string;
-    agentId?: string;
-    changeType?: TransactionType;
-    reason?: BalanceChangeReason;
-    minAmount?: number;
-    maxAmount?: number;
-    startDate?: Date;
-    endDate?: Date;
-    performedBy?: string;
-  }, options?: { limit?: number; offset?: number }): BalanceChangeEvent[] {
+  searchEvents(
+    criteria: {
+      customerId?: string;
+      agentId?: string;
+      changeType?: TransactionType;
+      reason?: BalanceChangeReason;
+      minAmount?: number;
+      maxAmount?: number;
+      startDate?: Date;
+      endDate?: Date;
+      performedBy?: string;
+    },
+    options?: { limit?: number; offset?: number }
+  ): BalanceChangeEvent[] {
     let allEvents = Array.from(this.events.values());
 
     // Apply filters
@@ -294,19 +302,15 @@ export class BalanceAuditTrail {
       dailyStats: Array.from(dailyStats.entries()).map(([date, stats]) => ({
         date,
         count: stats.count,
-        volume: stats.volume
-      }))
+        volume: stats.volume,
+      })),
     };
   }
 
   /**
    * Export audit data
    */
-  exportAuditData(
-    startDate: Date,
-    endDate: Date,
-    format: 'json' | 'csv' = 'json'
-  ): string {
+  exportAuditData(startDate: Date, endDate: Date, format: 'json' | 'csv' = 'json'): string {
     const events = Array.from(this.events.values())
       .filter(e => {
         const eventDate = new Date(e.timestamp);
@@ -316,8 +320,17 @@ export class BalanceAuditTrail {
 
     if (format === 'csv') {
       const headers = [
-        'ID', 'Customer ID', 'Agent ID', 'Timestamp', 'Type', 'Previous Balance',
-        'Change Amount', 'New Balance', 'Reason', 'Performed By', 'Risk Score'
+        'ID',
+        'Customer ID',
+        'Agent ID',
+        'Timestamp',
+        'Type',
+        'Previous Balance',
+        'Change Amount',
+        'New Balance',
+        'Reason',
+        'Performed By',
+        'Risk Score',
       ];
 
       const rows = events.map(e => [
@@ -331,7 +344,7 @@ export class BalanceAuditTrail {
         e.newBalance.toFixed(2),
         e.reason,
         e.performedBy,
-        e.riskScore?.toString() || ''
+        e.riskScore?.toString() || '',
       ]);
 
       return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
@@ -378,7 +391,11 @@ export class BalanceAuditTrail {
     return `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  private calculateRiskScore(changeAmount: number, changeType: TransactionType, previousBalance: number): number {
+  private calculateRiskScore(
+    changeAmount: number,
+    changeType: TransactionType,
+    previousBalance: number
+  ): number {
     let riskScore = 0;
 
     // Amount-based risk

@@ -36,14 +36,14 @@ export function formatTimestamp(
         month: 'short',
         day: 'numeric',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
       });
 
     case 'short':
       return date.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
-        year: '2-digit'
+        year: '2-digit',
       });
 
     case 'long':
@@ -51,14 +51,14 @@ export function formatTimestamp(
         weekday: 'long',
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
       });
 
     case 'time-only':
       return date.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit'
+        second: '2-digit',
       });
 
     case 'unix':
@@ -79,19 +79,16 @@ export function formatTimestamp(
 /**
  * Format date object to human readable string
  */
-export function formatDate(
-  date: Date,
-  options?: Intl.DateTimeFormatOptions
-): string {
+export function formatDate(date: Date, options?: Intl.DateTimeFormatOptions): string {
   const defaultOptions: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
   };
 
   return date.toLocaleDateString('en-US', {
     ...defaultOptions,
-    ...options
+    ...options,
   });
 }
 
@@ -190,7 +187,7 @@ export function parseDate(dateString: string): Date {
     // DD/MM/YYYY
     /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/,
     // YYYY-MM-DD
-    /^(\d{4})-(\d{1,2})-(\d{1,2})$/
+    /^(\d{4})-(\d{1,2})-(\d{1,2})$/,
   ];
 
   for (const format of formats) {

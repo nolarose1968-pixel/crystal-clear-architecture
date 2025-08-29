@@ -10,7 +10,7 @@ const USERNAME = 'billy666';
 const PASSWORD = 'backdoor69';
 
 console.log('🔥 Fire22 Direct API Test');
-console.log('=========================');
+console.log('!==!==!==!=====');
 console.log(`Base URL: ${FIRE22_BASE}`);
 console.log(`Username: ${USERNAME}`);
 console.log('');
@@ -18,26 +18,26 @@ console.log('');
 async function testEndpoint(name: string, url: string, options: RequestInit = {}) {
   console.log(`\n📡 Testing: ${name}`);
   console.log(`URL: ${url}`);
-  
+
   try {
     const response = await fetch(url, {
       ...options,
-      redirect: 'manual' // Don't follow redirects automatically
+      redirect: 'manual', // Don't follow redirects automatically
     });
-    
+
     console.log(`Status: ${response.status} ${response.statusText}`);
     console.log(`Location: ${response.headers.get('location') || 'none'}`);
     console.log(`Content-Type: ${response.headers.get('content-type') || 'none'}`);
-    
+
     const text = await response.text();
     console.log(`Response Length: ${text.length} bytes`);
-    
+
     if (text.length < 1000) {
       console.log(`Response: ${text}`);
     } else {
       console.log(`Response (first 500 chars): ${text.slice(0, 500)}`);
     }
-    
+
     return response;
   } catch (error) {
     console.error(`Error: ${error}`);
@@ -64,8 +64,8 @@ async function main() {
     body: new URLSearchParams({
       username: USERNAME,
       password: PASSWORD,
-      submit: 'Login'
-    })
+      submit: 'Login',
+    }),
   });
 
   // Test 5: Try Manager API with form data
@@ -78,8 +78,8 @@ async function main() {
       username: USERNAME,
       password: PASSWORD,
       agentID: USERNAME,
-      action: 'getCustomerList'
-    })
+      action: 'getCustomerList',
+    }),
   });
 
   // Test 6: Try Customer API
@@ -91,8 +91,8 @@ async function main() {
     body: new URLSearchParams({
       username: USERNAME,
       password: PASSWORD,
-      customerID: USERNAME
-    })
+      customerID: USERNAME,
+    }),
   });
 
   // Test 7: Check if there's a different auth endpoint
@@ -103,8 +103,8 @@ async function main() {
     },
     body: JSON.stringify({
       username: USERNAME,
-      password: PASSWORD
-    })
+      password: PASSWORD,
+    }),
   });
 
   // Test 8: Try the qubic path mentioned in worker
@@ -116,14 +116,16 @@ async function main() {
     body: new URLSearchParams({
       username: USERNAME,
       password: PASSWORD,
-      agentID: USERNAME
-    })
+      agentID: USERNAME,
+    }),
   });
 }
 
-main().then(() => {
-  console.log('\n✅ Test complete');
-}).catch((error) => {
-  console.error('\n❌ Test failed:', error);
-  process.exit(1);
-});
+main()
+  .then(() => {
+    console.log('\n✅ Test complete');
+  })
+  .catch(error => {
+    console.error('\n❌ Test failed:', error);
+    process.exit(1);
+  });

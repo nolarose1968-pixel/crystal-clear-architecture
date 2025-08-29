@@ -1,17 +1,18 @@
 # 📚 Fire22 Dashboard Worker - Repository Index
 
-Welcome to the Fire22 Dashboard Worker repository! This comprehensive index will help you navigate the codebase and find what you're looking for quickly.
+Welcome to the Fire22 Dashboard Worker repository! This comprehensive index will
+help you navigate the codebase and find what you're looking for quickly.
 
 ## 🚀 Quick Navigation
 
-| Section | Description | Link |
-|---------|-------------|------|
-| **Getting Started** | Installation and setup | [README.md](README.md) |
-| **Contributing** | How to contribute | [CONTRIBUTING.md](CONTRIBUTING.md) |
-| **License** | Legal information | [LICENSE](LICENSE) |
-| **Wiki** | Detailed documentation | [Wiki](wiki/) |
-| **Security** | Security guidelines | [Security Docs](#security-documentation) |
-| **API Reference** | API documentation | [API Docs](#api-documentation) |
+| Section             | Description            | Link                                     |
+| ------------------- | ---------------------- | ---------------------------------------- |
+| **Getting Started** | Installation and setup | [README.md](README.md)                   |
+| **Contributing**    | How to contribute      | [CONTRIBUTING.md](CONTRIBUTING.md)       |
+| **License**         | Legal information      | [LICENSE](LICENSE)                       |
+| **Wiki**            | Detailed documentation | [Wiki](wiki/)                            |
+| **Security**        | Security guidelines    | [Security Docs](#security-documentation) |
+| **API Reference**   | API documentation      | [API Docs](#api-documentation)           |
 
 ## 📁 Directory Structure
 
@@ -104,67 +105,97 @@ fire22-dashboard-worker/
 ## 🎯 Key Components
 
 ### Core Dashboard System
+
 - **Main Entry**: [`src/index.ts`](src/index.ts) - Application entry point
 - **Worker**: [`src/worker.ts`](src/worker.ts) - Cloudflare Worker handler
 - **Dashboard UI**: [`src/dashboard.html`](src/dashboard.html) - Main interface
 - **Configuration**: [`src/config.ts`](src/config.ts) - App configuration
 
 ### Pattern Weaver System
+
 - **Pattern Index**: [`src/patterns/index.ts`](src/patterns/index.ts)
-- **Pattern Weaver**: [`src/patterns/pattern-weaver.ts`](src/patterns/pattern-weaver.ts)
-- **Pattern Connector**: [`src/patterns/pattern-connector.ts`](src/patterns/pattern-connector.ts)
+- **Pattern Weaver**:
+  [`src/patterns/pattern-weaver.ts`](src/patterns/pattern-weaver.ts)
+- **Pattern Connector**:
+  [`src/patterns/pattern-connector.ts`](src/patterns/pattern-connector.ts)
 
 ### API Integration
+
 - **Fire22 API**: [`src/fire22-api.ts`](src/fire22-api.ts)
 - **P2P Queue**: [`src/p2p-queue-api.ts`](src/p2p-queue-api.ts)
 - **Telegram Bot**: [`src/telegram-bot.ts`](src/telegram-bot.ts)
 
 ### Business Logic
-- **Sports Betting**: [`src/sports-betting-management.ts`](src/sports-betting-management.ts)
-- **Live Casino**: [`src/live-casino-management.ts`](src/live-casino-management.ts)
-- **Business Management**: [`src/business-management.ts`](src/business-management.ts)
+
+- **Sports Betting**:
+  [`src/sports-betting-management.ts`](src/sports-betting-management.ts)
+- **Live Casino**:
+  [`src/live-casino-management.ts`](src/live-casino-management.ts)
+- **Business Management**:
+  [`src/business-management.ts`](src/business-management.ts)
 
 ## 📖 Documentation Index
 
 ### Getting Started
+
 - [**README.md**](README.md) - Project overview and quick start
-- [**Getting Started Guide**](wiki/Getting-Started.md) - Detailed setup instructions
-- [**Installation Guide**](docs/DEPENDENCIES-AND-ENVIRONMENT.md) - Environment setup
+- [**Getting Started Guide**](wiki/Getting-Started.md) - Detailed setup
+  instructions
+- [**Installation Guide**](docs/DEPENDENCIES-AND-ENVIRONMENT.md) - Environment
+  setup
 
 ### Development
+
 - [**Contributing Guidelines**](CONTRIBUTING.md) - How to contribute
-- [**Repository Standards**](REPOSITORY_STANDARDS.md) - Coding standards and conventions
+- [**Repository Standards**](REPOSITORY_STANDARDS.md) - Coding standards and
+  conventions
 - [**Commit Conventions**](COMMIT_CONVENTIONS.md) - Git commit guidelines
 - [**Development Workflow**](wiki/Getting-Started.md) - Development processes
 
 ### Architecture & Design
+
 - [**System Architecture**](docs/system-architecture.md) - High-level design
-- [**Workspace Architecture**](docs/workspace-architecture-visuals.md) - Multi-workspace design
+- [**Workspace Architecture**](docs/workspace-architecture-visuals.md) -
+  Multi-workspace design
 - [**Build System**](docs/BUILD-SYSTEM.md) - Build configuration
-- [**Pattern System**](wiki/Home.md#pattern-weaver-system) - Pattern weaver documentation
+- [**Pattern System**](wiki/Home.md#pattern-weaver-system) - Pattern weaver
+  documentation
 
 ### API Documentation
-- [**API Integration Guide**](FIRE22-INTEGRATION-GUIDE.md) - Fire22 API integration
+
+- [**API Integration Guide**](FIRE22-INTEGRATION-GUIDE.md) - Fire22 API
+  integration
 - [**Endpoint Matrix**](ENDPOINT-MATRIX.md) - API endpoint reference
 - [**Endpoint Quick Reference**](ENDPOINT-QUICK-REFERENCE.md) - Quick API guide
 
 ### Security Documentation
-- [**Security Documentation**](SECURITY-DOCUMENTATION.md) - Comprehensive security guide
-- [**Security Integration Guide**](SECURITY-INTEGRATION-GUIDE.md) - Security implementation
+
+- [**Security Documentation**](SECURITY-DOCUMENTATION.md) - Comprehensive
+  security guide
+- [**Security Integration Guide**](SECURITY-INTEGRATION-GUIDE.md) - Security
+  implementation
 - [**API Security Guide**](API-SECURITY-GUIDE.md) - API security practices
 
 ### Feature-Specific Guides
-- [**Sports Betting Enhancement**](SPORTS-BETTING-ENHANCEMENT.md) - Sports betting features
-- [**Live Casino Enhancement**](LIVE-CASINO-ENHANCEMENT.md) - Live casino features
-- [**Telegram Integration**](TELEGRAM-INTEGRATION-ENHANCEMENT.md) - Bot integration
-- [**P2P Queue System**](P2P-QUEUE-SYSTEM-README.md) - Queue system implementation
+
+- [**Sports Betting Enhancement**](SPORTS-BETTING-ENHANCEMENT.md) - Sports
+  betting features
+- [**Live Casino Enhancement**](LIVE-CASINO-ENHANCEMENT.md) - Live casino
+  features
+- [**Telegram Integration**](TELEGRAM-INTEGRATION-ENHANCEMENT.md) - Bot
+  integration
+- [**P2P Queue System**](P2P-QUEUE-SYSTEM-README.md) - Queue system
+  implementation
 
 ### Testing & Quality
+
 - [**Testing Guide**](TESTING-GUIDE.md) - Testing strategies
 - [**Testing Summary**](TESTING-SUMMARY.md) - Testing overview
-- [**Performance Monitoring**](DASHBOARD-HEALTH-MONITORING.md) - Health monitoring
+- [**Performance Monitoring**](DASHBOARD-HEALTH-MONITORING.md) - Health
+  monitoring
 
 ### Operations & Deployment
+
 - [**Environment Setup**](ENVIRONMENT-SETUP.md) - Environment configuration
 - [**Monitoring Workflow**](MONITORING-WORKFLOW.md) - Monitoring setup
 - [**Registry Configuration**](REGISTRY.md) - Package registry setup
@@ -172,12 +203,16 @@ fire22-dashboard-worker/
 ## 🔍 Search & Discovery
 
 ### Find by Technology
+
 - **Bun Features**: [`BUN-FEATURES-ENHANCEMENT.md`](BUN-FEATURES-ENHANCEMENT.md)
-- **Cloudflare Workers**: [`wrangler.toml`](wrangler.toml), [`src/worker.ts`](src/worker.ts)
-- **TypeScript**: [`tsconfig.json`](tsconfig.json), [`src/types.ts`](src/types.ts)
+- **Cloudflare Workers**: [`wrangler.toml`](wrangler.toml),
+  [`src/worker.ts`](src/worker.ts)
+- **TypeScript**: [`tsconfig.json`](tsconfig.json),
+  [`src/types.ts`](src/types.ts)
 - **Database**: [`*.sql`](schema.sql), [`src/fire22-api.ts`](src/fire22-api.ts)
 
 ### Find by Feature
+
 - **Authentication**: [`src/fire22-api.ts`](src/fire22-api.ts)
 - **Real-time Updates**: [`src/index.ts`](src/index.ts) (Server-Sent Events)
 - **Telegram Integration**: [`src/telegram-bot.ts`](src/telegram-bot.ts)
@@ -185,10 +220,13 @@ fire22-dashboard-worker/
 - **Queue Management**: [`src/queue-system.ts`](src/queue-system.ts)
 
 ### Find by Role
+
 - **Developers**: [`src/`](src/), [`scripts/`](scripts/), [`test/`](test/)
-- **DevOps**: [`wrangler.toml`](wrangler.toml), [`.github/workflows/`](.github/workflows/)
+- **DevOps**: [`wrangler.toml`](wrangler.toml),
+  [`.github/workflows/`](.github/workflows/)
 - **QA**: [`test/`](test/), [`TESTING-GUIDE.md`](TESTING-GUIDE.md)
-- **Security**: [`packages/security-*/`](packages/), [`SECURITY-*.md`](SECURITY-DOCUMENTATION.md)
+- **Security**: [`packages/security-*/`](packages/),
+  [`SECURITY-*.md`](SECURITY-DOCUMENTATION.md)
 - **Documentation**: [`docs/`](docs/), [`wiki/`](wiki/), [`*.md`](README.md)
 
 ## 🛠️ Development Tools
@@ -214,12 +252,14 @@ bun run security:audit             # Security audit
 ```
 
 ### Build Profiles
+
 - **Quick**: `bun run build:quick` - Fast development builds
 - **Standard**: `bun run build:standard` - Standard builds
 - **Production**: `bun run build:production` - Optimized production
 - **Executable**: `bun run build:executable` - Standalone executables
 
 ### Workspace Commands
+
 - **Status**: Check workspace health and configuration
 - **Split**: Split monorepo into independent workspaces
 - **Reunify**: Merge workspaces back into monorepo
@@ -228,14 +268,17 @@ bun run security:audit             # Security audit
 ## 🏷️ Tags & Labels
 
 ### GitHub Labels
-- **Priority**: `priority-critical`, `priority-high`, `priority-medium`, `priority-low`
+
+- **Priority**: `priority-critical`, `priority-high`, `priority-medium`,
+  `priority-low`
 - **Type**: `bug`, `enhancement`, `documentation`, `security`, `performance`
 - **Component**: `workspace-*`, `component-*`
 - **Status**: `needs-triage`, `ready-for-review`, `work-in-progress`
 
 ### Commit Types
+
 - **feat**: New features
-- **fix**: Bug fixes  
+- **fix**: Bug fixes
 - **docs**: Documentation
 - **style**: Code formatting
 - **refactor**: Code refactoring
@@ -246,17 +289,22 @@ bun run security:audit             # Security audit
 ## 🔗 External Links
 
 ### Project Links
+
 - **Repository**: https://github.com/brendadeeznuts1111/fire22-dashboard-worker
-- **Issues**: https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues
+- **Issues**:
+  https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues
 - **Wiki**: https://github.com/brendadeeznuts1111/fire22-dashboard-worker/wiki
-- **Releases**: https://github.com/brendadeeznuts1111/fire22-dashboard-worker/releases
+- **Releases**:
+  https://github.com/brendadeeznuts1111/fire22-dashboard-worker/releases
 
 ### Live Deployment
+
 - **Homepage**: https://dashboard-worker.brendawill2233.workers.dev
 - **Health Check**: https://dashboard-worker.brendawill2233.workers.dev/health
 - **API Status**: https://dashboard-worker.brendawill2233.workers.dev/api/health
 
 ### External Dependencies
+
 - **Bun Documentation**: https://bun.sh/docs
 - **Cloudflare Workers**: https://developers.cloudflare.com/workers/
 - **TypeScript**: https://www.typescriptlang.org/docs/
@@ -274,12 +322,14 @@ bun run security:audit             # Security audit
 ## 🤝 Community
 
 ### Support Channels
+
 - **GitHub Issues**: Bug reports and feature requests
 - **GitHub Discussions**: Questions and community discussions
 - **Documentation**: Comprehensive guides and references
 - **Discord**: Real-time community chat
 
 ### Team Contacts
+
 - **Engineering**: engineering@fire22.com
 - **Security**: security@fire22.com
 - **DevOps**: devops@fire22.com
@@ -288,14 +338,18 @@ bun run security:audit             # Security audit
 ## 📅 Recent Updates
 
 Check the following for latest changes:
+
 - [**Releases**](releases/) - Release notes and changelogs
 - [**CHANGELOG.md**](CHANGELOG.md) - Detailed change history
-- [**Recent Issues**](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues) - Latest reported issues
-- [**Recent PRs**](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/pulls) - Recent contributions
+- [**Recent Issues**](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues) -
+  Latest reported issues
+- [**Recent PRs**](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/pulls) -
+  Recent contributions
 
 ---
 
-**Navigation Tip**: Use your browser's search function (Ctrl/Cmd+F) to quickly find specific files, features, or documentation topics in this index.
+**Navigation Tip**: Use your browser's search function (Ctrl/Cmd+F) to quickly
+find specific files, features, or documentation topics in this index.
 
 **Last Updated**: August 2024  
 **Repository Version**: 3.0.9  

@@ -2,13 +2,13 @@
 
 /**
  * 🎨 Fire22 Workspace Dependency Visualizer
- * 
+ *
  * Generates visual representations of workspace dependencies:
  * - ASCII dependency tree
  * - Mermaid diagrams
  * - HTML interactive graph
  * - Dependency matrix
- * 
+ *
  * @version 1.0.0
  */
 
@@ -29,49 +29,49 @@ interface WorkspaceNode {
 class WorkspaceDependencyVisualizer {
   private workspacesPath: string;
   private workspaces: Map<string, WorkspaceNode>;
-  
+
   constructor() {
     this.workspacesPath = join(process.cwd(), 'workspaces');
     this.workspaces = new Map();
   }
-  
+
   /**
    * 🚀 Generate all visualizations
    */
   async generateVisualizations(): Promise<void> {
     console.log('🎨 Fire22 Workspace Dependency Visualizer');
-    console.log('=' .repeat(60));
-    
+    console.log('='.repeat(60));
+
     // Load workspace data
     await this.loadWorkspaceData();
-    
+
     // Generate visualizations
     this.generateASCIITree();
     this.generateMermaidDiagram();
     this.generateDependencyMatrix();
     await this.generateHTMLVisualization();
-    
+
     console.log('\n✅ Visualizations generated successfully!');
   }
-  
+
   /**
    * 📊 Load workspace data
    */
   private async loadWorkspaceData(): Promise<void> {
     const workspaceDirs = [
       '@fire22-pattern-system',
-      '@fire22-api-client', 
+      '@fire22-api-client',
       '@fire22-core-dashboard',
       '@fire22-sports-betting',
       '@fire22-telegram-integration',
-      '@fire22-build-system'
+      '@fire22-build-system',
     ];
-    
+
     for (const dir of workspaceDirs) {
       const packageJsonPath = join(this.workspacesPath, dir, 'package.json');
       if (existsSync(packageJsonPath)) {
         const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
-        
+
         const node: WorkspaceNode = {
           name: packageJson.name,
           displayName: dir,
@@ -80,9 +80,9 @@ class WorkspaceDependencyVisualizer {
           dependents: [],
           level: 0,
           size: 0,
-          private: packageJson.private || false
+          private: packageJson.private || false,
         };
-        
+
         // Extract dependencies
         if (packageJson.dependencies) {
           for (const [dep, version] of Object.entries(packageJson.dependencies)) {
@@ -91,7 +91,7 @@ class WorkspaceDependencyVisualizer {
             }
           }
         }
-        
+
         // Get workspace size
         try {
           const distPath = join(this.workspacesPath, dir, 'dist');
@@ -100,16 +100,16 @@ class WorkspaceDependencyVisualizer {
             node.size = parseInt(result.stdout.toString().split('\t')[0]);
           }
         } catch {}
-        
+
         this.workspaces.set(packageJson.name, node);
       }
     }
-    
+
     // Calculate dependents and levels
     this.calculateDependents();
     this.calculateLevels();
   }
-  
+
   /**
    * 🔗 Calculate dependents
    */
@@ -123,69 +123,69 @@ class WorkspaceDependencyVisualizer {
       }
     }
   }
-  
+
   /**
    * 📊 Calculate dependency levels
    */
   private calculateLevels(): void {
     const visited = new Set<string>();
-    
+
     const calculateLevel = (name: string, level: number = 0): number => {
       const node = this.workspaces.get(name);
       if (!node || visited.has(name)) return level;
-      
+
       visited.add(name);
       node.level = Math.max(node.level, level);
-      
+
       for (const dep of node.dependencies) {
         calculateLevel(dep, level + 1);
       }
-      
+
       return node.level;
     };
-    
+
     for (const name of this.workspaces.keys()) {
       calculateLevel(name);
     }
   }
-  
+
   /**
    * 🌳 Generate ASCII dependency tree
    */
   private generateASCIITree(): void {
     console.log('\n🌳 ASCII Dependency Tree');
-    console.log('-' .repeat(60));
-    
+    console.log('-'.repeat(60));
+
     const printed = new Set<string>();
-    
+
     const printNode = (name: string, prefix: string = '', isLast: boolean = true): void => {
       const node = this.workspaces.get(name);
       if (!node) return;
-      
+
       const connector = isLast ? '└── ' : '├── ';
       const sizeStr = node.size ? ` (${node.size}KB)` : '';
       console.log(`${prefix}${connector}${node.displayName} v${node.version}${sizeStr}`);
-      
+
       if (printed.has(name)) {
         if (node.dependencies.length > 0) {
           console.log(`${prefix}${isLast ? '    ' : '│   '}└── [circular reference]`);
         }
         return;
       }
-      
+
       printed.add(name);
-      
+
       const childPrefix = prefix + (isLast ? '    ' : '│   ');
       node.dependencies.forEach((dep, index) => {
         printNode(dep, childPrefix, index === node.dependencies.length - 1);
       });
     };
-    
+
     // Find root nodes (no dependents)
     const roots = Array.from(this.workspaces.entries())
       .filter(([_, node]) => node.dependents.length === 0)
       .map(([name, _]) => name);
-    
+
     if (roots.length === 0) {
       // If no roots (circular dependencies), start with level 0 nodes
       const level0 = Array.from(this.workspaces.entries())
@@ -193,33 +193,33 @@ class WorkspaceDependencyVisualizer {
         .map(([name, _]) => name);
       roots.push(...level0);
     }
-    
+
     roots.forEach((root, index) => {
       printNode(root, '', index === roots.length - 1);
     });
   }
-  
+
   /**
    * 📊 Generate Mermaid diagram
    */
   private generateMermaidDiagram(): void {
     console.log('\n📊 Mermaid Diagram');
-    console.log('-' .repeat(60));
-    
+    console.log('-'.repeat(60));
+
     const mermaid = ['graph TD'];
-    
+
     // Add nodes
     for (const [name, node] of this.workspaces) {
       const id = name.replace('@fire22/', '').replace(/-/g, '_');
       const label = `${node.displayName}<br/>v${node.version}`;
       const style = node.level === 0 ? 'fill:#f9f,stroke:#333,stroke-width:4px' : '';
-      
+
       mermaid.push(`    ${id}[${label}]`);
       if (style) {
         mermaid.push(`    style ${id} ${style}`);
       }
     }
-    
+
     // Add edges
     for (const [name, node] of this.workspaces) {
       const fromId = name.replace('@fire22/', '').replace(/-/g, '_');
@@ -228,35 +228,35 @@ class WorkspaceDependencyVisualizer {
         mermaid.push(`    ${fromId} --> ${toId}`);
       }
     }
-    
+
     const mermaidContent = mermaid.join('\n');
     console.log(mermaidContent);
-    
+
     // Save to file
     const mermaidPath = join(process.cwd(), 'docs', 'workspace-dependencies.mmd');
     writeFileSync(mermaidPath, mermaidContent);
     console.log(`\n💾 Mermaid diagram saved to: ${mermaidPath}`);
   }
-  
+
   /**
    * 📊 Generate dependency matrix
    */
   private generateDependencyMatrix(): void {
     console.log('\n📊 Dependency Matrix');
-    console.log('-' .repeat(60));
-    
+    console.log('-'.repeat(60));
+
     const names = Array.from(this.workspaces.keys());
     const shortNames = names.map(n => n.replace('@fire22/', ''));
-    
+
     // Print header
     console.log('         ', shortNames.map(n => n.substring(0, 8).padEnd(9)).join(''));
     console.log('         ', shortNames.map(() => '---------').join(''));
-    
+
     // Print matrix
     for (let i = 0; i < names.length; i++) {
       const row = [];
       const node = this.workspaces.get(names[i])!;
-      
+
       for (let j = 0; j < names.length; j++) {
         if (i === j) {
           row.push('    •    ');
@@ -268,13 +268,13 @@ class WorkspaceDependencyVisualizer {
           row.push('         ');
         }
       }
-      
+
       console.log(shortNames[i].substring(0, 8).padEnd(9), row.join(''));
     }
-    
+
     console.log('\nLegend: → depends on, ← depended by, • self');
   }
-  
+
   /**
    * 🌐 Generate HTML visualization
    */
@@ -286,19 +286,19 @@ class WorkspaceDependencyVisualizer {
       size: Math.max(10, Math.sqrt(node.size || 100) * 2),
       color: this.getNodeColor(node.level),
       x: (index % 3) * 200 + 100,
-      y: node.level * 150 + 100
+      y: node.level * 150 + 100,
     }));
-    
+
     const edges = [];
     for (const [name, node] of this.workspaces) {
       for (const dep of node.dependencies) {
         edges.push({
           source: name,
-          target: dep
+          target: dep,
         });
       }
     }
-    
+
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -535,12 +535,12 @@ class WorkspaceDependencyVisualizer {
     </script>
 </body>
 </html>`;
-    
+
     const htmlPath = join(process.cwd(), 'docs', 'workspace-dependencies.html');
     await Bun.write(htmlPath, html);
     console.log(`\n🌐 HTML visualization saved to: ${htmlPath}`);
   }
-  
+
   /**
    * 🎨 Get node color based on level
    */
@@ -550,7 +550,7 @@ class WorkspaceDependencyVisualizer {
       '#3b82f6', // Blue - Level 1
       '#8b5cf6', // Purple - Level 2
       '#f59e0b', // Orange - Level 3
-      '#ef4444'  // Red - Level 4+
+      '#ef4444', // Red - Level 4+
     ];
     return colors[Math.min(level, colors.length - 1)];
   }

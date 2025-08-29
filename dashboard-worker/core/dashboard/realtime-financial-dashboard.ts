@@ -46,12 +46,15 @@ export interface DashboardMetrics {
     processingTime: number; // average in seconds
   };
   paymentMetrics: {
-    gatewayPerformance: Record<string, {
-      volume: number;
-      successRate: number;
-      averageProcessingTime: number;
-      failureRate: number;
-    }>;
+    gatewayPerformance: Record<
+      string,
+      {
+        volume: number;
+        successRate: number;
+        averageProcessingTime: number;
+        failureRate: number;
+      }
+    >;
     methodDistribution: Record<string, number>;
     geographicDistribution: Record<string, number>;
     currencyDistribution: Record<string, number>;
@@ -198,7 +201,10 @@ export class RealtimeFinancialDashboard {
     const cached = this.metrics.get(cacheKey);
 
     // Return cached data if less than refresh interval old
-    if (cached && Date.now() - new Date(cached.timestamp).getTime() < this.config.refreshInterval * 1000) {
+    if (
+      cached &&
+      Date.now() - new Date(cached.timestamp).getTime() < this.config.refreshInterval * 1000
+    ) {
       return cached;
     }
 
@@ -243,8 +249,8 @@ export class RealtimeFinancialDashboard {
       updatedAt: new Date().toISOString(),
       escalation: {
         level: 1,
-        notifiedUsers: []
-      }
+        notifiedUsers: [],
+      },
     };
 
     this.alerts.set(alert.id, alert);
@@ -284,12 +290,14 @@ export class RealtimeFinancialDashboard {
   /**
    * Create custom widget
    */
-  createWidget(widgetConfig: Omit<DashboardWidget, 'id' | 'createdAt' | 'updatedAt'>): DashboardWidget {
+  createWidget(
+    widgetConfig: Omit<DashboardWidget, 'id' | 'createdAt' | 'updatedAt'>
+  ): DashboardWidget {
     const widget: DashboardWidget = {
       ...widgetConfig,
       id: this.generateWidgetId(),
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.widgets.set(widget.id, widget);
@@ -315,7 +323,7 @@ export class RealtimeFinancialDashboard {
       generatedAt: new Date().toISOString(),
       generatedBy,
       format,
-      status: 'generating'
+      status: 'generating',
     };
 
     // Simulate report generation
@@ -380,11 +388,13 @@ export class RealtimeFinancialDashboard {
       fraudMetrics,
       cryptoMetrics,
       complianceMetrics,
-      systemMetrics
+      systemMetrics,
     };
   }
 
-  private async generateTransactionMetrics(period: DashboardMetrics['period']): Promise<DashboardMetrics['transactionMetrics']> {
+  private async generateTransactionMetrics(
+    period: DashboardMetrics['period']
+  ): Promise<DashboardMetrics['transactionMetrics']> {
     // Simulate transaction metrics generation
     return {
       totalVolume: 1250000 + Math.random() * 100000,
@@ -393,56 +403,60 @@ export class RealtimeFinancialDashboard {
       successRate: 0.985 + Math.random() * 0.01,
       failureRate: 0.015 - Math.random() * 0.01,
       pendingTransactions: Math.floor(Math.random() * 50),
-      processingTime: 1.2 + Math.random() * 0.5
+      processingTime: 1.2 + Math.random() * 0.5,
     };
   }
 
-  private async generatePaymentMetrics(period: DashboardMetrics['period']): Promise<DashboardMetrics['paymentMetrics']> {
+  private async generatePaymentMetrics(
+    period: DashboardMetrics['period']
+  ): Promise<DashboardMetrics['paymentMetrics']> {
     return {
       gatewayPerformance: {
         stripe: {
           volume: 750000,
           successRate: 0.99,
           averageProcessingTime: 2.1,
-          failureRate: 0.01
+          failureRate: 0.01,
         },
         paypal: {
           volume: 350000,
           successRate: 0.97,
           averageProcessingTime: 1.8,
-          failureRate: 0.03
+          failureRate: 0.03,
         },
         crypto: {
           volume: 150000,
           successRate: 0.95,
           averageProcessingTime: 0.5,
-          failureRate: 0.05
-        }
+          failureRate: 0.05,
+        },
       },
       methodDistribution: {
         credit_card: 0.45,
         debit_card: 0.25,
         paypal: 0.15,
-        crypto: 0.10,
-        bank_transfer: 0.05
+        crypto: 0.1,
+        bank_transfer: 0.05,
       },
       geographicDistribution: {
-        US: 0.60,
+        US: 0.6,
         EU: 0.25,
-        Asia: 0.10,
-        Other: 0.05
+        Asia: 0.1,
+        Other: 0.05,
       },
       currencyDistribution: {
-        USD: 0.70,
+        USD: 0.7,
         EUR: 0.15,
         GBP: 0.08,
         BTC: 0.05,
-        ETH: 0.02
-      }
+        ETH: 0.02,
+      },
     };
   }
 
-  private async generateCustomerMetrics(period: DashboardMetrics['period']): Promise<DashboardMetrics['customerMetrics']> {
+  private async generateCustomerMetrics(
+    period: DashboardMetrics['period']
+  ): Promise<DashboardMetrics['customerMetrics']> {
     return {
       activeCustomers: 12500 + Math.floor(Math.random() * 1000),
       newCustomers: 150 + Math.floor(Math.random() * 50),
@@ -452,12 +466,14 @@ export class RealtimeFinancialDashboard {
       topCustomers: [
         { customerId: 'cust_001', totalVolume: 150000, transactionCount: 450 },
         { customerId: 'cust_002', totalVolume: 125000, transactionCount: 380 },
-        { customerId: 'cust_003', totalVolume: 98000, transactionCount: 295 }
-      ]
+        { customerId: 'cust_003', totalVolume: 98000, transactionCount: 295 },
+      ],
     };
   }
 
-  private async generateFraudMetrics(period: DashboardMetrics['period']): Promise<DashboardMetrics['fraudMetrics']> {
+  private async generateFraudMetrics(
+    period: DashboardMetrics['period']
+  ): Promise<DashboardMetrics['fraudMetrics']> {
     return {
       fraudDetectionRate: 0.92 + Math.random() * 0.05,
       falsePositiveRate: 0.03 + Math.random() * 0.02,
@@ -468,19 +484,21 @@ export class RealtimeFinancialDashboard {
         low: 0.75,
         medium: 0.18,
         high: 0.05,
-        critical: 0.02
-      }
+        critical: 0.02,
+      },
     };
   }
 
-  private async generateCryptoMetrics(period: DashboardMetrics['period']): Promise<DashboardMetrics['cryptoMetrics']> {
+  private async generateCryptoMetrics(
+    period: DashboardMetrics['period']
+  ): Promise<DashboardMetrics['cryptoMetrics']> {
     return {
       totalCryptoVolume: 250000 + Math.random() * 50000,
       cryptoTransactions: 450 + Math.floor(Math.random() * 100),
       exchangeRates: {
         'BTC/USD': 45000 + Math.random() * 1000,
         'ETH/USD': 3000 + Math.random() * 200,
-        'BNB/USD': 300 + Math.random() * 20
+        'BNB/USD': 300 + Math.random() * 20,
       },
       stakingVolume: 150000 + Math.random() * 30000,
       stakingRewards: 2500 + Math.random() * 500,
@@ -488,12 +506,14 @@ export class RealtimeFinancialDashboard {
         BTC: 25.5,
         ETH: 180.2,
         USDT: 50000,
-        USDC: 35000
-      }
+        USDC: 35000,
+      },
     };
   }
 
-  private async generateComplianceMetrics(period: DashboardMetrics['period']): Promise<DashboardMetrics['complianceMetrics']> {
+  private async generateComplianceMetrics(
+    period: DashboardMetrics['period']
+  ): Promise<DashboardMetrics['complianceMetrics']> {
     return {
       pendingReports: Math.floor(Math.random() * 5),
       completedReports: 12 + Math.floor(Math.random() * 5),
@@ -503,30 +523,32 @@ export class RealtimeFinancialDashboard {
         {
           reportType: 'SAR Filing',
           dueDate: '2024-02-15',
-          status: 'on_track'
+          status: 'on_track',
         },
         {
           reportType: 'CTR Report',
           dueDate: '2024-02-20',
-          status: 'on_track'
+          status: 'on_track',
         },
         {
           reportType: 'AML Review',
           dueDate: '2024-02-10',
-          status: 'at_risk'
-        }
-      ]
+          status: 'at_risk',
+        },
+      ],
     };
   }
 
-  private async generateSystemMetrics(period: DashboardMetrics['period']): Promise<DashboardMetrics['systemMetrics']> {
+  private async generateSystemMetrics(
+    period: DashboardMetrics['period']
+  ): Promise<DashboardMetrics['systemMetrics']> {
     return {
       uptime: 0.998 + Math.random() * 0.001,
       responseTime: 150 + Math.random() * 50,
       errorRate: 0.002 + Math.random() * 0.001,
       throughput: 50 + Math.random() * 20,
       queueDepth: Math.floor(Math.random() * 10),
-      serverLoad: 0.45 + Math.random() * 0.3
+      serverLoad: 0.45 + Math.random() * 0.3,
     };
   }
 
@@ -551,13 +573,13 @@ export class RealtimeFinancialDashboard {
         config: {
           dataSource: 'transactionMetrics.totalVolume',
           refreshInterval: 30,
-          parameters: {}
+          parameters: {},
         },
         permissions: {
           roles: ['admin', 'manager'],
-          users: []
+          users: [],
         },
-        status: 'active'
+        status: 'active',
       },
       {
         type: 'chart',
@@ -566,13 +588,13 @@ export class RealtimeFinancialDashboard {
         config: {
           dataSource: 'transactionMetrics.successRate',
           refreshInterval: 30,
-          parameters: { chartType: 'line' }
+          parameters: { chartType: 'line' },
         },
         permissions: {
           roles: ['admin', 'manager', 'analyst'],
-          users: []
+          users: [],
         },
-        status: 'active'
+        status: 'active',
       },
       {
         type: 'alert',
@@ -581,13 +603,13 @@ export class RealtimeFinancialDashboard {
         config: {
           dataSource: 'alerts',
           refreshInterval: 10,
-          parameters: { severity: 'high' }
+          parameters: { severity: 'high' },
         },
         permissions: {
           roles: ['admin', 'manager', 'analyst'],
-          users: []
+          users: [],
         },
-        status: 'active'
+        status: 'active',
       },
       {
         type: 'table',
@@ -596,13 +618,13 @@ export class RealtimeFinancialDashboard {
         config: {
           dataSource: 'customerMetrics.topCustomers',
           refreshInterval: 300,
-          parameters: { limit: 10 }
+          parameters: { limit: 10 },
         },
         permissions: {
           roles: ['admin', 'manager'],
-          users: []
+          users: [],
         },
-        status: 'active'
+        status: 'active',
       },
       {
         type: 'metric',
@@ -611,13 +633,13 @@ export class RealtimeFinancialDashboard {
         config: {
           dataSource: 'fraudMetrics.fraudDetectionRate',
           refreshInterval: 60,
-          parameters: {}
+          parameters: {},
         },
         permissions: {
           roles: ['admin', 'manager', 'compliance'],
-          users: []
+          users: [],
         },
-        status: 'active'
+        status: 'active',
       },
       {
         type: 'chart',
@@ -626,14 +648,14 @@ export class RealtimeFinancialDashboard {
         config: {
           dataSource: 'paymentMetrics.methodDistribution',
           refreshInterval: 300,
-          parameters: { chartType: 'pie' }
+          parameters: { chartType: 'pie' },
         },
         permissions: {
           roles: ['admin', 'manager', 'analyst'],
-          users: []
+          users: [],
         },
-        status: 'active'
-      }
+        status: 'active',
+      },
     ];
 
     defaultWidgets.forEach(widget => {
@@ -657,7 +679,6 @@ export class RealtimeFinancialDashboard {
 
         // Check for threshold alerts
         await this.checkThresholdAlerts(metrics);
-
       } catch (error) {
         console.error('Error in realtime update:', error);
       }
@@ -666,13 +687,18 @@ export class RealtimeFinancialDashboard {
 
   private async checkThresholdAlerts(metrics: DashboardMetrics): Promise<void> {
     // Check transaction volume threshold
-    if (metrics.transactionMetrics.totalVolume > this.config.alerts.thresholds.highTransactionVolume) {
+    if (
+      metrics.transactionMetrics.totalVolume > this.config.alerts.thresholds.highTransactionVolume
+    ) {
       await this.createAlert(
         'performance',
         'medium',
         'High Transaction Volume',
         `Transaction volume has exceeded threshold: $${metrics.transactionMetrics.totalVolume.toLocaleString()}`,
-        { currentVolume: metrics.transactionMetrics.totalVolume, threshold: this.config.alerts.thresholds.highTransactionVolume }
+        {
+          currentVolume: metrics.transactionMetrics.totalVolume,
+          threshold: this.config.alerts.thresholds.highTransactionVolume,
+        }
       );
     }
 
@@ -683,7 +709,10 @@ export class RealtimeFinancialDashboard {
         'high',
         'High Fraud Alert Count',
         `Fraud alerts have exceeded threshold: ${metrics.fraudMetrics.alertCount}`,
-        { currentAlerts: metrics.fraudMetrics.alertCount, threshold: this.config.alerts.thresholds.fraudAlertThreshold }
+        {
+          currentAlerts: metrics.fraudMetrics.alertCount,
+          threshold: this.config.alerts.thresholds.fraudAlertThreshold,
+        }
       );
     }
 
@@ -694,7 +723,10 @@ export class RealtimeFinancialDashboard {
         'critical',
         'High System Error Rate',
         `System error rate has exceeded threshold: ${(metrics.systemMetrics.errorRate * 100).toFixed(2)}%`,
-        { currentErrorRate: metrics.systemMetrics.errorRate, threshold: this.config.alerts.thresholds.systemDowntimeThreshold }
+        {
+          currentErrorRate: metrics.systemMetrics.errorRate,
+          threshold: this.config.alerts.thresholds.systemDowntimeThreshold,
+        }
       );
     }
   }
@@ -736,7 +768,7 @@ export class RealtimeFinancialDashboard {
       activeAlerts: this.getActiveAlerts().length,
       totalWidgets: this.widgets.size,
       activeSubscribers: this.subscribers.size,
-      totalReports: this.reports.size
+      totalReports: this.reports.size,
     };
   }
 }

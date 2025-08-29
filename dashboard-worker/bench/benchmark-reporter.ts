@@ -2,7 +2,7 @@
 
 /**
  * 📊 Fire22 Benchmark Reporter
- * 
+ *
  * Generate comprehensive benchmark reports in multiple formats
  * Includes trend analysis, comparisons, and visualizations
  */
@@ -68,12 +68,16 @@ export class BenchmarkReporter {
     const history = this.loadHistory();
     const trends = this.analyzeTrends(data, history);
 
-    return JSON.stringify({
-      ...data,
-      trends,
-      history: history.slice(-10), // Last 10 runs
-      summary: this.generateSummary(data)
-    }, null, 2);
+    return JSON.stringify(
+      {
+        ...data,
+        trends,
+        history: history.slice(-10), // Last 10 runs
+        summary: this.generateSummary(data),
+      },
+      null,
+      2
+    );
   }
 
   /**
@@ -97,13 +101,16 @@ export class BenchmarkReporter {
       '## Results',
       '',
       '| Test | Value | Unit | Notes |',
-      '|------|-------|------|-------|'
+      '|------|-------|------|-------|',
     ];
 
     for (const result of data.results) {
       const value = this.formatValue(result.value, result.unit);
-      const notes = result.metadata ? Object.entries(result.metadata)
-        .map(([k, v]) => `${k}: ${v}`).join(', ') : '-';
+      const notes = result.metadata
+        ? Object.entries(result.metadata)
+            .map(([k, v]) => `${k}: ${v}`)
+            .join(', ')
+        : '-';
       lines.push(`| ${result.test} | ${value} | ${result.unit} | ${notes} |`);
     }
 
@@ -122,12 +129,13 @@ export class BenchmarkReporter {
       lines.push('', '## Trends', '');
       lines.push('| Test | Trend | Change |');
       lines.push('|------|-------|--------|');
-      
+
       for (const trend of trends) {
-        const icon = trend.trend === 'improving' ? '📈' : 
-                     trend.trend === 'degrading' ? '📉' : '➡️';
-        const change = trend.changePercent > 0 ? `+${trend.changePercent.toFixed(1)}%` :
-                      `${trend.changePercent.toFixed(1)}%`;
+        const icon = trend.trend === 'improving' ? '📈' : trend.trend === 'degrading' ? '📉' : '➡️';
+        const change =
+          trend.changePercent > 0
+            ? `+${trend.changePercent.toFixed(1)}%`
+            : `${trend.changePercent.toFixed(1)}%`;
         lines.push(`| ${trend.test} | ${icon} ${trend.trend} | ${change} |`);
       }
     }
@@ -301,27 +309,37 @@ export class BenchmarkReporter {
                     </tr>
                 </thead>
                 <tbody>
-                    ${data.results.map(r => `
+                    ${data.results
+                      .map(
+                        r => `
                     <tr>
                         <td>${r.test}</td>
                         <td>${this.formatValue(r.value, r.unit)}</td>
                         <td>${r.unit}</td>
                         <td>${this.getStatusIcon(r.value, r.unit)}</td>
                     </tr>
-                    `).join('')}
+                    `
+                      )
+                      .join('')}
                 </tbody>
             </table>
             
             <div class="chart">
-                ${data.results.slice(0, 10).map(r => {
-                    const height = Math.min(250, (r.value / Math.max(...data.results.map(x => x.value))) * 250);
+                ${data.results
+                  .slice(0, 10)
+                  .map(r => {
+                    const height = Math.min(
+                      250,
+                      (r.value / Math.max(...data.results.map(x => x.value))) * 250
+                    );
                     return `
                     <div class="bar" style="height: ${height}px">
                         <span class="bar-value">${this.formatValue(r.value, r.unit)}</span>
                         <span class="bar-label">${r.test.substring(0, 10)}...</span>
                     </div>
                     `;
-                }).join('')}
+                  })
+                  .join('')}
             </div>
         </div>
 
@@ -336,21 +354,21 @@ export class BenchmarkReporter {
    * Generate CSV report
    */
   private generateCsvReport(data: BenchmarkData): string {
-    const rows: string[] = [
-      'Timestamp,Name,Test,Value,Unit,Platform,Architecture,Bun Version'
-    ];
+    const rows: string[] = ['Timestamp,Name,Test,Value,Unit,Platform,Architecture,Bun Version'];
 
     for (const result of data.results) {
-      rows.push([
-        data.timestamp,
-        data.name,
-        result.test,
-        result.value.toString(),
-        result.unit,
-        data.environment.platform,
-        data.environment.arch,
-        data.environment.bun
-      ].join(','));
+      rows.push(
+        [
+          data.timestamp,
+          data.name,
+          result.test,
+          result.value.toString(),
+          result.unit,
+          data.environment.platform,
+          data.environment.arch,
+          data.environment.bun,
+        ].join(',')
+      );
     }
 
     return rows.join('\n');
@@ -366,7 +384,7 @@ export class BenchmarkReporter {
       const historicalValues = history
         .map(h => ({
           timestamp: h.timestamp,
-          value: h.results.find(r => r.test === result.test)?.value
+          value: h.results.find(r => r.test === result.test)?.value,
         }))
         .filter(v => v.value !== undefined) as Array<{ timestamp: string; value: number }>;
 
@@ -375,7 +393,7 @@ export class BenchmarkReporter {
       // Add current value
       historicalValues.push({
         timestamp: current.timestamp,
-        value: result.value
+        value: result.value,
       });
 
       // Calculate trend
@@ -386,12 +404,10 @@ export class BenchmarkReporter {
       let trend: 'improving' | 'degrading' | 'stable';
       if (result.unit.includes('ms') || result.unit.includes('ns')) {
         // Lower is better for time measurements
-        trend = changePercent < -5 ? 'improving' : 
-                changePercent > 5 ? 'degrading' : 'stable';
+        trend = changePercent < -5 ? 'improving' : changePercent > 5 ? 'degrading' : 'stable';
       } else if (result.unit.includes('ops') || result.unit.includes('req')) {
         // Higher is better for throughput
-        trend = changePercent > 5 ? 'improving' : 
-                changePercent < -5 ? 'degrading' : 'stable';
+        trend = changePercent > 5 ? 'improving' : changePercent < -5 ? 'degrading' : 'stable';
       } else {
         trend = 'stable';
       }
@@ -400,7 +416,7 @@ export class BenchmarkReporter {
         test: result.test,
         values: historicalValues,
         trend,
-        changePercent
+        changePercent,
       });
     }
 
@@ -412,26 +428,35 @@ export class BenchmarkReporter {
    */
   private generateSummary(data: BenchmarkData): Record<string, any> {
     const timeTests = data.results.filter(r => r.unit.includes('ms') || r.unit.includes('ns'));
-    const throughputTests = data.results.filter(r => r.unit.includes('ops') || r.unit.includes('req'));
+    const throughputTests = data.results.filter(
+      r => r.unit.includes('ops') || r.unit.includes('req')
+    );
 
-    const avgTime = timeTests.length > 0 ?
-      timeTests.reduce((sum, r) => sum + r.value, 0) / timeTests.length : 0;
+    const avgTime =
+      timeTests.length > 0 ? timeTests.reduce((sum, r) => sum + r.value, 0) / timeTests.length : 0;
 
-    const avgThroughput = throughputTests.length > 0 ?
-      throughputTests.reduce((sum, r) => sum + r.value, 0) / throughputTests.length : 0;
+    const avgThroughput =
+      throughputTests.length > 0
+        ? throughputTests.reduce((sum, r) => sum + r.value, 0) / throughputTests.length
+        : 0;
 
-    const bestPerformer = timeTests.length > 0 ?
-      timeTests.reduce((best, r) => r.value < best.value ? r : best).test : 'N/A';
+    const bestPerformer =
+      timeTests.length > 0
+        ? timeTests.reduce((best, r) => (r.value < best.value ? r : best)).test
+        : 'N/A';
 
-    const needsAttention = timeTests.filter(r => r.value > avgTime * 1.5)
-      .map(r => r.test).join(', ') || 'None';
+    const needsAttention =
+      timeTests
+        .filter(r => r.value > avgTime * 1.5)
+        .map(r => r.test)
+        .join(', ') || 'None';
 
     return {
       totalTests: data.results.length,
       averagePerformance: `${avgTime.toFixed(2)}ms avg response`,
       bestPerformer,
       needsAttention,
-      avgThroughput: `${avgThroughput.toFixed(0)} ops/s`
+      avgThroughput: `${avgThroughput.toFixed(0)} ops/s`,
     };
   }
 
@@ -445,14 +470,14 @@ export class BenchmarkReporter {
     // Check for degrading trends
     const degrading = trends.filter(t => t.trend === 'degrading');
     if (degrading.length > 0) {
-      recommendations.push(`⚠️  Performance degradation detected in: ${degrading.map(d => d.test).join(', ')}`);
+      recommendations.push(
+        `⚠️  Performance degradation detected in: ${degrading.map(d => d.test).join(', ')}`
+      );
       recommendations.push('Consider profiling these operations to identify bottlenecks');
     }
 
     // Check for slow operations
-    const slowOps = data.results
-      .filter(r => r.unit === 'ms' && r.value > 100)
-      .map(r => r.test);
+    const slowOps = data.results.filter(r => r.unit === 'ms' && r.value > 100).map(r => r.test);
     if (slowOps.length > 0) {
       recommendations.push(`🐌 Slow operations detected: ${slowOps.join(', ')}`);
       recommendations.push('Consider optimizing or caching these operations');
@@ -469,7 +494,9 @@ export class BenchmarkReporter {
     // Positive feedback
     const improving = trends.filter(t => t.trend === 'improving');
     if (improving.length > 0) {
-      recommendations.push(`✅ Great job! Performance improvements in: ${improving.map(i => i.test).join(', ')}`);
+      recommendations.push(
+        `✅ Great job! Performance improvements in: ${improving.map(i => i.test).join(', ')}`
+      );
     }
 
     return recommendations;
@@ -497,10 +524,10 @@ export class BenchmarkReporter {
   async saveToHistory(data: BenchmarkData): Promise<void> {
     const history = this.loadHistory();
     history.push(data);
-    
+
     // Keep only recent history
     const recentHistory = history.slice(-this.maxHistory);
-    
+
     await Bun.write(this.historyFile, JSON.stringify(recentHistory, null, 2));
   }
 
@@ -542,7 +569,7 @@ export class BenchmarkReporter {
     if (history.length === 0) return '';
 
     const trends = this.analyzeTrends(data, history);
-    
+
     return `
     <div class="card">
         <h2>Performance Trends</h2>
@@ -555,13 +582,17 @@ export class BenchmarkReporter {
                 </tr>
             </thead>
             <tbody>
-                ${trends.map(t => `
+                ${trends
+                  .map(
+                    t => `
                 <tr>
                     <td>${t.test}</td>
                     <td><span class="trend ${t.trend}">${t.trend.toUpperCase()}</span></td>
                     <td>${t.changePercent > 0 ? '+' : ''}${t.changePercent.toFixed(1)}%</td>
                 </tr>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </tbody>
         </table>
     </div>`;
@@ -573,7 +604,7 @@ export class BenchmarkReporter {
   private generateHtmlRecommendations(data: BenchmarkData): string {
     const history = this.loadHistory();
     const recommendations = this.generateRecommendations(data, history);
-    
+
     if (recommendations.length === 0) return '';
 
     return `
@@ -588,10 +619,7 @@ export class BenchmarkReporter {
   /**
    * Generate comparison report
    */
-  async generateComparisonReport(
-    baseline: BenchmarkData,
-    current: BenchmarkData
-  ): Promise<string> {
+  async generateComparisonReport(baseline: BenchmarkData, current: BenchmarkData): Promise<string> {
     const lines: string[] = [
       '# Benchmark Comparison Report',
       '',
@@ -601,20 +629,22 @@ export class BenchmarkReporter {
       '## Comparison Results',
       '',
       '| Test | Baseline | Current | Change | Status |',
-      '|------|----------|---------|--------|--------|'
+      '|------|----------|---------|--------|--------|',
     ];
 
     for (const currentResult of current.results) {
       const baselineResult = baseline.results.find(r => r.test === currentResult.test);
-      
+
       if (!baselineResult) {
-        lines.push(`| ${currentResult.test} | N/A | ${this.formatValue(currentResult.value, currentResult.unit)} ${currentResult.unit} | NEW | 🆕 |`);
+        lines.push(
+          `| ${currentResult.test} | N/A | ${this.formatValue(currentResult.value, currentResult.unit)} ${currentResult.unit} | NEW | 🆕 |`
+        );
         continue;
       }
 
       const change = currentResult.value - baselineResult.value;
       const changePercent = (change / baselineResult.value) * 100;
-      
+
       let status = '➖';
       if (currentResult.unit.includes('ms') || currentResult.unit.includes('ns')) {
         // Lower is better
@@ -624,9 +654,12 @@ export class BenchmarkReporter {
         status = changePercent > 5 ? '✅' : changePercent < -5 ? '❌' : '➖';
       }
 
-      const changeStr = changePercent > 0 ? `+${changePercent.toFixed(1)}%` : `${changePercent.toFixed(1)}%`;
-      
-      lines.push(`| ${currentResult.test} | ${this.formatValue(baselineResult.value, baselineResult.unit)} ${baselineResult.unit} | ${this.formatValue(currentResult.value, currentResult.unit)} ${currentResult.unit} | ${changeStr} | ${status} |`);
+      const changeStr =
+        changePercent > 0 ? `+${changePercent.toFixed(1)}%` : `${changePercent.toFixed(1)}%`;
+
+      lines.push(
+        `| ${currentResult.test} | ${this.formatValue(baselineResult.value, baselineResult.unit)} ${baselineResult.unit} | ${this.formatValue(currentResult.value, currentResult.unit)} ${currentResult.unit} | ${changeStr} | ${status} |`
+      );
     }
 
     return lines.join('\n');
@@ -636,7 +669,7 @@ export class BenchmarkReporter {
 // Example usage
 if (import.meta.main) {
   const reporter = new BenchmarkReporter();
-  
+
   // Sample benchmark data
   const data: BenchmarkData = {
     name: 'Fire22 Performance Suite',
@@ -647,30 +680,30 @@ if (import.meta.main) {
       { test: 'SHA-256 Hash', value: 0.003, unit: 'ms' },
       { test: 'Array.map (10k)', value: 1.234, unit: 'ms' },
       { test: 'API Throughput', value: 1523, unit: 'req/s' },
-      { test: 'Memory Usage', value: 45.2, unit: 'MB' }
+      { test: 'Memory Usage', value: 45.2, unit: 'MB' },
     ],
     environment: {
       bun: process.versions.bun || '1.2.21',
       platform: process.platform,
       arch: process.arch,
       memory: process.memoryUsage().heapTotal,
-      cpus: 8
-    }
+      cpus: 8,
+    },
   };
 
   // Generate reports
   const markdown = await reporter.generateReport(data, 'markdown');
   await Bun.write('benchmark-report.md', markdown);
-  
+
   const html = await reporter.generateReport(data, 'html');
   await Bun.write('benchmark-report.html', html);
-  
+
   const csv = await reporter.generateReport(data, 'csv');
   await Bun.write('benchmark-report.csv', csv);
-  
+
   // Save to history
   await reporter.saveToHistory(data);
-  
+
   console.log('✅ Reports generated:');
   console.log('   - benchmark-report.md');
   console.log('   - benchmark-report.html');

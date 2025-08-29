@@ -2,7 +2,7 @@
 
 /**
  * Test Queue System
- * 
+ *
  * This script tests the peer-to-peer matching queue system for withdrawals and deposits
  */
 
@@ -30,7 +30,7 @@ class QueueSystemTester {
 
   private setupTestDatabase() {
     console.log('🔧 Setting up test database...');
-    
+
     // Create players table
     this.db.run(`
       CREATE TABLE players (
@@ -107,15 +107,21 @@ class QueueSystemTester {
     `);
 
     // Insert test data
-    this.db.run(`
+    this.db.run(
+      `
       INSERT INTO players (customer_id, name, balance)
       VALUES (?, ?, ?)
-    `, [this.testCustomerId1, 'Test Customer 1', 1000.00]);
+    `,
+      [this.testCustomerId1, 'Test Customer 1', 1000.0]
+    );
 
-    this.db.run(`
+    this.db.run(
+      `
       INSERT INTO players (customer_id, name, balance)
       VALUES (?, ?, ?)
-    `, [this.testCustomerId2, 'Test Customer 2', 500.00]);
+    `,
+      [this.testCustomerId2, 'Test Customer 2', 500.0]
+    );
 
     console.log('✅ Test database setup complete');
   }
@@ -129,7 +135,7 @@ class QueueSystemTester {
             test: testName,
             status: passed ? 'PASS' : 'FAIL',
             message: passed ? 'Test passed' : 'Test failed',
-            details
+            details,
           });
         });
       } else {
@@ -137,7 +143,7 @@ class QueueSystemTester {
           test: testName,
           status: result ? 'PASS' : 'FAIL',
           message: result ? 'Test passed' : 'Test failed',
-          details
+          details,
         });
       }
     } catch (error) {
@@ -145,7 +151,7 @@ class QueueSystemTester {
         test: testName,
         status: 'FAIL',
         message: `Test error: ${error}`,
-        details
+        details,
       });
     }
   }
@@ -165,13 +171,13 @@ class QueueSystemTester {
       const queueId = await queueSystem.addToQueue({
         type: 'withdrawal',
         customerId: this.testCustomerId1,
-        amount: 200.00,
+        amount: 200.0,
         paymentType: 'venmo',
         paymentDetails: '@testuser1',
         priority: 1,
-        notes: 'Test withdrawal'
+        notes: 'Test withdrawal',
       });
-      
+
       return queueId && queueId.length > 0;
     });
 
@@ -180,13 +186,13 @@ class QueueSystemTester {
       const queueSystem = new WithdrawalQueueSystem({ DB: this.db });
       const queueId = await queueSystem.addDepositToQueue({
         customerId: this.testCustomerId2,
-        amount: 250.00,
+        amount: 250.0,
         paymentType: 'venmo',
         paymentDetails: '@testuser2',
         priority: 1,
-        notes: 'Test deposit'
+        notes: 'Test deposit',
       });
-      
+
       return queueId && queueId.length > 0;
     });
 
@@ -194,49 +200,50 @@ class QueueSystemTester {
     this.runTest('Queue Statistics', () => {
       const queueSystem = new WithdrawalQueueSystem({ DB: this.db });
       const stats = queueSystem.getQueueStats();
-      
-      return stats.totalItems >= 2 && 
-             stats.pendingWithdrawals >= 1 && 
-             stats.pendingDeposits >= 1;
+
+      return stats.totalItems >= 2 && stats.pendingWithdrawals >= 1 && stats.pendingDeposits >= 1;
     });
 
     // Test 5: Test matching algorithm
     this.runTest('Matching Algorithm', () => {
       const queueSystem = new WithdrawalQueueSystem({ DB: this.db });
       const items = queueSystem.getQueueItems('pending');
-      
+
       // Should have both withdrawal and deposit
       const withdrawal = items.find(item => item.type === 'withdrawal');
       const deposit = items.find(item => item.type === 'deposit');
-      
-      return withdrawal && deposit && 
-             withdrawal.paymentType === deposit.paymentType &&
-             withdrawal.amount <= deposit.amount;
+
+      return (
+        withdrawal &&
+        deposit &&
+        withdrawal.paymentType === deposit.paymentType &&
+        withdrawal.amount <= deposit.amount
+      );
     });
 
     // Test 6: Test payment type matching
     this.runTest('Payment Type Matching', async () => {
       const queueSystem = new WithdrawalQueueSystem({ DB: this.db });
-      
+
       // Add another withdrawal with different payment type
       await queueSystem.addToQueue({
         type: 'withdrawal',
         customerId: this.testCustomerId1,
-        amount: 100.00,
+        amount: 100.0,
         paymentType: 'paypal',
         paymentDetails: 'test@example.com',
         priority: 1,
-        notes: 'PayPal withdrawal'
+        notes: 'PayPal withdrawal',
       });
 
       // Add matching deposit
       await queueSystem.addDepositToQueue({
         customerId: this.testCustomerId2,
-        amount: 120.00,
+        amount: 120.0,
         paymentType: 'paypal',
         paymentDetails: 'deposit@example.com',
         priority: 1,
-        notes: 'PayPal deposit'
+        notes: 'PayPal deposit',
       });
 
       const stats = queueSystem.getQueueStats();
@@ -247,57 +254,57 @@ class QueueSystemTester {
     this.runTest('Amount Matching', () => {
       const queueSystem = new WithdrawalQueueSystem({ DB: this.db });
       const items = queueSystem.getQueueItems('pending');
-      
+
       // Find items that can be matched by amount
       const withdrawals = items.filter(item => item.type === 'withdrawal');
       const deposits = items.filter(item => item.type === 'deposit');
-      
-      const canMatch = withdrawals.some(w => 
-        deposits.some(d => 
-          w.paymentType === d.paymentType && w.amount <= d.amount
-        )
+
+      const canMatch = withdrawals.some(w =>
+        deposits.some(d => w.paymentType === d.paymentType && w.amount <= d.amount)
       );
-      
+
       return canMatch;
     });
 
     // Test 8: Test queue item retrieval
     this.runTest('Queue Item Retrieval', () => {
       const queueSystem = new WithdrawalQueueSystem({ DB: this.db });
-      
+
       const allItems = queueSystem.getQueueItems();
       const pendingItems = queueSystem.getQueueItems('pending');
       const withdrawalItems = queueSystem.getQueueItems(undefined, 'withdrawal');
       const depositItems = queueSystem.getQueueItems(undefined, 'deposit');
-      
-      return allItems.length >= 4 && 
-             pendingItems.length >= 4 &&
-             withdrawalItems.length >= 2 &&
-             depositItems.length >= 2;
+
+      return (
+        allItems.length >= 4 &&
+        pendingItems.length >= 4 &&
+        withdrawalItems.length >= 2 &&
+        depositItems.length >= 2
+      );
     });
 
     // Test 9: Test match completion
     this.runTest('Match Completion', async () => {
       const queueSystem = new WithdrawalQueueSystem({ DB: this.db });
-      
+
       // Get a match to complete
       const matches = queueSystem.getAllMatches();
       if (matches.length === 0) {
         return false; // No matches to test
       }
-      
+
       const match = matches[0];
       const success = await queueSystem.completeMatch(match.withdrawalId, 'Test completion');
-      
+
       return success;
     });
 
     // Test 10: Test cleanup
     this.runTest('Queue Cleanup', async () => {
       const queueSystem = new WithdrawalQueueSystem({ DB: this.db });
-      
+
       await queueSystem.cleanupOldItems(0); // Clean up immediately
-      
+
       const stats = queueSystem.getQueueStats();
       return stats.totalItems >= 0; // Should not crash
     });
@@ -310,15 +317,15 @@ class QueueSystemTester {
 
   private printResults() {
     console.log('\n📊 Test Results Summary:');
-    console.log('========================');
-    
+    console.log('!==!==!==!====');
+
     let passCount = 0;
     let failCount = 0;
 
     this.results.forEach(result => {
       const statusIcon = result.status === 'PASS' ? '✅' : '❌';
       console.log(`${statusIcon} ${result.test}: ${result.status}`);
-      
+
       if (result.status === 'PASS') {
         passCount++;
       } else {
@@ -350,7 +357,7 @@ class QueueSystemTester {
 // Run tests
 async function main() {
   const tester = new QueueSystemTester();
-  
+
   try {
     await tester.runAllTests();
   } catch (error) {

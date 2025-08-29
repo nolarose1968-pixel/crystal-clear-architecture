@@ -285,5 +285,8 @@ export interface AgentActivityLog extends BaseEntity {
 // Export utility types
 export type AgentProfileCreate = Omit<AgentProfile, keyof BaseEntity>;
 export type AgentProfileUpdate = Partial<AgentProfileCreate>;
-export type CommissionCalculationCreate = Omit<CommissionCalculation, 'id' | 'createdAt' | 'updatedAt'>;
+export type CommissionCalculationCreate = Omit<
+  CommissionCalculation,
+  'id' | 'createdAt' | 'updatedAt'
+>;
 export type AgentCommissionPayoutCreate = Omit<AgentCommissionPayout, keyof BaseEntity>;

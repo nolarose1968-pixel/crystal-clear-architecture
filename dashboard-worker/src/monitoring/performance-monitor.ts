@@ -37,9 +37,9 @@ export class PerformanceMonitor {
 
     const responseTime = Date.now() - startTime;
     const metrics = this.collectMetrics(responseTime);
-    
+
     this.metrics.push(metrics);
-    
+
     // Keep only recent metrics based on retention policy
     if (this.metrics.length > 1000) {
       this.metrics = this.metrics.slice(-1000);
@@ -64,7 +64,7 @@ export class PerformanceMonitor {
       cpuUsage,
       memoryUsage,
       activeConnections,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -92,9 +92,7 @@ export class PerformanceMonitor {
    */
   getAverageResponseTime(period: number = 60000): number {
     const cutoff = Date.now() - period;
-    const recentMetrics = this.metrics.filter(m => 
-      new Date(m.timestamp).getTime() > cutoff
-    );
+    const recentMetrics = this.metrics.filter(m => new Date(m.timestamp).getTime() > cutoff);
 
     if (recentMetrics.length === 0) {
       return 0;
@@ -111,9 +109,7 @@ export class PerformanceMonitor {
    */
   getRequestRate(period: number = 60000): number {
     const cutoff = Date.now() - period;
-    const recentMetrics = this.metrics.filter(m => 
-      new Date(m.timestamp).getTime() > cutoff
-    );
+    const recentMetrics = this.metrics.filter(m => new Date(m.timestamp).getTime() > cutoff);
 
     return recentMetrics.length / (period / 1000);
   }
@@ -129,7 +125,7 @@ export class PerformanceMonitor {
     this.metricsIntervalId = setInterval(() => {
       const metrics = this.collectMetrics();
       this.metrics.push(metrics);
-      
+
       // Keep only recent metrics
       if (this.metrics.length > 1000) {
         this.metrics = this.metrics.slice(-1000);
@@ -209,7 +205,7 @@ export class RequestTracker {
   startTracking(request: Request, userId?: string): string {
     const requestId = generateRequestId();
     const startTime = Date.now();
-    
+
     const requestInfo: RequestInfo = {
       id: requestId,
       method: request.method,
@@ -217,12 +213,12 @@ export class RequestTracker {
       userAgent: request.headers.get('User-Agent') || '',
       ip: this.getClientIP(request),
       startTime,
-      userId
+      userId,
     };
 
     this.activeRequests.set(requestId, requestInfo);
     this.performanceMonitor.startRequest(requestId);
-    
+
     return requestId;
   }
 
@@ -234,16 +230,16 @@ export class RequestTracker {
   endTracking(requestId: string): RequestInfo | null {
     const requestInfo = this.activeRequests.get(requestId);
     this.activeRequests.delete(requestId);
-    
+
     const metrics = this.performanceMonitor.endRequest(requestId);
-    
+
     if (requestInfo && metrics) {
       return {
         ...requestInfo,
-        responseTime: metrics.responseTime
+        responseTime: metrics.responseTime,
       };
     }
-    
+
     return null;
   }
 
@@ -265,7 +261,7 @@ export class RequestTracker {
     const cfConnectingIP = request.headers.get('CF-Connecting-IP');
     const xForwardedFor = request.headers.get('X-Forwarded-For');
     const xRealIP = request.headers.get('X-Real-IP');
-    
+
     return cfConnectingIP || xForwardedFor?.split(',')[0] || xRealIP || 'unknown';
   }
 }
@@ -303,16 +299,16 @@ export function withRequestTracking(
   requestHandler: (request: Request) => Promise<Response>
 ): (request: Request) => Promise<Response> {
   const requestTracker = new RequestTracker(performanceMonitor);
-  
+
   return async (request: Request): Promise<Response> => {
     const requestId = requestTracker.startTracking(request);
-    
+
     try {
       const response = await requestHandler(request);
-      
+
       // Add request ID to response headers
       response.headers.set('X-Request-ID', requestId);
-      
+
       return response;
     } catch (error) {
       // Ensure tracking is completed even if error occurs

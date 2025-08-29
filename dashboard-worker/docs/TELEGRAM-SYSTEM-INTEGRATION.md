@@ -1,6 +1,8 @@
 # 🔥📱 Fire22 Telegram System Integration
 
-Complete documentation for the Fire22 Telegram bot system integration with multilingual support, queue management, departmental workflows, and dashboard connectivity.
+Complete documentation for the Fire22 Telegram bot system integration with
+multilingual support, queue management, departmental workflows, and dashboard
+connectivity.
 
 ## 📋 Table of Contents
 
@@ -17,10 +19,12 @@ Complete documentation for the Fire22 Telegram bot system integration with multi
 
 ## 🎯 System Overview
 
-The Fire22 Telegram integration provides a complete multilingual bot system with:
+The Fire22 Telegram integration provides a complete multilingual bot system
+with:
 
 - **4 Languages**: English, Spanish, Portuguese, French
-- **6 Departments**: Customer Service, Finance, Operations, Compliance, Management, Technical
+- **6 Departments**: Customer Service, Finance, Operations, Compliance,
+  Management, Technical
 - **P2P Queue System**: Intelligent transaction matching
 - **Real-time Dashboard**: Live metrics and monitoring
 - **Workflow Orchestration**: Department-specific command flows
@@ -40,13 +44,13 @@ graph TD
     B --> I[Dashboard Integration]
     I --> J[SSE Stream]
     I --> K[Real-time Metrics]
-    
+
     subgraph "Data Layer"
         L[SQLite/D1 Database]
         M[Environment Config]
         N[Constants System]
     end
-    
+
     G --> L
     H --> M
     C --> N
@@ -56,25 +60,25 @@ graph TD
 
 ### Core Components
 
-| Component | File | Purpose |
-|-----------|------|---------|
-| **Integration Master** | `src/telegram/telegram-integration.ts` | Main orchestrator combining all systems |
-| **Workflow Orchestrator** | `src/telegram/telegram-workflow.ts` | Command handling and department workflows |
-| **Language System** | `src/telegram/multilingual-telegram-bot.ts` | 77 language codes across 4 languages |
-| **Environment Config** | `src/telegram/telegram-env.ts` | Secure configuration and validation |
-| **Constants System** | `src/telegram/telegram-constants.ts` | Centralized configuration constants |
-| **Dashboard Integration** | `src/telegram/telegram-dashboard-integration.ts` | Real-time dashboard connectivity |
-| **Queue System** | `src/queue-system.ts` | P2P transaction matching |
+| Component                 | File                                             | Purpose                                   |
+| ------------------------- | ------------------------------------------------ | ----------------------------------------- |
+| **Integration Master**    | `src/telegram/telegram-integration.ts`           | Main orchestrator combining all systems   |
+| **Workflow Orchestrator** | `src/telegram/telegram-workflow.ts`              | Command handling and department workflows |
+| **Language System**       | `src/telegram/multilingual-telegram-bot.ts`      | 77 language codes across 4 languages      |
+| **Environment Config**    | `src/telegram/telegram-env.ts`                   | Secure configuration and validation       |
+| **Constants System**      | `src/telegram/telegram-constants.ts`             | Centralized configuration constants       |
+| **Dashboard Integration** | `src/telegram/telegram-dashboard-integration.ts` | Real-time dashboard connectivity          |
+| **Queue System**          | `src/queue-system.ts`                            | P2P transaction matching                  |
 
 ### Language Codes (77 Total)
 
 ```typescript
 // Core system codes (L-1000 to L-1499)
 L-1001: "Select Language"
-L-1002: "User Management" 
+L-1002: "User Management"
 // ... 56 existing codes
 
-// Telegram-specific codes (L-1500 to L-1520)  
+// Telegram-specific codes (L-1500 to L-1520)
 L-1500: "Welcome" - Bot welcome message
 L-1501: "Account Linked" - Account linking confirmation
 L-1502: "Transaction Alert" - Transaction notifications
@@ -154,7 +158,7 @@ if (!validation.valid) {
 ```typescript
 // Customer Service
 CS_AGENT: Basic support access
-CS_SENIOR: Escalation permissions  
+CS_SENIOR: Escalation permissions
 CS_MANAGER: Full CS management
 
 // Finance
@@ -163,7 +167,7 @@ SENIOR_CASHIER: Higher transaction limits
 CASHIER_MANAGER: Approval permissions
 FINANCE_DIRECTOR: Full finance access
 
-// Operations  
+// Operations
 OPS_ANALYST: Queue viewing
 OPS_SPECIALIST: Queue management
 QUEUE_MANAGER: Full queue control ($100,000 limit)
@@ -191,6 +195,7 @@ CTO: Technical oversight
 ### Command Flows
 
 #### Customer Service Workflow
+
 ```
 /start → CS Welcome → [Active Tickets | New Ticket | Stats | Escalate]
 /support → Ticket Type → [Technical | Payment | Account | Security]
@@ -198,6 +203,7 @@ CTO: Technical oversight
 ```
 
 #### Finance Workflow
+
 ```
 /start → Finance Welcome → [Pending Approvals | Balances | Summary | Risk]
 /balance → Balance Overview → [Refresh | Transactions | Deposit | Withdraw]
@@ -205,6 +211,7 @@ CTO: Technical oversight
 ```
 
 #### Operations Workflow
+
 ```
 /start → Operations Welcome → [Queue Status | Process | Performance | Alerts]
 /queue → Queue Overview → [Refresh | Process | Details]
@@ -221,14 +228,14 @@ const matchScore = calculateMatchScore(withdrawal, deposit);
 
 // Factors:
 // - Amount proximity (40% weight)
-// - Payment type match (20% bonus)  
+// - Payment type match (20% bonus)
 // - Wait time priority (20% bonus)
 // - Maximum wait bonus (20% bonus)
 
 // Example match:
 {
   withdrawalId: "uuid-1",
-  depositId: "uuid-2", 
+  depositId: "uuid-2",
   amount: 1000,
   matchScore: 95,
   processingTime: 0,
@@ -241,15 +248,18 @@ const matchScore = calculateMatchScore(withdrawal, deposit);
 ```typescript
 QUEUE_CONFIG = {
   MAX_RETRIES: 3,
-  MATCH_TIMEOUT: 300000,    // 5 minutes
-  CLEANUP_INTERVAL: 3600000, // 1 hour  
-  MAX_AGE: 604800000,       // 7 days
-  
+  MATCH_TIMEOUT: 300000, // 5 minutes
+  CLEANUP_INTERVAL: 3600000, // 1 hour
+  MAX_AGE: 604800000, // 7 days
+
   PRIORITY_LEVELS: {
-    LOW: 1, NORMAL: 2, HIGH: 3, 
-    URGENT: 4, CRITICAL: 5
-  }
-}
+    LOW: 1,
+    NORMAL: 2,
+    HIGH: 3,
+    URGENT: 4,
+    CRITICAL: 5,
+  },
+};
 ```
 
 ### Queue Operations
@@ -262,12 +272,12 @@ const queueId = await queueSystem.addToQueue({
   amount: 1000,
   paymentType: 'bank_transfer',
   paymentDetails: 'account_info',
-  priority: 2
+  priority: 2,
 });
 
-// Check status  
+// Check status
 const stats = queueSystem.getQueueStats();
-// Returns: { totalItems, pendingWithdrawals, pendingDeposits, 
+// Returns: { totalItems, pendingWithdrawals, pendingDeposits,
 //           matchedPairs, averageWaitTime, processingRate }
 
 // Process matches
@@ -285,7 +295,7 @@ const dashboardIntegration = new TelegramDashboardIntegration(env);
 await dashboardIntegration.start();
 
 // Subscribe to real-time updates
-dashboardIntegration.subscribeToUpdates((data) => {
+dashboardIntegration.subscribeToUpdates(data => {
   console.log('New telegram data:', data);
 });
 
@@ -296,18 +306,21 @@ const currentData = dashboardIntegration.getDashboardData();
 ### Dashboard Widgets
 
 1. **Bot Status Widget**
+
    - Online/Offline status
    - Uptime tracking
    - Active users count
    - Messages per hour
 
 2. **Queue Status Widget**
+
    - Pending withdrawals/deposits
    - Matched pairs count
    - Average wait time
    - Processing rate
 
 3. **Language Distribution**
+
    - Users by language
    - Translation cache hits
    - Language switch frequency
@@ -325,7 +338,7 @@ const sseEndpoint = dashboardIntegration.createSSEEndpoint();
 
 // Client-side connection
 const eventSource = new EventSource('/api/telegram/stream');
-eventSource.onmessage = (event) => {
+eventSource.onmessage = event => {
   const data = JSON.parse(event.data);
   updateDashboard(data.data);
 };
@@ -335,12 +348,12 @@ eventSource.onmessage = (event) => {
 
 ### Supported Languages
 
-| Code | Language | Flag | Users |
-|------|----------|------|-------|
-| `en` | English | 🇺🇸 | Primary |
-| `es` | Español | 🇪🇸 | Secondary |
-| `pt` | Português | 🇵🇹 | Secondary |
-| `fr` | Français | 🇫🇷 | Secondary |
+| Code | Language  | Flag | Users     |
+| ---- | --------- | ---- | --------- |
+| `en` | English   | 🇺🇸   | Primary   |
+| `es` | Español   | 🇪🇸   | Secondary |
+| `pt` | Português | 🇵🇹   | Secondary |
+| `fr` | Français  | 🇫🇷   | Secondary |
 
 ### Translation Usage
 
@@ -352,22 +365,23 @@ const languageSystem = new Fire22LanguageSystem();
 // Translate message
 const message = await languageSystem.translate(
   'L-1500', // Welcome code
-  'es',     // Target language
+  'es', // Target language
   { name: 'Usuario' } // Variables
 );
 
 // Detect user language
 const detectedLang = await languageSystem.detectUserLanguage(userId);
 
-// Set user preference  
+// Set user preference
 await languageSystem.setUserLanguage(userId, 'pt');
 ```
 
 ### Language Switching
 
 Users can switch languages via:
+
 - `/language` command
-- Inline keyboard buttons  
+- Inline keyboard buttons
 - Automatic detection from Telegram settings
 
 ## 🚀 Deployment
@@ -403,15 +417,15 @@ curl https://your-domain.com/api/telegram/health
 
 ```typescript
 // Development
-ENVIRONMENT=development
-LOG_LEVEL=debug
-ENABLE_METRICS=true
+ENVIRONMENT = development;
+LOG_LEVEL = debug;
+ENABLE_METRICS = true;
 
 // Production
-ENVIRONMENT=production  
-LOG_LEVEL=info
-ENABLE_METRICS=true
-CF_ZONE_ID=your_zone_id
+ENVIRONMENT = production;
+LOG_LEVEL = info;
+ENABLE_METRICS = true;
+CF_ZONE_ID = your_zone_id;
 ```
 
 ## 📡 API Reference
@@ -424,7 +438,7 @@ GET /api/telegram/health
 Response: { status: "healthy", checks: {...}, uptime: 3600 }
 
 // System status
-GET /api/telegram/status  
+GET /api/telegram/status
 Response: { status: "running", metrics: {...}, queue: {...} }
 
 // Real-time stream
@@ -454,7 +468,7 @@ const status = integration.getSystemStatus();
 // Process webhook
 await integration.processWebhookUpdate(telegramUpdate);
 
-// Send notification  
+// Send notification
 await integration.sendNotification(userId, message);
 
 // Add to queue
@@ -469,7 +483,7 @@ const queueId = await integration.addToQueue(queueItem);
 # Check system health
 curl /api/telegram/health | jq '.checks'
 
-# View real-time metrics  
+# View real-time metrics
 curl /api/telegram/status | jq '.metrics'
 
 # Monitor queue
@@ -481,16 +495,19 @@ curl /api/telegram/status | jq '.queue'
 #### Common Issues
 
 1. **Bot Not Responding**
+
    - Check `TELEGRAM_BOT_TOKEN`
    - Verify webhook URL accessibility
    - Review error logs
 
 2. **Language Switching Not Working**
+
    - Verify translation files loaded
    - Check language code mapping
    - Review user preference storage
 
 3. **Queue Matches Failing**
+
    - Check database connectivity
    - Verify queue configuration
    - Review matching algorithm
@@ -504,10 +521,10 @@ curl /api/telegram/status | jq '.queue'
 
 ```typescript
 // Configuration tuning
-TRANSLATION_CACHE_SIZE=1000     // Increase for more users
-TRANSLATION_CACHE_TTL=3600000   // 1 hour cache
-RATE_LIMIT_COMMANDS=20          // Commands per minute
-QUEUE_PROCESSING_INTERVAL=5000  // 5 second intervals
+TRANSLATION_CACHE_SIZE = 1000; // Increase for more users
+TRANSLATION_CACHE_TTL = 3600000; // 1 hour cache
+RATE_LIMIT_COMMANDS = 20; // Commands per minute
+QUEUE_PROCESSING_INTERVAL = 5000; // 5 second intervals
 ```
 
 ## 📈 Metrics & Analytics
@@ -541,7 +558,7 @@ import Fire22TelegramIntegration from './src/telegram/telegram-integration';
 // 2. Create and start
 const integration = await Fire22TelegramIntegration.createAndStart(env);
 
-// 3. Check status  
+// 3. Check status
 const status = integration.getSystemStatus();
 console.log('Bot Status:', status.status);
 
@@ -550,8 +567,10 @@ const health = integration.getHealthCheck();
 console.log('System Health:', health.status);
 ```
 
-✅ **The Fire22 Telegram system is now fully integrated and ready for production use!**
+✅ **The Fire22 Telegram system is now fully integrated and ready for production
+use!**
 
 ---
 
-*For detailed implementation examples, see the individual component files in `src/telegram/`*
+_For detailed implementation examples, see the individual component files in
+`src/telegram/`_

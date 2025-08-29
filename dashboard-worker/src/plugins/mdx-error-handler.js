@@ -9,28 +9,28 @@ const path = require('path');
 function mdxErrorHandlerPlugin() {
   return {
     name: 'mdx-error-handler',
-    
+
     configureWebpack(config, isServer, utils) {
       return {
         plugins: [
           // Custom webpack plugin to catch MDX compilation errors
           {
             apply(compiler) {
-              compiler.hooks.compilation.tap('MDXErrorHandler', (compilation) => {
+              compiler.hooks.compilation.tap('MDXErrorHandler', compilation => {
                 // Hook into the compilation process to catch MDX errors
-                compilation.hooks.failedModule.tap('MDXErrorHandler', (module) => {
+                compilation.hooks.failedModule.tap('MDXErrorHandler', module => {
                   if (module.resource && module.resource.endsWith('.md')) {
                     console.warn(`⚠️ MDX compilation failed for: ${module.resource}`);
                     console.warn('Error details:', module.error?.message);
-                    
+
                     // Log the error for monitoring
                     const errorInfo = {
                       file: module.resource,
                       error: module.error?.message,
                       timestamp: new Date().toISOString(),
-                      type: 'mdx-compilation-error'
+                      type: 'mdx-compilation-error',
                     };
-                    
+
                     // Write error log to file for debugging
                     const logFile = path.join(__dirname, '../../logs/mdx-errors.json');
                     try {
@@ -38,12 +38,12 @@ function mdxErrorHandlerPlugin() {
                       if (!fs.existsSync(logDir)) {
                         fs.mkdirSync(logDir, { recursive: true });
                       }
-                      
+
                       let existingLogs = [];
                       if (fs.existsSync(logFile)) {
                         existingLogs = JSON.parse(fs.readFileSync(logFile, 'utf8'));
                       }
-                      
+
                       existingLogs.push(errorInfo);
                       fs.writeFileSync(logFile, JSON.stringify(existingLogs, null, 2));
                     } catch (e) {
@@ -52,21 +52,21 @@ function mdxErrorHandlerPlugin() {
                   }
                 });
               });
-            }
-          }
-        ]
+            },
+          },
+        ],
       };
     },
 
     async contentLoaded({ content, actions }) {
       const { createData } = actions;
-      
+
       // Create error registry for failed MDX files
       const errorRegistry = {
         timestamp: new Date().toISOString(),
         errors: [],
         totalErrors: 0,
-        handledErrors: 0
+        handledErrors: 0,
       };
 
       // Save error registry data

@@ -2,22 +2,26 @@
 
 ## Overview
 
-This guide covers deploying the Fire22 Dashboard Worker to various environments, with a focus on Cloudflare Workers for production deployment.
+This guide covers deploying the Fire22 Dashboard Worker to various environments,
+with a focus on Cloudflare Workers for production deployment.
 
 ## Prerequisites
 
 ### Required Tools
+
 - **Bun** >= 1.2.20
 - **Wrangler CLI** >= 3.0.0
 - **Git** for version control
 - **GitHub CLI** (optional, for actions)
 
 ### Required Accounts
+
 - **Cloudflare Account** with Workers subscription
 - **GitHub Account** for CI/CD
 - **PostgreSQL Database** (production)
 
 ### Required Secrets
+
 ```bash
 # Cloudflare
 CLOUDFLARE_API_TOKEN
@@ -206,17 +210,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.2.20
-      
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      
+
       - name: Run tests
         run: bun test
-      
+
       - name: Type check
         run: bun run typecheck
 
@@ -224,32 +228,32 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.2.20
-      
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      
+
       - name: Build production
         run: bun run build:production
-      
+
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           environment: production
-          
+
       - name: Verify deployment
         run: |
           sleep 10
           curl -f https://dashboard.fire22.ag/health || exit 1
-          
+
       - name: Notify success
         if: success()
         uses: 8398a7/action-slack@v3
@@ -329,15 +333,15 @@ wrangler deploy --env production --var UPSTREAM=blue
 regions:
   us-east:
     worker: fire22-dashboard-us-east
-    routes: ["us.dashboard.fire22.ag/*"]
-    
+    routes: ['us.dashboard.fire22.ag/*']
+
   eu-west:
     worker: fire22-dashboard-eu-west
-    routes: ["eu.dashboard.fire22.ag/*"]
-    
+    routes: ['eu.dashboard.fire22.ag/*']
+
   ap-southeast:
     worker: fire22-dashboard-ap-southeast
-    routes: ["asia.dashboard.fire22.ag/*"]
+    routes: ['asia.dashboard.fire22.ag/*']
 ```
 
 ## Database Migration
@@ -391,25 +395,25 @@ curl -X POST https://api.uptimerobot.com/v2/newMonitor \
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const start = performance.now();
-    
+
     try {
       const response = await handleRequest(request, env);
-      
+
       // Log metrics
       env.ANALYTICS.writeDataPoint({
         timestamp: Date.now(),
         latency: performance.now() - start,
         status: response.status,
-        path: new URL(request.url).pathname
+        path: new URL(request.url).pathname,
       });
-      
+
       return response;
     } catch (error) {
       // Alert on errors
       await notifyError(error, env);
       throw error;
     }
-  }
+  },
 };
 ```
 
@@ -421,7 +425,7 @@ export default {
   run: |
     # Deploy new version
     wrangler deploy --env production
-    
+
     # Monitor for 5 minutes
     for i in {1..30}; do
       sleep 10
@@ -440,6 +444,7 @@ export default {
 ## Production Checklist
 
 ### Pre-Deployment
+
 - [ ] All tests passing
 - [ ] Security audit completed
 - [ ] Environment variables configured
@@ -449,6 +454,7 @@ export default {
 - [ ] Rollback plan documented
 
 ### Deployment
+
 - [ ] Build production assets
 - [ ] Deploy to staging first
 - [ ] Smoke test staging
@@ -458,6 +464,7 @@ export default {
 - [ ] Verify all endpoints
 
 ### Post-Deployment
+
 - [ ] Verify health checks
 - [ ] Check error rates
 - [ ] Monitor performance
@@ -470,6 +477,7 @@ export default {
 ### Common Issues
 
 #### 1. Build Failures
+
 ```bash
 # Clear cache and rebuild
 rm -rf node_modules dist
@@ -478,6 +486,7 @@ bun run build:production
 ```
 
 #### 2. Secret Issues
+
 ```bash
 # List all secrets
 wrangler secret list --env production
@@ -487,6 +496,7 @@ wrangler secret put SECRET_NAME --env production
 ```
 
 #### 3. Memory Issues
+
 ```toml
 # Increase memory limit in wrangler.toml
 [limits]
@@ -495,10 +505,11 @@ memory_mb = 256
 ```
 
 #### 4. Rate Limiting
+
 ```typescript
 // Add rate limiting bypass for health checks
 if (pathname === '/health') {
-  return handleHealth(request);  // Skip rate limiting
+  return handleHealth(request); // Skip rate limiting
 }
 ```
 
@@ -524,18 +535,21 @@ openssl s_client -connect dashboard.fire22.ag:443
 ## Security Considerations
 
 ### 1. Secret Management
+
 - Never commit secrets to git
 - Use environment-specific secrets
 - Rotate secrets regularly
 - Use least privilege principle
 
 ### 2. Access Control
+
 - Implement IP allowlisting for admin endpoints
 - Use JWT with short expiration
 - Require MFA for sensitive operations
 - Log all administrative actions
 
 ### 3. Compliance
+
 - Enable GDPR compliance mode
 - Implement data retention policies
 - Audit log all data access

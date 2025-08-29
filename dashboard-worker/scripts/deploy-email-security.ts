@@ -4,15 +4,15 @@
  * 🚀 Fire22 Special Ops Email Security Deployment Script
  * OPERATION: SECURE-COMM-22
  * CLASSIFICATION: CONFIDENTIAL - FIRE22 INTERNAL
- * 
+ *
  * @version 1.0.0
  * @team Special Operations
  * @mission Deploy Cloudflare Durable Objects Email Security
  */
 
-import { spawn } from "bun";
-import { writeFileSync, readFileSync, existsSync } from "fs";
-import { join } from "path";
+import { spawn } from 'bun';
+import { writeFileSync, readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 
 interface DeploymentConfig {
   environment: 'development' | 'staging' | 'production';
@@ -46,7 +46,7 @@ class EmailSecurityDeployer {
    */
   async deploy(): Promise<DeploymentResult> {
     console.log('🚀 FIRE22 SPECIAL OPS TEAM - EMAIL SECURITY DEPLOYMENT');
-    console.log('=====================================================');
+    console.log('!==!==!==!==!==!==!==!==!==!==');
     console.log(`🎯 OPERATION: SECURE-COMM-22`);
     console.log(`🔒 CLASSIFICATION: CONFIDENTIAL - FIRE22 INTERNAL`);
     console.log(`🌍 ENVIRONMENT: ${this.config.environment.toUpperCase()}`);
@@ -56,31 +56,30 @@ class EmailSecurityDeployer {
     try {
       // Pre-deployment security checks
       await this.performSecurityChecks();
-      
+
       // Deploy Durable Objects
       await this.deployDurableObjects();
-      
+
       // Configure security settings
       await this.configureSecuritySettings();
-      
+
       // Setup department-specific configurations
       await this.setupDepartmentConfigurations();
-      
+
       // Deploy monitoring and alerting
       await this.deployMonitoring();
-      
+
       // Perform post-deployment validation
       await this.validateDeployment();
-      
+
       // Generate deployment report
       const result = await this.generateDeploymentReport();
-      
+
       console.log('\n✅ SPECIAL OPS DEPLOYMENT COMPLETED SUCCESSFULLY!');
       console.log('🔒 Email security infrastructure is now operational');
       console.log('📊 All departments secured with Durable Objects');
-      
+
       return result;
-      
     } catch (error) {
       console.error('\n❌ SPECIAL OPS DEPLOYMENT FAILED:', error);
       throw error;
@@ -92,19 +91,19 @@ class EmailSecurityDeployer {
    */
   private async performSecurityChecks(): Promise<void> {
     console.log('🔍 Performing pre-deployment security checks...');
-    
+
     // Check Cloudflare CLI authentication
     await this.checkCloudflareAuth();
-    
+
     // Validate security configuration
     await this.validateSecurityConfig();
-    
+
     // Check encryption keys
     await this.checkEncryptionKeys();
-    
+
     // Verify compliance requirements
     await this.verifyComplianceRequirements();
-    
+
     console.log('  ✅ All security checks passed');
   }
 
@@ -113,25 +112,27 @@ class EmailSecurityDeployer {
    */
   private async deployDurableObjects(): Promise<void> {
     console.log('🏗️ Deploying Durable Objects for email security...');
-    
+
     try {
       // Deploy main email security worker
       await this.executeCommand('wrangler', [
         'deploy',
-        '--name', 'fire22-email-security',
-        '--env', this.config.environment,
-        '--compatibility-date', '2024-08-28'
+        '--name',
+        'fire22-email-security',
+        '--env',
+        this.config.environment,
+        '--compatibility-date',
+        '2024-08-28',
       ]);
-      
+
       console.log('  ✅ Main email security worker deployed');
-      
+
       // Deploy department-specific configurations
       for (const department of this.config.departments) {
         await this.deployDepartmentDurableObject(department);
       }
-      
+
       console.log(`  ✅ ${this.config.departments.length} department Durable Objects deployed`);
-      
     } catch (error) {
       throw new Error(`Durable Objects deployment failed: ${error}`);
     }
@@ -142,13 +143,13 @@ class EmailSecurityDeployer {
    */
   private async deployDepartmentDurableObject(department: string): Promise<void> {
     console.log(`  🏢 Deploying ${department} email security...`);
-    
+
     // Create department-specific namespace
     const namespaceId = await this.createDurableObjectNamespace(department);
-    
+
     // Configure department security settings
     await this.configureDepartmentSecurity(department);
-    
+
     console.log(`    ✅ ${department} email security deployed (${namespaceId})`);
   }
 
@@ -157,19 +158,19 @@ class EmailSecurityDeployer {
    */
   private async configureSecuritySettings(): Promise<void> {
     console.log('🔐 Configuring security settings...');
-    
+
     // Set encryption keys
     await this.setEncryptionKeys();
-    
+
     // Configure audit logging
     await this.configureAuditLogging();
-    
+
     // Setup access controls
     await this.setupAccessControls();
-    
+
     // Configure backup policies
     await this.configureBackupPolicies();
-    
+
     console.log('  ✅ Security settings configured');
   }
 
@@ -178,73 +179,73 @@ class EmailSecurityDeployer {
    */
   private async setupDepartmentConfigurations(): Promise<void> {
     console.log('🏢 Setting up department configurations...');
-    
+
     const departmentConfigs = {
       // Tier 1 - Maximum Security
       exec: {
         securityLevel: 'TOP_SECRET',
         encryptionLevel: 'AES_256_GCM_HSM',
         backupFrequency: 'REAL_TIME',
-        retentionPeriod: '10_YEARS'
+        retentionPeriod: '10_YEARS',
       },
       finance: {
         securityLevel: 'CONFIDENTIAL_FINANCIAL',
         encryptionLevel: 'AES_256_GCM_FINANCIAL',
         backupFrequency: 'REAL_TIME',
-        retentionPeriod: '7_YEARS'
+        retentionPeriod: '7_YEARS',
       },
       compliance: {
         securityLevel: 'CONFIDENTIAL_LEGAL',
         encryptionLevel: 'AES_256_GCM_LEGAL',
         backupFrequency: 'REAL_TIME',
-        retentionPeriod: '10_YEARS'
+        retentionPeriod: '10_YEARS',
       },
-      
+
       // Tier 2 - High Security
       support: {
         securityLevel: 'CONFIDENTIAL_CUSTOMER',
         encryptionLevel: 'AES_256_GCM',
         backupFrequency: 'EVERY_5_MIN',
-        retentionPeriod: '5_YEARS'
+        retentionPeriod: '5_YEARS',
       },
       operations: {
         securityLevel: 'CONFIDENTIAL_OPERATIONAL',
         encryptionLevel: 'AES_256_GCM',
         backupFrequency: 'EVERY_5_MIN',
-        retentionPeriod: '5_YEARS'
+        retentionPeriod: '5_YEARS',
       },
       communications: {
         securityLevel: 'CONFIDENTIAL_CORPORATE',
         encryptionLevel: 'AES_256_GCM',
         backupFrequency: 'EVERY_5_MIN',
-        retentionPeriod: '3_YEARS'
+        retentionPeriod: '3_YEARS',
       },
       technology: {
         securityLevel: 'CONFIDENTIAL_TECHNICAL',
         encryptionLevel: 'AES_256_GCM',
         backupFrequency: 'EVERY_10_MIN',
-        retentionPeriod: '3_YEARS'
+        retentionPeriod: '3_YEARS',
       },
-      
+
       // Tier 3 - Medium Security
       marketing: {
         securityLevel: 'INTERNAL',
         encryptionLevel: 'AES_256_GCM',
         backupFrequency: 'EVERY_15_MIN',
-        retentionPeriod: '2_YEARS'
+        retentionPeriod: '2_YEARS',
       },
       design: {
         securityLevel: 'INTERNAL',
         encryptionLevel: 'AES_256_GCM',
         backupFrequency: 'EVERY_15_MIN',
-        retentionPeriod: '2_YEARS'
+        retentionPeriod: '2_YEARS',
       },
       contributors: {
         securityLevel: 'INTERNAL',
         encryptionLevel: 'AES_256_GCM',
         backupFrequency: 'EVERY_15_MIN',
-        retentionPeriod: '2_YEARS'
-      }
+        retentionPeriod: '2_YEARS',
+      },
     };
 
     for (const [department, config] of Object.entries(departmentConfigs)) {
@@ -258,19 +259,19 @@ class EmailSecurityDeployer {
    */
   private async deployMonitoring(): Promise<void> {
     console.log('📊 Deploying monitoring and alerting...');
-    
+
     // Setup Analytics Engine
     await this.setupAnalyticsEngine();
-    
+
     // Configure security alerts
     await this.configureSecurityAlerts();
-    
+
     // Deploy health check endpoints
     await this.deployHealthChecks();
-    
+
     // Setup compliance monitoring
     await this.setupComplianceMonitoring();
-    
+
     console.log('  ✅ Monitoring and alerting deployed');
   }
 
@@ -279,19 +280,19 @@ class EmailSecurityDeployer {
    */
   private async validateDeployment(): Promise<void> {
     console.log('✅ Validating deployment...');
-    
+
     // Test Durable Objects connectivity
     await this.testDurableObjectsConnectivity();
-    
+
     // Validate security features
     await this.validateSecurityFeatures();
-    
+
     // Test department access
     await this.testDepartmentAccess();
-    
+
     // Verify backup functionality
     await this.verifyBackupFunctionality();
-    
+
     console.log('  ✅ Deployment validation completed');
   }
 
@@ -310,18 +311,21 @@ class EmailSecurityDeployer {
         'Audit Logging',
         'Real-time Backup',
         'Compliance Monitoring',
-        'Security Alerting'
-      ]
+        'Security Alerting',
+      ],
     };
 
     // Save deployment report
-    const reportPath = join(process.cwd(), 'deployment-reports', 
-      `email-security-${this.config.environment}-${Date.now()}.json`);
-    
+    const reportPath = join(
+      process.cwd(),
+      'deployment-reports',
+      `email-security-${this.config.environment}-${Date.now()}.json`
+    );
+
     writeFileSync(reportPath, JSON.stringify(result, null, 2));
-    
+
     console.log(`📋 Deployment report saved: ${reportPath}`);
-    
+
     return result;
   }
 
@@ -335,7 +339,7 @@ class EmailSecurityDeployer {
         encryptionEnabled: true,
         auditLogging: true,
         backupEnabled: false,
-        complianceMode: 'DEVELOPMENT'
+        complianceMode: 'DEVELOPMENT',
       },
       staging: {
         environment: 'staging' as const,
@@ -344,20 +348,28 @@ class EmailSecurityDeployer {
         encryptionEnabled: true,
         auditLogging: true,
         backupEnabled: true,
-        complianceMode: 'TESTING'
+        complianceMode: 'TESTING',
       },
       production: {
         environment: 'production' as const,
         securityLevel: 'MAXIMUM' as const,
         departments: [
-          'exec', 'finance', 'compliance', 'support', 'operations',
-          'communications', 'technology', 'marketing', 'design', 'contributors'
+          'exec',
+          'finance',
+          'compliance',
+          'support',
+          'operations',
+          'communications',
+          'technology',
+          'marketing',
+          'design',
+          'contributors',
         ],
         encryptionEnabled: true,
         auditLogging: true,
         backupEnabled: true,
-        complianceMode: 'SOC2_GDPR_SOX'
-      }
+        complianceMode: 'SOC2_GDPR_SOX',
+      },
     };
 
     return configs[environment] || configs.production;
@@ -366,21 +378,21 @@ class EmailSecurityDeployer {
   private async executeCommand(command: string, args: string[]): Promise<string> {
     return new Promise((resolve, reject) => {
       const process = spawn([command, ...args], {
-        stdio: ['pipe', 'pipe', 'pipe']
+        stdio: ['pipe', 'pipe', 'pipe'],
       });
 
       let output = '';
       let errorOutput = '';
 
-      process.stdout?.on('data', (data) => {
+      process.stdout?.on('data', data => {
         output += data.toString();
       });
 
-      process.stderr?.on('data', (data) => {
+      process.stderr?.on('data', data => {
         errorOutput += data.toString();
       });
 
-      process.on('close', (code) => {
+      process.on('close', code => {
         if (code === 0) {
           resolve(output);
         } else {
@@ -489,27 +501,26 @@ class EmailSecurityDeployer {
 async function main() {
   const args = process.argv.slice(2);
   const environment = (args[0] as any) || 'production';
-  
+
   if (!['development', 'staging', 'production'].includes(environment)) {
     console.error('❌ Invalid environment. Use: development, staging, or production');
     process.exit(1);
   }
-  
+
   try {
     const deployer = new EmailSecurityDeployer(environment);
     const result = await deployer.deploy();
-    
+
     console.log('\n🎉 SPECIAL OPS MISSION ACCOMPLISHED!');
-    console.log('===================================');
+    console.log('!==!==!==!==!==!=====');
     console.log(`✅ Environment: ${result.environment}`);
     console.log(`✅ Durable Objects: ${result.durableObjects.length}`);
     console.log(`✅ Security Features: ${result.securityFeatures.length}`);
     console.log(`✅ Deployed At: ${result.deployedAt}`);
-    
+
     console.log('\n🔒 Fire22 email infrastructure is now secured with Cloudflare Durable Objects!');
     console.log('📧 All 10 departments have enterprise-grade email security.');
     console.log('🛡️ AES-256 encryption, audit logging, and compliance monitoring active.');
-    
   } catch (error) {
     console.error('\n💥 SPECIAL OPS MISSION FAILED:', error);
     process.exit(1);

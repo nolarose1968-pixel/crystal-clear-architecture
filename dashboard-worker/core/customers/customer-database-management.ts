@@ -3,7 +3,10 @@
  * Comprehensive customer profiling, ranking, and scoring based on financial activities
  */
 
-import { DepositWithdrawalSystem, FinancialTransaction } from '../finance/deposit-withdrawal-system';
+import {
+  DepositWithdrawalSystem,
+  FinancialTransaction,
+} from '../finance/deposit-withdrawal-system';
 
 export interface CustomerProfile {
   customerId: string;
@@ -171,7 +174,12 @@ export class CustomerDatabaseManagement {
   /**
    * Create new customer profile
    */
-  async createCustomerProfile(profileData: Omit<CustomerProfile, 'rankingProfile' | 'createdAt' | 'updatedAt' | 'lastActivityAt'>): Promise<CustomerProfile> {
+  async createCustomerProfile(
+    profileData: Omit<
+      CustomerProfile,
+      'rankingProfile' | 'createdAt' | 'updatedAt' | 'lastActivityAt'
+    >
+  ): Promise<CustomerProfile> {
     const customerId = profileData.customerId;
 
     if (this.customers.has(customerId)) {
@@ -196,12 +204,12 @@ export class CustomerDatabaseManagement {
           winRate: 0,
           accountAge: 0,
           activityFrequency: 0,
-          riskLevel: 0
-        }
+          riskLevel: 0,
+        },
       },
       createdAt: now,
       updatedAt: now,
-      lastActivityAt: now
+      lastActivityAt: now,
     };
 
     this.customers.set(customerId, profile);
@@ -222,7 +230,10 @@ export class CustomerDatabaseManagement {
   /**
    * Update customer profile
    */
-  async updateCustomerProfile(customerId: string, updates: Partial<CustomerProfile>): Promise<CustomerProfile> {
+  async updateCustomerProfile(
+    customerId: string,
+    updates: Partial<CustomerProfile>
+  ): Promise<CustomerProfile> {
     const profile = this.customers.get(customerId);
     if (!profile) {
       throw new Error(`Customer ${customerId} not found`);
@@ -250,7 +261,9 @@ export class CustomerDatabaseManagement {
     // Get all customer transactions
     const transactions = this.financialSystem.getCustomerTransactions(customerId);
     const deposits = transactions.filter(t => t.type === 'deposit' && t.status === 'completed');
-    const withdrawals = transactions.filter(t => t.type === 'withdrawal' && t.status === 'completed');
+    const withdrawals = transactions.filter(
+      t => t.type === 'withdrawal' && t.status === 'completed'
+    );
 
     // Calculate financial metrics
     const totalDeposits = deposits.reduce((sum, t) => sum + t.amount, 0);
@@ -266,7 +279,8 @@ export class CustomerDatabaseManagement {
 
     // Calculate averages
     const averageDepositAmount = deposits.length > 0 ? totalDeposits / deposits.length : 0;
-    const averageWithdrawalAmount = withdrawals.length > 0 ? totalWithdrawals / withdrawals.length : 0;
+    const averageWithdrawalAmount =
+      withdrawals.length > 0 ? totalWithdrawals / withdrawals.length : 0;
 
     // Determine preferred payment methods
     const paymentMethods = deposits.map(d => d.paymentMethod).filter(Boolean) as string[];
@@ -286,7 +300,7 @@ export class CustomerDatabaseManagement {
       depositFrequency,
       withdrawalFrequency,
       preferredPaymentMethods,
-      riskScore
+      riskScore,
     };
 
     profile.updatedAt = new Date().toISOString();
@@ -296,26 +310,30 @@ export class CustomerDatabaseManagement {
   /**
    * Update customer betting profile
    */
-  async updateCustomerBettingProfile(customerId: string, bettingData: {
-    totalBets: number;
-    totalWagered: number;
-    totalWins: number;
-    totalLosses: number;
-    favoriteSports: string[];
-    favoriteBetTypes: string[];
-    recentBets: Array<{
-      amount: number;
-      timestamp: string;
-      sport: string;
-      betType: string;
-      result: 'win' | 'loss' | 'push';
-    }>;
-  }): Promise<void> {
+  async updateCustomerBettingProfile(
+    customerId: string,
+    bettingData: {
+      totalBets: number;
+      totalWagered: number;
+      totalWins: number;
+      totalLosses: number;
+      favoriteSports: string[];
+      favoriteBetTypes: string[];
+      recentBets: Array<{
+        amount: number;
+        timestamp: string;
+        sport: string;
+        betType: string;
+        result: 'win' | 'loss' | 'push';
+      }>;
+    }
+  ): Promise<void> {
     const profile = this.customers.get(customerId);
     if (!profile) return;
 
     const winRate = bettingData.totalBets > 0 ? bettingData.totalWins / bettingData.totalBets : 0;
-    const averageBetSize = bettingData.totalBets > 0 ? bettingData.totalWagered / bettingData.totalBets : 0;
+    const averageBetSize =
+      bettingData.totalBets > 0 ? bettingData.totalWagered / bettingData.totalBets : 0;
 
     // Calculate betting frequency (bets per month)
     const accountAgeMonths = this.calculateAccountAgeMonths(profile.accountInfo.registrationDate);
@@ -343,7 +361,7 @@ export class CustomerDatabaseManagement {
       bettingFrequency,
       timeOfDayPreference: timePreference,
       riskTolerance,
-      profitabilityScore
+      profitabilityScore,
     };
 
     profile.updatedAt = new Date().toISOString();
@@ -367,12 +385,11 @@ export class CustomerDatabaseManagement {
 
     // Calculate overall score (weighted average)
     const weights = { financial: 0.3, betting: 0.3, loyalty: 0.2, risk: 0.2 };
-    const overallScore = (
+    const overallScore =
       financialScore * weights.financial +
       bettingScore * weights.betting +
       loyaltyScore * weights.loyalty +
-      (100 - riskScore) * weights.risk // Invert risk score
-    );
+      (100 - riskScore) * weights.risk; // Invert risk score
 
     // Determine VIP tier
     const vipTier = this.determineVIPTier(overallScore);
@@ -399,11 +416,11 @@ export class CustomerDatabaseManagement {
         financial: financialScore,
         betting: bettingScore,
         loyalty: loyaltyScore,
-        risk: riskScore
+        risk: riskScore,
       },
       comparisonMetrics,
       trendIndicators,
-      calculatedAt: new Date().toISOString()
+      calculatedAt: new Date().toISOString(),
     };
 
     this.rankings.set(customerId, ranking);
@@ -417,7 +434,7 @@ export class CustomerDatabaseManagement {
       riskScore,
       vipTier,
       percentileRank,
-      rankingFactors
+      rankingFactors,
     };
 
     return ranking;
@@ -448,21 +465,27 @@ export class CustomerDatabaseManagement {
       throw new Error(`Segment ${segmentId} not found`);
     }
 
-    return Array.from(this.customers.values())
-      .filter(customer => this.matchesSegment(customer, segment));
+    return Array.from(this.customers.values()).filter(customer =>
+      this.matchesSegment(customer, segment)
+    );
   }
 
   /**
    * Create customer segment
    */
-  createSegment(segmentData: Omit<CustomerSegment, 'customerCount' | 'totalValue' | 'averageValue' | 'createdAt' | 'updatedAt'>): CustomerSegment {
+  createSegment(
+    segmentData: Omit<
+      CustomerSegment,
+      'customerCount' | 'totalValue' | 'averageValue' | 'createdAt' | 'updatedAt'
+    >
+  ): CustomerSegment {
     const segment: CustomerSegment = {
       ...segmentData,
       customerCount: 0,
       totalValue: 0,
       averageValue: 0,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.segments.set(segment.segmentId, segment);
@@ -494,54 +517,71 @@ export class CustomerDatabaseManagement {
     registrationDateFrom?: string;
     registrationDateTo?: string;
   }): CustomerProfile[] {
-    return Array.from(this.customers.values())
-      .filter(customer => {
-        if (query.name && !`${customer.personalInfo.firstName} ${customer.personalInfo.lastName}`.toLowerCase().includes(query.name.toLowerCase())) {
-          return false;
-        }
+    return Array.from(this.customers.values()).filter(customer => {
+      if (
+        query.name &&
+        !`${customer.personalInfo.firstName} ${customer.personalInfo.lastName}`
+          .toLowerCase()
+          .includes(query.name.toLowerCase())
+      ) {
+        return false;
+      }
 
-        if (query.email && !customer.personalInfo.email.toLowerCase().includes(query.email.toLowerCase())) {
-          return false;
-        }
+      if (
+        query.email &&
+        !customer.personalInfo.email.toLowerCase().includes(query.email.toLowerCase())
+      ) {
+        return false;
+      }
 
-        if (query.phone && customer.personalInfo.phone && !customer.personalInfo.phone.includes(query.phone)) {
-          return false;
-        }
+      if (
+        query.phone &&
+        customer.personalInfo.phone &&
+        !customer.personalInfo.phone.includes(query.phone)
+      ) {
+        return false;
+      }
 
-        if (query.vipTier && customer.rankingProfile.vipTier !== query.vipTier) {
-          return false;
-        }
+      if (query.vipTier && customer.rankingProfile.vipTier !== query.vipTier) {
+        return false;
+      }
 
-        if (query.accountStatus && customer.accountInfo.accountStatus !== query.accountStatus) {
-          return false;
-        }
+      if (query.accountStatus && customer.accountInfo.accountStatus !== query.accountStatus) {
+        return false;
+      }
 
-        if (query.minBalance && customer.financialProfile.currentBalance < query.minBalance) {
-          return false;
-        }
+      if (query.minBalance && customer.financialProfile.currentBalance < query.minBalance) {
+        return false;
+      }
 
-        if (query.maxBalance && customer.financialProfile.currentBalance > query.maxBalance) {
-          return false;
-        }
+      if (query.maxBalance && customer.financialProfile.currentBalance > query.maxBalance) {
+        return false;
+      }
 
-        if (query.minWinRate && customer.bettingProfile.winRate < query.minWinRate) {
-          return false;
-        }
+      if (query.minWinRate && customer.bettingProfile.winRate < query.minWinRate) {
+        return false;
+      }
 
-        if (query.maxWinRate && customer.bettingProfile.winRate > query.maxWinRate) {
-          return false;
-        }
+      if (query.maxWinRate && customer.bettingProfile.winRate > query.maxWinRate) {
+        return false;
+      }
 
-        if (query.registrationDateFrom && customer.accountInfo.registrationDate < query.registrationDateFrom) {
-          return false;
-        }
+      if (
+        query.registrationDateFrom &&
+        customer.accountInfo.registrationDate < query.registrationDateFrom
+      ) {
+        return false;
+      }
 
-        if (query.registrationDateTo && customer.accountInfo.registrationDate > query.registrationDateTo) {
-          return false;
-        }
+      if (
+        query.registrationDateTo &&
+        customer.accountInfo.registrationDate > query.registrationDateTo
+      ) {
+        return false;
+      }
 
-        return true;
-      });
+      return true;
+    });
   }
 
   /**
@@ -573,7 +613,7 @@ export class CustomerDatabaseManagement {
       financialTrends,
       bettingTrends,
       riskAssessment,
-      recommendations
+      recommendations,
     };
   }
 
@@ -662,7 +702,9 @@ export class CustomerDatabaseManagement {
   /**
    * Calculate ranking factors
    */
-  private calculateRankingFactors(profile: CustomerProfile): CustomerProfile['rankingProfile']['rankingFactors'] {
+  private calculateRankingFactors(
+    profile: CustomerProfile
+  ): CustomerProfile['rankingProfile']['rankingFactors'] {
     const accountAgeMonths = this.calculateAccountAgeMonths(profile.accountInfo.registrationDate);
 
     return {
@@ -671,8 +713,9 @@ export class CustomerDatabaseManagement {
       betVolume: profile.bettingProfile.totalWagered,
       winRate: profile.bettingProfile.winRate,
       accountAge: accountAgeMonths,
-      activityFrequency: profile.financialProfile.depositFrequency + profile.bettingProfile.bettingFrequency,
-      riskLevel: profile.financialProfile.riskScore
+      activityFrequency:
+        profile.financialProfile.depositFrequency + profile.bettingProfile.bettingFrequency,
+      riskLevel: profile.financialProfile.riskScore,
     };
   }
 
@@ -690,7 +733,9 @@ export class CustomerDatabaseManagement {
   /**
    * Calculate comparison metrics
    */
-  private async calculateComparisonMetrics(profile: CustomerProfile): Promise<CustomerRanking['comparisonMetrics']> {
+  private async calculateComparisonMetrics(
+    profile: CustomerProfile
+  ): Promise<CustomerRanking['comparisonMetrics']> {
     const allCustomers = Array.from(this.customers.values());
 
     if (allCustomers.length === 0) {
@@ -698,34 +743,43 @@ export class CustomerDatabaseManagement {
         vsAverageDeposit: 0,
         vsAverageBetSize: 0,
         vsAverageWinRate: 0,
-        vsAverageVolume: 0
+        vsAverageVolume: 0,
       };
     }
 
-    const avgDeposit = allCustomers.reduce((sum, c) => sum + c.financialProfile.totalDeposits, 0) / allCustomers.length;
-    const avgBetSize = allCustomers.reduce((sum, c) => sum + c.bettingProfile.averageBetSize, 0) / allCustomers.length;
-    const avgWinRate = allCustomers.reduce((sum, c) => sum + c.bettingProfile.winRate, 0) / allCustomers.length;
-    const avgVolume = allCustomers.reduce((sum, c) => sum + c.financialProfile.lifetimeVolume, 0) / allCustomers.length;
+    const avgDeposit =
+      allCustomers.reduce((sum, c) => sum + c.financialProfile.totalDeposits, 0) /
+      allCustomers.length;
+    const avgBetSize =
+      allCustomers.reduce((sum, c) => sum + c.bettingProfile.averageBetSize, 0) /
+      allCustomers.length;
+    const avgWinRate =
+      allCustomers.reduce((sum, c) => sum + c.bettingProfile.winRate, 0) / allCustomers.length;
+    const avgVolume =
+      allCustomers.reduce((sum, c) => sum + c.financialProfile.lifetimeVolume, 0) /
+      allCustomers.length;
 
     return {
       vsAverageDeposit: ((profile.financialProfile.totalDeposits - avgDeposit) / avgDeposit) * 100,
       vsAverageBetSize: ((profile.bettingProfile.averageBetSize - avgBetSize) / avgBetSize) * 100,
       vsAverageWinRate: ((profile.bettingProfile.winRate - avgWinRate) / avgWinRate) * 100,
-      vsAverageVolume: ((profile.financialProfile.lifetimeVolume - avgVolume) / avgVolume) * 100
+      vsAverageVolume: ((profile.financialProfile.lifetimeVolume - avgVolume) / avgVolume) * 100,
     };
   }
 
   /**
    * Calculate trend indicators
    */
-  private async calculateTrendIndicators(customerId: string): Promise<CustomerRanking['trendIndicators']> {
+  private async calculateTrendIndicators(
+    customerId: string
+  ): Promise<CustomerRanking['trendIndicators']> {
     // In a real implementation, this would analyze historical data
     // For now, return mock trends
     return {
       depositTrend: 'stable',
       bettingTrend: 'increasing',
       activityTrend: 'stable',
-      riskTrend: 'improving'
+      riskTrend: 'improving',
     };
   }
 
@@ -741,8 +795,8 @@ export class CustomerDatabaseManagement {
         criteria: {
           minDepositVolume: 50000,
           minBetVolume: 25000,
-          riskLevel: 'medium'
-        }
+          riskLevel: 'medium',
+        },
       },
       {
         segmentId: 'loyal_customers',
@@ -750,25 +804,25 @@ export class CustomerDatabaseManagement {
         description: 'Long-term customers with consistent activity',
         criteria: {
           accountAge: 12,
-          minDepositVolume: 10000
-        }
+          minDepositVolume: 10000,
+        },
       },
       {
         segmentId: 'new_customers',
         name: 'New Customers',
         description: 'Recently registered customers',
         criteria: {
-          accountAge: 1
-        }
+          accountAge: 1,
+        },
       },
       {
         segmentId: 'at_risk',
         name: 'At Risk Customers',
         description: 'Customers showing declining activity',
         criteria: {
-          riskLevel: 'high'
-        }
-      }
+          riskLevel: 'high',
+        },
+      },
     ];
 
     segments.forEach(segment => this.createSegment(segment));
@@ -796,11 +850,17 @@ export class CustomerDatabaseManagement {
   private matchesSegment(customer: CustomerProfile, segment: CustomerSegment): boolean {
     const criteria = segment.criteria;
 
-    if (criteria.minDepositVolume && customer.financialProfile.totalDeposits < criteria.minDepositVolume) {
+    if (
+      criteria.minDepositVolume &&
+      customer.financialProfile.totalDeposits < criteria.minDepositVolume
+    ) {
       return false;
     }
 
-    if (criteria.maxDepositVolume && customer.financialProfile.totalDeposits > criteria.maxDepositVolume) {
+    if (
+      criteria.maxDepositVolume &&
+      customer.financialProfile.totalDeposits > criteria.maxDepositVolume
+    ) {
       return false;
     }
 
@@ -821,7 +881,9 @@ export class CustomerDatabaseManagement {
     }
 
     if (criteria.accountAge) {
-      const accountAgeMonths = this.calculateAccountAgeMonths(customer.accountInfo.registrationDate);
+      const accountAgeMonths = this.calculateAccountAgeMonths(
+        customer.accountInfo.registrationDate
+      );
       if (accountAgeMonths < criteria.accountAge) {
         return false;
       }
@@ -844,18 +906,25 @@ export class CustomerDatabaseManagement {
   }
 
   private getMostCommonItems(items: string[], limit: number): string[] {
-    const counts = items.reduce((acc, item) => {
-      acc[item] = (acc[item] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const counts = items.reduce(
+      (acc, item) => {
+        acc[item] = (acc[item] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     return Object.entries(counts)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, limit)
       .map(([item]) => item);
   }
 
-  private calculateFinancialRiskScore(profile: CustomerProfile, deposits: FinancialTransaction[], withdrawals: FinancialTransaction[]): number {
+  private calculateFinancialRiskScore(
+    profile: CustomerProfile,
+    deposits: FinancialTransaction[],
+    withdrawals: FinancialTransaction[]
+  ): number {
     let risk = 0;
 
     // Large deposits/withdrawals
@@ -867,12 +936,15 @@ export class CustomerDatabaseManagement {
     if (profile.financialProfile.withdrawalFrequency > 5) risk += 10;
 
     // Low balance ratio
-    if (profile.financialProfile.currentBalance < profile.financialProfile.totalDeposits * 0.1) risk += 15;
+    if (profile.financialProfile.currentBalance < profile.financialProfile.totalDeposits * 0.1)
+      risk += 15;
 
     return Math.min(risk, 100);
   }
 
-  private calculateTimeOfDayPreference(recentBets: Array<{ timestamp: string }>): 'morning' | 'afternoon' | 'evening' | 'night' {
+  private calculateTimeOfDayPreference(
+    recentBets: Array<{ timestamp: string }>
+  ): 'morning' | 'afternoon' | 'evening' | 'night' {
     if (recentBets.length === 0) return 'evening';
 
     const hours = recentBets.map(bet => new Date(bet.timestamp).getHours());
@@ -885,7 +957,8 @@ export class CustomerDatabaseManagement {
   }
 
   private calculateRiskTolerance(bettingData: any): 'low' | 'medium' | 'high' | 'very_high' {
-    const avgBetSize = bettingData.totalBets > 0 ? bettingData.totalWagered / bettingData.totalBets : 0;
+    const avgBetSize =
+      bettingData.totalBets > 0 ? bettingData.totalWagered / bettingData.totalBets : 0;
     const maxBet = Math.max(...bettingData.recentBets.map((b: any) => b.amount), 0);
 
     if (maxBet > 10000) return 'very_high';
@@ -896,7 +969,8 @@ export class CustomerDatabaseManagement {
 
   private calculateProfitabilityScore(bettingData: any): number {
     const winRate = bettingData.totalBets > 0 ? bettingData.totalWins / bettingData.totalBets : 0;
-    const avgBetSize = bettingData.totalBets > 0 ? bettingData.totalWagered / bettingData.totalBets : 0;
+    const avgBetSize =
+      bettingData.totalBets > 0 ? bettingData.totalWagered / bettingData.totalBets : 0;
 
     // Adjust win rate by bet size (larger bets should have higher win rates to be profitable)
     const sizeAdjustment = Math.max(0, 1 - avgBetSize / 1000);
@@ -916,7 +990,8 @@ export class CustomerDatabaseManagement {
     if (profile.bettingProfile.riskTolerance === 'very_high') risk += 25;
 
     // Low win rate with high volume
-    if (profile.bettingProfile.winRate < 0.3 && profile.bettingProfile.totalWagered > 10000) risk += 20;
+    if (profile.bettingProfile.winRate < 0.3 && profile.bettingProfile.totalWagered > 10000)
+      risk += 20;
 
     return Math.min(risk, 100);
   }
@@ -926,7 +1001,7 @@ export class CustomerDatabaseManagement {
     return {
       depositTrend: 'increasing',
       balanceTrend: 'stable',
-      activityTrend: 'increasing'
+      activityTrend: 'increasing',
     };
   }
 
@@ -935,7 +1010,7 @@ export class CustomerDatabaseManagement {
     return {
       volumeTrend: 'increasing',
       winRateTrend: 'stable',
-      betSizeTrend: 'stable'
+      betSizeTrend: 'stable',
     };
   }
 
@@ -947,12 +1022,15 @@ export class CustomerDatabaseManagement {
       recommendations: [
         'Monitor deposit patterns',
         'Review betting activity',
-        'Consider VIP status upgrade'
-      ]
+        'Consider VIP status upgrade',
+      ],
     };
   }
 
-  private generateCustomerRecommendations(profile: CustomerProfile, ranking: CustomerRanking): string[] {
+  private generateCustomerRecommendations(
+    profile: CustomerProfile,
+    ranking: CustomerRanking
+  ): string[] {
     const recommendations: string[] = [];
 
     if (ranking.tier === 'bronze' && ranking.overallScore > 70) {
@@ -986,21 +1064,25 @@ export class CustomerDatabaseManagement {
     const totalCustomers = customers.length;
     const activeCustomers = customers.filter(c => c.accountInfo.accountStatus === 'active').length;
     const vipCustomers = customers.filter(c => c.accountInfo.accountType !== 'standard').length;
-    const averageScore = rankings.length > 0
-      ? rankings.reduce((sum, r) => sum + r.overallScore, 0) / rankings.length
-      : 0;
+    const averageScore =
+      rankings.length > 0
+        ? rankings.reduce((sum, r) => sum + r.overallScore, 0) / rankings.length
+        : 0;
 
-    const topTierDistribution = customers.reduce((dist, c) => {
-      dist[c.rankingProfile.vipTier] = (dist[c.rankingProfile.vipTier] || 0) + 1;
-      return dist;
-    }, {} as Record<string, number>);
+    const topTierDistribution = customers.reduce(
+      (dist, c) => {
+        dist[c.rankingProfile.vipTier] = (dist[c.rankingProfile.vipTier] || 0) + 1;
+        return dist;
+      },
+      {} as Record<string, number>
+    );
 
     return {
       totalCustomers,
       activeCustomers,
       vipCustomers,
       averageScore,
-      topTierDistribution
+      topTierDistribution,
     };
   }
 }

@@ -1,6 +1,6 @@
 /**
  * 🛡️ Enhanced Security Cloudflare Worker with Fire22 Integration
- * 
+ *
  * Provides comprehensive API security with:
  * - JWT token authentication and validation
  * - Enhanced security headers and CORS
@@ -13,7 +13,8 @@
 const corsHeaders = {
   'Access-Control-Allow-Origin': 'https://fire22.com',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token, X-API-Version, X-Client-ID, X-Fire22-Security, X-Request-ID',
+  'Access-Control-Allow-Headers':
+    'Content-Type, Authorization, X-CSRF-Token, X-API-Version, X-Client-ID, X-Fire22-Security, X-Request-ID',
   'Access-Control-Allow-Credentials': 'true',
   'Access-Control-Max-Age': '86400',
   'X-Content-Type-Options': 'nosniff',
@@ -21,7 +22,7 @@ const corsHeaders = {
   'X-XSS-Protection': '1; mode=block',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload'
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
 };
 
 // Security configuration
@@ -32,7 +33,7 @@ const SECURITY_CONFIG = {
   TOKEN_EXPIRY_SECONDS: 3600, // 1 hour
   REFRESH_TOKEN_EXPIRY_SECONDS: 86400, // 24 hours
   ALLOWED_ORIGINS: ['https://fire22.com', 'https://dashboard.fire22.com'],
-  SECURITY_LEVEL: 'enhanced'
+  SECURITY_LEVEL: 'enhanced',
 };
 
 // Rate limiting storage (use KV in production)
@@ -55,30 +56,33 @@ interface SecurityAuditLog {
 /**
  * Check rate limiting per IP with enhanced security
  */
-function checkRateLimit(ip: string, endpoint: string): { allowed: boolean; remaining: number; resetTime: number } {
+function checkRateLimit(
+  ip: string,
+  endpoint: string
+): { allowed: boolean; remaining: number; resetTime: number } {
   const now = Date.now();
   const windowMs = SECURITY_CONFIG.RATE_LIMIT_WINDOW_MS;
   const maxRequests = SECURITY_CONFIG.MAX_REQUESTS_PER_WINDOW;
 
   const key = `${ip}:${endpoint}`;
-  
+
   if (!rateLimit.has(key)) {
     rateLimit.set(key, []);
   }
 
   const requests = rateLimit.get(key).filter(time => now - time < windowMs);
-  
+
   if (requests.length >= maxRequests) {
     return { allowed: false, remaining: 0, resetTime: now + windowMs };
   }
 
   requests.push(now);
   rateLimit.set(key, requests);
-  
-  return { 
-    allowed: true, 
-    remaining: maxRequests - requests.length, 
-    resetTime: now + windowMs 
+
+  return {
+    allowed: true,
+    remaining: maxRequests - requests.length,
+    resetTime: now + windowMs,
   };
 }
 
@@ -88,14 +92,14 @@ function checkRateLimit(ip: string, endpoint: string): { allowed: boolean; remai
 async function verifyJWT(token: string): Promise<any> {
   try {
     const [header, payload, signature] = token.split('.');
-    
+
     if (!header || !payload || !signature) {
       throw new Error('Invalid JWT format');
     }
-    
+
     // Decode payload
     const decodedPayload = JSON.parse(atob(payload));
-    
+
     // Check expiration
     if (decodedPayload.exp < Math.floor(Date.now() / 1000)) {
       throw new Error('Token expired');
@@ -120,11 +124,11 @@ async function verifyJWT(token: string): Promise<any> {
     const sig = Uint8Array.from(atob(signature), c => c.charCodeAt(0));
 
     const valid = await crypto.subtle.verify('HMAC', key, sig, data);
-    
+
     if (!valid) {
       throw new Error('Invalid signature');
     }
-    
+
     return decodedPayload;
   } catch (error) {
     throw new Error(`JWT verification failed: ${error.message}`);
@@ -138,13 +142,14 @@ function generateJWT(payload: any, type: 'access' | 'refresh' = 'access'): strin
   const header = {
     alg: 'HS256',
     typ: 'JWT',
-    kid: 'fire22-key-1' // Key ID for rotation
+    kid: 'fire22-key-1', // Key ID for rotation
   };
 
   const now = Math.floor(Date.now() / 1000);
-  const expiry = type === 'access' 
-    ? SECURITY_CONFIG.TOKEN_EXPIRY_SECONDS 
-    : SECURITY_CONFIG.REFRESH_TOKEN_EXPIRY_SECONDS;
+  const expiry =
+    type === 'access'
+      ? SECURITY_CONFIG.TOKEN_EXPIRY_SECONDS
+      : SECURITY_CONFIG.REFRESH_TOKEN_EXPIRY_SECONDS;
 
   const tokenPayload = {
     ...payload,
@@ -152,7 +157,7 @@ function generateJWT(payload: any, type: 'access' | 'refresh' = 'access'): strin
     exp: now + expiry,
     type,
     iss: 'fire22-dashboard',
-    aud: 'fire22-api'
+    aud: 'fire22-api',
   };
 
   const encodedHeader = btoa(JSON.stringify(header));
@@ -170,7 +175,7 @@ function generateJWT(payload: any, type: 'access' | 'refresh' = 'access'): strin
 function logSecurityAudit(auditLog: SecurityAuditLog): void {
   // Log to console in development
   console.log('🔒 Security Audit:', JSON.stringify(auditLog, null, 2));
-  
+
   // In production, send to security monitoring service
   // This could be sent to a KV store, external API, or Cloudflare Analytics
 }
@@ -180,7 +185,7 @@ function logSecurityAudit(auditLog: SecurityAuditLog): void {
  */
 function validateSecurityHeaders(headers: Headers): { valid: boolean; issues: string[] } {
   const issues: string[] = [];
-  
+
   // Check required headers
   const requiredHeaders = ['X-API-Version', 'X-Client-ID', 'X-Request-ID'];
   for (const header of requiredHeaders) {
@@ -203,7 +208,7 @@ function validateSecurityHeaders(headers: Headers): { valid: boolean; issues: st
 
   return {
     valid: issues.length === 0,
-    issues
+    issues,
   };
 }
 
@@ -220,11 +225,11 @@ async function handleRequest(request: Request): Promise<Response> {
 
   // Handle CORS preflight
   if (method === 'OPTIONS') {
-    return new Response(null, { 
+    return new Response(null, {
       headers: {
         ...corsHeaders,
-        'Access-Control-Allow-Origin': request.headers.get('Origin') || '*'
-      }
+        'Access-Control-Allow-Origin': request.headers.get('Origin') || '*',
+      },
     });
   }
 
@@ -241,12 +246,12 @@ async function handleRequest(request: Request): Promise<Response> {
       requestId,
       securityLevel: SECURITY_CONFIG.SECURITY_LEVEL,
       status: 'error',
-      details: { origin, allowedOrigins: SECURITY_CONFIG.ALLOWED_ORIGINS }
+      details: { origin, allowedOrigins: SECURITY_CONFIG.ALLOWED_ORIGINS },
     });
 
     return new Response(JSON.stringify({ error: 'Origin not allowed' }), {
       status: 403,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 
@@ -263,23 +268,26 @@ async function handleRequest(request: Request): Promise<Response> {
       requestId,
       securityLevel: SECURITY_CONFIG.SECURITY_LEVEL,
       status: 'warning',
-      details: { 
-        remaining: rateLimitResult.remaining, 
-        resetTime: rateLimitResult.resetTime 
-      }
+      details: {
+        remaining: rateLimitResult.remaining,
+        resetTime: rateLimitResult.resetTime,
+      },
     });
 
-    return new Response(JSON.stringify({ 
-      error: 'Rate limit exceeded',
-      retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
-    }), {
-      status: 429,
-      headers: { 
-        ...corsHeaders, 
-        'Content-Type': 'application/json',
-        'Retry-After': Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000).toString()
+    return new Response(
+      JSON.stringify({
+        error: 'Rate limit exceeded',
+        retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000),
+      }),
+      {
+        status: 429,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+          'Retry-After': Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000).toString(),
+        },
       }
-    });
+    );
   }
 
   // Validate security headers
@@ -295,16 +303,19 @@ async function handleRequest(request: Request): Promise<Response> {
       requestId,
       securityLevel: SECURITY_CONFIG.SECURITY_LEVEL,
       status: 'warning',
-      details: { issues: headerValidation.issues }
+      details: { issues: headerValidation.issues },
     });
 
-    return new Response(JSON.stringify({ 
-      error: 'Security headers validation failed',
-      issues: headerValidation.issues
-    }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Security headers validation failed',
+        issues: headerValidation.issues,
+      }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 
   // Log request start
@@ -318,10 +329,10 @@ async function handleRequest(request: Request): Promise<Response> {
     requestId,
     securityLevel: SECURITY_CONFIG.SECURITY_LEVEL,
     status: 'success',
-    details: { 
+    details: {
       rateLimitRemaining: rateLimitResult.remaining,
-      securityHeaders: headerValidation.valid
-    }
+      securityHeaders: headerValidation.valid,
+    },
   });
 
   try {
@@ -349,7 +360,7 @@ async function handleRequest(request: Request): Promise<Response> {
       default:
         response = new Response(JSON.stringify({ error: 'Not Found' }), {
           status: 404,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
     }
 
@@ -371,17 +382,16 @@ async function handleRequest(request: Request): Promise<Response> {
       requestId,
       securityLevel: SECURITY_CONFIG.SECURITY_LEVEL,
       status: 'success',
-      details: { 
+      details: {
         statusCode: response.status,
-        rateLimitRemaining: rateLimitResult.remaining
-      }
+        rateLimitRemaining: rateLimitResult.remaining,
+      },
     });
 
     return new Response(response.body, {
       status: response.status,
-      headers: responseHeaders
+      headers: responseHeaders,
     });
-
   } catch (error) {
     // Log error
     logSecurityAudit({
@@ -394,16 +404,19 @@ async function handleRequest(request: Request): Promise<Response> {
       requestId,
       securityLevel: SECURITY_CONFIG.SECURITY_LEVEL,
       status: 'error',
-      details: { error: error.message }
+      details: { error: error.message },
     });
 
-    return new Response(JSON.stringify({ 
-      error: 'Internal server error',
-      requestId
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Internal server error',
+        requestId,
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -411,13 +424,13 @@ async function handleRequest(request: Request): Promise<Response> {
  * Handle login with enhanced security
  */
 async function handleLogin(
-  request: Request, 
-  ip: string, 
-  userAgent: string, 
+  request: Request,
+  ip: string,
+  userAgent: string,
   requestId: string
 ): Promise<Response> {
   const { username, password } = await request.json();
-  
+
   // Validate credentials (replace with database check)
   if (username !== 'fire22_user' || password !== 'secure_password_123') {
     logSecurityAudit({
@@ -430,28 +443,28 @@ async function handleLogin(
       requestId,
       securityLevel: SECURITY_CONFIG.SECURITY_LEVEL,
       status: 'warning',
-      details: { username, reason: 'Invalid credentials' }
+      details: { username, reason: 'Invalid credentials' },
     });
 
     return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
       status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 
   // Generate tokens
-  const accessToken = generateJWT({ 
-    sub: 'fire22_user_123', 
-    username, 
+  const accessToken = generateJWT({
+    sub: 'fire22_user_123',
+    username,
     scope: 'read write admin',
     ip,
-    userAgent
+    userAgent,
   });
-  
-  const refreshToken = generateJWT({ 
-    sub: 'fire22_user_123', 
+
+  const refreshToken = generateJWT({
+    sub: 'fire22_user_123',
     type: 'refresh',
-    ip
+    ip,
   });
 
   logSecurityAudit({
@@ -464,35 +477,38 @@ async function handleLogin(
     requestId,
     securityLevel: SECURITY_CONFIG.SECURITY_LEVEL,
     status: 'success',
-    details: { username, tokenType: 'access+refresh' }
+    details: { username, tokenType: 'access+refresh' },
   });
 
-  return new Response(JSON.stringify({
-    access_token: accessToken,
-    refresh_token: refreshToken,
-    token_type: 'Bearer',
-    expires_in: SECURITY_CONFIG.TOKEN_EXPIRY_SECONDS,
-    scope: 'read write admin'
-  }), {
-    status: 200,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-  });
+  return new Response(
+    JSON.stringify({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      token_type: 'Bearer',
+      expires_in: SECURITY_CONFIG.TOKEN_EXPIRY_SECONDS,
+      scope: 'read write admin',
+    }),
+    {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    }
+  );
 }
 
 /**
  * Handle token refresh
  */
 async function handleRefresh(
-  request: Request, 
-  ip: string, 
-  userAgent: string, 
+  request: Request,
+  ip: string,
+  userAgent: string,
   requestId: string
 ): Promise<Response> {
   const { refresh_token } = await request.json();
-  
+
   try {
     const payload = await verifyJWT(refresh_token);
-    
+
     if (payload.type !== 'refresh') {
       throw new Error('Invalid refresh token');
     }
@@ -509,33 +525,36 @@ async function handleRefresh(
         requestId,
         securityLevel: SECURITY_CONFIG.SECURITY_LEVEL,
         status: 'warning',
-        details: { 
-          tokenIp: payload.ip, 
-          requestIp: ip 
-        }
+        details: {
+          tokenIp: payload.ip,
+          requestIp: ip,
+        },
       });
     }
 
-    const newAccessToken = generateJWT({ 
-      sub: payload.sub, 
+    const newAccessToken = generateJWT({
+      sub: payload.sub,
       username: payload.username,
       scope: payload.scope || 'read write',
       ip,
-      userAgent
+      userAgent,
     });
 
-    return new Response(JSON.stringify({
-      access_token: newAccessToken,
-      token_type: 'Bearer',
-      expires_in: SECURITY_CONFIG.TOKEN_EXPIRY_SECONDS
-    }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        access_token: newAccessToken,
+        token_type: 'Bearer',
+        expires_in: SECURITY_CONFIG.TOKEN_EXPIRY_SECONDS,
+      }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 }
@@ -544,37 +563,40 @@ async function handleRefresh(
  * Handle token verification
  */
 async function handleVerify(
-  request: Request, 
-  ip: string, 
-  userAgent: string, 
+  request: Request,
+  ip: string,
+  userAgent: string,
   requestId: string
 ): Promise<Response> {
   const auth = request.headers.get('Authorization');
   if (!auth || !auth.startsWith('Bearer ')) {
     return new Response(JSON.stringify({ error: 'No token provided' }), {
       status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 
   try {
     const token = auth.substring(7);
     const payload = await verifyJWT(token);
-    
-    return new Response(JSON.stringify({
-      valid: true,
-      user: payload.username,
-      scope: payload.scope,
-      expires: payload.exp,
-      issued: payload.iat
-    }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+
+    return new Response(
+      JSON.stringify({
+        valid: true,
+        user: payload.username,
+        scope: payload.scope,
+        expires: payload.exp,
+        issued: payload.iat,
+      }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 }
@@ -583,9 +605,9 @@ async function handleVerify(
  * Handle logout
  */
 async function handleLogout(
-  request: Request, 
-  ip: string, 
-  userAgent: string, 
+  request: Request,
+  ip: string,
+  userAgent: string,
   requestId: string
 ): Promise<Response> {
   const auth = request.headers.get('Authorization');
@@ -593,7 +615,7 @@ async function handleLogout(
     const token = auth.substring(7);
     try {
       const payload = await verifyJWT(token);
-      
+
       logSecurityAudit({
         timestamp: new Date().toISOString(),
         event: 'logout_success',
@@ -604,7 +626,7 @@ async function handleLogout(
         requestId,
         securityLevel: SECURITY_CONFIG.SECURITY_LEVEL,
         status: 'success',
-        details: { username: payload.username }
+        details: { username: payload.username },
       });
     } catch (error) {
       // Token invalid, but still allow logout
@@ -613,7 +635,7 @@ async function handleLogout(
 
   return new Response(JSON.stringify({ message: 'Logged out successfully' }), {
     status: 200,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
 }
 
@@ -621,37 +643,40 @@ async function handleLogout(
  * Handle protected resource access
  */
 async function handleProtected(
-  request: Request, 
-  ip: string, 
-  userAgent: string, 
+  request: Request,
+  ip: string,
+  userAgent: string,
   requestId: string
 ): Promise<Response> {
   const auth = request.headers.get('Authorization');
   if (!auth || !auth.startsWith('Bearer ')) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 
   try {
     const token = auth.substring(7);
     const payload = await verifyJWT(token);
-    
-    return new Response(JSON.stringify({
-      message: 'Protected resource accessed successfully',
-      user: payload.username,
-      scope: payload.scope,
-      timestamp: new Date().toISOString(),
-      requestId
-    }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+
+    return new Response(
+      JSON.stringify({
+        message: 'Protected resource accessed successfully',
+        user: payload.username,
+        scope: payload.scope,
+        timestamp: new Date().toISOString(),
+        requestId,
+      }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 }
@@ -660,32 +685,35 @@ async function handleProtected(
  * Handle security status endpoint
  */
 async function handleSecurityStatus(
-  request: Request, 
-  ip: string, 
-  userAgent: string, 
+  request: Request,
+  ip: string,
+  userAgent: string,
   requestId: string
 ): Promise<Response> {
   const rateLimitResult = checkRateLimit(ip, '/api/v1/security/status');
-  
-  return new Response(JSON.stringify({
-    security: {
-      level: SECURITY_CONFIG.SECURITY_LEVEL,
-      rateLimit: {
-        remaining: rateLimitResult.remaining,
-        resetTime: rateLimitResult.resetTime
+
+  return new Response(
+    JSON.stringify({
+      security: {
+        level: SECURITY_CONFIG.SECURITY_LEVEL,
+        rateLimit: {
+          remaining: rateLimitResult.remaining,
+          resetTime: rateLimitResult.resetTime,
+        },
+        headers: {
+          cors: true,
+          security: true,
+          hsts: true,
+        },
       },
-      headers: {
-        cors: true,
-        security: true,
-        hsts: true
-      }
-    },
-    timestamp: new Date().toISOString(),
-    requestId
-  }), {
-    status: 200,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-  });
+      timestamp: new Date().toISOString(),
+      requestId,
+    }),
+    {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    }
+  );
 }
 
 // Event listener for Cloudflare Worker
@@ -694,11 +722,11 @@ addEventListener('fetch', event => {
 });
 
 // Export for testing
-export { 
-  handleRequest, 
-  verifyJWT, 
-  generateJWT, 
+export {
+  handleRequest,
+  verifyJWT,
+  generateJWT,
   checkRateLimit,
   validateSecurityHeaders,
-  logSecurityAudit
+  logSecurityAudit,
 };

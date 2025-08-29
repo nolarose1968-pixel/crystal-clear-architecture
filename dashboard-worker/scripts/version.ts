@@ -3,10 +3,10 @@
 /**
  * 🚀 Fire22 Dashboard Worker Version Management
  * Automated semantic versioning following Bun.semver standards
- * 
+ *
  * Usage:
  *   bun run scripts/version.ts [patch|minor|major|show|init]
- * 
+ *
  * Examples:
  *   bun run scripts/version.ts patch    # 1.0.0 → 1.0.1
  *   bun run scripts/version.ts minor    # 1.0.0 → 1.1.0
@@ -66,7 +66,7 @@ class VersionManager {
       minor: parseInt(match[2]),
       patch: parseInt(match[3]),
       prerelease: match[4],
-      build: match[5]
+      build: match[5],
     };
   }
 
@@ -130,20 +130,20 @@ class VersionManager {
           ...versionInfo,
           major: versionInfo.major + 1,
           minor: 0,
-          patch: 0
+          patch: 0,
         });
         break;
       case 'minor':
         newVersion = this.formatVersion({
           ...versionInfo,
           minor: versionInfo.minor + 1,
-          patch: 0
+          patch: 0,
         });
         break;
       case 'patch':
         newVersion = this.formatVersion({
           ...versionInfo,
-          patch: versionInfo.patch + 1
+          patch: versionInfo.patch + 1,
         });
         break;
       default:
@@ -183,7 +183,6 @@ class VersionManager {
       console.log('🚀 Pushing changes...');
       execSync('git push', { stdio: 'inherit' });
       execSync(`git push origin v${newVersion}`, { stdio: 'inherit' });
-
     } catch (error) {
       console.warn('⚠️  Git operations failed, but version was updated in package.json');
       console.warn(`Error: ${error.message}`);
@@ -217,7 +216,6 @@ class VersionManager {
 
       writeFileSync(this.changelogPath, changelog);
       console.log(`📝 Changelog updated: ${this.changelogPath}`);
-
     } catch (error) {
       console.warn('⚠️  Failed to update changelog');
       console.warn(`Error: ${error.message}`);
@@ -258,13 +256,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         { type: 'refactor', section: 'Code Refactoring' },
         { type: 'perf', section: 'Performance Improvements' },
         { type: 'test', section: 'Tests' },
-        { type: 'chore', section: 'Chores' }
+        { type: 'chore', section: 'Chores' },
       ],
       releaseCommitMessageFormat: 'chore(release): {{currentTag}}',
       issuePrefixes: ['#'],
-      commitUrlFormat: 'https://github.com/brendadeeznuts1111/fire22-dashboard-worker/commit/{{hash}}',
-      compareUrlFormat: 'https://github.com/brendadeeznuts1111/fire22-dashboard-worker/compare/{{previousTag}}...{{currentTag}}',
-      issueUrlFormat: 'https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues/{{id}}'
+      commitUrlFormat:
+        'https://github.com/brendadeeznuts1111/fire22-dashboard-worker/commit/{{hash}}',
+      compareUrlFormat:
+        'https://github.com/brendadeeznuts1111/fire22-dashboard-worker/compare/{{previousTag}}...{{currentTag}}',
+      issueUrlFormat: 'https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues/{{id}}',
     };
 
     writeFileSync(this.versionRcPath, JSON.stringify(versionRc, null, 2));
@@ -287,7 +287,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       'version:minor': 'bun run scripts/version.ts minor',
       'version:major': 'bun run scripts/version.ts major',
       'version:show': 'bun run scripts/version.ts show',
-      'version:init': 'bun run scripts/version.ts init'
+      'version:init': 'bun run scripts/version.ts init',
     };
 
     Object.assign(packageJson.scripts, versionScripts);
@@ -313,7 +313,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     console.log(`   Major: ${versionInfo.major}`);
     console.log(`   Minor: ${versionInfo.minor}`);
     console.log(`   Patch: ${versionInfo.patch}`);
-    
+
     if (packageJson.metadata?.versioning) {
       console.log(`   Last Release: ${packageJson.metadata.versioning.lastRelease || 'N/A'}`);
       console.log(`   Next Release: ${packageJson.metadata.versioning.nextRelease || 'N/A'}`);

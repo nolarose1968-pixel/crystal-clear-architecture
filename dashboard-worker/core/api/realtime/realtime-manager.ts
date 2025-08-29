@@ -76,14 +76,14 @@ export class RealTimeManager {
         id: clientId,
         subscriptions: new Set(),
         lastActivity: Date.now(),
-        websocket: server as any
+        websocket: server as any,
       };
 
       // Store client
       this.wsClients.set(clientId, wsClient);
 
       // Handle WebSocket messages
-      server.addEventListener('message', (event) => {
+      server.addEventListener('message', event => {
         this.handleWebSocketMessage(clientId, event.data);
       });
 
@@ -97,9 +97,8 @@ export class RealTimeManager {
 
       return new Response(null, {
         status: 101,
-        webSocket: client
+        webSocket: client,
       });
-
     } catch (error) {
       console.error('WebSocket connection error:', error);
       return new Response('WebSocket connection failed', { status: 500 });
@@ -126,7 +125,7 @@ export class RealTimeManager {
       subscriptions: new Set(subscriptions),
       response: null as any,
       controller,
-      lastActivity: Date.now()
+      lastActivity: Date.now(),
     };
 
     // Store client
@@ -134,15 +133,15 @@ export class RealTimeManager {
 
     // Create readable stream for SSE
     const stream = new ReadableStream({
-      start: (controller) => {
+      start: controller => {
         // Send initial connection message
         const initialMessage = {
           type: 'connection',
           data: {
             clientId,
             timestamp: Date.now(),
-            message: 'Connected to Fire22 Real-time API'
-          }
+            message: 'Connected to Fire22 Real-time API',
+          },
         };
         controller.enqueue(`data: ${JSON.stringify(initialMessage)}\n\n`);
 
@@ -157,18 +156,18 @@ export class RealTimeManager {
       },
       cancel: () => {
         this.removeSSEClient(clientId);
-      }
+      },
     });
 
     const response = new Response(stream, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Cache-Control',
-        'X-Client-ID': clientId
-      }
+        'X-Client-ID': clientId,
+      },
     });
 
     // Store response reference
@@ -183,7 +182,7 @@ export class RealTimeManager {
   async broadcast(message: Omit<RealTimeMessage, 'timestamp'>): Promise<void> {
     const fullMessage: RealTimeMessage = {
       ...message,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     // Send to WebSocket clients
@@ -215,7 +214,7 @@ export class RealTimeManager {
     const fullMessage: RealTimeMessage = {
       ...message,
       timestamp: Date.now(),
-      targetUserId: userId
+      targetUserId: userId,
     };
 
     // Send to WebSocket clients
@@ -247,7 +246,7 @@ export class RealTimeManager {
     const fullMessage: RealTimeMessage = {
       ...message,
       timestamp: Date.now(),
-      channel
+      channel,
     };
 
     // Send to WebSocket clients
@@ -325,11 +324,13 @@ export class RealTimeManager {
     const now = Date.now();
     const activeThreshold = now - this.config.connectionTimeout;
 
-    const activeWS = Array.from(this.wsClients.values())
-      .filter(client => client.lastActivity > activeThreshold).length;
+    const activeWS = Array.from(this.wsClients.values()).filter(
+      client => client.lastActivity > activeThreshold
+    ).length;
 
-    const activeSSE = Array.from(this.sseClients.values())
-      .filter(client => client.lastActivity > activeThreshold).length;
+    const activeSSE = Array.from(this.sseClients.values()).filter(
+      client => client.lastActivity > activeThreshold
+    ).length;
 
     const channels = new Set<string>();
     for (const client of this.wsClients.values()) {
@@ -342,13 +343,13 @@ export class RealTimeManager {
     return {
       websocket: {
         total: this.wsClients.size,
-        active: activeWS
+        active: activeWS,
       },
       sse: {
         total: this.sseClients.size,
-        active: activeSSE
+        active: activeSSE,
       },
-      channels: Array.from(channels)
+      channels: Array.from(channels),
     };
   }
 
@@ -370,30 +371,36 @@ export class RealTimeManager {
         case 'subscribe':
           if (message.channel) {
             client.subscriptions.add(message.channel);
-            client.websocket.send(JSON.stringify({
-              type: 'subscribed',
-              channel: message.channel,
-              timestamp: Date.now()
-            }));
+            client.websocket.send(
+              JSON.stringify({
+                type: 'subscribed',
+                channel: message.channel,
+                timestamp: Date.now(),
+              })
+            );
           }
           break;
 
         case 'unsubscribe':
           if (message.channel) {
             client.subscriptions.delete(message.channel);
-            client.websocket.send(JSON.stringify({
-              type: 'unsubscribed',
-              channel: message.channel,
-              timestamp: Date.now()
-            }));
+            client.websocket.send(
+              JSON.stringify({
+                type: 'unsubscribed',
+                channel: message.channel,
+                timestamp: Date.now(),
+              })
+            );
           }
           break;
 
         case 'ping':
-          client.websocket.send(JSON.stringify({
-            type: 'pong',
-            timestamp: Date.now()
-          }));
+          client.websocket.send(
+            JSON.stringify({
+              type: 'pong',
+              timestamp: Date.now(),
+            })
+          );
           break;
 
         default:
@@ -504,7 +511,7 @@ export class RealTimeManager {
       // Send heartbeat to active connections
       const heartbeatMessage = {
         type: 'heartbeat',
-        timestamp: now
+        timestamp: now,
       };
 
       for (const client of this.wsClients.values()) {
@@ -516,7 +523,6 @@ export class RealTimeManager {
           }
         }
       }
-
     }, this.config.heartbeatInterval);
   }
 
@@ -562,5 +568,5 @@ export const defaultRealTimeConfig: RealTimeConfig = {
   maxConnections: 1000,
   heartbeatInterval: 30000, // 30 seconds
   connectionTimeout: 60000, // 1 minute
-  messageQueueSize: 100
+  messageQueueSize: 100,
 };

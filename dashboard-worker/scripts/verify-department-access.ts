@@ -39,7 +39,7 @@ class DepartmentAccessVerifier {
     const report: AccessibilityReport = {
       changelog: await this.verifyChangelog(),
       rssFeed: await this.verifyRssFeed(),
-      sseEndpoint: await this.verifySSE()
+      sseEndpoint: await this.verifySSE(),
     };
 
     this.printReport(report);
@@ -53,17 +53,18 @@ class DepartmentAccessVerifier {
       exists: existsSync(this.changelogPath),
       readable: false,
       hasMikeHunt: false,
-      path: this.changelogPath
+      path: this.changelogPath,
     };
 
     if (changelog.exists) {
       try {
         const content = readFileSync(this.changelogPath, 'utf8');
         changelog.readable = true;
-        changelog.hasMikeHunt = content.includes('Mike Hunt') && content.includes('Technology Department Head');
-        
+        changelog.hasMikeHunt =
+          content.includes('Mike Hunt') && content.includes('Technology Department Head');
+
         console.log(`✅ Changelog is accessible at: ${this.changelogPath}`);
-        
+
         if (changelog.hasMikeHunt) {
           console.log('✅ Mike Hunt assignment documented in changelog');
         } else {
@@ -85,23 +86,24 @@ class DepartmentAccessVerifier {
       readable: false,
       validJson: false,
       hasMikeHunt: false,
-      path: this.rssPath
+      path: this.rssPath,
     };
 
     if (rss.exists) {
       try {
         const content = readFileSync(this.rssPath, 'utf8');
         rss.readable = true;
-        
+
         // Validate JSON format
         const jsonData = JSON.parse(content);
         rss.validJson = true;
         console.log('✅ RSS feed has valid JSON format');
-        
-        rss.hasMikeHunt = content.includes('Mike Hunt') && content.includes('Technology Department Head');
-        
+
+        rss.hasMikeHunt =
+          content.includes('Mike Hunt') && content.includes('Technology Department Head');
+
         console.log(`✅ RSS feed is accessible at: ${this.rssPath}`);
-        
+
         if (rss.hasMikeHunt) {
           console.log('✅ Mike Hunt assignment included in RSS feed');
         } else {
@@ -120,34 +122,36 @@ class DepartmentAccessVerifier {
   private async verifySSE() {
     const sse = {
       accessible: false,
-      url: this.sseUrl
+      url: this.sseUrl,
     };
 
     console.log('\n🌐 Testing SSE endpoint /api/departments/stream...');
-    
+
     try {
       // Test SSE endpoint with timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
-      
+
       const response = await fetch(this.sseUrl, {
         signal: controller.signal,
         headers: {
-          'Accept': 'text/event-stream',
-          'Cache-Control': 'no-cache'
-        }
+          Accept: 'text/event-stream',
+          'Cache-Control': 'no-cache',
+        },
       });
-      
+
       clearTimeout(timeoutId);
       sse.accessible = response.ok;
-      
+
       if (sse.accessible) {
         console.log('✅ SSE endpoint is accessible');
       } else {
         console.log(`⚠️  SSE endpoint returned status: ${response.status}`);
       }
     } catch (error) {
-      console.log('⚠️  Could not connect to SSE endpoint (might be expected if server not running)');
+      console.log(
+        '⚠️  Could not connect to SSE endpoint (might be expected if server not running)'
+      );
     }
 
     return sse;
@@ -155,17 +159,21 @@ class DepartmentAccessVerifier {
 
   private printReport(report: AccessibilityReport) {
     console.log('\n📊 ACCESSIBILITY SUMMARY:');
-    console.log('=========================');
+    console.log('!==!==!==!=====');
     console.log(`Changelog: ${report.changelog.exists ? '✅ Accessible' : '❌ Missing'}`);
     console.log(`RSS Feed: ${report.rssFeed.exists ? '✅ Accessible' : '❌ Missing'}`);
-    console.log(`Mike Hunt in Changelog: ${report.changelog.hasMikeHunt ? '✅ Found' : '❌ Missing'}`);
+    console.log(
+      `Mike Hunt in Changelog: ${report.changelog.hasMikeHunt ? '✅ Found' : '❌ Missing'}`
+    );
     console.log(`Mike Hunt in RSS: ${report.rssFeed.hasMikeHunt ? '✅ Found' : '❌ Missing'}`);
-    console.log(`SSE Endpoint: ${report.sseEndpoint.accessible ? '✅ Accessible' : '❌ Not accessible'}`);
+    console.log(
+      `SSE Endpoint: ${report.sseEndpoint.accessible ? '✅ Accessible' : '❌ Not accessible'}`
+    );
   }
 
   private generateRecommendations(report: AccessibilityReport) {
     console.log('\n📋 RECOMMENDED ACTIONS:');
-    console.log('=======================');
+    console.log('!==!==!==!====');
 
     const actions = [];
 
@@ -202,7 +210,7 @@ class DepartmentAccessVerifier {
 
     console.log('\nTo manually test the SSE endpoint, run:');
     console.log(`  curl -N ${this.sseUrl}`);
-    
+
     console.log('\n🚀 Verification completed!');
   }
 
@@ -231,22 +239,22 @@ The RSS feed includes:
 Please ensure your teams are aware of these updates.
 
 Best regards,
-Platform Team`
+Platform Team`,
       },
       slack: {
         channel: '#department-heads',
-        message: `🚀 *Department Update*: Mike Hunt has been assigned as Technology Department Head. Critical path status: BLOCKED → ON_TRACK. Check changelog and RSS feed for details.`
-      }
+        message: `🚀 *Department Update*: Mike Hunt has been assigned as Technology Department Head. Critical path status: BLOCKED → ON_TRACK. Check changelog and RSS feed for details.`,
+      },
     };
 
     console.log('\n📧 NOTIFICATION TEMPLATE:');
-    console.log('=========================');
+    console.log('!==!==!==!=====');
     console.log('Email:');
     console.log(`To: ${template.email.to}`);
     console.log(`Cc: ${template.email.cc}`);
     console.log(`Subject: ${template.email.subject}`);
     console.log(`\n${template.email.body}`);
-    
+
     console.log('\nSlack/Teams:');
     console.log(`Channel: ${template.slack.channel}`);
     console.log(`Message: ${template.slack.message}`);
@@ -258,7 +266,7 @@ Platform Team`
 // Main execution
 async function main() {
   const verifier = new DepartmentAccessVerifier();
-  
+
   try {
     await verifier.verify();
     await verifier.generateNotificationTemplate();

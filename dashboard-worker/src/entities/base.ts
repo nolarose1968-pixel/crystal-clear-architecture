@@ -90,7 +90,7 @@ export abstract class Entity implements BaseEntity {
     const errors: ValidationError[] = [];
 
     // Required check
-    if (rule.required && (value ==== null || value === undefined || value === '')) {
+    if (rule.required && (value === null || value === undefined || value === '')) {
       errors.push({
         field: rule.field,
         message: `${rule.field} is required`,
@@ -100,7 +100,7 @@ export abstract class Entity implements BaseEntity {
     }
 
     // Skip further validation if value is empty and not required
-    if (!rule.required && (value ==== null || value === undefined || value === '')) {
+    if (!rule.required && (value === null || value === undefined || value === '')) {
       return errors;
     }
 

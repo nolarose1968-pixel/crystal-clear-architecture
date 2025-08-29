@@ -55,11 +55,11 @@ export class TestingFramework {
           'Environment validation',
           'Basic API connectivity',
           'Database connection',
-          'Core service health'
+          'Core service health',
         ],
         estimatedDuration: 5000, // 5 seconds
         required: false,
-        status: 'pending'
+        status: 'pending',
       },
       {
         name: 'Pre-Deployment Checklist',
@@ -70,11 +70,11 @@ export class TestingFramework {
           'Performance testing',
           'Integration testing',
           'End-to-end testing',
-          'Coverage validation'
+          'Coverage validation',
         ],
         estimatedDuration: 120000, // 2 minutes
         required: true,
-        status: 'pending'
+        status: 'pending',
       },
       {
         name: 'Integration Testing',
@@ -83,12 +83,12 @@ export class TestingFramework {
           'Wager system integration',
           'Middleware integration',
           'Environment manager integration',
-          'API integration testing'
+          'API integration testing',
         ],
         estimatedDuration: 60000, // 1 minute
         required: true,
-        status: 'pending'
-      }
+        status: 'pending',
+      },
     ];
   }
 
@@ -99,7 +99,7 @@ export class TestingFramework {
       name: testName,
       success: false,
       duration: 0,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     try {
@@ -116,7 +116,10 @@ export class TestingFramework {
   }
 
   // Run a test suite
-  async runTestSuite(suiteName: string, tests: Array<{ name: string; fn: () => Promise<void> }>): Promise<TestSuite> {
+  async runTestSuite(
+    suiteName: string,
+    tests: Array<{ name: string; fn: () => Promise<void> }>
+  ): Promise<TestSuite> {
     const startTime = performance.now();
     const suite: TestSuite = {
       name: suiteName,
@@ -125,14 +128,14 @@ export class TestingFramework {
       passedTests: 0,
       failedTests: 0,
       duration: 0,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     // Run all tests in the suite
     for (const test of tests) {
       const result = await this.runTest(test.name, test.fn);
       suite.tests.push(result);
-      
+
       if (result.success) {
         suite.passedTests++;
       } else {
@@ -142,7 +145,7 @@ export class TestingFramework {
 
     suite.duration = performance.now() - startTime;
     this.testSuites.push(suite);
-    
+
     return suite;
   }
 
@@ -154,7 +157,7 @@ export class TestingFramework {
     }
 
     workflow.status = 'running';
-    
+
     try {
       // Create a test suite for the workflow
       const tests = workflow.steps.map(step => ({
@@ -163,11 +166,11 @@ export class TestingFramework {
           // Simulate test execution for each step
           await new Promise(resolve => setTimeout(resolve, 100));
           // In real implementation, this would run actual tests
-        }
+        },
       }));
 
       const suite = await this.runTestSuite(workflowName, tests);
-      
+
       if (suite.failedTests === 0) {
         workflow.status = 'completed';
       } else {
@@ -203,7 +206,7 @@ export class TestingFramework {
       failedTests,
       successRate,
       totalDuration,
-      averageDuration
+      averageDuration,
     };
   }
 
@@ -257,17 +260,21 @@ export class TestingFramework {
         t.success ? 'PASS' : 'FAIL',
         t.duration.toFixed(2),
         t.error || '',
-        t.timestamp
+        t.timestamp,
       ]);
-      
+
       return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     } else {
-      return JSON.stringify({
-        results: this.testResults,
-        suites: this.testSuites,
-        statistics: this.getTestStatistics(),
-        workflows: this.workflows
-      }, null, 2);
+      return JSON.stringify(
+        {
+          results: this.testResults,
+          suites: this.testSuites,
+          statistics: this.getTestStatistics(),
+          workflows: this.workflows,
+        },
+        null,
+        2
+      );
     }
   }
 }

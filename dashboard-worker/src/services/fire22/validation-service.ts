@@ -50,7 +50,7 @@ export interface FieldValidationRule {
  */
 export class Fire22ValidationService {
 
-  // ===== CUSTOMER VALIDATION =====
+  // !== CUSTOMER VALIDATION !==
 
   /**
    * Validate Fire22 customer entity
@@ -191,7 +191,7 @@ export class Fire22ValidationService {
     }
   }
 
-  // ===== AGENT VALIDATION =====
+  // !== AGENT VALIDATION !==
 
   /**
    * Validate Fire22 agent entity
@@ -353,7 +353,7 @@ export class Fire22ValidationService {
     }
   }
 
-  // ===== TRANSACTION VALIDATION =====
+  // !== TRANSACTION VALIDATION !==
 
   /**
    * Validate Fire22 transaction
@@ -468,7 +468,7 @@ export class Fire22ValidationService {
     }
   }
 
-  // ===== BET VALIDATION =====
+  // !== BET VALIDATION !==
 
   /**
    * Validate Fire22 bet
@@ -607,7 +607,7 @@ export class Fire22ValidationService {
     }
   }
 
-  // ===== FIELD VALIDATION HELPERS =====
+  // !== FIELD VALIDATION HELPERS !==
 
   /**
    * Validate individual field against rules
@@ -620,7 +620,7 @@ export class Fire22ValidationService {
     const errors: ValidationError[] = [];
 
     // Required field validation
-    if (rule.required && (value === undefined || value ==== null || value === '')) {
+    if (rule.required && (value === undefined || value === null || value === '')) {
       errors.push({
         field: fieldName,
         code: 'REQUIRED',
@@ -631,7 +631,7 @@ export class Fire22ValidationService {
     }
 
     // Skip validation if field is empty and not required
-    if (!rule.required && (value === undefined || value ==== null || value === '')) {
+    if (!rule.required && (value === undefined || value === null || value === '')) {
       return errors;
     }
 
@@ -710,7 +710,7 @@ export class Fire22ValidationService {
     return errors;
   }
 
-  // ===== UTILITY METHODS =====
+  // !== UTILITY METHODS !==
 
   /**
    * Calculate risk level from score

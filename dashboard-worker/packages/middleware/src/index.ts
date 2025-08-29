@@ -39,7 +39,7 @@ export class MiddlewareSystem {
   async parseRequestBody(request: Request): Promise<any> {
     try {
       const contentType = request.headers.get('content-type') || '';
-      
+
       if (contentType.includes('application/json')) {
         const body = await request.json();
         return this.validateRequestBody(body);
@@ -54,7 +54,9 @@ export class MiddlewareSystem {
         return null; // No body or unsupported content type
       }
     } catch (error) {
-      throw new Error(`Failed to parse request body: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to parse request body: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -63,7 +65,7 @@ export class MiddlewareSystem {
     if (!body || typeof body !== 'object') {
       throw new Error('Request body must be a valid object');
     }
-    
+
     // Add additional validation as needed
     return body;
   }
@@ -81,41 +83,42 @@ export class MiddlewareSystem {
       code,
       timestamp: new Date().toISOString(),
       requestId: requestId || this.generateRequestId(),
-      details
+      details,
     };
   }
 
   // Create standardized success response
-  createSuccessResponse<T>(
-    data: T,
-    requestId?: string
-  ): SuccessResponse<T> {
+  createSuccessResponse<T>(data: T, requestId?: string): SuccessResponse<T> {
     return {
       success: true,
       data,
       timestamp: new Date().toISOString(),
-      requestId: requestId || this.generateRequestId()
+      requestId: requestId || this.generateRequestId(),
     };
   }
 
   // Rate limiting middleware
-  async checkRateLimit(identifier: string, maxRequests: number = 100, windowMs: number = 900000): Promise<boolean> {
+  async checkRateLimit(
+    identifier: string,
+    maxRequests: number = 100,
+    windowMs: number = 900000
+  ): Promise<boolean> {
     const now = Date.now();
     const key = `rate_limit:${identifier}`;
-    
+
     if (!this.performanceMetrics.has(key)) {
       this.performanceMetrics.set(key, []);
     }
-    
+
     const requests = this.performanceMetrics.get(key)!;
-    
+
     // Remove expired requests
     const validRequests = requests.filter(time => now - time < windowMs);
-    
+
     if (validRequests.length >= maxRequests) {
       return false; // Rate limit exceeded
     }
-    
+
     validRequests.push(now);
     this.performanceMetrics.set(key, validRequests);
     return true;
@@ -135,10 +138,10 @@ export class MiddlewareSystem {
     if (!this.performanceMetrics.has(operation)) {
       this.performanceMetrics.set(operation, []);
     }
-    
+
     const metrics = this.performanceMetrics.get(operation)!;
     metrics.push(duration);
-    
+
     // Keep only last 1000 measurements
     if (metrics.length > 1000) {
       metrics.splice(0, metrics.length - 1000);
@@ -172,11 +175,11 @@ export class MiddlewareSystem {
   // Get all performance metrics
   getAllPerformanceStats(): Record<string, ReturnType<typeof this.getPerformanceStats>> {
     const stats: Record<string, ReturnType<typeof this.getPerformanceStats>> = {};
-    
+
     for (const [operation] of this.performanceMetrics) {
       stats[operation] = this.getPerformanceStats(operation);
     }
-    
+
     return stats;
   }
 }

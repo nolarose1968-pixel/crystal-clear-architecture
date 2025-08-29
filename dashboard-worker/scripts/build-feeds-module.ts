@@ -18,7 +18,7 @@ const feedFiles = [
   'team-announcements-rss.xml',
   'team-announcements-atom.xml',
   'critical-errors-alert.xml',
-  'index.html'
+  'index.html',
 ];
 
 console.log('📡 Building RSS feeds module for Cloudflare Workers...');
@@ -43,7 +43,7 @@ for (const file of feedFiles) {
       .replace(/\\/g, '\\\\')
       .replace(/`/g, '\\`')
       .replace(/\${/g, '\\${');
-    
+
     moduleContent += `  '${file}': \`${escapedContent}\`,\n`;
   } else {
     console.log(`  ⚠️ File not found: ${file}`);

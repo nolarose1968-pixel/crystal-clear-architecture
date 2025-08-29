@@ -4,13 +4,14 @@
 **Priority**: High  
 **Requested By**: Fire22 Development Team  
 **Date**: August 28, 2025  
-**Reference**: HR-2025-001 Personal Subdomain Initiative  
+**Reference**: HR-2025-001 Personal Subdomain Initiative
 
 ---
 
 ## 🎯 DEPLOYMENT REQUEST SUMMARY
 
-**REQUEST**: Deploy personal Cloudflare Workers subdomains for all Fire22 employees following the established pattern.
+**REQUEST**: Deploy personal Cloudflare Workers subdomains for all Fire22
+employees following the established pattern.
 
 **CURRENT STATUS**: ❌ DNS_PROBE_FINISHED_NXDOMAIN  
 **REQUIRED STATUS**: ✅ All employee subdomains operational
@@ -20,22 +21,27 @@
 ## 📋 CLOUDFLARE WORKERS SUBDOMAIN REQUIREMENTS
 
 ### **Primary VIP Subdomain (PRIORITY 1)**
+
 ```
 https://vinny2times.fire22.workers.dev/
 ```
+
 - **Owner**: Vinny2times (Head of VIP Management)
 - **Status**: CRITICAL - Referenced in commit 5d3e189
 - **Template**: VIP/Custom Tier 5
 - **Features**: VIP escalation, high-roller review, scheduling
 
 ### **Complete Employee Subdomain List (PRIORITY 2)**
+
 All Fire22 employees need personal subdomains:
 
 #### **Executive Team**
+
 - `https://william-harris.fire22.workers.dev/` (CEO)
 - `https://patricia-clark.fire22.workers.dev/` (COO)
 
 #### **Department Heads**
+
 - `https://jennifer-adams.fire22.workers.dev/` (HR Director)
 - `https://david-martinez.fire22.workers.dev/` (Operations Director)
 - `https://sarah-martinez.fire22.workers.dev/` (Communications Director)
@@ -43,13 +49,16 @@ All Fire22 employees need personal subdomains:
 - `https://isabella-martinez.fire22.workers.dev/` (Design Director)
 
 #### **All Team Members** (50+ employees)
-*Complete list available in `src/communications/FIRE22-PERSONAL-SUBDOMAIN-STANDARDS.md`*
+
+_Complete list available in
+`src/communications/FIRE22-PERSONAL-SUBDOMAIN-STANDARDS.md`_
 
 ---
 
 ## ⚙️ TECHNICAL SPECIFICATIONS
 
 ### **Cloudflare Workers Configuration**
+
 ```javascript
 // wrangler.toml template for personal subdomains
 name = "employee-personal-site"
@@ -71,6 +80,7 @@ FIRE22_BRAND = "enabled"
 ```
 
 ### **DNS Configuration Required**
+
 - **Wildcard DNS**: `*.fire22.workers.dev` → Cloudflare Workers
 - **SSL Certificates**: Automatic via Cloudflare (Universal SSL)
 - **CDN**: Global edge deployment
@@ -81,6 +91,7 @@ FIRE22_BRAND = "enabled"
 ## 🎨 TEMPLATE DEPLOYMENT
 
 ### **Template Tiers** (Deploy in Order)
+
 1. **Tier 5 (VIP/Custom)**: Vinny2times - URGENT
 2. **Tier 1 (Executive)**: C-suite and department heads
 3. **Tier 2 (Management)**: Directors and managers
@@ -88,6 +99,7 @@ FIRE22_BRAND = "enabled"
 5. **Tier 4 (Standard)**: All remaining employees
 
 ### **Template Features Per Tier**
+
 ```typescript
 interface PersonalSiteConfig {
   employee: EmployeeInfo;
@@ -108,24 +120,28 @@ interface PersonalSiteConfig {
 ## 🚀 DEPLOYMENT STEPS REQUIRED
 
 ### **Phase 1: Infrastructure Setup**
+
 1. **Configure Wildcard DNS** for `*.fire22.workers.dev`
 2. **Create KV Namespaces** for personal site data
 3. **Deploy Base Worker** with routing logic
 4. **Test SSL Certificate** generation
 
 ### **Phase 2: VIP Priority Deployment**
+
 1. **Deploy Vinny2times subdomain** FIRST (critical for current commit)
 2. **Test VIP features**: escalation, high-roller review
 3. **Validate branding** and Fire22 design standards
 4. **Confirm performance** (<3s load time)
 
 ### **Phase 3: Bulk Employee Rollout**
+
 1. **Deploy executive team** subdomains (Tier 1)
 2. **Deploy management team** subdomains (Tier 2)
 3. **Deploy specialist team** subdomains (Tier 3)
 4. **Deploy remaining employees** subdomains (Tier 4)
 
 ### **Phase 4: Automation Setup**
+
 1. **Configure automatic provisioning** for new hires
 2. **Setup monitoring** and health checks
 3. **Implement backup** and disaster recovery
@@ -136,17 +152,20 @@ interface PersonalSiteConfig {
 ## 📊 CLOUDFLARE RESOURCES NEEDED
 
 ### **Workers Usage**
+
 - **Estimated Requests**: 10,000-50,000 per day across all subdomains
 - **CPU Time**: <50ms per request (static content + dynamic profile)
 - **Memory**: <128MB per worker instance
 - **KV Operations**: 1,000-5,000 reads per day
 
 ### **Bandwidth Requirements**
+
 - **Static Assets**: ~2MB per site (images, CSS, JS)
 - **CDN Cache**: 95%+ hit rate expected
 - **Global Distribution**: Required for Fire22's international team
 
 ### **Security Requirements**
+
 - **SSL/TLS**: Automatic certificate management
 - **DDoS Protection**: Standard Cloudflare protection
 - **Access Control**: IP-based restrictions if needed
@@ -157,6 +176,7 @@ interface PersonalSiteConfig {
 ## ✅ ACCEPTANCE CRITERIA
 
 ### **Success Metrics**
+
 - [ ] **DNS Resolution**: All subdomains resolve correctly
 - [ ] **SSL Certificates**: Valid HTTPS for all subdomains
 - [ ] **Load Time**: <3 seconds for all personal sites
@@ -164,6 +184,7 @@ interface PersonalSiteConfig {
 - [ ] **Fire22 Branding**: Consistent across all sites
 
 ### **Critical Tests**
+
 1. **Vinny2times Site**: `curl -I https://vinny2times.fire22.workers.dev/`
 2. **Executive Sites**: Test 5-10 executive subdomains
 3. **Mobile Testing**: Verify responsive design
@@ -175,11 +196,13 @@ interface PersonalSiteConfig {
 ## 🔧 TROUBLESHOOTING SUPPORT
 
 ### **Current Error Resolution**
+
 **Error**: `DNS_PROBE_FINISHED_NXDOMAIN`  
 **Cause**: Subdomain not deployed to Cloudflare Workers  
 **Solution**: Deploy worker with proper routing configuration
 
 ### **Common Issues & Solutions**
+
 ```bash
 # Test DNS resolution
 nslookup vinny2times.fire22.workers.dev
@@ -196,11 +219,13 @@ curl -H "Accept: application/json" https://vinny2times.fire22.workers.dev/api/he
 ## 📞 CONTACT & COORDINATION
 
 ### **Fire22 Team Contacts**
+
 - **Technical Lead**: Chris Brown (CTO) - `chris-brown@tech.fire22`
 - **Project Manager**: Jennifer Adams (HR) - `jennifer-adams@hr.fire22`
 - **Design Lead**: Isabella Martinez - `isabella-martinez@design.fire22`
 
 ### **Required Information from Cloudflare Team**
+
 1. **Timeline**: When can deployment begin?
 2. **Resource Limits**: Any restrictions on subdomain count?
 3. **Configuration Access**: Who configures the DNS and workers?
@@ -212,24 +237,28 @@ curl -H "Accept: application/json" https://vinny2times.fire22.workers.dev/api/he
 ## 🎯 BUSINESS JUSTIFICATION
 
 ### **Why This Matters**
+
 - **HR Directive**: Mandatory for ALL employees (HR-2025-001)
 - **Professional Branding**: Consistent Fire22 identity across team
 - **VIP Management**: Critical for Vinny2times' VIP customer operations
 - **Employee Experience**: Modern, professional personal sites
 
 ### **Success Impact**
+
 - **100% Employee Coverage**: Every team member has professional presence
-- **VIP Operations**: Fully functional VIP escalation and review systems  
+- **VIP Operations**: Fully functional VIP escalation and review systems
 - **Brand Consistency**: Fire22 identity across all employee touchpoints
 - **Process Efficiency**: Automated onboarding with personal site setup
 
 ---
 
-**URGENT REQUEST**: Please prioritize `vinny2times.fire22.workers.dev` deployment as it's referenced in production commit and blocking VIP operations.
+**URGENT REQUEST**: Please prioritize `vinny2times.fire22.workers.dev`
+deployment as it's referenced in production commit and blocking VIP operations.
 
-**Timeline Requested**: 
+**Timeline Requested**:
+
 - **Phase 1 (VIP)**: Within 24 hours
-- **Phase 2 (Leadership)**: Within 1 week  
+- **Phase 2 (Leadership)**: Within 1 week
 - **Phase 3 (All Employees)**: Within 3 weeks
 
 ---
@@ -238,4 +267,5 @@ curl -H "Accept: application/json" https://vinny2times.fire22.workers.dev/api/he
 **Priority**: HIGH - Blocking production deployment  
 **Commit Reference**: 5d3e189 (VIP Management appointment)
 
-*Thank you for your support in making this personal subdomain infrastructure a reality!*
+_Thank you for your support in making this personal subdomain infrastructure a
+reality!_

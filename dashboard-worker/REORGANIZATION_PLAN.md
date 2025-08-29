@@ -1,6 +1,7 @@
 # Fire22 Dashboard Worker - File Reorganization Plan
 
 ## Current Structure Issues
+
 - 100+ files in root directory
 - SQL scripts scattered throughout
 - Documentation files mixed with code
@@ -87,29 +88,34 @@ dashboard-worker/
 ## Migration Plan
 
 ### Phase 1: Create New Directory Structure
+
 1. Create `data/` directory with subdirectories
 2. Create `temp/` directory for archives
 3. Reorganize `docs/` by category
 
 ### Phase 2: Move Files
+
 1. Move SQL files to appropriate `data/` subdirectories
-2. Move documentation files to categorized `docs/` subdirectories  
+2. Move documentation files to categorized `docs/` subdirectories
 3. Archive old/unused files to `temp/`
 
 ### Phase 3: Create Workflow Scripts
+
 1. Database population workflow
 2. Production sync scripts
 3. Data verification tools
 
 ### Phase 4: Update References
+
 1. Update import paths in code
 2. Update documentation links
 3. Update build scripts
 
 ## Benefits
+
 - **Clear separation of concerns**
 - **Easier database management workflow**
-- **Simplified root directory** 
+- **Simplified root directory**
 - **Better documentation organization**
 - **Cleaner development experience**
 - **Easier onboarding for new developers**
@@ -117,9 +123,10 @@ dashboard-worker/
 ## Files to Move
 
 ### SQL Files → `data/`
+
 - generate-players-data.sql → data/population/
 - fix-player-data.sql → data/population/
-- fix-transactions.sql → data/population/  
+- fix-transactions.sql → data/population/
 - fix-bets.sql → data/population/
 - fire22-complete-schema.sql → data/schemas/
 - enhanced-schema.sql → data/schemas/
@@ -129,12 +136,14 @@ dashboard-worker/
 - update-schema-fire22.sql → data/migration/
 
 ### Documentation → `docs/categories/`
+
 - API-related docs → docs/api/
-- Deployment docs → docs/deployment/  
+- Deployment docs → docs/deployment/
 - Development docs → docs/development/
 - Business docs → docs/business/
 
 ### Archive to `temp/`
+
 - Multiple duplicate documentation files
 - Old schema versions
 - Temporary test files

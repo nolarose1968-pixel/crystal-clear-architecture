@@ -2,71 +2,76 @@
 
 ## 🎯 Overview
 
-Complete documentation of all dependencies, development profiles, and environment configurations for the Fire22 Dashboard Worker system.
+Complete documentation of all dependencies, development profiles, and
+environment configurations for the Fire22 Dashboard Worker system.
 
 ---
 
 ## 📚 Dependencies Matrix
 
 ### Core Dependencies (Production)
+
 ```json
 {
-  "@cloudflare/workers-types": "^4.20250807.0",  // Cloudflare Workers TypeScript types
-  "jsonwebtoken": "9.0.2",                        // JWT authentication
-  "drizzle-orm": "^0.29.0",                      // SQL ORM for database operations
-  "better-sqlite3": "^9.2.2",                    // SQLite database driver
-  "zod": "^3.22.4",                              // Runtime type validation
-  "node-fetch": "^3.3.2",                        // HTTP fetch for Node.js compatibility
-  "twilio": "^4.19.0",                           // SMS/Voice communications
-  "stripe": "^14.1.0",                           // Payment processing
-  "@sendgrid/mail": "^8.0.0",                    // Email service
-  "crypto-js": "^4.2.0",                         // Cryptographic functions
-  "date-fns": "^3.0.6",                          // Date manipulation
-  "chalk": "^5.3.0",                             // Terminal colors
-  "kleur": "^4.1.5",                             // Terminal colors (lightweight)
-  "ansi-colors": "^4.1.3"                        // ANSI color codes
+  "@cloudflare/workers-types": "^4.20250807.0", // Cloudflare Workers TypeScript types
+  "jsonwebtoken": "9.0.2", // JWT authentication
+  "drizzle-orm": "^0.29.0", // SQL ORM for database operations
+  "better-sqlite3": "^9.2.2", // SQLite database driver
+  "zod": "^3.22.4", // Runtime type validation
+  "node-fetch": "^3.3.2", // HTTP fetch for Node.js compatibility
+  "twilio": "^4.19.0", // SMS/Voice communications
+  "stripe": "^14.1.0", // Payment processing
+  "@sendgrid/mail": "^8.0.0", // Email service
+  "crypto-js": "^4.2.0", // Cryptographic functions
+  "date-fns": "^3.0.6", // Date manipulation
+  "chalk": "^5.3.0", // Terminal colors
+  "kleur": "^4.1.5", // Terminal colors (lightweight)
+  "ansi-colors": "^4.1.3" // ANSI color codes
 }
 ```
 
 ### Development Dependencies
+
 ```json
 {
-  "@types/bun": "^1.2.21",                       // Bun TypeScript types
-  "@types/jsonwebtoken": "^9.0.10",              // JWT types
-  "@types/better-sqlite3": "^7.6.8",             // SQLite types
-  "@types/node": "^20.0.0",                      // Node.js types
-  "typescript": "5.9.2",                         // TypeScript compiler
-  "wrangler": "^3.0.0",                          // Cloudflare Workers CLI
-  "drizzle-kit": "^0.20.9",                      // Database migrations
-  "prettier": "^3.1.1",                          // Code formatter
-  "eslint": "^8.56.0",                           // Linter
-  "eslint-config-prettier": "^9.1.0",            // ESLint Prettier integration
-  "eslint-plugin-prettier": "^5.1.2",            // Prettier as ESLint rule
+  "@types/bun": "^1.2.21", // Bun TypeScript types
+  "@types/jsonwebtoken": "^9.0.10", // JWT types
+  "@types/better-sqlite3": "^7.6.8", // SQLite types
+  "@types/node": "^20.0.0", // Node.js types
+  "typescript": "5.9.2", // TypeScript compiler
+  "wrangler": "^3.0.0", // Cloudflare Workers CLI
+  "drizzle-kit": "^0.20.9", // Database migrations
+  "prettier": "^3.1.1", // Code formatter
+  "eslint": "^8.56.0", // Linter
+  "eslint-config-prettier": "^9.1.0", // ESLint Prettier integration
+  "eslint-plugin-prettier": "^5.1.2", // Prettier as ESLint rule
   "@typescript-eslint/eslint-plugin": "^6.15.0", // TypeScript ESLint rules
-  "@typescript-eslint/parser": "^6.15.0"         // TypeScript ESLint parser
+  "@typescript-eslint/parser": "^6.15.0" // TypeScript ESLint parser
 }
 ```
 
 ### Optional Dependencies
+
 ```json
 {
-  "dotenv": "^16.3.1",                           // Environment variable loading
-  "sqlite3": "^5.1.6",                           // Alternative SQLite driver
-  "redis": "^4.6.0",                             // Redis client
-  "ioredis": "^5.3.0"                            // Advanced Redis client
+  "dotenv": "^16.3.1", // Environment variable loading
+  "sqlite3": "^5.1.6", // Alternative SQLite driver
+  "redis": "^4.6.0", // Redis client
+  "ioredis": "^5.3.0" // Advanced Redis client
 }
 ```
 
 ### Workspace Dependencies
 
 #### Dependency Hierarchy
+
 ```
 @fire22/pattern-system (Zero dependencies - Foundation)
     ↓
 @fire22/api-client
     → @fire22/core-dashboard
     ↓
-@fire22/core-dashboard  
+@fire22/core-dashboard
     → @fire22/pattern-system
     → @fire22/api-client
     ↓
@@ -88,6 +93,7 @@ Complete documentation of all dependencies, development profiles, and environmen
 ## 🌍 Environment Configuration
 
 ### Environment Files Structure
+
 ```
 dashboard-worker/
 ├── .env                      # Local development (git ignored)
@@ -102,6 +108,7 @@ dashboard-worker/
 ### Environment Variables
 
 #### 🔐 Required Secrets
+
 ```bash
 # Authentication & Security
 JWT_SECRET=<minimum-32-chars>              # JWT signing key
@@ -119,6 +126,7 @@ FIRE22_WEBHOOK_SECRET=<webhook-secret>    # Fire22 webhook verification
 ```
 
 #### 📱 Optional Services
+
 ```bash
 # Telegram Bots
 BOT_TOKEN=<telegram-bot-token>            # Main bot
@@ -134,6 +142,7 @@ DEMO_MODE=true|false                      # Enable demo features
 ```
 
 #### 🔧 System Configuration
+
 ```bash
 # Runtime Environment
 NODE_ENV=development|staging|production|test|demo
@@ -155,6 +164,7 @@ PORT=3000                                 # Server port
 ## 👤 Development Profiles
 
 ### 1. Development Profile
+
 ```typescript
 {
   environment: "development",
@@ -180,6 +190,7 @@ PORT=3000                                 # Server port
 ```
 
 ### 2. Staging Profile
+
 ```typescript
 {
   environment: "staging",
@@ -205,6 +216,7 @@ PORT=3000                                 # Server port
 ```
 
 ### 3. Production Profile
+
 ```typescript
 {
   environment: "production",
@@ -230,6 +242,7 @@ PORT=3000                                 # Server port
 ```
 
 ### 4. Demo Profile
+
 ```typescript
 {
   environment: "demo",
@@ -260,6 +273,7 @@ PORT=3000                                 # Server port
 ## 🚀 Build Configurations
 
 ### Build-time Constants
+
 ```typescript
 // Injected via --define flags during build
 declare const ENVIRONMENT: string;
@@ -275,6 +289,7 @@ declare const COMMIT_HASH: string;
 ### Build Profiles
 
 #### Development Build
+
 ```bash
 bun build ./src/index.ts \
   --compile \
@@ -286,6 +301,7 @@ bun build ./src/index.ts \
 ```
 
 #### Production Build
+
 ```bash
 bun build ./src/index.ts \
   --compile \
@@ -304,6 +320,7 @@ bun build ./src/index.ts \
 ## 📊 Dependency Analysis
 
 ### Size Impact
+
 ```
 Production Dependencies:    ~45MB
 Development Dependencies:   ~120MB
@@ -315,6 +332,7 @@ Workspace Bundles:         364KB (99.4% reduction)
 ```
 
 ### Security Audit
+
 ```bash
 # Run security audit
 bun audit
@@ -327,6 +345,7 @@ bun pm trust verify
 ```
 
 ### Version Management
+
 ```bash
 # Check outdated packages
 bun outdated
@@ -344,6 +363,7 @@ bun update
 ## 🔄 Environment Switching
 
 ### Quick Switch Commands
+
 ```bash
 # Development
 bun run dev
@@ -359,6 +379,7 @@ DEMO_MODE=true bun run demo
 ```
 
 ### Environment Validation
+
 ```bash
 # Validate current environment
 bun run env:validate
@@ -378,6 +399,7 @@ bun run env:performance
 ## 🛠️ Development Tools
 
 ### Package Management
+
 ```bash
 # Install workspace dependencies
 bun install
@@ -393,6 +415,7 @@ bun run install:clean
 ```
 
 ### Workspace Commands
+
 ```bash
 # Build all workspaces
 bun run workspace:build
@@ -408,6 +431,7 @@ bun run workspace:version patch
 ```
 
 ### Publishing
+
 ```bash
 # Dry run publishing
 bun scripts/multi-registry-publisher.ts publish --dry-run
@@ -424,6 +448,7 @@ bun scripts/multi-registry-publisher.ts all
 ## 📝 Configuration Files
 
 ### bunfig.toml
+
 ```toml
 [install]
 registry = "https://registry.npmjs.org/"
@@ -443,6 +468,7 @@ minify = false
 ```
 
 ### tsconfig.json
+
 ```json
 {
   "compilerOptions": {

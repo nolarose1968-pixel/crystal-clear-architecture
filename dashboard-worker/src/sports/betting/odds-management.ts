@@ -11,7 +11,7 @@ import type {
   BetType,
   SportType,
   RiskLevel,
-  OddsUpdateRequest
+  OddsUpdateRequest,
 } from '../core/sports-types';
 
 export class OddsManagement {
@@ -50,7 +50,7 @@ export class OddsManagement {
       spread: request.odds.spread,
       overUnder: request.odds.overUnder,
       volume: this.calculateVolume(request.eventId),
-      reason: request.reason
+      reason: request.reason,
     };
 
     // Update odds
@@ -59,7 +59,7 @@ export class OddsManagement {
       ...request.odds,
       lastUpdated: new Date(),
       confidence: request.confidence || currentOdds.confidence,
-      movement: [...currentOdds.movement, movement].slice(-50) // Keep last 50 movements
+      movement: [...currentOdds.movement, movement].slice(-50), // Keep last 50 movements
     };
 
     // Add special bets if provided
@@ -67,10 +67,7 @@ export class OddsManagement {
       request.odds.specialBets.forEach(specialBet => {
         this.addSpecialBet(request.eventId, specialBet);
       });
-      updatedOdds.specialBets = [
-        ...updatedOdds.specialBets,
-        ...request.odds.specialBets
-      ];
+      updatedOdds.specialBets = [...updatedOdds.specialBets, ...request.odds.specialBets];
     }
 
     // Store in cache
@@ -102,7 +99,7 @@ export class OddsManagement {
       lastUpdated: new Date(),
       source: 'calculated',
       confidence: this.calculateConfidence(event),
-      movement: []
+      movement: [],
     };
 
     // Generate special bets
@@ -118,7 +115,7 @@ export class OddsManagement {
   addSpecialBet(eventId: string, specialBet: Omit<SpecialBet, 'id'>): SpecialBet {
     const bet: SpecialBet = {
       ...specialBet,
-      id: `sb_${eventId}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+      id: `sb_${eventId}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
     };
 
     this.specialBets.set(bet.id, bet);
@@ -146,7 +143,7 @@ export class OddsManagement {
 
     const updatedBet: SpecialBet = {
       ...bet,
-      ...updates
+      ...updates,
     };
 
     this.specialBets.set(specialBetId, updatedBet);
@@ -176,8 +173,7 @@ export class OddsManagement {
    * Get all special bets for an event
    */
   getSpecialBetsForEvent(eventId: string): SpecialBet[] {
-    return Array.from(this.specialBets.values())
-      .filter(bet => bet.id.includes(eventId));
+    return Array.from(this.specialBets.values()).filter(bet => bet.id.includes(eventId));
   }
 
   /**
@@ -191,7 +187,10 @@ export class OddsManagement {
   /**
    * Calculate fair odds based on market data
    */
-  calculateFairOdds(event: SportsEvent, marketData?: any): {
+  calculateFairOdds(
+    event: SportsEvent,
+    marketData?: any
+  ): {
     moneyline: { home: number; away: number; draw?: number };
     spread: { home: number; away: number; line: number };
     overUnder: { over: number; under: number; total: number };
@@ -200,20 +199,20 @@ export class OddsManagement {
     // For now, return calculated odds
     return {
       moneyline: {
-        home: 2.10,
+        home: 2.1,
         away: 1.85,
-        draw: event.sport === 'soccer' ? 3.20 : undefined
+        draw: event.sport === 'soccer' ? 3.2 : undefined,
       },
       spread: {
         home: 1.95,
         away: 1.95,
-        line: -3.5
+        line: -3.5,
       },
       overUnder: {
-        over: 1.90,
-        under: 1.90,
-        total: 48.5
-      }
+        over: 1.9,
+        under: 1.9,
+        total: 48.5,
+      },
     };
   }
 
@@ -317,7 +316,7 @@ export class OddsManagement {
     return {
       isValid: errors.length === 0,
       errors,
-      warnings
+      warnings,
     };
   }
 
@@ -330,10 +329,10 @@ export class OddsManagement {
   private getBaseOdds(sport: SportType, league: string): any {
     // Base odds configurations for different sports/leagues
     const baseOdds: Record<string, any> = {
-      'football_NFL': { moneyline: { home: 2.0, away: 2.0 }, spread: 3.5, total: 45 },
-      'basketball_NBA': { moneyline: { home: 1.9, away: 2.1 }, spread: 4.5, total: 220 },
-      'baseball_MLB': { moneyline: { home: 1.8, away: 2.2 }, spread: 1.5, total: 8.5 },
-      'soccer_EPL': { moneyline: { home: 2.3, away: 3.0, draw: 3.2 }, spread: 0.5, total: 2.5 }
+      football_NFL: { moneyline: { home: 2.0, away: 2.0 }, spread: 3.5, total: 45 },
+      basketball_NBA: { moneyline: { home: 1.9, away: 2.1 }, spread: 4.5, total: 220 },
+      baseball_MLB: { moneyline: { home: 1.8, away: 2.2 }, spread: 1.5, total: 8.5 },
+      soccer_EPL: { moneyline: { home: 2.3, away: 3.0, draw: 3.2 }, spread: 0.5, total: 2.5 },
     };
 
     return baseOdds[`${sport}_${league}`] || baseOdds[`${sport}_default`];
@@ -341,9 +340,9 @@ export class OddsManagement {
 
   private calculateMoneyline(baseOdds: any, event: SportsEvent): any {
     return {
-      homeWin: baseOdds?.moneyline?.home || 2.10,
+      homeWin: baseOdds?.moneyline?.home || 2.1,
       awayWin: baseOdds?.moneyline?.away || 1.85,
-      draw: baseOdds?.moneyline?.draw
+      draw: baseOdds?.moneyline?.draw,
     };
   }
 
@@ -352,15 +351,15 @@ export class OddsManagement {
       homeSpread: -(baseOdds?.spread || 3.5),
       homeOdds: 1.95,
       awaySpread: baseOdds?.spread || 3.5,
-      awayOdds: 1.95
+      awayOdds: 1.95,
     };
   }
 
   private calculateOverUnder(baseOdds: any, event: SportsEvent): any {
     return {
       total: baseOdds?.total || 45,
-      overOdds: 1.90,
-      underOdds: 1.90
+      overOdds: 1.9,
+      underOdds: 1.9,
     };
   }
 
@@ -402,7 +401,7 @@ export class OddsManagement {
             riskLevel: 'medium',
             maxBet: 1000,
             minBet: 10,
-            isLive: false
+            isLive: false,
           },
           {
             id: `sb_${event.id}_total_yds`,
@@ -413,25 +412,23 @@ export class OddsManagement {
             riskLevel: 'low',
             maxBet: 2000,
             minBet: 25,
-            isLive: false
+            isLive: false,
           }
         );
         break;
 
       case 'basketball':
-        specialBets.push(
-          {
-            id: `sb_${event.id}_first_team_20`,
-            name: 'First Team to 20 Points',
-            description: 'Which team reaches 20 first',
-            category: 'game_props',
-            odds: 1.90,
-            riskLevel: 'low',
-            maxBet: 1500,
-            minBet: 20,
-            isLive: true
-          }
-        );
+        specialBets.push({
+          id: `sb_${event.id}_first_team_20`,
+          name: 'First Team to 20 Points',
+          description: 'Which team reaches 20 first',
+          category: 'game_props',
+          odds: 1.9,
+          riskLevel: 'low',
+          maxBet: 1500,
+          minBet: 20,
+          isLive: true,
+        });
         break;
     }
 

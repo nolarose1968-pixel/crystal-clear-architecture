@@ -1,10 +1,12 @@
 # 🔐 Fire22 Security Scanner
 
-Advanced security scanner for Fire22 Dashboard using Bun's native security features.
+Advanced security scanner for Fire22 Dashboard using Bun's native security
+features.
 
 ## Features
 
-- **Dependency Vulnerability Scanning**: Identifies known CVEs in package.json dependencies
+- **Dependency Vulnerability Scanning**: Identifies known CVEs in package.json
+  dependencies
 - **Secret Detection**: Scans for exposed API keys, tokens, and credentials
 - **System Security**: Checks file permissions and system security issues
 - **Secure Storage**: Uses Bun.secrets for secure credential and result storage
@@ -22,10 +24,10 @@ bun add @fire22/security-scanner
 ### Programmatic Usage
 
 ```typescript
-import { Fire22SecurityScanner } from "@fire22/security-scanner";
+import { Fire22SecurityScanner } from '@fire22/security-scanner';
 
 const scanner = new Fire22SecurityScanner();
-const result = await scanner.performSecurityScan("./my-project");
+const result = await scanner.performSecurityScan('./my-project');
 
 console.log(`Security Score: ${result.score}/100`);
 console.log(`Risk Level: ${result.riskLevel}`);
@@ -55,11 +57,13 @@ scanner = "@fire22/security-scanner"
 ## Security Checks
 
 ### 1. Dependency Vulnerabilities
+
 - Scans package.json for known CVE vulnerabilities
 - Checks version ranges against vulnerability databases
 - Provides fix versions and upgrade recommendations
 
 ### 2. Secret Detection
+
 - AWS Access Keys (`AKIA...`)
 - GitHub Personal Access Tokens (`ghp_...`)
 - Private Keys (`-----BEGIN PRIVATE KEY-----`)
@@ -67,6 +71,7 @@ scanner = "@fire22/security-scanner"
 - Database Connection Strings
 
 ### 3. System Security
+
 - File permission checks (world-writable files)
 - Executable script validation
 - Configuration security review
@@ -171,15 +176,15 @@ export FIRE22_SCAN_SYSTEM=true           # Enable system security scanning
 
 ```typescript
 scanner.addCustomVulnerability({
-  packageName: "my-package",
+  packageName: 'my-package',
   vulnerability: {
-    id: "CUSTOM-001",
-    title: "Custom vulnerability",
-    severity: "medium",
-    description: "Description of the issue",
-    affectedPackages: ["my-package@<1.0.0"],
-    recommendation: "Upgrade to version 1.0.0 or later"
-  }
+    id: 'CUSTOM-001',
+    title: 'Custom vulnerability',
+    severity: 'medium',
+    description: 'Description of the issue',
+    affectedPackages: ['my-package@<1.0.0'],
+    recommendation: 'Upgrade to version 1.0.0 or later',
+  },
 });
 ```
 
@@ -193,7 +198,8 @@ scanner.addCustomVulnerability({
 ## Security Features
 
 - **No Network Calls**: All scanning performed locally
-- **Secure Storage**: Uses OS-native credential storage (Keychain/libsecret/CredMan)
+- **Secure Storage**: Uses OS-native credential storage
+  (Keychain/libsecret/CredMan)
 - **Memory Safety**: No persistent storage of sensitive data
 - **Audit Trail**: Secure logging of scan results with timestamps
 

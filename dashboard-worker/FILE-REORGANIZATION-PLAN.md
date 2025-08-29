@@ -2,9 +2,11 @@
 
 ## Current Issues
 
-1. **Inconsistent Naming**: Mix of kebab-case, CAPS, special characters (@packages.html)
+1. **Inconsistent Naming**: Mix of kebab-case, CAPS, special characters
+   (@packages.html)
 2. **Poor Organization**: Root directory cluttered with documentation files
-3. **Duplicate Concepts**: Multiple versions of similar files (index variations, dashboard versions)
+3. **Duplicate Concepts**: Multiple versions of similar files (index variations,
+   dashboard versions)
 4. **Release Management**: Release files scattered, not properly versioned
 5. **No Clear Hierarchy**: Mixing operational code with docs, tests, and configs
 
@@ -100,13 +102,13 @@ dashboard-worker/
 │
 ├── releases/                    # Release management
 │   ├── current/                # Current version
-│   │   └── v3.0.8/            
+│   │   └── v3.0.8/
 │   │       ├── changelog.md    # Version changelog
 │   │       ├── notes.md        # Release notes
 │   │       └── manifest.json   # Version manifest
 │   │
 │   └── archive/                # Previous versions
-│       └── v3.0.7/            
+│       └── v3.0.7/
 │
 ├── config/                      # Configuration files
 │   ├── wrangler.toml           # Cloudflare config
@@ -121,6 +123,7 @@ dashboard-worker/
 ## File Renaming Rules
 
 ### 1. Source Files (src/)
+
 ```
 ✅ Good:
 - index.ts
@@ -135,6 +138,7 @@ dashboard-worker/
 ```
 
 ### 2. Documentation (docs/)
+
 ```
 ✅ Good:
 - getting-started.md
@@ -148,6 +152,7 @@ dashboard-worker/
 ```
 
 ### 3. HTML/CSS Files
+
 ```
 ✅ Good:
 - dashboard.html
@@ -162,6 +167,7 @@ dashboard-worker/
 ## Migration Plan
 
 ### Phase 1: Create New Structure
+
 ```bash
 # Create new directory structure
 mkdir -p src/{core,features,ui,lib,workers}
@@ -176,6 +182,7 @@ mkdir -p config
 ```
 
 ### Phase 2: Move and Rename Files
+
 ```bash
 # Core files
 mv src/index.ts src/core/index.ts
@@ -203,6 +210,7 @@ mv releases/*.md releases/archive/
 ```
 
 ### Phase 3: Update Imports
+
 ```typescript
 // Before
 import { Fire22API } from '../fire22-api';
@@ -219,14 +227,14 @@ import dashboardHTML from '@/features/dashboard/index.html';
 // src/workers/durable/releases.ts
 export class ReleaseManager {
   state: DurableObjectState;
-  
+
   constructor(state: DurableObjectState) {
     this.state = state;
   }
 
   async fetch(request: Request) {
     const url = new URL(request.url);
-    
+
     switch (url.pathname) {
       case '/current':
         return this.getCurrentRelease();
@@ -252,14 +260,14 @@ export class ReleaseManager {
   async publishRelease(request: Request) {
     const release = await request.json();
     const version = release.version;
-    
+
     // Store release data
     await this.state.storage.put(`release-${version}`, release);
     await this.state.storage.put('current-release', release);
-    
+
     // Broadcast to connected clients
     this.broadcast({ type: 'new-release', version });
-    
+
     return Response.json({ success: true, version });
   }
 
@@ -272,26 +280,31 @@ export class ReleaseManager {
 ## Benefits of Reorganization
 
 ### 1. **Clear Separation of Concerns**
+
 - Core logic separate from features
 - UI components isolated
 - Documentation properly organized
 
 ### 2. **Better Developer Experience**
+
 - Intuitive file locations
 - Consistent naming
 - Easy navigation
 
 ### 3. **Improved Build Process**
+
 - Clear source/dist separation
 - Easier tree-shaking
 - Better code splitting
 
 ### 4. **Version Management**
+
 - Durable Objects for release tracking
 - Proper version history
 - Automated changelog generation
 
 ### 5. **Scalability**
+
 - Modular structure for growth
 - Feature-based organization
 - Clear extension points
@@ -400,6 +413,8 @@ echo "4. Commit the changes"
 5. **Update documentation references**
 6. **Implement Durable Objects for release management**
 
-This reorganization will make the codebase much cleaner, more maintainable, and easier to navigate. The consistent naming and logical structure will significantly improve developer experience.
+This reorganization will make the codebase much cleaner, more maintainable, and
+easier to navigate. The consistent naming and logical structure will
+significantly improve developer experience.
 
 Would you like me to proceed with implementing this reorganization?

@@ -1,16 +1,21 @@
 # @fire22/security-registry
 
-Enterprise-grade security registry with comprehensive package scanning and seamless bunx integration for the Fire22 ecosystem.
+Enterprise-grade security registry with comprehensive package scanning and
+seamless bunx integration for the Fire22 ecosystem.
 
 ## Features
 
-- **🔍 Advanced Security Scanning**: Comprehensive vulnerability detection for packages and source code
-- **🛡️ Registry Security**: Secure package publishing with automated security validation
-- **⚡ Bunx Integration**: Seamless integration with bun's package execution system
+- **🔍 Advanced Security Scanning**: Comprehensive vulnerability detection for
+  packages and source code
+- **🛡️ Registry Security**: Secure package publishing with automated security
+  validation
+- **⚡ Bunx Integration**: Seamless integration with bun's package execution
+  system
 - **🔧 CLI Tools**: Powerful command-line interface for security operations
 - **📊 Security Scoring**: Risk assessment and security scoring for all packages
 - **🚨 Real-time Monitoring**: Continuous monitoring of global packages
-- **🎯 Enterprise Ready**: Built for production environments with strict security requirements
+- **🎯 Enterprise Ready**: Built for production environments with strict
+  security requirements
 
 ## Installation
 
@@ -92,7 +97,7 @@ import { SecurityScanner } from '@fire22/security-registry/scanner';
 
 const scanner = new SecurityScanner({
   strict: true,
-  auditLevel: 'high'
+  auditLevel: 'high',
 });
 
 // Scan current project
@@ -114,8 +119,8 @@ const registry = new Fire22Registry({
   security: {
     scanning: true,
     audit: true,
-    strict: false
-  }
+    strict: false,
+  },
 });
 
 // Publish with security scanning
@@ -136,7 +141,7 @@ import { BunxIntegration } from '@fire22/security-registry/bunx';
 
 const bunx = new BunxIntegration({
   securityChecks: true,
-  autoUpdate: false
+  autoUpdate: false,
 });
 
 // Setup bunx with security
@@ -147,7 +152,9 @@ await bunx.execute('@fire22/some-tool', ['--help'], { validate: true });
 
 // Scan global packages
 const report = await bunx.scanGlobalPackages();
-console.log(`${report.vulnerablePackages}/${report.totalPackages} packages have vulnerabilities`);
+console.log(
+  `${report.vulnerablePackages}/${report.totalPackages} packages have vulnerabilities`
+);
 ```
 
 ## Security Features
@@ -242,7 +249,8 @@ Create `.fire22security.json` in your project root:
 ### Bunx Security Checks
 
 - **Pre-execution Validation**: Security validation before package execution
-- **Global Package Monitoring**: Continuous monitoring of globally installed packages
+- **Global Package Monitoring**: Continuous monitoring of globally installed
+  packages
 - **Auto-update Notifications**: Alerts for available security updates
 - **Strict Mode**: Optional strict mode blocks execution of vulnerable packages
 
@@ -270,7 +278,8 @@ Create `.fire22security.json` in your project root:
 
 ## Security
 
-If you discover a security vulnerability, please email security@fire22.dev instead of using the issue tracker.
+If you discover a security vulnerability, please email security@fire22.dev
+instead of using the issue tracker.
 
 ## License
 
@@ -279,6 +288,7 @@ MIT - Fire22 Security Team
 ## Support
 
 - 📚 Documentation: [Fire22 Security Docs](https://docs.fire22.dev/security)
-- 🐛 Issues: [GitHub Issues](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues)
+- 🐛 Issues:
+  [GitHub Issues](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues)
 - 💬 Community: [Fire22 Discord](https://discord.gg/fire22)
 - 📧 Email: [security@fire22.dev](mailto:security@fire22.dev)

@@ -3,7 +3,7 @@
  * Comprehensive type definitions for web activity tracking
  */
 
-// ========== Base Log Interfaces ==========
+// !==!== Base Log Interfaces !==!==
 
 export interface WebLogBase {
   id: string; // UUID v4
@@ -30,31 +30,31 @@ export interface WebLogBase {
   retentionExpiresAt?: Date;
 }
 
-// ========== Log Type Enums ==========
+// !==!== Log Type Enums !==!==
 
 export enum LogType {
   TRANSACTION = 'transaction',
-  WAGER = 'wager', 
+  WAGER = 'wager',
   AUTHENTICATION = 'authentication',
   CASINO_BET = 'casino_bet',
   SYSTEM = 'system',
-  SECURITY = 'security'
+  SECURITY = 'security',
 }
 
 export enum LogStatus {
   PENDING = 'pending',
-  PROCESSED = 'processed', 
+  PROCESSED = 'processed',
   FAILED = 'failed',
-  ARCHIVED = 'archived'
+  ARCHIVED = 'archived',
 }
 
 export enum LanguageCode {
   EN = 'en',
   ES = 'es',
-  PT = 'pt'
+  PT = 'pt',
 }
 
-// ========== Action Type Enums ==========
+// !==!== Action Type Enums !==!==
 
 export enum TransactionActionType {
   DEPOSIT = 'deposit',
@@ -65,7 +65,7 @@ export enum TransactionActionType {
   CHARGEBACK = 'chargeback',
   FEE = 'fee',
   BONUS_CREDIT = 'bonus_credit',
-  BONUS_DEBIT = 'bonus_debit'
+  BONUS_DEBIT = 'bonus_debit',
 }
 
 export enum WagerActionType {
@@ -74,12 +74,12 @@ export enum WagerActionType {
   LIVE_CASINO_BET = 'live_casino_bet',
   VIRTUAL_BET = 'virtual_bet',
   LOTTERY_BET = 'lottery_bet',
-  POOL_BET = 'pool_bet'
+  POOL_BET = 'pool_bet',
 }
 
 export enum AuthenticationActionType {
   LOGIN = 'login',
-  LOGOUT = 'logout', 
+  LOGOUT = 'logout',
   REGISTER = 'register',
   VERIFY_EMAIL = 'verify_email',
   VERIFY_PHONE = 'verify_phone',
@@ -88,7 +88,7 @@ export enum AuthenticationActionType {
   TWO_FA_DISABLE = '2fa_disable',
   KYC_SUBMIT = 'kyc_submit',
   KYC_APPROVE = 'kyc_approve',
-  KYC_REJECT = 'kyc_reject'
+  KYC_REJECT = 'kyc_reject',
 }
 
 export enum SecurityActionType {
@@ -98,10 +98,10 @@ export enum SecurityActionType {
   GEO_ANOMALY = 'geo_anomaly',
   DEVICE_CHANGE = 'device_change',
   RAPID_TRANSACTIONS = 'rapid_transactions',
-  RATE_LIMIT_EXCEEDED = 'rate_limit_exceeded'
+  RATE_LIMIT_EXCEEDED = 'rate_limit_exceeded',
 }
 
-// ========== Supporting Interfaces ==========
+// !==!== Supporting Interfaces !==!==
 
 export interface GeoLocation {
   country: string;
@@ -128,7 +128,7 @@ export interface ComplianceFlag {
   requiresManualReview: boolean;
 }
 
-// ========== Specific Log Interfaces ==========
+// !==!== Specific Log Interfaces !==!==
 
 export interface TransactionLog extends WebLogBase {
   logType: LogType.TRANSACTION;
@@ -228,7 +228,7 @@ export interface SecurityLog extends WebLogBase {
   };
 }
 
-// ========== Analytics Interfaces ==========
+// !==!== Analytics Interfaces !==!==
 
 export interface LogAnalytics {
   id: string;
@@ -250,7 +250,7 @@ export interface LogAnalytics {
   updatedAt: Date;
 }
 
-// ========== Storage Configuration ==========
+// !==!== Storage Configuration !==!==
 
 export interface StorageConfig {
   database: {
@@ -269,7 +269,7 @@ export interface StorageConfig {
   };
 }
 
-// ========== Filter and Query Interfaces ==========
+// !==!== Filter and Query Interfaces !==!==
 
 export interface LogQueryFilter {
   logTypes?: LogType[];
@@ -302,7 +302,7 @@ export interface LogQueryResult {
   };
 }
 
-// ========== Fire22 Language Key Mappings (Corrected from System) ==========
+// !==!== Fire22 Language Key Mappings (Corrected from System) !==!==
 
 export const FIRE22_LOG_LANGUAGE_KEYS = {
   [LogType.TRANSACTION]: 'L-69', // Amount
@@ -313,7 +313,7 @@ export const FIRE22_LOG_LANGUAGE_KEYS = {
   [LogType.SYSTEM]: 'L-407', // Settings
 } as const;
 
-// ========== Utility Types ==========
+// !==!== Utility Types !==!==
 
 export type AnyWebLog = TransactionLog | WagerLog | AuthenticationLog | CasinoBetLog | SecurityLog;
 
@@ -327,7 +327,7 @@ export type LogTypeMap = {
 };
 
 export type CreateLogRequest<T extends LogType> = Omit<
-  LogTypeMap[T], 
+  LogTypeMap[T],
   'id' | 'timestamp' | 'createdAt' | 'updatedAt' | 'status'
 > & {
   id?: string;

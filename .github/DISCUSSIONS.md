@@ -5,6 +5,7 @@ This guide explains how to set up and manage GitHub Discussions for Crystal Clea
 ## 🎯 Why GitHub Discussions?
 
 GitHub Discussions provide a space for:
+
 - **General Questions**: Ask about usage, setup, and configuration
 - **Ideas & Feedback**: Share ideas for new features and improvements
 - **Show and Tell**: Showcase projects built with Crystal Clear Architecture
@@ -25,40 +26,66 @@ GitHub Discussions provide a space for:
 After enabling discussions, create these categories:
 
 #### 📋 General
+
 - **General** - General discussions about the project
 - **Ideas** - Share ideas for new features or improvements
 - **Show and Tell** - Showcase your projects and implementations
 - **Help** - Get help with setup, configuration, or usage
 
 #### 🛠️ Development
+
 - **Architecture** - Discuss architecture patterns and decisions
 - **Performance** - Performance optimization discussions
 - **Security** - Security-related topics and best practices
 - **Testing** - Testing strategies and frameworks
 
 #### 📚 Learning & Education
+
 - **Tutorials** - Share tutorials and guides
 - **Best Practices** - Discuss coding and architectural best practices
 - **Resources** - Share learning resources and documentation
 - **Q&A** - Ask and answer technical questions
 
 #### 🎉 Community
+
 - **Announcements** - Project announcements and updates
 - **Events** - Community events, meetups, and webinars
 - **Jobs** - Job postings and career opportunities
 - **General Chat** - Casual community conversations
+
+#### 🏢 Enterprise Implementation
+
+- **🏦 Financial Services** - Banking and financial system implementations
+- **🎰 Sportsbook Platforms** - Betting platform development and operations
+- **📊 Analytics & BI** - Dashboard and analytics implementations
+- **🏢 Enterprise Integration** - Large-scale system integrations
 
 ## 📝 Discussion Guidelines
 
 ### Creating Discussions
 
 **Choose the Right Category:**
+
 - **General** - For broad topics
 - **Ideas** - For feature suggestions
 - **Help** - For getting assistance
 - **Show and Tell** - For sharing projects
+- **🏦 Financial Services** - For banking and financial implementations
+- **🎰 Sportsbook Platforms** - For betting platform discussions
+- **📊 Analytics & BI** - For dashboard and analytics topics
+- **🏢 Enterprise Integration** - For large-scale system integrations
+
+### Enterprise Implementation Templates
+
+We've created specialized discussion templates for enterprise scenarios:
+
+- **[Financial Services Template](./discussions/financial-services-implementation.md)** - Complete template for banking and financial system implementations
+- **[Sportsbook Platform Template](./discussions/sportsbook-platform-implementation.md)** - Template for betting platform development
+- **[Analytics Dashboard Template](./discussions/analytics-dashboard-implementation.md)** - Template for business intelligence implementations
+- **[Welcome Post](./discussions/welcome-to-discussions.md)** - Community introduction and navigation guide
 
 **Write Clear Titles:**
+
 ```markdown
 ✅ Good: "How to implement custom health checks?"
 ✅ Good: "Performance optimization for large datasets"
@@ -67,6 +94,7 @@ After enabling discussions, create these categories:
 ```
 
 **Provide Context:**
+
 - Include your environment (OS, Bun version, etc.)
 - Describe what you're trying to accomplish
 - Include code snippets or error messages when relevant
@@ -74,17 +102,20 @@ After enabling discussions, create these categories:
 ### Participating in Discussions
 
 **Be Respectful and Constructive:**
+
 - Treat all community members with respect
 - Focus on solutions rather than problems
 - Provide helpful feedback and suggestions
 - Acknowledge helpful responses
 
 **Stay On Topic:**
+
 - Keep discussions focused on the original topic
 - Create new discussions for different topics
 - Use appropriate categories
 
 **Share Knowledge:**
+
 - Help others when you can
 - Share your experiences and solutions
 - Contribute to the collective knowledge
@@ -109,6 +140,7 @@ Use these labels to help organize discussions:
 ### Community Moderation
 
 **As a maintainer:**
+
 1. **Welcome New Contributors** - Greet first-time contributors
 2. **Keep Discussions On Track** - Gently redirect off-topic discussions
 3. **Highlight Helpful Answers** - Mark helpful responses
@@ -118,12 +150,14 @@ Use these labels to help organize discussions:
 ### Regular Maintenance
 
 **Weekly Tasks:**
+
 - Review unanswered questions
 - Highlight valuable contributions
 - Clean up spam or inappropriate content
 - Pin important announcements
 
 **Monthly Tasks:**
+
 - Archive old discussions (3+ months old)
 - Review category usage and effectiveness
 - Update discussion guidelines based on feedback
@@ -179,11 +213,13 @@ Use these labels to help organize discussions:
 ## 📞 Support Channels
 
 ### Primary Support
+
 - **GitHub Discussions**: General questions and community support
 - **GitHub Issues**: Bug reports and feature requests
 - **Documentation**: Self-service help and guides
 
 ### Escalation Path
+
 1. **Search Documentation** - Check docs first
 2. **GitHub Discussions** - Ask the community
 3. **GitHub Issues** - Report bugs or request features
@@ -209,6 +245,7 @@ Use these labels to help organize discussions:
 ## 🚀 Quick Start Checklist
 
 ### For New Projects
+
 - [ ] Enable GitHub Discussions in repository settings
 - [ ] Create the recommended category structure
 - [ ] Add discussion guidelines to repository
@@ -216,6 +253,7 @@ Use these labels to help organize discussions:
 - [ ] Set up discussion monitoring and maintenance schedule
 
 ### For Existing Projects
+
 - [ ] Review current community channels
 - [ ] Migrate relevant content from other platforms
 - [ ] Update contribution guidelines

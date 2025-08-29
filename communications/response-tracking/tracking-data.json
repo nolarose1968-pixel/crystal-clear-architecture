@@ -64,9 +64,7 @@
         "confirmed": true,
         "teamVerified": true,
         "availabilityProvided": false,
-        "questionsRaised": [
-          "Security clearance requirements"
-        ]
+        "questionsRaised": ["Security clearance requirements"]
       }
     },
     {
@@ -125,9 +123,7 @@
         "confirmed": true,
         "teamVerified": true,
         "availabilityProvided": false,
-        "questionsRaised": [
-          "Security clearance requirements"
-        ]
+        "questionsRaised": ["Security clearance requirements"]
       }
     },
     {

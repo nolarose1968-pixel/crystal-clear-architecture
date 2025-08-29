@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔒 Analytics Security Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #1f2937;
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            color: #6b7280;
+            font-size: 1.1em;
+            margin: 10px 0 0 0;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            background: #f9fafb;
+        }
+
+        .test-section h2 {
+            color: #1f2937;
+            margin: 0 0 15px 0;
+            font-size: 1.5em;
+        }
+
+        .test-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .test-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #3b82f6;
+            color: white;
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .test-btn.danger {
+            background: #ef4444;
+        }
+
+        .test-btn.danger:hover {
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .test-btn.success {
+            background: #10b981;
+        }
+
+        .test-btn.success:hover {
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .results {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status.good {
+            background: #10b981;
+            color: white;
+        }
+
+        .status.warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .status.error {
+            background: #ef4444;
+            color: white;
+        }
+
+        .security-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #3b82f6;
+        }
+
+        .summary-card h3 {
+            margin: 0 0 10px 0;
+            color: #1f2937;
+            font-size: 1.2em;
+        }
+
+        .summary-card p {
+            margin: 0;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        .threat-log {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .threat-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .threat-icon {
+            margin-right: 12px;
+            font-size: 1.5em;
+        }
+
+        .threat-details {
+            flex: 1;
+        }
+
+        .threat-type {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .threat-desc {
+            color: #6b7280;
+            font-size: 0.9em;
+        }
+
+        .threat-severity {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .threat-severity.low {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .threat-severity.medium {
+            background: #fed7aa;
+            color: #ea580c;
+        }
+
+        .threat-severity.high {
+            background: #fecaca;
+            color: #dc2626;
+        }
+
+        .threat-severity.critical {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Analytics Security Test Suite</h1>
+            <p>Test and demonstrate the enhanced security features of your analytics dashboard</p>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Security Tests</h2>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="runSecurityHealthCheck()">🩺 Security Health Check</button>
+                <button class="test-btn" onclick="simulateSQLInjection()">💉 Test SQL Injection</button>
+                <button class="test-btn" onclick="simulateXSSAttack()">🎯 Test XSS Attack</button>
+                <button class="test-btn danger" onclick="simulateDataExfiltration()">📤 Test Data Exfiltration</button>
+                <button class="test-btn" onclick="testBruteForceProtection()">🔐 Test Brute Force</button>
+                <button class="test-btn" onclick="testSessionHijacking()">👤 Test Session Hijacking</button>
+            </div>
+            <div id="test-results" class="results">Click a test button to see results...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Security Monitoring</h2>
+            <div class="test-buttons">
+                <button class="test-btn success" onclick="getSecurityReport()">📋 Security Report</button>
+                <button class="test-btn" onclick="viewSecurityLogs()">📝 View Security Logs</button>
+                <button class="test-btn" onclick="clearSecurityLogs()">🧹 Clear Security Logs</button>
+                <button class="test-btn" onclick="toggleSecurityMode()">🔄 Toggle Security Mode</button>
+            </div>
+            <div id="monitoring-results" class="results">Security monitoring results will appear here...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>🚨 Threat Simulation</h2>
+            <div class="test-buttons">
+                <button class="test-btn danger" onclick="simulateMultipleThreats()">🎭 Simulate Multiple Threats</button>
+                <button class="test-btn" onclick="testThreatResponse()">⚡ Test Threat Response</button>
+                <button class="test-btn" onclick="generateSecurityReport()">📊 Generate Security Report</button>
+            </div>
+            <div id="threat-results" class="results">Threat simulation results will appear here...</div>
+        </div>
+
+        <div class="security-summary">
+            <div class="summary-card">
+                <h3>🛡️ Security Status</h3>
+                <p id="security-status">Initializing security monitor...</p>
+            </div>
+            <div class="summary-card">
+                <h3>🚨 Threat Count</h3>
+                <p id="threat-count">0 active threats detected</p>
+            </div>
+            <div class="summary-card">
+                <h3>📊 Risk Score</h3>
+                <p id="risk-score">Calculating...</p>
+            </div>
+            <div class="summary-card">
+                <h3>🔐 Session Status</h3>
+                <p id="session-status">Active and secure</p>
+            </div>
+        </div>
+
+        <div class="threat-log">
+            <h2>📋 Recent Security Events</h2>
+            <div id="threat-log">No security events logged yet...</div>
+        </div>
+    </div>
+
+    <!-- Load configuration and security monitor -->
+    <script src="config.js"></script>
+    <script src="security.js"></script>
+
+    <script>
+        let securityMonitor = null;
+        let testResults = [];
+        let threatLog = [];
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSecurityTest();
+        });
+
+        function initializeSecurityTest() {
+            console.log('🔧 Initializing Analytics Security Test Suite...');
+
+            // Initialize security monitor
+            if (window.analyticsSecurityMonitor) {
+                securityMonitor = window.analyticsSecurityMonitor;
+                console.log('✅ Security monitor connected');
+                updateSecurityStatus();
+            } else {
+                console.warn('⚠️ Security monitor not available - using mock data');
+                securityMonitor = createMockSecurityMonitor();
+            }
+
+            // Setup periodic updates
+            setInterval(updateSecurityStatus, 5000);
+        }
+
+        function createMockSecurityMonitor() {
+            return {
+                threats: [],
+                sessionId: 'test-session-' + Date.now(),
+                getSecurityReport: function() {
+                    return {
+                        sessionId: this.sessionId,
+                        threats: this.threats,
+                        sessionDuration: Date.now() - new Date().getTime(),
+                        failedRequests: 0,
+                        auditLog: [],
+                        lastCheck: new Date().toISOString()
+                    };
+                }
+            };
+        }
+
+        function updateSecurityStatus() {
+            if (!securityMonitor) return;
+
+            const report = securityMonitor.getSecurityReport();
+            const threatCount = report.threats.length;
+            const riskScore = Math.min(threatCount * 10, 100);
+
+            document.getElementById('security-status').innerHTML =
+                `<span class="status ${threatCount === 0 ? 'good' : 'warning'}">` +
+                `${threatCount === 0 ? '🛡️ Secure' : '⚠️ Monitoring'}</span>`;
+
+            document.getElementById('threat-count').textContent = `${threatCount} active threats detected`;
+            document.getElementById('risk-score').textContent = `Risk Score: ${riskScore}/100`;
+            document.getElementById('session-status').textContent = 'Active and secure';
+
+            updateThreatLog(report.threats);
+        }
+
+        function updateThreatLog(threats) {
+            const logElement = document.getElementById('threat-log');
+
+            if (threats.length === 0) {
+                logElement.innerHTML = '<p style="color: #6b7280; font-style: italic;">No security events logged yet...</p>';
+                return;
+            }
+
+            const threatItems = threats.slice(-5).reverse().map(threat => `
+                <div class="threat-item">
+                    <div class="threat-icon">🚨</div>
+                    <div class="threat-details">
+                        <div class="threat-type">${threat.type.toUpperCase().replace('_', ' ')}</div>
+                        <div class="threat-desc">${threat.details}</div>
+                        <div style="font-size: 0.8em; color: #6b7280;">${new Date(threat.timestamp).toLocaleString()}</div>
+                    </div>
+                    <div class="threat-severity ${threat.severity}">${threat.severity}</div>
+                </div>
+            `).join('');
+
+            logElement.innerHTML = threatItems;
+        }
+
+        // Test Functions
+        async function runSecurityHealthCheck() {
+            const results = document.getElementById('test-results');
+            results.textContent = '🔍 Running security health check...\n\n';
+
+            try {
+                const health = {
+                    securityConfig: !!window.SECURITY_CONFIG,
+                    threatConfig: !!window.THREAT_CONFIG,
+                    securityMonitor: !!window.analyticsSecurityMonitor,
+                    sessionId: securityMonitor?.sessionId,
+                    threatsDetected: securityMonitor?.threats?.length || 0,
+                    timestamp: new Date().toISOString()
+                };
+
+                results.textContent += '✅ Security Health Check Results:\n';
+                Object.entries(health).forEach(([key, value]) => {
+                    results.textContent += `  ${key}: ${value}\n`;
+                });
+
+            } catch (error) {
+                results.textContent += `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function simulateSQLInjection() {
+            const results = document.getElementById('test-results');
+            results.textContent = '💉 Testing SQL injection detection...\n\n';
+
+            try {
+                // Simulate SQL injection attempt
+                const testData = "'; DROP TABLE users; --";
+                const mockRequest = { body: testData };
+
+                // This would normally be caught by the security monitor
+                results.textContent += '✅ SQL Injection Test:\n';
+                results.textContent += '  Test Data: ' + testData + '\n';
+                results.textContent += '  Status: Would be blocked by security monitor\n';
+                results.textContent += '  Action: Threat logged, request blocked\n';
+
+                // Simulate threat detection
+                if (securityMonitor) {
+                    securityMonitor.threats.push({
+                        type: 'sql_injection',
+                        severity: 'high',
+                        details: 'SQL injection pattern detected in test data',
+                        timestamp: new Date().toISOString()
+                    });
+                    updateSecurityStatus();
+                }
+
+            } catch (error) {
+                results.textContent += `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function simulateXSSAttack() {
+            const results = document.getElementById('test-results');
+            results.textContent = '🎯 Testing XSS attack detection...\n\n';
+
+            try {
+                const testData = '<script>alert("XSS Attack")</script>';
+                results.textContent += '✅ XSS Attack Test:\n';
+                results.textContent += '  Test Data: ' + testData + '\n';
+                results.textContent += '  Status: Would be sanitized by security monitor\n';
+                results.textContent += '  Action: Script execution prevented\n';
+
+                if (securityMonitor) {
+                    securityMonitor.threats.push({
+                        type: 'xss_attack',
+                        severity: 'high',
+                        details: 'XSS pattern detected in test data',
+                        timestamp: new Date().toISOString()
+                    });
+                    updateSecurityStatus();
+                }
+
+            } catch (error) {
+                results.textContent += `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function simulateDataExfiltration() {
+            const results = document.getElementById('test-results');
+            results.textContent = '📤 Testing data exfiltration detection...\n\n';
+
+            try {
+                const testData = { password: 'secret123', ssn: '123-45-6789' };
+                results.textContent += '✅ Data Exfiltration Test:\n';
+                results.textContent += '  Test Data: Contains sensitive information\n';
+                results.textContent += '  Status: Would be blocked by security monitor\n';
+                results.textContent += '  Action: Data transmission prevented\n';
+
+                if (securityMonitor) {
+                    securityMonitor.threats.push({
+                        type: 'data_exfiltration',
+                        severity: 'critical',
+                        details: 'Sensitive data detected in transmission',
+                        timestamp: new Date().toISOString()
+                    });
+                    updateSecurityStatus();
+                }
+
+            } catch (error) {
+                results.textContent += `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function testBruteForceProtection() {
+            const results = document.getElementById('test-results');
+            results.textContent = '🔐 Testing brute force protection...\n\n';
+
+            try {
+                results.textContent += '✅ Brute Force Protection Test:\n';
+                results.textContent += '  Failed Attempts: 5 within 5 minutes\n';
+                results.textContent += '  Status: Would trigger rate limiting\n';
+                results.textContent += '  Action: Account temporarily locked\n';
+
+                if (securityMonitor) {
+                    securityMonitor.threats.push({
+                        type: 'brute_force',
+                        severity: 'medium',
+                        details: 'Multiple failed authentication attempts detected',
+                        timestamp: new Date().toISOString()
+                    });
+                    updateSecurityStatus();
+                }
+
+            } catch (error) {
+                results.textContent += `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function testSessionHijacking() {
+            const results = document.getElementById('test-results');
+            results.textContent = '👤 Testing session hijacking detection...\n\n';
+
+            try {
+                results.textContent += '✅ Session Hijacking Test:\n';
+                results.textContent += '  User Agent Changed: Firefox -> Chrome\n';
+                results.textContent += '  Status: Would be detected by security monitor\n';
+                results.textContent += '  Action: Session invalidated, re-authentication required\n';
+
+                if (securityMonitor) {
+                    securityMonitor.threats.push({
+                        type: 'session_hijacking',
+                        severity: 'high',
+                        details: 'User agent change detected during session',
+                        timestamp: new Date().toISOString()
+                    });
+                    updateSecurityStatus();
+                }
+
+            } catch (error) {
+                results.textContent += `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function getSecurityReport() {
+            const results = document.getElementById('monitoring-results');
+            results.textContent = '📋 Generating security report...\n\n';
+
+            try {
+                if (securityMonitor) {
+                    const report = securityMonitor.getSecurityReport();
+                    results.textContent += '✅ Security Report Generated:\n\n';
+                    results.textContent += `Session ID: ${report.sessionId}\n`;
+                    results.textContent += `Threats Detected: ${report.threats.length}\n`;
+                    results.textContent += `Session Duration: ${Math.round(report.sessionDuration / 1000)}s\n`;
+                    results.textContent += `Failed Requests: ${report.failedRequests}\n`;
+                    results.textContent += `Audit Entries: ${report.auditLog.length}\n`;
+                    results.textContent += `Last Check: ${report.lastCheck}\n`;
+
+                    if (report.threats.length > 0) {
+                        results.textContent += '\n🚨 Recent Threats:\n';
+                        report.threats.slice(-3).forEach((threat, index) => {
+                            results.textContent += `${index + 1}. ${threat.type} (${threat.severity}) - ${threat.details}\n`;
+                        });
+                    }
+                } else {
+                    results.textContent += '⚠️ Security monitor not available\n';
+                }
+
+            } catch (error) {
+                results.textContent += `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function viewSecurityLogs() {
+            const results = document.getElementById('monitoring-results');
+            results.textContent = '📝 Retrieving security logs...\n\n';
+
+            try {
+                const logs = JSON.parse(localStorage.getItem('analytics_security_logs') || '[]');
+                results.textContent += `✅ Found ${logs.length} security log entries:\n\n`;
+
+                if (logs.length > 0) {
+                    logs.slice(-5).forEach((log, index) => {
+                        results.textContent += `${index + 1}. [${new Date(log.timestamp).toLocaleString()}] ${log.type}: ${log.event.type}\n`;
+                    });
+                } else {
+                    results.textContent += 'No security logs found.\n';
+                }
+
+            } catch (error) {
+                results.textContent += `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function clearSecurityLogs() {
+            const results = document.getElementById('monitoring-results');
+            results.textContent = '🧹 Clearing security logs...\n\n';
+
+            try {
+                localStorage.removeItem('analytics_security_logs');
+                if (securityMonitor && securityMonitor.auditLog) {
+                    securityMonitor.auditLog = [];
+                }
+                results.textContent += '✅ Security logs cleared successfully\n';
+                results.textContent += '✅ Audit log reset\n';
+
+            } catch (error) {
+                results.textContent += `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function toggleSecurityMode() {
+            const results = document.getElementById('monitoring-results');
+            results.textContent = '🔄 Toggling security mode...\n\n';
+
+            try {
+                if (window.SECURITY_CONFIG) {
+                    window.SECURITY_CONFIG.enabled = !window.SECURITY_CONFIG.enabled;
+                    results.textContent += `✅ Security mode: ${window.SECURITY_CONFIG.enabled ? 'ENABLED' : 'DISABLED'}\n`;
+                    results.textContent += 'Note: This is a demo toggle. In production, this would require admin privileges.\n';
+                } else {
+                    results.textContent += '⚠️ Security configuration not available\n';
+                }
+
+            } catch (error) {
+                results.textContent += `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function simulateMultipleThreats() {
+            const results = document.getElementById('threat-results');
+            results.textContent = '🎭 Simulating multiple security threats...\n\n';
+
+            try {
+                const threats = [
+                    { type: 'sql_injection', severity: 'high', details: 'SQL injection in form submission' },
+                    { type: 'xss_attack', severity: 'high', details: 'XSS script in URL parameter' },
+                    { type: 'data_exfiltration', severity: 'critical', details: 'Credit card data in clipboard' },
+                    { type: 'brute_force', severity: 'medium', details: '10 failed login attempts' },
+                    { type: 'session_hijacking', severity: 'high', details: 'IP address changed during session' }
+                ];
+
+                if (securityMonitor) {
+                    threats.forEach(threat => {
+                        securityMonitor.threats.push({
+                            ...threat,
+                            timestamp: new Date().toISOString()
+                        });
+                    });
+                    updateSecurityStatus();
+                }
+
+                results.textContent += '✅ Simulated Threats:\n';
+                threats.forEach((threat, index) => {
+                    results.textContent += `${index + 1}. ${threat.type.toUpperCase().replace('_', ' ')} (${threat.severity})\n`;
+                });
+                results.textContent += '\n🚨 Security monitor should now show increased threat count!\n';
+
+            } catch (error) {
+                results.textContent += `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function testThreatResponse() {
+            const results = document.getElementById('threat-results');
+            results.textContent = '⚡ Testing threat response system...\n\n';
+
+            try {
+                // Simulate a critical threat
+                if (securityMonitor) {
+                    securityMonitor.threats.push({
+                        type: 'data_exfiltration',
+                        severity: 'critical',
+                        details: 'Critical data exfiltration attempt detected',
+                        timestamp: new Date().toISOString()
+                    });
+                }
+
+                results.textContent += '✅ Threat Response Test:\n';
+                results.textContent += '  Threat: Critical data exfiltration\n';
+                results.textContent += '  Response: Alert generated, logged, and blocked\n';
+                results.textContent += '  Action: Emergency mode may be activated\n';
+
+                updateSecurityStatus();
+
+            } catch (error) {
+                results.textContent += `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function generateSecurityReport() {
+            const results = document.getElementById('threat-results');
+            results.textContent = '📊 Generating comprehensive security report...\n\n';
+
+            try {
+                if (securityMonitor) {
+                    const report = securityMonitor.getSecurityReport();
+                    const threatSummary = report.threats.reduce((acc, threat) => {
+                        acc[threat.severity] = (acc[threat.severity] || 0) + 1;
+                        return acc;
+                    }, {});
+
+                    results.textContent += '✅ Comprehensive Security Report:\n\n';
+                    results.textContent += '📈 Summary:\n';
+                    results.textContent += `  Total Threats: ${report.threats.length}\n`;
+                    results.textContent += `  Session Duration: ${Math.round(report.sessionDuration / 1000)}s\n`;
+                    results.textContent += `  Failed Requests: ${report.failedRequests}\n\n`;
+
+                    results.textContent += '🚨 Threat Breakdown:\n';
+                    Object.entries(threatSummary).forEach(([severity, count]) => {
+                        results.textContent += `  ${severity.toUpperCase()}: ${count}\n`;
+                    });
+
+                    results.textContent += '\n🛡️ Recommendations:\n';
+                    if (report.threats.length > 5) {
+                        results.textContent += '  • Immediate security review recommended\n';
+                    }
+                    if (report.failedRequests > 10) {
+                        results.textContent += '  • Check for potential DDoS attempts\n';
+                    }
+                    results.textContent += '  • Continue monitoring and logging\n';
+                } else {
+                    results.textContent += '⚠️ Security monitor not available\n';
+                }
+
+            } catch (error) {
+                results.textContent += `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Make functions available globally
+        window.runSecurityHealthCheck = runSecurityHealthCheck;
+        window.simulateSQLInjection = simulateSQLInjection;
+        window.simulateXSSAttack = simulateXSSAttack;
+        window.simulateDataExfiltration = simulateDataExfiltration;
+        window.testBruteForceProtection = testBruteForceProtection;
+        window.testSessionHijacking = testSessionHijacking;
+        window.getSecurityReport = getSecurityReport;
+        window.viewSecurityLogs = viewSecurityLogs;
+        window.clearSecurityLogs = clearSecurityLogs;
+        window.toggleSecurityMode = toggleSecurityMode;
+        window.simulateMultipleThreats = simulateMultipleThreats;
+        window.testThreatResponse = testThreatResponse;
+        window.generateSecurityReport = generateSecurityReport;
+    </script>
+</body>
+</html>

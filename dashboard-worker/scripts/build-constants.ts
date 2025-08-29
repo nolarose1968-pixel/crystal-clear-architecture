@@ -11,24 +11,28 @@ interface BuildConstants {
 function getGitInfo() {
   try {
     // Use Bun.spawnSync for better performance and native Bun integration
-    const commit = Bun.spawnSync(['git', 'rev-parse', '--short', 'HEAD'], { 
-      stdout: 'pipe', stderr: 'ignore' 
+    const commit = Bun.spawnSync(['git', 'rev-parse', '--short', 'HEAD'], {
+      stdout: 'pipe',
+      stderr: 'ignore',
     });
-    const branch = Bun.spawnSync(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], { 
-      stdout: 'pipe', stderr: 'ignore' 
+    const branch = Bun.spawnSync(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], {
+      stdout: 'pipe',
+      stderr: 'ignore',
     });
-    const tag = Bun.spawnSync(['git', 'describe', '--tags', '--always'], { 
-      stdout: 'pipe', stderr: 'ignore' 
+    const tag = Bun.spawnSync(['git', 'describe', '--tags', '--always'], {
+      stdout: 'pipe',
+      stderr: 'ignore',
     });
-    const status = Bun.spawnSync(['git', 'status', '--porcelain'], { 
-      stdout: 'pipe', stderr: 'ignore' 
+    const status = Bun.spawnSync(['git', 'status', '--porcelain'], {
+      stdout: 'pipe',
+      stderr: 'ignore',
     });
-    
-    return { 
+
+    return {
       commit: commit.success ? commit.stdout.toString().trim() : 'unknown',
-      branch: branch.success ? branch.stdout.toString().trim() : 'unknown', 
+      branch: branch.success ? branch.stdout.toString().trim() : 'unknown',
       tag: tag.success ? tag.stdout.toString().trim() : 'unknown',
-      isDirty: status.success ? status.stdout.toString().length > 0 : false
+      isDirty: status.success ? status.stdout.toString().length > 0 : false,
     };
   } catch (error) {
     console.warn('Git not available or not a git repository');
@@ -46,50 +50,50 @@ function getPackageInfo() {
         version: pkg.version,
         description: pkg.description || '',
         dependenciesCount: Object.keys(pkg.dependencies || {}).length,
-        devDependenciesCount: Object.keys(pkg.devDependencies || {}).length
+        devDependenciesCount: Object.keys(pkg.devDependencies || {}).length,
       };
     }
   } catch (error) {
     console.warn('Could not read package.json');
   }
-  return { 
-    name: 'unknown', 
-    version: '0.0.0', 
-    description: '', 
-    dependenciesCount: 0, 
-    devDependenciesCount: 0 
+  return {
+    name: 'unknown',
+    version: '0.0.0',
+    description: '',
+    dependenciesCount: 0,
+    devDependenciesCount: 0,
   };
 }
 
 function getEnvironmentConfig(env: string = process.env.NODE_ENV || 'development') {
   const configs = {
     development: {
-      apiUrl: "http://localhost:3000",
+      apiUrl: 'http://localhost:3000',
       timeout: 10000,
       retries: 1,
-      debug: true
+      debug: true,
     },
     staging: {
-      apiUrl: "https://staging-api.fire22.com", 
+      apiUrl: 'https://staging-api.fire22.com',
       timeout: 8000,
       retries: 2,
-      debug: false
+      debug: false,
     },
     production: {
-      apiUrl: "https://api.fire22.com",
+      apiUrl: 'https://api.fire22.com',
       timeout: 5000,
       retries: 3,
-      debug: false
-    }
+      debug: false,
+    },
   };
-  
+
   return configs[env as keyof typeof configs] || configs.development;
 }
 
 function getFeatureFlags(env: string = process.env.NODE_ENV || 'development') {
   const isProduction = env === 'production';
   const isDevelopment = env === 'development';
-  
+
   return {
     newDashboard: !isProduction,
     advancedCharts: true,
@@ -98,7 +102,7 @@ function getFeatureFlags(env: string = process.env.NODE_ENV || 'development') {
     analytics: isProduction,
     sentry: isProduction,
     debugLogs: isDevelopment,
-    performanceMonitoring: !isDevelopment
+    performanceMonitoring: !isDevelopment,
   };
 }
 
@@ -109,7 +113,7 @@ export function generateBuildConstants(): BuildConstants {
   const env = process.env.NODE_ENV || 'development';
   const config = getEnvironmentConfig(env);
   const features = getFeatureFlags(env);
-  
+
   return {
     // Basic build metadata
     BUILD_VERSION: `"${pkgInfo.version}"`,
@@ -121,36 +125,36 @@ export function generateBuildConstants(): BuildConstants {
     BUILD_DATE: `"${now.toISOString()}"`,
     BUILD_TIME: `"${now.toISOString()}"`,
     BUILD_NUMBER: `"${Math.floor(now.getTime() / 1000)}"`,
-    
+
     // Package information
     PACKAGE_NAME: `"${pkgInfo.name}"`,
     PACKAGE_DESCRIPTION: `"${pkgInfo.description}"`,
     DEPENDENCIES_COUNT: pkgInfo.dependenciesCount,
     DEV_DEPENDENCIES_COUNT: pkgInfo.devDependenciesCount,
-    
+
     // Environment variables (property access patterns)
     'process.env.NODE_ENV': `"${env}"`,
     'process.env.API_URL': `"${config.apiUrl}"`,
     'process.env.BUILD_ENV': `"${env}"`,
-    
+
     // Runtime information
     ENVIRONMENT: `"${env}"`,
     DEBUG_MODE: env === 'development',
     LOG_LEVEL: `"${env === 'development' ? 'debug' : env === 'production' ? 'warn' : 'info'}"`,
     API_URL: `"${config.apiUrl}"`,
     BUN_VERSION: `"${Bun.version}"`,
-    
+
     // Platform information
     BUILD_PLATFORM: `"${process.platform}"`,
     BUILD_ARCH: `"${process.arch}"`,
     COMPILER_VERSION: `"${Bun.version}"`,
-    
+
     // Feature flags for dead code elimination
     ENABLE_ANALYTICS: features.analytics,
     ENABLE_DEBUG_LOGS: features.debugLogs,
     ENABLE_PERFORMANCE_MONITORING: features.performanceMonitoring,
     ENABLE_SENTRY: features.sentry,
-    
+
     // Configuration objects (complex types)
     FIRE22_CONFIG: config,
     FEATURE_FLAGS: features,
@@ -158,18 +162,18 @@ export function generateBuildConstants(): BuildConstants {
       platform: process.platform,
       arch: process.arch,
       nodeVersion: process.version,
-      bunVersion: Bun.version
-    }
+      bunVersion: Bun.version,
+    },
   };
 }
 
 export function formatDefineFlags(constants: BuildConstants): string[] {
   const flags: string[] = [];
-  
+
   for (const [key, value] of Object.entries(constants)) {
     if (value !== undefined) {
       let formattedValue: string;
-      
+
       if (typeof value === 'string') {
         // String values are already quoted from generateBuildConstants
         formattedValue = value.startsWith('"') ? `'${value}'` : `'\"${value}\"'`;
@@ -180,11 +184,11 @@ export function formatDefineFlags(constants: BuildConstants): string[] {
         // Primitives (boolean, number) can be used directly
         formattedValue = `'${value}'`;
       }
-      
+
       flags.push(`--define`, `${key}=${formattedValue}`);
     }
   }
-  
+
   return flags;
 }
 
@@ -208,28 +212,28 @@ export function generateBuildCommand(options: {
   if (options.environment) {
     process.env.NODE_ENV = options.environment;
   }
-  
+
   const constants = generateBuildConstants();
   const defineFlags = formatDefineFlags(constants);
-  
+
   const cmd = [
     'bun build',
     options.entrypoint,
     '--compile',
     `--outfile=${options.outputPath}`,
-    ...defineFlags
+    ...defineFlags,
   ];
-  
+
   // Add execution arguments
   if (options.execArgs && options.execArgs.length > 0) {
     cmd.push(`--compile-exec-argv="${options.execArgs.join(' ')}"`);
   }
-  
+
   // Add optimization flags
   if (options.minify) cmd.push('--minify');
   if (options.sourcemap) cmd.push('--sourcemap');
   if (options.bytecode) cmd.push('--bytecode');
-  
+
   // Add Windows-specific options
   if (options.windowsOptions) {
     const win = options.windowsOptions;
@@ -239,7 +243,7 @@ export function generateBuildCommand(options: {
     if (win.description) cmd.push(`--windows-description="${win.description}"`);
     if (win.copyright) cmd.push(`--windows-copyright="${win.copyright}"`);
   }
-  
+
   return cmd.join(' \\\\\n  ');
 }
 
@@ -249,14 +253,14 @@ if (import.meta.main) {
   console.log('🏗️ Fire22 Build Constants');
   console.log('='.repeat(50));
   console.log(JSON.stringify(constants, null, 2));
-  
+
   console.log('\n📋 Generated Define Flags:');
   console.log('='.repeat(50));
   const flags = formatDefineFlags(constants);
   for (let i = 0; i < flags.length; i += 2) {
     console.log(`${flags[i]} ${flags[i + 1]}`);
   }
-  
+
   console.log('\n🚀 Sample Build Command:');
   console.log('='.repeat(50));
   const sampleCommand = generateBuildCommand({
@@ -266,7 +270,7 @@ if (import.meta.main) {
     minify: true,
     sourcemap: true,
     bytecode: true,
-    execArgs: ['--env=production', '--port=8080']
+    execArgs: ['--env=production', '--port=8080'],
   });
   console.log(sampleCommand);
 }

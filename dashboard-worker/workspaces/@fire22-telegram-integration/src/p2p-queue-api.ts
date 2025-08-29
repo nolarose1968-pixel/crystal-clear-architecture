@@ -67,7 +67,9 @@ export class P2PQueueAPI {
   /**
    * Add withdrawal to P2P queue
    */
-  async addWithdrawalToQueue(withdrawal: Omit<P2PQueueItem, 'id' | 'createdAt' | 'status'>): Promise<string> {
+  async addWithdrawalToQueue(
+    withdrawal: Omit<P2PQueueItem, 'id' | 'createdAt' | 'status'>
+  ): Promise<string> {
     try {
       // Validate required fields
       if (!withdrawal.customerId || !withdrawal.amount || !withdrawal.paymentType) {
@@ -81,7 +83,7 @@ export class P2PQueueAPI {
         paymentType: withdrawal.paymentType,
         paymentDetails: withdrawal.paymentDetails,
         priority: withdrawal.priority || 1,
-        notes: withdrawal.notes
+        notes: withdrawal.notes,
       });
 
       // Store additional Telegram data in database
@@ -104,7 +106,9 @@ export class P2PQueueAPI {
   /**
    * Add deposit to P2P queue
    */
-  async addDepositToQueue(deposit: Omit<P2PQueueItem, 'id' | 'createdAt' | 'status' | 'type'>): Promise<string> {
+  async addDepositToQueue(
+    deposit: Omit<P2PQueueItem, 'id' | 'createdAt' | 'status' | 'type'>
+  ): Promise<string> {
     try {
       // Validate required fields
       if (!deposit.customerId || !deposit.amount || !deposit.paymentType) {
@@ -118,7 +122,7 @@ export class P2PQueueAPI {
         paymentType: deposit.paymentType,
         paymentDetails: deposit.paymentDetails,
         priority: deposit.priority || 1,
-        notes: deposit.notes
+        notes: deposit.notes,
       });
 
       // Store additional Telegram data in database
@@ -141,17 +145,19 @@ export class P2PQueueAPI {
   /**
    * Get P2P queue items with filtering
    */
-  async getQueueItems(filters: {
-    type?: 'withdrawal' | 'deposit';
-    paymentType?: string;
-    minAmount?: number;
-    maxAmount?: number;
-    telegramGroupId?: string;
-    telegramChatId?: string;
-    telegramChannel?: string;
-    status?: string;
-    customerId?: string;
-  } = {}): Promise<P2PQueueItem[]> {
+  async getQueueItems(
+    filters: {
+      type?: 'withdrawal' | 'deposit';
+      paymentType?: string;
+      minAmount?: number;
+      maxAmount?: number;
+      telegramGroupId?: string;
+      telegramChatId?: string;
+      telegramChannel?: string;
+      status?: string;
+      customerId?: string;
+    } = {}
+  ): Promise<P2PQueueItem[]> {
     try {
       let sql = `
         SELECT 
@@ -165,7 +171,7 @@ export class P2PQueueAPI {
         LEFT JOIN telegram_data tg ON qi.id = tg.queue_item_id
         WHERE 1=1
       `;
-      
+
       const params: any[] = [];
       let paramIndex = 1;
 
@@ -216,8 +222,10 @@ export class P2PQueueAPI {
 
       sql += ` ORDER BY qi.created_at ASC`;
 
-      const result = await this.env.DB.prepare(sql).bind(...params).all();
-      
+      const result = await this.env.DB.prepare(sql)
+        .bind(...params)
+        .all();
+
       return result.results.map(row => ({
         id: row.id,
         type: row.type,
@@ -234,7 +242,7 @@ export class P2PQueueAPI {
         telegramChatId: row.telegramChatId || undefined,
         telegramChannel: row.telegramChannel || undefined,
         telegramUsername: row.telegramUsername || undefined,
-        telegramId: row.telegramId || undefined
+        telegramId: row.telegramId || undefined,
       }));
     } catch (error) {
       console.error('Failed to get queue items:', error);
@@ -267,7 +275,7 @@ export class P2PQueueAPI {
       `;
 
       const result = await this.env.DB.prepare(sql).all();
-      
+
       return result.results.map(row => ({
         id: row.id,
         withdrawalId: row.withdrawal_id,
@@ -281,7 +289,7 @@ export class P2PQueueAPI {
         notes: row.notes,
         telegramGroupId: row.telegramGroupId || undefined,
         telegramChatId: row.telegramChatId || undefined,
-        telegramChannel: row.telegramChannel || undefined
+        telegramChannel: row.telegramChannel || undefined,
       }));
     } catch (error) {
       console.error('Failed to get matching opportunities:', error);
@@ -315,7 +323,7 @@ export class P2PQueueAPI {
 
       const [statsResult, metricsResult] = await Promise.all([
         this.env.DB.prepare(statsSql).first(),
-        this.env.DB.prepare(metricsSql).first()
+        this.env.DB.prepare(metricsSql).first(),
       ]);
 
       return {
@@ -326,7 +334,7 @@ export class P2PQueueAPI {
         averageWaitTime: metricsResult.avg_wait_time || 0,
         processingRate: 0, // Calculate based on your business logic
         successRate: Math.round(metricsResult.success_rate || 0),
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       };
     } catch (error) {
       console.error('Failed to get queue stats:', error);
@@ -340,24 +348,36 @@ export class P2PQueueAPI {
   async approveMatch(matchId: string): Promise<boolean> {
     try {
       // Update match status
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         UPDATE queue_matches 
         SET status = 'processing', updated_at = datetime('now')
         WHERE id = ?
-      `).bind(matchId).run();
+      `
+      )
+        .bind(matchId)
+        .run();
 
       // Get match details for notification
-      const match = await this.env.DB.prepare(`
+      const match = await this.env.DB.prepare(
+        `
         SELECT * FROM queue_matches WHERE id = ?
-      `).bind(matchId).first();
+      `
+      )
+        .bind(matchId)
+        .first();
 
       if (match) {
         // Update related queue items
-        await this.env.DB.prepare(`
+        await this.env.DB.prepare(
+          `
           UPDATE queue_items 
           SET status = 'processing', updated_at = datetime('now')
           WHERE id IN (?, ?)
-        `).bind(match.withdrawal_id, match.deposit_id).run();
+        `
+        )
+          .bind(match.withdrawal_id, match.deposit_id)
+          .run();
 
         // Send Telegram notification
         await this.notifyMatchApproved(match);
@@ -376,23 +396,35 @@ export class P2PQueueAPI {
   async rejectMatch(matchId: string, reason?: string): Promise<boolean> {
     try {
       // Update match status
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         UPDATE queue_matches 
         SET status = 'failed', notes = ?, updated_at = datetime('now')
         WHERE id = ?
-      `).bind(reason || 'Rejected by admin', matchId).run();
+      `
+      )
+        .bind(reason || 'Rejected by admin', matchId)
+        .run();
 
       // Reset related queue items to pending
-      const match = await this.env.DB.prepare(`
+      const match = await this.env.DB.prepare(
+        `
         SELECT * FROM queue_matches WHERE id = ?
-      `).bind(matchId).first();
+      `
+      )
+        .bind(matchId)
+        .first();
 
       if (match) {
-        await this.env.DB.prepare(`
+        await this.env.DB.prepare(
+          `
           UPDATE queue_items 
           SET status = 'pending', matched_with = NULL, updated_at = datetime('now')
           WHERE id IN (?, ?)
-        `).bind(match.withdrawal_id, match.deposit_id).run();
+        `
+        )
+          .bind(match.withdrawal_id, match.deposit_id)
+          .run();
       }
 
       return true;
@@ -439,7 +471,9 @@ export class P2PQueueAPI {
         WHERE id = $${paramIndex}
       `;
 
-      await this.env.DB.prepare(sql).bind(...params).run();
+      await this.env.DB.prepare(sql)
+        .bind(...params)
+        .run();
 
       // Update Telegram data if provided
       if (updates.telegramGroupId || updates.telegramChatId || updates.telegramChannel) {
@@ -459,18 +493,26 @@ export class P2PQueueAPI {
   async cancelQueueItem(itemId: string, reason?: string): Promise<boolean> {
     try {
       // Update item status
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         UPDATE queue_items 
         SET status = 'failed', notes = ?, updated_at = datetime('now')
         WHERE id = ?
-      `).bind(reason || 'Cancelled by admin', itemId).first();
+      `
+      )
+        .bind(reason || 'Cancelled by admin', itemId)
+        .first();
 
       // Remove from any pending matches
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         UPDATE queue_matches 
         SET status = 'failed', notes = ?, updated_at = datetime('now')
         WHERE (withdrawal_id = ? OR deposit_id = ?) AND status = 'pending'
-      `).bind('Cancelled due to item cancellation', itemId, itemId).run();
+      `
+      )
+        .bind('Cancelled due to item cancellation', itemId, itemId)
+        .run();
 
       return true;
     } catch (error) {
@@ -484,19 +526,23 @@ export class P2PQueueAPI {
    */
   private async storeTelegramData(queueItemId: string, item: Partial<P2PQueueItem>): Promise<void> {
     try {
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         INSERT OR REPLACE INTO telegram_data (
           queue_item_id, telegram_group_id, telegram_chat_id, 
           telegram_channel, telegram_username, telegram_id, created_at
         ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
-      `).bind(
-        queueItemId,
-        item.telegramGroupId || null,
-        item.telegramChatId || null,
-        item.telegramChannel || null,
-        item.telegramUsername || null,
-        item.telegramId || null
-      ).run();
+      `
+      )
+        .bind(
+          queueItemId,
+          item.telegramGroupId || null,
+          item.telegramChatId || null,
+          item.telegramChannel || null,
+          item.telegramUsername || null,
+          item.telegramId || null
+        )
+        .run();
     } catch (error) {
       console.error('Failed to store Telegram data:', error);
     }
@@ -505,7 +551,10 @@ export class P2PQueueAPI {
   /**
    * Update Telegram data for queue item
    */
-  private async updateTelegramData(queueItemId: string, updates: Partial<P2PQueueItem>): Promise<void> {
+  private async updateTelegramData(
+    queueItemId: string,
+    updates: Partial<P2PQueueItem>
+  ): Promise<void> {
     try {
       const updateFields: string[] = [];
       const params: any[] = [];
@@ -547,7 +596,9 @@ export class P2PQueueAPI {
         WHERE queue_item_id = $${paramIndex}
       `;
 
-      await this.env.DB.prepare(sql).bind(...params).run();
+      await this.env.DB.prepare(sql)
+        .bind(...params)
+        .run();
     } catch (error) {
       console.error('Failed to update Telegram data:', error);
     }
@@ -560,7 +611,7 @@ export class P2PQueueAPI {
     try {
       // This would integrate with your existing Telegram bot system
       console.log(`Telegram notification for ${event}:`, item);
-      
+
       // Example implementation:
       // await this.env.TELEGRAM_BOT.sendMessage({
       //   chat_id: item.telegramGroupId || item.telegramChatId,
@@ -577,7 +628,7 @@ export class P2PQueueAPI {
   private async notifyMatchApproved(match: any): Promise<void> {
     try {
       console.log('Match approved notification:', match);
-      
+
       // This would integrate with your existing Telegram bot system
       // await this.env.TELEGRAM_BOT.sendMessage({
       //   chat_id: match.telegramGroupId || match.telegramChatId,

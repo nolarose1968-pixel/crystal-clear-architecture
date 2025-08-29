@@ -4,7 +4,11 @@
  */
 
 import { EventEmitter } from 'events';
-import { CustomerInformationService, CustomerProfile, CustomerSearchFilters } from '../services/customer-information-service';
+import {
+  CustomerInformationService,
+  CustomerProfile,
+  CustomerSearchFilters,
+} from '../services/customer-information-service';
 import { FormManagementService } from '../services/form-management-service';
 import { CashierService } from '../services/cashier-service';
 
@@ -26,7 +30,8 @@ export class CustomerInformationInterface extends EventEmitter {
   private customerService: CustomerInformationService;
   private formService: FormManagementService;
   private cashierService: CashierService;
-  private currentView: 'dashboard' | 'list' | 'search' | 'create' | 'edit' | 'profile' = 'dashboard';
+  private currentView: 'dashboard' | 'list' | 'search' | 'create' | 'edit' | 'profile' =
+    'dashboard';
   private selectedCustomer: CustomerProfile | null = null;
   private searchResults: CustomerProfile[] = [];
   private isInitialized = false;
@@ -43,7 +48,7 @@ export class CustomerInformationInterface extends EventEmitter {
       enableRealTimeUpdates: true,
       maxSearchResults: 100,
       defaultView: 'list',
-      ...options
+      ...options,
     };
 
     this.customerService = CustomerInformationService.getInstance();
@@ -56,7 +61,6 @@ export class CustomerInformationInterface extends EventEmitter {
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
-
 
     // Initialize dependencies
     await this.customerService.initialize();
@@ -83,22 +87,24 @@ export class CustomerInformationInterface extends EventEmitter {
    */
   private setupEventListeners(): void {
     // Listen for customer service events
-    this.customerService.on('customer-created', (customer) => {
+    this.customerService.on('customer-created', customer => {
       this.onCustomerCreated(customer);
     });
 
-    this.customerService.on('customer-updated', (customer) => {
+    this.customerService.on('customer-updated', customer => {
       this.onCustomerUpdated(customer);
     });
 
-    this.customerService.on('customer-updated-realtime', (customer) => {
+    this.customerService.on('customer-updated-realtime', customer => {
       this.onCustomerUpdatedRealtime(customer);
     });
 
     // Listen for DOM events
-    this.container.addEventListener('click', (event) => {
+    this.container.addEventListener('click', event => {
       const target = event.target as HTMLElement;
-      const action = target.getAttribute('data-action') || target.closest('[data-action]')?.getAttribute('data-action');
+      const action =
+        target.getAttribute('data-action') ||
+        target.closest('[data-action]')?.getAttribute('data-action');
 
       if (action) {
         this.handleAction(action, target, event);
@@ -106,7 +112,7 @@ export class CustomerInformationInterface extends EventEmitter {
     });
 
     // Listen for form submissions
-    this.container.addEventListener('submit', (event) => {
+    this.container.addEventListener('submit', event => {
       const form = event.target as HTMLFormElement;
       if (form.hasAttribute('data-customer-form')) {
         event.preventDefault();
@@ -115,13 +121,12 @@ export class CustomerInformationInterface extends EventEmitter {
     });
 
     // Listen for search input
-    this.container.addEventListener('input', (event) => {
+    this.container.addEventListener('input', event => {
       const target = event.target as HTMLInputElement;
       if (target.hasAttribute('data-search-input')) {
         this.handleSearchInput(target.value);
       }
     });
-
   }
 
   /**
@@ -138,61 +143,63 @@ export class CustomerInformationInterface extends EventEmitter {
           type: 'text',
           label: 'Customer ID',
           required: false,
-          placeholder: 'Auto-generated'
+          placeholder: 'Auto-generated',
         },
         {
           id: 'firstName',
           type: 'text',
           label: 'First Name',
           required: true,
-          validation: { minLength: 2, maxLength: 50 }
+          validation: { minLength: 2, maxLength: 50 },
         },
         {
           id: 'lastName',
           type: 'text',
           label: 'Last Name',
           required: true,
-          validation: { minLength: 2, maxLength: 50 }
+          validation: { minLength: 2, maxLength: 50 },
         },
         {
           id: 'email',
           type: 'email',
           label: 'Email Address',
           required: true,
-          validation: { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ }
+          validation: { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
         },
         {
           id: 'phone',
           type: 'text',
           label: 'Phone Number',
           required: true,
-          validation: { pattern: /^\+?1?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/ }
+          validation: {
+            pattern: /^\+?1?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$/,
+          },
         },
         {
           id: 'altPhone',
           type: 'text',
           label: 'Alternate Phone',
-          required: false
+          required: false,
         },
         {
           id: 'dateOfBirth',
           type: 'date',
           label: 'Date of Birth',
-          required: false
+          required: false,
         },
         {
           id: 'street',
           type: 'text',
           label: 'Street Address',
           required: true,
-          validation: { minLength: 5 }
+          validation: { minLength: 5 },
         },
         {
           id: 'city',
           type: 'text',
           label: 'City',
           required: true,
-          validation: { minLength: 2 }
+          validation: { minLength: 2 },
         },
         {
           id: 'state',
@@ -250,15 +257,15 @@ export class CustomerInformationInterface extends EventEmitter {
             { id: 'WA', text: 'Washington' },
             { id: 'WV', text: 'West Virginia' },
             { id: 'WI', text: 'Wisconsin' },
-            { id: 'WY', text: 'Wyoming' }
-          ]
+            { id: 'WY', text: 'Wyoming' },
+          ],
         },
         {
           id: 'zipCode',
           type: 'text',
           label: 'ZIP Code',
           required: true,
-          validation: { pattern: /^\d{5}(-\d{4})?$/ }
+          validation: { pattern: /^\d{5}(-\d{4})?$/ },
         },
         {
           id: 'country',
@@ -268,15 +275,14 @@ export class CustomerInformationInterface extends EventEmitter {
           options: [
             { id: 'US', text: 'United States' },
             { id: 'CA', text: 'Canada' },
-            { id: 'MX', text: 'Mexico' }
+            { id: 'MX', text: 'Mexico' },
           ],
-          defaultValue: 'US'
-        }
+          defaultValue: 'US',
+        },
       ],
       submitButton: { text: 'Save Customer', class: 'btn btn-primary' },
-      cancelButton: { text: 'Cancel', class: 'btn btn-secondary' }
+      cancelButton: { text: 'Cancel', class: 'btn btn-secondary' },
     });
-
   }
 
   /**
@@ -287,7 +293,6 @@ export class CustomerInformationInterface extends EventEmitter {
     setInterval(() => {
       this.refreshCurrentView();
     }, 30000);
-
   }
 
   /**
@@ -318,12 +323,20 @@ export class CustomerInformationInterface extends EventEmitter {
               <small class="text-muted">Comprehensive customer profile management system</small>
             </div>
             <div class="customer-actions">
-              ${this.options.enableCreate ? `<button class="btn btn-primary" data-action="create-customer">
+              ${
+                this.options.enableCreate
+                  ? `<button class="btn btn-primary" data-action="create-customer">
                 <i class="fas fa-plus"></i> New Customer
-              </button>` : ''}
-              ${this.options.enableExport ? `<button class="btn btn-secondary" data-action="export-customers">
+              </button>`
+                  : ''
+              }
+              ${
+                this.options.enableExport
+                  ? `<button class="btn btn-secondary" data-action="export-customers">
                 <i class="fas fa-download"></i> Export
-              </button>` : ''}
+              </button>`
+                  : ''
+              }
             </div>
           </div>
         </div>
@@ -344,7 +357,9 @@ export class CustomerInformationInterface extends EventEmitter {
         </div>
 
         <!-- Search Bar (when enabled) -->
-        ${this.options.enableSearch ? `
+        ${
+          this.options.enableSearch
+            ? `
           <div class="customer-search">
             <div class="input-group">
               <input type="text" class="form-control" data-search-input
@@ -356,7 +371,9 @@ export class CustomerInformationInterface extends EventEmitter {
               </div>
             </div>
           </div>
-        ` : ''}
+        `
+            : ''
+        }
 
         <!-- Content Area -->
         <div class="customer-content">
@@ -478,11 +495,15 @@ export class CustomerInformationInterface extends EventEmitter {
             <button class="btn btn-primary" data-action="show-search">
               <i class="fas fa-search"></i> Search Customers
             </button>
-            ${this.options.enableCreate ? `
+            ${
+              this.options.enableCreate
+                ? `
               <button class="btn btn-success" data-action="create-customer">
                 <i class="fas fa-plus"></i> New Customer
               </button>
-            ` : ''}
+            `
+                : ''
+            }
             <button class="btn btn-info" data-action="show-list">
               <i class="fas fa-list"></i> View All
             </button>
@@ -699,11 +720,15 @@ export class CustomerInformationInterface extends EventEmitter {
               </span>
             </div>
             <div class="profile-actions">
-              ${this.options.enableEdit ? `
+              ${
+                this.options.enableEdit
+                  ? `
                 <button class="btn btn-primary btn-sm" data-action="edit-customer">
                   <i class="fas fa-edit"></i> Edit
                 </button>
-              ` : ''}
+              `
+                  : ''
+              }
               <button class="btn btn-info btn-sm" data-action="view-transactions">
                 <i class="fas fa-receipt"></i> Transactions
               </button>
@@ -897,16 +922,15 @@ export class CustomerInformationInterface extends EventEmitter {
         name: query,
         email: query,
         phone: query,
-        customerId: query
+        customerId: query,
       };
 
       const { customers } = await this.customerService.searchCustomers(filters, {
-        limit: this.options.maxSearchResults
+        limit: this.options.maxSearchResults,
       });
 
       this.searchResults = customers;
       this.updateSearchResults();
-
     } catch (error) {
       console.error('Search error:', error);
     }
@@ -944,14 +968,16 @@ export class CustomerInformationInterface extends EventEmitter {
     try {
       this.showLoading();
 
-      const { customers, total, hasMore } = await this.customerService.searchCustomers({}, {
-        limit: 50,
-        offset: (page - 1) * 50
-      });
+      const { customers, total, hasMore } = await this.customerService.searchCustomers(
+        {},
+        {
+          limit: 50,
+          offset: (page - 1) * 50,
+        }
+      );
 
       this.updateCustomerTable(customers);
       this.updatePagination(page, Math.ceil(total / 50), hasMore);
-
     } catch (error) {
       console.error('Error loading customer list:', error);
       this.showError('Failed to load customer list');
@@ -972,7 +998,9 @@ export class CustomerInformationInterface extends EventEmitter {
       return;
     }
 
-    const rows = customers.map(customer => `
+    const rows = customers
+      .map(
+        customer => `
       <tr>
         <td>${customer.customerId}</td>
         <td>${customer.personalInfo.firstName} ${customer.personalInfo.lastName}</td>
@@ -989,14 +1017,20 @@ export class CustomerInformationInterface extends EventEmitter {
           <button class="btn btn-sm btn-outline-primary" data-action="view-customer" data-customer-id="${customer.id}">
             <i class="fas fa-eye"></i>
           </button>
-          ${this.options.enableEdit ? `
+          ${
+            this.options.enableEdit
+              ? `
             <button class="btn btn-sm btn-outline-secondary" data-action="edit-customer" data-customer-id="${customer.id}">
               <i class="fas fa-edit"></i>
             </button>
-          ` : ''}
+          `
+              : ''
+          }
         </td>
       </tr>
-    `).join('');
+    `
+      )
+      .join('');
 
     tbody.innerHTML = rows;
   }
@@ -1028,7 +1062,7 @@ export class CustomerInformationInterface extends EventEmitter {
 
     // Add pagination event listeners
     pagination.querySelectorAll('.page-link').forEach(link => {
-      link.addEventListener('click', (e) => {
+      link.addEventListener('click', e => {
         e.preventDefault();
         const page = parseInt(link.getAttribute('data-page') || '1');
         this.loadCustomerList(page);
@@ -1048,7 +1082,9 @@ export class CustomerInformationInterface extends EventEmitter {
       return;
     }
 
-    const results = this.searchResults.map(customer => `
+    const results = this.searchResults
+      .map(
+        customer => `
       <div class="search-result-item" data-customer-id="${customer.id}">
         <div class="d-flex justify-content-between align-items-center">
           <div>
@@ -1064,7 +1100,9 @@ export class CustomerInformationInterface extends EventEmitter {
           </div>
         </div>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
 
     container.innerHTML = `<div class="search-results-list">${results}</div>`;
   }
@@ -1131,17 +1169,16 @@ export class CustomerInformationInterface extends EventEmitter {
       customerId: (this.container.querySelector('#search-customer-id') as HTMLInputElement)?.value,
       status: (this.container.querySelector('#search-status') as HTMLSelectElement)?.value,
       state: (this.container.querySelector('#search-state') as HTMLInputElement)?.value,
-      city: (this.container.querySelector('#search-city') as HTMLInputElement)?.value
+      city: (this.container.querySelector('#search-city') as HTMLInputElement)?.value,
     };
 
     try {
       const { customers } = await this.customerService.searchCustomers(filters, {
-        limit: this.options.maxSearchResults
+        limit: this.options.maxSearchResults,
       });
 
       this.searchResults = customers;
       this.updateSearchResults();
-
     } catch (error) {
       console.error('Advanced search error:', error);
       this.showError('Search failed');
@@ -1152,7 +1189,9 @@ export class CustomerInformationInterface extends EventEmitter {
    * Clear search filters
    */
   private clearSearchFilters(): void {
-    const filters = this.container.querySelectorAll('#search-name, #search-email, #search-phone, #search-customer-id, #search-state, #search-city');
+    const filters = this.container.querySelectorAll(
+      '#search-name, #search-email, #search-phone, #search-customer-id, #search-state, #search-city'
+    );
     filters.forEach(filter => {
       (filter as HTMLInputElement).value = '';
     });
@@ -1190,7 +1229,6 @@ export class CustomerInformationInterface extends EventEmitter {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-
     } catch (error) {
       console.error('Export error:', error);
       this.showError('Export failed');
@@ -1212,21 +1250,21 @@ export class CustomerInformationInterface extends EventEmitter {
     const formData = new FormData(form);
 
     const customerData = {
-      customerId: formData.get('customerId') as string || this.generateCustomerId(),
+      customerId: (formData.get('customerId') as string) || this.generateCustomerId(),
       personalInfo: {
         firstName: formData.get('firstName') as string,
         lastName: formData.get('lastName') as string,
         email: formData.get('email') as string,
         phone: formData.get('phone') as string,
         altPhone: formData.get('altPhone') as string,
-        dateOfBirth: formData.get('dateOfBirth') as string
+        dateOfBirth: formData.get('dateOfBirth') as string,
       },
       address: {
         street: formData.get('street') as string,
         city: formData.get('city') as string,
         state: formData.get('state') as string,
         zipCode: formData.get('zipCode') as string,
-        country: formData.get('country') as string || 'US'
+        country: (formData.get('country') as string) || 'US',
       },
       preferences: {
         language: 'en',
@@ -1236,13 +1274,13 @@ export class CustomerInformationInterface extends EventEmitter {
           email: true,
           sms: true,
           push: false,
-          telegram: false
+          telegram: false,
         },
         marketing: {
           email: false,
           sms: false,
-          phone: false
-        }
+          phone: false,
+        },
       },
       financial: {
         creditLimit: 1000,
@@ -1250,7 +1288,7 @@ export class CustomerInformationInterface extends EventEmitter {
         availableCredit: 1000,
         riskScore: 20,
         paymentMethods: [],
-        transactionHistory: []
+        transactionHistory: [],
       },
       gaming: {
         accountStatus: 'active',
@@ -1260,18 +1298,18 @@ export class CustomerInformationInterface extends EventEmitter {
         totalWins: 0,
         totalLosses: 0,
         favoriteSports: [],
-        riskProfile: 'low'
+        riskProfile: 'low',
       },
       verification: {
         emailVerified: false,
         phoneVerified: false,
         addressVerified: false,
         identityVerified: false,
-        documents: []
+        documents: [],
       },
       thirdParty: {
-        paymentAddresses: []
-      }
+        paymentAddresses: [],
+      },
     };
 
     const customer = await this.customerService.createCustomer(customerData);
@@ -1295,21 +1333,21 @@ export class CustomerInformationInterface extends EventEmitter {
         email: formData.get('email') as string,
         phone: formData.get('phone') as string,
         altPhone: formData.get('altPhone') as string,
-        dateOfBirth: formData.get('dateOfBirth') as string
+        dateOfBirth: formData.get('dateOfBirth') as string,
       },
       address: {
         street: formData.get('street') as string,
         city: formData.get('city') as string,
         state: formData.get('state') as string,
         zipCode: formData.get('zipCode') as string,
-        country: formData.get('country') as string || 'US'
-      }
+        country: (formData.get('country') as string) || 'US',
+      },
     };
 
     await this.customerService.updateCustomer({
       customerId: this.selectedCustomer.id,
       updates,
-      updatedBy: 'customer-interface'
+      updatedBy: 'customer-interface',
     });
 
     this.showSuccess('Customer updated successfully');
@@ -1423,11 +1461,16 @@ export class CustomerInformationInterface extends EventEmitter {
    */
   private getStatusBadgeClass(status: string): string {
     switch (status) {
-      case 'active': return 'success';
-      case 'suspended': return 'warning';
-      case 'pending': return 'info';
-      case 'closed': return 'secondary';
-      default: return 'secondary';
+      case 'active':
+        return 'success';
+      case 'suspended':
+        return 'warning';
+      case 'pending':
+        return 'info';
+      case 'closed':
+        return 'secondary';
+      default:
+        return 'secondary';
     }
   }
 
@@ -1458,7 +1501,10 @@ export class CustomerInformationInterface extends EventEmitter {
 }
 
 // Global functions for easy access
-export async function createCustomerInformationInterface(container: HTMLElement, options?: Partial<CustomerInterfaceOptions>): Promise<CustomerInformationInterface> {
+export async function createCustomerInformationInterface(
+  container: HTMLElement,
+  options?: Partial<CustomerInterfaceOptions>
+): Promise<CustomerInformationInterface> {
   const defaultOptions: CustomerInterfaceOptions = {
     container,
     enableSearch: true,
@@ -1469,7 +1515,7 @@ export async function createCustomerInformationInterface(container: HTMLElement,
     enableRealTimeUpdates: true,
     maxSearchResults: 100,
     defaultView: 'dashboard',
-    ...options
+    ...options,
   };
 
   const interface_ = new CustomerInformationInterface(defaultOptions);

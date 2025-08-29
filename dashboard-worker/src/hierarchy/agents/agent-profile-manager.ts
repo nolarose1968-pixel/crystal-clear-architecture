@@ -12,7 +12,7 @@ import type {
   AgentPermissions,
   AgentConfiguration,
   AgentType,
-  AgentStatus
+  AgentStatus,
 } from '../../../core/types/hierarchy';
 
 export class AgentProfileManager {
@@ -41,7 +41,7 @@ export class AgentProfileManager {
       createdBy: 'system',
       updatedBy: 'system',
       subAgents: [],
-      lastCommissionDate: new Date()
+      lastCommissionDate: new Date(),
     };
 
     this.agents.set(agent.id, agent);
@@ -71,7 +71,7 @@ export class AgentProfileManager {
       ...agent,
       ...updates,
       updatedAt: new Date(),
-      updatedBy: 'system'
+      updatedBy: 'system',
     };
 
     // Validate updated data
@@ -175,7 +175,7 @@ export class AgentProfileManager {
       relationshipType,
       assignedAt: new Date(),
       assignedBy,
-      commissionSplit
+      commissionSplit,
     };
 
     if (!this.customerRelationships.has(customerId)) {
@@ -226,7 +226,7 @@ export class AgentProfileManager {
       if (agentRelationship) {
         customers.push({
           customerId,
-          relationship: agentRelationship
+          relationship: agentRelationship,
         });
       }
     }
@@ -237,24 +237,30 @@ export class AgentProfileManager {
   /**
    * Update agent permissions
    */
-  updateAgentPermissions(agentId: string, permissions: Partial<AgentPermissions>): AgentProfile | null {
+  updateAgentPermissions(
+    agentId: string,
+    permissions: Partial<AgentPermissions>
+  ): AgentProfile | null {
     return this.updateAgent(agentId, {
       permissions: {
         ...this.agents.get(agentId)?.permissions,
-        ...permissions
-      } as AgentPermissions
+        ...permissions,
+      } as AgentPermissions,
     });
   }
 
   /**
    * Update agent configuration
    */
-  updateAgentConfiguration(agentId: string, configuration: Partial<AgentConfiguration>): AgentProfile | null {
+  updateAgentConfiguration(
+    agentId: string,
+    configuration: Partial<AgentConfiguration>
+  ): AgentProfile | null {
     return this.updateAgent(agentId, {
       configuration: {
         ...this.agents.get(agentId)?.configuration,
-        ...configuration
-      } as AgentConfiguration
+        ...configuration,
+      } as AgentConfiguration,
     });
   }
 
@@ -267,8 +273,8 @@ export class AgentProfileManager {
       metadata: {
         ...this.agents.get(agentId)?.metadata,
         suspensionReason: reason,
-        suspendedAt: new Date()
-      }
+        suspendedAt: new Date(),
+      },
     });
   }
 
@@ -280,8 +286,8 @@ export class AgentProfileManager {
       status: 'active',
       metadata: {
         ...this.agents.get(agentId)?.metadata,
-        reactivatedAt: new Date()
-      }
+        reactivatedAt: new Date(),
+      },
     });
   }
 
@@ -304,7 +310,7 @@ export class AgentProfileManager {
       byStatus: {} as Record<AgentStatus, number>,
       byOffice: {} as Record<string, number>,
       averageHierarchyDepth: 0,
-      totalCustomerAssignments: 0
+      totalCustomerAssignments: 0,
     };
 
     // Count by type, status, office
@@ -316,7 +322,8 @@ export class AgentProfileManager {
 
     // Calculate hierarchy depth
     const depths = Array.from(this.hierarchy.values()).map(node => node.level);
-    stats.averageHierarchyDepth = depths.length > 0 ? depths.reduce((a, b) => a + b, 0) / depths.length : 0;
+    stats.averageHierarchyDepth =
+      depths.length > 0 ? depths.reduce((a, b) => a + b, 0) / depths.length : 0;
 
     // Count customer assignments
     for (const relationships of this.customerRelationships.values()) {
@@ -422,9 +429,11 @@ export class AgentProfileManager {
       agent,
       level,
       children,
-      totalSubAgents: children.length + children.reduce((sum, child) => sum + child.totalSubAgents, 0),
-      activeSubAgents: children.filter(child => child.agent.status === 'active').length +
-                       children.reduce((sum, child) => sum + child.activeSubAgents, 0),
+      totalSubAgents:
+        children.length + children.reduce((sum, child) => sum + child.totalSubAgents, 0),
+      activeSubAgents:
+        children.filter(child => child.agent.status === 'active').length +
+        children.reduce((sum, child) => sum + child.activeSubAgents, 0),
       totalCommission: agent.totalCommission,
       monthlyCommission: 0, // Would be calculated based on current month
       performance: {
@@ -445,8 +454,8 @@ export class AgentProfileManager {
         averageBetSize: 0,
         topPerformingSport: '',
         customerSatisfaction: 0,
-        responseTime: 0
-      }
+        responseTime: 0,
+      },
     };
   }
 

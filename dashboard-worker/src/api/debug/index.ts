@@ -57,18 +57,20 @@ export class DebugAPI {
 
       // Default: Return available debug endpoints
       return this.handleDebugIndex(request);
-
     } catch (error) {
       console.error('Debug API error:', error);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Debug API error',
-        message: error.message,
-        timestamp: new Date().toISOString()
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Debug API error',
+          message: error.message,
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
   }
 
@@ -77,10 +79,10 @@ export class DebugAPI {
    */
   private async handlePermissionsMatrixDebug(request: Request): Promise<Response> {
     const data = await this.permissionsMatrixDebug.getMatrixStructure();
-    
+
     return new Response(JSON.stringify(data), {
       status: data.success ? 200 : 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
@@ -89,10 +91,10 @@ export class DebugAPI {
    */
   private async handlePermissionsMatrixValidationDebug(request: Request): Promise<Response> {
     const data = await this.permissionsMatrixDebug.getValidationDetails();
-    
+
     return new Response(JSON.stringify(data), {
       status: data.success ? 200 : 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
@@ -101,10 +103,10 @@ export class DebugAPI {
    */
   private async handlePermissionsMatrixAgentsDebug(request: Request): Promise<Response> {
     const data = await this.permissionsMatrixDebug.getAgentDetails();
-    
+
     return new Response(JSON.stringify(data), {
       status: data.success ? 200 : 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
@@ -113,10 +115,10 @@ export class DebugAPI {
    */
   private async handlePermissionsMatrixPerformanceDebug(request: Request): Promise<Response> {
     const data = await this.permissionsMatrixDebug.getPerformanceMetrics();
-    
+
     return new Response(JSON.stringify(data), {
       status: data.success ? 200 : 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
@@ -125,10 +127,10 @@ export class DebugAPI {
    */
   private async handlePermissionsMatrixRealTimeDebug(request: Request): Promise<Response> {
     const data = await this.permissionsMatrixDebug.getRealTimeStatus();
-    
+
     return new Response(JSON.stringify(data), {
       status: data.success ? 200 : 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
@@ -143,14 +145,14 @@ export class DebugAPI {
         hitRate: '85%',
         missRate: '15%',
         evictions: 25,
-        memoryUsage: '45MB'
+        memoryUsage: '45MB',
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     return new Response(JSON.stringify(cacheStats), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
@@ -165,16 +167,16 @@ export class DebugAPI {
         hitRate: '85%',
         missRate: '15%',
         evictions: 25,
-        memoryUsage: '45MB'
+        memoryUsage: '45MB',
       },
       source: 'admin_debug_endpoint',
       adminAccess: true,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     return new Response(JSON.stringify(adminCacheStats), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
@@ -193,29 +195,29 @@ export class DebugAPI {
             {
               path: '/api/debug/permissions-matrix',
               method: 'GET',
-              description: 'Matrix structure and validation summary'
+              description: 'Matrix structure and validation summary',
             },
             {
               path: '/api/debug/permissions-matrix/validation',
               method: 'GET',
-              description: 'Detailed validation results for all four scenarios'
+              description: 'Detailed validation results for all four scenarios',
             },
             {
               path: '/api/debug/permissions-matrix/agents',
               method: 'GET',
-              description: 'Agent details and validation breakdown'
+              description: 'Agent details and validation breakdown',
             },
             {
               path: '/api/debug/permissions-matrix/performance',
               method: 'GET',
-              description: 'Performance metrics and cache statistics'
+              description: 'Performance metrics and cache statistics',
             },
             {
               path: '/api/debug/permissions-matrix/realtime',
               method: 'GET',
-              description: 'Real-time status and live metrics'
-            }
-          ]
+              description: 'Real-time status and live metrics',
+            },
+          ],
         },
         'Legacy Debug': {
           description: 'Existing debug endpoints for backward compatibility',
@@ -223,26 +225,26 @@ export class DebugAPI {
             {
               path: '/api/debug/cache-stats',
               method: 'GET',
-              description: 'Cache statistics and performance metrics'
+              description: 'Cache statistics and performance metrics',
             },
             {
               path: '/api/admin/debug/cache-stats',
               method: 'GET',
-              description: 'Admin-only cache statistics with enhanced access'
-            }
-          ]
-        }
+              description: 'Admin-only cache statistics with enhanced access',
+            },
+          ],
+        },
       },
       documentation: {
         'Enhanced Permissions Matrix': 'docs/@packages.html',
         'Testing Framework': 'test-checklist.bun.ts',
-        'Health Monitoring': 'monitor-health.bun.ts'
-      }
+        'Health Monitoring': 'monitor-health.bun.ts',
+      },
     };
 
     return new Response(JSON.stringify(debugEndpoints), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }

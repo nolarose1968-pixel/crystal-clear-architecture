@@ -9,13 +9,13 @@ class ThemeToggle {
     this.THEMES = {
       LIGHT: 'light',
       DARK: 'dark',
-      SYSTEM: 'system'
+      SYSTEM: 'system',
     };
-    
+
     this.currentTheme = null;
     this.systemPreference = null;
     this.toggleButton = null;
-    
+
     this.init();
   }
 
@@ -25,16 +25,16 @@ class ThemeToggle {
   init() {
     // Detect system preference
     this.detectSystemPreference();
-    
+
     // Load saved preference or use system default
     this.loadThemePreference();
-    
+
     // Apply the initial theme
     this.applyTheme();
-    
+
     // Set up event listeners
     this.setupEventListeners();
-    
+
     // Create toggle button if it doesn't exist
     this.createToggleButton();
   }
@@ -46,11 +46,11 @@ class ThemeToggle {
     if (window.matchMedia) {
       const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
       this.systemPreference = darkModeQuery.matches ? this.THEMES.DARK : this.THEMES.LIGHT;
-      
+
       // Listen for system theme changes
-      darkModeQuery.addEventListener('change', (e) => {
+      darkModeQuery.addEventListener('change', e => {
         this.systemPreference = e.matches ? this.THEMES.DARK : this.THEMES.LIGHT;
-        
+
         // If user is using system theme, update automatically
         if (this.currentTheme === this.THEMES.SYSTEM) {
           this.applyTheme();
@@ -64,7 +64,7 @@ class ThemeToggle {
    */
   loadThemePreference() {
     const saved = localStorage.getItem(this.STORAGE_KEY);
-    
+
     if (saved && Object.values(this.THEMES).includes(saved)) {
       this.currentTheme = saved;
     } else {
@@ -85,11 +85,11 @@ class ThemeToggle {
    */
   applyTheme() {
     const effectiveTheme = this.getEffectiveTheme();
-    
+
     // Remove existing theme attributes
     document.documentElement.removeAttribute('data-theme');
     document.body.classList.remove('dark-mode', 'light-mode');
-    
+
     // Apply new theme
     if (effectiveTheme === this.THEMES.DARK) {
       document.documentElement.setAttribute('data-theme', 'dark');
@@ -98,14 +98,16 @@ class ThemeToggle {
       document.documentElement.setAttribute('data-theme', 'light');
       document.body.classList.add('light-mode');
     }
-    
+
     // Update toggle button appearance
     this.updateToggleButton();
-    
+
     // Dispatch custom event for other components
-    window.dispatchEvent(new CustomEvent('theme-changed', {
-      detail: { theme: effectiveTheme, userPreference: this.currentTheme }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('theme-changed', {
+        detail: { theme: effectiveTheme, userPreference: this.currentTheme },
+      })
+    );
   }
 
   /**
@@ -123,7 +125,7 @@ class ThemeToggle {
    */
   toggle() {
     const effectiveTheme = this.getEffectiveTheme();
-    
+
     // Cycle through: light -> dark -> system
     if (effectiveTheme === this.THEMES.LIGHT) {
       this.currentTheme = this.THEMES.DARK;
@@ -132,7 +134,7 @@ class ThemeToggle {
     } else {
       this.currentTheme = this.THEMES.LIGHT;
     }
-    
+
     this.saveThemePreference();
     this.applyTheme();
   }
@@ -157,14 +159,14 @@ class ThemeToggle {
       this.toggleButton = document.getElementById('theme-toggle-btn');
       return;
     }
-    
+
     // Create button container
     const button = document.createElement('button');
     button.id = 'theme-toggle-btn';
     button.className = 'theme-toggle';
     button.setAttribute('aria-label', 'Toggle theme');
     button.setAttribute('title', 'Toggle theme (current: ' + this.getEffectiveTheme() + ')');
-    
+
     // Create icons
     button.innerHTML = `
       <span class="theme-toggle-icon theme-icon-light">
@@ -187,14 +189,14 @@ class ThemeToggle {
       </span>
       <span class="theme-toggle-text"></span>
     `;
-    
+
     // Add click handler
     button.addEventListener('click', () => this.toggle());
-    
+
     // Append to body
     document.body.appendChild(button);
     this.toggleButton = button;
-    
+
     // Update initial state
     this.updateToggleButton();
   }
@@ -204,18 +206,18 @@ class ThemeToggle {
    */
   updateToggleButton() {
     if (!this.toggleButton) return;
-    
+
     const textElement = this.toggleButton.querySelector('.theme-toggle-text');
     if (textElement) {
       const effectiveTheme = this.getEffectiveTheme();
       let displayText = '';
-      
+
       if (this.currentTheme === this.THEMES.SYSTEM) {
         displayText = `System (${effectiveTheme})`;
       } else {
         displayText = effectiveTheme.charAt(0).toUpperCase() + effectiveTheme.slice(1);
       }
-      
+
       textElement.textContent = displayText;
       this.toggleButton.setAttribute('title', `Toggle theme (current: ${displayText})`);
     }
@@ -226,7 +228,7 @@ class ThemeToggle {
    */
   setupEventListeners() {
     // Keyboard shortcut: Ctrl/Cmd + Shift + L
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'L') {
         e.preventDefault();
         this.toggle();
@@ -261,24 +263,24 @@ class ThemeToggle {
         <button class="close-modal">Close</button>
       </div>
     `;
-    
+
     // Handle radio button changes
     modal.querySelectorAll('input[name="theme"]').forEach(input => {
-      input.addEventListener('change', (e) => {
+      input.addEventListener('change', e => {
         this.setTheme(e.target.value);
       });
     });
-    
+
     // Handle close button
     modal.querySelector('.close-modal').addEventListener('click', () => {
       modal.remove();
     });
-    
+
     // Handle overlay click
     modal.querySelector('.modal-overlay').addEventListener('click', () => {
       modal.remove();
     });
-    
+
     document.body.appendChild(modal);
   }
 
@@ -289,7 +291,7 @@ class ThemeToggle {
     return {
       userPreference: this.currentTheme,
       effectiveTheme: this.getEffectiveTheme(),
-      systemPreference: this.systemPreference
+      systemPreference: this.systemPreference,
     };
   }
 }

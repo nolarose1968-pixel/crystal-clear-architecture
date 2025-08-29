@@ -3,11 +3,11 @@
  * Monitors security status, authentication health, and compliance
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 interface SecurityHealth {
-  status: 'healthy' | 'degraded' | 'critical';
+  status: "healthy" | "degraded" | "critical";
   timestamp: string;
   authentication: AuthHealth;
   ssl: SSLHealth;
@@ -58,30 +58,28 @@ export class SecurityHealthService {
    * Get comprehensive security status
    */
   async getSecurityStatus(): Promise<SecurityHealth> {
-    const [
-      auth,
-      ssl,
-      firewall,
-      updates,
-      compliance
-    ] = await Promise.all([
+    const [auth, ssl, firewall, updates, compliance] = await Promise.all([
       this.getAuthenticationHealth(),
       this.getSSLHealth(),
       this.getFirewallHealth(),
       this.getUpdateHealth(),
-      this.getComplianceHealth()
+      this.getComplianceHealth(),
     ]);
 
     // Determine overall security status
     const components = [auth, ssl, firewall, updates, compliance];
-    const criticalComponents = components.filter(comp => comp.status === 'critical');
-    const degradedComponents = components.filter(comp => comp.status === 'degraded');
+    const criticalComponents = components.filter(
+      (comp) => comp.status === "critical",
+    );
+    const degradedComponents = components.filter(
+      (comp) => comp.status === "degraded",
+    );
 
-    let overallStatus: 'healthy' | 'degraded' | 'critical' = 'healthy';
+    let overallStatus: "healthy" | "degraded" | "critical" = "healthy";
     if (criticalComponents.length > 0) {
-      overallStatus = 'critical';
+      overallStatus = "critical";
     } else if (degradedComponents.length > 0) {
-      overallStatus = 'degraded';
+      overallStatus = "degraded";
     }
 
     return {
@@ -91,7 +89,7 @@ export class SecurityHealthService {
       ssl,
       firewall,
       updates,
-      compliance
+      compliance,
     };
   }
 
@@ -102,15 +100,17 @@ export class SecurityHealthService {
     // Simulate authentication metrics
     const activeSessions = Math.floor(Math.random() * 1000) + 100;
     const failedAttempts = Math.floor(Math.random() * 50);
-    const lastSuccessfulLogin = new Date(Date.now() - Math.random() * 3600000).toISOString(); // Within last hour
+    const lastSuccessfulLogin = new Date(
+      Date.now() - Math.random() * 3600000,
+    ).toISOString(); // Within last hour
     const mfaEnabled = Math.random() > 0.3; // 70% have MFA enabled
 
-    let status = 'healthy';
+    let status = "healthy";
     if (failedAttempts > 20) {
-      status = 'degraded';
+      status = "degraded";
     }
     if (failedAttempts > 50) {
-      status = 'critical';
+      status = "critical";
     }
 
     return {
@@ -118,7 +118,7 @@ export class SecurityHealthService {
       activeSessions,
       failedAttempts,
       lastSuccessfulLogin,
-      mfaEnabled
+      mfaEnabled,
     };
   }
 
@@ -128,15 +128,17 @@ export class SecurityHealthService {
   async getSSLHealth(): Promise<SSLHealth> {
     // Simulate SSL certificate check
     const certificateValid = Math.random() > 0.1; // 90% valid
-    const daysUntilExpiry = certificateValid ? Math.floor(Math.random() * 365) + 30 : -Math.floor(Math.random() * 30);
-    const issuer = certificateValid ? 'Let\'s Encrypt Authority X3' : 'Unknown';
-    const protocol = 'TLS 1.3';
+    const daysUntilExpiry = certificateValid
+      ? Math.floor(Math.random() * 365) + 30
+      : -Math.floor(Math.random() * 30);
+    const issuer = certificateValid ? "Let's Encrypt Authority X3" : "Unknown";
+    const protocol = "TLS 1.3";
 
-    let status = 'healthy';
+    let status = "healthy";
     if (!certificateValid) {
-      status = 'critical';
+      status = "critical";
     } else if (daysUntilExpiry < 30) {
-      status = 'degraded';
+      status = "degraded";
     }
 
     return {
@@ -144,7 +146,7 @@ export class SecurityHealthService {
       certificateValid,
       daysUntilExpiry,
       issuer,
-      protocol
+      protocol,
     };
   }
 
@@ -155,19 +157,21 @@ export class SecurityHealthService {
     // Simulate firewall metrics
     const rulesCount = Math.floor(Math.random() * 100) + 50;
     const blockedAttempts = Math.floor(Math.random() * 1000);
-    const lastBlocked = blockedAttempts > 0 ?
-      new Date(Date.now() - Math.random() * 86400000).toISOString() : null; // Within last 24 hours
+    const lastBlocked =
+      blockedAttempts > 0
+        ? new Date(Date.now() - Math.random() * 86400000).toISOString()
+        : null; // Within last 24 hours
 
-    let status = 'healthy';
+    let status = "healthy";
     if (blockedAttempts > 500) {
-      status = 'degraded'; // High number of blocked attempts might indicate attack
+      status = "degraded"; // High number of blocked attempts might indicate attack
     }
 
     return {
       status,
       rulesCount,
       blockedAttempts,
-      lastBlocked: lastBlocked || 'Never'
+      lastBlocked: lastBlocked || "Never",
     };
   }
 
@@ -178,21 +182,23 @@ export class SecurityHealthService {
     // Simulate security update status
     const securityUpdates = Math.floor(Math.random() * 10);
     const criticalUpdates = Math.floor(Math.random() * 3);
-    const lastUpdate = new Date(Date.now() - Math.random() * 604800000).toISOString(); // Within last week
+    const lastUpdate = new Date(
+      Date.now() - Math.random() * 604800000,
+    ).toISOString(); // Within last week
 
-    let status = 'healthy';
+    let status = "healthy";
     if (criticalUpdates > 0) {
-      status = 'degraded';
+      status = "degraded";
     }
     if (securityUpdates > 5) {
-      status = 'critical';
+      status = "critical";
     }
 
     return {
       status,
       securityUpdates,
       criticalUpdates,
-      lastUpdate
+      lastUpdate,
     };
   }
 
@@ -203,20 +209,22 @@ export class SecurityHealthService {
     // Simulate compliance status
     const gdprCompliant = Math.random() > 0.1; // 90% compliant
     const soc2Compliant = Math.random() > 0.2; // 80% compliant
-    const lastAudit = new Date(Date.now() - Math.random() * 31536000000).toISOString(); // Within last year
+    const lastAudit = new Date(
+      Date.now() - Math.random() * 31536000000,
+    ).toISOString(); // Within last year
 
-    let status = 'healthy';
+    let status = "healthy";
     if (!gdprCompliant) {
-      status = 'critical';
+      status = "critical";
     } else if (!soc2Compliant) {
-      status = 'degraded';
+      status = "degraded";
     }
 
     return {
       status,
       gdprCompliant,
       soc2Compliant,
-      lastAudit
+      lastAudit,
     };
   }
 
@@ -236,60 +244,79 @@ export class SecurityHealthService {
 
     const recommendations = [];
     if (vulnerabilities > 0) {
-      recommendations.push('Update dependencies to latest secure versions');
+      recommendations.push("Update dependencies to latest secure versions");
     }
     if (criticalIssues > 0) {
-      recommendations.push('Address critical security vulnerabilities immediately');
+      recommendations.push(
+        "Address critical security vulnerabilities immediately",
+      );
     }
     if (!recommendations.length) {
-      recommendations.push('Security posture is good, continue regular scans');
+      recommendations.push("Security posture is good, continue regular scans");
     }
 
     return {
-      status: criticalIssues > 0 ? 'critical' : vulnerabilities > 0 ? 'degraded' : 'healthy',
+      status:
+        criticalIssues > 0
+          ? "critical"
+          : vulnerabilities > 0
+            ? "degraded"
+            : "healthy",
       vulnerabilities,
       criticalIssues,
       scanTime: new Date().toISOString(),
-      recommendations
+      recommendations,
     };
   }
 
   /**
    * Get security audit log
    */
-  async getSecurityAuditLog(limit: number = 50): Promise<Array<{
-    timestamp: string;
-    event: string;
-    severity: 'low' | 'medium' | 'high' | 'critical';
-    source: string;
-    details: string;
-  }>> {
+  async getSecurityAuditLog(limit: number = 50): Promise<
+    Array<{
+      timestamp: string;
+      event: string;
+      severity: "low" | "medium" | "high" | "critical";
+      source: string;
+      details: string;
+    }>
+  > {
     // Simulate security audit log
     const events = [
-      'Failed login attempt',
-      'SSL certificate renewed',
-      'Firewall rule updated',
-      'Security update installed',
-      'User session expired',
-      'MFA code generated',
-      'API rate limit exceeded',
-      'Database query logged'
+      "Failed login attempt",
+      "SSL certificate renewed",
+      "Firewall rule updated",
+      "Security update installed",
+      "User session expired",
+      "MFA code generated",
+      "API rate limit exceeded",
+      "Database query logged",
     ];
 
-    const severities: Array<'low' | 'medium' | 'high' | 'critical'> = ['low', 'medium', 'high', 'critical'];
-    const sources = ['authentication', 'network', 'application', 'database'];
+    const severities: Array<"low" | "medium" | "high" | "critical"> = [
+      "low",
+      "medium",
+      "high",
+      "critical",
+    ];
+    const sources = ["authentication", "network", "application", "database"];
 
     const auditLog = [];
     for (let i = 0; i < Math.min(limit, 100); i++) {
       auditLog.push({
-        timestamp: new Date(Date.now() - Math.random() * 86400000).toISOString(),
+        timestamp: new Date(
+          Date.now() - Math.random() * 86400000,
+        ).toISOString(),
         event: events[Math.floor(Math.random() * events.length)],
         severity: severities[Math.floor(Math.random() * severities.length)],
         source: sources[Math.floor(Math.random() * sources.length)],
-        details: `Event details for security audit entry ${i + 1}`
+        details: `Event details for security audit entry ${i + 1}`,
       });
     }
 
-    return auditLog.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    return auditLog.sort(
+      (a, b) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+    );
   }
 }

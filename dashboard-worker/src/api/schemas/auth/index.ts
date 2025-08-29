@@ -13,7 +13,7 @@ export const LoginRequestSchema = z.object({
   password: z.string().min(1, 'Password is required').max(100, 'Password too long'),
   rememberMe: z.boolean().optional().default(false),
   deviceId: z.string().optional(),
-  ipAddress: z.string().optional()
+  ipAddress: z.string().optional(),
 });
 
 /**
@@ -29,17 +29,17 @@ export const LoginResponseSchema = z.object({
       id: z.string(),
       username: z.string(),
       role: z.string(),
-      permissions: z.array(z.string())
-    })
+      permissions: z.array(z.string()),
+    }),
   }),
-  timestamp: z.string().datetime()
+  timestamp: z.string().datetime(),
 });
 
 /**
  * Refresh token request schema
  */
 export const RefreshTokenRequestSchema = z.object({
-  refreshToken: z.string().min(1, 'Refresh token is required')
+  refreshToken: z.string().min(1, 'Refresh token is required'),
 });
 
 /**
@@ -50,9 +50,9 @@ export const RefreshTokenResponseSchema = z.object({
   data: z.object({
     token: z.string(),
     refreshToken: z.string(),
-    expiresIn: z.number()
+    expiresIn: z.number(),
   }),
-  timestamp: z.string().datetime()
+  timestamp: z.string().datetime(),
 });
 
 /**
@@ -60,23 +60,29 @@ export const RefreshTokenResponseSchema = z.object({
  */
 export const LogoutRequestSchema = z.object({
   token: z.string().optional(),
-  allDevices: z.boolean().optional().default(false)
+  allDevices: z.boolean().optional().default(false),
 });
 
 /**
  * Change password request schema
  */
-export const ChangePasswordRequestSchema = z.object({
-  currentPassword: z.string().min(1, 'Current password is required'),
-  newPassword: z.string()
-    .min(8, 'Password must be at least 8 characters')
-    .max(100, 'Password too long')
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one lowercase letter, one uppercase letter, and one number'),
-  confirmPassword: z.string()
-}).refine(data => data.newPassword === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword']
-});
+export const ChangePasswordRequestSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Current password is required'),
+    newPassword: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(100, 'Password too long')
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+        'Password must contain at least one lowercase letter, one uppercase letter, and one number'
+      ),
+    confirmPassword: z.string(),
+  })
+  .refine(data => data.newPassword === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
 /**
  * Reset password request schema
@@ -84,24 +90,28 @@ export const ChangePasswordRequestSchema = z.object({
 export const ResetPasswordRequestSchema = z.object({
   email: z.string().email('Invalid email format'),
   token: z.string().optional(),
-  newPassword: z.string()
+  newPassword: z
+    .string()
     .min(8, 'Password must be at least 8 characters')
     .max(100, 'Password too long')
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one lowercase letter, one uppercase letter, and one number')
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+      'Password must contain at least one lowercase letter, one uppercase letter, and one number'
+    ),
 });
 
 /**
  * Verify email request schema
  */
 export const VerifyEmailRequestSchema = z.object({
-  token: z.string().min(1, 'Verification token is required')
+  token: z.string().min(1, 'Verification token is required'),
 });
 
 /**
  * Two-factor authentication setup schema
  */
 export const TwoFactorSetupRequestSchema = z.object({
-  password: z.string().min(1, 'Password is required')
+  password: z.string().min(1, 'Password is required'),
 });
 
 /**
@@ -112,15 +122,18 @@ export const TwoFactorSetupResponseSchema = z.object({
   data: z.object({
     secret: z.string(),
     qrCode: z.string(),
-    backupCodes: z.array(z.string())
-  })
+    backupCodes: z.array(z.string()),
+  }),
 });
 
 /**
  * Two-factor authentication verify schema
  */
 export const TwoFactorVerifyRequestSchema = z.object({
-  code: z.string().length(6, 'Code must be 6 digits').regex(/^\d+$/, 'Code must contain only digits')
+  code: z
+    .string()
+    .length(6, 'Code must be 6 digits')
+    .regex(/^\d+$/, 'Code must contain only digits'),
 });
 
 /**
@@ -134,7 +147,7 @@ export const SessionInfoSchema = z.object({
   createdAt: z.string().datetime(),
   lastActivity: z.string().datetime(),
   expiresAt: z.string().datetime(),
-  isActive: z.boolean()
+  isActive: z.boolean(),
 });
 
 /**
@@ -144,10 +157,13 @@ export const UserProfileUpdateSchema = z.object({
   firstName: z.string().min(1).max(50).optional(),
   lastName: z.string().min(1).max(50).optional(),
   email: z.string().email().optional(),
-  phone: z.string().regex(/^\+?[\d\s\-\(\)]+$/).optional(),
+  phone: z
+    .string()
+    .regex(/^\+?[\d\s\-\(\)]+$/)
+    .optional(),
   timezone: z.string().optional(),
   language: z.string().optional(),
-  avatar: z.string().url().optional()
+  avatar: z.string().url().optional(),
 });
 
 /**
@@ -155,35 +171,46 @@ export const UserProfileUpdateSchema = z.object({
  */
 export const UserPreferencesSchema = z.object({
   theme: z.enum(['light', 'dark', 'auto']).default('auto'),
-  notifications: z.object({
-    email: z.boolean().default(true),
-    push: z.boolean().default(true),
-    sms: z.boolean().default(false)
-  }).default({}),
-  dashboard: z.object({
-    defaultView: z.string().default('overview'),
-    itemsPerPage: z.number().min(10).max(100).default(25),
-    autoRefresh: z.boolean().default(true),
-    refreshInterval: z.number().min(30).max(300).default(60)
-  }).default({})
+  notifications: z
+    .object({
+      email: z.boolean().default(true),
+      push: z.boolean().default(true),
+      sms: z.boolean().default(false),
+    })
+    .default({}),
+  dashboard: z
+    .object({
+      defaultView: z.string().default('overview'),
+      itemsPerPage: z.number().min(10).max(100).default(25),
+      autoRefresh: z.boolean().default(true),
+      refreshInterval: z.number().min(30).max(300).default(60),
+    })
+    .default({}),
 });
 
 /**
  * Password strength validation schema
  */
 export const PasswordStrengthSchema = z.object({
-  password: z.string()
+  password: z
+    .string()
     .min(8, 'Password must be at least 8 characters')
     .max(100, 'Password too long')
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/, 'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character')
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
+      'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character'
+    ),
 });
 
 /**
  * Security question schema
  */
 export const SecurityQuestionSchema = z.object({
-  question: z.string().min(10, 'Question must be at least 10 characters').max(200, 'Question too long'),
-  answer: z.string().min(1, 'Answer is required').max(100, 'Answer too long')
+  question: z
+    .string()
+    .min(10, 'Question must be at least 10 characters')
+    .max(200, 'Question too long'),
+  answer: z.string().min(1, 'Answer is required').max(100, 'Answer too long'),
 });
 
 /**
@@ -194,7 +221,7 @@ export const AccountLockoutSchema = z.object({
   lockoutReason: z.string().optional(),
   lockoutUntil: z.string().datetime().optional(),
   failedAttempts: z.number().min(0),
-  lastFailedAttempt: z.string().datetime().optional()
+  lastFailedAttempt: z.string().datetime().optional(),
 });
 
 // Export types for TypeScript

@@ -1,6 +1,6 @@
 /**
  * Enhanced Balance Management System
- * 
+ *
  * Implements:
  * 1. Balance validation with min/max limits
  * 2. Enhanced audit trail for balance changes
@@ -10,7 +10,7 @@
 
 import { Bun } from 'bun';
 
-// ===== TYPES & INTERFACES =====
+// !== TYPES & INTERFACES !==
 
 export interface BalanceValidationRules {
   minBalance: number;
@@ -67,7 +67,7 @@ export interface BalanceAnalytics {
   riskLevel: 'low' | 'medium' | 'high';
 }
 
-// ===== BALANCE VALIDATION =====
+// !== BALANCE VALIDATION !==
 
 export class BalanceValidator {
   private static readonly DEFAULT_RULES: BalanceValidationRules = {
@@ -76,7 +76,7 @@ export class BalanceValidator {
     warningThreshold: 1000, // Warning below $1K
     criticalThreshold: 100, // Critical below $100
     dailyChangeLimit: 50000, // Max daily change $50K
-    weeklyChangeLimit: 200000 // Max weekly change $200K
+    weeklyChangeLimit: 200000, // Max weekly change $200K
   };
 
   static validateBalanceChange(
@@ -105,7 +105,10 @@ export class BalanceValidator {
     }
 
     // Check warning thresholds
-    if (newBalance < appliedRules.warningThreshold && newBalance >= appliedRules.criticalThreshold) {
+    if (
+      newBalance < appliedRules.warningThreshold &&
+      newBalance >= appliedRules.criticalThreshold
+    ) {
       warnings.push(`Balance below warning threshold: $${appliedRules.warningThreshold}`);
     }
 
@@ -117,13 +120,13 @@ export class BalanceValidator {
     return {
       isValid: errors.length === 0,
       errors,
-      warnings
+      warnings,
     };
   }
 
   static getValidationRulesForVIP(vipLevel: string): BalanceValidationRules {
     const baseRules = { ...this.DEFAULT_RULES };
-    
+
     switch (vipLevel.toLowerCase()) {
       case 'diamond':
         return {
@@ -131,7 +134,7 @@ export class BalanceValidator {
           minBalance: -50000,
           maxBalance: 5000000,
           dailyChangeLimit: 500000,
-          weeklyChangeLimit: 2000000
+          weeklyChangeLimit: 2000000,
         };
       case 'platinum':
         return {
@@ -139,7 +142,7 @@ export class BalanceValidator {
           minBalance: -25000,
           maxBalance: 2500000,
           dailyChangeLimit: 250000,
-          weeklyChangeLimit: 1000000
+          weeklyChangeLimit: 1000000,
         };
       case 'gold':
         return {
@@ -147,7 +150,7 @@ export class BalanceValidator {
           minBalance: -15000,
           maxBalance: 1500000,
           dailyChangeLimit: 150000,
-          weeklyChangeLimit: 750000
+          weeklyChangeLimit: 750000,
         };
       case 'silver':
         return {
@@ -155,7 +158,7 @@ export class BalanceValidator {
           minBalance: -10000,
           maxBalance: 1000000,
           dailyChangeLimit: 100000,
-          weeklyChangeLimit: 500000
+          weeklyChangeLimit: 500000,
         };
       default: // bronze
         return baseRules;
@@ -163,7 +166,7 @@ export class BalanceValidator {
   }
 }
 
-// ===== AUDIT TRAIL =====
+// !== AUDIT TRAIL !==
 
 export class BalanceAuditTrail {
   private static readonly AUDIT_TABLE = 'balance_audit_trail';
@@ -180,21 +183,22 @@ export class BalanceAuditTrail {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
-      await Bun.sqlite.query(auditQuery).run(
-        event.id,
-        event.customerId,
-        event.agentId,
-        event.timestamp,
-        event.changeType,
-        event.previousBalance,
-        event.newBalance,
-        event.changeAmount,
-        event.reason,
-        event.performedBy,
-        JSON.stringify(event.metadata || {}),
-        event.riskScore || 0
-      );
-
+      await Bun.sqlite
+        .query(auditQuery)
+        .run(
+          event.id,
+          event.customerId,
+          event.agentId,
+          event.timestamp,
+          event.changeType,
+          event.previousBalance,
+          event.newBalance,
+          event.changeAmount,
+          event.reason,
+          event.performedBy,
+          JSON.stringify(event.metadata || {}),
+          event.riskScore || 0
+        );
     } catch (error) {
       console.error('❌ Failed to log balance change:', error);
       throw error;
@@ -215,7 +219,7 @@ export class BalanceAuditTrail {
       `;
 
       const result = await Bun.sqlite.query(query).all(customerId, limit, offset);
-      
+
       return result.map(row => ({
         id: row.id,
         customerId: row.customer_id,
@@ -228,7 +232,7 @@ export class BalanceAuditTrail {
         reason: row.reason,
         performedBy: row.performed_by,
         metadata: row.metadata ? JSON.parse(row.metadata) : {},
-        riskScore: row.risk_score
+        riskScore: row.risk_score,
       }));
     } catch (error) {
       console.error('❌ Failed to get balance history:', error);
@@ -256,7 +260,7 @@ export class BalanceAuditTrail {
       query += ' ORDER BY timestamp DESC';
 
       const result = await Bun.sqlite.query(query).all(...params);
-      
+
       return result.map(row => ({
         id: row.id,
         customerId: row.customer_id,
@@ -269,7 +273,7 @@ export class BalanceAuditTrail {
         reason: row.reason,
         performedBy: row.performed_by,
         metadata: row.metadata ? JSON.parse(row.metadata) : {},
-        riskScore: row.risk_score
+        riskScore: row.risk_score,
       }));
     } catch (error) {
       console.error('❌ Failed to get recent balance changes:', error);
@@ -278,7 +282,7 @@ export class BalanceAuditTrail {
   }
 }
 
-// ===== NOTIFICATIONS =====
+// !== NOTIFICATIONS !==
 
 export class BalanceNotificationService {
   private static readonly ALERTS_TABLE = 'balance_threshold_alerts';
@@ -301,7 +305,7 @@ export class BalanceNotificationService {
         currentBalance,
         timestamp: new Date().toISOString(),
         message: `Balance below warning threshold: $${rules.warningThreshold}`,
-        acknowledged: false
+        acknowledged: false,
       });
     }
 
@@ -315,7 +319,7 @@ export class BalanceNotificationService {
         currentBalance,
         timestamp: new Date().toISOString(),
         message: `Balance below critical threshold: $${rules.criticalThreshold}`,
-        acknowledged: false
+        acknowledged: false,
       });
     }
 
@@ -330,7 +334,7 @@ export class BalanceNotificationService {
         currentBalance,
         timestamp: new Date().toISOString(),
         message: `Significant balance drop detected: ${dropPercentage.toFixed(1)}% decrease`,
-        acknowledged: false
+        acknowledged: false,
       });
     }
 
@@ -351,16 +355,18 @@ export class BalanceNotificationService {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
-      await Bun.sqlite.query(query).run(
-        alert.id,
-        alert.customerId,
-        alert.alertType,
-        alert.threshold,
-        alert.currentBalance,
-        alert.timestamp,
-        alert.message,
-        alert.acknowledged ? 1 : 0
-      );
+      await Bun.sqlite
+        .query(query)
+        .run(
+          alert.id,
+          alert.customerId,
+          alert.alertType,
+          alert.threshold,
+          alert.currentBalance,
+          alert.timestamp,
+          alert.message,
+          alert.acknowledged ? 1 : 0
+        );
     } catch (error) {
       console.error('❌ Failed to save alert:', error);
       throw error;
@@ -388,7 +394,7 @@ export class BalanceNotificationService {
       query += ' ORDER BY timestamp DESC';
 
       const result = await Bun.sqlite.query(query).all(...params);
-      
+
       return result.map(row => ({
         id: row.id,
         customerId: row.customer_id,
@@ -399,7 +405,7 @@ export class BalanceNotificationService {
         message: row.message,
         acknowledged: row.acknowledged === 1,
         acknowledgedBy: row.acknowledged_by,
-        acknowledgedAt: row.acknowledged_at
+        acknowledgedAt: row.acknowledged_at,
       }));
     } catch (error) {
       console.error('❌ Failed to get active alerts:', error);
@@ -407,10 +413,7 @@ export class BalanceNotificationService {
     }
   }
 
-  static async acknowledgeAlert(
-    alertId: string,
-    acknowledgedBy: string
-  ): Promise<void> {
+  static async acknowledgeAlert(alertId: string, acknowledgedBy: string): Promise<void> {
     try {
       const query = `
         UPDATE ${this.ALERTS_TABLE} 
@@ -418,11 +421,7 @@ export class BalanceNotificationService {
         WHERE id = ?
       `;
 
-      await Bun.sqlite.query(query).run(
-        acknowledgedBy,
-        new Date().toISOString(),
-        alertId
-      );
+      await Bun.sqlite.query(query).run(acknowledgedBy, new Date().toISOString(), alertId);
     } catch (error) {
       console.error('❌ Failed to acknowledge alert:', error);
       throw error;
@@ -430,7 +429,7 @@ export class BalanceNotificationService {
   }
 }
 
-// ===== ANALYTICS =====
+// !== ANALYTICS !==
 
 export class BalanceAnalyticsService {
   static async generateCustomerAnalytics(
@@ -443,33 +442,33 @@ export class BalanceAnalyticsService {
 
       // Get balance history for the period
       const history = await BalanceAuditTrail.getBalanceHistory(customerId, 1000, 0);
-      const periodHistory = history.filter(event => 
-        new Date(event.timestamp) >= startDate && new Date(event.timestamp) <= endDate
+      const periodHistory = history.filter(
+        event => new Date(event.timestamp) >= startDate && new Date(event.timestamp) <= endDate
       );
 
       // Calculate analytics
       const startingBalance = this.getBalanceAtTime(history, startDate);
       const endingBalance = this.getBalanceAtTime(history, endDate);
-      
+
       const totalDeposits = periodHistory
         .filter(event => event.changeType === 'deposit')
         .reduce((sum, event) => sum + Math.max(0, event.changeAmount), 0);
-      
+
       const totalWithdrawals = periodHistory
         .filter(event => event.changeType === 'withdrawal')
         .reduce((sum, event) => sum + Math.abs(Math.min(0, event.changeAmount)), 0);
-      
+
       const totalWagers = periodHistory
         .filter(event => event.changeType === 'wager')
         .reduce((sum, event) => sum + Math.abs(event.changeAmount), 0);
-      
+
       const totalSettlements = periodHistory
         .filter(event => event.changeType === 'settlement')
         .reduce((sum, event) => sum + event.changeAmount, 0);
 
       const netChange = endingBalance - startingBalance;
       const changePercentage = startingBalance !== 0 ? (netChange / startingBalance) * 100 : 0;
-      
+
       const volatilityScore = this.calculateVolatilityScore(periodHistory);
       const trendDirection = this.determineTrendDirection(periodHistory);
       const riskLevel = this.calculateRiskLevel(volatilityScore, changePercentage);
@@ -489,7 +488,7 @@ export class BalanceAnalyticsService {
         changePercentage,
         volatilityScore,
         trendDirection,
-        riskLevel
+        riskLevel,
       };
     } catch (error) {
       console.error('❌ Failed to generate customer analytics:', error);
@@ -499,7 +498,7 @@ export class BalanceAnalyticsService {
 
   private static getStartDate(endDate: Date, period: string): Date {
     const startDate = new Date(endDate);
-    
+
     switch (period) {
       case 'daily':
         startDate.setDate(startDate.getDate() - 1);
@@ -516,7 +515,7 @@ export class BalanceAnalyticsService {
       default:
         startDate.setDate(startDate.getDate() - 1);
     }
-    
+
     return startDate;
   }
 
@@ -525,33 +524,36 @@ export class BalanceAnalyticsService {
     const relevantEvents = history
       .filter(event => new Date(event.timestamp) <= targetTime)
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-    
+
     if (relevantEvents.length === 0) return 0;
-    
+
     return relevantEvents[0].newBalance;
   }
 
   private static calculateVolatilityScore(history: BalanceChangeEvent[]): number {
     if (history.length < 2) return 0;
-    
+
     const changes = history.map(event => Math.abs(event.changeAmount));
     const mean = changes.reduce((sum, change) => sum + change, 0) / changes.length;
-    const variance = changes.reduce((sum, change) => sum + Math.pow(change - mean, 2), 0) / changes.length;
-    
+    const variance =
+      changes.reduce((sum, change) => sum + Math.pow(change - mean, 2), 0) / changes.length;
+
     return Math.sqrt(variance);
   }
 
-  private static determineTrendDirection(history: BalanceChangeEvent[]): 'increasing' | 'decreasing' | 'stable' {
+  private static determineTrendDirection(
+    history: BalanceChangeEvent[]
+  ): 'increasing' | 'decreasing' | 'stable' {
     if (history.length < 2) return 'stable';
-    
-    const sortedHistory = history.sort((a, b) => 
-      new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+
+    const sortedHistory = history.sort(
+      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
     );
-    
+
     const firstBalance = sortedHistory[0].newBalance;
     const lastBalance = sortedHistory[sortedHistory.length - 1].newBalance;
     const change = lastBalance - firstBalance;
-    
+
     if (change > 100) return 'increasing';
     if (change < -100) return 'decreasing';
     return 'stable';
@@ -592,7 +594,7 @@ export class BalanceAnalyticsService {
         totalWagers: 0,
         totalSettlements: 0,
         riskDistribution: { low: 0, medium: 0, high: 0 },
-        topCustomers: []
+        topCustomers: [],
       };
     } catch (error) {
       console.error('❌ Failed to generate system analytics:', error);
@@ -601,7 +603,7 @@ export class BalanceAnalyticsService {
   }
 }
 
-// ===== MAIN BALANCE MANAGER =====
+// !== MAIN BALANCE MANAGER !==
 
 export class BalanceManager {
   static async updateBalance(
@@ -655,7 +657,7 @@ export class BalanceManager {
         reason,
         performedBy,
         metadata,
-        riskScore: this.calculateRiskScore(changeAmount, currentBalance, vipLevel)
+        riskScore: this.calculateRiskScore(changeAmount, currentBalance, vipLevel),
       };
 
       // Log the balance change
@@ -677,7 +679,7 @@ export class BalanceManager {
         newBalance,
         validation,
         alerts,
-        event
+        event,
       };
     } catch (error) {
       console.error('❌ Balance update failed:', error);
@@ -752,12 +754,14 @@ export class BalanceManager {
   }
 }
 
-// ===== DATABASE MIGRATION =====
+// !== DATABASE MIGRATION !==
 
 export async function initializeBalanceTables(): Promise<void> {
   try {
     // Create balance audit trail table
-    await Bun.sqlite.query(`
+    await Bun.sqlite
+      .query(
+        `
       CREATE TABLE IF NOT EXISTS balance_audit_trail (
         id TEXT PRIMARY KEY,
         customer_id TEXT NOT NULL,
@@ -773,10 +777,14 @@ export async function initializeBalanceTables(): Promise<void> {
         risk_score INTEGER DEFAULT 0,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
       )
-    `).run();
+    `
+      )
+      .run();
 
     // Create balance threshold alerts table
-    await Bun.sqlite.query(`
+    await Bun.sqlite
+      .query(
+        `
       CREATE TABLE IF NOT EXISTS balance_threshold_alerts (
         id TEXT PRIMARY KEY,
         customer_id TEXT NOT NULL,
@@ -790,19 +798,28 @@ export async function initializeBalanceTables(): Promise<void> {
         acknowledged_at TEXT,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
       )
-    `).run();
+    `
+      )
+      .run();
 
     // Create indexes for performance
-    await Bun.sqlite.query(`
+    await Bun.sqlite
+      .query(
+        `
       CREATE INDEX IF NOT EXISTS idx_balance_audit_customer 
       ON balance_audit_trail(customer_id, timestamp)
-    `).run();
+    `
+      )
+      .run();
 
-    await Bun.sqlite.query(`
+    await Bun.sqlite
+      .query(
+        `
       CREATE INDEX IF NOT EXISTS idx_balance_alerts_customer 
       ON balance_threshold_alerts(customer_id, acknowledged)
-    `).run();
-
+    `
+      )
+      .run();
   } catch (error) {
     console.error('❌ Failed to initialize balance tables:', error);
     throw error;
@@ -816,5 +833,5 @@ export {
   BalanceNotificationService,
   BalanceAnalyticsService,
   BalanceManager,
-  initializeBalanceTables
+  initializeBalanceTables,
 };

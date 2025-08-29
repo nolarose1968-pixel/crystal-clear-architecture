@@ -1,4 +1,8 @@
-import { SecurityMonitor, SecurityMiddleware, SecurityUtils } from '../../src/monitoring/security-monitor';
+import {
+  SecurityMonitor,
+  SecurityMiddleware,
+  SecurityUtils,
+} from '../../src/monitoring/security-monitor';
 import { SecurityEvent, SecurityConfig } from '../../src/types/enhanced-types';
 import { describe, it, expect, beforeEach, afterEach, jest } from 'jest';
 
@@ -11,7 +15,7 @@ describe('SecurityMonitor', () => {
       enableSecurityMonitoring: true,
       securityEventRetention: 30,
       suspiciousActivityThreshold: 10,
-      enableRateLimiting: true
+      enableRateLimiting: true,
     };
     securityMonitor = new SecurityMonitor(mockConfig);
   });
@@ -26,9 +30,9 @@ describe('SecurityMonitor', () => {
         enableSecurityMonitoring: true,
         securityEventRetention: 30,
         suspiciousActivityThreshold: 10,
-        enableRateLimiting: true
+        enableRateLimiting: true,
       });
-      
+
       expect(defaultMonitor).toBeDefined();
     });
 
@@ -37,9 +41,9 @@ describe('SecurityMonitor', () => {
         enableSecurityMonitoring: false,
         securityEventRetention: 7,
         suspiciousActivityThreshold: 5,
-        enableRateLimiting: false
+        enableRateLimiting: false,
       };
-      
+
       const customMonitor = new SecurityMonitor(customConfig);
       expect(customMonitor).toBeDefined();
     });
@@ -52,7 +56,7 @@ describe('SecurityMonitor', () => {
         severity: 'medium',
         details: { userId: 'user123', action: 'login' },
         timestamp: new Date().toISOString(),
-        userId: 'user123'
+        userId: 'user123',
       };
 
       await expect(securityMonitor.recordEvent(event)).resolves.not.toThrow();
@@ -61,7 +65,7 @@ describe('SecurityMonitor', () => {
     it('should filter out events when security monitoring is disabled', async () => {
       const disabledMonitor = new SecurityMonitor({
         ...mockConfig,
-        enableSecurityMonitoring: false
+        enableSecurityMonitoring: false,
       });
 
       const event: SecurityEvent = {
@@ -69,7 +73,7 @@ describe('SecurityMonitor', () => {
         severity: 'high',
         details: { userId: 'user123', action: 'login' },
         timestamp: new Date().toISOString(),
-        userId: 'user123'
+        userId: 'user123',
       };
 
       await expect(disabledMonitor.recordEvent(event)).resolves.not.toThrow();
@@ -80,17 +84,19 @@ describe('SecurityMonitor', () => {
         type: 'invalid' as any,
         severity: 'invalid' as any,
         details: {} as Record<string, any>,
-        timestamp: 'invalid'
+        timestamp: 'invalid',
       };
 
-      await expect(securityMonitor.recordEvent(invalidEvent as SecurityEvent)).resolves.not.toThrow();
+      await expect(
+        securityMonitor.recordEvent(invalidEvent as SecurityEvent)
+      ).resolves.not.toThrow();
     });
   });
 
   describe('getSecurityReport', () => {
     it('should return a security report with no events', async () => {
       const report = await securityMonitor.getSecurityReport();
-      
+
       expect(report).toEqual({
         events: [],
         summary: {
@@ -100,9 +106,9 @@ describe('SecurityMonitor', () => {
           lowSeverity: 0,
           authenticationEvents: 0,
           authorizationEvents: 0,
-          validationEvents: 0
+          validationEvents: 0,
         },
-        recommendations: []
+        recommendations: [],
       });
     });
 
@@ -113,15 +119,15 @@ describe('SecurityMonitor', () => {
           severity: 'high',
           details: { userId: 'user123', action: 'login' },
           timestamp: new Date().toISOString(),
-          userId: 'user123'
+          userId: 'user123',
         },
         {
           type: 'authorization',
           severity: 'medium',
           details: { userId: 'user456', resource: 'admin', action: 'access' },
           timestamp: new Date().toISOString(),
-          userId: 'user456'
-        }
+          userId: 'user456',
+        },
       ];
 
       // Record events
@@ -130,7 +136,7 @@ describe('SecurityMonitor', () => {
       }
 
       const report = await securityMonitor.getSecurityReport();
-      
+
       expect(report.events).toHaveLength(2);
       expect(report.summary.totalEvents).toBe(2);
       expect(report.summary.highSeverity).toBe(1);
@@ -147,13 +153,13 @@ describe('SecurityMonitor', () => {
         severity: 'high',
         details: { userId: 'user123', action: 'failed_login' },
         timestamp: new Date().toISOString(),
-        userId: 'user123'
+        userId: 'user123',
       };
 
       await securityMonitor.recordEvent(highSeverityEvent);
 
       const report = await securityMonitor.getSecurityReport();
-      
+
       expect(report.recommendations).toContain('Review authentication security measures');
       expect(report.recommendations).toContain('Monitor for suspicious activity patterns');
     });
@@ -166,7 +172,7 @@ describe('SecurityMonitor', () => {
         severity: 'high',
         details: { userId: 'user123', action: 'login' },
         timestamp: new Date().toISOString(),
-        userId: 'user123'
+        userId: 'user123',
       };
 
       const authEvent2: SecurityEvent = {
@@ -174,7 +180,7 @@ describe('SecurityMonitor', () => {
         severity: 'medium',
         details: { userId: 'user456', action: 'logout' },
         timestamp: new Date().toISOString(),
-        userId: 'user456'
+        userId: 'user456',
       };
 
       const authEvent3: SecurityEvent = {
@@ -182,21 +188,25 @@ describe('SecurityMonitor', () => {
         severity: 'low',
         details: { userId: 'user789', resource: 'profile', action: 'view' },
         timestamp: new Date().toISOString(),
-        userId: 'user789'
+        userId: 'user789',
       };
 
       await securityMonitor.recordEvent(authEvent);
       await securityMonitor.recordEvent(authEvent2);
       await securityMonitor.recordEvent(authEvent3);
 
-      const authEvents = (await securityMonitor.getSecurityReport()).events.filter(event => event.type === 'authentication');
-      
+      const authEvents = (await securityMonitor.getSecurityReport()).events.filter(
+        event => event.type === 'authentication'
+      );
+
       expect(authEvents).toHaveLength(2);
       expect(authEvents.every(event => event.type === 'authentication')).toBe(true);
     });
 
     it('should return empty array for non-existent type', async () => {
-      const events = (await securityMonitor.getSecurityReport()).events.filter(event => event.type === 'nonexistent' as any);
+      const events = (await securityMonitor.getSecurityReport()).events.filter(
+        event => event.type === ('nonexistent' as any)
+      );
       expect(events).toEqual([]);
     });
   });
@@ -208,7 +218,7 @@ describe('SecurityMonitor', () => {
         severity: 'high',
         details: { userId: 'user123', action: 'login' },
         timestamp: new Date().toISOString(),
-        userId: 'user123'
+        userId: 'user123',
       };
 
       const mediumEvent: SecurityEvent = {
@@ -216,7 +226,7 @@ describe('SecurityMonitor', () => {
         severity: 'medium',
         details: { userId: 'user456', resource: 'admin', action: 'access' },
         timestamp: new Date().toISOString(),
-        userId: 'user456'
+        userId: 'user456',
       };
 
       const lowEvent: SecurityEvent = {
@@ -224,15 +234,17 @@ describe('SecurityMonitor', () => {
         severity: 'low',
         details: { userId: 'user789', field: 'email', error: 'invalid' },
         timestamp: new Date().toISOString(),
-        userId: 'user789'
+        userId: 'user789',
       };
 
       await securityMonitor.recordEvent(highEvent);
       await securityMonitor.recordEvent(mediumEvent);
       await securityMonitor.recordEvent(lowEvent);
 
-      const highSeverityEvents = (await securityMonitor.getSecurityReport()).events.filter(event => event.severity === 'high');
-      
+      const highSeverityEvents = (await securityMonitor.getSecurityReport()).events.filter(
+        event => event.severity === 'high'
+      );
+
       expect(highSeverityEvents).toHaveLength(1);
       expect(highSeverityEvents[0].severity).toBe('high');
     });
@@ -245,7 +257,7 @@ describe('SecurityMonitor', () => {
         severity: 'high',
         details: { userId: 'user123', action: 'login' },
         timestamp: new Date().toISOString(),
-        userId: 'user123'
+        userId: 'user123',
       };
 
       const user2Event: SecurityEvent = {
@@ -253,7 +265,7 @@ describe('SecurityMonitor', () => {
         severity: 'medium',
         details: { userId: 'user456', resource: 'admin', action: 'access' },
         timestamp: new Date().toISOString(),
-        userId: 'user456'
+        userId: 'user456',
       };
 
       const user1Event2: SecurityEvent = {
@@ -261,21 +273,25 @@ describe('SecurityMonitor', () => {
         severity: 'low',
         details: { userId: 'user123', field: 'email', error: 'invalid' },
         timestamp: new Date().toISOString(),
-        userId: 'user123'
+        userId: 'user123',
       };
 
       await securityMonitor.recordEvent(user1Event);
       await securityMonitor.recordEvent(user2Event);
       await securityMonitor.recordEvent(user1Event2);
 
-      const user1Events = (await securityMonitor.getSecurityReport()).events.filter(event => event.userId === 'user123');
-      
+      const user1Events = (await securityMonitor.getSecurityReport()).events.filter(
+        event => event.userId === 'user123'
+      );
+
       expect(user1Events).toHaveLength(2);
       expect(user1Events.every(event => event.userId === 'user123')).toBe(true);
     });
 
     it('should return empty array for non-existent user', async () => {
-      const events = (await securityMonitor.getSecurityReport()).events.filter(event => event.userId === 'nonexistent');
+      const events = (await securityMonitor.getSecurityReport()).events.filter(
+        event => event.userId === 'nonexistent'
+      );
       expect(events).toEqual([]);
     });
   });
@@ -291,7 +307,7 @@ describe('SecurityMonitor', () => {
         severity: 'high',
         details: { userId: 'user123', action: 'login' },
         timestamp: now.toISOString(),
-        userId: 'user123'
+        userId: 'user123',
       };
 
       const oldEvent: SecurityEvent = {
@@ -299,17 +315,18 @@ describe('SecurityMonitor', () => {
         severity: 'medium',
         details: { userId: 'user456', resource: 'admin', action: 'access' },
         timestamp: twoHoursAgo.toISOString(),
-        userId: 'user456'
+        userId: 'user456',
       };
 
       await securityMonitor.recordEvent(recentEvent);
       await securityMonitor.recordEvent(oldEvent);
 
-      const recentEvents = (await securityMonitor.getSecurityReport()).events.filter(event => 
-        new Date(event.timestamp).getTime() > oneHourAgo.getTime() && 
-        new Date(event.timestamp).getTime() <= now.getTime()
+      const recentEvents = (await securityMonitor.getSecurityReport()).events.filter(
+        event =>
+          new Date(event.timestamp).getTime() > oneHourAgo.getTime() &&
+          new Date(event.timestamp).getTime() <= now.getTime()
       );
-      
+
       expect(recentEvents).toHaveLength(1);
       expect(recentEvents[0].timestamp).toBe(now.toISOString());
     });
@@ -322,17 +339,17 @@ describe('SecurityMonitor', () => {
         severity: 'high',
         details: { userId: 'user123', action: 'login' },
         timestamp: new Date().toISOString(),
-        userId: 'user123'
+        userId: 'user123',
       };
 
       await securityMonitor.recordEvent(event);
-      
+
       let report = await securityMonitor.getSecurityReport();
       expect(report.events).toHaveLength(1);
 
       // Clear events by reinitializing
       securityMonitor = new SecurityMonitor(mockConfig);
-      
+
       report = await securityMonitor.getSecurityReport();
       expect(report.events).toHaveLength(0);
     });
@@ -341,7 +358,7 @@ describe('SecurityMonitor', () => {
   describe('isSuspiciousActivity', () => {
     it('should detect suspicious activity based on threshold', async () => {
       const userId = 'user123';
-      
+
       // Record events below threshold
       for (let i = 0; i < 9; i++) {
         const event: SecurityEvent = {
@@ -349,7 +366,7 @@ describe('SecurityMonitor', () => {
           severity: 'medium',
           details: { userId, action: 'login_attempt' },
           timestamp: new Date().toISOString(),
-          userId
+          userId,
         };
         await securityMonitor.recordEvent(event);
       }
@@ -365,7 +382,7 @@ describe('SecurityMonitor', () => {
         severity: 'medium',
         details: { userId, action: 'login_attempt' },
         timestamp: new Date().toISOString(),
-        userId
+        userId,
       };
       await securityMonitor.recordEvent(thresholdEvent);
 
@@ -395,7 +412,7 @@ describe('SecurityMonitor', () => {
           severity: 'high',
           details: { userId: suspiciousUser, action: 'failed_login' },
           timestamp: new Date().toISOString(),
-          userId: suspiciousUser
+          userId: suspiciousUser,
         };
         await securityMonitor.recordEvent(event);
       }
@@ -407,14 +424,14 @@ describe('SecurityMonitor', () => {
           severity: 'low',
           details: { userId: normalUser, action: 'successful_login' },
           timestamp: new Date().toISOString(),
-          userId: normalUser
+          userId: normalUser,
         };
         await securityMonitor.recordEvent(event);
       }
 
       const report = await securityMonitor.getSecurityReport();
       const userEventCounts = new Map<string, number>();
-      
+
       report.events.forEach(event => {
         if (event.userId) {
           userEventCounts.set(event.userId, (userEventCounts.get(event.userId) || 0) + 1);
@@ -424,7 +441,7 @@ describe('SecurityMonitor', () => {
       const suspiciousUsers = Array.from(userEventCounts.entries())
         .filter(([_, count]) => count >= mockConfig.suspiciousActivityThreshold)
         .map(([userId]) => userId);
-      
+
       expect(suspiciousUsers).toContain(suspiciousUser);
       expect(suspiciousUsers).not.toContain(normalUser);
     });
@@ -434,7 +451,7 @@ describe('SecurityMonitor', () => {
     it('should calculate security score based on events', async () => {
       // No events should give maximum score
       let report = await securityMonitor.getSecurityReport();
-      let score = 100 - (report.summary.totalEvents * 2);
+      let score = 100 - report.summary.totalEvents * 2;
       expect(score).toBe(100);
 
       // High severity events should decrease score
@@ -443,12 +460,12 @@ describe('SecurityMonitor', () => {
         severity: 'high',
         details: { userId: 'user123', action: 'failed_login' },
         timestamp: new Date().toISOString(),
-        userId: 'user123'
+        userId: 'user123',
       };
       await securityMonitor.recordEvent(highSeverityEvent);
 
       report = await securityMonitor.getSecurityReport();
-      score = 100 - (report.summary.totalEvents * 5) - (report.summary.highSeverity * 10);
+      score = 100 - report.summary.totalEvents * 5 - report.summary.highSeverity * 10;
       expect(score).toBeLessThan(100);
 
       // Medium severity events should decrease score less
@@ -457,12 +474,16 @@ describe('SecurityMonitor', () => {
         severity: 'medium',
         details: { userId: 'user456', resource: 'admin', action: 'access' },
         timestamp: new Date().toISOString(),
-        userId: 'user456'
+        userId: 'user456',
       };
       await securityMonitor.recordEvent(mediumSeverityEvent);
 
       report = await securityMonitor.getSecurityReport();
-      score = 100 - (report.summary.totalEvents * 3) - (report.summary.highSeverity * 10) - (report.summary.mediumSeverity * 5);
+      score =
+        100 -
+        report.summary.totalEvents * 3 -
+        report.summary.highSeverity * 10 -
+        report.summary.mediumSeverity * 5;
       expect(score).toBeLessThan(100);
     });
   });
@@ -478,7 +499,7 @@ describe('SecurityMiddleware', () => {
       enableSecurityMonitoring: true,
       securityEventRetention: 30,
       suspiciousActivityThreshold: 10,
-      enableRateLimiting: true
+      enableRateLimiting: true,
     };
     securityMonitor = new SecurityMonitor(mockConfig);
     securityMiddleware = new SecurityMiddleware(securityMonitor);
@@ -563,43 +584,51 @@ describe('SecurityMiddleware', () => {
   describe('logAuthenticationAttempt', () => {
     it('should log successful authentication attempt', async () => {
       const logSpy = jest.spyOn(securityMonitor, 'recordEvent');
-      
+
       await securityMiddleware.logAuthenticationAttempt(true, 'user123', { ip: '192.168.1.1' });
-      
+
       expect(logSpy).toHaveBeenCalledWith({
         type: 'authentication',
         severity: 'low',
         details: { success: true, userId: 'user123', ip: '192.168.1.1' },
         timestamp: expect.any(String),
-        userId: 'user123'
+        userId: 'user123',
       });
     });
 
     it('should log failed authentication attempt with higher severity', async () => {
       const logSpy = jest.spyOn(securityMonitor, 'recordEvent');
-      
-      await securityMiddleware.logAuthenticationAttempt(false, 'user123', { ip: '192.168.1.1', reason: 'invalid_password' });
-      
+
+      await securityMiddleware.logAuthenticationAttempt(false, 'user123', {
+        ip: '192.168.1.1',
+        reason: 'invalid_password',
+      });
+
       expect(logSpy).toHaveBeenCalledWith({
         type: 'authentication',
         severity: 'high',
-        details: { success: false, userId: 'user123', ip: '192.168.1.1', reason: 'invalid_password' },
+        details: {
+          success: false,
+          userId: 'user123',
+          ip: '192.168.1.1',
+          reason: 'invalid_password',
+        },
         timestamp: expect.any(String),
-        userId: 'user123'
+        userId: 'user123',
       });
     });
 
     it('should log authentication attempt without user ID', async () => {
       const logSpy = jest.spyOn(securityMonitor, 'recordEvent');
-      
+
       await securityMiddleware.logAuthenticationAttempt(true, undefined, { ip: '192.168.1.1' });
-      
+
       expect(logSpy).toHaveBeenCalledWith({
         type: 'authentication',
         severity: 'low',
         details: { success: true, ip: '192.168.1.1' },
         timestamp: expect.any(String),
-        userId: undefined
+        userId: undefined,
       });
     });
   });
@@ -607,29 +636,29 @@ describe('SecurityMiddleware', () => {
   describe('logAuthorizationAttempt', () => {
     it('should log successful authorization attempt', async () => {
       const logSpy = jest.spyOn(securityMonitor, 'recordEvent');
-      
+
       await securityMiddleware.logAuthorizationAttempt(true, 'user123', 'admin_panel', 'view');
-      
+
       expect(logSpy).toHaveBeenCalledWith({
         type: 'authorization',
         severity: 'low',
         details: { success: true, userId: 'user123', resource: 'admin_panel', action: 'view' },
         timestamp: expect.any(String),
-        userId: 'user123'
+        userId: 'user123',
       });
     });
 
     it('should log failed authorization attempt with higher severity', async () => {
       const logSpy = jest.spyOn(securityMonitor, 'recordEvent');
-      
+
       await securityMiddleware.logAuthorizationAttempt(false, 'user123', 'admin_panel', 'delete');
-      
+
       expect(logSpy).toHaveBeenCalledWith({
         type: 'authorization',
         severity: 'high',
         details: { success: false, userId: 'user123', resource: 'admin_panel', action: 'delete' },
         timestamp: expect.any(String),
-        userId: 'user123'
+        userId: 'user123',
       });
     });
   });
@@ -639,8 +668,10 @@ describe('SecurityUtils', () => {
   describe('detectSQLInjection', () => {
     it('should detect SQL injection patterns', () => {
       expect(SecurityUtils.detectSQLInjection("'; DROP TABLE users; --")).toBe(true);
-      expect(SecurityUtils.detectSQLInjection("SELECT * FROM users WHERE id = 1 OR 1=1")).toBe(true);
-      expect(SecurityUtils.detectSQLInjection("UNION SELECT * FROM passwords")).toBe(true);
+      expect(SecurityUtils.detectSQLInjection('SELECT * FROM users WHERE id = 1 OR 1=1')).toBe(
+        true
+      );
+      expect(SecurityUtils.detectSQLInjection('UNION SELECT * FROM passwords')).toBe(true);
       expect(SecurityUtils.detectSQLInjection("1; WAITFOR DELAY '0:0:5'--")).toBe(true);
     });
 
@@ -699,7 +730,7 @@ describe('SecurityUtils', () => {
     it('should sanitize HTML content', () => {
       const input = '<script>alert("xss")</script><div>content</div>';
       const sanitized = SecurityUtils.sanitizeInput(input, 'html');
-      
+
       expect(sanitized).not.toContain('<script>');
       expect(sanitized).toContain('<div>content</div>');
     });
@@ -707,7 +738,7 @@ describe('SecurityUtils', () => {
     it('should sanitize general input', () => {
       const input = '<script>alert("xss")</script>; rm -rf /';
       const sanitized = SecurityUtils.sanitizeInput(input, 'general');
-      
+
       expect(sanitized).not.toContain('<script>');
       expect(sanitized).not.toContain('rm -rf /');
     });
@@ -726,7 +757,7 @@ describe('SecurityUtils', () => {
   describe('generateCSRFToken', () => {
     it('should generate a CSRF token', () => {
       const token = SecurityUtils.generateSecureToken();
-      
+
       expect(token).toBeDefined();
       expect(typeof token).toBe('string');
       expect(token.length).toBeGreaterThan(0);
@@ -735,7 +766,7 @@ describe('SecurityUtils', () => {
     it('should generate unique tokens', () => {
       const token1 = SecurityUtils.generateSecureToken();
       const token2 = SecurityUtils.generateSecureToken();
-      
+
       expect(token1).not.toBe(token2);
     });
   });
@@ -746,23 +777,23 @@ describe('SecurityUtils', () => {
         'X-Content-Type-Options': 'nosniff',
         'X-Frame-Options': 'DENY',
         'X-XSS-Protection': '1; mode=block',
-        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains'
+        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
       };
-      
+
       const result = SecurityUtils.validateSecurityHeaders(headers);
-      
+
       expect(result.valid).toBe(true);
       expect(result.missing).toEqual([]);
     });
 
     it('should detect missing security headers', () => {
       const headers = {
-        'X-Content-Type-Options': 'nosniff'
+        'X-Content-Type-Options': 'nosniff',
         // Missing other headers
       };
-      
+
       const result = SecurityUtils.validateSecurityHeaders(headers);
-      
+
       expect(result.valid).toBe(false);
       expect(result.missing).toContain('X-Frame-Options');
       expect(result.missing).toContain('X-XSS-Protection');
@@ -774,17 +805,17 @@ describe('SecurityUtils', () => {
         'X-Content-Type-Options': 'invalid', // Should be 'nosniff'
         'X-Frame-Options': 'ALLOW-FROM', // Should be 'DENY' or 'SAMEORIGIN'
         'X-XSS-Protection': '0', // Should be '1; mode=block'
-        'Strict-Transport-Security': 'max-age=0' // Should have max-age > 0
+        'Strict-Transport-Security': 'max-age=0', // Should have max-age > 0
       };
-      
+
       const result = SecurityUtils.validateSecurityHeaders(headers);
-      
+
       expect(result.valid).toBe(false);
       expect(result.invalid).toEqual({
         'X-Content-Type-Options': 'Expected: nosniff',
         'X-Frame-Options': 'Expected: DENY or SAMEORIGIN',
         'X-XSS-Protection': 'Expected: 1; mode=block',
-        'Strict-Transport-Security': 'Expected: max-age > 0'
+        'Strict-Transport-Security': 'Expected: max-age > 0',
       });
     });
   });
@@ -796,9 +827,9 @@ describe('SecurityUtils', () => {
         failedAttempts: 0,
         highSeverityEvents: 0,
         timeWindow: 3600,
-        userId: 'user123'
+        userId: 'user123',
       });
-      
+
       expect(risk.level).toBe('low');
       expect(risk.score).toBeGreaterThan(70);
       expect(risk.recommendations).toContain('Continue monitoring user activity');
@@ -810,9 +841,9 @@ describe('SecurityUtils', () => {
         failedAttempts: 20,
         highSeverityEvents: 10,
         timeWindow: 300, // 5 minutes
-        userId: 'user123'
+        userId: 'user123',
       });
-      
+
       expect(risk.level).toBe('high');
       expect(risk.score).toBeLessThan(30);
       expect(risk.recommendations).toContain('Immediate investigation required');
@@ -825,9 +856,9 @@ describe('SecurityUtils', () => {
         failedAttempts: 3,
         highSeverityEvents: 2,
         timeWindow: 3600,
-        userId: 'user123'
+        userId: 'user123',
       });
-      
+
       expect(risk.level).toBe('medium');
       expect(risk.score).toBeGreaterThan(30);
       expect(risk.score).toBeLessThan(70);

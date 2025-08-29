@@ -1,6 +1,6 @@
 /**
  * Fire22 Retry and Circuit Breaker Utilities
- * 
+ *
  * Implements retry logic and circuit breaker patterns for resilient error handling
  */
 
@@ -57,10 +57,11 @@ export class CircuitBreaker {
 
   private onSuccess(): void {
     this.failureCount = 0;
-    
+
     if (this.state === 'HALF_OPEN') {
       this.successCount++;
-      if (this.successCount >= 2) { // Require 2 successes to close
+      if (this.successCount >= 2) {
+        // Require 2 successes to close
         this.state = 'CLOSED';
       }
     }
@@ -69,7 +70,7 @@ export class CircuitBreaker {
   private onFailure(): void {
     this.failureCount++;
     this.lastFailureTime = Date.now();
-    
+
     if (this.failureCount >= this.options.failureThreshold) {
       this.state = 'OPEN';
     }
@@ -146,7 +147,7 @@ export class RetryUtils {
       maxAttempts: 3,
       baseDelayMs: 1000,
       exponentialBackoff: true,
-      retryCondition: (error) => {
+      retryCondition: error => {
         // Retry on connection errors, timeouts, but not on syntax errors
         const message = error.message.toLowerCase();
         return (
@@ -156,7 +157,7 @@ export class RetryUtils {
           message.includes('locked')
         );
       },
-    }).catch((error) => {
+    }).catch(error => {
       throw errorHandler.createError(
         ERROR_CODES.DATABASE_ERROR,
         `Database operation failed: ${operationName}`,
@@ -179,12 +180,12 @@ export class RetryUtils {
     const errorHandler = ErrorHandler.getInstance();
 
     try {
-      return await circuitBreaker.execute(() => 
+      return await circuitBreaker.execute(() =>
         this.retry(operation, {
           maxAttempts: 3,
           baseDelayMs: 2000,
           maxDelayMs: 10000,
-          retryCondition: (error) => {
+          retryCondition: error => {
             const message = error.message.toLowerCase();
             return (
               message.includes('timeout') ||
@@ -201,10 +202,10 @@ export class RetryUtils {
         `External service failed: ${serviceName}`,
         request,
         error as Error,
-        { 
-          serviceName, 
+        {
+          serviceName,
           circuitBreakerState: circuitBreaker.getState(),
-          maxAttempts: 3 
+          maxAttempts: 3,
         }
       );
     }
@@ -215,11 +216,14 @@ export class RetryUtils {
    */
   private static getCircuitBreaker(serviceName: string): CircuitBreaker {
     if (!this.circuitBreakers.has(serviceName)) {
-      this.circuitBreakers.set(serviceName, new CircuitBreaker({
-        failureThreshold: 5,
-        resetTimeoutMs: 60000, // 1 minute
-        monitoringPeriodMs: 300000, // 5 minutes
-      }));
+      this.circuitBreakers.set(
+        serviceName,
+        new CircuitBreaker({
+          failureThreshold: 5,
+          resetTimeoutMs: 60000, // 1 minute
+          monitoringPeriodMs: 300000, // 5 minutes
+        })
+      );
     }
     return this.circuitBreakers.get(serviceName)!;
   }
@@ -318,15 +322,15 @@ export async function withFallback<T>(
   try {
     return await primaryOperation();
   } catch (error) {
-    const shouldFallback = fallbackCondition 
+    const shouldFallback = fallbackCondition
       ? fallbackCondition(error as Error)
       : RetryUtils.isRetryableError(error as Error);
-    
+
     if (shouldFallback) {
       console.warn('Primary operation failed, using fallback:', error);
       return await fallbackOperation();
     }
-    
+
     throw error;
   }
 }

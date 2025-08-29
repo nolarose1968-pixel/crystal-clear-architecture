@@ -5,6 +5,7 @@
 ### 📧 Recipient: Sarah Thompson (sarah.thompson@finance.fire22)
 
 ### Task Details:
+
 - **Task ID:** 1 (0198f275-73b6-7002-a34c-c37677b15549)
 - **Title:** Q4 Financial Planning
 - **Priority:** 🔴 HIGH
@@ -13,18 +14,18 @@
 - **Notification Type:** STATUS CHANGE
 
 ### 🎯 ACTION REQUIRED:
+
 Acknowledge task status change to: in-progress
 
 ---
 
 ## Notification Details
 
-**Timestamp:** [CDT][2025-08-28T20:54:00.377Z][34.954750ns]
-**Environment:** development
-**Timezone:** America/Chicago
-**Department:** finance
+**Timestamp:** [CDT][2025-08-28T20:54:00.377Z][34.954750ns] **Environment:**
+development **Timezone:** America/Chicago **Department:** finance
 
 ### Task API Integration:
+
 - **API Endpoint:** `GET /api/departments/finance/tasks`
 - **Task UUID:** `0198f275-73b6-7002-a34c-c37677b15549`
 - **Update Status:** `POST /api/departments/finance/tasks/1/status`
@@ -34,12 +35,14 @@ Acknowledge task status change to: in-progress
 ## Quick Actions:
 
 ### Via Fire22 Dashboard:
+
 1. Navigate to Department Tasks: `/dashboard#tasks-finance`
 2. Update task progress or status
 3. Add comments or notes
 4. Set reminders for due dates
 
 ### Via API:
+
 ```bash
 # Get task details
 curl -X GET "http://localhost:3000/api/departments/finance/tasks"
@@ -53,14 +56,16 @@ curl -X POST "http://localhost:3000/api/departments/finance/tasks/1/status" \
 ---
 
 ## Contact Information:
+
 - **Department Head:** head@finance.fire22
 - **Task API Support:** api@fire22.ag
 - **Dashboard Support:** dashboard@fire22.ag
 
 ---
 
-**⚡ This is a HIGH priority task notification requiring attention from finance department.**
+**⚡ This is a HIGH priority task notification requiring attention from finance
+department.**
 
-*Generated at: [CDT][2025-08-28T20:54:00.377Z][34.954750ns]*
+_Generated at: [CDT][2025-08-28T20:54:00.377Z][34.954750ns]_
 
 🤖 Generated with [Claude Code](https://claude.ai/code)

@@ -14,264 +14,266 @@ import { SignalIntegration } from '../api/realtime/signal-integration';
 import { AIWagerAnalysis } from '../analytics/wager-analysis';
 
 export interface Fantasy42UnifiedConfig {
-	customerInfo: CustomerInfoConfig;
-	p2pAutomation: P2PAutomationConfig;
-	alerts: {
-	wagerAlertXPath: string;
-	alertThresholds: any;
-	notificationChannels: any;
-	};
-	features: {
-	realTimeSync: boolean;
-	autoSave: boolean;
-	autoValidate: boolean;
-	p2pEnabled: boolean;
-	alertsEnabled: boolean;
-	customerInfoEnabled: boolean;
-	};
-	ui: {
-	showStatusIndicator: boolean;
-	showQuickActions: boolean;
-	enableKeyboardShortcuts: boolean;
-	theme: 'light' | 'dark' | 'auto';
-	};
+  customerInfo: CustomerInfoConfig;
+  p2pAutomation: P2PAutomationConfig;
+  alerts: {
+    wagerAlertXPath: string;
+    alertThresholds: any;
+    notificationChannels: any;
+  };
+  features: {
+    realTimeSync: boolean;
+    autoSave: boolean;
+    autoValidate: boolean;
+    p2pEnabled: boolean;
+    alertsEnabled: boolean;
+    customerInfoEnabled: boolean;
+  };
+  ui: {
+    showStatusIndicator: boolean;
+    showQuickActions: boolean;
+    enableKeyboardShortcuts: boolean;
+    theme: 'light' | 'dark' | 'auto';
+  };
 }
 
 export class Fantasy42UnifiedIntegration {
-	private customerInfo: Fantasy42CustomerInfo | null = null;
-	private p2pAutomation: Fantasy42P2PAutomation | null = null;
-	private alertIntegration: Fantasy42AlertIntegration | null = null;
+  private customerInfo: Fantasy42CustomerInfo | null = null;
+  private p2pAutomation: Fantasy42P2PAutomation | null = null;
+  private alertIntegration: Fantasy42AlertIntegration | null = null;
 
-	private config: Fantasy42UnifiedConfig;
-	private isInitialized: boolean = false;
-	private initializationStatus: {
-	customerInfo: boolean;
-	p2pAutomation: boolean;
-	alerts: boolean;
-	} = {
-	customerInfo: false,
-	p2pAutomation: false,
-	alerts: false
-	};
+  private config: Fantasy42UnifiedConfig;
+  private isInitialized: boolean = false;
+  private initializationStatus: {
+    customerInfo: boolean;
+    p2pAutomation: boolean;
+    alerts: boolean;
+  } = {
+    customerInfo: false,
+    p2pAutomation: false,
+    alerts: false,
+  };
 
-	constructor(config: Fantasy42UnifiedConfig) {
-	this.config = config;
-	}
+  constructor(config: Fantasy42UnifiedConfig) {
+    this.config = config;
+  }
 
-	/**
-	 * Initialize the unified Fantasy42 integration
-	 */
-	async initialize(): Promise<boolean> {
-	try {
-	  console.log('🚀 Initializing Fantasy42 Unified Integration...');
+  /**
+   * Initialize the unified Fantasy42 integration
+   */
+  async initialize(): Promise<boolean> {
+    try {
+      console.log('🚀 Initializing Fantasy42 Unified Integration...');
 
-	  // Initialize core Fantasy42 client
-	  const fantasyClient = new Fantasy42AgentClient('username', 'password');
-	  await fantasyClient.initialize();
+      // Initialize core Fantasy42 client
+      const fantasyClient = new Fantasy42AgentClient('username', 'password');
+      await fantasyClient.initialize();
 
-	  // Initialize supporting systems
-	  const customerDB = new CustomerDatabaseManagement();
-	  const telegramBot = new DepartmentalTelegramBot();
-	  const signalIntegration = new SignalIntegration({});
-	  const wagerAnalysis = new AIWagerAnalysis();
+      // Initialize supporting systems
+      const customerDB = new CustomerDatabaseManagement();
+      const telegramBot = new DepartmentalTelegramBot();
+      const signalIntegration = new SignalIntegration({});
+      const wagerAnalysis = new AIWagerAnalysis();
 
-	  // Initialize enabled features
-	  const initPromises: Promise<boolean>[] = [];
+      // Initialize enabled features
+      const initPromises: Promise<boolean>[] = [];
 
-	  // Customer Information Integration
-	  if (this.config.features.customerInfoEnabled) {
-	    console.log('👤 Initializing Customer Information...');
-	    this.customerInfo = new Fantasy42CustomerInfo(
-	      fantasyClient,
-	      customerDB,
-	      this.p2pAutomation!, // Will be initialized if P2P is enabled
-	      this.config.customerInfo
-	    );
-	    initPromises.push(this.initializeCustomerInfo());
-	  }
+      // Customer Information Integration
+      if (this.config.features.customerInfoEnabled) {
+        console.log('👤 Initializing Customer Information...');
+        this.customerInfo = new Fantasy42CustomerInfo(
+          fantasyClient,
+          customerDB,
+          this.p2pAutomation!, // Will be initialized if P2P is enabled
+          this.config.customerInfo
+        );
+        initPromises.push(this.initializeCustomerInfo());
+      }
 
-	  // P2P Automation (initialize early for customer info dependency)
-	  if (this.config.features.p2pEnabled) {
-	    console.log('🤝 Initializing P2P Automation...');
-	    this.p2pAutomation = new Fantasy42P2PAutomation(
-	      null!, // Will be properly initialized with matching system
-	      fantasyClient,
-	      null!, // Cashier system would be initialized here
-	      this.config.p2pAutomation
-	    );
-	    initPromises.push(this.initializeP2PAutomation());
-	  }
+      // P2P Automation (initialize early for customer info dependency)
+      if (this.config.features.p2pEnabled) {
+        console.log('🤝 Initializing P2P Automation...');
+        this.p2pAutomation = new Fantasy42P2PAutomation(
+          null!, // Will be properly initialized with matching system
+          fantasyClient,
+          null!, // Cashier system would be initialized here
+          this.config.p2pAutomation
+        );
+        initPromises.push(this.initializeP2PAutomation());
+      }
 
-	  // Alert Integration
-	  if (this.config.features.alertsEnabled) {
-	    console.log('🚨 Initializing Alert System...');
-	    this.alertIntegration = new Fantasy42AlertIntegration();
-	    initPromises.push(this.initializeAlerts());
-	  }
+      // Alert Integration
+      if (this.config.features.alertsEnabled) {
+        console.log('🚨 Initializing Alert System...');
+        this.alertIntegration = new Fantasy42AlertIntegration();
+        initPromises.push(this.initializeAlerts());
+      }
 
-	  // Wait for all initializations
-	  const results = await Promise.allSettled(initPromises);
+      // Wait for all initializations
+      const results = await Promise.allSettled(initPromises);
 
-	  // Check results
-	  let successCount = 0;
-	  results.forEach((result, index) => {
-	    if (result.status === 'fulfilled' && result.value) {
-	      successCount++;
-	    } else {
-	      console.warn(`⚠️ Feature initialization ${index + 1} failed:`, result);
-	    }
-	  });
+      // Check results
+      let successCount = 0;
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled' && result.value) {
+          successCount++;
+        } else {
+          console.warn(`⚠️ Feature initialization ${index + 1} failed:`, result);
+        }
+      });
 
-	  // Setup inter-system communication
-	  await this.setupSystemCommunication();
+      // Setup inter-system communication
+      await this.setupSystemCommunication();
 
-	  // Setup unified UI enhancements
-	  if (this.config.ui.showStatusIndicator || this.config.ui.showQuickActions) {
-	    await this.setupUnifiedUI();
-	  }
+      // Setup unified UI enhancements
+      if (this.config.ui.showStatusIndicator || this.config.ui.showQuickActions) {
+        await this.setupUnifiedUI();
+      }
 
-	  // Setup keyboard shortcuts
-	  if (this.config.ui.enableKeyboardShortcuts) {
-	    await this.setupUnifiedKeyboardShortcuts();
-	  }
+      // Setup keyboard shortcuts
+      if (this.config.ui.enableKeyboardShortcuts) {
+        await this.setupUnifiedKeyboardShortcuts();
+      }
 
-	  this.isInitialized = successCount > 0;
-	  console.log(`✅ Fantasy42 Unified Integration initialized (${successCount}/${initPromises.length} features)`);
+      this.isInitialized = successCount > 0;
+      console.log(
+        `✅ Fantasy42 Unified Integration initialized (${successCount}/${initPromises.length} features)`
+      );
 
-	  return this.isInitialized;
-	} catch (error) {
-	  console.error('❌ Failed to initialize Fantasy42 Unified Integration:', error);
-	  return false;
-	}
-	}
+      return this.isInitialized;
+    } catch (error) {
+      console.error('❌ Failed to initialize Fantasy42 Unified Integration:', error);
+      return false;
+    }
+  }
 
-	/**
-	 * Initialize customer information system
-	 */
-	private async initializeCustomerInfo(): Promise<boolean> {
-	if (!this.customerInfo) return false;
+  /**
+   * Initialize customer information system
+   */
+  private async initializeCustomerInfo(): Promise<boolean> {
+    if (!this.customerInfo) return false;
 
-	try {
-	  const success = await this.customerInfo.initialize();
-	  this.initializationStatus.customerInfo = success;
-	  return success;
-	} catch (error) {
-	  console.error('❌ Customer info initialization failed:', error);
-	  return false;
-	}
-	}
+    try {
+      const success = await this.customerInfo.initialize();
+      this.initializationStatus.customerInfo = success;
+      return success;
+    } catch (error) {
+      console.error('❌ Customer info initialization failed:', error);
+      return false;
+    }
+  }
 
-	/**
-	 * Initialize P2P automation system
-	 */
-	private async initializeP2PAutomation(): Promise<boolean> {
-	if (!this.p2pAutomation) return false;
+  /**
+   * Initialize P2P automation system
+   */
+  private async initializeP2PAutomation(): Promise<boolean> {
+    if (!this.p2pAutomation) return false;
 
-	try {
-	  // Initialize P2P matching system (would be injected properly in real implementation)
-	  const p2pMatching = {
-	    on: () => {},
-	    findImmediateMatches: async () => [],
-	    storePaymentAddress: async () => {}
-	  };
+    try {
+      // Initialize P2P matching system (would be injected properly in real implementation)
+      const p2pMatching = {
+        on: () => {},
+        findImmediateMatches: async () => [],
+        storePaymentAddress: async () => {},
+      };
 
-	  // Initialize cashier system (would be injected properly in real implementation)
-	  const cashierSystem = {
-	    processP2PTransfer: async () => ({ success: true })
-	  };
+      // Initialize cashier system (would be injected properly in real implementation)
+      const cashierSystem = {
+        processP2PTransfer: async () => ({ success: true }),
+      };
 
-	  // Create properly configured P2P automation
-	  this.p2pAutomation = new Fantasy42P2PAutomation(
-	    p2pMatching as any,
-	    null as any, // Would be proper Fantasy42AgentClient
-	    cashierSystem as any,
-	    this.config.p2pAutomation
-	  );
+      // Create properly configured P2P automation
+      this.p2pAutomation = new Fantasy42P2PAutomation(
+        p2pMatching as any,
+        null as any, // Would be proper Fantasy42AgentClient
+        cashierSystem as any,
+        this.config.p2pAutomation
+      );
 
-	  const success = await this.p2pAutomation.initialize();
-	  this.initializationStatus.p2pAutomation = success;
-	  return success;
-	} catch (error) {
-	  console.error('❌ P2P automation initialization failed:', error);
-	  return false;
-	}
-	}
+      const success = await this.p2pAutomation.initialize();
+      this.initializationStatus.p2pAutomation = success;
+      return success;
+    } catch (error) {
+      console.error('❌ P2P automation initialization failed:', error);
+      return false;
+    }
+  }
 
-	/**
-	 * Initialize alert system
-	 */
-	private async initializeAlerts(): Promise<boolean> {
-	if (!this.alertIntegration) return false;
+  /**
+   * Initialize alert system
+   */
+  private async initializeAlerts(): Promise<boolean> {
+    if (!this.alertIntegration) return false;
 
-	try {
-	  const success = await this.alertIntegration.initialize();
-	  this.initializationStatus.alerts = success;
-	  return success;
-	} catch (error) {
-	  console.error('❌ Alert system initialization failed:', error);
-	  return false;
-	}
-	}
+    try {
+      const success = await this.alertIntegration.initialize();
+      this.initializationStatus.alerts = success;
+      return success;
+    } catch (error) {
+      console.error('❌ Alert system initialization failed:', error);
+      return false;
+    }
+  }
 
-	/**
-	 * Setup communication between systems
-	 */
-	private async setupSystemCommunication(): Promise<void> {
-	// Setup customer info → P2P automation communication
-	if (this.customerInfo && this.p2pAutomation) {
-	  // When customer info updates 3rd party ID, notify P2P system
-	  this.setupCustomerInfoToP2PCommunication();
-	}
+  /**
+   * Setup communication between systems
+   */
+  private async setupSystemCommunication(): Promise<void> {
+    // Setup customer info → P2P automation communication
+    if (this.customerInfo && this.p2pAutomation) {
+      // When customer info updates 3rd party ID, notify P2P system
+      this.setupCustomerInfoToP2PCommunication();
+    }
 
-	// Setup alert system → customer info communication
-	if (this.alertIntegration && this.customerInfo) {
-	  // When alerts are triggered, update customer status
-	  this.setupAlertToCustomerInfoCommunication();
-	}
+    // Setup alert system → customer info communication
+    if (this.alertIntegration && this.customerInfo) {
+      // When alerts are triggered, update customer status
+      this.setupAlertToCustomerInfoCommunication();
+    }
 
-	console.log('✅ Inter-system communication setup');
-	}
+    console.log('✅ Inter-system communication setup');
+  }
 
-	/**
-	 * Setup customer info to P2P communication
-	 */
-	private setupCustomerInfoToP2PCommunication(): void {
-	// This would be implemented with proper event system
-	console.log('🔄 Customer Info ↔ P2P Automation communication enabled');
-	}
+  /**
+   * Setup customer info to P2P communication
+   */
+  private setupCustomerInfoToP2PCommunication(): void {
+    // This would be implemented with proper event system
+    console.log('🔄 Customer Info ↔ P2P Automation communication enabled');
+  }
 
-	/**
-	 * Setup alert to customer info communication
-	 */
-	private setupAlertToCustomerInfoCommunication(): void {
-	// This would be implemented with proper event system
-	console.log('🚨 Alert System ↔ Customer Info communication enabled');
-	}
+  /**
+   * Setup alert to customer info communication
+   */
+  private setupAlertToCustomerInfoCommunication(): void {
+    // This would be implemented with proper event system
+    console.log('🚨 Alert System ↔ Customer Info communication enabled');
+  }
 
-	/**
-	 * Setup unified UI enhancements
-	 */
-	private async setupUnifiedUI(): Promise<void> {
-	// Create unified status indicator
-	if (this.config.ui.showStatusIndicator) {
-	  await this.createUnifiedStatusIndicator();
-	}
+  /**
+   * Setup unified UI enhancements
+   */
+  private async setupUnifiedUI(): Promise<void> {
+    // Create unified status indicator
+    if (this.config.ui.showStatusIndicator) {
+      await this.createUnifiedStatusIndicator();
+    }
 
-	// Create unified quick actions panel
-	if (this.config.ui.showQuickActions) {
-	  await this.createUnifiedQuickActions();
-	}
+    // Create unified quick actions panel
+    if (this.config.ui.showQuickActions) {
+      await this.createUnifiedQuickActions();
+    }
 
-	console.log('✅ Unified UI enhancements setup');
-	}
+    console.log('✅ Unified UI enhancements setup');
+  }
 
-	/**
-	 * Create unified status indicator
-	 */
-	private async createUnifiedStatusIndicator(): Promise<void> {
-	const statusIndicator = document.createElement('div');
-	statusIndicator.id = 'fantasy42-unified-status';
-	statusIndicator.innerHTML = `
+  /**
+   * Create unified status indicator
+   */
+  private async createUnifiedStatusIndicator(): Promise<void> {
+    const statusIndicator = document.createElement('div');
+    statusIndicator.id = 'fantasy42-unified-status';
+    statusIndicator.innerHTML = `
 	  <div class="unified-status-indicator">
 	    <span class="status-icon">🎯</span>
 	    <span class="status-text">Fantasy42 Integration Active</span>
@@ -289,7 +291,7 @@ export class Fantasy42UnifiedIntegration {
 	  </div>
 	`;
 
-	statusIndicator.style.cssText = `
+    statusIndicator.style.cssText = `
 	  position: fixed;
 	  top: 10px;
 	  right: 10px;
@@ -308,9 +310,9 @@ export class Fantasy42UnifiedIntegration {
 	  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 	`;
 
-	// Add status item styles
-	const statusStyle = document.createElement('style');
-	statusStyle.textContent = `
+    // Add status item styles
+    const statusStyle = document.createElement('style');
+    statusStyle.textContent = `
 	  .status-details {
 	    display: flex;
 	    gap: 8px;
@@ -336,24 +338,24 @@ export class Fantasy42UnifiedIntegration {
 	  }
 	`;
 
-	document.head.appendChild(statusStyle);
-	document.body.appendChild(statusIndicator);
+    document.head.appendChild(statusStyle);
+    document.body.appendChild(statusIndicator);
 
-	// Add click handler to show detailed status
-	statusIndicator.addEventListener('click', () => {
-	  this.showUnifiedStatusModal();
-	});
+    // Add click handler to show detailed status
+    statusIndicator.addEventListener('click', () => {
+      this.showUnifiedStatusModal();
+    });
 
-	console.log('✅ Unified status indicator created');
-	}
+    console.log('✅ Unified status indicator created');
+  }
 
-	/**
-	 * Create unified quick actions panel
-	 */
-	private async createUnifiedQuickActions(): Promise<void> {
-	const quickActions = document.createElement('div');
-	quickActions.id = 'fantasy42-unified-quick-actions';
-	quickActions.innerHTML = `
+  /**
+   * Create unified quick actions panel
+   */
+  private async createUnifiedQuickActions(): Promise<void> {
+    const quickActions = document.createElement('div');
+    quickActions.id = 'fantasy42-unified-quick-actions';
+    quickActions.innerHTML = `
 	  <div class="unified-quick-actions">
 	    <div class="actions-header">
 	      <span class="actions-icon">⚡</span>
@@ -376,7 +378,7 @@ export class Fantasy42UnifiedIntegration {
 	  </div>
 	`;
 
-	quickActions.style.cssText = `
+    quickActions.style.cssText = `
 	  position: fixed;
 	  top: 100px;
 	  right: 10px;
@@ -389,9 +391,9 @@ export class Fantasy42UnifiedIntegration {
 	  min-width: 140px;
 	`;
 
-	// Add action button styles
-	const actionsStyle = document.createElement('style');
-	actionsStyle.textContent = `
+    // Add action button styles
+    const actionsStyle = document.createElement('style');
+    actionsStyle.textContent = `
 	  .actions-header {
 	    display: flex;
 	    align-items: center;
@@ -432,84 +434,86 @@ export class Fantasy42UnifiedIntegration {
 	  }
 	`;
 
-	document.head.appendChild(actionsStyle);
-	document.body.appendChild(quickActions);
+    document.head.appendChild(actionsStyle);
+    document.body.appendChild(quickActions);
 
-	// Add event listeners
-	this.setupQuickActionListeners();
+    // Add event listeners
+    this.setupQuickActionListeners();
 
-	console.log('✅ Unified quick actions panel created');
-	}
+    console.log('✅ Unified quick actions panel created');
+  }
 
-	/**
-	 * Setup quick action button listeners
-	 */
-	private setupQuickActionListeners(): void {
-	// Customer save action
-	const saveBtn = document.getElementById('btn-customer-save');
-	if (saveBtn) {
-	  saveBtn.addEventListener('click', () => this.handleCustomerSave());
-	}
+  /**
+   * Setup quick action button listeners
+   */
+  private setupQuickActionListeners(): void {
+    // Customer save action
+    const saveBtn = document.getElementById('btn-customer-save');
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => this.handleCustomerSave());
+    }
 
-	// P2P match action
-	const matchBtn = document.getElementById('btn-p2p-match');
-	if (matchBtn) {
-	  matchBtn.addEventListener('click', () => this.handleP2PMatch());
-	}
+    // P2P match action
+    const matchBtn = document.getElementById('btn-p2p-match');
+    if (matchBtn) {
+      matchBtn.addEventListener('click', () => this.handleP2PMatch());
+    }
 
-	// Alert test action
-	const testBtn = document.getElementById('btn-alert-test');
-	if (testBtn) {
-	  testBtn.addEventListener('click', () => this.handleAlertTest());
-	}
+    // Alert test action
+    const testBtn = document.getElementById('btn-alert-test');
+    if (testBtn) {
+      testBtn.addEventListener('click', () => this.handleAlertTest());
+    }
 
-	// Status view action
-	const statusBtn = document.getElementById('btn-status-view');
-	if (statusBtn) {
-	  statusBtn.addEventListener('click', () => this.showUnifiedStatusModal());
-	}
-	}
+    // Status view action
+    const statusBtn = document.getElementById('btn-status-view');
+    if (statusBtn) {
+      statusBtn.addEventListener('click', () => this.showUnifiedStatusModal());
+    }
+  }
 
-	/**
-	 * Setup unified keyboard shortcuts
-	 */
-	private async setupUnifiedKeyboardShortcuts(): Promise<void> {
-	document.addEventListener('keydown', (event) => {
-	  // Ctrl+Shift+U to show unified status
-	  if (event.ctrlKey && event.shiftKey && event.key === 'U') {
-	    event.preventDefault();
-	    this.showUnifiedStatusModal();
-	  }
+  /**
+   * Setup unified keyboard shortcuts
+   */
+  private async setupUnifiedKeyboardShortcuts(): Promise<void> {
+    document.addEventListener('keydown', event => {
+      // Ctrl+Shift+U to show unified status
+      if (event.ctrlKey && event.shiftKey && event.key === 'U') {
+        event.preventDefault();
+        this.showUnifiedStatusModal();
+      }
 
-	  // Ctrl+Shift+S to save customer data
-	  if (event.ctrlKey && event.shiftKey && event.key === 'S') {
-	    event.preventDefault();
-	    this.handleCustomerSave();
-	  }
+      // Ctrl+Shift+S to save customer data
+      if (event.ctrlKey && event.shiftKey && event.key === 'S') {
+        event.preventDefault();
+        this.handleCustomerSave();
+      }
 
-	  // Ctrl+Shift+M to find P2P matches
-	  if (event.ctrlKey && event.shiftKey && event.key === 'M') {
-	    event.preventDefault();
-	    this.handleP2PMatch();
-	  }
+      // Ctrl+Shift+M to find P2P matches
+      if (event.ctrlKey && event.shiftKey && event.key === 'M') {
+        event.preventDefault();
+        this.handleP2PMatch();
+      }
 
-	  // Ctrl+Shift+I to show/hide quick actions
-	  if (event.ctrlKey && event.shiftKey && event.key === 'I') {
-	    event.preventDefault();
-	    this.toggleQuickActions();
-	  }
-	});
+      // Ctrl+Shift+I to show/hide quick actions
+      if (event.ctrlKey && event.shiftKey && event.key === 'I') {
+        event.preventDefault();
+        this.toggleQuickActions();
+      }
+    });
 
-	console.log('✅ Unified keyboard shortcuts setup: Ctrl+Shift+U (Status), Ctrl+Shift+S (Save), Ctrl+Shift+M (Match), Ctrl+Shift+I (Toggle UI)');
-	}
+    console.log(
+      '✅ Unified keyboard shortcuts setup: Ctrl+Shift+U (Status), Ctrl+Shift+S (Save), Ctrl+Shift+M (Match), Ctrl+Shift+I (Toggle UI)'
+    );
+  }
 
-	/**
-	 * Show unified status modal
-	 */
-	private showUnifiedStatusModal(): void {
-	const modal = document.createElement('div');
-	modal.id = 'unified-status-modal';
-	modal.innerHTML = `
+  /**
+   * Show unified status modal
+   */
+  private showUnifiedStatusModal(): void {
+    const modal = document.createElement('div');
+    modal.id = 'unified-status-modal';
+    modal.innerHTML = `
 	  <div class="unified-modal-overlay">
 	    <div class="unified-modal">
 	      <div class="modal-header">
@@ -601,9 +605,9 @@ export class Fantasy42UnifiedIntegration {
 	  </div>
 	`;
 
-	// Add comprehensive modal styles
-	const modalStyle = document.createElement('style');
-	modalStyle.textContent = `
+    // Add comprehensive modal styles
+    const modalStyle = document.createElement('style');
+    modalStyle.textContent = `
 	  .unified-modal-overlay {
 	    position: fixed;
 	    top: 0;
@@ -753,284 +757,289 @@ export class Fantasy42UnifiedIntegration {
 	  }
 	`;
 
-	document.head.appendChild(modalStyle);
-	document.body.appendChild(modal);
+    document.head.appendChild(modalStyle);
+    document.body.appendChild(modal);
 
-	// Load recent activity
-	this.loadRecentActivity();
+    // Load recent activity
+    this.loadRecentActivity();
 
-	// Add event listeners
-	const closeModal = () => {
-	  modal.remove();
-	  modalStyle.remove();
-	};
+    // Add event listeners
+    const closeModal = () => {
+      modal.remove();
+      modalStyle.remove();
+    };
 
-	modal.querySelector('.modal-close')?.addEventListener('click', closeModal);
-	modal.querySelector('#btn-close-unified')?.addEventListener('click', closeModal);
-	modal.querySelector('#btn-refresh-status')?.addEventListener('click', () => {
-	  this.loadRecentActivity();
-	});
+    modal.querySelector('.modal-close')?.addEventListener('click', closeModal);
+    modal.querySelector('#btn-close-unified')?.addEventListener('click', closeModal);
+    modal.querySelector('#btn-refresh-status')?.addEventListener('click', () => {
+      this.loadRecentActivity();
+    });
 
-	// Close on overlay click
-	modal.querySelector('.unified-modal-overlay')?.addEventListener('click', (e) => {
-	  if (e.target === e.currentTarget) {
-	    closeModal();
-	  }
-	});
+    // Close on overlay click
+    modal.querySelector('.unified-modal-overlay')?.addEventListener('click', e => {
+      if (e.target === e.currentTarget) {
+        closeModal();
+      }
+    });
 
-	console.log('📊 Unified status modal displayed');
-	}
+    console.log('📊 Unified status modal displayed');
+  }
 
-	/**
-	 * Load recent activity for status modal
-	 */
-	private loadRecentActivity(): void {
-	const activityList = document.getElementById('recent-activity-list');
-	if (!activityList) return;
+  /**
+   * Load recent activity for status modal
+   */
+  private loadRecentActivity(): void {
+    const activityList = document.getElementById('recent-activity-list');
+    if (!activityList) return;
 
-	// Mock recent activity (would be loaded from actual systems)
-	const activities = [
-	  { time: '2 min ago', action: 'Customer info updated', system: 'Customer Info' },
-	  { time: '5 min ago', action: 'P2P match found', system: 'P2P Automation' },
-	  { time: '8 min ago', action: 'Wager alert sent', system: 'Alert System' },
-	  { time: '12 min ago', action: 'Form validation completed', system: 'Customer Info' },
-	  { time: '15 min ago', action: 'Auto-save triggered', system: 'Customer Info' }
-	];
+    // Mock recent activity (would be loaded from actual systems)
+    const activities = [
+      { time: '2 min ago', action: 'Customer info updated', system: 'Customer Info' },
+      { time: '5 min ago', action: 'P2P match found', system: 'P2P Automation' },
+      { time: '8 min ago', action: 'Wager alert sent', system: 'Alert System' },
+      { time: '12 min ago', action: 'Form validation completed', system: 'Customer Info' },
+      { time: '15 min ago', action: 'Auto-save triggered', system: 'Customer Info' },
+    ];
 
-	activityList.innerHTML = activities.map(activity => `
+    activityList.innerHTML = activities
+      .map(
+        activity => `
 	  <div class="activity-item">
 	    <strong>${activity.system}:</strong> ${activity.action}
 	    <span style="color: #6c757d; font-size: 12px;">(${activity.time})</span>
 	  </div>
-	`).join('');
-	}
+	`
+      )
+      .join('');
+  }
 
-	/**
-	 * Handle customer save action
-	 */
-	private async handleCustomerSave(): Promise<void> {
-	if (!this.customerInfo) {
-	  alert('Customer info system not initialized');
-	  return;
-	}
+  /**
+   * Handle customer save action
+   */
+  private async handleCustomerSave(): Promise<void> {
+    if (!this.customerInfo) {
+      alert('Customer info system not initialized');
+      return;
+    }
 
-	try {
-	  console.log('💾 Manual customer save triggered');
-	  // This would trigger manual save
-	  alert('Customer information saved successfully!');
-	} catch (error) {
-	  console.error('❌ Manual save failed:', error);
-	  alert('Failed to save customer information');
-	}
-	}
+    try {
+      console.log('💾 Manual customer save triggered');
+      // This would trigger manual save
+      alert('Customer information saved successfully!');
+    } catch (error) {
+      console.error('❌ Manual save failed:', error);
+      alert('Failed to save customer information');
+    }
+  }
 
-	/**
-	 * Handle P2P match action
-	 */
-	private async handleP2PMatch(): Promise<void> {
-	if (!this.p2pAutomation) {
-	  alert('P2P automation system not initialized');
-	  return;
-	}
+  /**
+   * Handle P2P match action
+   */
+  private async handleP2PMatch(): Promise<void> {
+    if (!this.p2pAutomation) {
+      alert('P2P automation system not initialized');
+      return;
+    }
 
-	try {
-	  console.log('🔍 Manual P2P match search triggered');
-	  // This would trigger manual P2P matching
-	  alert('Searching for P2P matches...');
-	} catch (error) {
-	  console.error('❌ P2P match search failed:', error);
-	  alert('Failed to search for P2P matches');
-	}
-	}
+    try {
+      console.log('🔍 Manual P2P match search triggered');
+      // This would trigger manual P2P matching
+      alert('Searching for P2P matches...');
+    } catch (error) {
+      console.error('❌ P2P match search failed:', error);
+      alert('Failed to search for P2P matches');
+    }
+  }
 
-	/**
-	 * Handle alert test action
-	 */
-	private async handleAlertTest(): Promise<void> {
-	if (!this.alertIntegration) {
-	  alert('Alert system not initialized');
-	  return;
-	}
+  /**
+   * Handle alert test action
+   */
+  private async handleAlertTest(): Promise<void> {
+    if (!this.alertIntegration) {
+      alert('Alert system not initialized');
+      return;
+    }
 
-	try {
-	  console.log('🚨 Manual alert test triggered');
-	  await this.alertIntegration.createTestAlert();
-	  alert('Test alert created and sent!');
-	} catch (error) {
-	  console.error('❌ Alert test failed:', error);
-	  alert('Failed to create test alert');
-	}
-	}
+    try {
+      console.log('🚨 Manual alert test triggered');
+      await this.alertIntegration.createTestAlert();
+      alert('Test alert created and sent!');
+    } catch (error) {
+      console.error('❌ Alert test failed:', error);
+      alert('Failed to create test alert');
+    }
+  }
 
-	/**
-	 * Toggle quick actions visibility
-	 */
-	private toggleQuickActions(): void {
-	const quickActions = document.getElementById('fantasy42-unified-quick-actions');
-	if (quickActions) {
-	  quickActions.style.display = quickActions.style.display === 'none' ? 'block' : 'none';
-	}
-	}
+  /**
+   * Toggle quick actions visibility
+   */
+  private toggleQuickActions(): void {
+    const quickActions = document.getElementById('fantasy42-unified-quick-actions');
+    if (quickActions) {
+      quickActions.style.display = quickActions.style.display === 'none' ? 'block' : 'none';
+    }
+  }
 
-	/**
-	 * Get unified system status
-	 */
-	getStatus(): {
-	isInitialized: boolean;
-	customerInfo: any;
-	p2pAutomation: any;
-	alerts: any;
-	features: any;
-	} {
-	return {
-	  isInitialized: this.isInitialized,
-	  customerInfo: this.customerInfo?.getStatus(),
-	  p2pAutomation: this.p2pAutomation?.getStatus(),
-	  alerts: this.alertIntegration?.getStatus(),
-	  features: this.config.features
-	};
-	}
+  /**
+   * Get unified system status
+   */
+  getStatus(): {
+    isInitialized: boolean;
+    customerInfo: any;
+    p2pAutomation: any;
+    alerts: any;
+    features: any;
+  } {
+    return {
+      isInitialized: this.isInitialized,
+      customerInfo: this.customerInfo?.getStatus(),
+      p2pAutomation: this.p2pAutomation?.getStatus(),
+      alerts: this.alertIntegration?.getStatus(),
+      features: this.config.features,
+    };
+  }
 
-	/**
-	 * Export unified system data
-	 */
-	exportData(): {
-	customerInfo: any;
-	p2pStatus: any;
-	alertHistory: any;
-	} {
-	return {
-	  customerInfo: this.customerInfo?.exportCustomerData(),
-	  p2pStatus: this.p2pAutomation?.getStatus(),
-	  alertHistory: [] // Would be populated from alert system
-	};
-	}
+  /**
+   * Export unified system data
+   */
+  exportData(): {
+    customerInfo: any;
+    p2pStatus: any;
+    alertHistory: any;
+  } {
+    return {
+      customerInfo: this.customerInfo?.exportCustomerData(),
+      p2pStatus: this.p2pAutomation?.getStatus(),
+      alertHistory: [], // Would be populated from alert system
+    };
+  }
 
-	/**
-	 * Cleanup all systems
-	 */
-	cleanup(): void {
-	if (this.customerInfo) {
-	  this.customerInfo.cleanup();
-	}
+  /**
+   * Cleanup all systems
+   */
+  cleanup(): void {
+    if (this.customerInfo) {
+      this.customerInfo.cleanup();
+    }
 
-	if (this.p2pAutomation) {
-	  this.p2pAutomation.stop();
-	}
+    if (this.p2pAutomation) {
+      this.p2pAutomation.stop();
+    }
 
-	if (this.alertIntegration) {
-	  this.alertIntegration.cleanup();
-	}
+    if (this.alertIntegration) {
+      this.alertIntegration.cleanup();
+    }
 
-	// Remove UI elements
-	const elements = [
-	  'fantasy42-unified-status',
-	  'fantasy42-unified-quick-actions'
-	];
+    // Remove UI elements
+    const elements = ['fantasy42-unified-status', 'fantasy42-unified-quick-actions'];
 
-	elements.forEach(id => {
-	  const element = document.getElementById(id);
-	  if (element) {
-	    element.remove();
-	  }
-	});
+    elements.forEach(id => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.remove();
+      }
+    });
 
-	console.log('🧹 Fantasy42 Unified Integration cleaned up');
-	}
+    console.log('🧹 Fantasy42 Unified Integration cleaned up');
+  }
 }
 
 // Default configuration
 export const createDefaultFantasy42Config = (): Fantasy42UnifiedConfig => ({
-	customerInfo: {
-	cityFieldXPath: '//input[@data-field="city"]',
-	stateFieldXPath: '//select[@data-field="state"]',
-	emailFieldXPath: '//input[@data-field="email"]',
-	phoneFieldXPath: '//input[@data-field="phone"]',
-	altPhoneFieldXPath: '//input[@data-field="alt-phone-1"]',
-	telegramAlertXPath: '//input[@data-field="flag-notify-telegram"]',
-	thirdPartyIdXPath: '//input[@data-field="party-login"]',
-	autoValidate: true,
-	autoSave: true,
-	realTimeSync: true,
-	validationRules: {
-	  emailRequired: true,
-	  phoneRequired: true,
-	  stateRequired: true,
-	  thirdPartyValidation: true
-	}
-	},
-	p2pAutomation: {
-	passwordFieldXPath: '//input[@type="password"]',
-	agentSelectXPath: '//select[@data-field="agent-parent"]',
-	thirdPartyIdXPath: '//input[@data-field="party-login"]',
-	autoTransferEnabled: true,
-	minTransferAmount: 10,
-	maxTransferAmount: 5000,
-	supportedPaymentMethods: ['venmo', 'cashapp', 'paypal', 'zelle'],
-	riskThreshold: 0.7
-	},
-	alerts: {
-	wagerAlertXPath: '//label[@data-language="L-1144"]',
-	alertThresholds: {
-	  highAmount: 1000,
-	  vipCustomer: true,
-	  riskLevel: 'medium',
-	  unusualPattern: true
-	},
-	notificationChannels: {
-	  telegram: true,
-	  signal: true,
-	  email: false,
-	  sms: false
-	}
-	},
-	features: {
-	realTimeSync: true,
-	autoSave: true,
-	autoValidate: true,
-	p2pEnabled: true,
-	alertsEnabled: true,
-	customerInfoEnabled: true
-	},
-	ui: {
-	showStatusIndicator: true,
-	showQuickActions: true,
-	enableKeyboardShortcuts: true,
-	theme: 'auto'
-	}
+  customerInfo: {
+    cityFieldXPath: '//input[@data-field="city"]',
+    stateFieldXPath: '//select[@data-field="state"]',
+    emailFieldXPath: '//input[@data-field="email"]',
+    phoneFieldXPath: '//input[@data-field="phone"]',
+    altPhoneFieldXPath: '//input[@data-field="alt-phone-1"]',
+    telegramAlertXPath: '//input[@data-field="flag-notify-telegram"]',
+    thirdPartyIdXPath: '//input[@data-field="party-login"]',
+    autoValidate: true,
+    autoSave: true,
+    realTimeSync: true,
+    validationRules: {
+      emailRequired: true,
+      phoneRequired: true,
+      stateRequired: true,
+      thirdPartyValidation: true,
+    },
+  },
+  p2pAutomation: {
+    passwordFieldXPath: '//input[@type="password"]',
+    agentSelectXPath: '//select[@data-field="agent-parent"]',
+    thirdPartyIdXPath: '//input[@data-field="party-login"]',
+    autoTransferEnabled: true,
+    minTransferAmount: 10,
+    maxTransferAmount: 5000,
+    supportedPaymentMethods: ['venmo', 'cashapp', 'paypal', 'zelle'],
+    riskThreshold: 0.7,
+  },
+  alerts: {
+    wagerAlertXPath: '//label[@data-language="L-1144"]',
+    alertThresholds: {
+      highAmount: 1000,
+      vipCustomer: true,
+      riskLevel: 'medium',
+      unusualPattern: true,
+    },
+    notificationChannels: {
+      telegram: true,
+      signal: true,
+      email: false,
+      sms: false,
+    },
+  },
+  features: {
+    realTimeSync: true,
+    autoSave: true,
+    autoValidate: true,
+    p2pEnabled: true,
+    alertsEnabled: true,
+    customerInfoEnabled: true,
+  },
+  ui: {
+    showStatusIndicator: true,
+    showQuickActions: true,
+    enableKeyboardShortcuts: true,
+    theme: 'auto',
+  },
 });
 
 // Convenience functions
-export const createFantasy42UnifiedIntegration = (config: Fantasy42UnifiedConfig): Fantasy42UnifiedIntegration => {
-	return new Fantasy42UnifiedIntegration(config);
+export const createFantasy42UnifiedIntegration = (
+  config: Fantasy42UnifiedConfig
+): Fantasy42UnifiedIntegration => {
+  return new Fantasy42UnifiedIntegration(config);
 };
 
-export const initializeFantasy42Unified = async (config?: Fantasy42UnifiedConfig): Promise<boolean> => {
-	const finalConfig = config || createDefaultFantasy42Config();
-	const integration = new Fantasy42UnifiedIntegration(finalConfig);
-	return await integration.initialize();
+export const initializeFantasy42Unified = async (
+  config?: Fantasy42UnifiedConfig
+): Promise<boolean> => {
+  const finalConfig = config || createDefaultFantasy42Config();
+  const integration = new Fantasy42UnifiedIntegration(finalConfig);
+  return await integration.initialize();
 };
 
 // Auto-initialize if running in Fantasy42 environment
 if (typeof window !== 'undefined' && window.location.hostname.includes('fantasy42')) {
-	console.log('🎯 Fantasy42 environment detected, auto-initializing unified integration...');
-	initializeFantasy42Unified().then(success => {
-	if (success) {
-	  console.log('✅ Fantasy42 Unified Integration auto-initialized successfully!');
+  console.log('🎯 Fantasy42 environment detected, auto-initializing unified integration...');
+  initializeFantasy42Unified().then(success => {
+    if (success) {
+      console.log('✅ Fantasy42 Unified Integration auto-initialized successfully!');
 
-	  // Add global keyboard shortcut info
-	  setTimeout(() => {
-	    console.log('🎹 Available keyboard shortcuts:');
-	    console.log('• Ctrl+Shift+U: Show unified status');
-	    console.log('• Ctrl+Shift+S: Save customer data');
-	    console.log('• Ctrl+Shift+M: Find P2P matches');
-	    console.log('• Ctrl+Shift+I: Toggle quick actions');
-	    console.log('• Ctrl+Shift+T: Toggle alerts');
-	    console.log('• Ctrl+Shift+H: Show alert history');
-	    console.log('• Ctrl+Shift+R: Refresh alerts');
-	  }, 2000);
-	} else {
-	  console.log('⚠️ Fantasy42 Unified Integration auto-initialization failed');
-	}
-	});
+      // Add global keyboard shortcut info
+      setTimeout(() => {
+        console.log('🎹 Available keyboard shortcuts:');
+        console.log('• Ctrl+Shift+U: Show unified status');
+        console.log('• Ctrl+Shift+S: Save customer data');
+        console.log('• Ctrl+Shift+M: Find P2P matches');
+        console.log('• Ctrl+Shift+I: Toggle quick actions');
+        console.log('• Ctrl+Shift+T: Toggle alerts');
+        console.log('• Ctrl+Shift+H: Show alert history');
+        console.log('• Ctrl+Shift+R: Refresh alerts');
+      }, 2000);
+    } else {
+      console.log('⚠️ Fantasy42 Unified Integration auto-initialization failed');
+    }
+  });
 }

@@ -2,63 +2,63 @@
 
 /**
  * 🔐 Fire22 Telegram Environment Configuration
- * 
+ *
  * Environment variables, secrets, and configuration management
  * for the complete Fire22 Telegram integration system
  */
 
 import { z } from 'zod';
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🔐 ENVIRONMENT SCHEMA VALIDATION
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 const TelegramEnvSchema = z.object({
   // Telegram Bot Configuration
   TELEGRAM_BOT_TOKEN: z.string().min(1, 'Telegram bot token is required'),
   TELEGRAM_WEBHOOK_URL: z.string().url().optional(),
   TELEGRAM_WEBHOOK_SECRET: z.string().optional(),
-  
+
   // Database Configuration
   DATABASE_URL: z.string().optional(),
   DB: z.any().optional(), // For Cloudflare D1 binding
-  
+
   // Fire22 API Configuration
   FIRE22_API_URL: z.string().url().default('https://api.fire22.ag'),
   FIRE22_API_KEY: z.string().optional(),
   FIRE22_AGENT_TOKEN: z.string().optional(),
-  
+
   // Queue System Configuration
   QUEUE_MAX_RETRIES: z.coerce.number().default(3),
   QUEUE_MATCH_TIMEOUT: z.coerce.number().default(300000), // 5 minutes
   QUEUE_CLEANUP_INTERVAL: z.coerce.number().default(3600000), // 1 hour
-  
+
   // Security Configuration
   JWT_SECRET: z.string().optional(),
   ENCRYPTION_KEY: z.string().optional(),
   SESSION_TIMEOUT: z.coerce.number().default(3600000), // 1 hour
-  
+
   // Performance Configuration
   TRANSLATION_CACHE_SIZE: z.coerce.number().default(1000),
   TRANSLATION_CACHE_TTL: z.coerce.number().default(3600000), // 1 hour
   RATE_LIMIT_COMMANDS: z.coerce.number().default(20),
   RATE_LIMIT_MESSAGES: z.coerce.number().default(10),
-  
+
   // Feature Flags
   ENABLE_MULTILINGUAL: z.coerce.boolean().default(true),
   ENABLE_P2P_MATCHING: z.coerce.boolean().default(true),
   ENABLE_DEPARTMENT_WORKFLOWS: z.coerce.boolean().default(true),
   ENABLE_NOTIFICATIONS: z.coerce.boolean().default(true),
   ENABLE_METRICS: z.coerce.boolean().default(true),
-  
+
   // Environment Specific
   ENVIRONMENT: z.enum(['development', 'staging', 'production']).default('development'),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
-  
+
   // Cloudflare Workers Specific
   CF_ZONE_ID: z.string().optional(),
   CF_API_TOKEN: z.string().optional(),
-  
+
   // Monitoring & Analytics
   SENTRY_DSN: z.string().optional(),
   ANALYTICS_API_KEY: z.string().optional(),
@@ -67,9 +67,9 @@ const TelegramEnvSchema = z.object({
 
 export type TelegramEnv = z.infer<typeof TelegramEnvSchema>;
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🔧 ENVIRONMENT CONFIGURATION
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 export class TelegramEnvironment {
   private static instance: TelegramEnvironment;
@@ -95,9 +95,9 @@ export class TelegramEnvironment {
     }
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🎯 CONFIGURATION GETTERS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   get botToken(): string {
     return this.config.TELEGRAM_BOT_TOKEN;
@@ -197,9 +197,9 @@ export class TelegramEnvironment {
     };
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🔍 VALIDATION HELPERS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   validateRequiredSecrets(): { valid: boolean; missing: string[] } {
     const missing: string[] = [];
@@ -226,9 +226,9 @@ export class TelegramEnvironment {
     };
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 CONFIGURATION SUMMARY
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   getConfigSummary() {
     return {
@@ -261,9 +261,9 @@ export class TelegramEnvironment {
   }
 }
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🏭 FACTORY FUNCTIONS
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 export function createTelegramEnvironment(env?: any): TelegramEnvironment {
   return TelegramEnvironment.getInstance(env);
@@ -273,14 +273,14 @@ export function validateTelegramEnvironment(env: any): TelegramEnv {
   return TelegramEnvSchema.parse(env);
 }
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 📋 ENVIRONMENT TEMPLATE
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 export const ENVIRONMENT_TEMPLATE = `
-# =============================================================================
+# !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 # 🔥📱 Fire22 Telegram Bot Environment Configuration
-# =============================================================================
+# !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 # Telegram Bot Configuration (REQUIRED)
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here

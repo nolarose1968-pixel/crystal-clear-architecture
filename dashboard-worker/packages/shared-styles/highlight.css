@@ -2,13 +2,13 @@
 
 /* 1. Design tokens: highlight rings with Fire22 brand colors */
 :root {
-  --fire22-highlight-primary: 0 0 0 2px oklch(70% 0.25 30);    /* Orange/fire glow */
-  --fire22-highlight-hover: 0 0 0 3px oklch(75% 0.3 28);       /* Brighter on hover */
-  --fire22-highlight-success: 0 0 0 2px oklch(75% 0.2 145);    /* Green success */
-  --fire22-highlight-warning: 0 0 0 2px oklch(75% 0.2 60);     /* Yellow warning */
-  --fire22-highlight-error: 0 0 0 2px oklch(65% 0.25 25);      /* Red error */
-  --fire22-highlight-info: 0 0 0 2px oklch(65% 0.2 230);       /* Blue info */
-  
+  --fire22-highlight-primary: 0 0 0 2px oklch(70% 0.25 30); /* Orange/fire glow */
+  --fire22-highlight-hover: 0 0 0 3px oklch(75% 0.3 28); /* Brighter on hover */
+  --fire22-highlight-success: 0 0 0 2px oklch(75% 0.2 145); /* Green success */
+  --fire22-highlight-warning: 0 0 0 2px oklch(75% 0.2 60); /* Yellow warning */
+  --fire22-highlight-error: 0 0 0 2px oklch(65% 0.25 25); /* Red error */
+  --fire22-highlight-info: 0 0 0 2px oklch(65% 0.2 230); /* Blue info */
+
   /* Animation timing */
   --fire22-transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -17,8 +17,9 @@
 .fire22-highlight {
   border-radius: 12px;
   box-shadow: var(--fire22-highlight-primary);
-  transition: box-shadow var(--fire22-transition), 
-              transform var(--fire22-transition);
+  transition:
+    box-shadow var(--fire22-transition),
+    transform var(--fire22-transition);
   position: relative;
 }
 
@@ -71,21 +72,23 @@
   inset: -2px;
   border-radius: inherit;
   padding: 2px;
-  background: linear-gradient(45deg, 
-    oklch(70% 0.25 30),
-    oklch(75% 0.2 145),
-    oklch(70% 0.25 30)
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, 
-                linear-gradient(#fff 0 0);
+  background: linear-gradient(45deg, oklch(70% 0.25 30), oklch(75% 0.2 145), oklch(70% 0.25 30));
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   animation: fire22-glow 3s ease-in-out infinite;
 }
 
 @keyframes fire22-glow {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 /* 6. Focus styles for accessibility */
@@ -97,8 +100,9 @@
 /* 7. Dark mode adjustments (automatic) */
 @media (prefers-color-scheme: dark) {
   .fire22-highlight {
-    box-shadow: var(--fire22-highlight-primary), 
-                0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow:
+      var(--fire22-highlight-primary),
+      0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -107,7 +111,7 @@
   .fire22-highlight {
     border-radius: 8px;
   }
-  
+
   .fire22-highlight:hover {
     transform: none;
   }

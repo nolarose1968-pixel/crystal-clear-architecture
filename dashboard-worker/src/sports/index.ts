@@ -367,7 +367,7 @@ export class SportsBettingSystem {
       events: eventStats,
       bets: betStats,
       risk: riskMetrics,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -380,7 +380,7 @@ export class SportsBettingSystem {
       bets: this.getAllBets().length,
       riskAssessments: Array.from(this.riskEngine['assessments']).length,
       oddsTracked: Array.from(this.oddsManager['oddsCache']).length,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 }

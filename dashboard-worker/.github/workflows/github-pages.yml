@@ -2,7 +2,7 @@ name: 🚀 GitHub Pages & Wiki Mirror Deployment
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
       - 'docs/**'
       - 'wiki/**'
@@ -31,7 +31,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: false
 
 env:
@@ -60,12 +60,12 @@ jobs:
         run: |
           echo "🚀 Building GitHub Pages with Bun..."
           bun run build:pages --env production --minify
-          
+
       - name: 📊 Generate department pages
         run: |
           echo "📊 Generating department documentation pages..."
           bun run scripts/generate-department-pages.ts
-          
+
       - name: 📝 Generate wiki mirror
         run: |
           echo "📝 Mirroring wiki content..."
@@ -180,7 +180,7 @@ jobs:
         run: |
           echo "📚 Syncing wiki content..."
           bun run scripts/sync-wiki.ts --source wiki-repo --target wiki
-          
+
       - name: 📝 Generate wiki pages
         run: |
           echo "📝 Generating wiki static pages..."

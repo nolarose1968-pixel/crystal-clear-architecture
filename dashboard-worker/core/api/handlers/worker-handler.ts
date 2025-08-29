@@ -25,12 +25,15 @@ interface WorkerMetrics {
   averageResponseTime: number;
   totalResponseTime: number;
   statusCodes: Record<number, number>;
-  endpointMetrics: Record<string, {
-    count: number;
-    totalTime: number;
-    averageTime: number;
-    errors: number;
-  }>;
+  endpointMetrics: Record<
+    string,
+    {
+      count: number;
+      totalTime: number;
+      averageTime: number;
+      errors: number;
+    }
+  >;
   memoryUsage?: number;
   cpuTime?: number;
 }
@@ -52,7 +55,7 @@ const workerMetrics: WorkerMetrics = {
   averageResponseTime: 0,
   totalResponseTime: 0,
   statusCodes: {},
-  endpointMetrics: {}
+  endpointMetrics: {},
 };
 
 // Request monitoring middleware
@@ -79,14 +82,19 @@ class RequestMonitor {
       method: request.method,
       url: request.url,
       userAgent: request.headers.get('User-Agent') || undefined,
-      clientIP: request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || undefined
+      clientIP:
+        request.headers.get('CF-Connecting-IP') ||
+        request.headers.get('X-Forwarded-For') ||
+        undefined,
     };
 
     this.activeRequests.set(traceId, context);
 
     // Log request start (based on log level)
     if (this.shouldLog('debug', env)) {
-      console.log(`[REQUEST_START] ${context.method} ${new URL(context.url).pathname} - Trace: ${traceId}`);
+      console.log(
+        `[REQUEST_START] ${context.method} ${new URL(context.url).pathname} - Trace: ${traceId}`
+      );
     }
 
     return context;
@@ -108,7 +116,9 @@ class RequestMonitor {
     // Log request end (based on log level)
     const logLevel = error ? 'error' : statusCode >= 400 ? 'warn' : 'info';
     if (this.shouldLog(logLevel, env as Env)) {
-      console.log(`[${logLevel.toUpperCase()}] ${context.method} ${endpoint} - ${statusCode} - ${duration}ms - Trace: ${traceId}`);
+      console.log(
+        `[${logLevel.toUpperCase()}] ${context.method} ${endpoint} - ${statusCode} - ${duration}ms - Trace: ${traceId}`
+      );
     }
 
     if (error && this.shouldLog('error', env as Env)) {
@@ -116,11 +126,17 @@ class RequestMonitor {
     }
   }
 
-  private updateMetrics(endpoint: string, duration: number, statusCode: number, error?: Error): void {
+  private updateMetrics(
+    endpoint: string,
+    duration: number,
+    statusCode: number,
+    error?: Error
+  ): void {
     // Update global counters
     workerMetrics.requestCount++;
     workerMetrics.totalResponseTime += duration;
-    workerMetrics.averageResponseTime = workerMetrics.totalResponseTime / workerMetrics.requestCount;
+    workerMetrics.averageResponseTime =
+      workerMetrics.totalResponseTime / workerMetrics.requestCount;
 
     // Update status code counters
     workerMetrics.statusCodes[statusCode] = (workerMetrics.statusCodes[statusCode] || 0) + 1;
@@ -131,7 +147,7 @@ class RequestMonitor {
         count: 0,
         totalTime: 0,
         averageTime: 0,
-        errors: 0
+        errors: 0,
       };
     }
 
@@ -192,7 +208,7 @@ class HealthChecker {
     const now = Date.now();
 
     // Return cached result if still valid
-    if (this.healthCache && (now - this.lastHealthCheck) < this.HEALTH_CACHE_TTL) {
+    if (this.healthCache && now - this.lastHealthCheck < this.HEALTH_CACHE_TTL) {
       return this.healthCache;
     }
 
@@ -206,12 +222,12 @@ class HealthChecker {
         database: { status: 'unknown', message: 'Database check not implemented' },
         cache: { status: 'unknown', message: 'Cache check not implemented' },
         memory: { status: 'ok', message: 'Memory usage normal' },
-        performance: { status: 'ok', message: 'Performance metrics available' }
+        performance: { status: 'ok', message: 'Performance metrics available' },
       },
       metrics: RequestMonitor.getInstance().getMetrics(),
       version: '2.1.0',
       memoryUsage: {},
-      responseTime: 0
+      responseTime: 0,
     };
 
     // Check database if available
@@ -220,7 +236,10 @@ class HealthChecker {
         // Add database health check logic here
         checks.checks.database = { status: 'ok', message: 'Database connection healthy' };
       } catch (error) {
-        checks.checks.database = { status: 'error', message: `Database error: ${(error as Error).message}` };
+        checks.checks.database = {
+          status: 'error',
+          message: `Database error: ${(error as Error).message}`,
+        };
         checks.status = 'degraded';
       }
     }
@@ -231,7 +250,10 @@ class HealthChecker {
         // Add cache health check logic here
         checks.checks.cache = { status: 'ok', message: 'Cache connection healthy' };
       } catch (error) {
-        checks.checks.cache = { status: 'error', message: `Cache error: ${(error as Error).message}` };
+        checks.checks.cache = {
+          status: 'error',
+          message: `Cache error: ${(error as Error).message}`,
+        };
         checks.status = 'degraded';
       }
     }
@@ -242,7 +264,7 @@ class HealthChecker {
       checks.memoryUsage = {
         rss: (globalThis as any).performance?.memory?.usedJSHeapSize || 0,
         heapUsed: (globalThis as any).performance?.memory?.usedJSHeapSize || 0,
-        heapTotal: (globalThis as any).performance?.memory?.totalJSHeapSize || 0
+        heapTotal: (globalThis as any).performance?.memory?.totalJSHeapSize || 0,
       };
     } catch (error) {
       // Memory API might not be available
@@ -269,24 +291,26 @@ class AlertManager {
 
     // Check error rate
     const errorRate = metrics.errorCount / metrics.requestCount;
-    if (errorRate > 0.05) { // 5% error rate
+    if (errorRate > 0.05) {
+      // 5% error rate
       alerts.push({
         type: 'error_rate_high',
         severity: 'high',
         message: `High error rate: ${(errorRate * 100).toFixed(2)}%`,
         value: errorRate,
-        threshold: 0.05
+        threshold: 0.05,
       });
     }
 
     // Check response time
-    if (metrics.averageResponseTime > 2000) { // 2 second average
+    if (metrics.averageResponseTime > 2000) {
+      // 2 second average
       alerts.push({
         type: 'response_time_high',
         severity: 'medium',
         message: `High average response time: ${metrics.averageResponseTime.toFixed(0)}ms`,
         value: metrics.averageResponseTime,
-        threshold: 2000
+        threshold: 2000,
       });
     }
 
@@ -301,7 +325,7 @@ class AlertManager {
         severity: 'critical',
         message: `High server error count: ${serverErrors}`,
         value: serverErrors,
-        threshold: 5
+        threshold: 5,
       });
     }
 
@@ -316,7 +340,7 @@ class AlertManager {
     this.alerts.unshift({
       ...alert,
       timestamp: new Date().toISOString(),
-      id: crypto.randomUUID()
+      id: crypto.randomUUID(),
     });
 
     // Keep only recent alerts
@@ -333,8 +357,8 @@ class AlertManager {
           body: JSON.stringify({
             ...alert,
             source: 'cloudflare-worker',
-            timestamp: new Date().toISOString()
-          })
+            timestamp: new Date().toISOString(),
+          }),
         });
       } catch (error) {
         console.error('Failed to send alert:', error);
@@ -381,7 +405,7 @@ class WorkerMonitoringBridge {
       ...metric,
       timestamp: new Date().toISOString(),
       source: 'cloudflare-worker',
-      workerId: 'dashboard-worker'
+      workerId: 'dashboard-worker',
     });
 
     // Send immediately if batch is full
@@ -417,8 +441,8 @@ class WorkerMonitoringBridge {
         body: JSON.stringify({
           type: 'worker_metrics_batch',
           timestamp: new Date().toISOString(),
-          metrics: batch
-        })
+          metrics: batch,
+        }),
       });
 
       if (!response.ok) {
@@ -442,7 +466,7 @@ class WorkerMonitoringBridge {
       this.recordWorkerMetric({
         type: 'worker_health_sync',
         metrics,
-        alerts: alertManager.getRecentAlerts(5)
+        alerts: alertManager.getRecentAlerts(5),
       });
     }
   }
@@ -464,8 +488,8 @@ class EnhancedAlertManager extends AlertManager {
         metrics: {
           errorRate: (metrics.errorCount / metrics.requestCount) * 100,
           averageResponseTime: metrics.averageResponseTime,
-          totalRequests: metrics.requestCount
-        }
+          totalRequests: metrics.requestCount,
+        },
       });
     }
   }
@@ -494,8 +518,8 @@ export default async function handleWorkerRequest(
       return new Response(JSON.stringify(healthData, null, 2), {
         headers: {
           'Content-Type': 'application/json',
-          'X-Trace-Id': requestContext.traceId
-        }
+          'X-Trace-Id': requestContext.traceId,
+        },
       });
     }
 
@@ -514,31 +538,38 @@ export default async function handleWorkerRequest(
         alerts: alerts.length,
         system: {
           uptime: Date.now() - (globalThis as any).startTime || Date.now(),
-          memoryUsage: (globalThis as any).performance?.memory || {}
-        }
+          memoryUsage: (globalThis as any).performance?.memory || {},
+        },
       };
 
       return new Response(JSON.stringify(metricsData, null, 2), {
         headers: {
           'Content-Type': 'application/json',
-          'X-Trace-Id': requestContext.traceId
-        }
+          'X-Trace-Id': requestContext.traceId,
+        },
       });
     }
 
     // Alerts endpoint
     if (url.pathname === '/alerts') {
       const alerts = alertManager.getRecentAlerts();
-      return new Response(JSON.stringify({
-        timestamp: new Date().toISOString(),
-        alerts,
-        total: alerts.length
-      }, null, 2), {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Trace-Id': requestContext.traceId
+      return new Response(
+        JSON.stringify(
+          {
+            timestamp: new Date().toISOString(),
+            alerts,
+            total: alerts.length,
+          },
+          null,
+          2
+        ),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Trace-Id': requestContext.traceId,
+          },
         }
-      });
+      );
     }
 
     // Configuration endpoint
@@ -548,12 +579,12 @@ export default async function handleWorkerRequest(
           enabled: env.MONITORING_ENABLED !== false,
           endpoint: env.MONITORING_ENDPOINT || null,
           alertWebhook: env.ALERT_WEBHOOK_URL || null,
-          workerId: env.WORKER_ID || 'dashboard-worker'
+          workerId: env.WORKER_ID || 'dashboard-worker',
         },
         environment: {
           logLevel: env.LOG_LEVEL || 'info',
           hasDatabase: !!env.DB,
-          hasCache: !!env.CACHE
+          hasCache: !!env.CACHE,
         },
         features: [
           'performance-monitoring',
@@ -561,15 +592,15 @@ export default async function handleWorkerRequest(
           'distributed-tracing',
           'alerting',
           'metrics-collection',
-          'main-system-integration'
-        ]
+          'main-system-integration',
+        ],
       };
 
       return new Response(JSON.stringify(config, null, 2), {
         headers: {
           'Content-Type': 'application/json',
-          'X-Trace-Id': requestContext.traceId
-        }
+          'X-Trace-Id': requestContext.traceId,
+        },
       });
     }
 
@@ -585,80 +616,82 @@ export default async function handleWorkerRequest(
           endpointPerformance: Object.entries(metrics.endpointMetrics).map(([endpoint, data]) => ({
             endpoint,
             ...data,
-            errorRate: (data.errors / data.count) * 100
-          }))
+            errorRate: (data.errors / data.count) * 100,
+          })),
         },
-        recommendations: generatePerformanceRecommendations(metrics)
+        recommendations: generatePerformanceRecommendations(metrics),
       };
 
       return new Response(JSON.stringify(performanceData, null, 2), {
         headers: {
           'Content-Type': 'application/json',
-          'X-Trace-Id': requestContext.traceId
-        }
+          'X-Trace-Id': requestContext.traceId,
+        },
       });
     }
 
     // Default response
-    const response = new Response(JSON.stringify({
-      message: 'Enhanced Worker is running',
-      timestamp: new Date().toISOString(),
-      traceId: requestContext.traceId,
-      version: '2.1.0',
-      monitoring: {
-        enabled: env.MONITORING_ENABLED !== false,
-        endpoints: ['/health', '/metrics', '/alerts', '/profile', '/config'],
+    const response = new Response(
+      JSON.stringify({
+        message: 'Enhanced Worker is running',
+        timestamp: new Date().toISOString(),
+        traceId: requestContext.traceId,
         version: '2.1.0',
-        features: [
-          'real-time-metrics',
-          'distributed-tracing',
-          'performance-profiling',
-          'alerting-system',
-          'health-checks',
-          'main-system-integration'
-        ]
+        monitoring: {
+          enabled: env.MONITORING_ENABLED !== false,
+          endpoints: ['/health', '/metrics', '/alerts', '/profile', '/config'],
+          version: '2.1.0',
+          features: [
+            'real-time-metrics',
+            'distributed-tracing',
+            'performance-profiling',
+            'alerting-system',
+            'health-checks',
+            'main-system-integration',
+          ],
+        },
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Trace-Id': requestContext.traceId,
+        },
       }
-    }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Trace-Id': requestContext.traceId
-      }
-    });
+    );
 
     // End request monitoring
     requestMonitor.endRequest(requestContext.traceId, response.status, undefined, env);
 
     // Check for alerts (run in background)
     if (env.MONITORING_ENABLED !== false) {
-      ctx.waitUntil(
-        enhancedAlertManager.checkAndAlert(requestMonitor.getMetrics(), env)
-      );
+      ctx.waitUntil(enhancedAlertManager.checkAndAlert(requestMonitor.getMetrics(), env));
     }
 
     // Periodic sync with main monitoring system
-    if (env.MONITORING_ENDPOINT && Math.random() < 0.1) { // 10% of requests
-      ctx.waitUntil(
-        monitoringBridge.syncWithMainMonitoring(env)
-      );
+    if (env.MONITORING_ENDPOINT && Math.random() < 0.1) {
+      // 10% of requests
+      ctx.waitUntil(monitoringBridge.syncWithMainMonitoring(env));
     }
 
     return response;
-
   } catch (error) {
     // Enhanced error handling with monitoring
-    const errorResponse = new Response(JSON.stringify({
-      error: 'Internal Server Error',
-      message: (error as Error).message,
-      traceId: requestContext.traceId,
-      timestamp: new Date().toISOString()
-    }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Trace-Id': requestContext.traceId
+    const errorResponse = new Response(
+      JSON.stringify({
+        error: 'Internal Server Error',
+        message: (error as Error).message,
+        traceId: requestContext.traceId,
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Trace-Id': requestContext.traceId,
+        },
       }
-    });
+    );
 
     // End request monitoring with error
     requestMonitor.endRequest(requestContext.traceId, 500, error as Error, env);
@@ -691,7 +724,7 @@ function generatePerformanceRecommendations(metrics: WorkerMetrics): string[] {
   }
 
   const errorEndpoints = Object.entries(metrics.endpointMetrics)
-    .filter(([, data]) => (data.errors / data.count) > 0.05)
+    .filter(([, data]) => data.errors / data.count > 0.05)
     .map(([endpoint]) => endpoint);
 
   if (errorEndpoints.length > 0) {

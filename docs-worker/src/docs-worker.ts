@@ -72,12 +72,28 @@ class DocsCDN {
   private async serveIndexPage(): Promise<Response> {
     try {
       const content = await this.fetchFromGitHub('docs/index.html');
-      return new Response(content, {
+
+      // Add performance optimizations
+      let optimizedContent = content;
+
+      // Add preload hints for critical resources
+      if (content.includes('<head>')) {
+        const preloadHints = `
+          <link rel="preload" href="/docs/performance.html" as="document">
+          <link rel="preload" href="/docs/communication.html" as="document">
+          <link rel="dns-prefetch" href="//fonts.googleapis.com">
+          <link rel="dns-prefetch" href="//raw.githubusercontent.com">
+        `;
+        optimizedContent = content.replace('<head>', '<head>' + preloadHints);
+      }
+
+      return new Response(optimizedContent, {
         headers: {
           'Content-Type': 'text/html; charset=utf-8',
           'Cache-Control': `public, max-age=${this.env.CACHE_TTL}`,
           'X-Source': 'GitHub-CDN',
-          'X-Timestamp': new Date().toISOString()
+          'X-Timestamp': new Date().toISOString(),
+          'X-Optimized': 'true'
         }
       });
     } catch (error) {
@@ -189,6 +205,14 @@ class DocsCDN {
 
     if (path === '/api/clear-cache') {
       return this.handleClearCache(request);
+    }
+
+    if (path === '/api/pages-integration') {
+      return this.servePagesIntegration(request);
+    }
+
+    if (path === '/api/performance-metrics') {
+      return this.servePerformanceMetrics();
     }
 
     return this.serve404Page();
@@ -454,6 +478,122 @@ class DocsCDN {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
         'Cache-Control': 'public, max-age=300'
+      }
+    });
+  }
+}
+
+  /**
+   * Serve Pages integration endpoint
+   */
+  private async servePagesIntegration(request: Request): Promise<Response> {
+    try {
+      const pagesUrl = 'https://crystal-clear-architecture.pages.dev';
+
+      // Check Pages health
+      const pagesHealth = await this.checkPagesHealth(pagesUrl);
+
+      const integration = {
+        service: 'Docs Worker - Pages Integration',
+        timestamp: new Date().toISOString(),
+        worker: {
+          url: `https://crystal-clear-docs.nolarose1968.workers.dev`,
+          status: 'active',
+          cache_entries: this.cache.size,
+          cache_ttl: this.env.CACHE_TTL
+        },
+        pages: {
+          url: pagesUrl,
+          status: pagesHealth.status,
+          response_time: pagesHealth.responseTime,
+          health_endpoint: `${pagesUrl}/api/health`
+        },
+        integration: {
+          docs_served_by: 'worker', // Worker serves docs, Pages serves main site
+          api_endpoints_shared: false, // Different API endpoints
+          caching_coordinated: true, // Both use similar caching strategies
+          performance_monitored: true
+        },
+        recommendations: [
+          'Use Worker for docs CDN (current setup)',
+          'Use Pages for main site and API functions',
+          'Monitor both services independently',
+          'Consider consolidating if needed'
+        ]
+      };
+
+      return new Response(JSON.stringify(integration, null, 2), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'public, max-age=300',
+          'X-Integration-Status': 'active'
+        }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({ error: 'Failed to check integration status' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  /**
+   * Check Pages service health
+   */
+  private async checkPagesHealth(pagesUrl: string): Promise<{status: string, responseTime: number}> {
+    try {
+      const startTime = Date.now();
+      const response = await fetch(`${pagesUrl}/api/health`, { timeout: 5000 });
+      const responseTime = Date.now() - startTime;
+
+      return {
+        status: response.ok ? 'healthy' : 'unhealthy',
+        responseTime
+      };
+    } catch (error) {
+      return {
+        status: 'unreachable',
+        responseTime: -1
+      };
+    }
+  }
+
+  /**
+   * Serve performance metrics
+   */
+  private servePerformanceMetrics(): Response {
+    const metrics = {
+      service: 'Crystal Clear Docs CDN',
+      timestamp: new Date().toISOString(),
+      cache: {
+        entries: this.cache.size,
+        ttl_seconds: this.env.CACHE_TTL,
+        hit_rate_estimate: 'N/A', // Would need more tracking
+        memory_usage: 'N/A' // Workers don't expose memory usage
+      },
+      github: {
+        repo: this.env.GITHUB_REPO,
+        branch: this.env.GITHUB_BRANCH,
+        rate_limit_status: 'N/A' // Would need GitHub API integration
+      },
+      performance: {
+        average_response_time: 'N/A', // Would need metrics collection
+        error_rate: 'N/A',
+        uptime: 'N/A'
+      },
+      optimizations: {
+        compression: true,
+        caching: true,
+        preload_hints: true,
+        dns_prefetch: true
+      }
+    };
+
+    return new Response(JSON.stringify(metrics, null, 2), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache',
+        'X-Metrics-Source': 'worker'
       }
     });
   }

@@ -2,7 +2,7 @@
 
 /**
  * 🎯 Fire22 Micro-Benchmarks
- * 
+ *
  * Precision microbenchmarking for critical functions
  * Custom implementation optimized for Bun runtime
  */
@@ -26,7 +26,7 @@ interface MicroBenchmarkResult {
 export class MicroBenchmarks {
   private suite: BenchmarkSuite;
   private profiler: MemoryProfiler;
-  
+
   constructor() {
     this.suite = new BenchmarkSuite('Fire22 Micro-Benchmarks');
     this.profiler = new MemoryProfiler('Micro-Benchmark Memory');
@@ -44,11 +44,7 @@ export class MicroBenchmarks {
       maxTime?: number;
     } = {}
   ): Promise<MicroBenchmarkResult> {
-    const {
-      samples = 1000,
-      minTime = 0.05,
-      maxTime = 5
-    } = options;
+    const { samples = 1000, minTime = 0.05, maxTime = 5 } = options;
 
     console.log(`\n🎯 Microbenchmark: ${name}`);
     console.log(`   Target samples: ${samples}`);
@@ -78,19 +74,19 @@ export class MicroBenchmarks {
     process.stdout.write('   Collecting samples...');
     for (let i = 0; i < samples; i++) {
       const start = Bun.nanoseconds();
-      
+
       for (let j = 0; j < iterations; j++) {
         await fn();
       }
-      
+
       const end = Bun.nanoseconds();
       const time = Number(end - start) / iterations;
       timings.push(time);
-      
+
       if (i % Math.floor(samples / 10) === 0) {
         process.stdout.write('.');
       }
-      
+
       totalTime += time / 1_000_000_000;
       if (totalTime > maxTime) {
         console.log(` (stopped at ${i} samples due to time limit)`);
@@ -105,17 +101,18 @@ export class MicroBenchmarks {
     const max = sorted[sorted.length - 1];
     const median = sorted[Math.floor(sorted.length / 2)];
     const mean = timings.reduce((sum, t) => sum + t, 0) / timings.length;
-    
+
     // Standard deviation
-    const variance = timings.reduce((sum, t) => {
-      const diff = t - mean;
-      return sum + diff * diff;
-    }, 0) / timings.length;
+    const variance =
+      timings.reduce((sum, t) => {
+        const diff = t - mean;
+        return sum + diff * diff;
+      }, 0) / timings.length;
     const stdDev = Math.sqrt(variance);
-    
+
     // Confidence interval (95%)
     const confidence = 1.96 * (stdDev / Math.sqrt(timings.length));
-    
+
     const result: MicroBenchmarkResult = {
       name,
       samples: timings.length,
@@ -125,7 +122,7 @@ export class MicroBenchmarks {
       median,
       stdDev,
       opsPerSecond: Math.floor(1_000_000_000 / mean),
-      confidence
+      confidence,
     };
 
     this.printResult(result);
@@ -140,11 +137,12 @@ export class MicroBenchmarks {
     console.log('='.repeat(50));
 
     // Mock request/response objects
-    const mockRequest = () => new Request('http://localhost/api/test', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ test: 'data' })
-    });
+    const mockRequest = () =>
+      new Request('http://localhost/api/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ test: 'data' }),
+      });
 
     await this.microBenchmark('Request Parsing', async () => {
       const req = mockRequest();
@@ -153,7 +151,7 @@ export class MicroBenchmarks {
 
     await this.microBenchmark('Response Creation', () => {
       new Response(JSON.stringify({ status: 'ok' }), {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
     });
 
@@ -182,10 +180,10 @@ export class MicroBenchmarks {
       const table = 'users';
       const fields = ['id', 'name', 'email'];
       const where = { active: true, role: 'admin' };
-      
-      const query = `SELECT ${fields.join(', ')} FROM ${table} WHERE ${
-        Object.entries(where).map(([k, v]) => `${k} = '${v}'`).join(' AND ')
-      }`;
+
+      const query = `SELECT ${fields.join(', ')} FROM ${table} WHERE ${Object.entries(where)
+        .map(([k, v]) => `${k} = '${v}'`)
+        .join(' AND ')}`;
     });
 
     await this.microBenchmark('Parameterized Query', () => {
@@ -195,16 +193,18 @@ export class MicroBenchmarks {
     });
 
     await this.microBenchmark('Result Processing', () => {
-      const rows = Array(100).fill(null).map((_, i) => ({
-        id: i,
-        name: `User ${i}`,
-        email: `user${i}@example.com`,
-        metadata: JSON.stringify({ created: Date.now() })
-      }));
-      
+      const rows = Array(100)
+        .fill(null)
+        .map((_, i) => ({
+          id: i,
+          name: `User ${i}`,
+          email: `user${i}@example.com`,
+          metadata: JSON.stringify({ created: Date.now() }),
+        }));
+
       rows.map(row => ({
         ...row,
-        metadata: JSON.parse(row.metadata)
+        metadata: JSON.parse(row.metadata),
       }));
     });
   }
@@ -217,20 +217,22 @@ export class MicroBenchmarks {
     console.log('='.repeat(50));
 
     const sampleData = {
-      users: Array(100).fill(null).map((_, i) => ({
-        id: i,
-        firstName: `First${i}`,
-        lastName: `Last${i}`,
-        email: `user${i}@example.com`,
-        age: 20 + (i % 50)
-      }))
+      users: Array(100)
+        .fill(null)
+        .map((_, i) => ({
+          id: i,
+          firstName: `First${i}`,
+          lastName: `Last${i}`,
+          email: `user${i}@example.com`,
+          age: 20 + (i % 50),
+        })),
     };
 
     await this.microBenchmark('Object Mapping', () => {
       sampleData.users.map(user => ({
         fullName: `${user.firstName} ${user.lastName}`,
         contact: user.email,
-        ageGroup: user.age < 30 ? 'young' : user.age < 50 ? 'middle' : 'senior'
+        ageGroup: user.age < 30 ? 'young' : user.age < 50 ? 'middle' : 'senior',
       }));
     });
 
@@ -241,12 +243,15 @@ export class MicroBenchmarks {
     });
 
     await this.microBenchmark('Grouping', () => {
-      const grouped = sampleData.users.reduce((acc, user) => {
-        const ageGroup = Math.floor(user.age / 10) * 10;
-        if (!acc[ageGroup]) acc[ageGroup] = [];
-        acc[ageGroup].push(user);
-        return acc;
-      }, {} as Record<number, typeof sampleData.users>);
+      const grouped = sampleData.users.reduce(
+        (acc, user) => {
+          const ageGroup = Math.floor(user.age / 10) * 10;
+          if (!acc[ageGroup]) acc[ageGroup] = [];
+          acc[ageGroup].push(user);
+          return acc;
+        },
+        {} as Record<number, typeof sampleData.users>
+      );
     });
 
     await this.microBenchmark('Deep Clone', () => {
@@ -283,9 +288,7 @@ export class MicroBenchmarks {
     });
 
     await this.microBenchmark('String Replace', () => {
-      template
-        .replace('{{name}}', 'User')
-        .replace('{{place}}', 'Fire22');
+      template.replace('{{name}}', 'User').replace('{{place}}', 'Fire22');
     });
 
     await this.microBenchmark('Regex Replace', () => {
@@ -296,7 +299,10 @@ export class MicroBenchmarks {
     });
 
     await this.microBenchmark('String Split & Join', () => {
-      longString.split(' ').map(word => word.toUpperCase()).join(' ');
+      longString
+        .split(' ')
+        .map(word => word.toUpperCase())
+        .join(' ');
     });
   }
 
@@ -367,12 +373,11 @@ export class MicroBenchmarks {
 
     await this.microBenchmark('JSON Schema Validation', () => {
       const data = { id: 1, name: 'Test', email: 'test@example.com' };
-      const valid = (
+      const valid =
         typeof data.id === 'number' &&
         typeof data.name === 'string' &&
         typeof data.email === 'string' &&
-        emailRegex.test(data.email)
-      );
+        emailRegex.test(data.email);
     });
 
     await this.microBenchmark('Type Guards', () => {
@@ -397,9 +402,13 @@ export class MicroBenchmarks {
   private printResult(result: MicroBenchmarkResult): void {
     console.log(`\n   ✅ ${result.name}`);
     console.log(`      Samples: ${result.samples}`);
-    console.log(`      Mean: ${this.formatNanoseconds(result.mean)} ± ${this.formatNanoseconds(result.confidence)}`);
+    console.log(
+      `      Mean: ${this.formatNanoseconds(result.mean)} ± ${this.formatNanoseconds(result.confidence)}`
+    );
     console.log(`      Median: ${this.formatNanoseconds(result.median)}`);
-    console.log(`      Min/Max: ${this.formatNanoseconds(result.min)} / ${this.formatNanoseconds(result.max)}`);
+    console.log(
+      `      Min/Max: ${this.formatNanoseconds(result.min)} / ${this.formatNanoseconds(result.max)}`
+    );
     console.log(`      StdDev: ${this.formatNanoseconds(result.stdDev)}`);
     console.log(`      Ops/sec: ${result.opsPerSecond.toLocaleString()}`);
   }

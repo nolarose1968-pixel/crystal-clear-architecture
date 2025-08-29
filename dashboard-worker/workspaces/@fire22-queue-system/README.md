@@ -4,7 +4,8 @@
 [![Bun](https://img.shields.io/badge/bun-%3E%3D1.2.20-f472b6.svg)](https://bun.sh)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-Advanced P2P transaction matching and withdrawal queue management system with intelligent scoring algorithms.
+Advanced P2P transaction matching and withdrawal queue management system with
+intelligent scoring algorithms.
 
 ## 📦 Installation
 
@@ -36,7 +37,7 @@ const withdrawalId = await queueSystem.addToQueue({
   amount: 1000,
   paymentType: 'bank_transfer',
   paymentDetails: 'account_info',
-  priority: 3 // HIGH priority
+  priority: 3, // HIGH priority
 });
 
 // Add deposit for matching
@@ -45,7 +46,7 @@ const depositId = await queueSystem.addDepositToQueue({
   amount: 1200,
   paymentType: 'bank_transfer',
   paymentDetails: 'account_info',
-  priority: 2
+  priority: 2,
 });
 
 // Process matches
@@ -63,26 +64,26 @@ console.log(`Matched pairs: ${stats.matchedPairs}`);
 ```typescript
 const QUEUE_CONFIG = {
   MAX_RETRIES: 3,
-  MATCH_TIMEOUT: 300000,    // 5 minutes
+  MATCH_TIMEOUT: 300000, // 5 minutes
   CLEANUP_INTERVAL: 3600000, // 1 hour
-  MAX_AGE: 604800000,        // 7 days
-  
+  MAX_AGE: 604800000, // 7 days
+
   PRIORITY_LEVELS: {
     LOW: 1,
     NORMAL: 2,
     HIGH: 3,
     URGENT: 4,
-    CRITICAL: 5
+    CRITICAL: 5,
   },
-  
+
   PAYMENT_TYPES: {
     BANK_TRANSFER: 'bank_transfer',
     CREDIT_CARD: 'credit_card',
     CRYPTO: 'cryptocurrency',
     PAYPAL: 'paypal',
     SKRILL: 'skrill',
-    NETELLER: 'neteller'
-  }
+    NETELLER: 'neteller',
+  },
 };
 ```
 
@@ -93,14 +94,17 @@ The P2P matching algorithm considers multiple factors:
 ### Scoring Components
 
 1. **Amount Match** (40% weight)
+
    - Closer amounts receive higher scores
    - Exact matches get maximum points
 
 2. **Payment Type** (20% bonus)
+
    - Same payment type adds bonus points
    - Ensures compatibility
 
 3. **Wait Time** (20% bonus)
+
    - Longer waiting items get priority
    - Prevents starvation
 
@@ -111,11 +115,12 @@ The P2P matching algorithm considers multiple factors:
 ### Match Score Formula
 
 ```typescript
-score = baseScore * 0.4 + 
-        amountScore * 0.4 + 
-        (paymentTypeMatch ? 20 : 0) + 
-        min(20, waitTimeMinutes) +
-        priorityBonus;
+score =
+  baseScore * 0.4 +
+  amountScore * 0.4 +
+  (paymentTypeMatch ? 20 : 0) +
+  min(20, waitTimeMinutes) +
+  priorityBonus;
 ```
 
 ## 🧪 Testing
@@ -145,6 +150,7 @@ bun run benchmark:matching
 ## 🗃️ Database Schema
 
 ### Queue Items Table
+
 ```sql
 CREATE TABLE queue_items (
   id TEXT PRIMARY KEY,
@@ -162,6 +168,7 @@ CREATE TABLE queue_items (
 ```
 
 ### Queue Matches Table
+
 ```sql
 CREATE TABLE queue_matches (
   id TEXT PRIMARY KEY,
@@ -181,26 +188,33 @@ CREATE TABLE queue_matches (
 ### Classes
 
 #### `WithdrawalQueueSystem`
+
 Main queue management class.
 
 ### Methods
 
 #### `addToQueue(item)`
+
 Add withdrawal to processing queue.
 
 #### `addDepositToQueue(item)`
+
 Add deposit for matching.
 
 #### `processMatchedItems()`
+
 Process all matched pairs.
 
 #### `getQueueStats()`
+
 Get current queue statistics.
 
 #### `completeMatch(matchId, notes?)`
+
 Complete a matched transaction.
 
 #### `cleanupOldItems(maxAge?)`
+
 Remove old completed items.
 
 ## 🔗 Dependencies
@@ -219,7 +233,8 @@ MIT © Fire22 Team
 
 - [@fire22/telegram-bot](../fire22-telegram-bot) - Telegram bot integration
 - [@fire22/telegram-workflows](../fire22-telegram-workflows) - Workflow system
-- [@fire22/telegram-benchmarks](../fire22-telegram-benchmarks) - Performance testing
+- [@fire22/telegram-benchmarks](../fire22-telegram-benchmarks) - Performance
+  testing
 
 ## 📞 Support
 

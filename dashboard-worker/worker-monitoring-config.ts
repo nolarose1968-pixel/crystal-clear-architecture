@@ -38,24 +38,24 @@ export const defaultWorkerMonitoringConfig: WorkerMonitoringConfig = {
     endpoint: process.env.MONITORING_ENDPOINT,
     alertWebhookUrl: process.env.ALERT_WEBHOOK_URL,
     batchSize: 10,
-    batchInterval: 30000 // 30 seconds
+    batchInterval: 30000, // 30 seconds
   },
   logging: {
     level: (process.env.LOG_LEVEL as any) || 'info',
     enableRequestTracing: true,
-    enablePerformanceLogging: true
+    enablePerformanceLogging: true,
   },
   alerts: {
     errorRateThreshold: 0.05, // 5%
     responseTimeThreshold: 2000, // 2 seconds
     serverErrorThreshold: 5, // 5+ 5xx errors
-    enableWebhookAlerts: true
+    enableWebhookAlerts: true,
   },
   health: {
     checkInterval: 30000, // 30 seconds
     cacheTtl: 30000, // 30 seconds
-    enableDetailedChecks: true
-  }
+    enableDetailedChecks: true,
+  },
 };
 
 /**
@@ -75,7 +75,7 @@ export const workerEnvironmentConfig = {
 
   // Database and cache (if available)
   DB_URL: 'your-database-url',
-  CACHE_URL: 'your-cache-url'
+  CACHE_URL: 'your-cache-url',
 };
 
 /**
@@ -157,7 +157,7 @@ Content-Type: application/json
 - Response time: < 1000ms average
 - Error rate: < 1%
 - Memory usage: < 50MB
-  `
+  `,
 };
 
 /**
@@ -169,7 +169,7 @@ export const dashboardIntegration = {
     'worker.error.rate': 'errorRate',
     'worker.response.time.avg': 'averageResponseTime',
     'worker.active.requests': 'activeRequests',
-    'worker.memory.usage': 'memoryUsage'
+    'worker.memory.usage': 'memoryUsage',
   },
 
   alertRules: [
@@ -177,38 +177,32 @@ export const dashboardIntegration = {
       name: 'Worker High Error Rate',
       condition: 'worker.error.rate > 0.05',
       severity: 'high',
-      message: 'Worker error rate exceeded 5%'
+      message: 'Worker error rate exceeded 5%',
     },
     {
       name: 'Worker Slow Response Time',
       condition: 'worker.response.time.avg > 2000',
       severity: 'medium',
-      message: 'Worker average response time > 2 seconds'
-    }
+      message: 'Worker average response time > 2 seconds',
+    },
   ],
 
   dashboardConfig: {
     refreshInterval: 30000, // 30 seconds
-    metrics: [
-      'requestCount',
-      'errorCount',
-      'averageResponseTime',
-      'activeRequests',
-      'alerts'
-    ],
+    metrics: ['requestCount', 'errorCount', 'averageResponseTime', 'activeRequests', 'alerts'],
     charts: [
       {
         type: 'line',
         metric: 'averageResponseTime',
-        title: 'Response Time Trend'
+        title: 'Response Time Trend',
       },
       {
         type: 'bar',
         metric: 'statusCodes',
-        title: 'HTTP Status Codes'
-      }
-    ]
-  }
+        title: 'HTTP Status Codes',
+      },
+    ],
+  },
 };
 
 /**
@@ -218,20 +212,20 @@ export const troubleshooting = {
   commonIssues: [
     {
       issue: 'Metrics not sending to main system',
-      solution: 'Check MONITORING_ENDPOINT URL and network connectivity'
+      solution: 'Check MONITORING_ENDPOINT URL and network connectivity',
     },
     {
       issue: 'High memory usage',
-      solution: 'Enable health check caching and reduce batch sizes'
+      solution: 'Enable health check caching and reduce batch sizes',
     },
     {
       issue: 'Too many alerts',
-      solution: 'Adjust alert thresholds in configuration'
+      solution: 'Adjust alert thresholds in configuration',
     },
     {
       issue: 'Slow response times',
-      solution: 'Check database/cache connections and optimize queries'
-    }
+      solution: 'Check database/cache connections and optimize queries',
+    },
   ],
 
   debuggingSteps: [
@@ -239,8 +233,8 @@ export const troubleshooting = {
     'Review /metrics for performance data',
     'Check /alerts for active issues',
     'Use /profile for optimization recommendations',
-    'Enable debug logging temporarily'
-  ]
+    'Enable debug logging temporarily',
+  ],
 };
 
 export default {
@@ -248,5 +242,5 @@ export default {
   environmentConfig: workerEnvironmentConfig,
   setupInstructions,
   dashboardIntegration,
-  troubleshooting
+  troubleshooting,
 };

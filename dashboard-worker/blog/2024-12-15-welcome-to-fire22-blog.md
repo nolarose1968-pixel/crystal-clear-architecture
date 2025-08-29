@@ -11,22 +11,32 @@ tags: [announcement, dashboard, fire22, blog]
 
 # Welcome to the Fire22 Dashboard Blog
 
-We're excited to launch the official Fire22 Dashboard blog, your central hub for updates, insights, and technical deep-dives into our enterprise multi-workspace system.
+We're excited to launch the official Fire22 Dashboard blog, your central hub for
+updates, insights, and technical deep-dives into our enterprise multi-workspace
+system.
 
 ## What You'll Find Here
 
 Our blog will feature regular updates from all Fire22 departments:
 
-- **📈 Marketing Department**: Campaign insights, ROI analytics, and brand performance
-- **⚙️ Operations**: Workflow optimizations, system improvements, and operational excellence  
+- **📈 Marketing Department**: Campaign insights, ROI analytics, and brand
+  performance
+- **⚙️ Operations**: Workflow optimizations, system improvements, and
+  operational excellence
 - **💰 Finance**: Performance metrics, financial insights, and reporting updates
 - **🎧 Customer Support**: Service improvements, user experience enhancements
-- **⚖️ Compliance**: Regulatory updates, policy changes, and compliance achievements
-- **💻 Technology**: Technical deep-dives, architecture updates, and innovation spotlights
-- **🛡️ Security**: Security enhancements, threat intelligence, and safety improvements
-- **👔 Management**: Strategic updates, organizational improvements, and leadership insights
-- **🎯 Sportsbook Operations**: Live betting insights, odds management, and operational metrics
-- **👥 Team Contributors**: Developer stories, contribution highlights, and team achievements
+- **⚖️ Compliance**: Regulatory updates, policy changes, and compliance
+  achievements
+- **💻 Technology**: Technical deep-dives, architecture updates, and innovation
+  spotlights
+- **🛡️ Security**: Security enhancements, threat intelligence, and safety
+  improvements
+- **👔 Management**: Strategic updates, organizational improvements, and
+  leadership insights
+- **🎯 Sportsbook Operations**: Live betting insights, odds management, and
+  operational metrics
+- **👥 Team Contributors**: Developer stories, contribution highlights, and team
+  achievements
 
 ## RSS Feeds Available
 
@@ -50,13 +60,14 @@ Built with Docusaurus and powered by our enterprise-grade infrastructure:
 Expect regular updates on:
 
 - System performance improvements and benchmarks
-- New feature rollouts and enhancements  
+- New feature rollouts and enhancements
 - Department achievements and success stories
 - Technical tutorials and best practices
 - Industry insights and thought leadership
 
 ---
 
-**Subscribe to our RSS feeds** to stay informed about Fire22 Dashboard developments and department updates.
+**Subscribe to our RSS feeds** to stay informed about Fire22 Dashboard
+developments and department updates.
 
-*Published by the Fire22 Dashboard Engineering Team*
+_Published by the Fire22 Dashboard Engineering Team_

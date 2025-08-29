@@ -177,5 +177,5 @@ export type {
   AgentConfig,
   ValidationSummary,
   AgentValidationDetail,
-  Env
+  Env,
 };

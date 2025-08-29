@@ -389,7 +389,7 @@ export async function getTransactions(request: ValidatedRequest): Promise<Respon
         id: 'TXN_001',
         customerId: 'CUST_001',
         type: 'deposit',
-        amount: 500.00,
+        amount: 500.0,
         currency: 'USD',
         method: 'credit_card',
         status: 'completed',
@@ -397,19 +397,19 @@ export async function getTransactions(request: ValidatedRequest): Promise<Respon
         reference: 'DEP_20240115_001',
         timestamp: '2024-01-15T14:30:00Z',
         processingTime: 'instant',
-        fee: 0.00,
-        netAmount: 500.00,
+        fee: 0.0,
+        netAmount: 500.0,
         metadata: {
           cardLast4: '1234',
           cardType: 'visa',
-          merchantId: 'MERCH_001'
-        }
+          merchantId: 'MERCH_001',
+        },
       },
       {
         id: 'TXN_002',
         customerId: 'CUST_001',
         type: 'withdrawal',
-        amount: 250.00,
+        amount: 250.0,
         currency: 'USD',
         method: 'bank_transfer',
         status: 'pending',
@@ -417,19 +417,19 @@ export async function getTransactions(request: ValidatedRequest): Promise<Respon
         reference: 'WD_20240114_001',
         timestamp: '2024-01-14T16:45:00Z',
         processingTime: '1-3 business days',
-        fee: 0.00,
-        netAmount: 250.00,
+        fee: 0.0,
+        netAmount: 250.0,
         metadata: {
           accountLast4: '7890',
           routingNumber: '123456789',
-          bankName: 'First National Bank'
-        }
+          bankName: 'First National Bank',
+        },
       },
       {
         id: 'TXN_003',
         customerId: 'CUST_001',
         type: 'deposit',
-        amount: 1000.00,
+        amount: 1000.0,
         currency: 'USD',
         method: 'paypal',
         status: 'completed',
@@ -437,18 +437,18 @@ export async function getTransactions(request: ValidatedRequest): Promise<Respon
         reference: 'DEP_20240113_001',
         timestamp: '2024-01-13T09:15:00Z',
         processingTime: 'instant',
-        fee: 0.00,
-        netAmount: 1000.00,
+        fee: 0.0,
+        netAmount: 1000.0,
         metadata: {
           paypalEmail: 'user@example.com',
-          transactionId: 'PAY_123456789'
-        }
+          transactionId: 'PAY_123456789',
+        },
       },
       {
         id: 'TXN_004',
         customerId: 'CUST_001',
         type: 'bonus',
-        amount: 50.00,
+        amount: 50.0,
         currency: 'USD',
         method: 'system',
         status: 'completed',
@@ -456,18 +456,18 @@ export async function getTransactions(request: ValidatedRequest): Promise<Respon
         reference: 'BONUS_20240112_001',
         timestamp: '2024-01-12T12:00:00Z',
         processingTime: 'instant',
-        fee: 0.00,
-        netAmount: 50.00,
+        fee: 0.0,
+        netAmount: 50.0,
         metadata: {
           bonusType: 'welcome',
-          campaignId: 'CAMP_WELCOME_2024'
-        }
+          campaignId: 'CAMP_WELCOME_2024',
+        },
       },
       {
         id: 'TXN_005',
         customerId: 'CUST_001',
         type: 'withdrawal',
-        amount: 150.00,
+        amount: 150.0,
         currency: 'USD',
         method: 'crypto',
         status: 'completed',
@@ -475,14 +475,14 @@ export async function getTransactions(request: ValidatedRequest): Promise<Respon
         reference: 'WD_20240111_001',
         timestamp: '2024-01-11T11:20:00Z',
         processingTime: '10-60 minutes',
-        fee: 5.00,
-        netAmount: 145.00,
+        fee: 5.0,
+        netAmount: 145.0,
         metadata: {
           cryptoAddress: 'bc1q...xyz',
           network: 'bitcoin',
-          txHash: 'a1b2c3d4e5f6...'
-        }
-      }
+          txHash: 'a1b2c3d4e5f6...',
+        },
+      },
     ];
 
     // Filter transactions based on parameters
@@ -515,7 +515,9 @@ export async function getTransactions(request: ValidatedRequest): Promise<Respon
     }
 
     // Sort by timestamp (newest first)
-    filteredTransactions.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    filteredTransactions.sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
 
     // Pagination
     const totalTransactions = filteredTransactions.length;
@@ -532,7 +534,10 @@ export async function getTransactions(request: ValidatedRequest): Promise<Respon
       totalAmount: filteredTransactions.reduce((sum, t) => sum + t.amount, 0),
       pendingTransactions: filteredTransactions.filter(t => t.status === 'pending').length,
       completedTransactions: filteredTransactions.filter(t => t.status === 'completed').length,
-      averageTransactionAmount: totalTransactions > 0 ? filteredTransactions.reduce((sum, t) => sum + t.amount, 0) / totalTransactions : 0
+      averageTransactionAmount:
+        totalTransactions > 0
+          ? filteredTransactions.reduce((sum, t) => sum + t.amount, 0) / totalTransactions
+          : 0,
     };
 
     const response = {
@@ -546,30 +551,30 @@ export async function getTransactions(request: ValidatedRequest): Promise<Respon
           totalTransactions,
           totalPages,
           hasNextPage: page < totalPages,
-          hasPrevPage: page > 1
+          hasPrevPage: page > 1,
         },
         filters: {
           customerId,
           type,
           status,
-          dateRange: startDate && endDate ? { startDate, endDate } : null
-        }
-      }
+          dateRange: startDate && endDate ? { startDate, endDate } : null,
+        },
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
     return new Response(
       JSON.stringify({
         error: 'Failed to get transactions',
-        message: error.message
+        message: error.message,
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       }
     );
   }

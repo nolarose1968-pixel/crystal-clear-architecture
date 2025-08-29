@@ -1,7 +1,7 @@
 /**
  * 🔧 Enhanced Runtime Information System
  * Provides comprehensive runtime details for Bun v1.01.04-alpha features
- * 
+ *
  * Features:
  * - Runtime configuration display
  * - Process arguments parsing
@@ -20,32 +20,32 @@ export interface RuntimeConfiguration {
   nodeVersion?: string;
   platform: string;
   arch: string;
-  
+
   // Process info
   execArgv: string[];
   pid: number;
   ppid: number;
   uptime: number;
-  
+
   // Bun-specific flags
   userAgent?: string;
   isSmol: boolean;
   isInspect: boolean;
   inspectHost?: string;
   inspectPort?: number;
-  
+
   // Mode detection
   isStandalone: boolean;
   isDevelopment: boolean;
   isHMREnabled: boolean;
-  
+
   // Memory info
   memory: NodeJS.MemoryUsage;
-  
+
   // Build info
   buildDate?: string;
   buildTarget?: string;
-  
+
   // Environment
   nodeEnv: string;
   environment: 'development' | 'production' | 'test' | 'staging';
@@ -58,17 +58,17 @@ export interface RuntimePerformanceMetrics {
   memoryUsage: NodeJS.MemoryUsage;
   uptime: number;
   loadAverage?: number[];
-  
+
   // Runtime metrics
   eventLoopDelay?: number;
   v8HeapStats?: any;
-  
+
   // Custom metrics
   requestsPerSecond: number;
   averageResponseTime: number;
   errorRate: number;
   cacheHitRate: number;
-  
+
   // Timestamps
   lastUpdated: Date;
   startTime: Date;
@@ -102,14 +102,14 @@ export class EnhancedRuntimeInfo {
    */
   getConfiguration(): RuntimeConfiguration {
     const execArgv = process.execArgv || [];
-    
+
     // Parse exec arguments
     const userAgentArg = execArgv.find(arg => arg.startsWith('--user-agent='));
     const inspectArg = execArgv.find(arg => arg.startsWith('--inspect'));
-    
+
     let inspectHost: string | undefined;
     let inspectPort: number | undefined;
-    
+
     if (inspectArg) {
       if (inspectArg.includes('=')) {
         const inspectValue = inspectArg.split('=')[1];
@@ -135,31 +135,31 @@ export class EnhancedRuntimeInfo {
       nodeVersion: process.version,
       platform: process.platform,
       arch: process.arch,
-      
+
       // Process info
       execArgv,
       pid: process.pid,
       ppid: process.ppid || 0,
       uptime: process.uptime(),
-      
+
       // Bun-specific flags
       userAgent: userAgentArg?.split('=')[1],
       isSmol: execArgv.includes('--smol'),
       isInspect: !!inspectArg,
       inspectHost,
       inspectPort,
-      
+
       // Mode detection
       isStandalone,
       isDevelopment,
       isHMREnabled,
-      
+
       // Memory info
       memory: process.memoryUsage(),
-      
+
       // Environment
       nodeEnv: process.env.NODE_ENV || 'development',
-      environment: this.detectEnvironment()
+      environment: this.detectEnvironment(),
     };
   }
 
@@ -169,7 +169,8 @@ export class EnhancedRuntimeInfo {
   getPerformanceMetrics(): RuntimePerformanceMetrics {
     const uptime = process.uptime();
     const requestsPerSecond = this.requestCount / uptime;
-    const averageResponseTime = this.requestCount > 0 ? this.totalResponseTime / this.requestCount : 0;
+    const averageResponseTime =
+      this.requestCount > 0 ? this.totalResponseTime / this.requestCount : 0;
     const errorRate = this.requestCount > 0 ? this.errorCount / this.requestCount : 0;
     const totalCacheRequests = this.cacheHits + this.cacheMisses;
     const cacheHitRate = totalCacheRequests > 0 ? this.cacheHits / totalCacheRequests : 0;
@@ -180,16 +181,16 @@ export class EnhancedRuntimeInfo {
       memoryUsage: process.memoryUsage(),
       uptime,
       loadAverage: this.getLoadAverage(),
-      
+
       // Custom metrics
       requestsPerSecond,
       averageResponseTime,
       errorRate,
       cacheHitRate,
-      
+
       // Timestamps
       lastUpdated: new Date(),
-      startTime: this.startTime
+      startTime: this.startTime,
     };
   }
 
@@ -214,8 +215,10 @@ export class EnhancedRuntimeInfo {
   private checkHMRAvailability(): boolean {
     try {
       // Check if import.meta is available and has hot property
-      return typeof (globalThis as any).import !== 'undefined' && 
-             (globalThis as any).import?.meta?.hot !== undefined;
+      return (
+        typeof (globalThis as any).import !== 'undefined' &&
+        (globalThis as any).import?.meta?.hot !== undefined
+      );
     } catch {
       return false;
     }
@@ -226,20 +229,20 @@ export class EnhancedRuntimeInfo {
    */
   getCapabilities(): RuntimeCapabilities {
     const config = this.getConfiguration();
-    
+
     const features: string[] = [];
     const apis: string[] = [];
-    
+
     // Detect Bun features
     if (typeof Bun !== 'undefined') {
       features.push('Bun Runtime');
-      
+
       // Add available Bun APIs
       apis.push('Bun.file()');
       apis.push('Bun.$ (shell)');
       apis.push('Bun.serve()');
       apis.push('Bun.build()');
-      
+
       // Add optional Bun APIs if they exist
       if ((Bun as any).nanoseconds) apis.push('Bun.nanoseconds()');
       if ((Bun as any).stripANSI) apis.push('Bun.stripANSI()');
@@ -259,7 +262,10 @@ export class EnhancedRuntimeInfo {
     }
 
     // Detect database APIs - check for Bun's SQLite
-    if (typeof (globalThis as any).Database !== 'undefined' || typeof (globalThis as any).sqlite !== 'undefined') {
+    if (
+      typeof (globalThis as any).Database !== 'undefined' ||
+      typeof (globalThis as any).sqlite !== 'undefined'
+    ) {
       features.push('SQLite Integration');
       apis.push('bun:sqlite');
     }
@@ -278,8 +284,8 @@ export class EnhancedRuntimeInfo {
         platform: config.platform,
         arch: config.arch,
         standalone: config.isStandalone,
-        development: config.isDevelopment
-      }
+        development: config.isDevelopment,
+      },
     };
   }
 
@@ -301,36 +307,36 @@ export class EnhancedRuntimeInfo {
     const performance = this.getPerformanceMetrics();
     const capabilities = this.getCapabilities();
     const userAgent = userAgentManager.generateReport();
-    
+
     // Health diagnostics
     const issues: string[] = [];
     const recommendations: string[] = [];
-    
+
     // Memory check
     const memoryUsageMB = performance.memoryUsage.heapUsed / 1024 / 1024;
     if (memoryUsageMB > 512) {
       issues.push('High memory usage detected');
       recommendations.push('Consider implementing memory optimization');
     }
-    
+
     // Error rate check
     if (performance.errorRate > 0.05) {
       issues.push('High error rate detected');
       recommendations.push('Review error logs and implement fixes');
     }
-    
+
     // Cache performance check
     if (performance.cacheHitRate < 0.8 && this.cacheHits + this.cacheMisses > 100) {
       issues.push('Low cache hit rate');
       recommendations.push('Optimize caching strategy');
     }
-    
+
     // Development mode in production check
     if (configuration.environment === 'production' && configuration.isDevelopment) {
       issues.push('Development mode detected in production');
       recommendations.push('Build standalone executable for production');
     }
-    
+
     const health = issues.length === 0 ? 'healthy' : issues.length <= 2 ? 'warning' : 'critical';
 
     return {
@@ -341,8 +347,8 @@ export class EnhancedRuntimeInfo {
       diagnostics: {
         health,
         issues,
-        recommendations
-      }
+        recommendations,
+      },
     };
   }
 
@@ -352,7 +358,7 @@ export class EnhancedRuntimeInfo {
   trackRequest(responseTime: number, isError = false): void {
     this.requestCount++;
     this.totalResponseTime += responseTime;
-    
+
     if (isError) {
       this.errorCount++;
     }
@@ -386,9 +392,9 @@ export class EnhancedRuntimeInfo {
    */
   private isStandaloneMode(): boolean {
     // Check if running from compiled executable
-    const isExecutable = process.argv[0].endsWith('.exe') || 
-                         process.argv[0].includes('water-dashboard');
-    
+    const isExecutable =
+      process.argv[0].endsWith('.exe') || process.argv[0].includes('water-dashboard');
+
     // Check if package.json is accessible (not available in standalone)
     try {
       require.resolve('./package.json');
@@ -403,11 +409,11 @@ export class EnhancedRuntimeInfo {
    */
   private detectEnvironment(): 'development' | 'production' | 'test' | 'staging' {
     const nodeEnv = process.env.NODE_ENV?.toLowerCase();
-    
+
     if (nodeEnv === 'test') return 'test';
     if (nodeEnv === 'staging') return 'staging';
     if (nodeEnv === 'production') return 'production';
-    
+
     // Default to development if not specified or if HMR is available
     return 'development';
   }
@@ -425,25 +431,29 @@ export class EnhancedRuntimeInfo {
 
     const summary = `${config.isStandalone ? 'Standalone' : 'Development'} mode on ${config.platform} with Bun ${config.bunVersion}`;
 
-    const details: Array<{ label: string; value: string; status?: 'success' | 'warning' | 'error' }> = [
+    const details: Array<{
+      label: string;
+      value: string;
+      status?: 'success' | 'warning' | 'error';
+    }> = [
       { label: 'Version', value: config.version },
       { label: 'Bun Version', value: config.bunVersion },
       { label: 'Platform', value: `${config.platform}/${config.arch}` },
       { label: 'Mode', value: config.isStandalone ? 'Standalone' : 'Development' },
       { label: 'PID', value: config.pid.toString() },
       { label: 'Uptime', value: `${Math.floor(performance.uptime)}s` },
-      { 
-        label: 'Memory', 
+      {
+        label: 'Memory',
         value: `${Math.round(performance.memoryUsage.heapUsed / 1024 / 1024)}MB`,
-        status: performance.memoryUsage.heapUsed > 512 * 1024 * 1024 ? 'warning' : 'success'
+        status: performance.memoryUsage.heapUsed > 512 * 1024 * 1024 ? 'warning' : 'success',
       },
       { label: 'User Agent', value: config.userAgent || 'Default' },
       { label: 'Features', value: capabilities.features.length.toString() },
-      { 
-        label: 'Error Rate', 
+      {
+        label: 'Error Rate',
         value: `${(performance.errorRate * 100).toFixed(2)}%`,
-        status: performance.errorRate > 0.05 ? 'error' : 'success'
-      }
+        status: performance.errorRate > 0.05 ? 'error' : 'success',
+      },
     ];
 
     return { summary, details };

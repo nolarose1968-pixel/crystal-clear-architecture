@@ -12,38 +12,46 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
   public customer_id: string;
   public agent_id: string;
   public amount: number;
-  public tran_type: 'deposit' | 'withdrawal' | 'bet' | 'win' | 'adjustment' | 'bonus' | 'commission' | 'fee';
+  public tran_type:
+    | 'deposit'
+    | 'withdrawal'
+    | 'bet'
+    | 'win'
+    | 'adjustment'
+    | 'bonus'
+    | 'commission'
+    | 'fee';
   public tran_code: string;
   public document_number?: string;
   public reference?: string;
-  
+
   // Description and details
   public short_desc: string;
   public long_desc?: string;
-  
+
   // Processing information
   public status: 'pending' | 'completed' | 'failed' | 'cancelled';
   public processed_at?: string;
   public processor?: string;
   public external_reference?: string;
-  
+
   // Balance tracking
   public balance_before: number;
   public balance_after: number;
   public freeplay_balance: number;
   public freeplay_pending_balance: number;
   public freeplay_pending_count: number;
-  
+
   // Audit information
   public entered_by: string;
   public approved_by?: string;
   public grade_num?: number;
   public tran_datetime: string;
-  
+
   // Related entities
   public wager_id?: string;
   public parent_transaction_id?: string;
-  
+
   // Metadata
   public metadata?: Record<string, any>;
   public fees?: {
@@ -54,7 +62,7 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
 
   constructor(data: Partial<Transaction>) {
     super(data);
-    
+
     // Basic information
     this.customer_id = data.customer_id || '';
     this.agent_id = data.agent_id || '';
@@ -63,40 +71,40 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
     this.tran_code = data.tran_code || this.generateTransactionCode();
     this.document_number = data.document_number;
     this.reference = data.reference;
-    
+
     // Description
     this.short_desc = data.short_desc || '';
     this.long_desc = data.long_desc;
-    
+
     // Processing
     this.status = data.status || 'pending';
     this.processed_at = data.processed_at;
     this.processor = data.processor;
     this.external_reference = data.external_reference;
-    
+
     // Balance tracking
     this.balance_before = data.balance_before || 0;
     this.balance_after = data.balance_after || 0;
     this.freeplay_balance = data.freeplay_balance || 0;
     this.freeplay_pending_balance = data.freeplay_pending_balance || 0;
     this.freeplay_pending_count = data.freeplay_pending_count || 0;
-    
+
     // Audit information
     this.entered_by = data.entered_by || '';
     this.approved_by = data.approved_by;
     this.grade_num = data.grade_num;
     this.tran_datetime = data.tran_datetime || new Date().toISOString();
-    
+
     // Related entities
     this.wager_id = data.wager_id;
     this.parent_transaction_id = data.parent_transaction_id;
-    
+
     // Metadata
     this.metadata = data.metadata || {};
     this.fees = data.fees || {
       processing_fee: 0,
       service_fee: 0,
-      third_party_fee: 0
+      third_party_fee: 0,
     };
   }
 
@@ -110,13 +118,13 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
         field: 'customer_id',
         required: true,
         type: 'string',
-        minLength: 1
+        minLength: 1,
       },
       {
         field: 'agent_id',
         required: true,
         type: 'string',
-        minLength: 1
+        minLength: 1,
       },
       {
         field: 'amount',
@@ -128,27 +136,27 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
             return `Amount exceeds maximum limit of ${BUSINESS.TRANSACTION_LIMITS.MAX_AMOUNT}`;
           }
           return true;
-        }
+        },
       },
       {
         field: 'tran_code',
         required: true,
         type: 'string',
         minLength: 1,
-        maxLength: 50
+        maxLength: 50,
       },
       {
         field: 'short_desc',
         required: true,
         type: 'string',
         minLength: 1,
-        maxLength: 255
+        maxLength: 255,
       },
       {
         field: 'entered_by',
         required: true,
         type: 'string',
-        minLength: 1
+        minLength: 1,
       },
       {
         field: 'tran_datetime',
@@ -157,8 +165,8 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
         custom: (value: string) => {
           const date = new Date(value);
           return !isNaN(date.getTime()) || 'Invalid transaction datetime';
-        }
-      }
+        },
+      },
     ];
   }
 
@@ -219,22 +227,25 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
    */
   public requiresApproval(): boolean {
     const absAmount = this.getAbsoluteAmount();
-    
+
     // Large transactions require approval
     if (absAmount >= BUSINESS.TRANSACTION_LIMITS.APPROVAL_REQUIRED) {
       return true;
     }
-    
+
     // Withdrawals over certain amount require approval
-    if (this.tran_type === 'withdrawal' && absAmount >= BUSINESS.TRANSACTION_LIMITS.WITHDRAWAL_APPROVAL) {
+    if (
+      this.tran_type === 'withdrawal' &&
+      absAmount >= BUSINESS.TRANSACTION_LIMITS.WITHDRAWAL_APPROVAL
+    ) {
       return true;
     }
-    
+
     // Adjustments always require approval
     if (this.tran_type === 'adjustment') {
       return true;
     }
-    
+
     return false;
   }
 
@@ -245,12 +256,12 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
     if (this.status !== 'pending') {
       throw new Error('Only pending transactions can be processed');
     }
-    
+
     this.status = 'completed';
     this.processed_at = new Date().toISOString();
     this.processor = processor;
     this.touch();
-    
+
     return this;
   }
 
@@ -261,10 +272,10 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
     if (this.status !== 'pending') {
       throw new Error('Only pending transactions can be approved');
     }
-    
+
     this.approved_by = approvedBy;
     this.touch();
-    
+
     return this;
   }
 
@@ -275,14 +286,14 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
     if (this.status === 'completed') {
       throw new Error('Cannot cancel completed transaction');
     }
-    
+
     this.status = 'cancelled';
     this.processed_at = new Date().toISOString();
-    
+
     if (reason) {
       this.metadata = { ...this.metadata, cancellation_reason: reason };
     }
-    
+
     this.touch();
     return this;
   }
@@ -294,12 +305,12 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
     if (this.status === 'completed') {
       throw new Error('Cannot fail completed transaction');
     }
-    
+
     this.status = 'failed';
     this.processed_at = new Date().toISOString();
     this.metadata = { ...this.metadata, error_message: errorMessage };
     this.touch();
-    
+
     return this;
   }
 
@@ -310,10 +321,10 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
     if (!this.fees) {
       this.fees = { processing_fee: 0, service_fee: 0, third_party_fee: 0 };
     }
-    
+
     this.fees[type] += amount;
     this.touch();
-    
+
     return this;
   }
 
@@ -366,7 +377,7 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
       status: this.status,
       customer: this.customer_id,
       datetime: this.tran_datetime,
-      description: this.short_desc
+      description: this.short_desc,
     };
   }
 
@@ -377,7 +388,7 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
     const transactionTime = new Date(this.tran_datetime);
     const now = new Date();
     const diffHours = (now.getTime() - transactionTime.getTime()) / (1000 * 60 * 60);
-    
+
     return diffHours <= hours;
   }
 
@@ -386,10 +397,10 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
    */
   public getProcessingTime(): number | null {
     if (!this.processed_at) return null;
-    
+
     const created = new Date(this.created_at);
     const processed = new Date(this.processed_at);
-    
+
     return processed.getTime() - created.getTime();
   }
 
@@ -409,8 +420,8 @@ export class TransactionEntity extends AuditableEntityClass implements Transacti
       metadata: {
         reversal_of: this.id,
         reversal_reason: reason,
-        original_transaction_code: this.tran_code
-      }
+        original_transaction_code: this.tran_code,
+      },
     };
   }
 }

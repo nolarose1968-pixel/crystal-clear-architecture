@@ -1,6 +1,7 @@
 # Contributing to Fire22 Dashboard Worker
 
-Thank you for your interest in contributing to the Fire22 Dashboard Worker project! This document provides guidelines and information for contributors.
+Thank you for your interest in contributing to the Fire22 Dashboard Worker
+project! This document provides guidelines and information for contributors.
 
 ## Table of Contents
 
@@ -41,7 +42,6 @@ Before contributing, ensure you have:
 
 1. Fork the repository on GitHub
 2. Clone your fork locally:
-
 
 ```bash
 git clone https://github.com/your-username/fire22-dashboard-worker.git
@@ -126,7 +126,6 @@ We welcome the following types of contributions:
 
 Follow [Conventional Commits](https://conventionalcommits.org/):
 
-
 ```
 <type>(<scope>): <subject>
 
@@ -136,6 +135,7 @@ Follow [Conventional Commits](https://conventionalcommits.org/):
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation
@@ -146,6 +146,7 @@ Follow [Conventional Commits](https://conventionalcommits.org/):
 - `chore`: Maintenance tasks
 
 **Scopes:**
+
 - `core`: Core dashboard
 - `api`: API client
 - `pattern`: Pattern system
@@ -155,6 +156,7 @@ Follow [Conventional Commits](https://conventionalcommits.org/):
 - `security`: Security features
 
 **Examples:**
+
 ```bash
 feat(api): add real-time wager tracking
 
@@ -220,23 +222,26 @@ bun run scripts/workspace-health-monitor.ts
 
 Use our PR template:
 
-
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] Unit tests pass
 - [ ] Integration tests pass
 - [ ] Manual testing completed
 
 ## Checklist
+
 - [ ] Code follows style guidelines
 - [ ] Self-review completed
 - [ ] Documentation updated
@@ -279,7 +284,6 @@ Brief description of changes
 - Bug fixes must include regression tests
 
 ### Testing Strategy
-
 
 ```bash
 # Unit tests
@@ -369,6 +373,7 @@ grep -r "password\|secret\|token" src/
 ### Recognition
 
 Contributors are recognized in:
+
 - **CONTRIBUTORS.md**: List of contributors
 - **Release notes**: Credit for significant contributions
 - **GitHub contributors**: Automatic GitHub recognition
@@ -399,9 +404,11 @@ All contributions go through code review:
 ### Automated Quality Gates
 
 All PRs must pass:
+
 - 🔍 **Code Quality & Linting**: ESLint, Prettier, TypeScript checks
 - 🔒 **Security Scanning**: Dependency audit, secret detection, SAST
-- 🧪 **Test Suite**: Unit, integration, and edge case tests for affected workspaces
+- 🧪 **Test Suite**: Unit, integration, and edge case tests for affected
+  workspaces
 - 🏗️ **Build Verification**: Cross-platform executable compilation
 - 🏢 **Workspace Health**: Workspace consistency and isolation validation
 
@@ -410,6 +417,7 @@ All PRs must pass:
 ### Versioning
 
 We use [Semantic Versioning](https://semver.org/):
+
 - **Major**: Breaking changes
 - **Minor**: New features (backward compatible)
 - **Patch**: Bug fixes (backward compatible)
@@ -422,7 +430,9 @@ We use [Semantic Versioning](https://semver.org/):
 
 ## License
 
-By contributing to Fire22 Dashboard Worker, you agree that your contributions will be licensed under the project's proprietary license. See [LICENSE](LICENSE) file for details.
+By contributing to Fire22 Dashboard Worker, you agree that your contributions
+will be licensed under the project's proprietary license. See [LICENSE](LICENSE)
+file for details.
 
 ## Questions?
 

@@ -1,6 +1,6 @@
 /**
  * Fire22 Error Monitoring and Alerting
- * 
+ *
  * Comprehensive error monitoring, alerting, and observability
  */
 
@@ -67,7 +67,7 @@ export class FireEventMonitoring {
             endpoint: error.context.endpoint,
             userId: error.context.userId,
             retryable: error.retryable,
-          }
+          },
         });
       }
 
@@ -82,9 +82,8 @@ export class FireEventMonitoring {
         metadata: {
           category: error.category,
           endpoint: error.context.endpoint,
-        }
+        },
       });
-
     } catch (monitoringError) {
       console.error('Failed to process error for monitoring:', monitoringError);
     }
@@ -284,13 +283,16 @@ export class FireEventMonitoring {
     const errorHandler = ErrorHandler.getInstance();
     const errorStats = errorHandler.getErrorStats();
     const circuitBreakerStats = RetryUtils.getCircuitBreakerStats();
-    
+
     // Recent alerts by severity
     const recentAlerts = this.alertBuffer.slice(0, 20);
-    const alertsByseverity = recentAlerts.reduce((acc, alert) => {
-      acc[alert.severity] = (acc[alert.severity] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const alertsByseverity = recentAlerts.reduce(
+      (acc, alert) => {
+        acc[alert.severity] = (acc[alert.severity] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     // Error trends (last hour)
     const oneHourAgo = Date.now() - 3600000;
@@ -326,19 +328,22 @@ export class FireEventMonitoring {
    */
   createMonitoringResponse(): Response {
     const dashboardData = this.getDashboardData();
-    
-    return new Response(JSON.stringify({
-      success: true,
-      message: 'Fire22 Error Monitoring Dashboard',
-      data: dashboardData,
-      timestamp: new Date().toISOString(),
-    }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-      },
-    });
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: 'Fire22 Error Monitoring Dashboard',
+        data: dashboardData,
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+        },
+      }
+    );
   }
 
   /**

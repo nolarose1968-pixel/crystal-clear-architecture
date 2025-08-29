@@ -37,7 +37,10 @@ export class PerformanceHealthService {
     const p95 = this.calculatePercentile(this.responseTimes, 95);
     const p99 = this.calculatePercentile(this.responseTimes, 99);
 
-    const totalRequests = this.requestCounts.reduce((sum, count) => sum + count, 0);
+    const totalRequests = this.requestCounts.reduce(
+      (sum, count) => sum + count,
+      0,
+    );
     const totalErrors = this.errorCounts.reduce((sum, count) => sum + count, 0);
     const errorRate = totalRequests > 0 ? totalErrors / totalRequests : 0;
 
@@ -45,12 +48,12 @@ export class PerformanceHealthService {
     const requestsPerSecond = uptime > 0 ? totalRequests / uptime : 0;
 
     // Determine status based on performance thresholds
-    let status = 'healthy';
+    let status = "healthy";
     if (p95 > 1000 || errorRate > 0.05) {
-      status = 'degraded';
+      status = "degraded";
     }
     if (p95 > 2000 || errorRate > 0.1) {
-      status = 'critical';
+      status = "critical";
     }
 
     return {
@@ -60,14 +63,14 @@ export class PerformanceHealthService {
         avg: avgResponseTime,
         p50,
         p95,
-        p99
+        p99,
       },
       throughput: {
         requestsPerSecond,
-        totalRequests
+        totalRequests,
       },
       errorRate,
-      uptime
+      uptime,
     };
   }
 
@@ -78,7 +81,7 @@ export class PerformanceHealthService {
     status: string;
     current: number;
     average: number;
-    trend: 'improving' | 'stable' | 'degrading';
+    trend: "improving" | "stable" | "degrading";
     timestamp: string;
   }> {
     const current = this.responseTimes[this.responseTimes.length - 1] || 0;
@@ -90,19 +93,19 @@ export class PerformanceHealthService {
     const recentAvg = this.calculateAverage(recent);
     const olderAvg = this.calculateAverage(older);
 
-    let trend: 'improving' | 'stable' | 'degrading' = 'stable';
+    let trend: "improving" | "stable" | "degrading" = "stable";
     if (recentAvg < olderAvg * 0.9) {
-      trend = 'improving';
+      trend = "improving";
     } else if (recentAvg > olderAvg * 1.1) {
-      trend = 'degrading';
+      trend = "degrading";
     }
 
-    let status = 'healthy';
+    let status = "healthy";
     if (current > 1000) {
-      status = 'degraded';
+      status = "degraded";
     }
     if (current > 2000) {
-      status = 'critical';
+      status = "critical";
     }
 
     return {
@@ -110,7 +113,7 @@ export class PerformanceHealthService {
       current,
       average,
       trend,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -125,20 +128,25 @@ export class PerformanceHealthService {
     timestamp: string;
   }> {
     const uptime = (Date.now() - this.startTime) / 1000;
-    const totalRequests = this.requestCounts.reduce((sum, count) => sum + count, 0);
+    const totalRequests = this.requestCounts.reduce(
+      (sum, count) => sum + count,
+      0,
+    );
     const averageRPS = uptime > 0 ? totalRequests / uptime : 0;
     const peakRPS = Math.max(...this.requestCounts);
 
     // Calculate current RPS (last minute)
-    const recentRequests = this.requestCounts.slice(-60).reduce((sum, count) => sum + count, 0);
+    const recentRequests = this.requestCounts
+      .slice(-60)
+      .reduce((sum, count) => sum + count, 0);
     const currentRPS = recentRequests / 60;
 
-    let status = 'healthy';
+    let status = "healthy";
     if (currentRPS > 100) {
-      status = 'degraded';
+      status = "degraded";
     }
     if (currentRPS > 200) {
-      status = 'critical';
+      status = "critical";
     }
 
     return {
@@ -146,7 +154,7 @@ export class PerformanceHealthService {
       currentRPS,
       averageRPS,
       peakRPS,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -157,36 +165,47 @@ export class PerformanceHealthService {
     status: string;
     currentRate: number;
     averageRate: number;
-    trend: 'improving' | 'stable' | 'degrading';
+    trend: "improving" | "stable" | "degrading";
     timestamp: string;
   }> {
-    const totalRequests = this.requestCounts.reduce((sum, count) => sum + count, 0);
+    const totalRequests = this.requestCounts.reduce(
+      (sum, count) => sum + count,
+      0,
+    );
     const totalErrors = this.errorCounts.reduce((sum, count) => sum + count, 0);
     const averageRate = totalRequests > 0 ? totalErrors / totalRequests : 0;
 
     // Calculate current error rate (last 100 requests)
-    const recentRequests = this.requestCounts.slice(-10).reduce((sum, count) => sum + count, 0);
-    const recentErrors = this.errorCounts.slice(-10).reduce((sum, count) => sum + count, 0);
+    const recentRequests = this.requestCounts
+      .slice(-10)
+      .reduce((sum, count) => sum + count, 0);
+    const recentErrors = this.errorCounts
+      .slice(-10)
+      .reduce((sum, count) => sum + count, 0);
     const currentRate = recentRequests > 0 ? recentErrors / recentRequests : 0;
 
     // Calculate trend
-    const olderRequests = this.requestCounts.slice(-20, -10).reduce((sum, count) => sum + count, 0);
-    const olderErrors = this.errorCounts.slice(-20, -10).reduce((sum, count) => sum + count, 0);
+    const olderRequests = this.requestCounts
+      .slice(-20, -10)
+      .reduce((sum, count) => sum + count, 0);
+    const olderErrors = this.errorCounts
+      .slice(-20, -10)
+      .reduce((sum, count) => sum + count, 0);
     const olderRate = olderRequests > 0 ? olderErrors / olderRequests : 0;
 
-    let trend: 'improving' | 'stable' | 'degrading' = 'stable';
+    let trend: "improving" | "stable" | "degrading" = "stable";
     if (currentRate < olderRate * 0.8) {
-      trend = 'improving';
+      trend = "improving";
     } else if (currentRate > olderRate * 1.2) {
-      trend = 'degrading';
+      trend = "degrading";
     }
 
-    let status = 'healthy';
+    let status = "healthy";
     if (currentRate > 0.05) {
-      status = 'degraded';
+      status = "degraded";
     }
     if (currentRate > 0.1) {
-      status = 'critical';
+      status = "critical";
     }
 
     return {
@@ -194,7 +213,7 @@ export class PerformanceHealthService {
       currentRate,
       averageRate,
       trend,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -210,7 +229,10 @@ export class PerformanceHealthService {
 
     // Record request and error counts (per minute)
     const currentMinute = Math.floor(Date.now() / 60000);
-    if (this.requestCounts.length === 0 || this.requestCounts.length - 1 !== currentMinute) {
+    if (
+      this.requestCounts.length === 0 ||
+      this.requestCounts.length - 1 !== currentMinute
+    ) {
       this.requestCounts.push(1);
       this.errorCounts.push(success ? 0 : 1);
     } else {

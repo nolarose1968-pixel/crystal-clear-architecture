@@ -172,21 +172,21 @@ src/
 
 ```typescript
 // ✅ Good: Comprehensive test with edge cases
-describe('UserService', () => {
-  describe('getUserById', () => {
-    it('should return user when found', async () => {
-      const user = await userService.getUserById('123');
+describe("UserService", () => {
+  describe("getUserById", () => {
+    it("should return user when found", async () => {
+      const user = await userService.getUserById("123");
       expect(user).toBeDefined();
-      expect(user?.id).toBe('123');
+      expect(user?.id).toBe("123");
     });
 
-    it('should return null when user not found', async () => {
-      const user = await userService.getUserById('nonexistent');
+    it("should return null when user not found", async () => {
+      const user = await userService.getUserById("nonexistent");
       expect(user).toBeNull();
     });
 
-    it('should throw error for invalid id', async () => {
-      await expect(userService.getUserById('')).rejects.toThrow();
+    it("should throw error for invalid id", async () => {
+      await expect(userService.getUserById("")).rejects.toThrow();
     });
   });
 });
@@ -221,16 +221,19 @@ refactor: simplify dashboard component structure
 ### Pull Request Process
 
 1. **Create Feature Branch**
+
    ```bash
    git checkout -b feature/amazing-feature
    ```
 
 2. **Make Changes**
+
    - Follow coding standards
    - Add tests for new functionality
    - Update documentation if needed
 
 3. **Test Your Changes**
+
    ```bash
    bun run test:coverage
    bun run lint
@@ -238,6 +241,7 @@ refactor: simplify dashboard component structure
    ```
 
 4. **Commit Changes**
+
    ```bash
    git add .
    git commit -m "feat: add amazing feature"
@@ -298,6 +302,7 @@ bun run docs:deploy
 ### Recognition
 
 Contributors will be recognized in:
+
 - **CHANGELOG.md**: For all contributions
 - **README.md**: For significant contributors
 - **GitHub Releases**: For major contributors

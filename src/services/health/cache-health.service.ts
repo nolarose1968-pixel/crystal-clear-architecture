@@ -4,7 +4,7 @@
  */
 
 interface CacheHealth {
-  status: 'healthy' | 'degraded' | 'critical';
+  status: "healthy" | "degraded" | "critical";
   timestamp: string;
   memory: CacheMemoryHealth;
   performance: CachePerformanceHealth;
@@ -33,7 +33,7 @@ interface CacheHitRateHealth {
   hitRate: number;
   missRate: number;
   totalRequests: number;
-  trend: 'improving' | 'stable' | 'degrading';
+  trend: "improving" | "stable" | "degrading";
 }
 
 interface CacheEvictionHealth {
@@ -58,34 +58,31 @@ export class CacheHealthService {
     totalRequests: 0,
     evictedKeys: 0,
     expiredKeys: 0,
-    startTime: Date.now()
+    startTime: Date.now(),
   };
 
   /**
    * Get comprehensive cache health
    */
   async getCacheHealth(): Promise<CacheHealth> {
-    const [
-      memory,
-      performance,
-      hitRate,
-      eviction
-    ] = await Promise.all([
+    const [memory, performance, hitRate, eviction] = await Promise.all([
       this.getMemoryHealth(),
       this.getPerformanceHealth(),
       this.getHitRateHealth(),
-      this.getEvictionHealth()
+      this.getEvictionHealth(),
     ]);
 
     // Determine overall status
     const components = [memory, performance, hitRate, eviction];
-    const unhealthyComponents = components.filter(comp => comp.status !== 'healthy');
+    const unhealthyComponents = components.filter(
+      (comp) => comp.status !== "healthy",
+    );
 
-    let overallStatus: 'healthy' | 'degraded' | 'critical' = 'healthy';
-    if (unhealthyComponents.some(comp => comp.status === 'critical')) {
-      overallStatus = 'critical';
+    let overallStatus: "healthy" | "degraded" | "critical" = "healthy";
+    if (unhealthyComponents.some((comp) => comp.status === "critical")) {
+      overallStatus = "critical";
     } else if (unhealthyComponents.length > 0) {
-      overallStatus = 'degraded';
+      overallStatus = "degraded";
     }
 
     return {
@@ -94,7 +91,7 @@ export class CacheHealthService {
       memory,
       performance,
       hitRate,
-      eviction
+      eviction,
     };
   }
 
@@ -108,12 +105,12 @@ export class CacheHealthService {
     const usagePercent = (usedMemory / totalMemory) * 100;
     const fragmentationRatio = Math.random() * 0.3 + 0.8; // 0.8-1.1 typical range
 
-    let status = 'healthy';
+    let status = "healthy";
     if (usagePercent > 80) {
-      status = 'degraded';
+      status = "degraded";
     }
     if (usagePercent > 95) {
-      status = 'critical';
+      status = "critical";
     }
 
     return {
@@ -121,7 +118,7 @@ export class CacheHealthService {
       usedMemory,
       totalMemory,
       usagePercent,
-      fragmentationRatio
+      fragmentationRatio,
     };
   }
 
@@ -135,12 +132,12 @@ export class CacheHealthService {
     const connectionsCount = Math.floor(Math.random() * 50) + 10;
     const uptime = (Date.now() - this.cacheMetrics.startTime) / 1000;
 
-    let status = 'healthy';
+    let status = "healthy";
     if (avgResponseTime > 10) {
-      status = 'degraded';
+      status = "degraded";
     }
     if (avgResponseTime > 50) {
-      status = 'critical';
+      status = "critical";
     }
 
     return {
@@ -148,7 +145,7 @@ export class CacheHealthService {
       operationsPerSecond,
       avgResponseTime,
       connectionsCount,
-      uptime
+      uptime,
     };
   }
 
@@ -157,27 +154,32 @@ export class CacheHealthService {
    */
   async getHitRateHealth(): Promise<CacheHitRateHealth> {
     const totalRequests = this.cacheMetrics.totalRequests;
-    const hitRate = totalRequests > 0 ? this.cacheMetrics.hits / totalRequests : 0;
+    const hitRate =
+      totalRequests > 0 ? this.cacheMetrics.hits / totalRequests : 0;
     const missRate = 1 - hitRate;
 
-    let status = 'healthy';
+    let status = "healthy";
     if (hitRate < 0.7) {
-      status = 'degraded';
+      status = "degraded";
     }
     if (hitRate < 0.5) {
-      status = 'critical';
+      status = "critical";
     }
 
     // Calculate trend (simplified - in production would use time-series data)
-    const trend: 'improving' | 'stable' | 'degrading' = Math.random() > 0.6 ?
-      (Math.random() > 0.5 ? 'improving' : 'degrading') : 'stable';
+    const trend: "improving" | "stable" | "degrading" =
+      Math.random() > 0.6
+        ? Math.random() > 0.5
+          ? "improving"
+          : "degrading"
+        : "stable";
 
     return {
       status,
       hitRate,
       missRate,
       totalRequests,
-      trend
+      trend,
     };
   }
 
@@ -187,16 +189,17 @@ export class CacheHealthService {
   async getEvictionHealth(): Promise<CacheEvictionHealth> {
     const evictedKeys = this.cacheMetrics.evictedKeys;
     const expiredKeys = this.cacheMetrics.expiredKeys;
-    const totalKeys = evictedKeys + expiredKeys + Math.floor(Math.random() * 10000);
+    const totalKeys =
+      evictedKeys + expiredKeys + Math.floor(Math.random() * 10000);
     const evictionRate = totalKeys > 0 ? evictedKeys / totalKeys : 0;
     const memoryPressure = evictionRate > 0.1; // High eviction rate indicates memory pressure
 
-    let status = 'healthy';
+    let status = "healthy";
     if (evictionRate > 0.2) {
-      status = 'degraded';
+      status = "degraded";
     }
     if (evictionRate > 0.5) {
-      status = 'critical';
+      status = "critical";
     }
 
     return {
@@ -204,7 +207,7 @@ export class CacheHealthService {
       evictedKeys,
       expiredKeys,
       evictionRate,
-      memoryPressure
+      memoryPressure,
     };
   }
 
@@ -245,8 +248,10 @@ export class CacheHealthService {
     uptime: number;
   } {
     const uptime = (Date.now() - this.cacheMetrics.startTime) / 1000;
-    const hitRate = this.cacheMetrics.totalRequests > 0 ?
-      this.cacheMetrics.hits / this.cacheMetrics.totalRequests : 0;
+    const hitRate =
+      this.cacheMetrics.totalRequests > 0
+        ? this.cacheMetrics.hits / this.cacheMetrics.totalRequests
+        : 0;
 
     return {
       totalRequests: this.cacheMetrics.totalRequests,
@@ -255,7 +260,7 @@ export class CacheHealthService {
       hitRate,
       evictedKeys: this.cacheMetrics.evictedKeys,
       expiredKeys: this.cacheMetrics.expiredKeys,
-      uptime
+      uptime,
     };
   }
 
@@ -280,7 +285,7 @@ export class CacheHealthService {
       success: true,
       clearedKeys,
       freedMemory,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -297,9 +302,9 @@ export class CacheHealthService {
     return {
       maxMemory: 1024, // MB
       ttl: 3600, // seconds
-      evictionPolicy: 'LRU',
+      evictionPolicy: "LRU",
       compression: true,
-      clustering: false
+      clustering: false,
     };
   }
 
@@ -313,7 +318,7 @@ export class CacheHealthService {
       totalRequests: 0,
       evictedKeys: 0,
       expiredKeys: 0,
-      startTime: Date.now()
+      startTime: Date.now(),
     };
   }
 }

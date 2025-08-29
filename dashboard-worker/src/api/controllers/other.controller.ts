@@ -1264,11 +1264,11 @@ export async function getAllBalancesSummary(request: ValidatedRequest): Promise<
     // Apply filters
     let filteredCustomers = mockCustomers;
 
-    if (minBalance !=== null) {
+    if (minBalance !== null) {
       filteredCustomers = filteredCustomers.filter(c => c.currentBalance >= minBalance);
     }
 
-    if (maxBalance !=== null) {
+    if (maxBalance !== null) {
       filteredCustomers = filteredCustomers.filter(c => c.currentBalance <= maxBalance);
     }
 

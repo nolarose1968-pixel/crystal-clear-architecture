@@ -5,9 +5,9 @@
  * Last Updated: 2025-08-27
  */
 
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 // VERSIONING STANDARDS
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 
 /**
  * Semantic Versioning Standard (SemVer)
@@ -15,11 +15,11 @@
  * Example: 2.1.3-beta.1+20250827
  */
 export interface VersionStandard {
-  major: number;      // Breaking changes
-  minor: number;      // New features (backward compatible)
-  patch: number;      // Bug fixes (backward compatible)
-  prerelease?: string;  // Optional: alpha, beta, rc
-  build?: string;       // Optional: build metadata
+  major: number; // Breaking changes
+  minor: number; // New features (backward compatible)
+  patch: number; // Bug fixes (backward compatible)
+  prerelease?: string; // Optional: alpha, beta, rc
+  build?: string; // Optional: build metadata
 }
 
 /**
@@ -43,9 +43,9 @@ export class ComponentVersion {
   }
 }
 
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 // GLOBAL DATA TYPES
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 
 /**
  * Fire22 L-Key Standard Type
@@ -71,7 +71,7 @@ export interface Fire22LKeyMapping {
 /**
  * Supported SQL data types across all storage tiers
  */
-export type SQLDataType = 
+export type SQLDataType =
   | 'TEXT'
   | 'INTEGER'
   | 'REAL'
@@ -90,9 +90,9 @@ export interface ValidationRule {
   message: string;
 }
 
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 // STORAGE TIER STANDARDS
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 
 /**
  * D1 Database Standards
@@ -111,8 +111,8 @@ export interface D1DatabaseStandard {
   };
   performanceTargets: {
     queryResponseTime: number; // milliseconds
-    writeLatency: number;      // milliseconds
-    readLatency: number;       // milliseconds
+    writeLatency: number; // milliseconds
+    readLatency: number; // milliseconds
   };
 }
 
@@ -131,9 +131,9 @@ export interface R2BucketStandard {
     naming: string; // Pattern for file naming
   };
   performanceTargets: {
-    uploadLatency: number;   // milliseconds
+    uploadLatency: number; // milliseconds
     downloadLatency: number; // milliseconds
-    throughputMBps: number;  // MB per second
+    throughputMBps: number; // MB per second
   };
 }
 
@@ -147,9 +147,9 @@ export interface KVNamespaceStandard {
   maxItemsPerKey: number;
   cacheStrategy: 'lru' | 'lfu' | 'fifo';
   performanceTargets: {
-    hitRate: number;    // Target hit rate (0-1)
+    hitRate: number; // Target hit rate (0-1)
     missLatency: number; // milliseconds
-    hitLatency: number;  // milliseconds
+    hitLatency: number; // milliseconds
   };
 }
 
@@ -162,8 +162,8 @@ export interface DurableObjectStandard {
   scriptName?: string;
   persistenceModel: 'transactional' | 'eventual';
   storage: {
-    maxKeySize: number;      // bytes
-    maxValueSize: number;    // bytes
+    maxKeySize: number; // bytes
+    maxValueSize: number; // bytes
     maxKeys: number;
   };
   alarm?: {
@@ -171,15 +171,15 @@ export interface DurableObjectStandard {
     retryPolicy: 'exponential' | 'linear' | 'fixed';
   };
   performanceTargets: {
-    initTime: number;        // milliseconds
-    requestLatency: number;  // milliseconds
-    storageLatency: number;  // milliseconds
+    initTime: number; // milliseconds
+    requestLatency: number; // milliseconds
+    storageLatency: number; // milliseconds
   };
 }
 
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 // WEB LOG STANDARDS
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 
 /**
  * Log Type Enumeration
@@ -193,49 +193,49 @@ export enum LogType {
   SYSTEM = 'system',
   API_ACCESS = 'api_access',
   ERROR = 'error',
-  AUDIT = 'audit'
+  AUDIT = 'audit',
 }
 
 /**
  * Standard web log entry structure
  */
 export interface WebLogEntry {
-  id: string;           // UUID v4
+  id: string; // UUID v4
   timestamp: Date;
   logType: LogType;
   actionType?: string;
-  customerId?: string;  // L-603
+  customerId?: string; // L-603
   ipAddress?: string;
   userAgent?: string;
-  
+
   // Financial fields (with L-key references)
-  amount?: number;              // L-69
-  riskAmount?: number;          // L-627
-  winAmount?: number;           // L-628
-  balance?: number;             // L-187
-  depositAmount?: number;       // L-202
-  withdrawalAmount?: number;    // L-206
-  
+  amount?: number; // L-69
+  riskAmount?: number; // L-627
+  winAmount?: number; // L-628
+  balance?: number; // L-187
+  depositAmount?: number; // L-202
+  withdrawalAmount?: number; // L-206
+
   // Betting fields (with L-key references)
-  straightsBet?: number;        // L-12
-  parlaysBet?: number;          // L-15
-  ifBets?: number;              // L-16
-  teasersBet?: number;          // L-85
-  livePropsBet?: number;        // L-1390
-  
+  straightsBet?: number; // L-12
+  parlaysBet?: number; // L-15
+  ifBets?: number; // L-16
+  teasersBet?: number; // L-85
+  livePropsBet?: number; // L-1390
+
   // Security & compliance
-  riskScore?: number;           // 0-100
+  riskScore?: number; // 0-100
   isSuspicious?: boolean;
-  fraudDetection?: string;      // L-848
-  auditTrail?: string;          // L-1391
-  
+  fraudDetection?: string; // L-848
+  auditTrail?: string; // L-1391
+
   // Metadata
   fire22LanguageKeys?: Fire22LKey[];
   languageCode?: LanguageCode;
   actionData?: Record<string, any>;
   status?: TransactionStatus;
   errorMessage?: string;
-  
+
   // Versioning
   schemaVersion: string;
 }
@@ -255,12 +255,12 @@ export enum TransactionStatus {
   COMPLETED = 'completed',
   FAILED = 'failed',
   CANCELLED = 'cancelled',
-  REVERSED = 'reversed'
+  REVERSED = 'reversed',
 }
 
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 // CUSTOMER STANDARDS
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 
 /**
  * Customer type enumeration
@@ -270,41 +270,41 @@ export enum CustomerType {
   AGENT = 'agent',
   SUPERAGENT = 'superagent',
   MASTER = 'master',
-  VIP = 'vip'
+  VIP = 'vip',
 }
 
 /**
  * Standard Fire22 customer structure
  */
 export interface Fire22Customer {
-  id: string;                   // L-603: Customer ID
-  customerName: string;         // L-526: Name
-  customerType: CustomerType;   // L-152: Type
-  loginId: string;              // L-889: Login ID
-  passwordHash?: string;        // L-214: Password (never expose)
-  
+  id: string; // L-603: Customer ID
+  customerName: string; // L-526: Name
+  customerType: CustomerType; // L-152: Type
+  loginId: string; // L-889: Login ID
+  passwordHash?: string; // L-214: Password (never expose)
+
   // Financial
-  balance: number;              // L-187: Balance
+  balance: number; // L-187: Balance
   creditLimit?: number;
   currency: string;
-  
+
   // Security
-  securitySettings?: SecuritySettings;  // L-1387
-  accountVerification?: AccountVerification;  // L-1388
+  securitySettings?: SecuritySettings; // L-1387
+  accountVerification?: AccountVerification; // L-1388
   lastLogin?: Date;
   loginAttempts?: number;
-  
+
   // Preferences
   languageCode: LanguageCode;
   timezone?: string;
   notifications?: NotificationPreferences;
-  
+
   // Metadata
   createdAt: Date;
   updatedAt: Date;
   isActive: boolean;
   isLocked?: boolean;
-  
+
   // L-keys
   fire22LanguageKeys: Fire22LKey[];
 }
@@ -315,7 +315,7 @@ export interface Fire22Customer {
 export interface SecuritySettings {
   twoFactorEnabled: boolean;
   ipWhitelist?: string[];
-  sessionTimeout: number;  // minutes
+  sessionTimeout: number; // minutes
   passwordExpiryDays?: number;
   securityQuestions?: Array<{
     question: string;
@@ -333,7 +333,7 @@ export interface AccountVerification {
   verificationLevel: 'basic' | 'standard' | 'enhanced' | 'full';
   verifiedAt?: Date;
   verifiedBy?: string;
-  documents?: string[];  // Document IDs
+  documents?: string[]; // Document IDs
 }
 
 /**
@@ -347,9 +347,9 @@ export interface NotificationPreferences {
   marketing: boolean;
 }
 
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 // ANALYTICS STANDARDS
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 
 /**
  * Standard analytics summary structure
@@ -358,53 +358,53 @@ export interface AnalyticsSummary {
   period: {
     start: Date;
     end: Date;
-    duration: number;  // milliseconds
+    duration: number; // milliseconds
   };
-  
+
   transaction: {
     totalEvents: number;
-    totalAmount: number;       // L-69 aggregation
-    avgAmount: number;         // L-69 average
-    totalDeposits: number;     // L-202 aggregation
-    totalWithdrawals: number;  // L-206 aggregation
+    totalAmount: number; // L-69 aggregation
+    avgAmount: number; // L-69 average
+    totalDeposits: number; // L-202 aggregation
+    totalWithdrawals: number; // L-206 aggregation
     suspiciousEvents: number;
   };
-  
+
   wager: {
     totalEvents: number;
-    totalStraights: number;    // L-12 aggregation
-    totalParlays: number;      // L-15 aggregation
-    totalLiveProps: number;    // L-1390 aggregation
-    totalRiskAmount: number;   // L-627 aggregation
-    totalWinAmount: number;    // L-628 aggregation
+    totalStraights: number; // L-12 aggregation
+    totalParlays: number; // L-15 aggregation
+    totalLiveProps: number; // L-1390 aggregation
+    totalRiskAmount: number; // L-627 aggregation
+    totalWinAmount: number; // L-628 aggregation
     avgRiskScore: number;
   };
-  
+
   authentication: {
     totalLogins: number;
     failedLogins: number;
     uniqueUsers: number;
-    avgSessionDuration: number;  // minutes
+    avgSessionDuration: number; // minutes
   };
-  
+
   security: {
     totalAlerts: number;
     highRiskEvents: number;
     blockedTransactions: number;
-    fraudDetections: number;     // L-848 count
+    fraudDetections: number; // L-848 count
   };
-  
+
   performance: {
-    avgResponseTime: number;     // milliseconds
-    p95ResponseTime: number;     // milliseconds
-    errorRate: number;           // percentage
-    uptime: number;              // percentage
+    avgResponseTime: number; // milliseconds
+    p95ResponseTime: number; // milliseconds
+    errorRate: number; // percentage
+    uptime: number; // percentage
   };
 }
 
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 // CACHE MANAGER STANDARDS
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 
 /**
  * Cache entry structure
@@ -412,12 +412,12 @@ export interface AnalyticsSummary {
 export interface CacheEntry<T = any> {
   key: string;
   value: T;
-  ttl: number;          // seconds
+  ttl: number; // seconds
   createdAt: Date;
   expiresAt: Date;
   hits: number;
   lastAccessed: Date;
-  size: number;         // bytes
+  size: number; // bytes
   compressed: boolean;
   version: string;
 }
@@ -427,12 +427,12 @@ export interface CacheEntry<T = any> {
  */
 export interface CacheStatistics {
   totalEntries: number;
-  totalSize: number;    // bytes
-  hitRate: number;      // 0-1
-  missRate: number;     // 0-1
+  totalSize: number; // bytes
+  hitRate: number; // 0-1
+  missRate: number; // 0-1
   evictionCount: number;
   avgEntrySize: number; // bytes
-  avgTTL: number;       // seconds
+  avgTTL: number; // seconds
   oldestEntry: Date;
   newestEntry: Date;
 }
@@ -443,17 +443,17 @@ export interface CacheStatistics {
 export interface CacheConfiguration {
   maxEntries: number;
   maxSizeBytes: number;
-  defaultTTL: number;   // seconds
+  defaultTTL: number; // seconds
   evictionPolicy: 'lru' | 'lfu' | 'ttl' | 'fifo';
-  compressionThreshold: number;  // bytes
+  compressionThreshold: number; // bytes
   warmupEnabled: boolean;
   persistEnabled: boolean;
   namespace: string;
 }
 
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 // WORKER STANDARDS
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 
 /**
  * Worker configuration standard
@@ -462,7 +462,7 @@ export interface WorkerConfiguration {
   name: string;
   environment: 'development' | 'staging' | 'production';
   routes: string[];
-  
+
   bindings: {
     databases?: D1DatabaseStandard[];
     r2Buckets?: R2BucketStandard[];
@@ -471,19 +471,19 @@ export interface WorkerConfiguration {
     secrets?: string[];
     vars?: Record<string, string>;
   };
-  
+
   limits: {
     cpuMs: number;
     memoryMB: number;
     subrequests: number;
-    duration: number;  // seconds
+    duration: number; // seconds
   };
-  
+
   compatibility: {
     date: string;
     flags?: string[];
   };
-  
+
   triggers?: {
     crons?: Array<{
       schedule: string;
@@ -493,9 +493,9 @@ export interface WorkerConfiguration {
   };
 }
 
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 // TESTING STANDARDS
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 
 /**
  * Test suite configuration
@@ -503,7 +503,7 @@ export interface WorkerConfiguration {
 export interface TestSuiteConfiguration {
   name: string;
   type: 'unit' | 'integration' | 'e2e' | 'performance';
-  
+
   coverage: {
     enabled: boolean;
     threshold: {
@@ -513,18 +513,18 @@ export interface TestSuiteConfiguration {
       statements: number;
     };
   };
-  
-  timeout: number;  // milliseconds
+
+  timeout: number; // milliseconds
   retries: number;
   parallel: boolean;
-  
+
   environment: {
     preset: string;
     setup?: string;
     teardown?: string;
     globals?: Record<string, any>;
   };
-  
+
   reporting: {
     format: 'json' | 'html' | 'lcov' | 'text';
     outputDir: string;
@@ -540,7 +540,7 @@ export interface TestCase {
   suite: string;
   name: string;
   type: 'unit' | 'integration' | 'e2e' | 'performance';
-  
+
   input?: any;
   expectedOutput?: any;
   assertions: Array<{
@@ -549,11 +549,11 @@ export interface TestCase {
     expected: any;
     message?: string;
   }>;
-  
-  duration: number;  // milliseconds
+
+  duration: number; // milliseconds
   status: 'passed' | 'failed' | 'skipped' | 'pending';
   error?: Error;
-  
+
   metadata?: {
     tags?: string[];
     priority?: 'low' | 'medium' | 'high' | 'critical';
@@ -563,9 +563,9 @@ export interface TestCase {
   };
 }
 
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 // BUN CONFIGURATION STANDARDS
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 
 /**
  * Bun configuration standard
@@ -578,7 +578,7 @@ export interface BunConfiguration {
     smol?: boolean;
     logLevel?: 'debug' | 'info' | 'warn' | 'error';
   };
-  
+
   // Package management
   install: {
     lockfile?: {
@@ -590,7 +590,7 @@ export interface BunConfiguration {
     globalCache?: string;
     globalBinDir?: string;
   };
-  
+
   // Test runner
   test: {
     root?: string;
@@ -600,7 +600,7 @@ export interface BunConfiguration {
     coverageThreshold?: number;
     timeout?: number;
   };
-  
+
   // Development
   dev: {
     port?: number;
@@ -608,22 +608,22 @@ export interface BunConfiguration {
     publicPath?: string;
     hmr?: boolean;
   };
-  
+
   // Performance
   performance: {
     // DNS optimization
     dns?: {
-      ttl?: number;  // BUN_CONFIG_DNS_TIME_TO_LIVE_SECONDS
+      ttl?: number; // BUN_CONFIG_DNS_TIME_TO_LIVE_SECONDS
       prefetch?: string[];
       cache?: boolean;
     };
-    
+
     // Memory
     memory?: {
-      maxHeap?: number;  // MB
-      maxOldSpace?: number;  // MB
+      maxHeap?: number; // MB
+      maxOldSpace?: number; // MB
     };
-    
+
     // Concurrency
     concurrency?: {
       workers?: number;
@@ -632,9 +632,9 @@ export interface BunConfiguration {
   };
 }
 
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 // ERROR HANDLING STANDARDS
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 
 /**
  * Standard error structure
@@ -650,7 +650,7 @@ export class Fire22Error extends Error {
     super(message);
     this.name = 'Fire22Error';
   }
-  
+
   toJSON() {
     return {
       code: this.code,
@@ -658,7 +658,7 @@ export class Fire22Error extends Error {
       statusCode: this.statusCode,
       details: this.details,
       lkey: this.lkey,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 }
@@ -671,31 +671,31 @@ export enum ErrorCode {
   AUTH_INVALID_TOKEN = 'AUTH_001',
   AUTH_TOKEN_EXPIRED = 'AUTH_002',
   AUTH_INSUFFICIENT_PERMISSIONS = 'AUTH_003',
-  
+
   // Database errors
   DB_CONNECTION_FAILED = 'DB_001',
   DB_QUERY_FAILED = 'DB_002',
   DB_TRANSACTION_FAILED = 'DB_003',
-  
+
   // Validation errors
   VALIDATION_FAILED = 'VAL_001',
   INVALID_LKEY = 'VAL_002',
   INVALID_AMOUNT = 'VAL_003',
-  
+
   // Business logic errors
   INSUFFICIENT_BALANCE = 'BIZ_001',
   LIMIT_EXCEEDED = 'BIZ_002',
   DUPLICATE_TRANSACTION = 'BIZ_003',
-  
+
   // System errors
   INTERNAL_ERROR = 'SYS_001',
   SERVICE_UNAVAILABLE = 'SYS_002',
-  RATE_LIMIT_EXCEEDED = 'SYS_003'
+  RATE_LIMIT_EXCEEDED = 'SYS_003',
 }
 
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 // GLOBAL CONSTANTS
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 
 /**
  * System-wide constants
@@ -705,48 +705,48 @@ export const GLOBAL_CONSTANTS = {
   SYSTEM_VERSION: '2.0.0',
   SCHEMA_VERSION: '1.0.0',
   API_VERSION: 'v2',
-  
+
   // Timeouts (milliseconds)
   DEFAULT_TIMEOUT: 30000,
   DATABASE_TIMEOUT: 10000,
   API_TIMEOUT: 15000,
   CACHE_TIMEOUT: 1000,
-  
+
   // Limits
   MAX_BATCH_SIZE: 1000,
   MAX_QUERY_RESULTS: 10000,
-  MAX_FILE_SIZE: 10 * 1024 * 1024,  // 10MB
-  MAX_CACHE_SIZE: 100 * 1024 * 1024,  // 100MB
-  
+  MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
+  MAX_CACHE_SIZE: 100 * 1024 * 1024, // 100MB
+
   // Retention
   LOG_RETENTION_DAYS: 90,
   ARCHIVE_RETENTION_YEARS: 7,
-  CACHE_TTL_DEFAULT: 3600,  // seconds
-  
+  CACHE_TTL_DEFAULT: 3600, // seconds
+
   // Performance targets
-  TARGET_RESPONSE_TIME: 50,  // milliseconds
+  TARGET_RESPONSE_TIME: 50, // milliseconds
   TARGET_CACHE_HIT_RATE: 0.85,
   TARGET_UPTIME: 0.999,
-  
+
   // Fire22 specific
   FIRE22_API_BASE: 'https://fire22.ag/cloud/api',
   FIRE22_LKEY_PREFIX: 'L-',
   FIRE22_SUPPORTED_LANGUAGES: ['en', 'es', 'pt'],
-  
+
   // Security
-  JWT_EXPIRY: 86400,  // 24 hours in seconds
-  SESSION_TIMEOUT: 1800,  // 30 minutes in seconds
+  JWT_EXPIRY: 86400, // 24 hours in seconds
+  SESSION_TIMEOUT: 1800, // 30 minutes in seconds
   MAX_LOGIN_ATTEMPTS: 5,
   PASSWORD_MIN_LENGTH: 8,
-  
+
   // Pagination
   DEFAULT_PAGE_SIZE: 100,
   MAX_PAGE_SIZE: 1000,
-  
+
   // Monitoring
-  HEALTH_CHECK_INTERVAL: 60000,  // 1 minute
-  METRICS_COLLECTION_INTERVAL: 30000,  // 30 seconds
-  
+  HEALTH_CHECK_INTERVAL: 60000, // 1 minute
+  METRICS_COLLECTION_INTERVAL: 30000, // 30 seconds
+
   // Feature flags
   FEATURES: {
     ENABLE_CACHING: true,
@@ -756,13 +756,13 @@ export const GLOBAL_CONSTANTS = {
     ENABLE_FRAUD_DETECTION: true,
     ENABLE_REAL_TIME_UPDATES: true,
     ENABLE_DNS_OPTIMIZATION: true,
-    ENABLE_DURABLE_OBJECTS: false  // Coming soon
-  }
+    ENABLE_DURABLE_OBJECTS: false, // Coming soon
+  },
 } as const;
 
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 // UTILITY TYPES
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 
 /**
  * Make all properties optional recursively
@@ -800,29 +800,27 @@ export type Async<T> = Promise<T> | T;
 /**
  * Result type for operations that can fail
  */
-export type Result<T, E = Error> = 
-  | { success: true; data: T }
-  | { success: false; error: E };
+export type Result<T, E = Error> = { success: true; data: T } | { success: false; error: E };
 
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 // EXPORTS
-// ============================================================
+// !==!==!==!==!==!==!==!==!==!==!===
 
 export default {
   // Version info
   VERSION: GLOBAL_CONSTANTS.SYSTEM_VERSION,
   SCHEMA_VERSION: GLOBAL_CONSTANTS.SCHEMA_VERSION,
-  
+
   // Enums
   LogType,
   TransactionStatus,
   CustomerType,
   ErrorCode,
-  
+
   // Classes
   ComponentVersion,
   Fire22Error,
-  
+
   // Constants
-  GLOBAL_CONSTANTS
+  GLOBAL_CONSTANTS,
 };

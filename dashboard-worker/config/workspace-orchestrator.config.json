@@ -21,13 +21,8 @@
       "name": "fire22-benchmarking-suite",
       "description": "Performance benchmarking and testing suite",
       "domain": "benchmarking",
-      "packages": [
-        "@fire22/benchmark-suite",
-        "@fire22/performance-monitor"
-      ],
-      "dependencies": [
-        "@fire22/core"
-      ],
+      "packages": ["@fire22/benchmark-suite", "@fire22/performance-monitor"],
+      "dependencies": ["@fire22/core"],
       "registry": "npm",
       "repository": {
         "url": "https://github.com/fire22/fire22-benchmarking-suite",
@@ -38,13 +33,8 @@
       "name": "fire22-wager-system",
       "description": "Advanced wager processing and risk management",
       "domain": "wager",
-      "packages": [
-        "@fire22/wager-system"
-      ],
-      "dependencies": [
-        "@fire22/core",
-        "@fire22/middleware"
-      ],
+      "packages": ["@fire22/wager-system"],
+      "dependencies": ["@fire22/core", "@fire22/middleware"],
       "registry": "private",
       "repository": {
         "url": "https://github.com/fire22/fire22-wager-system",
@@ -71,41 +61,17 @@
       }
     },
     "publishingStrategy": {
-      "prerelease": [
-        "alpha",
-        "beta",
-        "rc"
-      ],
-      "beta": [
-        "beta",
-        "rc"
-      ],
-      "stable": [
-        "latest"
-      ]
+      "prerelease": ["alpha", "beta", "rc"],
+      "beta": ["beta", "rc"],
+      "stable": ["latest"]
     }
   },
   "benchmarking": {
     "suites": {
-      "package": [
-        "unit",
-        "integration",
-        "performance"
-      ],
-      "integration": [
-        "cross-package",
-        "end-to-end"
-      ],
-      "deployment": [
-        "cold-start",
-        "memory-usage",
-        "bundle-size"
-      ],
-      "performance": [
-        "throughput",
-        "latency",
-        "resource-usage"
-      ]
+      "package": ["unit", "integration", "performance"],
+      "integration": ["cross-package", "end-to-end"],
+      "deployment": ["cold-start", "memory-usage", "bundle-size"],
+      "performance": ["throughput", "latency", "resource-usage"]
     },
     "budgets": {
       "buildTime": 30000,

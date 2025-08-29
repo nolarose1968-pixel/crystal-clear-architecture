@@ -1,10 +1,10 @@
 #!/usr/bin/env bun
 /**
  * 🔍 Fire22 Pre-Commit Quality Gate
- * 
+ *
  * Fast quality checks for git pre-commit hook integration
  * Optimized for speed while maintaining code quality standards
- * 
+ *
  * @version 3.0.9
  * @author Fire22 Development Team
  */
@@ -26,7 +26,7 @@ class PreCommitCheck {
    */
   async runPreCommitChecks(): Promise<boolean> {
     console.log('🔍 Fire22 Pre-Commit Quality Gate');
-    console.log('==================================\n');
+    console.log('!==!==!==!==!==!====\n');
 
     const checks = [
       { name: 'format-check', fn: this.checkFormatting.bind(this), required: true },
@@ -42,10 +42,11 @@ class PreCommitCheck {
       const result = await check.fn();
       this.results.push(result);
 
-      const statusIcon = result.status === 'pass' ? '✅' : 
-                        result.status === 'fail' ? '❌' : '⏭️';
-      
-      console.log(`${statusIcon} ${check.name} - ${result.status.toUpperCase()} (${result.duration.toFixed(0)}ms)`);
+      const statusIcon = result.status === 'pass' ? '✅' : result.status === 'fail' ? '❌' : '⏭️';
+
+      console.log(
+        `${statusIcon} ${check.name} - ${result.status.toUpperCase()} (${result.duration.toFixed(0)}ms)`
+      );
       console.log(`   💬 ${result.message}\n`);
 
       if (result.status === 'fail' && check.required) {
@@ -62,22 +63,22 @@ class PreCommitCheck {
    */
   private async checkFormatting(): Promise<PreCommitResult> {
     const startTime = performance.now();
-    
+
     try {
       await this.execCommand('bunx', ['--package', 'prettier@3.1.1', '--check', 'src/**/*.ts']);
-      
+
       return {
         step: 'format-check',
         status: 'pass',
         duration: performance.now() - startTime,
-        message: 'All files are properly formatted'
+        message: 'All files are properly formatted',
       };
     } catch (error) {
       return {
         step: 'format-check',
         status: 'fail',
         duration: performance.now() - startTime,
-        message: 'Formatting issues detected. Run "fire22 format" to fix.'
+        message: 'Formatting issues detected. Run "fire22 format" to fix.',
       };
     }
   }
@@ -87,22 +88,22 @@ class PreCommitCheck {
    */
   private async checkLinting(): Promise<PreCommitResult> {
     const startTime = performance.now();
-    
+
     try {
       await this.execCommand('bunx', ['--package', 'eslint@8.56.0', '--ext', '.ts', 'src/']);
-      
+
       return {
         step: 'lint-check',
         status: 'pass',
         duration: performance.now() - startTime,
-        message: 'No linting errors found'
+        message: 'No linting errors found',
       };
     } catch (error) {
       return {
         step: 'lint-check',
         status: 'fail',
         duration: performance.now() - startTime,
-        message: 'Linting errors detected. Run "fire22 lint --fix" to fix.'
+        message: 'Linting errors detected. Run "fire22 lint --fix" to fix.',
       };
     }
   }
@@ -112,22 +113,22 @@ class PreCommitCheck {
    */
   private async checkTypes(): Promise<PreCommitResult> {
     const startTime = performance.now();
-    
+
     try {
       await this.execCommand('bun', ['run', 'typecheck']);
-      
+
       return {
         step: 'type-check',
         status: 'pass',
         duration: performance.now() - startTime,
-        message: 'TypeScript compilation successful'
+        message: 'TypeScript compilation successful',
       };
     } catch (error) {
       return {
         step: 'type-check',
         status: 'fail',
         duration: performance.now() - startTime,
-        message: 'TypeScript errors detected. Fix before committing.'
+        message: 'TypeScript errors detected. Fix before committing.',
       };
     }
   }
@@ -137,22 +138,22 @@ class PreCommitCheck {
    */
   private async runQuickTests(): Promise<PreCommitResult> {
     const startTime = performance.now();
-    
+
     try {
       await this.execCommand('bun', ['run', 'test:quick'], 10000); // 10 second timeout
-      
+
       return {
         step: 'test-quick',
         status: 'pass',
         duration: performance.now() - startTime,
-        message: 'Quick tests passed'
+        message: 'Quick tests passed',
       };
     } catch (error) {
       return {
         step: 'test-quick',
         status: 'skip',
         duration: performance.now() - startTime,
-        message: 'Quick tests skipped (optional check)'
+        message: 'Quick tests skipped (optional check)',
       };
     }
   }
@@ -164,7 +165,7 @@ class PreCommitCheck {
     return new Promise((resolve, reject) => {
       const child = spawn(command, args, {
         stdio: 'pipe',
-        shell: true
+        shell: true,
       });
 
       const timeoutId = setTimeout(() => {
@@ -172,7 +173,7 @@ class PreCommitCheck {
         reject(new Error('Command timed out'));
       }, timeout);
 
-      child.on('close', (code) => {
+      child.on('close', code => {
         clearTimeout(timeoutId);
         if (code === 0) {
           resolve();
@@ -181,7 +182,7 @@ class PreCommitCheck {
         }
       });
 
-      child.on('error', (error) => {
+      child.on('error', error => {
         clearTimeout(timeoutId);
         reject(error);
       });
@@ -198,7 +199,7 @@ class PreCommitCheck {
     const totalDuration = this.results.reduce((sum, r) => sum + r.duration, 0);
 
     console.log('📊 Pre-Commit Summary');
-    console.log('====================');
+    console.log('!==!==!=====');
     console.log(`🎯 Status: ${allPassed ? '✅ PASSED' : '❌ FAILED'}`);
     console.log(`⏱️  Duration: ${(totalDuration / 1000).toFixed(1)}s`);
     console.log(`✅ Passed: ${passed}`);
@@ -222,7 +223,7 @@ class PreCommitCheck {
 // CLI interface and git hook integration
 async function main() {
   const preCommit = new PreCommitCheck();
-  
+
   try {
     const success = await preCommit.runPreCommitChecks();
     process.exit(success ? 0 : 1);

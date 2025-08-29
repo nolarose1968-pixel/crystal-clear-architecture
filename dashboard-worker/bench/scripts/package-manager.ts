@@ -2,7 +2,7 @@
 
 /**
  * 📦 Fire22 Package Manager Utilities
- * 
+ *
  * Complete implementation of bun link and bun pm commands
  */
 
@@ -40,21 +40,20 @@ interface PkgCommand {
 }
 
 export class PackageManager {
-  
   /**
    * Link a local package for development
    */
   async link(packagePath?: string, options: LinkOptions = {}): Promise<void> {
     const args: string[] = ['link'];
-    
+
     if (packagePath) {
       args.push(packagePath);
     }
-    
+
     if (options.save) {
       args.push('--save');
     }
-    
+
     console.log(`🔗 Running: bun ${args.join(' ')}`);
     await $`bun ${args}`.cwd(options.cwd || process.cwd());
   }
@@ -64,11 +63,11 @@ export class PackageManager {
    */
   async unlink(packageName?: string): Promise<void> {
     const args = ['unlink'];
-    
+
     if (packageName) {
       args.push(packageName);
     }
-    
+
     console.log(`🔓 Running: bun ${args.join(' ')}`);
     await $`bun ${args}`;
   }
@@ -78,7 +77,7 @@ export class PackageManager {
    */
   async pack(options: PackOptions = {}): Promise<string> {
     const args: string[] = ['pm', 'pack'];
-    
+
     if (options.dryRun) args.push('--dry-run');
     if (options.destination) args.push('--destination', options.destination);
     if (options.filename) args.push('--filename', options.filename);
@@ -87,14 +86,14 @@ export class PackageManager {
       args.push('--gzip-level', options.gzipLevel.toString());
     }
     if (options.quiet) args.push('--quiet');
-    
+
     console.log(`📦 Running: bun ${args.join(' ')}`);
     const result = await $`bun ${args}`.text();
-    
+
     if (options.quiet) {
       return result.trim();
     }
-    
+
     // Extract tarball name from output
     const lines = result.split('\n');
     const tarballLine = lines.find(line => line.endsWith('.tgz'));
@@ -107,7 +106,7 @@ export class PackageManager {
   async getBinPath(global: boolean = false): Promise<string> {
     const args = ['pm', 'bin'];
     if (global) args.push('-g');
-    
+
     const result = await $`bun ${args}`.text();
     return result.trim();
   }
@@ -118,7 +117,7 @@ export class PackageManager {
   async list(all: boolean = false): Promise<void> {
     const args = ['pm', 'ls'];
     if (all) args.push('--all');
-    
+
     console.log(`📋 Running: bun ${args.join(' ')}`);
     await $`bun ${args}`;
   }
@@ -136,7 +135,7 @@ export class PackageManager {
    */
   async hash(operation: 'generate' | 'string' | 'print' = 'generate'): Promise<string> {
     const args = ['pm'];
-    
+
     switch (operation) {
       case 'string':
         args.push('hash-string');
@@ -147,7 +146,7 @@ export class PackageManager {
       default:
         args.push('hash');
     }
-    
+
     const result = await $`bun ${args}`.text();
     return result.trim();
   }
@@ -157,7 +156,7 @@ export class PackageManager {
    */
   async cache(operation: 'path' | 'clear' = 'path'): Promise<string | void> {
     const args = ['pm', 'cache'];
-    
+
     if (operation === 'clear') {
       args.push('rm');
       console.log('🗑️  Clearing cache...');
@@ -165,7 +164,7 @@ export class PackageManager {
       console.log('✅ Cache cleared');
       return;
     }
-    
+
     const result = await $`bun ${args}`.text();
     return result.trim();
   }
@@ -189,13 +188,13 @@ export class PackageManager {
 
   async trust(packages?: string[], all: boolean = false): Promise<void> {
     const args = ['pm', 'trust'];
-    
+
     if (all) {
       args.push('--all');
     } else if (packages && packages.length > 0) {
       args.push(...packages);
     }
-    
+
     console.log(`🔓 Running: bun ${args.join(' ')}`);
     await $`bun ${args}`;
   }
@@ -208,22 +207,19 @@ export class PackageManager {
   /**
    * Version management
    */
-  async version(
-    increment?: string,
-    options: VersionOptions = {}
-  ): Promise<string> {
+  async version(increment?: string, options: VersionOptions = {}): Promise<string> {
     const args = ['pm', 'version'];
-    
+
     if (increment) {
       args.push(increment);
     }
-    
+
     if (options.noGitTagVersion) args.push('--no-git-tag-version');
     if (options.allowSameVersion) args.push('--allow-same-version');
     if (options.message) args.push('--message', options.message);
     if (options.preid) args.push('--preid', options.preid);
     if (options.force) args.push('--force');
-    
+
     console.log(`📝 Running: bun ${args.join(' ')}`);
     const result = await $`bun ${args}`.text();
     return result.trim();
@@ -234,14 +230,14 @@ export class PackageManager {
    */
   async pkg(command: PkgCommand): Promise<void> {
     const args = ['pm', 'pkg', command.action];
-    
+
     switch (command.action) {
       case 'get':
         if (command.properties) {
           args.push(...command.properties);
         }
         break;
-        
+
       case 'set':
         if (command.values) {
           if (command.json) {
@@ -253,18 +249,18 @@ export class PackageManager {
           }
         }
         break;
-        
+
       case 'delete':
         if (command.properties) {
           args.push(...command.properties);
         }
         break;
-        
+
       case 'fix':
         // No additional args needed
         break;
     }
-    
+
     console.log(`📋 Running: bun ${args.join(' ')}`);
     await $`bun ${args}`;
   }
@@ -275,15 +271,15 @@ export class PackageManager {
   async linkWorkspacePackages(): Promise<void> {
     console.log('\n🔗 Linking Workspace Packages');
     console.log('='.repeat(50));
-    
+
     const packages = [
       '@fire22/benchmark-suite',
       '@fire22/memory-profiler',
       '@fire22/micro-benchmarks',
       '@fire22/load-testing',
-      '@fire22/benchmark-formatter'
+      '@fire22/benchmark-formatter',
     ];
-    
+
     // First, register each package
     for (const pkg of packages) {
       const pkgPath = join(process.cwd(), 'packages', pkg.replace('@fire22/', ''));
@@ -292,7 +288,7 @@ export class PackageManager {
         await $`bun link`.cwd(pkgPath);
       }
     }
-    
+
     // Then link them in the bench directory
     const benchPath = join(process.cwd(), 'bench');
     if (existsSync(benchPath)) {
@@ -301,7 +297,7 @@ export class PackageManager {
         await $`bun link ${pkg} --save`.cwd(benchPath);
       }
     }
-    
+
     console.log('\n✅ All workspace packages linked!');
   }
 
@@ -311,23 +307,29 @@ export class PackageManager {
   async createDistribution(): Promise<void> {
     console.log('\n📦 Creating Distribution Packages');
     console.log('='.repeat(50));
-    
+
     const distDir = join(process.cwd(), 'bench', 'dist');
     if (!existsSync(distDir)) {
       mkdirSync(distDir, { recursive: true });
     }
-    
+
     // Pack main bench package
     console.log('\n📦 Packing bench package...');
     const benchTarball = await this.pack({
       destination: distDir,
-      gzipLevel: 9
+      gzipLevel: 9,
     });
     console.log(`   Created: ${benchTarball}`);
-    
+
     // Pack each workspace package
-    const packages = ['benchmark-suite', 'memory-profiler', 'micro-benchmarks', 'load-testing', 'benchmark-formatter'];
-    
+    const packages = [
+      'benchmark-suite',
+      'memory-profiler',
+      'micro-benchmarks',
+      'load-testing',
+      'benchmark-formatter',
+    ];
+
     for (const pkg of packages) {
       const pkgPath = join(process.cwd(), 'packages', pkg);
       if (existsSync(pkgPath)) {
@@ -335,12 +337,12 @@ export class PackageManager {
         process.chdir(pkgPath);
         const tarball = await this.pack({
           destination: distDir,
-          gzipLevel: 9
+          gzipLevel: 9,
         });
         console.log(`   Created: ${tarball}`);
       }
     }
-    
+
     console.log(`\n✅ All packages created in ${distDir}`);
   }
 
@@ -350,7 +352,7 @@ export class PackageManager {
   showCommands(): void {
     console.log(`
 📦 Bun Package Manager Commands
-================================
+!==!==!==!==!==!==
 
 LINK COMMANDS:
   bun link                    Register current package as linkable
@@ -438,7 +440,7 @@ if (import.meta.main) {
         };
         const destIndex = args.indexOf('--destination');
         if (destIndex !== -1) packOptions.destination = args[destIndex + 1];
-        
+
         const tarball = await pm.pack(packOptions);
         if (!packOptions.quiet) {
           console.log(`\n📦 Tarball created: ${tarball}`);
@@ -527,7 +529,7 @@ if (import.meta.main) {
       default:
         console.log(`
 🚀 Fire22 Package Manager
-=========================
+!==!==!==!=====
 
 COMMANDS:
   link [pkg|workspace]     Link packages for development

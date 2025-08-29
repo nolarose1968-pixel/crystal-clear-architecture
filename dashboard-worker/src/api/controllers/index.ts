@@ -31,7 +31,9 @@ export type * from '../../../core/types/controllers';
  * Legacy settlement history function (now handled by settlement controller)
  */
 export async function settlementHistory(request: any): Promise<Response> {
-  console.warn('⚠️ Using legacy settlementHistory function. Please migrate to settlement controller.');
+  console.warn(
+    '⚠️ Using legacy settlementHistory function. Please migrate to settlement controller.'
+  );
   const { getSettlementHistory } = await import('./settlement/settlement-controller');
   return getSettlementHistory(request, {});
 }
@@ -40,7 +42,9 @@ export async function settlementHistory(request: any): Promise<Response> {
  * Legacy adjustment history function (now handled by adjustment controller)
  */
 export async function getAdjustmentsHistory(request: any): Promise<Response> {
-  console.warn('⚠️ Using legacy getAdjustmentsHistory function. Please migrate to adjustment controller.');
+  console.warn(
+    '⚠️ Using legacy getAdjustmentsHistory function. Please migrate to adjustment controller.'
+  );
   const { getAdjustmentHistory } = await import('./adjustment/adjustment-controller');
   return getAdjustmentHistory(request, {});
 }
@@ -49,7 +53,9 @@ export async function getAdjustmentsHistory(request: any): Promise<Response> {
  * Legacy customer balances function (now handled by balance controller)
  */
 export async function getCustomerBalances(request: any): Promise<Response> {
-  console.warn('⚠️ Using legacy getCustomerBalances function. Please migrate to balance controller.');
+  console.warn(
+    '⚠️ Using legacy getCustomerBalances function. Please migrate to balance controller.'
+  );
   const { getCustomerBalances } = await import('./balance/balance-controller');
   return getCustomerBalances(request, {});
 }
@@ -62,12 +68,12 @@ export async function placeholder(request: any): Promise<Response> {
     status: 'info',
     message: 'This endpoint is under development',
     timestamp: new Date().toISOString(),
-    requestId: `placeholder_${Date.now()}`
+    requestId: `placeholder_${Date.now()}`,
   };
 
   return new Response(JSON.stringify(response), {
     status: 200,
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json' },
   });
 }
 

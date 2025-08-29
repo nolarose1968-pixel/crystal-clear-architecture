@@ -3,11 +3,11 @@
  * Monitors application-specific metrics, domain health, and task processing
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 interface ApplicationHealth {
-  status: 'healthy' | 'degraded' | 'critical';
+  status: "healthy" | "degraded" | "critical";
   timestamp: string;
   domains: DomainHealth[];
   tasks: TaskProcessingHealth;
@@ -19,7 +19,7 @@ interface ApplicationHealth {
 
 interface DomainHealth {
   name: string;
-  status: 'healthy' | 'degraded' | 'critical';
+  status: "healthy" | "degraded" | "critical";
   activeRequests: number;
   errorRate: number;
   avgResponseTime: number;
@@ -68,27 +68,24 @@ export class ApplicationHealthService {
    * Get comprehensive application health
    */
   async getApplicationHealth(): Promise<ApplicationHealth> {
-    const [
-      domains,
-      tasks,
-      api,
-      memory
-    ] = await Promise.all([
+    const [domains, tasks, api, memory] = await Promise.all([
       this.getDomainHealth(),
       this.getTaskProcessingHealth(),
       this.getAPIHealth(),
-      this.getProcessMemoryHealth()
+      this.getProcessMemoryHealth(),
     ]);
 
     // Determine overall status
     const components = [domains, tasks, api, memory];
-    const unhealthyComponents = components.filter(comp => comp.status !== 'healthy');
+    const unhealthyComponents = components.filter(
+      (comp) => comp.status !== "healthy",
+    );
 
-    let overallStatus: 'healthy' | 'degraded' | 'critical' = 'healthy';
-    if (unhealthyComponents.some(comp => comp.status === 'critical')) {
-      overallStatus = 'critical';
+    let overallStatus: "healthy" | "degraded" | "critical" = "healthy";
+    if (unhealthyComponents.some((comp) => comp.status === "critical")) {
+      overallStatus = "critical";
     } else if (unhealthyComponents.length > 0) {
-      overallStatus = 'degraded';
+      overallStatus = "degraded";
     }
 
     return {
@@ -99,7 +96,7 @@ export class ApplicationHealthService {
       api,
       memory,
       version: this.getApplicationVersion(),
-      environment: process.env.NODE_ENV || 'development'
+      environment: process.env.NODE_ENV || "development",
     };
   }
 
@@ -110,62 +107,62 @@ export class ApplicationHealthService {
     // Simulate domain monitoring - in real implementation, this would check actual domain services
     const domains: DomainHealth[] = [
       {
-        name: 'Collections',
-        status: 'healthy',
+        name: "Collections",
+        status: "healthy",
         activeRequests: Math.floor(Math.random() * 50) + 10,
         errorRate: Math.random() * 0.02,
         avgResponseTime: Math.random() * 100 + 50,
-        uptime: Date.now() - this.startTime
+        uptime: Date.now() - this.startTime,
       },
       {
-        name: 'Distributions',
-        status: 'healthy',
+        name: "Distributions",
+        status: "healthy",
         activeRequests: Math.floor(Math.random() * 30) + 5,
         errorRate: Math.random() * 0.01,
         avgResponseTime: Math.random() * 80 + 40,
-        uptime: Date.now() - this.startTime
+        uptime: Date.now() - this.startTime,
       },
       {
-        name: 'Bet Odds & Wagers',
-        status: Math.random() > 0.9 ? 'degraded' : 'healthy',
+        name: "Bet Odds & Wagers",
+        status: Math.random() > 0.9 ? "degraded" : "healthy",
         activeRequests: Math.floor(Math.random() * 20) + 2,
         errorRate: Math.random() * 0.05,
         avgResponseTime: Math.random() * 150 + 75,
-        uptime: Date.now() - this.startTime
+        uptime: Date.now() - this.startTime,
       },
       {
-        name: 'Cashier',
-        status: 'healthy',
+        name: "Cashier",
+        status: "healthy",
         activeRequests: Math.floor(Math.random() * 40) + 8,
         errorRate: Math.random() * 0.015,
         avgResponseTime: Math.random() * 120 + 60,
-        uptime: Date.now() - this.startTime
+        uptime: Date.now() - this.startTime,
       },
       {
-        name: 'Finance',
-        status: 'healthy',
+        name: "Finance",
+        status: "healthy",
         activeRequests: Math.floor(Math.random() * 25) + 3,
         errorRate: Math.random() * 0.008,
         avgResponseTime: Math.random() * 90 + 45,
-        uptime: Date.now() - this.startTime
+        uptime: Date.now() - this.startTime,
       },
       {
-        name: 'Settlements',
-        status: 'healthy',
+        name: "Settlements",
+        status: "healthy",
         activeRequests: Math.floor(Math.random() * 15) + 1,
         errorRate: Math.random() * 0.012,
         avgResponseTime: Math.random() * 200 + 100,
-        uptime: Date.now() - this.startTime
-      }
+        uptime: Date.now() - this.startTime,
+      },
     ];
 
     // Adjust status based on error rates and response times
-    domains.forEach(domain => {
+    domains.forEach((domain) => {
       if (domain.errorRate > 0.03 || domain.avgResponseTime > 200) {
-        domain.status = 'degraded';
+        domain.status = "degraded";
       }
       if (domain.errorRate > 0.1 || domain.avgResponseTime > 500) {
-        domain.status = 'critical';
+        domain.status = "critical";
       }
     });
 
@@ -183,12 +180,12 @@ export class ApplicationHealthService {
     const failedTasks = Math.floor(Math.random() * 20);
     const avgProcessingTime = Math.random() * 500 + 100;
 
-    let status = 'healthy';
+    let status = "healthy";
     if (queuedTasks > 100 || failedTasks > 10) {
-      status = 'degraded';
+      status = "degraded";
     }
     if (queuedTasks > 200 || failedTasks > 50) {
-      status = 'critical';
+      status = "critical";
     }
 
     return {
@@ -198,7 +195,7 @@ export class ApplicationHealthService {
       completedTasks,
       failedTasks,
       avgProcessingTime,
-      queueDepth: queuedTasks
+      queueDepth: queuedTasks,
     };
   }
 
@@ -212,12 +209,12 @@ export class ApplicationHealthService {
     const avgResponseTime = Math.random() * 150 + 50;
     const requestsPerSecond = Math.random() * 50 + 10;
 
-    let status = 'healthy';
+    let status = "healthy";
     if (errorRate > 0.02 || avgResponseTime > 200) {
-      status = 'degraded';
+      status = "degraded";
     }
     if (errorRate > 0.05 || avgResponseTime > 500) {
-      status = 'critical';
+      status = "critical";
     }
 
     return {
@@ -226,7 +223,7 @@ export class ApplicationHealthService {
       activeEndpoints,
       errorRate,
       avgResponseTime,
-      requestsPerSecond
+      requestsPerSecond,
     };
   }
 
@@ -242,12 +239,12 @@ export class ApplicationHealthService {
 
     const usagePercent = (heapUsed / heapTotal) * 100;
 
-    let status = 'healthy';
+    let status = "healthy";
     if (usagePercent > 75) {
-      status = 'degraded';
+      status = "degraded";
     }
     if (usagePercent > 90) {
-      status = 'critical';
+      status = "critical";
     }
 
     return {
@@ -256,14 +253,18 @@ export class ApplicationHealthService {
       heapTotal,
       external,
       rss,
-      usagePercent
+      usagePercent,
     };
   }
 
   /**
    * Record API request metrics
    */
-  recordRequest(endpoint: string, responseTime: number, success: boolean): void {
+  recordRequest(
+    endpoint: string,
+    responseTime: number,
+    success: boolean,
+  ): void {
     // Update request counts
     const currentCount = this.requestCounts.get(endpoint) || 0;
     this.requestCounts.set(endpoint, currentCount + 1);
@@ -298,7 +299,8 @@ export class ApplicationHealthService {
     const errorRate = requestCount > 0 ? errorCount / requestCount : 0;
 
     const times = this.responseTimes.get(endpoint) || [];
-    const avgResponseTime = times.length > 0 ? times.reduce((a, b) => a + b, 0) / times.length : 0;
+    const avgResponseTime =
+      times.length > 0 ? times.reduce((a, b) => a + b, 0) / times.length : 0;
 
     // Calculate P95 response time
     const sortedTimes = [...times].sort((a, b) => a - b);
@@ -310,15 +312,21 @@ export class ApplicationHealthService {
       errorCount,
       errorRate,
       avgResponseTime,
-      p95ResponseTime
+      p95ResponseTime,
     };
   }
 
   /**
    * Get all endpoint metrics
    */
-  getAllEndpointMetrics(): Record<string, ReturnType<typeof this.getEndpointMetrics>> {
-    const metrics: Record<string, ReturnType<typeof this.getEndpointMetrics>> = {};
+  getAllEndpointMetrics(): Record<
+    string,
+    ReturnType<typeof this.getEndpointMetrics>
+  > {
+    const metrics: Record<
+      string,
+      ReturnType<typeof this.getEndpointMetrics>
+    > = {};
 
     for (const endpoint of this.requestCounts.keys()) {
       metrics[endpoint] = this.getEndpointMetrics(endpoint);
@@ -343,16 +351,16 @@ export class ApplicationHealthService {
   private getApplicationVersion(): string {
     try {
       // Try to read from package.json
-      const packagePath = path.join(process.cwd(), 'package.json');
+      const packagePath = path.join(process.cwd(), "package.json");
       if (fs.existsSync(packagePath)) {
-        const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
-        return packageJson.version || '1.0.0';
+        const packageJson = JSON.parse(fs.readFileSync(packagePath, "utf8"));
+        return packageJson.version || "1.0.0";
       }
     } catch (error) {
-      console.warn('Could not read package.json:', error);
+      console.warn("Could not read package.json:", error);
     }
 
-    return process.env.npm_package_version || '1.0.0';
+    return process.env.npm_package_version || "1.0.0";
   }
 
   /**
@@ -375,7 +383,8 @@ export class ApplicationHealthService {
     // In a real implementation, you'd track timestamps for each metric
     // and remove old entries. For now, we'll just clear very old response times.
     for (const [endpoint, times] of this.responseTimes.entries()) {
-      if (times.length > 1000) { // If we have too many measurements, keep only recent ones
+      if (times.length > 1000) {
+        // If we have too many measurements, keep only recent ones
         this.responseTimes.set(endpoint, times.slice(-100));
       }
     }

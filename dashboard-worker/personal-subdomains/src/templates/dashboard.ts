@@ -60,12 +60,16 @@ function generateQuickActions(employee: EmployeeData): string {
       icon: '👤',
       className: 'secondary',
     },
-    ...(employee.features.includes('scheduling') ? [{
-      href: '/schedule',
-      label: 'Schedule Meeting',
-      icon: '📅',
-      className: 'secondary',
-    }] : []),
+    ...(employee.features.includes('scheduling')
+      ? [
+          {
+            href: '/schedule',
+            label: 'Schedule Meeting',
+            icon: '📅',
+            className: 'secondary',
+          },
+        ]
+      : []),
     {
       href: '/tools',
       label: 'Department Tools',
@@ -110,13 +114,17 @@ function generateQuickActions(employee: EmployeeData): string {
     <div class="dashboard-card">
       <h3>⚡ Quick Actions</h3>
       <div class="action-grid">
-        ${actions.map(action => `
+        ${actions
+          .map(
+            action => `
           <a href="${action.href}" class="action-card">
             <div class="action-icon">${action.icon}</div>
             <div class="action-title">${action.label}</div>
             <div class="action-desc">${getActionDescription(action.href)}</div>
           </a>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     </div>
   `;
@@ -177,7 +185,10 @@ function generateRecentActivity(employee: EmployeeData): string {
     <div class="dashboard-card">
       <h3>📋 Recent Activity</h3>
       <div class="activity-list">
-        ${activities.slice(0, 6).map(activity => `
+        ${activities
+          .slice(0, 6)
+          .map(
+            activity => `
           <div class="activity-item">
             <div class="activity-icon">${activity.icon}</div>
             <div class="activity-content">
@@ -185,7 +196,9 @@ function generateRecentActivity(employee: EmployeeData): string {
               <div class="activity-meta">${activity.description} • ${activity.time}</div>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     </div>
   `;

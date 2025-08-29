@@ -2,22 +2,30 @@
 
 ## Overview
 
-The Fire22 Dashboard RSS feeds are now fully integrated with our CI/CD pipeline using Bun and GitHub Actions. This document outlines the complete integration for the CI team.
+The Fire22 Dashboard RSS feeds are now fully integrated with our CI/CD pipeline
+using Bun and GitHub Actions. This document outlines the complete integration
+for the CI team.
 
 ## 🚀 Live RSS Feed URLs
 
 - **Feed Index**: https://dashboard-worker.nolarose1968-806.workers.dev/feeds/
-- **Error Codes RSS**: https://dashboard-worker.nolarose1968-806.workers.dev/feeds/error-codes-rss.xml
-- **Error Codes Atom**: https://dashboard-worker.nolarose1968-806.workers.dev/feeds/error-codes-atom.xml
-- **Team Announcements RSS**: https://dashboard-worker.nolarose1968-806.workers.dev/feeds/team-announcements-rss.xml
-- **Team Announcements Atom**: https://dashboard-worker.nolarose1968-806.workers.dev/feeds/team-announcements-atom.xml
-- **Critical Alerts**: https://dashboard-worker.nolarose1968-806.workers.dev/feeds/critical-errors-alert.xml
+- **Error Codes RSS**:
+  https://dashboard-worker.nolarose1968-806.workers.dev/feeds/error-codes-rss.xml
+- **Error Codes Atom**:
+  https://dashboard-worker.nolarose1968-806.workers.dev/feeds/error-codes-atom.xml
+- **Team Announcements RSS**:
+  https://dashboard-worker.nolarose1968-806.workers.dev/feeds/team-announcements-rss.xml
+- **Team Announcements Atom**:
+  https://dashboard-worker.nolarose1968-806.workers.dev/feeds/team-announcements-atom.xml
+- **Critical Alerts**:
+  https://dashboard-worker.nolarose1968-806.workers.dev/feeds/critical-errors-alert.xml
 
 ## 🔧 CI/CD Pipeline Integration
 
 ### GitHub Actions Workflow
 
-The RSS feeds are built, validated, and deployed as part of our CI pipeline in `.github/workflows/ci.yml`:
+The RSS feeds are built, validated, and deployed as part of our CI pipeline in
+`.github/workflows/ci.yml`:
 
 ```yaml
 rss-feeds:
@@ -116,6 +124,7 @@ bun run feeds:deploy --dry-run
 ### Deployment Verification
 
 The deployment script automatically:
+
 - Validates all feeds before deployment
 - Runs tests to ensure functionality
 - Verifies deployment with HTTP checks
@@ -141,6 +150,7 @@ bun run scripts/validate-feeds.ts
 ### CI Validation Reports
 
 Each CI run generates:
+
 - Feed file list with sizes
 - Module size metrics
 - Validation results
@@ -152,22 +162,25 @@ Each CI run generates:
 ### Common Issues
 
 1. **XML Validation Failures**
+
    ```bash
    # Check XML syntax
    xmllint --noout src/feeds/*.xml
    ```
 
 2. **Build Module Failures**
+
    ```bash
    # Rebuild feeds module
    bun run scripts/build-feeds-module.ts
    ```
 
 3. **Deployment Failures**
+
    ```bash
    # Check Cloudflare credentials
    wrangler whoami
-   
+
    # Verify KV namespaces
    wrangler kv:namespace list
    ```
@@ -188,12 +201,14 @@ curl -s https://dashboard-worker.nolarose1968-806.workers.dev/feeds/error-codes-
 ## 📊 Performance Metrics
 
 ### Build Performance (Bun)
+
 - Feed module generation: ~200ms
 - XML generation: ~50ms per feed
 - Validation: ~100ms total
 - Deployment: ~5 seconds
 
 ### Runtime Performance
+
 - Cold start: < 50ms
 - Feed response: < 10ms
 - Cache TTL: 3600 seconds
@@ -202,12 +217,14 @@ curl -s https://dashboard-worker.nolarose1968-806.workers.dev/feeds/error-codes-
 ## 🔐 Security Considerations
 
 ### Feed Security
+
 - CORS headers enabled (`Access-Control-Allow-Origin: *`)
 - Cache headers for CDN optimization
 - No sensitive data in feeds
 - HTTPS-only deployment
 
 ### CI/CD Security
+
 - Secrets stored in GitHub Actions
 - Cloudflare API tokens encrypted
 - Build artifacts retention: 7 days
@@ -216,18 +233,21 @@ curl -s https://dashboard-worker.nolarose1968-806.workers.dev/feeds/error-codes-
 ## 📈 Integration Benefits
 
 ### For CI Team
+
 - ✅ Automated feed generation on every commit
 - ✅ XML validation prevents broken feeds
 - ✅ Test coverage ensures functionality
 - ✅ Deployment verification confirms availability
 
 ### For Development Team
+
 - ✅ No manual feed updates needed
 - ✅ Automatic URL updates for deployments
 - ✅ Version-controlled feed content
 - ✅ Rollback capability through Git
 
 ### For Operations Team
+
 - ✅ Real-time error code updates
 - ✅ Team announcement distribution
 - ✅ Critical alert notifications
@@ -248,5 +268,4 @@ curl -s https://dashboard-worker.nolarose1968-806.workers.dev/feeds/error-codes-
 
 ---
 
-Last Updated: January 28, 2025
-Version: 1.0.0
+Last Updated: January 28, 2025 Version: 1.0.0

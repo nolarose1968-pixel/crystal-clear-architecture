@@ -105,8 +105,20 @@ export class HierarchySystem {
   /**
    * Assign customer to agent
    */
-  assignCustomerToAgent(customerId: string, agentId: string, relationshipType?: any, commissionSplit?: number, assignedBy?: string) {
-    return this.agentManager.assignCustomerToAgent(customerId, agentId, relationshipType, commissionSplit, assignedBy);
+  assignCustomerToAgent(
+    customerId: string,
+    agentId: string,
+    relationshipType?: any,
+    commissionSplit?: number,
+    assignedBy?: string
+  ) {
+    return this.agentManager.assignCustomerToAgent(
+      customerId,
+      agentId,
+      relationshipType,
+      commissionSplit,
+      assignedBy
+    );
   }
 
   /**
@@ -198,7 +210,14 @@ export class HierarchySystem {
   /**
    * Calculate commission
    */
-  calculateCommission(agentId: string, structureId: string, revenue: number, period?: any, startDate?: Date, endDate?: Date) {
+  calculateCommission(
+    agentId: string,
+    structureId: string,
+    revenue: number,
+    period?: any,
+    startDate?: Date,
+    endDate?: Date
+  ) {
     return this.commissionManager.calculateCommission(
       agentId,
       structureId,
@@ -267,7 +286,7 @@ export class HierarchySystem {
     return {
       agents: this.getAgentStatistics(),
       commissions: this.getCommissionStatistics(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -287,9 +306,9 @@ export class HierarchySystem {
         totalCommissionStructures: commissionStats.totalStructures,
         activeCommissionStructures: commissionStats.activeStructures,
         totalCommissionPaid: commissionStats.totalCommissionPaid,
-        pendingPayouts: commissionStats.pendingPayouts
+        pendingPayouts: commissionStats.pendingPayouts,
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 

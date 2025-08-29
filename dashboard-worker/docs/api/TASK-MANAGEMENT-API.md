@@ -2,7 +2,9 @@
 
 ## Overview
 
-The Fire22 Dashboard Task Management API provides comprehensive CRUD operations for task management with real-time updates, advanced filtering, and department-based access control.
+The Fire22 Dashboard Task Management API provides comprehensive CRUD operations
+for task management with real-time updates, advanced filtering, and
+department-based access control.
 
 **Base URL:** `https://dashboard-worker.nolarose1968-806.workers.dev`  
 **API Version:** 1.0.0  
@@ -21,6 +23,7 @@ Authorization: Bearer <jwt_token>
 ### Tasks CRUD Operations
 
 #### 1. Create Task
+
 ```http
 POST /api/tasks
 Content-Type: application/json
@@ -28,6 +31,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 **Request Body:**
+
 ```json
 {
   "title": "Implement user authentication",
@@ -46,6 +50,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "success": true,
@@ -86,16 +91,19 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 2. Get Tasks (with filtering and pagination)
+
 ```http
 GET /api/tasks?page=1&limit=20&department=technology&status=active&priority=high
 Authorization: Bearer <jwt_token>
 ```
 
 **Query Parameters:**
+
 - `page` (number): Page number (default: 1)
 - `limit` (number): Items per page (default: 20, max: 100)
 - `department` (string): Filter by department ID
-- `status` (string): Filter by status (planning|active|in-progress|review|completed|cancelled)
+- `status` (string): Filter by status
+  (planning|active|in-progress|review|completed|cancelled)
 - `priority` (string): Filter by priority (low|medium|high|critical)
 - `assignee` (string): Filter by assignee ID
 - `reporter` (string): Filter by reporter ID
@@ -107,6 +115,7 @@ Authorization: Bearer <jwt_token>
 - `sortOrder` (string): Sort direction (asc|desc)
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -115,7 +124,7 @@ Authorization: Bearer <jwt_token>
       {
         "id": 123,
         "uuid": "task_2024_08_28_abc123def456",
-        "title": "Implement user authentication",
+        "title": "Implement user authentication"
         // ... full task object
       }
     ],
@@ -137,12 +146,14 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 3. Get Single Task
+
 ```http
 GET /api/tasks/{uuid}
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -167,6 +178,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 4. Update Task
+
 ```http
 PUT /api/tasks/{uuid}
 Content-Type: application/json
@@ -174,6 +186,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 **Request Body (partial update):**
+
 ```json
 {
   "status": "in-progress",
@@ -183,6 +196,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -198,12 +212,14 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 5. Delete Task
+
 ```http
 DELETE /api/tasks/{uuid}
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -214,6 +230,7 @@ Authorization: Bearer <jwt_token>
 ### Task Comments
 
 #### 6. Add Comment
+
 ```http
 POST /api/tasks/{uuid}/comments
 Content-Type: application/json
@@ -221,6 +238,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 **Request Body:**
+
 ```json
 {
   "content": "Updated the authentication flow based on security review",
@@ -229,6 +247,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 7. Get Comments
+
 ```http
 GET /api/tasks/{uuid}/comments
 Authorization: Bearer <jwt_token>
@@ -237,6 +256,7 @@ Authorization: Bearer <jwt_token>
 ### Real-time Updates (Server-Sent Events)
 
 #### 8. Task Event Stream
+
 ```http
 GET /api/tasks/events
 Authorization: Bearer <jwt_token>
@@ -244,11 +264,13 @@ Accept: text/event-stream
 ```
 
 **Query Parameters:**
+
 - `departments` (string): Comma-separated department IDs
 - `assignees` (string): Comma-separated assignee IDs
 - `eventTypes` (string): Comma-separated event types
 
 **Event Types:**
+
 - `task_created`: New task created
 - `task_updated`: Task updated
 - `task_deleted`: Task deleted
@@ -257,6 +279,7 @@ Accept: text/event-stream
 - `task_comment`: New comment added
 
 **Event Format:**
+
 ```
 event: task_updated
 data: {"type":"task_updated","taskUuid":"task_2024_08_28_abc123def456","task":{...},"changes":{...},"timestamp":"2024-08-28T10:30:00Z","departmentId":"technology"}
@@ -283,6 +306,7 @@ All endpoints return consistent error responses:
 ```
 
 **Common Error Codes:**
+
 - `TASK_NOT_FOUND` (404): Task does not exist
 - `INVALID_DEPARTMENT` (400): Invalid department ID
 - `UNAUTHORIZED` (401): Invalid or missing JWT token
@@ -301,6 +325,7 @@ All endpoints return consistent error responses:
 The API integrates with the Fire22 department system:
 
 **Supported Departments:**
+
 - `finance` - Finance Department
 - `customer-support` - Customer Support
 - `compliance` - Compliance Department
@@ -319,6 +344,7 @@ The API integrates with the Fire22 department system:
 Special endpoints for design team collaboration:
 
 #### 9. Design Review Request
+
 ```http
 POST /api/tasks/{uuid}/design-review
 Content-Type: application/json
@@ -326,6 +352,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 **Request Body:**
+
 ```json
 {
   "reviewType": "ui_design" | "ux_review" | "design_system" | "accessibility",
@@ -337,6 +364,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 #### 10. Design Assets Upload
+
 ```http
 POST /api/tasks/{uuid}/design-assets
 Content-Type: multipart/form-data

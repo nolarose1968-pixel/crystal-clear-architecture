@@ -3,11 +3,7 @@
  */
 
 import type { EmployeeData } from '../types';
-import {
-  generateHtmlHead,
-  generateHeader,
-  generateFooter,
-} from '../components';
+import { generateHtmlHead, generateHeader, generateFooter } from '../components';
 import { sanitizeHtml } from '../utils';
 
 export function generateSchedulePage(employee: EmployeeData): string {
@@ -45,7 +41,12 @@ export function generateSchedulePage(employee: EmployeeData): string {
 }
 
 function generateScheduleHero(employee: EmployeeData): string {
-  const statusIndicator = employee.tier === 5 ? '👑 VIP Executive' : employee.tier >= 4 ? '🎯 Senior Leadership' : '💼 Professional';
+  const statusIndicator =
+    employee.tier === 5
+      ? '👑 VIP Executive'
+      : employee.tier >= 4
+        ? '🎯 Senior Leadership'
+        : '💼 Professional';
 
   return `
     <div class="schedule-hero">
@@ -58,11 +59,12 @@ function generateScheduleHero(employee: EmployeeData): string {
         <div class="hero-info">
           <h2>Schedule Meeting with ${sanitizeHtml(employee.name)}</h2>
           <p class="hero-description">
-            ${employee.tier === 5
-              ? 'VIP Management Executive • Specialized in high-value client relationships and premium betting operations'
-              : employee.tier >= 4
-              ? 'Senior Leadership • Strategic planning and business development'
-              : 'Professional Consultation • Expert guidance and support'
+            ${
+              employee.tier === 5
+                ? 'VIP Management Executive • Specialized in high-value client relationships and premium betting operations'
+                : employee.tier >= 4
+                  ? 'Senior Leadership • Strategic planning and business development'
+                  : 'Professional Consultation • Expert guidance and support'
             }
           </p>
           <div class="hero-stats">
@@ -97,7 +99,7 @@ function generateMeetingTypes(employee: EmployeeData): string {
       duration: '30 minutes',
       description: 'Standard consultation and professional guidance',
       tier: 1,
-      color: 'blue'
+      color: 'blue',
     },
     {
       icon: '📊',
@@ -105,7 +107,7 @@ function generateMeetingTypes(employee: EmployeeData): string {
       duration: '60 minutes',
       description: 'In-depth planning and strategic discussion',
       tier: 3,
-      color: 'green'
+      color: 'green',
     },
     {
       icon: '🎯',
@@ -113,7 +115,7 @@ function generateMeetingTypes(employee: EmployeeData): string {
       duration: '45 minutes',
       description: 'Investment portfolio analysis and optimization',
       tier: 4,
-      color: 'orange'
+      color: 'orange',
     },
     {
       icon: '👑',
@@ -121,7 +123,7 @@ function generateMeetingTypes(employee: EmployeeData): string {
       duration: '45 minutes',
       description: 'Premium client service and high-value relationship management',
       tier: 5,
-      color: 'gold'
+      color: 'gold',
     },
     {
       icon: '🚨',
@@ -129,13 +131,14 @@ function generateMeetingTypes(employee: EmployeeData): string {
       duration: '30 minutes',
       description: 'Urgent matters requiring immediate attention',
       tier: 5,
-      color: 'red'
-    }
+      color: 'red',
+    },
   ];
 
   return meetingTypes
     .filter(type => employee.tier >= type.tier)
-    .map(type => `
+    .map(
+      type => `
       <div class="meeting-type-card ${type.color}" data-type="${type.title.toLowerCase().replace(/\s+/g, '-')}">
         <div class="meeting-icon">${type.icon}</div>
         <div class="meeting-content">
@@ -151,7 +154,9 @@ function generateMeetingTypes(employee: EmployeeData): string {
           <label for="${type.title.toLowerCase().replace(/\s+/g, '-')}">Select</label>
         </div>
       </div>
-    `).join('');
+    `
+    )
+    .join('');
 }
 
 function generateAvailabilityDashboard(employee: EmployeeData): string {
@@ -175,7 +180,7 @@ function generateAvailabilityDashboard(employee: EmployeeData): string {
       dayName,
       isWeekend,
       isToday,
-      slots
+      slots,
     };
   });
 
@@ -193,7 +198,9 @@ function generateAvailabilityDashboard(employee: EmployeeData): string {
       </div>
 
       <div class="calendar-week">
-        ${availabilityData.map((day, index) => `
+        ${availabilityData
+          .map(
+            (day, index) => `
           <div class="calendar-day ${day.isToday ? 'today' : ''} ${day.isWeekend ? 'weekend' : ''}" data-date="${day.date}">
             <div class="day-header">
               <div class="day-name">${day.dayName}</div>
@@ -202,7 +209,9 @@ function generateAvailabilityDashboard(employee: EmployeeData): string {
             </div>
 
             <div class="day-slots">
-              ${day.slots.map(slot => `
+              ${day.slots
+                .map(
+                  slot => `
                 <button class="time-slot ${slot.status}"
                         data-time="${slot.time}"
                         data-duration="${slot.duration}"
@@ -211,10 +220,14 @@ function generateAvailabilityDashboard(employee: EmployeeData): string {
                   <div class="slot-duration">${slot.duration}</div>
                   <div class="slot-status">${slot.statusText}</div>
                 </button>
-              `).join('')}
+              `
+                )
+                .join('')}
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
 
       <div class="availability-legend">
@@ -399,38 +412,38 @@ function generateIntegrationHub(employee: EmployeeData): string {
       icon: '📧',
       title: 'Email Integration',
       description: 'Automated email confirmations and reminders',
-      status: 'active'
+      status: 'active',
     },
     {
       icon: '📱',
       title: 'Mobile Calendar',
       description: 'Sync with iOS Calendar, Google Calendar, Outlook',
-      status: 'active'
+      status: 'active',
     },
     {
       icon: '💼',
       title: 'Corporate Outlook',
       description: 'Direct integration with enterprise calendar systems',
-      status: employee.tier >= 3 ? 'active' : 'inactive'
+      status: employee.tier >= 3 ? 'active' : 'inactive',
     },
     {
       icon: '🤖',
       title: 'CRM Integration',
       description: 'Automatic client data synchronization',
-      status: employee.tier >= 4 ? 'active' : 'inactive'
+      status: employee.tier >= 4 ? 'active' : 'inactive',
     },
     {
       icon: '📊',
       title: 'Analytics Tracking',
       description: 'Meeting effectiveness and engagement metrics',
-      status: 'active'
+      status: 'active',
     },
     {
       icon: '🚨',
       title: 'Emergency Override',
       description: 'Priority scheduling for urgent matters',
-      status: employee.tier === 5 ? 'active' : 'inactive'
-    }
+      status: employee.tier === 5 ? 'active' : 'inactive',
+    },
   ];
 
   return `
@@ -439,7 +452,9 @@ function generateIntegrationHub(employee: EmployeeData): string {
       <p>Seamless integration with your preferred tools and platforms</p>
 
       <div class="integrations-grid">
-        ${integrations.map(integration => `
+        ${integrations
+          .map(
+            integration => `
           <div class="integration-card ${integration.status}">
             <div class="integration-icon">${integration.icon}</div>
             <div class="integration-content">
@@ -451,7 +466,9 @@ function generateIntegrationHub(employee: EmployeeData): string {
               </div>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
 
       <div class="integration-summary">
@@ -479,22 +496,22 @@ function generatePriorityQueue(employee: EmployeeData): string {
       title: 'VIP Client Crisis',
       requester: 'Diamond Club Member',
       time: '2 min ago',
-      priority: 'CRITICAL'
+      priority: 'CRITICAL',
     },
     {
       type: 'strategy-review',
       title: 'Portfolio Strategy Review',
       requester: 'Premium Client',
       time: '15 min ago',
-      priority: 'HIGH'
+      priority: 'HIGH',
     },
     {
       type: 'investment-opportunity',
       title: 'Time-Sensitive Investment',
       requester: 'High-Net-Worth Individual',
       time: '1 hour ago',
-      priority: 'HIGH'
-    }
+      priority: 'HIGH',
+    },
   ];
 
   return `
@@ -503,7 +520,9 @@ function generatePriorityQueue(employee: EmployeeData): string {
       <p>Urgent matters requiring immediate attention</p>
 
       <div class="queue-items">
-        ${priorityItems.map(item => `
+        ${priorityItems
+          .map(
+            item => `
           <div class="queue-item ${item.type}" data-priority="${item.priority}">
             <div class="queue-icon">
               ${item.priority === 'CRITICAL' ? '🚨' : '⚡'}
@@ -521,7 +540,9 @@ function generatePriorityQueue(employee: EmployeeData): string {
               </button>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
 
       <div class="queue-controls">

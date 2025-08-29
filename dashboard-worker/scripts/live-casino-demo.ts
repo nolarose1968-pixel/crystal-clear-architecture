@@ -5,7 +5,10 @@
  * Demonstrates live casino games, rates, sessions, and revenue management
  */
 
-import { createLiveCasinoManagementSystem, LiveCasinoManagementSystem } from '../src/live-casino-management';
+import {
+  createLiveCasinoManagementSystem,
+  LiveCasinoManagementSystem,
+} from '../src/live-casino-management';
 
 class LiveCasinoDemo {
   private casinoSystem: LiveCasinoManagementSystem;
@@ -67,9 +70,9 @@ class LiveCasinoDemo {
 
     // Show games by category
     console.log('\n📋 **Games by Category:**');
-    const categories: Array<'table' | 'card' | 'wheel' | 'dice' | 'baccarat' | 'roulette' | 'blackjack' | 'poker'> = [
-      'baccarat', 'roulette', 'blackjack', 'poker', 'dice', 'wheel'
-    ];
+    const categories: Array<
+      'table' | 'card' | 'wheel' | 'dice' | 'baccarat' | 'roulette' | 'blackjack' | 'poker'
+    > = ['baccarat', 'roulette', 'blackjack', 'poker', 'dice', 'wheel'];
 
     categories.forEach(category => {
       const categoryGames = this.casinoSystem.getGamesByCategory(category);
@@ -87,10 +90,10 @@ class LiveCasinoDemo {
     if (gameToUpdate) {
       const oldPopularity = gameToUpdate.popularity;
       const newPopularity = Math.min(100, oldPopularity + 5);
-      
+
       this.casinoSystem.updateGamePopularity(gameToUpdate.id, newPopularity);
       const updatedGame = this.casinoSystem.getGame(gameToUpdate.id);
-      
+
       console.log(`  ${gameToUpdate.name}:`);
       console.log(`    Old Popularity: ${oldPopularity}%`);
       console.log(`    New Popularity: ${updatedGame?.popularity}%`);
@@ -110,7 +113,7 @@ class LiveCasinoDemo {
 
     defaultAgents.forEach(agentId => {
       console.log(`👤 **Agent: ${agentId}**\n`);
-      
+
       games.slice(0, 3).forEach(game => {
         const rate = this.casinoSystem.getRate(agentId, game.id);
         if (rate) {
@@ -130,11 +133,11 @@ class LiveCasinoDemo {
     const agentId = 'agent1';
     const gameId = 'baccarat-live';
     const oldRate = this.casinoSystem.getRate(agentId, gameId);
-    
+
     if (oldRate) {
       console.log(`\nUpdating rate for ${agentId} on Baccarat:`);
       console.log(`  Old Rate: ${(oldRate.adjustedRate * 100).toFixed(1)}%`);
-      
+
       const newRate = oldRate.adjustedRate * 1.2; // 20% increase
       const updatedRate = this.casinoSystem.updateAgentRate(
         agentId,
@@ -143,7 +146,7 @@ class LiveCasinoDemo {
         'Performance bonus - increased player volume',
         'admin'
       );
-      
+
       if (updatedRate) {
         console.log(`  New Rate: ${(updatedRate.adjustedRate * 100).toFixed(1)}%`);
         console.log(`  Adjustment: ${(updatedRate.adjustmentFactor * 100).toFixed(0)}%`);
@@ -158,7 +161,9 @@ class LiveCasinoDemo {
     console.log(`Rate history for ${agentId}:`);
     agentRates.forEach(rate => {
       const game = this.casinoSystem.getGame(rate.gameId);
-      console.log(`  ${game?.name}: ${(rate.adjustedRate * 100).toFixed(1)}% (${rate.effectiveFrom.toLocaleDateString()})`);
+      console.log(
+        `  ${game?.name}: ${(rate.adjustedRate * 100).toFixed(1)}% (${rate.effectiveFrom.toLocaleDateString()})`
+      );
     });
   }
 
@@ -170,7 +175,7 @@ class LiveCasinoDemo {
 
     // Create sample sessions
     console.log('🆕 **Creating Sample Sessions:**');
-    
+
     const agents = ['agent1', 'agent2', 'agent3'];
     const games = this.casinoSystem.getAllGames();
     const players = ['player1', 'player2', 'player3', 'player4', 'player5'];
@@ -182,10 +187,10 @@ class LiveCasinoDemo {
       const gameId = games[i % games.length].id;
       const playerId = players[i % players.length];
       const sessionId = `session_${Date.now()}_${i}`;
-      
+
       const session = this.casinoSystem.startSession(sessionId, playerId, agentId, gameId);
       sessions.push(session);
-      
+
       console.log(`  ✅ Started session ${sessionId}:`);
       console.log(`    Player: ${playerId}`);
       console.log(`    Agent: ${agentId}`);
@@ -196,18 +201,20 @@ class LiveCasinoDemo {
     // End some sessions with results
     console.log('\n🏁 **Ending Sessions with Results:**');
     sessions.slice(0, 5).forEach((session, index) => {
-      const totalBets = 100 + (index * 50);
+      const totalBets = 100 + index * 50;
       const totalWins = Math.floor(totalBets * (0.8 + Math.random() * 0.4)); // 80-120% of bets
-      
+
       const endedSession = this.casinoSystem.endSession(session.sessionId, totalBets, totalWins);
-      
+
       if (endedSession) {
         console.log(`  ✅ Ended session ${session.sessionId}:`);
         console.log(`    💰 Total Bets: $${endedSession.totalBets.toLocaleString()}`);
         console.log(`    🏆 Total Wins: $${endedSession.totalWins.toLocaleString()}`);
         console.log(`    📊 Net Result: $${endedSession.netResult.toLocaleString()}`);
         console.log(`    💸 Commission: $${endedSession.commissionEarned.toFixed(2)}`);
-        console.log(`    ⏱️ Duration: ${Math.round((endedSession.endTime!.getTime() - endedSession.startTime.getTime()) / 1000)}s`);
+        console.log(
+          `    ⏱️ Duration: ${Math.round((endedSession.endTime!.getTime() - endedSession.startTime.getTime()) / 1000)}s`
+        );
       }
     });
 
@@ -217,16 +224,16 @@ class LiveCasinoDemo {
       const activeSessions = this.casinoSystem.getActiveSessions(agentId);
       const currentPeriod = new Date().toISOString().slice(0, 7);
       const completedSessions = this.casinoSystem.getCompletedSessions(agentId, currentPeriod);
-      
+
       console.log(`\n${agentId}:`);
       console.log(`  🎯 Active Sessions: ${activeSessions.length}`);
       console.log(`  ✅ Completed This Month: ${completedSessions.length}`);
-      
+
       if (completedSessions.length > 0) {
         const totalBets = completedSessions.reduce((sum, s) => sum + s.totalBets, 0);
         const totalWins = completedSessions.reduce((sum, s) => sum + s.totalWins, 0);
         const totalCommission = completedSessions.reduce((sum, s) => sum + s.commissionEarned, 0);
-        
+
         console.log(`  💰 Total Bets: $${totalBets.toLocaleString()}`);
         console.log(`  🏆 Total Wins: $${totalWins.toLocaleString()}`);
         console.log(`  💸 Commission Earned: $${totalCommission.toFixed(2)}`);
@@ -243,12 +250,12 @@ class LiveCasinoDemo {
     // Calculate monthly revenue for all agents
     const agents = ['agent1', 'agent2', 'agent3'];
     const currentPeriod = new Date().toISOString().slice(0, 7);
-    
+
     console.log(`📅 **Monthly Revenue Report - ${currentPeriod}**\n`);
-    
+
     agents.forEach(agentId => {
       const revenue = this.casinoSystem.calculateMonthlyRevenue(agentId, currentPeriod);
-      
+
       console.log(`👤 **${agentId}**`);
       console.log(`  💰 Total Bets: $${revenue.totalBets.toLocaleString()}`);
       console.log(`  🏆 Total Wins: $${revenue.totalWins.toLocaleString()}`);
@@ -264,11 +271,13 @@ class LiveCasinoDemo {
     console.log('📋 **Revenue History Demo:**');
     const sampleAgent = 'agent1';
     const revenueHistory = this.casinoSystem.getAgentRevenueHistory(sampleAgent);
-    
+
     if (revenueHistory.length > 0) {
       console.log(`Revenue history for ${sampleAgent}:`);
       revenueHistory.forEach(revenue => {
-        console.log(`  ${revenue.period}: $${revenue.netRevenue.toLocaleString()} (${revenue.sessionCount} sessions)`);
+        console.log(
+          `  ${revenue.period}: $${revenue.netRevenue.toLocaleString()} (${revenue.sessionCount} sessions)`
+        );
       });
     }
   }
@@ -280,11 +289,11 @@ class LiveCasinoDemo {
     console.log('\n📊 **Live Casino Performance Demo**\n');
 
     const currentPeriod = new Date().toISOString().slice(0, 7);
-    
+
     // Game performance analysis
     console.log('🎮 **Game Performance Analysis:**');
     const gamePerformance = this.casinoSystem.getGamePerformance(currentPeriod);
-    
+
     if (gamePerformance.length > 0) {
       gamePerformance.forEach(performance => {
         console.log(`\n${performance.gameName}:`);
@@ -306,7 +315,7 @@ class LiveCasinoDemo {
     // Agent performance ranking
     console.log('\n🏆 **Agent Performance Ranking:**');
     const agentRanking = this.casinoSystem.getAgentPerformanceRanking(currentPeriod);
-    
+
     if (agentRanking.length > 0) {
       agentRanking.forEach((agent, index) => {
         console.log(`\n${index + 1}. **${agent.agentId}**`);
@@ -328,7 +337,7 @@ class LiveCasinoDemo {
     console.log('\n📈 **Live Casino System Statistics Demo**\n');
 
     const stats = this.casinoSystem.getSystemStats();
-    
+
     console.log('🎰 **Overall System Status:**');
     console.log(`  🎮 Total Games: ${stats.totalGames}`);
     console.log(`  ✅ Active Games: ${stats.activeGames}`);
@@ -340,15 +349,15 @@ class LiveCasinoDemo {
     console.log(`  💸 Total Commission: $${stats.totalCommission.toFixed(2)}\n`);
 
     // Calculate additional metrics
-    const gameUtilization = stats.activeGames / stats.totalGames * 100;
-    const rateUtilization = stats.activeRates / stats.totalRates * 100;
-    const sessionActivity = stats.activeSessions / stats.totalSessions * 100;
-    
+    const gameUtilization = (stats.activeGames / stats.totalGames) * 100;
+    const rateUtilization = (stats.activeRates / stats.totalRates) * 100;
+    const sessionActivity = (stats.activeSessions / stats.totalSessions) * 100;
+
     console.log('📊 **System Utilization:**');
     console.log(`  🎮 Game Utilization: ${gameUtilization.toFixed(1)}%`);
     console.log(`  💎 Rate Utilization: ${rateUtilization.toFixed(1)}%`);
     console.log(`  🎯 Session Activity: ${sessionActivity.toFixed(1)}%`);
-    
+
     if (stats.totalRevenue > 0) {
       const commissionRatio = (stats.totalCommission / stats.totalRevenue) * 100;
       console.log(`  💸 Commission Ratio: ${commissionRatio.toFixed(2)}%`);
@@ -368,27 +377,27 @@ async function main() {
       case 'games':
         await demo.runGamesDemo();
         break;
-        
+
       case 'rates':
         await demo.runRatesDemo();
         break;
-        
+
       case 'sessions':
         await demo.runSessionsDemo();
         break;
-        
+
       case 'revenue':
         await demo.runRevenueDemo();
         break;
-        
+
       case 'performance':
         await demo.runPerformanceDemo();
         break;
-        
+
       case 'stats':
         await demo.runSystemStatsDemo();
         break;
-        
+
       case 'demo':
       default:
         await demo.runCompleteDemo();

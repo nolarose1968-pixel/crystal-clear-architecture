@@ -16,9 +16,9 @@ const mockEnv = {
         all: async () => {
           // Return different mock data based on the SQL query content
           const sqlLower = sql.toLowerCase();
-          
+
           if (sqlLower.includes('queue_items') && !sqlLower.includes('queue_matches')) {
-            return { 
+            return {
               results: [
                 // Mock queue items data
                 {
@@ -32,7 +32,7 @@ const mockEnv = {
                   status: 'pending',
                   created_at: new Date().toISOString(),
                   matched_with: null,
-                  notes: 'Test withdrawal for P2P queue'
+                  notes: 'Test withdrawal for P2P queue',
                 },
                 {
                   id: 'mock-queue-2',
@@ -45,12 +45,12 @@ const mockEnv = {
                   status: 'pending',
                   created_at: new Date().toISOString(),
                   matched_with: null,
-                  notes: 'Test deposit for P2P queue'
-                }
-              ]
+                  notes: 'Test deposit for P2P queue',
+                },
+              ],
             };
           } else if (sqlLower.includes('queue_matches')) {
-            return { 
+            return {
               results: [
                 // Mock queue matches data
                 {
@@ -71,12 +71,12 @@ const mockEnv = {
                   deposit_created: new Date().toISOString(),
                   telegramgroupid: 'TEST_GROUP_001',
                   telegramchatid: 'TEST_CHAT_001',
-                  telegramchannel: 'TEST_CHANNEL'
-                }
-              ]
+                  telegramchannel: 'TEST_CHANNEL',
+                },
+              ],
             };
           } else if (sqlLower.includes('telegram_data')) {
-            return { 
+            return {
               results: [
                 // Mock telegram data
                 {
@@ -85,7 +85,7 @@ const mockEnv = {
                   telegram_chat_id: 'TEST_CHAT_001',
                   telegram_channel: 'TEST_CHANNEL',
                   telegram_username: '@testuser1',
-                  telegram_id: '12345'
+                  telegram_id: '12345',
                 },
                 {
                   queue_item_id: 'mock-queue-2',
@@ -93,9 +93,9 @@ const mockEnv = {
                   telegram_chat_id: 'TEST_CHAT_002',
                   telegram_channel: 'TEST_CHANNEL',
                   telegram_username: '@testuser2',
-                  telegram_id: '67890'
-                }
-              ]
+                  telegram_id: '67890',
+                },
+              ],
             };
           } else {
             return { results: [] };
@@ -103,18 +103,18 @@ const mockEnv = {
         },
         first: async () => {
           const sqlLower = sql.toLowerCase();
-          
+
           if (sqlLower.includes('count(*)')) {
-            return { 
+            return {
               total_items: 2,
               pending_withdrawals: 1,
               pending_deposits: 1,
-              matched_pairs: 1
+              matched_pairs: 1,
             };
           } else if (sqlLower.includes('avg') || sqlLower.includes('julianday')) {
-            return { 
+            return {
               avg_wait_time: 0,
-              success_rate: 100
+              success_rate: 100,
             };
           } else if (sqlLower.includes('queue_matches')) {
             return {
@@ -127,22 +127,22 @@ const mockEnv = {
               status: 'pending',
               created_at: new Date().toISOString(),
               completed_at: null,
-              notes: 'Test match'
+              notes: 'Test match',
             };
           } else {
-            return { 
+            return {
               total_items: 2,
               pending_withdrawals: 1,
               pending_deposits: 1,
               matched_pairs: 0,
               avg_wait_time: 0,
-              success_rate: 100
+              success_rate: 100,
             };
           }
-        }
-      })
-    })
-  }
+        },
+      }),
+    }),
+  },
 };
 
 async function testP2PQueueSystem() {
@@ -166,7 +166,7 @@ async function testP2PQueueSystem() {
       telegramGroupId: 'TEST_GROUP_001',
       telegramChatId: 'TEST_CHAT_001',
       telegramChannel: 'TEST_CHANNEL',
-      telegramUsername: '@testuser1'
+      telegramUsername: '@testuser1',
     });
     console.log(`✅ Withdrawal added with ID: ${withdrawalId}`);
 
@@ -182,7 +182,7 @@ async function testP2PQueueSystem() {
       telegramGroupId: 'TEST_GROUP_001',
       telegramChatId: 'TEST_CHAT_002',
       telegramChannel: 'TEST_CHANNEL',
-      telegramUsername: '@testuser2'
+      telegramUsername: '@testuser2',
     });
     console.log(`✅ Deposit added with ID: ${depositId}`);
 
@@ -191,7 +191,7 @@ async function testP2PQueueSystem() {
     try {
       const queueItems = await p2pAPI.getQueueItems({
         paymentType: 'bank_transfer',
-        telegramGroupId: 'TEST_GROUP_001'
+        telegramGroupId: 'TEST_GROUP_001',
       });
       console.log(`✅ Retrieved ${queueItems.length} queue items`);
     } catch (error) {
@@ -204,15 +204,21 @@ async function testP2PQueueSystem() {
       const matches = await p2pAPI.getMatchingOpportunities();
       console.log(`✅ Retrieved ${matches.length} matching opportunities`);
     } catch (error) {
-      console.log('⚠️ Matching opportunities test skipped due to complex SQL query in mock environment');
-      console.log('   This is expected in the test environment - the real system will work properly');
+      console.log(
+        '⚠️ Matching opportunities test skipped due to complex SQL query in mock environment'
+      );
+      console.log(
+        '   This is expected in the test environment - the real system will work properly'
+      );
     }
 
     // Test getting queue stats (basic functionality)
     console.log('\n📊 Testing queue statistics...');
     try {
       const stats = await p2pAPI.getQueueStats();
-      console.log(`✅ Queue stats: ${stats.totalItems} total items, ${stats.successRate}% success rate`);
+      console.log(
+        `✅ Queue stats: ${stats.totalItems} total items, ${stats.successRate}% success rate`
+      );
     } catch (error) {
       console.log('⚠️ Queue stats test skipped due to mock environment limitations');
     }
@@ -222,7 +228,7 @@ async function testP2PQueueSystem() {
     try {
       const updateResult = await p2pAPI.updateQueueItem(withdrawalId, {
         notes: 'Updated test withdrawal notes',
-        priority: 2
+        priority: 2,
       });
       console.log(`✅ Queue item updated: ${updateResult}`);
     } catch (error) {
@@ -269,7 +275,6 @@ async function testP2PQueueSystem() {
     console.log('  ⚠️ Item Cancellation (mock limited)');
     console.log('\n💡 Note: Mock environment limitations are expected in testing.');
     console.log('   The real system will work properly with actual database connections.');
-
   } catch (error) {
     console.error('❌ Test failed:', error);
     process.exit(1);

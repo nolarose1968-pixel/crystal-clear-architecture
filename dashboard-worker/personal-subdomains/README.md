@@ -1,6 +1,7 @@
 # 🌐 Fire22 Personal Subdomains
 
-**Personal subdomain infrastructure for all Fire22 employees using Cloudflare Workers**
+**Personal subdomain infrastructure for all Fire22 employees using Cloudflare
+Workers**
 
 [![Deploy to Cloudflare](https://img.shields.io/badge/Deploy-Cloudflare-blue)](https://workers.cloudflare.com/)
 [![Status](https://img.shields.io/badge/Status-Ready-green)](#)
@@ -9,11 +10,14 @@
 
 ## 🎯 Overview
 
-This project implements a complete personal subdomain system for Fire22 employees, providing each team member with their own professional presence at `firstname-lastname.fire22.workers.dev`.
+This project implements a complete personal subdomain system for Fire22
+employees, providing each team member with their own professional presence at
+`firstname-lastname.fire22.workers.dev`.
 
 ### ✨ Key Features
 
-- **5-Tier Template System**: Executive, Management, Specialist, Standard, and VIP templates
+- **5-Tier Template System**: Executive, Management, Specialist, Standard, and
+  VIP templates
 - **Wildcard DNS**: Automatic subdomain routing via `*.fire22.workers.dev`
 - **SSL Security**: Automatic HTTPS certificates for all subdomains
 - **Mobile Responsive**: Perfect display across all devices
@@ -54,6 +58,7 @@ bun run setup
 ```
 
 This command will:
+
 - ✅ Create KV namespaces for employee data
 - ✅ Deploy the Cloudflare Worker
 - ✅ Seed employee data for all team members
@@ -65,18 +70,26 @@ This command will:
 ## 📋 Employee Subdomain Registry
 
 ### VIP Management (Tier 5 - CRITICAL)
-- **Vinny2Times**: `https://vinny2times.fire22.workers.dev/` ⭐ **URGENT - 24hr deadline**
+
+- **Vinny2Times**: `https://vinny2times.fire22.workers.dev/` ⭐ **URGENT - 24hr
+  deadline**
 
 ### Executive Team (Tier 1)
+
 - **William Harris (CEO)**: `https://william-harris.fire22.workers.dev/`
 - **Patricia Clark (COO)**: `https://patricia-clark.fire22.workers.dev/`
 - **Chris Brown (CTO)**: `https://chris-brown.fire22.workers.dev/`
 - **Jennifer Adams (HR Director)**: `https://jennifer-adams.fire22.workers.dev/`
-- **Sarah Martinez (Communications Director)**: `https://sarah-martinez.fire22.workers.dev/`
-- **Isabella Martinez (Design Director)**: `https://isabella-martinez.fire22.workers.dev/`
+- **Sarah Martinez (Communications Director)**:
+  `https://sarah-martinez.fire22.workers.dev/`
+- **Isabella Martinez (Design Director)**:
+  `https://isabella-martinez.fire22.workers.dev/`
 
 ### Complete Employee List
-See [`FIRE22-PERSONAL-SUBDOMAIN-STANDARDS.md`](../src/communications/FIRE22-PERSONAL-SUBDOMAIN-STANDARDS.md) for the complete registry of all 50+ employee subdomains.
+
+See
+[`FIRE22-PERSONAL-SUBDOMAIN-STANDARDS.md`](../src/communications/FIRE22-PERSONAL-SUBDOMAIN-STANDARDS.md)
+for the complete registry of all 50+ employee subdomains.
 
 ---
 
@@ -106,13 +119,13 @@ See [`FIRE22-PERSONAL-SUBDOMAIN-STANDARDS.md`](../src/communications/FIRE22-PERS
 
 ### Template Tiers
 
-| Tier | Template | Target | Features |
-|------|----------|--------|----------|
-| 1 | Executive | C-suite, Department Heads | Team dashboard, advanced analytics |
-| 2 | Management | Directors, Managers | Team management, reporting tools |
-| 3 | Specialist | Senior roles, Experts | Specialized tools, expertise showcase |
-| 4 | Standard | All employees | Basic profile, contact info |
-| 5 | VIP/Custom | Special roles (Vinny2Times) | Custom features, VIP tools |
+| Tier | Template   | Target                      | Features                              |
+| ---- | ---------- | --------------------------- | ------------------------------------- |
+| 1    | Executive  | C-suite, Department Heads   | Team dashboard, advanced analytics    |
+| 2    | Management | Directors, Managers         | Team management, reporting tools      |
+| 3    | Specialist | Senior roles, Experts       | Specialized tools, expertise showcase |
+| 4    | Standard   | All employees               | Basic profile, contact info           |
+| 5    | VIP/Custom | Special roles (Vinny2Times) | Custom features, VIP tools            |
 
 ---
 
@@ -209,11 +222,11 @@ id = "your-employee-data-namespace-id"
 
 ### Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID | ✅ |
-| `CLOUDFLARE_API_TOKEN` | API token with Workers/KV permissions | ✅ |
-| `CLOUDFLARE_ZONE_ID` | Zone ID for fire22.workers.dev | ✅ |
+| Variable                | Description                           | Required |
+| ----------------------- | ------------------------------------- | -------- |
+| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID            | ✅       |
+| `CLOUDFLARE_API_TOKEN`  | API token with Workers/KV permissions | ✅       |
+| `CLOUDFLARE_ZONE_ID`    | Zone ID for fire22.workers.dev        | ✅       |
 
 ---
 
@@ -222,6 +235,7 @@ id = "your-employee-data-namespace-id"
 ### Worker Analytics
 
 Access Cloudflare dashboard for:
+
 - Request volume and performance
 - Error rates and response times
 - Geographic distribution
@@ -230,6 +244,7 @@ Access Cloudflare dashboard for:
 ### Custom Analytics
 
 Each employee site includes:
+
 - Page view tracking
 - Feature usage metrics
 - Performance monitoring
@@ -252,8 +267,9 @@ wrangler tail
 ### Common Issues
 
 #### DNS_PROBE_FINISHED_NXDOMAIN
-**Cause**: Wildcard DNS not configured
-**Solution**:
+
+**Cause**: Wildcard DNS not configured **Solution**:
+
 ```bash
 # Check DNS configuration
 nslookup vinny2times.fire22.workers.dev
@@ -263,12 +279,14 @@ nslookup vinny2times.fire22.workers.dev
 ```
 
 #### SSL Certificate Errors
-**Cause**: SSL not provisioned
-**Solution**: Wait for Cloudflare to provision SSL (usually < 5 minutes)
+
+**Cause**: SSL not provisioned **Solution**: Wait for Cloudflare to provision
+SSL (usually < 5 minutes)
 
 #### Worker Deployment Fails
-**Cause**: Configuration or permission issues
-**Solution**:
+
+**Cause**: Configuration or permission issues **Solution**:
+
 ```bash
 # Check wrangler authentication
 wrangler auth login
@@ -288,12 +306,14 @@ wrangler deploy --dry-run
 ## 📈 Success Metrics
 
 ### Performance Targets
+
 - **Load Time**: < 3 seconds
 - **Uptime**: 99.9%
 - **SSL Score**: A+ rating
 - **Mobile Score**: 100/100
 
 ### Coverage Goals
+
 - **100% Employee Coverage**: Every employee has a subdomain
 - **95% Compliance**: All sites meet Fire22 standards
 - **<48 Hour Provisioning**: New employee setup time
@@ -303,11 +323,13 @@ wrangler deploy --dry-run
 ## 🎯 Business Impact
 
 ### HR Directive Compliance
+
 - ✅ **HR-2025-001**: Mandatory personal subdomains for all employees
 - ✅ **Professional Branding**: Consistent Fire22 identity
 - ✅ **VIP Operations**: Critical infrastructure for Vinny2Times
 
 ### Benefits Delivered
+
 - **Modern Employee Experience**: Professional personal sites
 - **Brand Consistency**: Unified Fire22 presence
 - **Process Efficiency**: Automated onboarding integration
@@ -318,13 +340,16 @@ wrangler deploy --dry-run
 ## 📞 Support & Contact
 
 ### Fire22 Team
+
 - **Technical Lead**: Chris Brown (CTO)
 - **Project Manager**: Jennifer Adams (HR Director)
 - **Design Lead**: Isabella Martinez (Design Director)
 
 ### Cloudflare Support
+
 - **Enterprise Support**: Available 24/7
-- **Documentation**: [Cloudflare Workers Docs](https://developers.cloudflare.com/workers/)
+- **Documentation**:
+  [Cloudflare Workers Docs](https://developers.cloudflare.com/workers/)
 - **Community**: [Cloudflare Community](https://community.cloudflare.com/)
 
 ---
@@ -332,18 +357,21 @@ wrangler deploy --dry-run
 ## 🔄 Roadmap
 
 ### Phase 1: Core Infrastructure ✅
+
 - [x] Wildcard DNS configuration
 - [x] Basic worker deployment
 - [x] Employee data seeding
 - [x] VIP subdomain (vinny2times.fire22.workers.dev)
 
 ### Phase 2: Enhanced Features 🔄
+
 - [ ] Advanced analytics dashboard
 - [ ] Team collaboration tools
 - [ ] Custom domain support
 - [ ] Integration with existing Fire22 systems
 
 ### Phase 3: Automation 🚀
+
 - [ ] Automatic new hire provisioning
 - [ ] Self-service profile management
 - [ ] Advanced customization options
@@ -351,7 +379,8 @@ wrangler deploy --dry-run
 
 ---
 
-**🎉 Fire22 Personal Subdomains - Empowering Every Employee with Professional Presence**
+**🎉 Fire22 Personal Subdomains - Empowering Every Employee with Professional
+Presence**
 
-*Deployed and maintained by the Fire22 Technology Department*</contents>
+_Deployed and maintained by the Fire22 Technology Department_</contents>
 </xai:function_call">

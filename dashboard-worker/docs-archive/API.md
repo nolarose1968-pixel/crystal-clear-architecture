@@ -2,15 +2,16 @@
 
 ## Overview
 
-The Fire22 Dashboard API provides comprehensive endpoints for sports betting operations, real-time monitoring, and system management.
+The Fire22 Dashboard API provides comprehensive endpoints for sports betting
+operations, real-time monitoring, and system management.
 
 ## Base URLs
 
-| Environment | URL | Authentication |
-|-------------|-----|----------------|
-| Production | `https://api.fire22.ag` | Required |
-| Staging | `https://staging-api.fire22.ag` | Required |
-| Development | `http://localhost:3001` | Optional |
+| Environment | URL                             | Authentication |
+| ----------- | ------------------------------- | -------------- |
+| Production  | `https://api.fire22.ag`         | Required       |
+| Staging     | `https://staging-api.fire22.ag` | Required       |
+| Development | `http://localhost:3001`         | Optional       |
 
 ## Authentication
 
@@ -31,8 +32,8 @@ const response = await fetch('https://api.fire22.ag/api/auth/login', {
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     username: 'admin',
-    password: 'password123'
-  })
+    password: 'password123',
+  }),
 });
 
 const { token, expiresIn } = await response.json();
@@ -44,16 +45,17 @@ const { token, expiresIn } = await response.json();
 ### Dashboard
 
 #### GET /dashboard
+
 Returns the main dashboard HTML interface.
 
 **Response**: `text/html`
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <title>Fire22 Dashboard</title>
-    <link rel="stylesheet" href="/styles/index.css">
+    <link rel="stylesheet" href="/styles/index.css" />
   </head>
   <body>
     <!-- Dashboard content -->
@@ -62,6 +64,7 @@ Returns the main dashboard HTML interface.
 ```
 
 #### GET /api/live
+
 Server-Sent Events stream for real-time updates.
 
 **Response**: `text/event-stream`
@@ -78,9 +81,11 @@ data: {"type":"agent","timestamp":1703001234569,"data":{"id":"a456","action":"lo
 ### Fire22 Integration
 
 #### POST /api/manager/getLiveWagers
+
 Get all pending wagers requiring attention.
 
 **Request Body**:
+
 ```json
 {
   "agentId": "uuid-string",
@@ -93,6 +98,7 @@ Get all pending wagers requiring attention.
 ```
 
 **Response**: `200 OK`
+
 ```json
 {
   "success": true,
@@ -103,7 +109,7 @@ Get all pending wagers requiring attention.
         "customerId": "c456",
         "customerName": "John Doe",
         "agentId": "a789",
-        "amount": 150.00,
+        "amount": 150.0,
         "type": "single",
         "sport": "football",
         "event": "Team A vs Team B",
@@ -120,9 +126,11 @@ Get all pending wagers requiring attention.
 ```
 
 #### POST /api/manager/getWeeklyFigureByAgent
+
 Get weekly performance metrics for agents.
 
 **Request Body**:
+
 ```json
 {
   "agentId": "uuid-string",
@@ -133,6 +141,7 @@ Get weekly performance metrics for agents.
 ```
 
 **Response**: `200 OK`
+
 ```json
 {
   "success": true,
@@ -145,18 +154,18 @@ Get weekly performance metrics for agents.
     "metrics": {
       "wagers": {
         "count": 342,
-        "volume": 45670.00,
+        "volume": 45670.0,
         "won": 156,
         "lost": 186
       },
       "revenue": {
-        "gross": 12340.00,
-        "net": 8456.00,
+        "gross": 12340.0,
+        "net": 8456.0,
         "margin": 0.185
       },
       "commissions": {
-        "earned": 1234.00,
-        "rate": 0.10
+        "earned": 1234.0,
+        "rate": 0.1
       },
       "players": {
         "active": 89,
@@ -166,11 +175,11 @@ Get weekly performance metrics for agents.
     },
     "comparison": {
       "previousWeek": {
-        "revenue": 11230.00,
+        "revenue": 11230.0,
         "change": 0.099
       },
       "yearAgo": {
-        "revenue": 9870.00,
+        "revenue": 9870.0,
         "change": 0.251
       }
     },
@@ -178,7 +187,7 @@ Get weekly performance metrics for agents.
       {
         "id": "a790",
         "metrics": {
-          "revenue": 3456.00,
+          "revenue": 3456.0,
           "players": 23
         }
       }
@@ -190,9 +199,11 @@ Get weekly performance metrics for agents.
 ### Customer Management
 
 #### GET /api/customers
+
 Get paginated list of customers.
 
 **Query Parameters**:
+
 - `page` (integer): Page number (default: 1)
 - `limit` (integer): Items per page (default: 50, max: 200)
 - `search` (string): Search by name/username
@@ -202,6 +213,7 @@ Get paginated list of customers.
 - `order` (string): asc|desc
 
 **Response**: `200 OK`
+
 ```json
 {
   "success": true,
@@ -214,7 +226,7 @@ Get paginated list of customers.
         "lastName": "Doe",
         "email": "john@example.com",
         "phone": "+1234567890",
-        "balance": 500.00,
+        "balance": 500.0,
         "currency": "USD",
         "status": "active",
         "agentId": "a789",
@@ -223,8 +235,8 @@ Get paginated list of customers.
         "lastActiveAt": "2024-01-15T12:00:00Z",
         "stats": {
           "totalWagers": 145,
-          "totalWon": 4560.00,
-          "totalLost": 3890.00
+          "totalWon": 4560.0,
+          "totalLost": 3890.0
         }
       }
     ],
@@ -239,9 +251,11 @@ Get paginated list of customers.
 ```
 
 #### POST /api/customers
+
 Create a new customer.
 
 **Request Body**:
+
 ```json
 {
   "username": "newplayer",
@@ -251,19 +265,20 @@ Create a new customer.
   "email": "jane@example.com",
   "phone": "+1234567891",
   "agentId": "a789",
-  "initialDeposit": 100.00,
+  "initialDeposit": 100.0,
   "currency": "USD"
 }
 ```
 
 **Response**: `201 Created`
+
 ```json
 {
   "success": true,
   "data": {
     "id": "c124",
     "username": "newplayer",
-    "balance": 100.00,
+    "balance": 100.0,
     "status": "active",
     "createdAt": "2024-01-15T13:00:00Z"
   }
@@ -273,14 +288,17 @@ Create a new customer.
 ### Agent Hierarchy
 
 #### GET /api/agents/hierarchy
+
 Get the complete 8-level agent hierarchy.
 
 **Query Parameters**:
+
 - `rootId` (uuid): Start from specific agent
 - `depth` (integer): Max depth (1-8)
 - `includeStats` (boolean): Include performance stats
 
 **Response**: `200 OK`
+
 ```json
 {
   "success": true,
@@ -292,7 +310,7 @@ Get the complete 8-level agent hierarchy.
       "stats": {
         "directCustomers": 0,
         "totalCustomers": 2600,
-        "weeklyRevenue": 125000.00
+        "weeklyRevenue": 125000.0
       },
       "children": [
         {
@@ -334,9 +352,11 @@ Get the complete 8-level agent hierarchy.
 ### Synchronization
 
 #### POST /api/sync/fire22-customers
+
 Force synchronization with Fire22 API.
 
 **Request Body**:
+
 ```json
 {
   "fullSync": true,
@@ -347,6 +367,7 @@ Force synchronization with Fire22 API.
 ```
 
 **Response**: `200 OK`
+
 ```json
 {
   "success": true,
@@ -364,7 +385,7 @@ Force synchronization with Fire22 API.
         "blocked": 50
       },
       "balances": {
-        "total": 456789.00,
+        "total": 456789.0,
         "average": 175.68
       }
     }
@@ -375,9 +396,11 @@ Force synchronization with Fire22 API.
 ### Health & Monitoring
 
 #### GET /health
+
 System health check.
 
 **Response**: `200 OK`
+
 ```json
 {
   "status": "healthy",
@@ -410,9 +433,11 @@ System health check.
 ```
 
 #### GET /api/test/fire22
+
 Test Fire22 API connectivity.
 
 **Response**: `200 OK`
+
 ```json
 {
   "success": true,
@@ -433,9 +458,11 @@ Test Fire22 API connectivity.
 ### DNS Management
 
 #### GET /api/fire22/dns-stats
+
 Get DNS cache statistics.
 
 **Response**: `200 OK`
+
 ```json
 {
   "success": true,
@@ -458,9 +485,11 @@ Get DNS cache statistics.
 ```
 
 #### POST /api/fire22/refresh-dns
+
 Manually refresh DNS cache.
 
 **Request Body**:
+
 ```json
 {
   "domains": ["fire22.ag", "api.fire22.ag"],
@@ -469,6 +498,7 @@ Manually refresh DNS cache.
 ```
 
 **Response**: `200 OK`
+
 ```json
 {
   "success": true,
@@ -507,29 +537,30 @@ All errors follow this structure:
 
 ### Common Error Codes
 
-| Code | Status | Description |
-|------|--------|-------------|
-| `AUTH_REQUIRED` | 401 | Missing authentication token |
-| `AUTH_INVALID` | 401 | Invalid or expired token |
-| `FORBIDDEN` | 403 | Insufficient permissions |
-| `NOT_FOUND` | 404 | Resource not found |
-| `VALIDATION_ERROR` | 400 | Invalid request data |
-| `RATE_LIMITED` | 429 | Too many requests |
-| `SERVER_ERROR` | 500 | Internal server error |
-| `SERVICE_UNAVAILABLE` | 503 | Temporary outage |
+| Code                  | Status | Description                  |
+| --------------------- | ------ | ---------------------------- |
+| `AUTH_REQUIRED`       | 401    | Missing authentication token |
+| `AUTH_INVALID`        | 401    | Invalid or expired token     |
+| `FORBIDDEN`           | 403    | Insufficient permissions     |
+| `NOT_FOUND`           | 404    | Resource not found           |
+| `VALIDATION_ERROR`    | 400    | Invalid request data         |
+| `RATE_LIMITED`        | 429    | Too many requests            |
+| `SERVER_ERROR`        | 500    | Internal server error        |
+| `SERVICE_UNAVAILABLE` | 503    | Temporary outage             |
 
 ## Rate Limiting
 
 Rate limits per tier:
 
-| Tier | Requests/Second | Burst |
-|------|----------------|-------|
-| Free | 10 | 20 |
-| Basic | 100 | 200 |
-| Pro | 1000 | 2000 |
-| Enterprise | Unlimited | - |
+| Tier       | Requests/Second | Burst |
+| ---------- | --------------- | ----- |
+| Free       | 10              | 20    |
+| Basic      | 100             | 200   |
+| Pro        | 1000            | 2000  |
+| Enterprise | Unlimited       | -     |
 
 Headers:
+
 ```http
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 95
@@ -542,11 +573,11 @@ Standard pagination parameters:
 
 ```typescript
 interface PaginationParams {
-  page?: number;    // Current page (default: 1)
-  limit?: number;   // Items per page (default: 50)
-  cursor?: string;  // Cursor-based pagination
-  sortBy?: string;  // Sort field
-  order?: 'asc' | 'desc';  // Sort order
+  page?: number; // Current page (default: 1)
+  limit?: number; // Items per page (default: 50)
+  cursor?: string; // Cursor-based pagination
+  sortBy?: string; // Sort field
+  order?: 'asc' | 'desc'; // Sort order
 }
 
 interface PaginationResponse {
@@ -592,7 +623,7 @@ Configure webhooks for real-time events:
   "data": {
     "wagerId": "w123",
     "customerId": "c456",
-    "amount": 100.00
+    "amount": 100.0
   },
   "signature": "sha256=abc123..."
 }
@@ -606,27 +637,23 @@ Configure webhooks for real-time events:
 npm install @fire22/dashboard-client
 ```
 
-```typescript
+````typescript
 ```javascript
 import { Fire22Client } from '@fire22/dashboard-client';
-```
+````
 
-const client = new Fire22Client({
-  apiKey: 'your_api_key',
-  environment: 'production'
-});
+const client = new Fire22Client({ apiKey: 'your_api_key', environment:
+'production' });
 
-const customers = await client.customers.list({
-  page: 1,
-  limit: 50
-});
-```
+const customers = await client.customers.list({ page: 1, limit: 50 });
+
+````
 
 ### Python
 
 ```bash
 pip install fire22-dashboard
-```
+````
 
 ```python
 from fire22_dashboard import Fire22Client
@@ -651,6 +678,7 @@ The API uses URL versioning:
 - Beta: `/api/v3-beta/`
 
 Include version in Accept header:
+
 ```http
 Accept: application/vnd.fire22.v2+json
 ```
@@ -662,6 +690,7 @@ Accept: application/vnd.fire22.v2+json
 Base URL: `https://test-api.fire22.ag`
 
 Test credentials:
+
 ```json
 {
   "username": "test_admin",

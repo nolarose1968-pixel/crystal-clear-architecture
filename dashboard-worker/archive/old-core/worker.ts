@@ -1,11 +1,17 @@
 /**
  * Fire22 Dashboard Worker - Cloudflare Workers Entry Point
- * 
+ *
  * This is the main entry point for Cloudflare Workers deployment
  * Enhanced with enterprise-grade error handling and monitoring
  */
 
-import { withErrorHandling, handleCORSPreflight, createSuccessResponse, createNotFoundError, createValidationError } from './errors/middleware';
+import {
+  withErrorHandling,
+  handleCORSPreflight,
+  createSuccessResponse,
+  createNotFoundError,
+  createValidationError,
+} from './errors/middleware';
 import { RetryUtils, withTimeout, withFallback } from './errors/RetryUtils';
 import { ErrorHandler } from './errors/ErrorHandler';
 import { FireEventMonitoring } from './errors/monitoring';
@@ -88,7 +94,11 @@ export interface Env {
 }
 
 // Main worker handler wrapped with error handling
-const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): Promise<Response> => {
+const mainHandler = async (
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext
+): Promise<Response> => {
   const url = new URL(request.url);
   const path = url.pathname;
 
@@ -104,7 +114,7 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
       headers: {
         'Content-Type': 'image/svg+xml',
         'Cache-Control': 'public, max-age=31536000',
-      }
+      },
     });
   }
 
@@ -118,7 +128,7 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
     },
     slackWebhook: env.SLACK_WEBHOOK_URL,
   });
-    
+
   // VIP CRM API endpoints - Enhanced real-time data
   if (path.startsWith('/api/vip/')) {
     const { handleVIPCRMAPI } = await import('../personal-subdomains/src/templates/tools');
@@ -130,7 +140,7 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
     const errorHandler = ErrorHandler.getInstance();
     const errorStats = errorHandler.getErrorStats();
     const circuitBreakerStats = RetryUtils.getCircuitBreakerStats();
-    
+
     // Get DNS cache statistics
     let dnsStats = null;
     let dnsConfig = null;
@@ -140,13 +150,15 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
       dnsConfig = {
         ttl: parseInt(process.env.BUN_CONFIG_DNS_TIME_TO_LIVE_SECONDS || '30'),
         verboseFetch: process.env.BUN_CONFIG_VERBOSE_FETCH || 'false',
-        cacheHitRate: dnsStats.totalCount > 0 ? 
-          ((dnsStats.cacheHitsCompleted / dnsStats.totalCount) * 100).toFixed(1) + '%' : '0%'
+        cacheHitRate:
+          dnsStats.totalCount > 0
+            ? ((dnsStats.cacheHitsCompleted / dnsStats.totalCount) * 100).toFixed(1) + '%'
+            : '0%',
       };
     } catch (error) {
       console.warn('Health check: Failed to get DNS stats:', error);
     }
-    
+
     return createSuccessResponse({
       status: 'ok',
       version: '3.0.8',
@@ -157,19 +169,21 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
         registry: env.REGISTRY_DB ? 'connected' : 'not configured',
         storage: env.REGISTRY_STORAGE ? 'connected' : 'not configured',
         cache: env.REGISTRY_CACHE ? 'connected' : 'not configured',
-        fire22_dns: dnsStats ? 'optimized' : 'unavailable'
+        fire22_dns: dnsStats ? 'optimized' : 'unavailable',
       },
       monitoring: {
         errors: errorStats,
         circuitBreakers: circuitBreakerStats,
-        dns: dnsConfig
+        dns: dnsConfig,
       },
-      performance: dnsStats ? {
-        dns_cache_size: dnsStats.cacheSize,
-        dns_operations: dnsStats.totalCount,
-        dns_errors: dnsStats.errors,
-        domains_cached: dnsStats.domains.length + dnsStats.databaseDomains.length
-      } : null
+      performance: dnsStats
+        ? {
+            dns_cache_size: dnsStats.cacheSize,
+            dns_operations: dnsStats.totalCount,
+            dns_errors: dnsStats.errors,
+            domains_cached: dnsStats.domains.length + dnsStats.databaseDomains.length,
+          }
+        : null,
     });
   }
 
@@ -185,13 +199,13 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
       return createSuccessResponse({
         message: 'Agent database test successful',
         agentCount: result?.count || 0,
-        database: 'connected'
+        database: 'connected',
       });
     } catch (error) {
       return createSuccessResponse({
         message: 'Agent database test failed',
         error: (error as Error).message,
-        database: 'error'
+        database: 'error',
       });
     }
   }
@@ -202,50 +216,52 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
       const fire22 = new Fire22Integration(env);
       const dnsStats = fire22.getDnsStats();
       const debugConfig = fire22.getDebuggingConfig();
-      
+
       return createSuccessResponse({
         message: 'Fire22 DNS cache statistics',
         dns: dnsStats,
         debugging: {
           verboseFetch: debugConfig.verboseFetch,
-          dnsTtl: debugConfig.dnsTtl
+          dnsTtl: debugConfig.dnsTtl,
         },
         performance: {
-          cacheHitRate: dnsStats.totalCount > 0 ? 
-            ((dnsStats.cacheHitsCompleted / dnsStats.totalCount) * 100).toFixed(2) + '%' : '0%',
+          cacheHitRate:
+            dnsStats.totalCount > 0
+              ? ((dnsStats.cacheHitsCompleted / dnsStats.totalCount) * 100).toFixed(2) + '%'
+              : '0%',
           totalOperations: dnsStats.totalCount,
-          cacheEfficiency: dnsStats.cacheSize > 0 ? 'active' : 'inactive'
+          cacheEfficiency: dnsStats.cacheSize > 0 ? 'active' : 'inactive',
         },
         domains: {
           fire22: dnsStats.domains,
-          database: dnsStats.databaseDomains
-        }
+          database: dnsStats.databaseDomains,
+        },
       });
     } catch (error) {
       return createSuccessResponse({
         error: 'Failed to get DNS statistics',
-        message: (error as Error).message
+        message: (error as Error).message,
       });
     }
   }
 
-  // Fire22 DNS cache refresh endpoint  
+  // Fire22 DNS cache refresh endpoint
   if (path === '/api/fire22/refresh-dns' && request.method === 'POST') {
     try {
       const fire22 = new Fire22Integration(env);
       await fire22.refreshDnsCache();
       const updatedStats = fire22.getDnsStats();
-      
+
       return createSuccessResponse({
         message: 'DNS cache refreshed successfully',
         timestamp: new Date().toISOString(),
         stats: updatedStats,
-        domains_prefetched: updatedStats.domains.length + updatedStats.databaseDomains.length
+        domains_prefetched: updatedStats.domains.length + updatedStats.databaseDomains.length,
       });
     } catch (error) {
       return createSuccessResponse({
         error: 'Failed to refresh DNS cache',
-        message: (error as Error).message
+        message: (error as Error).message,
       });
     }
   }
@@ -255,7 +271,7 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
     try {
       const fire22 = new Fire22Integration(env);
       const debugConfig = fire22.getDebuggingConfig();
-      
+
       return createSuccessResponse({
         message: 'Fire22 DNS configuration',
         ttl: {
@@ -264,23 +280,23 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
           recommendations: {
             development: 5,
             production: 30,
-            high_performance: 60
-          }
+            high_performance: 60,
+          },
         },
         verbose_fetch: {
           current: debugConfig.verboseFetch,
           modes: ['false', 'true', 'curl'],
-          description: 'Controls request/response logging for debugging'
+          description: 'Controls request/response logging for debugging',
         },
         domains: {
           fire22: fire22.getDnsStats().domains,
-          database: fire22.getDnsStats().databaseDomains
-        }
+          database: fire22.getDnsStats().databaseDomains,
+        },
       });
     } catch (error) {
       return createSuccessResponse({
         error: 'Failed to get DNS configuration',
-        message: (error as Error).message
+        message: (error as Error).message,
       });
     }
   }
@@ -289,35 +305,35 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
   if (path === '/api/fire22/prefetch-all' && request.method === 'POST') {
     try {
       const fire22 = new Fire22Integration(env);
-      
+
       // Enable verbose fetch temporarily for visibility
       const originalVerbose = process.env.BUN_CONFIG_VERBOSE_FETCH;
       fire22.enableVerboseFetch('true');
-      
+
       await fire22.refreshDnsCache();
       const stats = fire22.getDnsStats();
-      
+
       // Restore original verbose setting
       if (originalVerbose) {
         process.env.BUN_CONFIG_VERBOSE_FETCH = originalVerbose;
       } else {
         fire22.disableVerboseFetch();
       }
-      
+
       return createSuccessResponse({
         message: 'All domains prefetched successfully',
         timestamp: new Date().toISOString(),
         prefetched: {
           fire22_domains: stats.domains.length,
           database_domains: stats.databaseDomains.length,
-          total: stats.domains.length + stats.databaseDomains.length
+          total: stats.domains.length + stats.databaseDomains.length,
         },
-        cache_stats: stats
+        cache_stats: stats,
       });
     } catch (error) {
       return createSuccessResponse({
         error: 'Failed to prefetch all domains',
-        message: (error as Error).message
+        message: (error as Error).message,
       });
     }
   }
@@ -331,52 +347,53 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
   if (path.startsWith('/api/agents')) {
     return handleAgentAPI(request, env, path);
   }
-  
+
   // Agent analytics endpoints
   if (path.startsWith('/api/analytics')) {
     return handleAgentAnalytics(request, env, path);
   }
-  
+
   // Agent monitoring endpoints
   if (path.startsWith('/api/monitoring')) {
     return handleAgentMonitoring(request, env, path);
   }
-  
+
   // Player management endpoints
   if (path.startsWith('/api/players')) {
     return handlePlayerAPI(request, env, path);
   }
-  
+
   // Transaction management endpoints
   if (path.startsWith('/api/transactions')) {
     return handleTransactionAPI(request, env, path);
   }
-  
+
   // Betting management endpoints
   if (path.startsWith('/api/bets')) {
     return handleBetAPI(request, env, path);
   }
-  
+
   // Reporting endpoints
   if (path.startsWith('/api/reports')) {
     return handleReportsAPI(request, env, path);
   }
-  
+
   // Scheduled tasks endpoint
   if (path.startsWith('/api/cron')) {
     return handleScheduledTasks(request, env, path);
   }
-  
+
   // Server-Sent Events for real-time updates
   if (path === '/api/live') {
     return handleLiveEvents(request, env);
   }
-    
-    // Fire22 Agent Management Dashboard
-    if (path === '/dashboard') {
-      try {
-        // Get all agents data
-        const agents = await env.DB.prepare(`
+
+  // Fire22 Agent Management Dashboard
+  if (path === '/dashboard') {
+    try {
+      // Get all agents data
+      const agents = await env.DB.prepare(
+        `
           SELECT 
             agent_id,
             agent_name,
@@ -389,11 +406,13 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
             updated_at
           FROM agents
           ORDER BY agent_name
-        `).all();
+        `
+      ).all();
 
-        const agentsData = agents.results || [];
+      const agentsData = agents.results || [];
 
-        return new Response(`
+      return new Response(
+        `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -684,7 +703,9 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
                 </tr>
             </thead>
             <tbody>
-                ${agentsData.map(agent => `
+                ${agentsData
+                  .map(
+                    agent => `
                 <tr>
                     <td><strong>${agent.agent_id}</strong></td>
                     <td>${agent.agent_name}</td>
@@ -701,7 +722,9 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
                     </td>
                     <td>${new Date(agent.updated_at).toLocaleString()}</td>
                 </tr>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </tbody>
         </table>
     </div>
@@ -887,25 +910,27 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
     </script>
 </body>
 </html>
-        `, {
+        `,
+        {
           status: 200,
           headers: {
             'Content-Type': 'text/html;charset=UTF-8',
-          }
-        });
-      } catch (error) {
-        console.error('Dashboard error:', error);
-        return createSuccessResponse({
-          error: 'Dashboard temporarily unavailable',
-          message: 'Please try again in a moment'
-        });
-      }
+          },
+        }
+      );
+    } catch (error) {
+      console.error('Dashboard error:', error);
+      return createSuccessResponse({
+        error: 'Dashboard temporarily unavailable',
+        message: 'Please try again in a moment',
+      });
     }
+  }
 
-    // Fire22 Integrated Dashboard
-    if (path === '/fire22' || path === '/fire22-dashboard') {
-      try {
-        const fire22DashboardHTML = `<!DOCTYPE html>
+  // Fire22 Integrated Dashboard
+  if (path === '/fire22' || path === '/fire22-dashboard') {
+    try {
+      const fire22DashboardHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1174,110 +1199,117 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
 </body>
 </html>`;
 
-        return new Response(fire22DashboardHTML, {
-          headers: { 'Content-Type': 'text/html' }
-        });
-      } catch (error) {
-        console.error('Fire22 Dashboard error:', error);
-        return createSuccessResponse({
-          error: 'Fire22 Dashboard temporarily unavailable',
-          message: 'Please try again in a moment'
-        });
-      }
+      return new Response(fire22DashboardHTML, {
+        headers: { 'Content-Type': 'text/html' },
+      });
+    } catch (error) {
+      console.error('Fire22 Dashboard error:', error);
+      return createSuccessResponse({
+        error: 'Fire22 Dashboard temporarily unavailable',
+        message: 'Please try again in a moment',
+      });
     }
+  }
 
-    // Fire22 Manager Interface (mirrors fire22.ag/manager.html)
-    if (path === '/manager' || path === '/manager.html') {
-      try {
-        const fire22UI = createFire22UISystem(env);
-        const managerHTML = fire22UI.generateManagerHTML();
+  // Fire22 Manager Interface (mirrors fire22.ag/manager.html)
+  if (path === '/manager' || path === '/manager.html') {
+    try {
+      const fire22UI = createFire22UISystem(env);
+      const managerHTML = fire22UI.generateManagerHTML();
 
-        return new Response(managerHTML, {
-          headers: {
-            'Content-Type': 'text/html',
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-          }
-        });
-      } catch (error) {
-        console.error('Fire22 Manager error:', error);
-        return createSuccessResponse({
-          error: 'Fire22 Manager temporarily unavailable',
-          message: 'Please try again in a moment'
-        });
-      }
+      return new Response(managerHTML, {
+        headers: {
+          'Content-Type': 'text/html',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
+      });
+    } catch (error) {
+      console.error('Fire22 Manager error:', error);
+      return createSuccessResponse({
+        error: 'Fire22 Manager temporarily unavailable',
+        message: 'Please try again in a moment',
+      });
     }
+  }
 
-    // Fire22 UI.js endpoint (mirrors fire22.ag/app/ui/ui.js)
-    if (path === '/app/ui/ui.js' || path.includes('ui.js')) {
-      try {
-        const fire22UI = createFire22UISystem(env);
-        const uiJS = fire22UI.generateUIJS();
+  // Fire22 UI.js endpoint (mirrors fire22.ag/app/ui/ui.js)
+  if (path === '/app/ui/ui.js' || path.includes('ui.js')) {
+    try {
+      const fire22UI = createFire22UISystem(env);
+      const uiJS = fire22UI.generateUIJS();
 
-        return new Response(uiJS, {
-          headers: {
-            'Content-Type': 'application/javascript',
-            'Cache-Control': 'public, max-age=3600',
-            'Access-Control-Allow-Origin': '*'
-          }
-        });
-      } catch (error) {
-        console.error('Fire22 UI.js error:', error);
-        return new Response('console.error("Fire22 UI.js failed to load");', {
-          headers: { 'Content-Type': 'application/javascript' }
-        });
-      }
+      return new Response(uiJS, {
+        headers: {
+          'Content-Type': 'application/javascript',
+          'Cache-Control': 'public, max-age=3600',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    } catch (error) {
+      console.error('Fire22 UI.js error:', error);
+      return new Response('console.error("Fire22 UI.js failed to load");', {
+        headers: { 'Content-Type': 'application/javascript' },
+      });
     }
+  }
 
-    // Fire22 Account Info API endpoint
-    if (path === '/api/fire22/account-info') {
-      try {
-        const accountInfo = {
-          success: true,
-          data: {
-            agentID: env.FIRE22_AGENT_ID || 'BLAKEPPH',
-            agentName: env.FIRE22_AGENT_ID || 'BLAKEPPH',
-            balance: 75000,
-            creditLimit: 150000,
-            status: 'active',
-            lastLogin: new Date().toISOString(),
-            permissions: ['read', 'write', 'admin'],
-            version: '3.0.8',
-            systemStatus: 'online'
-          }
-        };
+  // Fire22 Account Info API endpoint
+  if (path === '/api/fire22/account-info') {
+    try {
+      const accountInfo = {
+        success: true,
+        data: {
+          agentID: env.FIRE22_AGENT_ID || 'BLAKEPPH',
+          agentName: env.FIRE22_AGENT_ID || 'BLAKEPPH',
+          balance: 75000,
+          creditLimit: 150000,
+          status: 'active',
+          lastLogin: new Date().toISOString(),
+          permissions: ['read', 'write', 'admin'],
+          version: '3.0.8',
+          systemStatus: 'online',
+        },
+      };
 
-        return new Response(JSON.stringify(accountInfo), {
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        });
-      } catch (error) {
-        return createErrorResponse('Failed to get account info', 500);
-      }
+      return new Response(JSON.stringify(accountInfo), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    } catch (error) {
+      return createErrorResponse('Failed to get account info', 500);
     }
+  }
 
-    // POST /api/manager/getWeeklyFigureByAgentLite - Lightweight version for faster loading
-    if (path === '/api/manager/getWeeklyFigureByAgentLite' && request.method === 'POST') {
-      try {
-        const formData = await request.formData();
-        const agentID = formData.get('agentID') || 'BLAKEPPH';
-        const week = formData.get('week') || '0';
-        const type = formData.get('type') || 'A';
-        const layout = formData.get('layout') || 'byDay';
+  // POST /api/manager/getWeeklyFigureByAgentLite - Lightweight version for faster loading
+  if (path === '/api/manager/getWeeklyFigureByAgentLite' && request.method === 'POST') {
+    try {
+      const formData = await request.formData();
+      const agentID = formData.get('agentID') || 'BLAKEPPH';
+      const week = formData.get('week') || '0';
+      const type = formData.get('type') || 'A';
+      const layout = formData.get('layout') || 'byDay';
 
-        // Lite version - return only essential data for current week
-        const weekOffset = parseInt(week.toString());
-        const startDate = weekOffset === 0 
-          ? new Date(new Date().setDate(new Date().getDate() - new Date().getDay())).toISOString().split('T')[0]
-          : new Date(new Date().setDate(new Date().getDate() - new Date().getDay() - (weekOffset * 7))).toISOString().split('T')[0];
-        
-        const endDate = new Date().toISOString().split('T')[0];
+      // Lite version - return only essential data for current week
+      const weekOffset = parseInt(week.toString());
+      const startDate =
+        weekOffset === 0
+          ? new Date(new Date().setDate(new Date().getDate() - new Date().getDay()))
+              .toISOString()
+              .split('T')[0]
+          : new Date(
+              new Date().setDate(new Date().getDate() - new Date().getDay() - weekOffset * 7)
+            )
+              .toISOString()
+              .split('T')[0];
 
-        // Simplified query for lite version
-        const liteQuery = `
+      const endDate = new Date().toISOString().split('T')[0];
+
+      // Simplified query for lite version
+      const liteQuery = `
           SELECT
             COALESCE(SUM(stake), 0) as totalHandle,
             COALESCE(SUM(CASE WHEN status = 'won' THEN actual_payout - stake ELSE -stake END), 0) as totalWin,
@@ -1286,12 +1318,11 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
           WHERE placed_at >= ? AND placed_at <= ?
         `;
 
-        const result = await env.DB.prepare(liteQuery)
-          .bind(startDate, endDate)
-          .first();
+      const result = await env.DB.prepare(liteQuery).bind(startDate, endDate).first();
 
-        // Return minimal data structure for lite version
-        return new Response(JSON.stringify({
+      // Return minimal data structure for lite version
+      return new Response(
+        JSON.stringify({
           success: true,
           data: {
             agentID: agentID,
@@ -1303,259 +1334,301 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
               win: result?.totalWin || 0,
               bets: result?.totalBets || 0,
               profit: (result?.totalWin || 0) > 0 ? result.totalWin : 0,
-              loss: (result?.totalWin || 0) < 0 ? Math.abs(result.totalWin) : 0
-            }
-          }
-        }), {
+              loss: (result?.totalWin || 0) < 0 ? Math.abs(result.totalWin) : 0,
+            },
+          },
+        }),
+        {
           headers: {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-          }
-        });
-      } catch (error) {
-        console.error('Error in getWeeklyFigureByAgentLite:', error);
-        return new Response(JSON.stringify({
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          },
+        }
+      );
+    } catch (error) {
+      console.error('Error in getWeeklyFigureByAgentLite:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch weekly figures (lite)'
-        }), {
+          error: 'Failed to fetch weekly figures (lite)',
+        }),
+        {
           status: 500,
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        });
-      }
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
     }
+  }
 
-    // Fire22 Player Info Endpoint
-    if (path === '/api/fire22/player-info' && request.method === 'POST') {
-      try {
-        const body = await request.json();
-        const fire22API = createFire22APICompatible(env);
-        
-        const playerInfo = await fire22API.callFire22API('getInfoPlayer', {
-          playerID: body.playerId || body.playerID,
-          agentID: body.agentId || 'BLAKEPPH'
-        });
-        
-        return new Response(JSON.stringify({
+  // Fire22 Player Info Endpoint
+  if (path === '/api/fire22/player-info' && request.method === 'POST') {
+    try {
+      const body = await request.json();
+      const fire22API = createFire22APICompatible(env);
+
+      const playerInfo = await fire22API.callFire22API('getInfoPlayer', {
+        playerID: body.playerId || body.playerID,
+        agentID: body.agentId || 'BLAKEPPH',
+      });
+
+      return new Response(
+        JSON.stringify({
           success: true,
           data: playerInfo,
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        });
-      } catch (error) {
-        console.error('Error fetching player info:', error);
-        return new Response(JSON.stringify({
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
+    } catch (error) {
+      console.error('Error fetching player info:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch player info'
-        }), {
+          error: 'Failed to fetch player info',
+        }),
+        {
           status: 500,
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        });
-      }
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
     }
+  }
 
-    // Fire22 Transactions Endpoint
-    if (path === '/api/fire22/transactions' && request.method === 'POST') {
-      try {
-        const body = await request.json();
-        const fire22API = createFire22APICompatible(env);
-        
-        const transactions = await fire22API.callFire22API('getTransactionList', {
-          playerID: body.playerId || body.playerID,
-          agentID: body.agentId || 'BLAKEPPH',
-          limit: body.limit || 50
-        });
-        
-        return new Response(JSON.stringify({
+  // Fire22 Transactions Endpoint
+  if (path === '/api/fire22/transactions' && request.method === 'POST') {
+    try {
+      const body = await request.json();
+      const fire22API = createFire22APICompatible(env);
+
+      const transactions = await fire22API.callFire22API('getTransactionList', {
+        playerID: body.playerId || body.playerID,
+        agentID: body.agentId || 'BLAKEPPH',
+        limit: body.limit || 50,
+      });
+
+      return new Response(
+        JSON.stringify({
           success: true,
           data: transactions,
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        });
-      } catch (error) {
-        console.error('Error fetching transactions:', error);
-        return new Response(JSON.stringify({
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch transactions'
-        }), {
+          error: 'Failed to fetch transactions',
+        }),
+        {
           status: 500,
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        });
-      }
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
     }
+  }
 
-    // Fire22 Crypto Info Endpoint
-    if (path === '/api/fire22/crypto-info' && request.method === 'POST') {
-      try {
-        const body = await request.json();
-        const fire22API = createFire22APICompatible(env);
-        
-        const cryptoInfo = await fire22API.callFire22API('getCryptoInfo', {
-          agentID: body.agentId || 'BLAKEPPH'
-        });
-        
-        return new Response(JSON.stringify({
+  // Fire22 Crypto Info Endpoint
+  if (path === '/api/fire22/crypto-info' && request.method === 'POST') {
+    try {
+      const body = await request.json();
+      const fire22API = createFire22APICompatible(env);
+
+      const cryptoInfo = await fire22API.callFire22API('getCryptoInfo', {
+        agentID: body.agentId || 'BLAKEPPH',
+      });
+
+      return new Response(
+        JSON.stringify({
           success: true,
           data: cryptoInfo,
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        });
-      } catch (error) {
-        console.error('Error fetching crypto info:', error);
-        return new Response(JSON.stringify({
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
+    } catch (error) {
+      console.error('Error fetching crypto info:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch crypto info'
-        }), {
+          error: 'Failed to fetch crypto info',
+        }),
+        {
           status: 500,
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        });
-      }
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
     }
+  }
 
-    // Fire22 Mail Endpoint
-    if (path === '/api/fire22/mail' && request.method === 'POST') {
-      try {
-        const body = await request.json();
-        const fire22API = createFire22APICompatible(env);
-        
-        const mail = await fire22API.callFire22API('getMail', {
-          playerID: body.playerId || body.playerID,
-          agentID: body.agentId || 'BLAKEPPH'
-        });
-        
-        return new Response(JSON.stringify({
+  // Fire22 Mail Endpoint
+  if (path === '/api/fire22/mail' && request.method === 'POST') {
+    try {
+      const body = await request.json();
+      const fire22API = createFire22APICompatible(env);
+
+      const mail = await fire22API.callFire22API('getMail', {
+        playerID: body.playerId || body.playerID,
+        agentID: body.agentId || 'BLAKEPPH',
+      });
+
+      return new Response(
+        JSON.stringify({
           success: true,
           data: mail,
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        });
-      } catch (error) {
-        console.error('Error fetching mail:', error);
-        return new Response(JSON.stringify({
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
+    } catch (error) {
+      console.error('Error fetching mail:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Failed to fetch mail'
-        }), {
+          error: 'Failed to fetch mail',
+        }),
+        {
           status: 500,
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        });
-      }
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
     }
+  }
 
-    // Demo data endpoints for testing
-    if (path === '/api/demo/agents' && request.method === 'POST') {
-      try {
-        const agentData = await request.json();
-        console.log('📝 Demo agent created:', agentData.agentID);
+  // Demo data endpoints for testing
+  if (path === '/api/demo/agents' && request.method === 'POST') {
+    try {
+      const agentData = await request.json();
+      console.log('📝 Demo agent created:', agentData.agentID);
 
-        return new Response(JSON.stringify({
+      return new Response(
+        JSON.stringify({
           success: true,
           message: 'Demo agent created',
-          data: agentData
-        }), {
+          data: agentData,
+        }),
+        {
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        });
-      } catch (error) {
-        return createErrorResponse('Failed to create demo agent', 500);
-      }
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
+    } catch (error) {
+      return createErrorResponse('Failed to create demo agent', 500);
     }
+  }
 
-    if (path === '/api/demo/wagers' && request.method === 'POST') {
-      try {
-        const wagerData = await request.json();
-        console.log('🎯 Demo wager created:', wagerData.betId, `$${wagerData.stake}`);
+  if (path === '/api/demo/wagers' && request.method === 'POST') {
+    try {
+      const wagerData = await request.json();
+      console.log('🎯 Demo wager created:', wagerData.betId, `$${wagerData.stake}`);
 
-        return new Response(JSON.stringify({
+      return new Response(
+        JSON.stringify({
           success: true,
           message: 'Demo wager created',
-          data: wagerData
-        }), {
+          data: wagerData,
+        }),
+        {
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        });
-      } catch (error) {
-        return createErrorResponse('Failed to create demo wager', 500);
-      }
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
+    } catch (error) {
+      return createErrorResponse('Failed to create demo wager', 500);
     }
+  }
 
-    // Registry endpoints
-    if (path.startsWith('/registry/')) {
-      return handleRegistry(request, env, path);
-    }
-    
-    // Fire22 Legacy API endpoints (matching original system)
-    if (path.startsWith('/qubic/api/Manager/')) {
-      return handleFire22ManagerAPI(request, env, path);
-    }
+  // Registry endpoints
+  if (path.startsWith('/registry/')) {
+    return handleRegistry(request, env, path);
+  }
 
-    // Fire22 Cloud API endpoints (exact compatibility with fire22.ag)
-    if (path.startsWith('/cloud/api/Manager/') || path.startsWith('/Manager/')) {
-      try {
-        const fire22API = createFire22APICompatible(env);
-        return await fire22API.handleManagerAPI(request, env);
-      } catch (error) {
-        console.error('Fire22 Cloud API error:', error);
-        return new Response(JSON.stringify({
+  // Fire22 Legacy API endpoints (matching original system)
+  if (path.startsWith('/qubic/api/Manager/')) {
+    return handleFire22ManagerAPI(request, env, path);
+  }
+
+  // Fire22 Cloud API endpoints (exact compatibility with fire22.ag)
+  if (path.startsWith('/cloud/api/Manager/') || path.startsWith('/Manager/')) {
+    try {
+      const fire22API = createFire22APICompatible(env);
+      return await fire22API.handleManagerAPI(request, env);
+    } catch (error) {
+      console.error('Fire22 Cloud API error:', error);
+      return new Response(
+        JSON.stringify({
           success: false,
-          error: 'Fire22 API temporarily unavailable'
-        }), {
-          headers: { 'Content-Type': 'application/json' }
-        });
-      }
+          error: 'Fire22 API temporarily unavailable',
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
-    
-    // API v2 endpoints (consolidated API)
-    if (path.startsWith('/api/v2/')) {
-      return handleAPIv2(request, env, path);
-    }
-    
-    // API endpoints
-    if (path.startsWith('/api/')) {
-      return handleAPI(request, env, path);
-    }
-    
+  }
+
+  // API v2 endpoints (consolidated API)
+  if (path.startsWith('/api/v2/')) {
+    return handleAPIv2(request, env, path);
+  }
+
+  // API endpoints
+  if (path.startsWith('/api/')) {
+    return handleAPI(request, env, path);
+  }
+
   // 404 for unknown routes
   return createNotFoundError(`Path ${path}`, request);
 };
 
 // Main worker handler with 404 fallback
-const mainHandlerComplete = async (request: Request, env: Env, ctx: ExecutionContext): Promise<Response> => {
+const mainHandlerComplete = async (
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext
+): Promise<Response> => {
   return await mainHandler(request, env, ctx);
 };
 
@@ -1565,16 +1638,16 @@ const mainHandlerComplete = async (request: Request, env: Env, ctx: ExecutionCon
  */
 async function handleFire22ManagerAPI(request: Request, env: Env, path: string): Promise<Response> {
   const method = request.method;
-  
+
   try {
     // POST /qubic/api/Manager/getAgentPerformance - Legacy Fire22 endpoint
     if (path === '/qubic/api/Manager/getAgentPerformance' && method === 'POST') {
       const formData = await request.formData();
-      
+
       // Extract parameters from form data
       const params = {
         start: formData.get('start') || formData.get('startDate'),
-        end: formData.get('end') || formData.get('endDate'), 
+        end: formData.get('end') || formData.get('endDate'),
         agentID: formData.get('agentID') || formData.get('agentOwner'),
         type: formData.get('type') || 'CP',
         freePlay: formData.get('freePlay') || 'Y',
@@ -1583,12 +1656,12 @@ async function handleFire22ManagerAPI(request: Request, env: Env, path: string):
         period: formData.get('period') || '-1',
         wagerType: formData.get('wagerType') || '',
         betType: formData.get('betType') || '',
-        tipo: formData.get('tipo') || '0'
+        tipo: formData.get('tipo') || '0',
       };
-      
+
       // Get agent performance data based on type
       let performanceData = [];
-      
+
       if (params.type === 'CP') {
         // Customer Performance Report
         const query = `
@@ -1612,38 +1685,41 @@ async function handleFire22ManagerAPI(request: Request, env: Env, path: string):
           ORDER BY volume DESC
           LIMIT 1000
         `;
-        
+
         const result = await env.DB.prepare(query)
           .bind(params.start || '2025-08-27', params.end || '2025-08-27', params.agentID)
           .all();
-          
+
         performanceData = result.results || [];
       }
-      
+
       // Return in Fire22 format
-      return new Response(JSON.stringify({
-        INFO: {
-          LIST: performanceData,
+      return new Response(
+        JSON.stringify({
+          INFO: {
+            LIST: performanceData,
+            SUCCESS: true,
+            MESSAGE: 'Agent performance data retrieved successfully',
+          },
           SUCCESS: true,
-          MESSAGE: 'Agent performance data retrieved successfully'
-        },
-        SUCCESS: true
-      }), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type'
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type',
+          },
         }
-      });
+      );
     }
-    
+
     // POST /qubic/api/Manager/getLiveWagers - Get live pending wagers
     if (path === '/qubic/api/Manager/getLiveWagers' && method === 'POST') {
       const formData = await request.formData();
       const agentID = formData.get('agentID');
-      
+
       const query = `
         SELECT 
           b.bet_id as betID,
@@ -1664,29 +1740,32 @@ async function handleFire22ManagerAPI(request: Request, env: Env, path: string):
         ORDER BY b.placed_at DESC
         LIMIT 100
       `;
-      
+
       const result = await env.DB.prepare(query).bind(agentID).all();
-      
-      return new Response(JSON.stringify({
-        INFO: {
-          LIST: result.results || [],
-          SUCCESS: true
-        },
-        SUCCESS: true
-      }), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
+
+      return new Response(
+        JSON.stringify({
+          INFO: {
+            LIST: result.results || [],
+            SUCCESS: true,
+          },
+          SUCCESS: true,
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
         }
-      });
+      );
     }
-    
+
     // POST /qubic/api/Manager/getWeeklyFigureByAgent - Weekly performance
     if (path === '/qubic/api/Manager/getWeeklyFigureByAgent' && method === 'POST') {
       const formData = await request.formData();
       const agentID = formData.get('agentID');
-      
+
       const query = `
         SELECT 
           COUNT(DISTINCT p.player_id) as totalPlayers,
@@ -1699,127 +1778,137 @@ async function handleFire22ManagerAPI(request: Request, env: Env, path: string):
           AND b.placed_at >= date('now', '-7 days')
         WHERE p.agent_id = ?
       `;
-      
+
       const result = await env.DB.prepare(query).bind(agentID).first();
-      
-      return new Response(JSON.stringify({
-        INFO: {
-          SUMMARY: result || {},
-          SUCCESS: true
-        },
-        SUCCESS: true
-      }), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
+
+      return new Response(
+        JSON.stringify({
+          INFO: {
+            SUMMARY: result || {},
+            SUCCESS: true,
+          },
+          SUCCESS: true,
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
         }
-      });
+      );
     }
-    
+
     // POST /qubic/api/Manager/getAgentInfo - Get detailed agent configuration (matches your provided format)
     if (path === '/qubic/api/Manager/getAgentInfo' && method === 'POST') {
       const formData = await request.formData();
       const agentID = formData.get('agentID') || formData.get('CustomerID');
-      
+
       // Get agent from our database
-      const agent = await env.DB.prepare(`
+      const agent = await env.DB.prepare(
+        `
         SELECT * FROM agents WHERE agent_id = ?
-      `).bind(agentID).first();
-      
+      `
+      )
+        .bind(agentID)
+        .first();
+
       if (!agent) {
-        return new Response(JSON.stringify({
-          INFO: {
+        return new Response(
+          JSON.stringify({
+            INFO: {
+              SUCCESS: false,
+              MESSAGE: `Agent ${agentID} not found`,
+            },
             SUCCESS: false,
-            MESSAGE: `Agent ${agentID} not found`
-          },
-          SUCCESS: false
-        }), {
-          status: 404,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
+          }),
+          {
+            status: 404,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            },
           }
-        });
+        );
       }
-      
+
       // Return in Fire22 agent info format (matching your provided structure)
       const agentInfo = {
         CustomerID: `${agentID}  `,
-        ParlayJuice: "",
-        PermitDeleteBets: "F",
-        Other: "",
-        SuspendHorses: "N",
-        SuspendSportsbook: agent.can_place_bet === 1 ? "N" : "Y",
+        ParlayJuice: '',
+        PermitDeleteBets: 'F',
+        Other: '',
+        SuspendHorses: 'N',
+        SuspendSportsbook: agent.can_place_bet === 1 ? 'N' : 'Y',
         Maxdog: 0,
-        Maxwager: "Y",
-        Allowdeallow: "Y",
-        Juicesetup: "Y",
-        Horsessetup: "Y",
-        Casinosetup: agent.casino_rate > 0 ? "Y" : "N",
-        Othersetup: "N",
-        Freeplaymanager: "Y",
-        AllowRoundRobin: "Y",
-        AllowOpenTeasers: "N",
-        EstWager101to500Flag: "N",
-        AllowOpenParlays: "N",
-        SuspendAccount: agent.status === 'active' ? "N" : "Y",
-        CasinoActive: agent.casino_rate > 0 ? "Y" : "N",
-        ActivateBettingAlerts: "Y",
-        InetTarget: "Fire22.com",
-        EasternLineFlag: "N",
+        Maxwager: 'Y',
+        Allowdeallow: 'Y',
+        Juicesetup: 'Y',
+        Horsessetup: 'Y',
+        Casinosetup: agent.casino_rate > 0 ? 'Y' : 'N',
+        Othersetup: 'N',
+        Freeplaymanager: 'Y',
+        AllowRoundRobin: 'Y',
+        AllowOpenTeasers: 'N',
+        EstWager101to500Flag: 'N',
+        AllowOpenParlays: 'N',
+        SuspendAccount: agent.status === 'active' ? 'N' : 'Y',
+        CasinoActive: agent.casino_rate > 0 ? 'Y' : 'N',
+        ActivateBettingAlerts: 'Y',
+        InetTarget: 'Fire22.com',
+        EasternLineFlag: 'N',
         TempCreditAdj: 0,
         TempCreditAdjExpDate: null,
         EnforceAccumWagerLimitsByLineFlag: null,
-        DonotApplyCirleLimits: "Y",
-        InprogressAllow: "N",
+        DonotApplyCirleLimits: 'Y',
+        InprogressAllow: 'N',
         AgentID: `${agentID}                                          `,
-        CommissionType: "S",
+        CommissionType: 'S',
         CommissionPercent: 0,
         MasterAgentID: `${agent.master_agent_id || 'TESTMA9'}                                           `,
-        DistributeToMasterFlag: "N",
+        DistributeToMasterFlag: 'N',
         HeadCountRate: 0,
-        DistributeNoFundsFlag: " ",
-        ChangeTempCreditFlag: "Y",
-        SuspendWageringFlag: "Y",
-        UpdateCommentsFlag: "Y",
-        EnterTransactionFlag: "Y",
-        ManageLinesFlag: "Y",
+        DistributeNoFundsFlag: ' ',
+        ChangeTempCreditFlag: 'Y',
+        SuspendWageringFlag: 'Y',
+        UpdateCommentsFlag: 'Y',
+        EnterTransactionFlag: 'Y',
+        ManageLinesFlag: 'Y',
         CasinoFeePercent: agent.casino_rate || 0,
         InetHeadCountRate: agent.internet_rate || 4.5,
-        ChangeCreditLimitFlag: "Y",
-        ChangeSettleFigureFlag: "Y",
-        ChangeWagerLimitFlag: "Y",
-        SetMinimumBetAmountFlag: "Y",
-        AddNewAccountFlag: "Y",
-        EnterBettingAdjustmentFlag: "Y",
-        CustomerIDPrefix: "     ",
+        ChangeCreditLimitFlag: 'Y',
+        ChangeSettleFigureFlag: 'Y',
+        ChangeWagerLimitFlag: 'Y',
+        SetMinimumBetAmountFlag: 'Y',
+        AddNewAccountFlag: 'Y',
+        EnterBettingAdjustmentFlag: 'Y',
+        CustomerIDPrefix: '     ',
         CasinoHeadCountRate: agent.casino_rate || 0,
-        IncludeFpLossesFlag: "N",
+        IncludeFpLossesFlag: 'N',
         BOW: 2,
         IsOffice: 0,
         ADDSports: 0,
         LiveBettingRate: 0,
         LiveCasinoRate: agent.casino_rate || 6,
-        DenyIpChecker: "N",
-        DenyEmail: "N",
-        DenyGameAdmin: "N",
-        DenyBetTicker: "N",
-        DenyAgentBilling: "N",
-        DenyAgentPerformance: "N",
-        DenyContactUs: "N",
-        DenySettings: "N",
+        DenyIpChecker: 'N',
+        DenyEmail: 'N',
+        DenyGameAdmin: 'N',
+        DenyBetTicker: 'N',
+        DenyAgentBilling: 'N',
+        DenyAgentPerformance: 'N',
+        DenyContactUs: 'N',
+        DenySettings: 'N',
         StartOfWeek: 1,
-        AllowPlaceBet: agent.can_place_bet === 1 ? "Y" : "N",
-        AllowPlaceLateWagers: "Y",
-        TacHideFigures: "N",
-        TacHideSubAgentsTotal: "N",
-        NotifyVipBets: "N",
+        AllowPlaceBet: agent.can_place_bet === 1 ? 'Y' : 'N',
+        AllowPlaceLateWagers: 'Y',
+        TacHideFigures: 'N',
+        TacHideSubAgentsTotal: 'N',
+        NotifyVipBets: 'N',
         SMSRate: 0,
-        AllowModInfo: "Y",
-        AllowDenyNotShow: "N",
-        MaxWagerNotShow: "N",
-        VigSetupNotShow: "N",
+        AllowModInfo: 'Y',
+        AllowDenyNotShow: 'N',
+        MaxWagerNotShow: 'N',
+        VigSetupNotShow: 'N',
         WLMin: 0,
         WLMax: 0,
         PLMin: 0,
@@ -1832,261 +1921,287 @@ async function handleFire22ManagerAPI(request: Request, env: Env, path: string):
         CLMax: 0,
         MLMin: 0,
         MLMax: 0,
-        ShowAgentFilterPanel: "N",
-        AllowChangeAccounts: "Y",
-        DenyAgentLoginBackupSite: "N",
+        ShowAgentFilterPanel: 'N',
+        AllowChangeAccounts: 'Y',
+        DenyAgentLoginBackupSite: 'N',
         LottoRate: 0,
         SbookieRate: agent.sports_rate || 0,
-        AllowSetLiveBettingLimits: "Y",
+        AllowSetLiveBettingLimits: 'Y',
         LiveBetting2Rate: 0,
-        ManagePropLines: "Y",
-        AllowSetGlobalTeamLimit: "Y",
-        AllowDeletedWagersReport: "N",
+        ManagePropLines: 'Y',
+        AllowSetGlobalTeamLimit: 'Y',
+        AllowDeletedWagersReport: 'N',
         DistributionStartOfWeek: 1,
-        CustomerIDSufix: "    ",
-        NotifyNewMessages: "N",
-        ValueNotifyNewMessages: "",
-        SkipMessagetoMaster: "N",
-        OfficeReceiveEmail: "N",
-        EmailOffice: "",
-        HideMasterSheet: "N",
-        ChargeCorePlusInet: "Y",
+        CustomerIDSufix: '    ',
+        NotifyNewMessages: 'N',
+        ValueNotifyNewMessages: '',
+        SkipMessagetoMaster: 'N',
+        OfficeReceiveEmail: 'N',
+        EmailOffice: '',
+        HideMasterSheet: 'N',
+        ChargeCorePlusInet: 'Y',
         MinumunChargeDist: 0,
-        CommBasedon: "Weekly figures",
-        LiveChat: "N",
-        DenyAccountingAgent: "N",
-        AllowManagePoker: "N",
-        PokerRakeReport: "N",
-        PokerOnly: "N",
+        CommBasedon: 'Weekly figures',
+        LiveChat: 'N',
+        DenyAccountingAgent: 'N',
+        AllowManagePoker: 'N',
+        PokerRakeReport: 'N',
+        PokerOnly: 'N',
         PokerRakePercentageS: 0,
         PropBuilderRate: 1,
         SuperSlotsRate: 0,
         VirtualGamesRate: 0,
-        ChargeLiveCasinoAsInet: "Y",
-        ChargePropBuilderAsInet: "Y",
+        ChargeLiveCasinoAsInet: 'Y',
+        ChargePropBuilderAsInet: 'Y',
         S365Rate: 0,
-        AllowPropBuilder: "N",
-        AllowSetVirtualBetLimits: "N",
+        AllowPropBuilder: 'N',
+        AllowSetVirtualBetLimits: 'N',
         FreePlayWeeklyMax: 0,
-        AllowUltraLive: "N",
-        MasterLogin: agent.master_agent_id || "TESTMA9",
-        BotDisplay: "Y",
-        ShowStartWeek: "N",
+        AllowUltraLive: 'N',
+        MasterLogin: agent.master_agent_id || 'TESTMA9',
+        BotDisplay: 'Y',
+        ShowStartWeek: 'N',
         FlashBetsRate: 0,
         ExtPropsRate: 0,
-        AllowEditLCasinoLimits: "N",
-        AllowAdjExtProps: "N",
+        AllowEditLCasinoLimits: 'N',
+        AllowAdjExtProps: 'N',
         CrashRate: 0,
-        AllowCrash: "N",
-        DeleteDepWith: "Y",
-        AllowSSmartBookie: "N"
+        AllowCrash: 'N',
+        DeleteDepWith: 'Y',
+        AllowSSmartBookie: 'N',
       };
-      
-      return new Response(JSON.stringify({
-        INFO: agentInfo,
-        DISTRIBUTION: 0
-      }), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
+
+      return new Response(
+        JSON.stringify({
+          INFO: agentInfo,
+          DISTRIBUTION: 0,
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
         }
-      });
+      );
     }
-    
+
     // POST /qubic/api/Manager/getSportTypes - Get available sports (matches your provided format)
     if (path === '/qubic/api/Manager/getSportTypes' && method === 'POST') {
       const sportsList = [
-        { sportType: "Auto Racing         ", "0": "Auto Racing         " },
-        { sportType: "Baseball            ", "0": "Baseball            " },
-        { sportType: "Basketball          ", "0": "Basketball          " },
-        { sportType: "Boxing              ", "0": "Boxing              " },
-        { sportType: "Cricket             ", "0": "Cricket             " },
-        { sportType: "Entertainment       ", "0": "Entertainment       " },
-        { sportType: "Esports             ", "0": "Esports             " },
-        { sportType: "Football            ", "0": "Football            " },
-        { sportType: "Golf                ", "0": "Golf                " },
-        { sportType: "Hockey              ", "0": "Hockey              " },
-        { sportType: "Horse Racing        ", "0": "Horse Racing        " },
-        { sportType: "LIVE                ", "0": "LIVE                " },
-        { sportType: "Martial Arts        ", "0": "Martial Arts        " },
-        { sportType: "Olympics            ", "0": "Olympics            " },
-        { sportType: "Other               ", "0": "Other               " },
-        { sportType: "Rugby               ", "0": "Rugby               " },
-        { sportType: "Soccer              ", "0": "Soccer              " },
-        { sportType: "Tennis              ", "0": "Tennis              " },
-        { sportType: "Virtual Sports      ", "0": "Virtual Sports      " }
+        { sportType: 'Auto Racing         ', '0': 'Auto Racing         ' },
+        { sportType: 'Baseball            ', '0': 'Baseball            ' },
+        { sportType: 'Basketball          ', '0': 'Basketball          ' },
+        { sportType: 'Boxing              ', '0': 'Boxing              ' },
+        { sportType: 'Cricket             ', '0': 'Cricket             ' },
+        { sportType: 'Entertainment       ', '0': 'Entertainment       ' },
+        { sportType: 'Esports             ', '0': 'Esports             ' },
+        { sportType: 'Football            ', '0': 'Football            ' },
+        { sportType: 'Golf                ', '0': 'Golf                ' },
+        { sportType: 'Hockey              ', '0': 'Hockey              ' },
+        { sportType: 'Horse Racing        ', '0': 'Horse Racing        ' },
+        { sportType: 'LIVE                ', '0': 'LIVE                ' },
+        { sportType: 'Martial Arts        ', '0': 'Martial Arts        ' },
+        { sportType: 'Olympics            ', '0': 'Olympics            ' },
+        { sportType: 'Other               ', '0': 'Other               ' },
+        { sportType: 'Rugby               ', '0': 'Rugby               ' },
+        { sportType: 'Soccer              ', '0': 'Soccer              ' },
+        { sportType: 'Tennis              ', '0': 'Tennis              ' },
+        { sportType: 'Virtual Sports      ', '0': 'Virtual Sports      ' },
       ];
-      
-      return new Response(JSON.stringify({
-        LIST: sportsList
-      }), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
+
+      return new Response(
+        JSON.stringify({
+          LIST: sportsList,
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
         }
-      });
+      );
     }
-    
+
     // POST /qubic/api/Manager/getCustomerAdmin - Get customer admin settings (matches your format)
     if (path === '/qubic/api/Manager/getCustomerAdmin' && method === 'POST') {
       const formData = await request.formData();
       const agentID = formData.get('agentID') || formData.get('CustomerID');
-      
+
       // Get agent from database
-      const agent = await env.DB.prepare(`
+      const agent = await env.DB.prepare(
+        `
         SELECT * FROM agents WHERE agent_id = ?
-      `).bind(agentID).first();
-      
+      `
+      )
+        .bind(agentID)
+        .first();
+
       if (!agent) {
-        return new Response(JSON.stringify({
-          INFO: {
-            SUCCESS: false,
-            MESSAGE: `Agent ${agentID} not found`
+        return new Response(
+          JSON.stringify({
+            INFO: {
+              SUCCESS: false,
+              MESSAGE: `Agent ${agentID} not found`,
+            },
+          }),
+          {
+            status: 404,
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
           }
-        }), {
-          status: 404,
-          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-        });
+        );
       }
-      
-      return new Response(JSON.stringify({
-        INFO: {
-          AgentID: `${agentID}                                          `,
-          Config: "",
-          showCasinoDistribution: "off",
-          showPassword: "on",
-          showBalance: "on",
-          showDepositWithdraw: "on", 
-          showEndBalance: "on",
-          showPending: "on",
-          showName: "on",
-          showSettleFigure: "on",
-          showActiveOnly: "off",
-          showLastWagerDate: "on",
-          showWagersSameScreen: "",
-          showPhone: "on",
-          showDailyFigures: "on",
-          eowBalanceDefault: "on",
-          adds: {
+
+      return new Response(
+        JSON.stringify({
+          INFO: {
             AgentID: `${agentID}                                          `,
-            weeklyScroll: "off"
-          }
+            Config: '',
+            showCasinoDistribution: 'off',
+            showPassword: 'on',
+            showBalance: 'on',
+            showDepositWithdraw: 'on',
+            showEndBalance: 'on',
+            showPending: 'on',
+            showName: 'on',
+            showSettleFigure: 'on',
+            showActiveOnly: 'off',
+            showLastWagerDate: 'on',
+            showWagersSameScreen: '',
+            showPhone: 'on',
+            showDailyFigures: 'on',
+            eowBalanceDefault: 'on',
+            adds: {
+              AgentID: `${agentID}                                          `,
+              weeklyScroll: 'off',
+            },
+          },
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         }
-      }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
+      );
     }
-    
-    // POST /qubic/api/Manager/getCustomerPerformanceConfig - Get customer performance configuration 
+
+    // POST /qubic/api/Manager/getCustomerPerformanceConfig - Get customer performance configuration
     if (path === '/qubic/api/Manager/getCustomerPerformanceConfig' && method === 'POST') {
       const formData = await request.formData();
       const agentID = formData.get('agentID');
-      
-      return new Response(JSON.stringify({
-        INFO: {
-          AgentID: `${agentID}                                          `,
-          CustomerIDF: "on",
-          PasswordF: "on", 
-          NameF: "off",
-          TimeAcceptedF: "on",
-          TimeScheduledF: "off",
-          TypeF: "off",
-          PrintF: "on",
-          DeleteF: "on",
-          ShowCustTotalF: "off",
-          AgentF: "on"
+
+      return new Response(
+        JSON.stringify({
+          INFO: {
+            AgentID: `${agentID}                                          `,
+            CustomerIDF: 'on',
+            PasswordF: 'on',
+            NameF: 'off',
+            TimeAcceptedF: 'on',
+            TimeScheduledF: 'off',
+            TypeF: 'off',
+            PrintF: 'on',
+            DeleteF: 'on',
+            ShowCustTotalF: 'off',
+            AgentF: 'on',
+          },
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
         }
-      }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
+      );
     }
-    
+
     // POST /qubic/api/Manager/getCustomerDetails - Get detailed customer account info
     if (path === '/qubic/api/Manager/getCustomerDetails' && method === 'POST') {
       const formData = await request.formData();
       const customerID = formData.get('customerID') || formData.get('agentID');
-      
+
       // Get player/agent from database
-      const player = await env.DB.prepare(`
+      const player = await env.DB.prepare(
+        `
         SELECT p.*, a.agent_name, a.master_agent_id
         FROM players p
         LEFT JOIN agents a ON p.agent_id = a.agent_id
         WHERE p.customer_id = ? OR p.agent_id = ?
         LIMIT 1
-      `).bind(customerID, customerID).first();
-      
+      `
+      )
+        .bind(customerID, customerID)
+        .first();
+
       if (!player) {
-        return new Response(JSON.stringify({
-          accountInfo: null,
-          SERVER: { date: new Date().toISOString().replace('T', ' ').slice(0, -1) },
-          error: `Customer ${customerID} not found`
-        }), {
-          status: 404,
-          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-        });
+        return new Response(
+          JSON.stringify({
+            accountInfo: null,
+            SERVER: { date: new Date().toISOString().replace('T', ' ').slice(0, -1) },
+            error: `Customer ${customerID} not found`,
+          }),
+          {
+            status: 404,
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+          }
+        );
       }
-      
+
       const accountInfo = {
-        Active: player.status === 'active' ? "Y" : "N",
+        Active: player.status === 'active' ? 'Y' : 'N',
         customerID: player.customer_id || customerID,
-        CasinoActive: "Y",
-        AgentID: player.agent_id || "3NOLAPPH",
-        LiveCasinoActive: "N",
-        email: player.email || "",
+        CasinoActive: 'Y',
+        AgentID: player.agent_id || '3NOLAPPH',
+        LiveCasinoActive: 'N',
+        email: player.email || '',
         CreditLimit: player.credit_limit || 0,
         CurrentBalance: Math.round((player.outstanding_balance || 0) * -1), // Fire22 shows negative balance
         AvailableBalance: Math.round((player.available_credit || 0) * -1),
         PendingWagerBalance: 0,
-        CurrencyCode: "USD",
-        Currency: "USD United States Dollars",
-        Store: "PPHINSIDER          ",
-        CustProfile: ".                   ",
+        CurrencyCode: 'USD',
+        Currency: 'USD United States Dollars',
+        Store: 'PPHINSIDER          ',
+        CustProfile: '.                   ',
         WagerLimit: player.max_bet_limit || 0,
-        DonotApplyCirleLimits: "Y",
-        ParlayName: "8 Team Max               ",
-        CreditAcctFlag: "Y",
+        DonotApplyCirleLimits: 'Y',
+        ParlayName: '8 Team Max               ',
+        CreditAcctFlag: 'Y',
         PercentBook: 100,
         ContestMaxBet: 0,
         FreePlayBalance: 0,
-        EasternLineFlag: "N",
-        NotrueOdds: "N",
+        EasternLineFlag: 'N',
+        NotrueOdds: 'N',
         MaxContestPrice: 10000,
         NotrueOddsDiscount: 0,
         ParlayMaxPayout: 1000000,
         ParlayMaxBet: 0,
-        AgentType: "M",
+        AgentType: 'M',
         MaxIfBetReverse: 0,
-        EnforceLimitByGame: "Y",
+        EnforceLimitByGame: 'Y',
         EnforceLimitByLine: null,
         TeamLimit: 0,
         maxRoundRobin: 0,
-        DenyRunlineParlay: "N",
-        DenyParlayML: "N",
-        DenyParlayBuyPoints: "N",
-        AllowMatchupParlay: "N",
-        AllowGolfMatchupParlay: "Y",
-        AllowNascarMatchupParlay: "N",
-        AllowRoundRobin: "Y",
-        AllowOpenTeasers: "N",
-        EstWager101to500Flag: "N",
-        AllowOpenParlays: "N",
+        DenyRunlineParlay: 'N',
+        DenyParlayML: 'N',
+        DenyParlayBuyPoints: 'N',
+        AllowMatchupParlay: 'N',
+        AllowGolfMatchupParlay: 'Y',
+        AllowNascarMatchupParlay: 'N',
+        AllowRoundRobin: 'Y',
+        AllowOpenTeasers: 'N',
+        EstWager101to500Flag: 'N',
+        AllowOpenParlays: 'N',
         RRMaxPayout: 0,
         TeaserMaxTotals: 0,
         TeaserMaxBet: 0,
         TeaserTeamMaxWager: 0,
-        PlaceWagerPassword: "N",
-        DenyLiveBetting: "Y",
-        SuspendHorses: "N",
-        Password: "balls",
-        ckGlbStraight: "N",
-        ckGlbParlay: "N",
-        ckGlbTeaser: "N",
-        ckGlbIfbet: "N",
-        DenyPuckLineParlay: "N",
+        PlaceWagerPassword: 'N',
+        DenyLiveBetting: 'Y',
+        SuspendHorses: 'N',
+        Password: 'balls',
+        ckGlbStraight: 'N',
+        ckGlbParlay: 'N',
+        ckGlbTeaser: 'N',
+        ckGlbIfbet: 'N',
+        DenyPuckLineParlay: 'N',
         ConfirmationDelay: 0,
         WSBettingType: 1,
         WSBettingTypeMobile: 1,
@@ -2094,184 +2209,196 @@ async function handleFire22ManagerAPI(request: Request, env: Env, path: string):
         Basketball1st2ndFlatPrice: 0,
         FootballFlatPrice: 0,
         Football1st2ndFlatPrice: 0,
-        UseCaptcha: "N",
-        HalfPointInetFootballFlag: "N",
+        UseCaptcha: 'N',
+        HalfPointInetFootballFlag: 'N',
         HalfPointInetFootballDow: null,
-        HalfPointInetBasketballFlag: "N",
+        HalfPointInetBasketballFlag: 'N',
         HalfPointInetBasketballDow: null,
         HalfPointMaxBet: 0,
-        SuspendSportsbook: "N",
-        ReadOnlyFlag: "N",
+        SuspendSportsbook: 'N',
+        ReadOnlyFlag: 'N',
         maxsoccerbet: 0,
-        DenyBirdCage: "N",
-        DenyReverses: "N",
+        DenyBirdCage: 'N',
+        DenyReverses: 'N',
         ReverseTeamMaxWager: 0,
         ParlayMaxDogsGeneral: 0,
-        NoStoreLimits: "N",
+        NoStoreLimits: 'N',
         ShowHowManyWeeks: 0,
-        BaseballAction: "Action",
-        BaseballActionProps: "N",
+        BaseballAction: 'Action',
+        BaseballActionProps: 'N',
         StartOfWeek: 1,
-        ZeroBalanceFlag: "N",
-        DenyStraightBets: "N",
-        DenyParlayBets: "N",
-        DenyIfbetBets: "N",
-        DenyTeaserBets: "N",
-        AllowParlayAllGames: "N",
-        Office: "NOLAROSE",
-        AllowPrintTicket: "N",
-        AllowCancelPrintedTicket: "N",
-        ParlayAlwaysTrueOdds: "N",
-        Language: "English",
-        AlwaysUseParlayCard: "N",
-        AllowNewLiveBetting: "N",
-        CustomCSS: "",
-        PriceType: "A",
-        Skin: "skin-e",
+        ZeroBalanceFlag: 'N',
+        DenyStraightBets: 'N',
+        DenyParlayBets: 'N',
+        DenyIfbetBets: 'N',
+        DenyTeaserBets: 'N',
+        AllowParlayAllGames: 'N',
+        Office: 'NOLAROSE',
+        AllowPrintTicket: 'N',
+        AllowCancelPrintedTicket: 'N',
+        ParlayAlwaysTrueOdds: 'N',
+        Language: 'English',
+        AlwaysUseParlayCard: 'N',
+        AllowNewLiveBetting: 'N',
+        CustomCSS: '',
+        PriceType: 'A',
+        Skin: 'skin-e',
         TimeZone: 1,
         TimeZoneSource: 1,
         ARDogs: 0,
         messagecount: 0,
-        DefaultBettingType: "Normal",
-        CanChangeBettingType: "N",
-        CanChangeSiteSkin: "N",
-        DefaultSiteSkin: "RiseOfSnake",
-        displayLogoRotation: "logo",
+        DefaultBettingType: 'Normal',
+        CanChangeBettingType: 'N',
+        CanChangeSiteSkin: 'N',
+        DefaultSiteSkin: 'RiseOfSnake',
+        displayLogoRotation: 'logo',
         casinoDaily: null,
-        ParlayJuice: "",
-        DefaultSiteTheme: "",
-        DisplayWeek: "P",
-        AllowEZLive: "N",
-        DenyPlayerSettings: "N",
+        ParlayJuice: '',
+        DefaultSiteTheme: '',
+        DisplayWeek: 'P',
+        AllowEZLive: 'N',
+        DenyPlayerSettings: 'N',
         Login: player.username || customerID,
-        DenyPlayerContactUs: "N",
-        ForceReset: "N",
+        DenyPlayerContactUs: 'N',
+        ForceReset: 'N',
         MaxInetContestBet: 1000000,
         MinimumWager: 100,
         CommentsForCustomer: null,
         MaxPropPayout: 10000,
         ParlayTeamMaxWager: 0,
-        SMSPhoneNumber: "",
-        AgentMenuStyle: "",
-        FreePlayStraightOnly: "N",
+        SMSPhoneNumber: '',
+        AgentMenuStyle: '',
+        FreePlayStraightOnly: 'N',
         RecipientAccount: null,
-        AllowSurvivorPool: "N",
-        NCAATournamentBracket: "N",
-        AllowBuyPointsExtraGames: "Y",
+        AllowSurvivorPool: 'N',
+        NCAATournamentBracket: 'N',
+        AllowBuyPointsExtraGames: 'Y',
         GlobalMaxPayout: 0,
-        ReverseAllOccurences: "Y",
-        DenyPlayerEmail: "N",
-        DenySGIfBets: "N",
+        ReverseAllOccurences: 'Y',
+        DenyPlayerEmail: 'N',
+        DenySGIfBets: 'N',
         LocalTimeZone: 0,
-        AlertMSG: "",
-        AllowPoker: "N",
+        AlertMSG: '',
+        AllowPoker: 'N',
         PlayerName: `${player.first_name || ''} ${player.last_name || ''}`.trim(),
         OpenDateTime: player.created_at,
         OpenDateTimeUnix: new Date(player.created_at).getTime(),
-        PasswordFix: "†balls",
-        AllowPropBuilder: "N",
-        AllowSuperSlots: "N",
-        AllowVirtualGames: "N",
-        AllowS365: "N",
+        PasswordFix: '†balls',
+        AllowPropBuilder: 'N',
+        AllowSuperSlots: 'N',
+        AllowVirtualGames: 'N',
+        AllowS365: 'N',
         CryptoCashierType: 0,
-        PayTableForAllSports: "N",
-        NameFirst: player.first_name || "",
-        NameLast: player.last_name || "",
-        Phone: player.phone || "",
+        PayTableForAllSports: 'N',
+        NameFirst: player.first_name || '',
+        NameLast: player.last_name || '',
+        Phone: player.phone || '',
         FreePlayPendingBalance: 0,
         ParlayOpenSpotsExpireDays: 0,
         TeaserOpenSpotsExpireDays: 0,
         ParlayMaxTeamAppearance: 0,
-        ezliveID: "buck2",
-        AllowUltraLive: "Y",
-        AllowVirtual: "N",
-        AllowLotto: "N",
-        DenySpecialSportsContest: "N",
-        AllowFreshdeckCasino: "N",
+        ezliveID: 'buck2',
+        AllowUltraLive: 'Y',
+        AllowVirtual: 'N',
+        AllowLotto: 'N',
+        DenySpecialSportsContest: 'N',
+        AllowFreshdeckCasino: 'N',
         FreeplayPercent: 0,
         FreeplayMax: 0,
-        AllowFlashBets: "N",
-        AllowExtProps: "N",
-        AllowCrash: "N"
+        AllowFlashBets: 'N',
+        AllowExtProps: 'N',
+        AllowCrash: 'N',
       };
-      
-      return new Response(JSON.stringify({
-        accountInfo,
-        SERVER: { 
-          date: new Date().toISOString().replace('T', ' ').slice(0, -1)
-        },
-        preferenceDate: [{
-          BettingMode: "advance",
-          Theme: "theme1/theme1.css",
-          BettingModeHome: "normal", 
-          FixedHeader: "No",
-          PopupComments: "Yes",
-          ImportantMessage: "",
-          isTickerDisplayAlready: "false",
-          TickerDay: "",
-          TickerMessage: "",
-          TickerMonth: "",
-          TickerShowOneTime: "false",
-          TickerSubject: "",
-          TickerYear: "",
-          CMImportantMessage: "",
-          CMisTickerDisplayAlready: "false",
-          CMTickerDay: "",
-          CMTickerMessage: "uglypopup",
-          CMTickerMonth: "",
-          CMTickerShowOneTime: "false",
-          CMTickerSubject: "",
-          CMTickerYear: ""
-        }],
-        site: [{
-          Site: "fire22.com",
-          TextScroll: "",
-          Snow: 0,
-          Status: 1,
-          AgentPhoneNumber: "1-855-649-4343      ",
-          PlayerPhoneNumber: "877-347-0213        ",
-          AgentEmail: "",
-          AgentSignUpEmail: ""
-        }],
-        ips: {}, // Simplified for security
-        test: Math.floor(Date.now() / 1000),
-        SKIN: "M"
-      }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
+
+      return new Response(
+        JSON.stringify({
+          accountInfo,
+          SERVER: {
+            date: new Date().toISOString().replace('T', ' ').slice(0, -1),
+          },
+          preferenceDate: [
+            {
+              BettingMode: 'advance',
+              Theme: 'theme1/theme1.css',
+              BettingModeHome: 'normal',
+              FixedHeader: 'No',
+              PopupComments: 'Yes',
+              ImportantMessage: '',
+              isTickerDisplayAlready: 'false',
+              TickerDay: '',
+              TickerMessage: '',
+              TickerMonth: '',
+              TickerShowOneTime: 'false',
+              TickerSubject: '',
+              TickerYear: '',
+              CMImportantMessage: '',
+              CMisTickerDisplayAlready: 'false',
+              CMTickerDay: '',
+              CMTickerMessage: 'uglypopup',
+              CMTickerMonth: '',
+              CMTickerShowOneTime: 'false',
+              CMTickerSubject: '',
+              CMTickerYear: '',
+            },
+          ],
+          site: [
+            {
+              Site: 'fire22.com',
+              TextScroll: '',
+              Snow: 0,
+              Status: 1,
+              AgentPhoneNumber: '1-855-649-4343      ',
+              PlayerPhoneNumber: '877-347-0213        ',
+              AgentEmail: '',
+              AgentSignUpEmail: '',
+            },
+          ],
+          ips: {}, // Simplified for security
+          test: Math.floor(Date.now() / 1000),
+          SKIN: 'M',
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        }
+      );
     }
-    
-    return new Response(JSON.stringify({
-      INFO: {
+
+    return new Response(
+      JSON.stringify({
+        INFO: {
+          SUCCESS: false,
+          MESSAGE: 'Fire22 Manager API endpoint not found',
+        },
         SUCCESS: false,
-        MESSAGE: 'Fire22 Manager API endpoint not found'
-      },
-      SUCCESS: false
-    }), {
-      status: 404,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+      }),
+      {
+        status: 404,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
       }
-    });
-    
+    );
   } catch (error) {
     console.error('Fire22 Manager API error:', error);
-    return new Response(JSON.stringify({
-      INFO: {
+    return new Response(
+      JSON.stringify({
+        INFO: {
+          SUCCESS: false,
+          MESSAGE: 'Internal server error',
+          ERROR: (error as Error).message,
+        },
         SUCCESS: false,
-        MESSAGE: 'Internal server error',
-        ERROR: (error as Error).message
-      },
-      SUCCESS: false
-    }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
       }
-    });
+    );
   }
 }
 
@@ -2281,20 +2408,23 @@ async function handleFire22ManagerAPI(request: Request, env: Env, path: string):
 async function handleAPI(request: Request, env: Env, path: string): Promise<Response> {
   // API status endpoint
   if (path === '/api/status') {
-    return new Response(JSON.stringify({
-      api: 'Fire22 Dashboard API',
-      version: '3.0.8',
-      status: 'operational',
-      database: env.DB ? 'connected' : 'not configured',
-      timestamp: new Date().toISOString()
-    }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
+    return new Response(
+      JSON.stringify({
+        api: 'Fire22 Dashboard API',
+        version: '3.0.8',
+        status: 'operational',
+        database: env.DB ? 'connected' : 'not configured',
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
-    });
+    );
   }
-  
+
   // GET /api/customers - List customers/players (Fire22 Integration)
   if (path === '/api/customers' && request.method === 'GET') {
     try {
@@ -2305,36 +2435,40 @@ async function handleAPI(request: Request, env: Env, path: string): Promise<Resp
       const useFallback = url.searchParams.get('fallback') === 'true';
 
       const fire22 = new Fire22Integration(env);
-      
+
       // Try Fire22 integration first, fallback to database if needed
       if (!useFallback) {
         try {
           const result = await fire22.getCustomersWithPermissions(agent, page, limit);
-          
-          const isDemoMode = env.NODE_ENV === 'development' || 
-                           env.FIRE22_TOKEN?.includes('dev') || 
-                           env.FIRE22_DEMO_MODE === 'true';
-          
-          return new Response(JSON.stringify({
-            success: true,
-            data: result.customers,
-            pagination: result.pagination,
-            source: isDemoMode ? 'fire22_demo' : 'fire22',
-            cached: result.cached,
-            total_fire22_customers: result.total,
-            agent: agent,
-            demo_mode: isDemoMode,
-            note: isDemoMode 
-              ? `Showing ${result.total} mock Fire22 customers (demo mode)` 
-              : `Showing ${result.total} real Fire22 customers`
-          }), {
-            status: 200,
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Data-Source': 'fire22',
-              'X-Cached': result.cached.toString()
+
+          const isDemoMode =
+            env.NODE_ENV === 'development' ||
+            env.FIRE22_TOKEN?.includes('dev') ||
+            env.FIRE22_DEMO_MODE === 'true';
+
+          return new Response(
+            JSON.stringify({
+              success: true,
+              data: result.customers,
+              pagination: result.pagination,
+              source: isDemoMode ? 'fire22_demo' : 'fire22',
+              cached: result.cached,
+              total_fire22_customers: result.total,
+              agent: agent,
+              demo_mode: isDemoMode,
+              note: isDemoMode
+                ? `Showing ${result.total} mock Fire22 customers (demo mode)`
+                : `Showing ${result.total} real Fire22 customers`,
+            }),
+            {
+              status: 200,
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Data-Source': 'fire22',
+                'X-Cached': result.cached.toString(),
+              },
             }
-          });
+          );
         } catch (fire22Error) {
           // Log Fire22 error but continue with fallback
           console.warn('Fire22 API failed, using database fallback:', fire22Error.message);
@@ -2370,8 +2504,10 @@ async function handleAPI(request: Request, env: Env, path: string): Promise<Resp
       query += ' ORDER BY outstanding_balance DESC LIMIT ? OFFSET ?';
       bindings.push(limit, offset);
 
-      const result = await env.DB.prepare(query).bind(...bindings).all();
-      
+      const result = await env.DB.prepare(query)
+        .bind(...bindings)
+        .all();
+
       // Count total for pagination
       let countQuery = 'SELECT COUNT(*) as total FROM players WHERE 1=1';
       const countBindings: any[] = [];
@@ -2379,42 +2515,50 @@ async function handleAPI(request: Request, env: Env, path: string): Promise<Resp
         countQuery += ' AND agent_id = ?';
         countBindings.push(agent);
       }
-      
-      const countResult = await env.DB.prepare(countQuery).bind(...countBindings).first();
+
+      const countResult = await env.DB.prepare(countQuery)
+        .bind(...countBindings)
+        .first();
       const total = countResult?.total || 0;
 
-      return new Response(JSON.stringify({
-        success: true,
-        data: result.results || [],
-        pagination: {
-          page,
-          limit,
-          total,
-          pages: Math.ceil(total / limit)
-        },
-        source: 'database_fallback',
-        cached: false,
-        agent: agent,
-        note: 'Using database fallback - not real Fire22 data'
-      }), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Data-Source': 'database',
-          'X-Cached': 'false'
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: result.results || [],
+          pagination: {
+            page,
+            limit,
+            total,
+            pages: Math.ceil(total / limit),
+          },
+          source: 'database_fallback',
+          cached: false,
+          agent: agent,
+          note: 'Using database fallback - not real Fire22 data',
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Data-Source': 'database',
+            'X-Cached': 'false',
+          },
         }
-      });
+      );
     } catch (error) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to fetch customers',
-        details: error.message
-      }), {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to fetch customers',
+          details: error.message,
+        }),
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
-      });
+      );
     }
   }
 
@@ -2423,36 +2567,42 @@ async function handleAPI(request: Request, env: Env, path: string): Promise<Resp
     try {
       const body = await request.json();
       const agentID = body.agentID || 'BLAKEPPH';
-      
+
       const fire22 = new Fire22Integration(env);
-      
+
       // Force fresh fetch from Fire22 API
       const customers = await fire22.fetchAndCacheCustomers(agentID);
-      
-      return new Response(JSON.stringify({
-        success: true,
-        message: 'Fire22 customer data synchronized successfully',
-        agentID,
-        customerCount: customers.length,
-        syncTime: new Date().toISOString(),
-        note: 'Real Fire22 customer data cached successfully'
-      }), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: 'Fire22 customer data synchronized successfully',
+          agentID,
+          customerCount: customers.length,
+          syncTime: new Date().toISOString(),
+          note: 'Real Fire22 customer data cached successfully',
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
-      });
+      );
     } catch (error) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to sync Fire22 customer data',
-        details: error.message
-      }), {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to sync Fire22 customer data',
+          details: error.message,
+        }),
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
-      });
+      );
     }
   }
 
@@ -2461,38 +2611,44 @@ async function handleAPI(request: Request, env: Env, path: string): Promise<Resp
     try {
       const body = await request.json();
       const agentID = body.agentID || 'BLAKEPPH';
-      
+
       const fire22 = new Fire22Integration(env);
       const auths = await fire22.getAuthorizations(agentID);
-      
-      return new Response(JSON.stringify({
-        success: true,
-        agentID,
-        permissions: {
-          canAccessCustomers: auths.DenyAgentPerformance !== "Y",
-          canAccessBilling: auths.DenyAgentBilling !== "Y",
-          canManageLines: auths.ManageLinesFlag === "Y",
-          canAccessCrypto: auths.EnterTransactionFlag === "Y"
-        },
-        fullAuthorizations: auths,
-        cached: true
-      }), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          agentID,
+          permissions: {
+            canAccessCustomers: auths.DenyAgentPerformance !== 'Y',
+            canAccessBilling: auths.DenyAgentBilling !== 'Y',
+            canManageLines: auths.ManageLinesFlag === 'Y',
+            canAccessCrypto: auths.EnterTransactionFlag === 'Y',
+          },
+          fullAuthorizations: auths,
+          cached: true,
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
-      });
+      );
     } catch (error) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to get Fire22 authorization status',
-        details: error.message
-      }), {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to get Fire22 authorization status',
+          details: error.message,
+        }),
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
-      });
+      );
     }
   }
 
@@ -2500,46 +2656,55 @@ async function handleAPI(request: Request, env: Env, path: string): Promise<Resp
   if (path === '/api/fire22/cache-stats' && request.method === 'GET') {
     try {
       // This would normally query KV metadata, simplified for demo
-      return new Response(JSON.stringify({
-        success: true,
-        cacheStats: {
-          authCacheHits: '~95%',
-          customerDataFreshness: '< 6 hours',
-          totalCachedCustomers: '~2,600',
-          cacheStatus: 'healthy',
-          lastSyncTime: new Date(Date.now() - 3600000).toISOString() // 1 hour ago
-        },
-        note: 'Fire22 cache operating within security parameters'
-      }), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
+      return new Response(
+        JSON.stringify({
+          success: true,
+          cacheStats: {
+            authCacheHits: '~95%',
+            customerDataFreshness: '< 6 hours',
+            totalCachedCustomers: '~2,600',
+            cacheStatus: 'healthy',
+            lastSyncTime: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+          },
+          note: 'Fire22 cache operating within security parameters',
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
-      });
+      );
     } catch (error) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to get cache statistics',
-        details: error.message
-      }), {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to get cache statistics',
+          details: error.message,
+        }),
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
-      });
+      );
     }
   }
-  
+
   // Add more API endpoints as needed
-  
-  return new Response(JSON.stringify({
-    error: 'API endpoint not found'
-  }), {
-    status: 404,
-    headers: {
-      'Content-Type': 'application/json',
+
+  return new Response(
+    JSON.stringify({
+      error: 'API endpoint not found',
+    }),
+    {
+      status: 404,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     }
-  });
+  );
 }
 
 /**
@@ -2548,34 +2713,40 @@ async function handleAPI(request: Request, env: Env, path: string): Promise<Resp
 async function handleAPIv2(request: Request, env: Env, path: string): Promise<Response> {
   // Health check for consolidated API
   if (path === '/api/v2/health') {
-    return new Response(JSON.stringify({
-      api: 'Fire22 Consolidated API v2',
-      version: '2.0.0',
-      status: 'operational',
-      endpoints: 107,
-      security: 'enterprise-grade',
-      performance: '4.96M+ ops/sec',
-      database: env.DB ? 'connected' : 'not configured',
-      timestamp: new Date().toISOString()
-    }), {
-      status: 200,
+    return new Response(
+      JSON.stringify({
+        api: 'Fire22 Consolidated API v2',
+        version: '2.0.0',
+        status: 'operational',
+        endpoints: 107,
+        security: 'enterprise-grade',
+        performance: '4.96M+ ops/sec',
+        database: env.DB ? 'connected' : 'not configured',
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Version': '2.0.0',
+        },
+      }
+    );
+  }
+
+  return new Response(
+    JSON.stringify({
+      error: 'Consolidated API endpoint under development',
+      message: 'Full consolidated API integration coming soon',
+      availableNow: ['/api/v2/health'],
+    }),
+    {
+      status: 501,
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Version': '2.0.0'
-      }
-    });
-  }
-  
-  return new Response(JSON.stringify({
-    error: 'Consolidated API endpoint under development',
-    message: 'Full consolidated API integration coming soon',
-    availableNow: ['/api/v2/health']
-  }), {
-    status: 501,
-    headers: {
-      'Content-Type': 'application/json',
+      },
     }
-  });
+  );
 }
 
 /**
@@ -2587,7 +2758,7 @@ async function handleRegistry(request: Request, env: Env, path: string): Promise
     let dbStatus = 'not configured';
     let storageStatus = 'not configured';
     let cacheStatus = 'not configured';
-    
+
     try {
       if (env.REGISTRY_DB) {
         await env.REGISTRY_DB.prepare('SELECT 1').first();
@@ -2596,7 +2767,7 @@ async function handleRegistry(request: Request, env: Env, path: string): Promise
     } catch (e) {
       dbStatus = 'error';
     }
-    
+
     try {
       if (env.REGISTRY_STORAGE) {
         await env.REGISTRY_STORAGE.head('test');
@@ -2605,7 +2776,7 @@ async function handleRegistry(request: Request, env: Env, path: string): Promise
     } catch (e) {
       storageStatus = env.REGISTRY_STORAGE ? 'connected' : 'not configured';
     }
-    
+
     try {
       if (env.REGISTRY_CACHE) {
         await env.REGISTRY_CACHE.get('test');
@@ -2614,51 +2785,57 @@ async function handleRegistry(request: Request, env: Env, path: string): Promise
     } catch (e) {
       cacheStatus = 'error';
     }
-    
-    return new Response(JSON.stringify({
-      registry: env.REGISTRY_NAME || 'Fire22 Security Registry',
-      version: '1.0.0',
-      status: 'operational',
-      security: {
-        scanning: env.SECURITY_SCANNING_ENABLED === 'true',
-        minScore: parseInt(env.MIN_SECURITY_SCORE || '50'),
-        allowedScopes: env.ALLOWED_SCOPES?.split(',') || []
-      },
-      infrastructure: {
-        database: dbStatus,
-        storage: storageStatus,
-        cache: cacheStatus
-      },
-      timestamp: new Date().toISOString()
-    }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Registry-Version': '1.0.0'
+
+    return new Response(
+      JSON.stringify({
+        registry: env.REGISTRY_NAME || 'Fire22 Security Registry',
+        version: '1.0.0',
+        status: 'operational',
+        security: {
+          scanning: env.SECURITY_SCANNING_ENABLED === 'true',
+          minScore: parseInt(env.MIN_SECURITY_SCORE || '50'),
+          allowedScopes: env.ALLOWED_SCOPES?.split(',') || [],
+        },
+        infrastructure: {
+          database: dbStatus,
+          storage: storageStatus,
+          cache: cacheStatus,
+        },
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Registry-Version': '1.0.0',
+        },
       }
-    });
+    );
   }
-  
+
   // Registry statistics with proper error handling
   if (path === '/registry/-/stats') {
     const fallbackStats = {
       total_packages: 0,
       avg_security_score: 100,
       total_downloads: 0,
-      vulnerable_packages: 0
+      vulnerable_packages: 0,
     };
 
     return withFallback(
       async () => {
         const stats = await RetryUtils.retryDatabaseOperation(
-          () => env.REGISTRY_DB.prepare(`
+          () =>
+            env.REGISTRY_DB.prepare(
+              `
             SELECT 
               COUNT(*) as total_packages,
               AVG(security_score) as avg_security_score,
               SUM(downloads) as total_downloads,
               COUNT(CASE WHEN vulnerabilities > 0 THEN 1 END) as vulnerable_packages
             FROM packages
-          `).first(),
+          `
+            ).first(),
           'registry-stats',
           request
         );
@@ -2668,14 +2845,15 @@ async function handleRegistry(request: Request, env: Env, path: string): Promise
           statistics: stats || fallbackStats,
         });
       },
-      () => createSuccessResponse({
-        registry: env.REGISTRY_NAME || 'Fire22 Security Registry',
-        statistics: fallbackStats,
-        message: 'Using fallback statistics - registry database temporarily unavailable'
-      })
+      () =>
+        createSuccessResponse({
+          registry: env.REGISTRY_NAME || 'Fire22 Security Registry',
+          statistics: fallbackStats,
+          message: 'Using fallback statistics - registry database temporarily unavailable',
+        })
     );
   }
-  
+
   return createNotFoundError('Registry endpoint', request);
 }
 
@@ -2687,7 +2865,7 @@ async function handleLiveEvents(request: Request, env: Env): Promise<Response> {
     // Initialize Fire22 API connection
     const fire22BaseUrl = env.FIRE22_API_BASE_URL || 'https://fire22.ag/cloud/api';
     const fire22Token = env.FIRE22_TOKEN || '';
-    
+
     // Try to fetch real Fire22 data
     let realFire22Data: any = null;
     try {
@@ -2696,24 +2874,25 @@ async function handleLiveEvents(request: Request, env: Env): Promise<Response> {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': fire22Token ? `Bearer ${fire22Token}` : '',
-          'User-Agent': 'Fire22-Dashboard-Worker/4.0.0'
+          Authorization: fire22Token ? `Bearer ${fire22Token}` : '',
+          'User-Agent': 'Fire22-Dashboard-Worker/4.0.0',
         },
         body: new URLSearchParams({
           agentAcc: 'BLAKEPPH',
-          limit: '100'
-        })
+          limit: '100',
+        }),
       });
-      
+
       if (response.ok) {
         realFire22Data = await response.json();
       }
     } catch (apiError) {
       console.error('Fire22 API error:', apiError);
     }
-    
+
     // Get local database data as fallback
-    const agents = await env.DB.prepare(`
+    const agents = await env.DB.prepare(
+      `
       SELECT 
         agent_id,
         agent_name,
@@ -2728,15 +2907,20 @@ async function handleLiveEvents(request: Request, env: Env): Promise<Response> {
       WHERE status = 'active'
       ORDER BY agent_name
       LIMIT 10
-    `).all();
+    `
+    ).all();
 
-    const transactionCount = await env.DB.prepare(`
+    const transactionCount = await env.DB.prepare(
+      `
       SELECT COUNT(*) as count FROM transactions
-    `).first();
+    `
+    ).first();
 
-    const betCount = await env.DB.prepare(`
+    const betCount = await env.DB.prepare(
+      `
       SELECT COUNT(*) as count FROM bets
-    `).first();
+    `
+    ).first();
 
     // Build real performance data
     const performanceData = {
@@ -2746,37 +2930,36 @@ async function handleLiveEvents(request: Request, env: Env): Promise<Response> {
         agents: agents.results || [],
         agentCount: agents.results?.length || 0,
         transactions: {
-          total: transactionCount?.count || 0
+          total: transactionCount?.count || 0,
         },
         bets: {
-          total: betCount?.count || 0
-        }
+          total: betCount?.count || 0,
+        },
       },
       systemStatus: {
         database: 'connected',
-        registry: 'connected', 
+        registry: 'connected',
         cache: 'connected',
-        fire22API: realFire22Data ? 'connected' : 'disconnected'
+        fire22API: realFire22Data ? 'connected' : 'disconnected',
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     // Return SSE-formatted response
     const sseData = `data: ${JSON.stringify(performanceData)}\n\n`;
-    
+
     return new Response(sseData, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Cache-Control'
-      }
+        'Access-Control-Allow-Headers': 'Cache-Control',
+      },
     });
-
   } catch (error) {
     console.error('Error fetching live data:', error);
-    
+
     // Return error in SSE format
     const errorData = {
       error: 'Failed to fetch live data',
@@ -2784,20 +2967,20 @@ async function handleLiveEvents(request: Request, env: Env): Promise<Response> {
       systemStatus: {
         database: 'error',
         registry: 'unknown',
-        cache: 'unknown'
-      }
+        cache: 'unknown',
+      },
     };
-    
+
     const sseData = `data: ${JSON.stringify(errorData)}\n\n`;
-    
+
     return new Response(sseData, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Cache-Control'
-      }
+        'Access-Control-Allow-Headers': 'Cache-Control',
+      },
     });
   }
 }
@@ -2809,12 +2992,12 @@ async function handleAgentAnalytics(request: Request, env: Env, path: string): P
   const url = new URL(request.url);
   const method = request.method;
   const pathParts = path.split('/');
-  
+
   try {
     // GET /api/analytics/agents - Get all agent analytics
     if (path === '/api/analytics/agents' && method === 'GET') {
       const timeframe = url.searchParams.get('timeframe') || '24h';
-      
+
       // Mock analytics data (replace with real Fire22 API integration)
       const analyticsData = {
         timeframe,
@@ -2822,49 +3005,49 @@ async function handleAgentAnalytics(request: Request, env: Env, path: string): P
           totalVolume: 2500000,
           totalCommission: 125000,
           totalBets: 1250,
-          averageBet: 2000
+          averageBet: 2000,
         },
         agents: {
-          'BLAKEPPH': {
+          BLAKEPPH: {
             volume: 650000,
             commission: 32500,
             bets: 325,
             winRate: 0.62,
-            performance: 'excellent'
+            performance: 'excellent',
           },
-          'DAKOMA': {
+          DAKOMA: {
             volume: 480000,
             commission: 24000,
             bets: 240,
             winRate: 0.58,
-            performance: 'good'
+            performance: 'good',
           },
-          'SCRAMPOST': {
+          SCRAMPOST: {
             volume: 720000,
             commission: 36000,
             bets: 360,
             winRate: 0.65,
-            performance: 'excellent'
+            performance: 'excellent',
           },
-          'SPEN': {
+          SPEN: {
             volume: 650000,
             commission: 32500,
             bets: 325,
-            winRate: 0.60,
-            performance: 'good'
-          }
+            winRate: 0.6,
+            performance: 'good',
+          },
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      
+
       return createSuccessResponse(analyticsData, 'Analytics data retrieved successfully');
     }
-    
+
     // GET /api/analytics/agents/{agentId} - Get specific agent analytics
     if (pathParts[3] && pathParts.length === 4 && method === 'GET') {
       const agentId = pathParts[3];
       const timeframe = url.searchParams.get('timeframe') || '24h';
-      
+
       // Mock individual agent analytics
       const agentAnalytics = {
         agentId,
@@ -2874,31 +3057,33 @@ async function handleAgentAnalytics(request: Request, env: Env, path: string): P
           commission: Math.floor(Math.random() * 25000) + 15000,
           bets: Math.floor(Math.random() * 200) + 150,
           winRate: Math.round((Math.random() * 0.3 + 0.5) * 100) / 100,
-          averageBet: Math.floor(Math.random() * 1000) + 1500
+          averageBet: Math.floor(Math.random() * 1000) + 1500,
         },
         trends: {
           volumeGrowth: Math.round((Math.random() * 0.4 - 0.2) * 100) / 100,
-          betFrequency: Math.round((Math.random() * 0.3 + 0.8) * 100) / 100
+          betFrequency: Math.round((Math.random() * 0.3 + 0.8) * 100) / 100,
         },
         risk: {
           level: 'medium',
-          score: Math.floor(Math.random() * 30) + 40
+          score: Math.floor(Math.random() * 30) + 40,
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      
-      return createSuccessResponse(agentAnalytics, `Analytics for agent ${agentId} retrieved successfully`);
+
+      return createSuccessResponse(
+        agentAnalytics,
+        `Analytics for agent ${agentId} retrieved successfully`
+      );
     }
-    
+
     return createNotFoundError(`Analytics endpoint ${path}`, request);
-    
   } catch (error) {
     console.error('Analytics API error:', error);
     const errorHandler = ErrorHandler.getInstance();
     return errorHandler.handleGenericError(error as Error, request, {
       endpoint: path,
       method,
-      errorDetails: (error as Error).message
+      errorDetails: (error as Error).message,
     });
   }
 }
@@ -2918,7 +3103,9 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
     // GET /api/agents - List all agents
     if (path === '/api/agents' && method === 'GET') {
       const agents = await RetryUtils.retryDatabaseOperation(
-        () => env.DB.prepare(`
+        () =>
+          env.DB.prepare(
+            `
           SELECT 
             agent_id,
             agent_name,
@@ -2937,7 +3124,8 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
             activated_at
           FROM agents
           ORDER BY agent_name
-        `).all(),
+        `
+          ).all(),
         'get-all-agents',
         request
       );
@@ -2949,9 +3137,14 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
     if (agentId && pathParts.length === 4 && method === 'GET') {
       // Get agent details
       const agent = await RetryUtils.retryDatabaseOperation(
-        () => env.DB.prepare(`
+        () =>
+          env.DB.prepare(
+            `
           SELECT * FROM agents WHERE agent_id = ?
-        `).bind(agentId).first(),
+        `
+          )
+            .bind(agentId)
+            .first(),
         'get-agent',
         request
       );
@@ -2961,20 +3154,28 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
       }
 
       // Get agent permissions
-      const permissions = await env.DB.prepare(`
+      const permissions = await env.DB.prepare(
+        `
         SELECT permission_name, permission_value, granted_by, granted_at
         FROM agent_permissions
         WHERE agent_id = ?
-      `).bind(agentId).all();
+      `
+      )
+        .bind(agentId)
+        .all();
 
-      return createSuccessResponse({
-        agent,
-        permissions: permissions.results,
-        summary: {
-          totalPermissions: permissions.results.length,
-          activePermissions: permissions.results.filter((p: any) => p.permission_value === 1).length
-        }
-      }, `Agent ${agentId} retrieved successfully`);
+      return createSuccessResponse(
+        {
+          agent,
+          permissions: permissions.results,
+          summary: {
+            totalPermissions: permissions.results.length,
+            activePermissions: permissions.results.filter((p: any) => p.permission_value === 1)
+              .length,
+          },
+        },
+        `Agent ${agentId} retrieved successfully`
+      );
     }
 
     // PUT /api/agents/{agentId} - Update agent configuration
@@ -2983,16 +3184,27 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
       const changedBy = request.headers.get('X-Changed-By') || 'system';
 
       // Validate the agent exists
-      const existingAgent = await env.DB.prepare(`
+      const existingAgent = await env.DB.prepare(
+        `
         SELECT agent_id FROM agents WHERE agent_id = ?
-      `).bind(agentId).first();
+      `
+      )
+        .bind(agentId)
+        .first();
 
       if (!existingAgent) {
         return createNotFoundError(`Agent ${agentId}`, request);
       }
 
       // Build update query
-      const validFields = ['can_place_bet', 'internet_rate', 'casino_rate', 'sports_rate', 'credit_limit', 'status'];
+      const validFields = [
+        'can_place_bet',
+        'internet_rate',
+        'casino_rate',
+        'sports_rate',
+        'credit_limit',
+        'status',
+      ];
       const updateFields: string[] = [];
       const updateValues: any[] = [];
 
@@ -3010,11 +3222,16 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
       updateValues.push(agentId); // For WHERE clause
 
       await RetryUtils.retryDatabaseOperation(
-        () => env.DB.prepare(`
+        () =>
+          env.DB.prepare(
+            `
           UPDATE agents 
           SET ${updateFields.join(', ')}, updated_at = datetime('now')
           WHERE agent_id = ?
-        `).bind(...updateValues).run(),
+        `
+          )
+            .bind(...updateValues)
+            .run(),
         'update-agent',
         request
       );
@@ -3022,18 +3239,23 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
       return createSuccessResponse({
         agentId,
         updatedFields: Object.keys(updates).filter(k => validFields.includes(k)),
-        message: `Agent ${agentId} updated successfully`
+        message: `Agent ${agentId} updated successfully`,
       });
     }
 
     // POST /api/agents/{agentId}/enable-betting - Enable betting
     if (agentId && path.endsWith('/enable-betting') && method === 'POST') {
       await RetryUtils.retryDatabaseOperation(
-        () => env.DB.prepare(`
+        () =>
+          env.DB.prepare(
+            `
           UPDATE agents 
           SET can_place_bet = 1, status = 'active', updated_at = datetime('now')
           WHERE agent_id = ?
-        `).bind(agentId).run(),
+        `
+          )
+            .bind(agentId)
+            .run(),
         'enable-betting',
         request
       );
@@ -3041,7 +3263,7 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
       return createSuccessResponse({
         agentId,
         action: 'enable-betting',
-        message: `Betting enabled for agent ${agentId}`
+        message: `Betting enabled for agent ${agentId}`,
       });
     }
 
@@ -3052,15 +3274,20 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
       const changedBy = request.headers.get('X-Changed-By') || 'system';
 
       await RetryUtils.retryDatabaseOperation(
-        () => env.DB.prepare(`
+        () =>
+          env.DB.prepare(
+            `
           UPDATE agents 
           SET can_place_bet = 0, updated_at = datetime('now')
           WHERE agent_id = ?
-        `).bind(agentId).run(),
+        `
+          )
+            .bind(agentId)
+            .run(),
         'disable-betting',
         request
       );
-      
+
       // Log the action
       await logAgentAction(env, agentId, 'disable-betting', { reason, changedBy });
 
@@ -3069,50 +3296,61 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
         action: 'disable-betting',
         reason,
         changedBy,
-        message: `Betting disabled for agent ${agentId}`
+        message: `Betting disabled for agent ${agentId}`,
       });
     }
-    
+
     // POST /api/agents/bulk - Bulk operations
     if (path === '/api/agents/bulk' && method === 'POST') {
       const body = await request.json();
       const { operation, agentIds, parameters } = body;
       const changedBy = request.headers.get('X-Changed-By') || 'system';
-      
+
       if (!operation || !agentIds || !Array.isArray(agentIds)) {
         return createValidationError('Invalid bulk operation request', 'body', body, request);
       }
-      
+
       const results = [];
-      
+
       for (const agentId of agentIds) {
         try {
           switch (operation) {
             case 'enable-betting':
-              await env.DB.prepare(`
+              await env.DB.prepare(
+                `
                 UPDATE agents 
                 SET can_place_bet = 1, status = 'active', updated_at = datetime('now')
                 WHERE agent_id = ?
-              `).bind(agentId).run();
+              `
+              )
+                .bind(agentId)
+                .run();
               await logAgentAction(env, agentId, 'bulk-enable-betting', { changedBy });
               results.push({ agentId, status: 'success' });
               break;
-              
+
             case 'disable-betting':
-              await env.DB.prepare(`
+              await env.DB.prepare(
+                `
                 UPDATE agents 
                 SET can_place_bet = 0, updated_at = datetime('now')
                 WHERE agent_id = ?
-              `).bind(agentId).run();
-              await logAgentAction(env, agentId, 'bulk-disable-betting', { changedBy, reason: parameters?.reason });
+              `
+              )
+                .bind(agentId)
+                .run();
+              await logAgentAction(env, agentId, 'bulk-disable-betting', {
+                changedBy,
+                reason: parameters?.reason,
+              });
               results.push({ agentId, status: 'success' });
               break;
-              
+
             case 'update-rates':
               if (parameters?.rates) {
                 const updateFields = [];
                 const updateValues = [];
-                
+
                 if (parameters.rates.internet_rate !== undefined) {
                   updateFields.push('internet_rate = ?');
                   updateValues.push(parameters.rates.internet_rate);
@@ -3125,15 +3363,22 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
                   updateFields.push('sports_rate = ?');
                   updateValues.push(parameters.rates.sports_rate);
                 }
-                
+
                 if (updateFields.length > 0) {
                   updateValues.push(agentId);
-                  await env.DB.prepare(`
+                  await env.DB.prepare(
+                    `
                     UPDATE agents 
                     SET ${updateFields.join(', ')}, updated_at = datetime('now')
                     WHERE agent_id = ?
-                  `).bind(...updateValues).run();
-                  await logAgentAction(env, agentId, 'bulk-update-rates', { changedBy, rates: parameters.rates });
+                  `
+                  )
+                    .bind(...updateValues)
+                    .run();
+                  await logAgentAction(env, agentId, 'bulk-update-rates', {
+                    changedBy,
+                    rates: parameters.rates,
+                  });
                   results.push({ agentId, status: 'success' });
                 } else {
                   results.push({ agentId, status: 'skipped', reason: 'No valid rates provided' });
@@ -3142,7 +3387,7 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
                 results.push({ agentId, status: 'error', reason: 'No rates provided' });
               }
               break;
-              
+
             default:
               results.push({ agentId, status: 'error', reason: `Unknown operation: ${operation}` });
           }
@@ -3150,26 +3395,27 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
           results.push({ agentId, status: 'error', reason: (error as Error).message });
         }
       }
-      
+
       const successCount = results.filter(r => r.status === 'success').length;
       const errorCount = results.filter(r => r.status === 'error').length;
-      
+
       return createSuccessResponse({
         operation,
         processed: agentIds.length,
         successful: successCount,
         failed: errorCount,
         results,
-        message: `Bulk operation completed: ${successCount} successful, ${errorCount} failed`
+        message: `Bulk operation completed: ${successCount} successful, ${errorCount} failed`,
       });
     }
-    
+
     // GET /api/agents/{agentId}/audit - Get agent audit log
     if (agentId && path.endsWith('/audit') && method === 'GET') {
       const limit = parseInt(url.searchParams.get('limit') || '50');
       const offset = parseInt(url.searchParams.get('offset') || '0');
-      
-      const auditLogs = await env.DB.prepare(`
+
+      const auditLogs = await env.DB.prepare(
+        `
         SELECT 
           action,
           parameters,
@@ -3180,34 +3426,46 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
         WHERE agent_id = ?
         ORDER BY created_at DESC
         LIMIT ? OFFSET ?
-      `).bind(agentId, limit, offset).all();
-      
-      const totalCount = await env.DB.prepare(`
+      `
+      )
+        .bind(agentId, limit, offset)
+        .all();
+
+      const totalCount = await env.DB.prepare(
+        `
         SELECT COUNT(*) as count FROM agent_config_history WHERE agent_id = ?
-      `).bind(agentId).first();
-      
-      return createSuccessResponse({
-        agentId,
-        auditLogs: auditLogs.results?.map(log => ({
-          ...log,
-          parameters: log.parameters ? JSON.parse(log.parameters) : null
-        })) || [],
-        pagination: {
-          limit,
-          offset,
-          total: totalCount?.count || 0,
-          hasMore: (offset + limit) < (totalCount?.count || 0)
-        }
-      }, `Audit log for agent ${agentId} retrieved successfully`);
+      `
+      )
+        .bind(agentId)
+        .first();
+
+      return createSuccessResponse(
+        {
+          agentId,
+          auditLogs:
+            auditLogs.results?.map(log => ({
+              ...log,
+              parameters: log.parameters ? JSON.parse(log.parameters) : null,
+            })) || [],
+          pagination: {
+            limit,
+            offset,
+            total: totalCount?.count || 0,
+            hasMore: offset + limit < (totalCount?.count || 0),
+          },
+        },
+        `Audit log for agent ${agentId} retrieved successfully`
+      );
     }
 
     // GET /api/agents/export - Export agent data
     if (path === '/api/agents/export' && method === 'GET') {
       const format = url.searchParams.get('format') || 'json';
       const includeAnalytics = url.searchParams.get('analytics') === 'true';
-      
+
       // Get all agents
-      const agents = await env.DB.prepare(`
+      const agents = await env.DB.prepare(
+        `
         SELECT 
           agent_id,
           agent_name,
@@ -3226,20 +3484,32 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
           activated_at
         FROM agents
         ORDER BY agent_name
-      `).all();
-      
+      `
+      ).all();
+
       const agentsData = agents.results || [];
-      
+
       if (format === 'csv') {
         // Generate CSV
         const headers = [
-          'Agent ID', 'Agent Name', 'Master Agent', 'Status', 'Can Place Bet',
-          'Internet Rate', 'Casino Rate', 'Sports Rate', 'Credit Limit',
-          'Outstanding Credit', 'Available Credit', 'Last Login', 'Created At', 'Updated At'
+          'Agent ID',
+          'Agent Name',
+          'Master Agent',
+          'Status',
+          'Can Place Bet',
+          'Internet Rate',
+          'Casino Rate',
+          'Sports Rate',
+          'Credit Limit',
+          'Outstanding Credit',
+          'Available Credit',
+          'Last Login',
+          'Created At',
+          'Updated At',
         ];
-        
+
         const csvRows = [headers.join(',')];
-        
+
         for (const agent of agentsData) {
           const row = [
             agent.agent_id,
@@ -3255,17 +3525,17 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
             agent.available_credit || 0,
             agent.last_login_at || '',
             agent.created_at,
-            agent.updated_at
+            agent.updated_at,
           ];
           csvRows.push(row.join(','));
         }
-        
+
         return new Response(csvRows.join('\n'), {
           status: 200,
           headers: {
             'Content-Type': 'text/csv',
-            'Content-Disposition': `attachment; filename="fire22-agents-${new Date().toISOString().split('T')[0]}.csv"`
-          }
+            'Content-Disposition': `attachment; filename="fire22-agents-${new Date().toISOString().split('T')[0]}.csv"`,
+          },
         });
       } else {
         // JSON format
@@ -3274,21 +3544,20 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
           totalAgents: agentsData.length,
           activeAgents: agentsData.filter((a: any) => a.status === 'active').length,
           bettingEnabledAgents: agentsData.filter((a: any) => a.can_place_bet === 1).length,
-          agents: agentsData
+          agents: agentsData,
         };
-        
+
         return new Response(JSON.stringify(exportData, null, 2), {
           status: 200,
           headers: {
             'Content-Type': 'application/json',
-            'Content-Disposition': `attachment; filename="fire22-agents-${new Date().toISOString().split('T')[0]}.json"`
-          }
+            'Content-Disposition': `attachment; filename="fire22-agents-${new Date().toISOString().split('T')[0]}.json"`,
+          },
         });
       }
     }
 
     return createNotFoundError(`Agent API endpoint ${path}`, request);
-
   } catch (error) {
     console.error('Agent API error:', error);
     const errorHandler = ErrorHandler.getInstance();
@@ -3296,7 +3565,7 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
       endpoint: path,
       method,
       agentId,
-      errorDetails: (error as Error).message
+      errorDetails: (error as Error).message,
     });
   }
 }
@@ -3306,7 +3575,7 @@ async function handleAgentAPI(request: Request, env: Env, path: string): Promise
  */
 async function getRecentAPILogs(env: Env, limit: number = 10, hours: number = 24): Promise<any[]> {
   try {
-    const cutoffTime = new Date(Date.now() - (hours * 60 * 60 * 1000));
+    const cutoffTime = new Date(Date.now() - hours * 60 * 60 * 1000);
 
     // Query web logs for recent API activity
     const logsQuery = `
@@ -3326,30 +3595,32 @@ async function getRecentAPILogs(env: Env, limit: number = 10, hours: number = 24
       LIMIT ?
     `;
 
-    const logsResult = await env.DB.prepare(logsQuery)
-      .bind(cutoffTime.toISOString(), limit)
-      .all();
+    const logsResult = await env.DB.prepare(logsQuery).bind(cutoffTime.toISOString(), limit).all();
 
     // Transform logs to match the user's format
     return logsResult.results.map((log: any) => ({
       timestamp: log.timestamp,
       method: log.method || 'GET',
       endpoint: `/api/v2/${log.endpoint.replace('_', '-')}`,
-      status: log.status === 'processed' ? '200 OK' :
-              log.status === 'failed' ? '500 Internal Server Error' :
-              log.status === 'created' ? '201 Created' : '200 OK',
-      responseTime: log.response_time || Math.floor(Math.random() * 200) + 50
+      status:
+        log.status === 'processed'
+          ? '200 OK'
+          : log.status === 'failed'
+            ? '500 Internal Server Error'
+            : log.status === 'created'
+              ? '201 Created'
+              : '200 OK',
+      responseTime: log.response_time || Math.floor(Math.random() * 200) + 50,
     }));
-
   } catch (error) {
     console.error('Error fetching recent API logs:', error);
     // Return sample data if database query fails
     return [
-      { timestamp: "14:32:15", method: "GET", endpoint: "/api/v2/clients", status: "200 OK" },
-      { timestamp: "14:31:42", method: "POST", endpoint: "/api/v2/bets", status: "201 Created" },
-      { timestamp: "14:30:18", method: "GET", endpoint: "/api/v2/analytics", status: "200 OK" },
-      { timestamp: "14:29:55", method: "PUT", endpoint: "/api/v2/profiles", status: "200 OK" },
-      { timestamp: "14:28:33", method: "GET", endpoint: "/api/v2/health", status: "200 OK" }
+      { timestamp: '14:32:15', method: 'GET', endpoint: '/api/v2/clients', status: '200 OK' },
+      { timestamp: '14:31:42', method: 'POST', endpoint: '/api/v2/bets', status: '201 Created' },
+      { timestamp: '14:30:18', method: 'GET', endpoint: '/api/v2/analytics', status: '200 OK' },
+      { timestamp: '14:29:55', method: 'PUT', endpoint: '/api/v2/profiles', status: '200 OK' },
+      { timestamp: '14:28:33', method: 'GET', endpoint: '/api/v2/health', status: '200 OK' },
     ];
   }
 }
@@ -3359,7 +3630,7 @@ async function getRecentAPILogs(env: Env, limit: number = 10, hours: number = 24
  */
 async function getAPILogStatistics(env: Env, hours: number = 24): Promise<any> {
   try {
-    const cutoffTime = new Date(Date.now() - (hours * 60 * 60 * 1000));
+    const cutoffTime = new Date(Date.now() - hours * 60 * 60 * 1000);
 
     // Get comprehensive log statistics
     const statsQuery = `
@@ -3379,9 +3650,7 @@ async function getAPILogStatistics(env: Env, hours: number = 24): Promise<any> {
       LIMIT 1
     `;
 
-    const statsResult = await env.DB.prepare(statsQuery)
-      .bind(cutoffTime.toISOString())
-      .first();
+    const statsResult = await env.DB.prepare(statsQuery).bind(cutoffTime.toISOString()).first();
 
     const totalRequests = statsResult?.total_requests || 47231;
     const successCount = statsResult?.success_count || 47150;
@@ -3396,9 +3665,8 @@ async function getAPILogStatistics(env: Env, hours: number = 24): Promise<any> {
       peakHour,
       avgResponseTime: Math.round(avgResponseTime),
       successCount,
-      failedCount: totalRequests - successCount
+      failedCount: totalRequests - successCount,
     };
-
   } catch (error) {
     console.error('Error fetching API log statistics:', error);
     // Return sample data if database query fails
@@ -3408,7 +3676,7 @@ async function getAPILogStatistics(env: Env, hours: number = 24): Promise<any> {
       peakHour: '8:00 PM',
       avgResponseTime: 142,
       successCount: 47150,
-      failedCount: 81
+      failedCount: 81,
     };
   }
 }
@@ -3416,16 +3684,19 @@ async function getAPILogStatistics(env: Env, hours: number = 24): Promise<any> {
 /**
  * Get filtered API logs based on search criteria
  */
-async function getFilteredAPILogs(env: Env, filters: {
-  limit: number;
-  hours: number;
-  method: string;
-  status: string;
-  endpoint: string;
-  searchTerm: string;
-}): Promise<any> {
+async function getFilteredAPILogs(
+  env: Env,
+  filters: {
+    limit: number;
+    hours: number;
+    method: string;
+    status: string;
+    endpoint: string;
+    searchTerm: string;
+  }
+): Promise<any> {
   try {
-    const cutoffTime = new Date(Date.now() - (filters.hours * 60 * 60 * 1000));
+    const cutoffTime = new Date(Date.now() - filters.hours * 60 * 60 * 1000);
 
     // Build dynamic query with filters
     let query = `
@@ -3468,27 +3739,39 @@ async function getFilteredAPILogs(env: Env, filters: {
     query += ` ORDER BY timestamp DESC LIMIT ?`;
     params.push(filters.limit);
 
-    const logsResult = await env.DB.prepare(query).bind(...params).all();
+    const logsResult = await env.DB.prepare(query)
+      .bind(...params)
+      .all();
 
     // Transform logs
     const logs = logsResult.results.map((log: any) => ({
       timestamp: log.timestamp,
       method: log.method || 'GET',
       endpoint: `/api/v2/${log.endpoint.replace('_', '-')}`,
-      status: log.status === 'processed' ? '200 OK' :
-              log.status === 'failed' ? '500 Internal Server Error' :
-              log.status === 'created' ? '201 Created' : '200 OK',
+      status:
+        log.status === 'processed'
+          ? '200 OK'
+          : log.status === 'failed'
+            ? '500 Internal Server Error'
+            : log.status === 'created'
+              ? '201 Created'
+              : '200 OK',
       responseTime: log.response_time || Math.floor(Math.random() * 200) + 50,
       ipAddress: log.ip_address,
-      userAgent: log.user_agent
+      userAgent: log.user_agent,
     }));
 
     // Calculate filtered statistics
     const totalFiltered = logs.length;
-    const successCount = logs.filter(log => log.status.includes('200') || log.status.includes('201')).length;
-    const successRate = totalFiltered > 0 ? ((successCount / totalFiltered) * 100).toFixed(1) : '0.0';
-    const avgResponseTime = totalFiltered > 0 ?
-      Math.round(logs.reduce((sum, log) => sum + (log.responseTime || 0), 0) / totalFiltered) : 0;
+    const successCount = logs.filter(
+      log => log.status.includes('200') || log.status.includes('201')
+    ).length;
+    const successRate =
+      totalFiltered > 0 ? ((successCount / totalFiltered) * 100).toFixed(1) : '0.0';
+    const avgResponseTime =
+      totalFiltered > 0
+        ? Math.round(logs.reduce((sum, log) => sum + (log.responseTime || 0), 0) / totalFiltered)
+        : 0;
     const errorCount = totalFiltered - successCount;
 
     return {
@@ -3497,28 +3780,39 @@ async function getFilteredAPILogs(env: Env, filters: {
         filteredCount: totalFiltered,
         successRate,
         avgResponseTime,
-        errorCount
+        errorCount,
       },
       filters: filters,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-
   } catch (error) {
     console.error('Error fetching filtered API logs:', error);
     // Return sample data if database query fails
     return {
       logs: [
-        { timestamp: "14:32:15", method: "GET", endpoint: "/api/v2/clients", status: "200 OK", responseTime: 142 },
-        { timestamp: "14:31:42", method: "POST", endpoint: "/api/v2/bets", status: "201 Created", responseTime: 156 }
+        {
+          timestamp: '14:32:15',
+          method: 'GET',
+          endpoint: '/api/v2/clients',
+          status: '200 OK',
+          responseTime: 142,
+        },
+        {
+          timestamp: '14:31:42',
+          method: 'POST',
+          endpoint: '/api/v2/bets',
+          status: '201 Created',
+          responseTime: 156,
+        },
       ],
       statistics: {
         filteredCount: 2,
         successRate: '100.0',
         avgResponseTime: 149,
-        errorCount: 0
+        errorCount: 0,
       },
       filters: filters,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 }
@@ -3530,56 +3824,56 @@ async function handleAgentMonitoring(request: Request, env: Env, path: string): 
   const method = request.method;
 
   try {
-      // GET /api/logs - API logs and activity data
-  if (path === '/api/logs' && method === 'GET') {
-    const url = new URL(request.url);
-    const limit = parseInt(url.searchParams.get('limit') || '10');
-    const hours = parseInt(url.searchParams.get('hours') || '24');
+    // GET /api/logs - API logs and activity data
+    if (path === '/api/logs' && method === 'GET') {
+      const url = new URL(request.url);
+      const limit = parseInt(url.searchParams.get('limit') || '10');
+      const hours = parseInt(url.searchParams.get('hours') || '24');
 
-    // Get recent API activity logs
-    const recentActivity = await getRecentAPILogs(env, limit, hours);
+      // Get recent API activity logs
+      const recentActivity = await getRecentAPILogs(env, limit, hours);
 
-    // Get log statistics
-    const logStats = await getAPILogStatistics(env, hours);
+      // Get log statistics
+      const logStats = await getAPILogStatistics(env, hours);
 
-    return createSuccessResponse({
-      recentActivity,
-      statistics: logStats,
-      metadata: {
-        retentionDays: 90,
-        storageSize: '2.3GB',
-        compressionEnabled: true,
-        exportAvailable: true,
-        timestamp: new Date().toISOString()
-      }
-    });
-  }
+      return createSuccessResponse({
+        recentActivity,
+        statistics: logStats,
+        metadata: {
+          retentionDays: 90,
+          storageSize: '2.3GB',
+          compressionEnabled: true,
+          exportAvailable: true,
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
 
-  // GET /api/logs/filtered - Filtered API logs with search and filtering
-  if (path === '/api/logs/filtered' && method === 'GET') {
-    const url = new URL(request.url);
-    const limit = parseInt(url.searchParams.get('limit') || '50');
-    const hours = parseInt(url.searchParams.get('hours') || '24');
-    const methodFilter = url.searchParams.get('method') || '';
-    const statusFilter = url.searchParams.get('status') || '';
-    const endpointFilter = url.searchParams.get('endpoint') || '';
-    const searchTerm = url.searchParams.get('search') || '';
+    // GET /api/logs/filtered - Filtered API logs with search and filtering
+    if (path === '/api/logs/filtered' && method === 'GET') {
+      const url = new URL(request.url);
+      const limit = parseInt(url.searchParams.get('limit') || '50');
+      const hours = parseInt(url.searchParams.get('hours') || '24');
+      const methodFilter = url.searchParams.get('method') || '';
+      const statusFilter = url.searchParams.get('status') || '';
+      const endpointFilter = url.searchParams.get('endpoint') || '';
+      const searchTerm = url.searchParams.get('search') || '';
 
-    // Get filtered logs
-    const filteredData = await getFilteredAPILogs(env, {
-      limit,
-      hours,
-      method: methodFilter,
-      status: statusFilter,
-      endpoint: endpointFilter,
-      searchTerm
-    });
+      // Get filtered logs
+      const filteredData = await getFilteredAPILogs(env, {
+        limit,
+        hours,
+        method: methodFilter,
+        status: statusFilter,
+        endpoint: endpointFilter,
+        searchTerm,
+      });
 
-    return createSuccessResponse(filteredData);
-  }
+      return createSuccessResponse(filteredData);
+    }
 
-  // GET /api/monitoring - Main monitoring dashboard overview
-  if (path === '/api/monitoring' && method === 'GET') {
+    // GET /api/monitoring - Main monitoring dashboard overview
+    if (path === '/api/monitoring' && method === 'GET') {
       const alerts = await checkAgentAlerts(env);
       const healthStatus = await performAgentHealthCheck(env);
 
@@ -3593,15 +3887,15 @@ async function handleAgentMonitoring(request: Request, env: Env, path: string): 
           alertsCount: alerts.length,
           criticalAlerts: alerts.filter(a => a.severity === 'critical').length,
           warningAlerts: alerts.filter(a => a.severity === 'warning').length,
-          systemHealth: healthStatus.overall || 'healthy'
+          systemHealth: healthStatus.overall || 'healthy',
         },
         endpoints: {
           alerts: '/api/monitoring/alerts',
           health: '/api/monitoring/health-check',
           test: '/api/monitoring/test-alert',
-          responseTimes: '/api/monitoring/response-times'
+          responseTimes: '/api/monitoring/response-times',
         },
-        message: 'Fire22 Agent Monitoring API - Use specific endpoints for detailed data'
+        message: 'Fire22 Agent Monitoring API - Use specific endpoints for detailed data',
       });
     }
 
@@ -3613,16 +3907,16 @@ async function handleAgentMonitoring(request: Request, env: Env, path: string): 
         alertCount: alerts.length,
         criticalCount: alerts.filter(a => a.severity === 'critical').length,
         warningCount: alerts.filter(a => a.severity === 'warning').length,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
-    
+
     // GET /api/monitoring/health-check - Comprehensive health check
     if (path === '/api/monitoring/health-check' && method === 'GET') {
       const healthStatus = await performAgentHealthCheck(env);
       return createSuccessResponse(healthStatus);
     }
-    
+
     // POST /api/monitoring/test-alert - Test alert system
     if (path === '/api/monitoring/test-alert' && method === 'POST') {
       const testAlert = {
@@ -3631,24 +3925,23 @@ async function handleAgentMonitoring(request: Request, env: Env, path: string): 
         severity: 'info',
         message: 'Test alert from Fire22 monitoring system',
         agentId: 'TEST',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      
+
       return createSuccessResponse({
         message: 'Test alert generated successfully',
-        alert: testAlert
+        alert: testAlert,
       });
     }
-    
+
     return createNotFoundError(`Monitoring endpoint ${path}`, request);
-    
   } catch (error) {
     console.error('Monitoring API error:', error);
     const errorHandler = ErrorHandler.getInstance();
     return errorHandler.handleGenericError(error as Error, request, {
       endpoint: path,
       method,
-      errorDetails: (error as Error).message
+      errorDetails: (error as Error).message,
     });
   }
 }
@@ -3659,46 +3952,45 @@ async function handleAgentMonitoring(request: Request, env: Env, path: string): 
 async function handleScheduledTasks(request: Request, env: Env, path: string): Promise<Response> {
   const method = request.method;
   const cronSecret = request.headers.get('X-Cron-Secret');
-  
+
   // Verify cron secret for security
   if (cronSecret !== env.CRON_SECRET) {
     return createNotFoundError('Invalid cron secret', request);
   }
-  
+
   try {
     // POST /api/cron/sync-agents - Sync with Fire22 API
     if (path === '/api/cron/sync-agents' && method === 'POST') {
       const syncResult = await syncWithFire22API(env);
       return createSuccessResponse(syncResult);
     }
-    
+
     // POST /api/cron/health-check - Scheduled health check
     if (path === '/api/cron/health-check' && method === 'POST') {
       const healthStatus = await performAgentHealthCheck(env);
       const alerts = await checkAgentAlerts(env);
-      
+
       // Send alerts if needed
       const criticalAlerts = alerts.filter(a => a.severity === 'critical');
       if (criticalAlerts.length > 0 && env.SLACK_WEBHOOK_URL) {
         await sendSlackAlert(env.SLACK_WEBHOOK_URL, criticalAlerts);
       }
-      
+
       return createSuccessResponse({
         healthStatus,
         alerts,
-        alertsSent: criticalAlerts.length
+        alertsSent: criticalAlerts.length,
       });
     }
-    
+
     return createNotFoundError(`Cron endpoint ${path}`, request);
-    
   } catch (error) {
     console.error('Cron API error:', error);
     const errorHandler = ErrorHandler.getInstance();
     return errorHandler.handleGenericError(error as Error, request, {
       endpoint: path,
       method,
-      errorDetails: (error as Error).message
+      errorDetails: (error as Error).message,
     });
   }
 }
@@ -3708,15 +4000,17 @@ async function handleScheduledTasks(request: Request, env: Env, path: string): P
  */
 async function checkAgentAlerts(env: Env): Promise<any[]> {
   const alerts: any[] = [];
-  
+
   try {
     // Check for agents with betting disabled
-    const disabledAgents = await env.DB.prepare(`
+    const disabledAgents = await env.DB.prepare(
+      `
       SELECT agent_id, agent_name, updated_at
       FROM agents 
       WHERE can_place_bet = 0 AND status = 'active'
-    `).all();
-    
+    `
+    ).all();
+
     for (const agent of disabledAgents.results || []) {
       alerts.push({
         id: `betting-disabled-${agent.agent_id}`,
@@ -3725,17 +4019,19 @@ async function checkAgentAlerts(env: Env): Promise<any[]> {
         message: `Betting is disabled for active agent ${agent.agent_id}`,
         agentId: agent.agent_id,
         agentName: agent.agent_name,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
-    
+
     // Check for agents with low credit limits
-    const lowCreditAgents = await env.DB.prepare(`
+    const lowCreditAgents = await env.DB.prepare(
+      `
       SELECT agent_id, agent_name, credit_limit, outstanding_credit
       FROM agents 
       WHERE credit_limit > 0 AND outstanding_credit > (credit_limit * 0.8)
-    `).all();
-    
+    `
+    ).all();
+
     for (const agent of lowCreditAgents.results || []) {
       const utilizationRate = (agent.outstanding_credit / agent.credit_limit) * 100;
       alerts.push({
@@ -3746,17 +4042,19 @@ async function checkAgentAlerts(env: Env): Promise<any[]> {
         agentId: agent.agent_id,
         agentName: agent.agent_name,
         utilizationRate,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
-    
+
     // Check for agents with outdated configurations
-    const staleAgents = await env.DB.prepare(`
+    const staleAgents = await env.DB.prepare(
+      `
       SELECT agent_id, agent_name, updated_at
       FROM agents 
       WHERE updated_at < datetime('now', '-30 days')
-    `).all();
-    
+    `
+    ).all();
+
     for (const agent of staleAgents.results || []) {
       alerts.push({
         id: `stale-config-${agent.agent_id}`,
@@ -3766,10 +4064,9 @@ async function checkAgentAlerts(env: Env): Promise<any[]> {
         agentId: agent.agent_id,
         agentName: agent.agent_name,
         lastUpdated: agent.updated_at,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
-    
   } catch (error) {
     console.error('Error checking agent alerts:', error);
     alerts.push({
@@ -3778,10 +4075,10 @@ async function checkAgentAlerts(env: Env): Promise<any[]> {
       severity: 'critical',
       message: 'Failed to check agent alerts',
       error: (error as Error).message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
-  
+
   return alerts;
 }
 
@@ -3792,56 +4089,63 @@ async function performAgentHealthCheck(env: Env): Promise<any> {
   const healthStatus = {
     overall: 'healthy',
     checks: {} as Record<string, any>,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
-  
+
   try {
     // Database connectivity check
     const dbCheck = await env.DB.prepare('SELECT COUNT(*) as count FROM agents').first();
     healthStatus.checks.database = {
       status: dbCheck ? 'healthy' : 'unhealthy',
-      agentCount: dbCheck?.count || 0
+      agentCount: dbCheck?.count || 0,
     };
-    
+
     // Agent configuration validation
-    const configIssues = await env.DB.prepare(`
+    const configIssues = await env.DB.prepare(
+      `
       SELECT COUNT(*) as count FROM agents 
       WHERE internet_rate = 0 OR casino_rate = 0 OR sports_rate = 0
-    `).first();
-    
+    `
+    ).first();
+
     healthStatus.checks.configuration = {
       status: (configIssues?.count || 0) === 0 ? 'healthy' : 'warning',
-      issueCount: configIssues?.count || 0
+      issueCount: configIssues?.count || 0,
     };
-    
+
     // Active agents check
-    const activeAgents = await env.DB.prepare(`
+    const activeAgents = await env.DB.prepare(
+      `
       SELECT COUNT(*) as count FROM agents WHERE status = 'active'
-    `).first();
-    
+    `
+    ).first();
+
     healthStatus.checks.activeAgents = {
       status: (activeAgents?.count || 0) > 0 ? 'healthy' : 'critical',
-      count: activeAgents?.count || 0
+      count: activeAgents?.count || 0,
     };
-    
+
     // Determine overall health
-    const criticalIssues = Object.values(healthStatus.checks).filter((check: any) => check.status === 'critical');
-    const warningIssues = Object.values(healthStatus.checks).filter((check: any) => check.status === 'warning');
-    
+    const criticalIssues = Object.values(healthStatus.checks).filter(
+      (check: any) => check.status === 'critical'
+    );
+    const warningIssues = Object.values(healthStatus.checks).filter(
+      (check: any) => check.status === 'warning'
+    );
+
     if (criticalIssues.length > 0) {
       healthStatus.overall = 'critical';
     } else if (warningIssues.length > 0) {
       healthStatus.overall = 'warning';
     }
-    
   } catch (error) {
     healthStatus.overall = 'critical';
     healthStatus.checks.system = {
       status: 'critical',
-      error: (error as Error).message
+      error: (error as Error).message,
     };
   }
-  
+
   return healthStatus;
 }
 
@@ -3855,24 +4159,23 @@ async function syncWithFire22API(env: Env): Promise<any> {
     agentsProcessed: 0,
     agentsUpdated: 0,
     errors: [] as string[],
-    completed: ''
+    completed: '',
   };
-  
+
   try {
     // Mock Fire22 API sync - replace with actual API calls
     const agents = await env.DB.prepare('SELECT agent_id FROM agents').all();
     syncResult.agentsProcessed = agents.results?.length || 0;
-    
+
     // Simulate some updates
     syncResult.agentsUpdated = Math.floor(syncResult.agentsProcessed * 0.3);
-    
+
     syncResult.completed = new Date().toISOString();
-    
   } catch (error) {
     syncResult.status = 'error';
     syncResult.errors.push((error as Error).message);
   }
-  
+
   return syncResult;
 }
 
@@ -3889,28 +4192,28 @@ async function sendSlackAlert(webhookUrl: string, alerts: any[]): Promise<void> 
           {
             title: alert.type.replace('_', ' ').toUpperCase(),
             value: alert.message,
-            short: false
+            short: false,
           },
           {
             title: 'Agent',
             value: alert.agentId,
-            short: true
+            short: true,
           },
           {
             title: 'Time',
             value: new Date(alert.timestamp).toLocaleString(),
-            short: true
-          }
-        ]
-      }))
+            short: true,
+          },
+        ],
+      })),
     };
-    
+
     await fetch(webhookUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(message)
+      body: JSON.stringify(message),
     });
   } catch (error) {
     console.error('Failed to send Slack alert:', error);
@@ -3925,7 +4228,7 @@ async function handlePlayerAPI(request: Request, env: Env, path: string): Promis
   const method = request.method;
   const pathParts = path.split('/');
   const playerId = pathParts[3];
-  
+
   try {
     // GET /api/players - List players with pagination and filtering
     if (path === '/api/players' && method === 'GET') {
@@ -3935,33 +4238,36 @@ async function handlePlayerAPI(request: Request, env: Env, path: string): Promis
       const status = url.searchParams.get('status');
       const search = url.searchParams.get('search');
       const accountType = url.searchParams.get('account_type');
-      
+
       let whereConditions = [];
       let bindParams = [];
-      
+
       if (agentId) {
         whereConditions.push('agent_id = ?');
         bindParams.push(agentId);
       }
-      
+
       if (status) {
         whereConditions.push('status = ?');
         bindParams.push(status);
       }
-      
+
       if (accountType) {
         whereConditions.push('account_type = ?');
         bindParams.push(accountType);
       }
-      
+
       if (search) {
-        whereConditions.push('(customer_id LIKE ? OR username LIKE ? OR first_name LIKE ? OR last_name LIKE ?)');
+        whereConditions.push(
+          '(customer_id LIKE ? OR username LIKE ? OR first_name LIKE ? OR last_name LIKE ?)'
+        );
         const searchPattern = `%${search}%`;
         bindParams.push(searchPattern, searchPattern, searchPattern, searchPattern);
       }
-      
-      const whereClause = whereConditions.length > 0 ? 'WHERE ' + whereConditions.join(' AND ') : '';
-      
+
+      const whereClause =
+        whereConditions.length > 0 ? 'WHERE ' + whereConditions.join(' AND ') : '';
+
       const query = `
         SELECT 
           player_id, customer_id, agent_id, username, email,
@@ -3974,29 +4280,34 @@ async function handlePlayerAPI(request: Request, env: Env, path: string): Promis
         ORDER BY created_at DESC
         LIMIT ? OFFSET ?
       `;
-      
+
       const players = await RetryUtils.retryDatabaseOperation(
-        () => env.DB.prepare(query).bind(...bindParams, limit, offset).all(),
+        () =>
+          env.DB.prepare(query)
+            .bind(...bindParams, limit, offset)
+            .all(),
         'get-players',
         request
       );
-      
+
       // Get total count for pagination
       const countQuery = `SELECT COUNT(*) as total FROM players ${whereClause}`;
-      const totalResult = await env.DB.prepare(countQuery).bind(...bindParams).first();
-      
+      const totalResult = await env.DB.prepare(countQuery)
+        .bind(...bindParams)
+        .first();
+
       return createSuccessResponse({
         players: players.results,
         pagination: {
           limit,
           offset,
           total: totalResult?.total || 0,
-          hasMore: (offset + limit) < (totalResult?.total || 0)
+          hasMore: offset + limit < (totalResult?.total || 0),
         },
-        filters: { agentId, status, search, accountType }
+        filters: { agentId, status, search, accountType },
       });
     }
-    
+
     // GET /api/players/{playerId} - Get specific player details
     if (playerId && pathParts.length === 4 && method === 'GET') {
       const player = await RetryUtils.retryDatabaseOperation(
@@ -4004,90 +4315,109 @@ async function handlePlayerAPI(request: Request, env: Env, path: string): Promis
         'get-player',
         request
       );
-      
+
       if (!player) {
         return createNotFoundError(`Player ${playerId}`, request);
       }
-      
+
       // Get recent transactions
-      const transactions = await env.DB.prepare(`
+      const transactions = await env.DB.prepare(
+        `
         SELECT transaction_id, transaction_type, amount, status, 
                description, requested_at, completed_at
         FROM transactions 
         WHERE player_id = ? 
         ORDER BY requested_at DESC 
         LIMIT 10
-      `).bind(playerId).all();
-      
+      `
+      )
+        .bind(playerId)
+        .all();
+
       // Get recent bets
-      const bets = await env.DB.prepare(`
+      const bets = await env.DB.prepare(
+        `
         SELECT bet_id, bet_type, selection, odds, stake, 
                status, placed_at, settled_at
         FROM bets 
         WHERE player_id = ? 
         ORDER BY placed_at DESC 
         LIMIT 10
-      `).bind(playerId).all();
-      
+      `
+      )
+        .bind(playerId)
+        .all();
+
       return createSuccessResponse({
         player,
         recentTransactions: transactions.results,
         recentBets: bets.results,
         summary: {
           totalTransactions: transactions.results?.length || 0,
-          totalBets: bets.results?.length || 0
-        }
+          totalBets: bets.results?.length || 0,
+        },
       });
     }
-    
+
     // PUT /api/players/{playerId} - Update player
     if (playerId && pathParts.length === 4 && method === 'PUT') {
       const updates = await request.json();
       const changedBy = request.headers.get('X-Changed-By') || 'system';
-      
-      const validFields = ['status', 'credit_limit', 'max_bet_limit', 'daily_bet_limit', 'risk_level', 'account_type'];
+
+      const validFields = [
+        'status',
+        'credit_limit',
+        'max_bet_limit',
+        'daily_bet_limit',
+        'risk_level',
+        'account_type',
+      ];
       const updateFields: string[] = [];
       const updateValues: any[] = [];
-      
+
       Object.entries(updates).forEach(([key, value]) => {
         if (validFields.includes(key) && value !== undefined) {
           updateFields.push(`${key} = ?`);
           updateValues.push(value);
         }
       });
-      
+
       if (updateFields.length === 0) {
         return createValidationError('No valid fields to update', 'updates', updates, request);
       }
-      
+
       updateValues.push(playerId);
-      
+
       await RetryUtils.retryDatabaseOperation(
-        () => env.DB.prepare(`
+        () =>
+          env.DB.prepare(
+            `
           UPDATE players 
           SET ${updateFields.join(', ')}, updated_at = datetime('now')
           WHERE player_id = ?
-        `).bind(...updateValues).run(),
+        `
+          )
+            .bind(...updateValues)
+            .run(),
         'update-player',
         request
       );
-      
+
       return createSuccessResponse({
         playerId,
         updatedFields: Object.keys(updates).filter(k => validFields.includes(k)),
-        changedBy
+        changedBy,
       });
     }
-    
+
     return createNotFoundError(`Player API endpoint ${path}`, request);
-    
   } catch (error) {
     console.error('Player API error:', error);
     const errorHandler = ErrorHandler.getInstance();
     return errorHandler.handleGenericError(error as Error, request, {
       endpoint: path,
       method,
-      playerId
+      playerId,
     });
   }
 }
@@ -4100,7 +4430,7 @@ async function handleTransactionAPI(request: Request, env: Env, path: string): P
   const method = request.method;
   const pathParts = path.split('/');
   const transactionId = pathParts[3];
-  
+
   try {
     // GET /api/transactions - List transactions with filtering
     if (path === '/api/transactions' && method === 'GET') {
@@ -4112,42 +4442,43 @@ async function handleTransactionAPI(request: Request, env: Env, path: string): P
       const status = url.searchParams.get('status');
       const dateFrom = url.searchParams.get('date_from');
       const dateTo = url.searchParams.get('date_to');
-      
+
       let whereConditions = [];
       let bindParams = [];
-      
+
       if (playerId) {
         whereConditions.push('player_id = ?');
         bindParams.push(playerId);
       }
-      
+
       if (agentId) {
         whereConditions.push('agent_id = ?');
         bindParams.push(agentId);
       }
-      
+
       if (type) {
         whereConditions.push('transaction_type = ?');
         bindParams.push(type);
       }
-      
+
       if (status) {
         whereConditions.push('status = ?');
         bindParams.push(status);
       }
-      
+
       if (dateFrom) {
         whereConditions.push('requested_at >= ?');
         bindParams.push(dateFrom);
       }
-      
+
       if (dateTo) {
         whereConditions.push('requested_at <= ?');
         bindParams.push(dateTo);
       }
-      
-      const whereClause = whereConditions.length > 0 ? 'WHERE ' + whereConditions.join(' AND ') : '';
-      
+
+      const whereClause =
+        whereConditions.length > 0 ? 'WHERE ' + whereConditions.join(' AND ') : '';
+
       const query = `
         SELECT 
           t.transaction_id, t.player_id, t.agent_id, t.transaction_type,
@@ -4160,51 +4491,59 @@ async function handleTransactionAPI(request: Request, env: Env, path: string): P
         ORDER BY t.requested_at DESC
         LIMIT ? OFFSET ?
       `;
-      
+
       const transactions = await RetryUtils.retryDatabaseOperation(
-        () => env.DB.prepare(query).bind(...bindParams, limit, offset).all(),
+        () =>
+          env.DB.prepare(query)
+            .bind(...bindParams, limit, offset)
+            .all(),
         'get-transactions',
         request
       );
-      
+
       const countQuery = `SELECT COUNT(*) as total FROM transactions t ${whereClause}`;
-      const totalResult = await env.DB.prepare(countQuery).bind(...bindParams).first();
-      
+      const totalResult = await env.DB.prepare(countQuery)
+        .bind(...bindParams)
+        .first();
+
       return createSuccessResponse({
         transactions: transactions.results,
         pagination: {
           limit,
           offset,
-          total: totalResult?.total || 0
-        }
+          total: totalResult?.total || 0,
+        },
       });
     }
-    
+
     // GET /api/transactions/{transactionId} - Get specific transaction
     if (transactionId && pathParts.length === 4 && method === 'GET') {
-      const transaction = await env.DB.prepare(`
+      const transaction = await env.DB.prepare(
+        `
         SELECT t.*, p.customer_id, p.username, p.first_name, p.last_name
         FROM transactions t
         LEFT JOIN players p ON t.player_id = p.player_id
         WHERE t.transaction_id = ?
-      `).bind(transactionId).first();
-      
+      `
+      )
+        .bind(transactionId)
+        .first();
+
       if (!transaction) {
         return createNotFoundError(`Transaction ${transactionId}`, request);
       }
-      
+
       return createSuccessResponse({ transaction });
     }
-    
+
     return createNotFoundError(`Transaction API endpoint ${path}`, request);
-    
   } catch (error) {
     console.error('Transaction API error:', error);
     const errorHandler = ErrorHandler.getInstance();
     return errorHandler.handleGenericError(error as Error, request, {
       endpoint: path,
       method,
-      transactionId
+      transactionId,
     });
   }
 }
@@ -4217,7 +4556,7 @@ async function handleBetAPI(request: Request, env: Env, path: string): Promise<R
   const method = request.method;
   const pathParts = path.split('/');
   const betId = pathParts[3];
-  
+
   try {
     // GET /api/bets - List bets with filtering
     if (path === '/api/bets' && method === 'GET') {
@@ -4229,42 +4568,43 @@ async function handleBetAPI(request: Request, env: Env, path: string): Promise<R
       const betType = url.searchParams.get('bet_type');
       const dateFrom = url.searchParams.get('date_from');
       const dateTo = url.searchParams.get('date_to');
-      
+
       let whereConditions = [];
       let bindParams = [];
-      
+
       if (playerId) {
         whereConditions.push('b.player_id = ?');
         bindParams.push(playerId);
       }
-      
+
       if (agentId) {
         whereConditions.push('b.agent_id = ?');
         bindParams.push(agentId);
       }
-      
+
       if (status) {
         whereConditions.push('b.status = ?');
         bindParams.push(status);
       }
-      
+
       if (betType) {
         whereConditions.push('b.bet_type = ?');
         bindParams.push(betType);
       }
-      
+
       if (dateFrom) {
         whereConditions.push('b.placed_at >= ?');
         bindParams.push(dateFrom);
       }
-      
+
       if (dateTo) {
         whereConditions.push('b.placed_at <= ?');
         bindParams.push(dateTo);
       }
-      
-      const whereClause = whereConditions.length > 0 ? 'WHERE ' + whereConditions.join(' AND ') : '';
-      
+
+      const whereClause =
+        whereConditions.length > 0 ? 'WHERE ' + whereConditions.join(' AND ') : '';
+
       const query = `
         SELECT 
           b.bet_id, b.player_id, b.agent_id, b.bet_type, b.selection,
@@ -4279,53 +4619,61 @@ async function handleBetAPI(request: Request, env: Env, path: string): Promise<R
         ORDER BY b.placed_at DESC
         LIMIT ? OFFSET ?
       `;
-      
+
       const bets = await RetryUtils.retryDatabaseOperation(
-        () => env.DB.prepare(query).bind(...bindParams, limit, offset).all(),
+        () =>
+          env.DB.prepare(query)
+            .bind(...bindParams, limit, offset)
+            .all(),
         'get-bets',
         request
       );
-      
+
       const countQuery = `SELECT COUNT(*) as total FROM bets b ${whereClause}`;
-      const totalResult = await env.DB.prepare(countQuery).bind(...bindParams).first();
-      
+      const totalResult = await env.DB.prepare(countQuery)
+        .bind(...bindParams)
+        .first();
+
       return createSuccessResponse({
         bets: bets.results,
         pagination: {
           limit,
           offset,
-          total: totalResult?.total || 0
-        }
+          total: totalResult?.total || 0,
+        },
       });
     }
-    
+
     // GET /api/bets/{betId} - Get specific bet
     if (betId && pathParts.length === 4 && method === 'GET') {
-      const bet = await env.DB.prepare(`
+      const bet = await env.DB.prepare(
+        `
         SELECT b.*, p.customer_id, p.username, p.first_name, p.last_name,
                g.home_team_id, g.away_team_id, g.game_date, g.status as game_status
         FROM bets b
         LEFT JOIN players p ON b.player_id = p.player_id
         LEFT JOIN games g ON b.game_id = g.game_id
         WHERE b.bet_id = ?
-      `).bind(betId).first();
-      
+      `
+      )
+        .bind(betId)
+        .first();
+
       if (!bet) {
         return createNotFoundError(`Bet ${betId}`, request);
       }
-      
+
       return createSuccessResponse({ bet });
     }
-    
+
     return createNotFoundError(`Bet API endpoint ${path}`, request);
-    
   } catch (error) {
     console.error('Bet API error:', error);
     const errorHandler = ErrorHandler.getInstance();
     return errorHandler.handleGenericError(error as Error, request, {
       endpoint: path,
       method,
-      betId
+      betId,
     });
   }
 }
@@ -4336,12 +4684,13 @@ async function handleBetAPI(request: Request, env: Env, path: string): Promise<R
 async function handleReportsAPI(request: Request, env: Env, path: string): Promise<Response> {
   const url = new URL(request.url);
   const method = request.method;
-  
+
   try {
     // GET /api/reports/summary - Overall system summary
     if (path === '/api/reports/summary' && method === 'GET') {
       const [playerStats, transactionStats, betStats] = await Promise.all([
-        env.DB.prepare(`
+        env.DB.prepare(
+          `
           SELECT 
             COUNT(*) as total_players,
             COUNT(CASE WHEN status = 'active' THEN 1 END) as active_players,
@@ -4350,9 +4699,11 @@ async function handleReportsAPI(request: Request, env: Env, path: string): Promi
             SUM(outstanding_balance) as total_outstanding,
             SUM(lifetime_volume) as total_lifetime_volume
           FROM players
-        `).first(),
-        
-        env.DB.prepare(`
+        `
+        ).first(),
+
+        env.DB.prepare(
+          `
           SELECT 
             COUNT(*) as total_transactions,
             SUM(CASE WHEN transaction_type = 'deposit' AND status = 'completed' THEN amount ELSE 0 END) as total_deposits,
@@ -4360,9 +4711,11 @@ async function handleReportsAPI(request: Request, env: Env, path: string): Promi
             COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_transactions
           FROM transactions
           WHERE requested_at >= date('now', '-30 days')
-        `).first(),
-        
-        env.DB.prepare(`
+        `
+        ).first(),
+
+        env.DB.prepare(
+          `
           SELECT 
             COUNT(*) as total_bets,
             SUM(stake) as total_stake,
@@ -4371,23 +4724,27 @@ async function handleReportsAPI(request: Request, env: Env, path: string): Promi
             AVG(stake) as avg_bet_size
           FROM bets
           WHERE placed_at >= date('now', '-30 days')
-        `).first()
+        `
+        ).first(),
       ]);
-      
+
       return createSuccessResponse({
         players: playerStats,
         transactions: transactionStats,
         bets: betStats,
-        reportDate: new Date().toISOString()
+        reportDate: new Date().toISOString(),
       });
     }
-    
+
     // GET /api/reports/agent-performance - Agent performance report
     if (path === '/api/reports/agent-performance' && method === 'GET') {
-      const dateFrom = url.searchParams.get('date_from') || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const dateFrom =
+        url.searchParams.get('date_from') ||
+        new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
       const dateTo = url.searchParams.get('date_to') || new Date().toISOString().split('T')[0];
-      
-      const agentReport = await env.DB.prepare(`
+
+      const agentReport = await env.DB.prepare(
+        `
         SELECT 
           a.agent_id,
           a.agent_name,
@@ -4402,22 +4759,22 @@ async function handleReportsAPI(request: Request, env: Env, path: string): Promi
         LEFT JOIN bets b ON p.player_id = b.player_id
         GROUP BY a.agent_id, a.agent_name
         ORDER BY total_handle DESC
-      `).all();
-      
+      `
+      ).all();
+
       return createSuccessResponse({
         agents: agentReport.results,
-        period: { from: dateFrom, to: dateTo }
+        period: { from: dateFrom, to: dateTo },
       });
     }
-    
+
     return createNotFoundError(`Reports API endpoint ${path}`, request);
-    
   } catch (error) {
     console.error('Reports API error:', error);
     const errorHandler = ErrorHandler.getInstance();
     return errorHandler.handleGenericError(error as Error, request, {
       endpoint: path,
-      method
+      method,
     });
   }
 }
@@ -4425,19 +4782,28 @@ async function handleReportsAPI(request: Request, env: Env, path: string): Promi
 /**
  * Log agent actions for audit trail
  */
-async function logAgentAction(env: Env, agentId: string, action: string, parameters: any = {}): Promise<void> {
+async function logAgentAction(
+  env: Env,
+  agentId: string,
+  action: string,
+  parameters: any = {}
+): Promise<void> {
   try {
-    await env.DB.prepare(`
+    await env.DB.prepare(
+      `
       INSERT INTO agent_config_history (
         agent_id, action, parameters, changed_by, created_at, ip_address
       ) VALUES (?, ?, ?, ?, datetime('now'), ?)
-    `).bind(
-      agentId,
-      action,
-      JSON.stringify(parameters),
-      parameters.changedBy || 'system',
-      parameters.ipAddress || 'unknown'
-    ).run();
+    `
+    )
+      .bind(
+        agentId,
+        action,
+        JSON.stringify(parameters),
+        parameters.changedBy || 'system',
+        parameters.ipAddress || 'unknown'
+      )
+      .run();
   } catch (error) {
     console.error('Failed to log agent action:', error);
     // Don't throw - audit logging failure shouldn't break the main operation
@@ -4455,14 +4821,18 @@ async function initializeSystemController(env: Env): Promise<Fire22SystemControl
       enableRealTimeUpdates: env.ENABLE_REAL_TIME_UPDATES === 'true',
       enableNotifications: env.ENABLE_NOTIFICATIONS === 'true',
       adminUsers: ['admin', 'nolarose'], // Configure admin users
-      environment: env.NODE_ENV === 'production' ? 'production' : 'development'
+      environment: env.NODE_ENV === 'production' ? 'production' : 'development',
     });
   }
   return systemController;
 }
 
 // Enhanced main handler with system integration
-async function mainHandlerWithIntegration(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+async function mainHandlerWithIntegration(
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext
+): Promise<Response> {
   // Initialize system controller
   const controller = await initializeSystemController(env);
 
@@ -4479,7 +4849,7 @@ export default {
     return withErrorHandling(mainHandlerWithIntegration, {
       isDevelopment: env.NODE_ENV !== 'production',
       enableCORS: true,
-      corsOrigins: ['*'] // Configure specific origins in production
+      corsOrigins: ['*'], // Configure specific origins in production
     })(request, env, ctx);
-  }
+  },
 };

@@ -2,7 +2,7 @@
 
 /**
  * 🎨 Fire22 Benchmark Formatter
- * 
+ *
  * Beautiful benchmark output using Bun's native formatting utilities
  * - Bun.stringWidth() for accurate column alignment
  * - Bun.inspect() for object serialization
@@ -70,7 +70,7 @@ export class BenchmarkFormatter {
 
     // Use Bun's native table formatting
     console.log(Bun.inspect.table(tableData));
-    
+
     return ''; // Console output handled by Bun.inspect.table
   }
 
@@ -79,35 +79,41 @@ export class BenchmarkFormatter {
    */
   createAlignedTable(columns: TableColumn[], data: any[]): string {
     const lines: string[] = [];
-    
+
     // Calculate column widths using Bun.stringWidth
     const widths = columns.map(col => {
       const headerWidth = Bun.stringWidth(col.header);
-      const maxDataWidth = Math.max(...data.map(row => {
-        const value = col.format ? col.format(row[col.key]) : String(row[col.key]);
-        return Bun.stringWidth(this.stripAnsi(value));
-      }));
+      const maxDataWidth = Math.max(
+        ...data.map(row => {
+          const value = col.format ? col.format(row[col.key]) : String(row[col.key]);
+          return Bun.stringWidth(this.stripAnsi(value));
+        })
+      );
       return Math.max(col.width || 0, headerWidth, maxDataWidth) + 2;
     });
 
     // Create header
-    const header = columns.map((col, i) => 
-      this.alignText(this.colorize(col.header, 'bold'), widths[i], col.align || 'left')
-    ).join('│');
-    
+    const header = columns
+      .map((col, i) =>
+        this.alignText(this.colorize(col.header, 'bold'), widths[i], col.align || 'left')
+      )
+      .join('│');
+
     // Create separator
     const separator = widths.map(w => '─'.repeat(w)).join('┼');
-    
+
     lines.push('┌' + widths.map(w => '─'.repeat(w)).join('┬') + '┐');
     lines.push('│' + header + '│');
     lines.push('├' + separator + '┤');
 
     // Add data rows
     for (const row of data) {
-      const rowStr = columns.map((col, i) => {
-        const value = col.format ? col.format(row[col.key]) : String(row[col.key]);
-        return this.alignText(value, widths[i], col.align || 'left');
-      }).join('│');
+      const rowStr = columns
+        .map((col, i) => {
+          const value = col.format ? col.format(row[col.key]) : String(row[col.key]);
+          return this.alignText(value, widths[i], col.align || 'left');
+        })
+        .join('│');
       lines.push('│' + rowStr + '│');
     }
 
@@ -123,10 +129,10 @@ export class BenchmarkFormatter {
     const percentage = Math.min(100, Math.max(0, progress));
     const filled = Math.floor((percentage / 100) * width);
     const empty = width - filled;
-    
+
     const bar = [
       this.colorize('█'.repeat(filled), 'green'),
-      this.colorize('░'.repeat(empty), 'dim')
+      this.colorize('░'.repeat(empty), 'dim'),
     ].join('');
 
     if (showPercentage) {
@@ -145,13 +151,13 @@ export class BenchmarkFormatter {
     const lines: string[] = [];
     const prefix = indent === 0 ? '' : isLast ? '└── ' : '├── ';
     const connector = indent === 0 ? '' : isLast ? '    ' : '│   ';
-    
+
     if (typeof data === 'object' && data !== null) {
       const entries = Object.entries(data);
       entries.forEach(([key, value], index) => {
         const isLastEntry = index === entries.length - 1;
         const keyStr = this.colorize(key, 'cyan');
-        
+
         if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
           lines.push(' '.repeat(indent) + prefix + keyStr);
           lines.push(this.formatTree(value, indent + 4, isLastEntry));
@@ -163,7 +169,7 @@ export class BenchmarkFormatter {
     } else {
       lines.push(' '.repeat(indent) + prefix + Bun.inspect(data, { colors: true }));
     }
-    
+
     return lines.filter(line => line.length > 0).join('\n');
   }
 
@@ -173,19 +179,16 @@ export class BenchmarkFormatter {
   formatComparison(baseline: number, current: number, unit: string): string {
     const diff = current - baseline;
     const percentChange = (diff / baseline) * 100;
-    
+
     const baselineStr = this.formatValue(baseline, unit);
     const currentStr = this.formatValue(current, unit);
     const diffStr = diff > 0 ? `+${this.formatValue(diff, unit)}` : this.formatValue(diff, unit);
-    
+
     const arrow = diff > 0 ? '↑' : diff < 0 ? '↓' : '→';
     const color = this.isImprovement(diff, unit) ? 'green' : diff === 0 ? 'yellow' : 'red';
-    
-    const changeStr = this.colorize(
-      `${arrow} ${Math.abs(percentChange).toFixed(1)}%`,
-      color
-    );
-    
+
+    const changeStr = this.colorize(`${arrow} ${Math.abs(percentChange).toFixed(1)}%`, color);
+
     return `${baselineStr} → ${currentStr} (${diffStr}, ${changeStr})`;
   }
 
@@ -197,7 +200,7 @@ export class BenchmarkFormatter {
     const min = Math.min(...values);
     const max = Math.max(...values);
     const range = max - min || 1;
-    
+
     // Resample to fit width
     const samples = [];
     const step = values.length / width;
@@ -205,12 +208,14 @@ export class BenchmarkFormatter {
       const index = Math.floor(i * step);
       samples.push(values[index]);
     }
-    
-    return samples.map(v => {
-      const normalized = (v - min) / range;
-      const index = Math.floor(normalized * (chars.length - 1));
-      return chars[index];
-    }).join('');
+
+    return samples
+      .map(v => {
+        const normalized = (v - min) / range;
+        const index = Math.floor(normalized * (chars.length - 1));
+        return chars[index];
+      })
+      .join('');
   }
 
   /**
@@ -220,15 +225,15 @@ export class BenchmarkFormatter {
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
     let size = Math.abs(bytes);
     let unitIndex = 0;
-    
+
     while (size >= 1024 && unitIndex < units.length - 1) {
       size /= 1024;
       unitIndex++;
     }
-    
+
     const formatted = size < 10 ? size.toFixed(2) : size.toFixed(1);
     const color = unitIndex >= 3 ? 'red' : unitIndex >= 2 ? 'yellow' : 'green';
-    
+
     return this.colorize(`${formatted} ${units[unitIndex]}`, color);
   }
 
@@ -253,19 +258,23 @@ export class BenchmarkFormatter {
   /**
    * Create a box around content
    */
-  createBox(content: string, title?: string, style: 'single' | 'double' | 'rounded' = 'single'): string {
+  createBox(
+    content: string,
+    title?: string,
+    style: 'single' | 'double' | 'rounded' = 'single'
+  ): string {
     const borders = {
       single: { tl: '┌', tr: '┐', bl: '└', br: '┘', h: '─', v: '│' },
       double: { tl: '╔', tr: '╗', bl: '╚', br: '╝', h: '═', v: '║' },
       rounded: { tl: '╭', tr: '╮', bl: '╰', br: '╯', h: '─', v: '│' },
     };
-    
+
     const border = borders[style];
     const lines = content.split('\n');
     const maxWidth = Math.max(...lines.map(line => Bun.stringWidth(this.stripAnsi(line))));
-    
+
     const result: string[] = [];
-    
+
     // Top border
     if (title) {
       const titleStr = ` ${title} `;
@@ -273,26 +282,26 @@ export class BenchmarkFormatter {
       const leftPad = Math.floor((maxWidth - titleWidth + 2) / 2);
       const rightPad = maxWidth - titleWidth - leftPad + 2;
       result.push(
-        border.tl + 
-        border.h.repeat(leftPad) + 
-        this.colorize(titleStr, 'bold') + 
-        border.h.repeat(rightPad) + 
-        border.tr
+        border.tl +
+          border.h.repeat(leftPad) +
+          this.colorize(titleStr, 'bold') +
+          border.h.repeat(rightPad) +
+          border.tr
       );
     } else {
       result.push(border.tl + border.h.repeat(maxWidth + 2) + border.tr);
     }
-    
+
     // Content
     for (const line of lines) {
       const lineWidth = Bun.stringWidth(this.stripAnsi(line));
       const padding = maxWidth - lineWidth;
       result.push(border.v + ' ' + line + ' '.repeat(padding) + ' ' + border.v);
     }
-    
+
     // Bottom border
     result.push(border.bl + border.h.repeat(maxWidth + 2) + border.br);
-    
+
     return result.join('\n');
   }
 
@@ -309,9 +318,9 @@ export class BenchmarkFormatter {
   duration: ${this.duration}ms,
   status: ${this.passed ? '✅ PASSED' : '❌ FAILED'}
 }`;
-      }
+      },
     };
-    
+
     return Bun.inspect(customData, {
       colors: true,
       depth: 3,
@@ -324,7 +333,7 @@ export class BenchmarkFormatter {
   private formatTitle(title: string): string {
     const width = Bun.stringWidth(title) + 4;
     const border = '═'.repeat(width);
-    
+
     return [
       this.colorize('╔' + border + '╗', 'cyan'),
       this.colorize('║ ', 'cyan') + this.colorize(title, 'bold') + this.colorize('  ║', 'cyan'),
@@ -335,7 +344,7 @@ export class BenchmarkFormatter {
   private alignText(text: string, width: number, align: 'left' | 'right' | 'center'): string {
     const textWidth = Bun.stringWidth(this.stripAnsi(text));
     const padding = width - textWidth;
-    
+
     if (align === 'right') {
       return ' '.repeat(padding) + text;
     } else if (align === 'center') {
@@ -358,16 +367,16 @@ export class BenchmarkFormatter {
   private formatValue(value: number, unit: string): string {
     if (unit.includes('ms') || unit.includes('ns') || unit.includes('μs')) {
       return this.formatDuration(
-        unit.includes('ns') ? value :
-        unit.includes('μs') ? value * 1000 :
-        value * 1_000_000
+        unit.includes('ns') ? value : unit.includes('μs') ? value * 1000 : value * 1_000_000
       );
     }
     if (unit.includes('MB') || unit.includes('GB') || unit.includes('KB')) {
       return this.formatMemory(
-        unit.includes('KB') ? value * 1024 :
-        unit.includes('MB') ? value * 1024 * 1024 :
-        value * 1024 * 1024 * 1024
+        unit.includes('KB')
+          ? value * 1024
+          : unit.includes('MB')
+            ? value * 1024 * 1024
+            : value * 1024 * 1024 * 1024
       );
     }
     if (unit.includes('ops') || unit.includes('req')) {
@@ -399,11 +408,11 @@ export class BenchmarkFormatter {
   displayProgress(current: number, total: number, message: string): void {
     const progress = (current / total) * 100;
     const bar = this.formatProgressBar(progress, 40);
-    
+
     // Clear line and write progress
     process.stdout.write('\r' + ' '.repeat(100) + '\r');
     process.stdout.write(`${bar} ${current}/${total} - ${message}`);
-    
+
     if (current === total) {
       process.stdout.write('\n');
     }
@@ -414,20 +423,19 @@ export class BenchmarkFormatter {
    */
   displayResults(results: any[]): void {
     // Group results by category
-    const grouped = results.reduce((acc, r) => {
-      const category = r.category || 'General';
-      if (!acc[category]) acc[category] = [];
-      acc[category].push(r);
-      return acc;
-    }, {} as Record<string, any[]>);
+    const grouped = results.reduce(
+      (acc, r) => {
+        const category = r.category || 'General';
+        if (!acc[category]) acc[category] = [];
+        acc[category].push(r);
+        return acc;
+      },
+      {} as Record<string, any[]>
+    );
 
     // Display each category
     for (const [category, items] of Object.entries(grouped)) {
-      console.log('\n' + this.createBox(
-        this.formatTree(items),
-        `📊 ${category}`,
-        'rounded'
-      ));
+      console.log('\n' + this.createBox(this.formatTree(items), `📊 ${category}`, 'rounded'));
 
       // Create sparkline for values
       const values = items.map(i => i.value);
@@ -438,96 +446,125 @@ export class BenchmarkFormatter {
 
     // Display summary table using Bun.inspect.table
     console.log('\n' + this.formatTitle('Summary'));
-    console.log(Bun.inspect.table(results.map(r => ({
-      Test: r.test,
-      Value: this.formatValue(r.value, r.unit),
-      Status: r.passed ? '✅' : '❌',
-      Notes: r.notes || '-'
-    }))));
+    console.log(
+      Bun.inspect.table(
+        results.map(r => ({
+          Test: r.test,
+          Value: this.formatValue(r.value, r.unit),
+          Status: r.passed ? '✅' : '❌',
+          Notes: r.notes || '-',
+        }))
+      )
+    );
   }
 }
 
 // Example usage and demo
 if (import.meta.main) {
   const formatter = new BenchmarkFormatter();
-  
+
   console.log('\n🎨 Benchmark Formatter Demo\n');
-  
+
   // Demo 1: Formatted table
   const benchData: BenchmarkTableData[] = [
-    { test: 'JSON.parse', value: 0.125, unit: 'ms', status: '✅', percentile: { p50: 0.1, p95: 0.2, p99: 0.3 } },
-    { test: 'JSON.stringify', value: 0.089, unit: 'ms', status: '✅', percentile: { p50: 0.08, p95: 0.15, p99: 0.25 } },
-    { test: 'SHA-256 Hash', value: 0.003, unit: 'ms', status: '✅', percentile: { p50: 0.002, p95: 0.005, p99: 0.008 } },
-    { test: 'Array.map (10k)', value: 125, unit: 'ms', status: '⚠️', percentile: { p50: 120, p95: 150, p99: 180 } },
+    {
+      test: 'JSON.parse',
+      value: 0.125,
+      unit: 'ms',
+      status: '✅',
+      percentile: { p50: 0.1, p95: 0.2, p99: 0.3 },
+    },
+    {
+      test: 'JSON.stringify',
+      value: 0.089,
+      unit: 'ms',
+      status: '✅',
+      percentile: { p50: 0.08, p95: 0.15, p99: 0.25 },
+    },
+    {
+      test: 'SHA-256 Hash',
+      value: 0.003,
+      unit: 'ms',
+      status: '✅',
+      percentile: { p50: 0.002, p95: 0.005, p99: 0.008 },
+    },
+    {
+      test: 'Array.map (10k)',
+      value: 125,
+      unit: 'ms',
+      status: '⚠️',
+      percentile: { p50: 120, p95: 150, p99: 180 },
+    },
     { test: 'API Throughput', value: 1523, unit: 'req/s', status: '✅' },
     { test: 'Memory Usage', value: 45.2, unit: 'MB', status: '✅' },
   ];
-  
+
   formatter.formatTable(benchData, 'Performance Benchmarks');
-  
+
   // Demo 2: Progress bars
   console.log('\n📊 Progress Examples:\n');
   console.log('Low:    ' + formatter.formatProgressBar(25));
   console.log('Medium: ' + formatter.formatProgressBar(50));
   console.log('High:   ' + formatter.formatProgressBar(75));
   console.log('Done:   ' + formatter.formatProgressBar(100));
-  
+
   // Demo 3: Comparisons
   console.log('\n⚔️  Comparison Examples:\n');
   console.log('Response Time: ' + formatter.formatComparison(100, 85, 'ms'));
   console.log('Throughput:    ' + formatter.formatComparison(1000, 1200, 'req/s'));
   console.log('Memory:        ' + formatter.formatComparison(50, 45, 'MB'));
-  
+
   // Demo 4: Sparklines
   console.log('\n📈 Sparkline Examples:\n');
   const trend1 = [10, 12, 8, 15, 20, 18, 25, 22, 30, 28];
   const trend2 = [100, 95, 90, 85, 80, 75, 70, 65, 60, 55];
   console.log('Improving: ' + formatter.formatSparkline(trend1));
   console.log('Degrading: ' + formatter.formatSparkline(trend2));
-  
+
   // Demo 5: Tree structure
   console.log('\n🌳 Tree Structure:\n');
   const treeData = {
     'Core Benchmarks': {
       'JSON Operations': {
-        'parse': '0.125ms',
-        'stringify': '0.089ms'
+        parse: '0.125ms',
+        stringify: '0.089ms',
       },
-      'Crypto': {
+      Crypto: {
         'SHA-256': '0.003ms',
-        'UUID': '0.001ms'
-      }
+        UUID: '0.001ms',
+      },
     },
     'API Performance': {
-      'Throughput': '1523 req/s',
-      'Latency': '15ms'
-    }
+      Throughput: '1523 req/s',
+      Latency: '15ms',
+    },
   };
   console.log(formatter.formatTree(treeData));
-  
+
   // Demo 6: Boxed content
-  console.log('\n' + formatter.createBox(
-    'Benchmarking Complete!\n' +
-    'All tests passed ✅\n' +
-    'No regressions detected',
-    'Results',
-    'double'
-  ));
+  console.log(
+    '\n' +
+      formatter.createBox(
+        'Benchmarking Complete!\n' + 'All tests passed ✅\n' + 'No regressions detected',
+        'Results',
+        'double'
+      )
+  );
 
   // Demo 7: Custom aligned table
   const columns: TableColumn[] = [
     { key: 'name', header: 'Benchmark', align: 'left' },
-    { key: 'time', header: 'Time', align: 'right', format: (v) => formatter.formatDuration(v) },
-    { key: 'memory', header: 'Memory', align: 'right', format: (v) => formatter.formatMemory(v) },
+    { key: 'time', header: 'Time', align: 'right', format: v => formatter.formatDuration(v) },
+    { key: 'memory', header: 'Memory', align: 'right', format: v => formatter.formatMemory(v) },
     { key: 'status', header: 'Status', align: 'center' },
   ];
-  
+
   const tableData = [
     { name: 'Startup', time: 5_000_000, memory: 10_485_760, status: '✅' },
     { name: 'Process', time: 125_000_000, memory: 52_428_800, status: '⚠️' },
     { name: 'Cleanup', time: 2_000_000, memory: 5_242_880, status: '✅' },
   ];
-  
+
   console.log('\n' + formatter.createAlignedTable(columns, tableData));
 }
 

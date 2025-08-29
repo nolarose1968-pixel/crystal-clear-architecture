@@ -3,11 +3,7 @@
  * Demonstrates how to create custom file watcher plugins
  */
 
-import {
-  FileWatcherPlugin,
-  FileTypeConfig,
-  FileChangeResult
-} from './file-watcher-plugin';
+import { FileWatcherPlugin, FileTypeConfig, FileChangeResult } from './file-watcher-plugin';
 import type { FileChangeEvent } from '../../../core/types/dev-server';
 
 /**
@@ -23,7 +19,7 @@ export class MarkdownPlugin implements FileWatcherPlugin {
     extensions: ['.md', '.markdown'],
     description: 'Markdown documentation files',
     priority: 60,
-    enabled: true
+    enabled: true,
   };
 
   async initialize(): Promise<void> {
@@ -51,8 +47,8 @@ export class MarkdownPlugin implements FileWatcherPlugin {
           fileType: 'markdown',
           changeType: change.type,
           rebuildDocs: true,
-          reason: 'Documentation files require full rebuild'
-        }
+          reason: 'Documentation files require full rebuild',
+        },
       };
     }
 
@@ -63,8 +59,8 @@ export class MarkdownPlugin implements FileWatcherPlugin {
       data: {
         fileType: 'markdown',
         changeType: change.type,
-        livePreview: true
-      }
+        livePreview: true,
+      },
     };
   }
 
@@ -94,7 +90,7 @@ export class VuePlugin implements FileWatcherPlugin {
     extensions: ['.vue'],
     description: 'Vue.js single-file components',
     priority: 95,
-    enabled: true
+    enabled: true,
   };
 
   async initialize(): Promise<void> {
@@ -120,8 +116,8 @@ export class VuePlugin implements FileWatcherPlugin {
         fileType: 'vue',
         changeType: change.type,
         componentUpdate: true,
-        requiresReload: change.type === 'delete'
-      }
+        requiresReload: change.type === 'delete',
+      },
     };
   }
 
@@ -151,7 +147,7 @@ export class DatabaseMigrationPlugin implements FileWatcherPlugin {
     extensions: ['.sql', '.migration', '.db'],
     description: 'Database migration files',
     priority: 30,
-    enabled: true
+    enabled: true,
   };
 
   async initialize(): Promise<void> {
@@ -164,9 +160,8 @@ export class DatabaseMigrationPlugin implements FileWatcherPlugin {
 
   canHandle(filePath: string): boolean {
     const ext = filePath.substring(filePath.lastIndexOf('.'));
-    const isMigration = filePath.includes('migration') ||
-                       filePath.includes('schema') ||
-                       filePath.includes('db/');
+    const isMigration =
+      filePath.includes('migration') || filePath.includes('schema') || filePath.includes('db/');
 
     return this.config.extensions.includes(ext) || isMigration;
   }
@@ -183,8 +178,8 @@ export class DatabaseMigrationPlugin implements FileWatcherPlugin {
         changeType: change.type,
         requiresMigration: change.type === 'modify',
         severity: 'high',
-        reason: 'Database changes require server restart and potential data migration'
-      }
+        reason: 'Database changes require server restart and potential data migration',
+      },
     };
   }
 
@@ -214,7 +209,7 @@ export class LogFilePlugin implements FileWatcherPlugin {
     extensions: ['.log', '.out', '.err'],
     description: 'Log files',
     priority: 10,
-    enabled: true
+    enabled: true,
   };
 
   async initialize(): Promise<void> {
@@ -227,9 +222,10 @@ export class LogFilePlugin implements FileWatcherPlugin {
 
   canHandle(filePath: string): boolean {
     const ext = filePath.substring(filePath.lastIndexOf('.'));
-    const isLogFile = filePath.includes('log') ||
-                     filePath.includes('debug') ||
-                     this.config.extensions.includes(ext);
+    const isLogFile =
+      filePath.includes('log') ||
+      filePath.includes('debug') ||
+      this.config.extensions.includes(ext);
 
     return isLogFile;
   }
@@ -244,8 +240,8 @@ export class LogFilePlugin implements FileWatcherPlugin {
       data: {
         fileType: 'log',
         changeType: change.type,
-        reason: 'Log files should not trigger HMR'
-      }
+        reason: 'Log files should not trigger HMR',
+      },
     };
   }
 
@@ -266,11 +262,13 @@ export class LogFilePlugin implements FileWatcherPlugin {
  * Example: Custom Plugin Factory
  * Shows how to create configurable plugins
  */
-export function createCustomMarkdownPlugin(options: {
-  extensions?: string[];
-  priority?: number;
-  enableLivePreview?: boolean;
-} = {}): MarkdownPlugin {
+export function createCustomMarkdownPlugin(
+  options: {
+    extensions?: string[];
+    priority?: number;
+    enableLivePreview?: boolean;
+  } = {}
+): MarkdownPlugin {
   const plugin = new MarkdownPlugin();
 
   if (options.extensions) {
@@ -325,7 +323,7 @@ export const examplePlugins = {
   markdown: new MarkdownPlugin(),
   vue: new VuePlugin(),
   dbMigration: new DatabaseMigrationPlugin(),
-  logFiles: new LogFilePlugin()
+  logFiles: new LogFilePlugin(),
 };
 
 export function createExamplePluginRegistry(): PluginRegistry {

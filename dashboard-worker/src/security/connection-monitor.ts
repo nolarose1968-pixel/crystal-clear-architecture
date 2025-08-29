@@ -7,7 +7,7 @@
 import { logger } from "../../scripts/enhanced-logging-system";
 import { errorTracker } from "../../scripts/error-code-index";
 
-// ==================== INTERFACES ====================
+// !==!==!===== INTERFACES !==!==!=====
 interface ConnectionInfo {
   id: string;
   ipAddress: string;
@@ -40,7 +40,7 @@ interface SuspiciousPattern {
   timeWindow: number; // in milliseconds
 }
 
-// ==================== CONNECTION SECURITY MONITOR ====================
+// !==!==!===== CONNECTION SECURITY MONITOR !==!==!=====
 export class ConnectionSecurityMonitor {
   private connections: Map<string, ConnectionInfo[]> = new Map();
   private alerts: SecurityAlert[] = [];
@@ -59,7 +59,7 @@ export class ConnectionSecurityMonitor {
     this.startCleanupInterval();
   }
 
-  // ==================== CONNECTION MONITORING ====================
+  // !==!==!===== CONNECTION MONITORING !==!==!=====
   /**
    * Monitor new connection and generate security alerts if suspicious
    */
@@ -289,7 +289,7 @@ export class ConnectionSecurityMonitor {
       `Security incident logged: ${JSON.stringify(incidentData)}`);
   }
 
-  // ==================== HELPER METHODS ====================
+  // !==!==!===== HELPER METHODS !==!==!=====
   /**
    * Get recent connections from specific IP
    */
@@ -386,7 +386,7 @@ export class ConnectionSecurityMonitor {
       `Cleanup completed: ${this.connections.size} IPs tracked, ${this.alerts.length} alerts stored`);
   }
 
-  // ==================== PUBLIC API ====================
+  // !==!==!===== PUBLIC API !==!==!=====
   /**
    * Get current security status
    */
@@ -453,10 +453,10 @@ export class ConnectionSecurityMonitor {
   }
 }
 
-// ==================== SINGLETON INSTANCE ====================
+// !==!==!===== SINGLETON INSTANCE !==!==!=====
 export const connectionMonitor = new ConnectionSecurityMonitor();
 
-// ==================== PACKAGE REFERENCE PATTERN MATCHER ====================
+// !==!==!===== PACKAGE REFERENCE PATTERN MATCHER !==!==!=====
 export class PackageReferenceTracker {
   private packagePattern = /\[pk:([^@]+)@([^\]]+)\]/g;
   private detectedPackages: Map<string, {version: string, lastSeen: Date}> = new Map();
@@ -471,7 +471,7 @@ export class PackageReferenceTracker {
     // Reset regex index
     this.packagePattern.lastIndex = 0;
 
-    while ((match = this.packagePattern.exec(logMessage)) !=== null) {
+    while ((match = this.packagePattern.exec(logMessage)) !== null) {
       const [, name, version] = match;
       packages.push({ name, version });
       
@@ -527,7 +527,7 @@ export class PackageReferenceTracker {
 
 export const packageTracker = new PackageReferenceTracker();
 
-// ==================== DEMO USAGE ====================
+// !==!==!===== DEMO USAGE !==!==!=====
 if (import.meta.main) {
   console.log("🔐 **CONNECTION SECURITY MONITOR DEMO** 🔐");
   console.log("=" .repeat(60));

@@ -1,6 +1,8 @@
 # Architecture Overview
 
-Fire22 Dashboard is built on a cutting-edge architecture that combines enterprise scalability with modern performance optimization using Bun-native features.
+Fire22 Dashboard is built on a cutting-edge architecture that combines
+enterprise scalability with modern performance optimization using Bun-native
+features.
 
 ## High-Level Architecture
 
@@ -9,18 +11,18 @@ graph TB
     Client[Client Browser] --> LB[Load Balancer]
     LB --> CF[Cloudflare Workers]
     LB --> Express[Express.js Server]
-    
+
     CF --> D1[Cloudflare D1]
     Express --> PG[PostgreSQL]
-    
+
     CF --> Fire22[Fire22 APIs]
     Express --> Fire22
-    
+
     subgraph "Monitoring"
         Prometheus[Prometheus]
         Grafana[Grafana]
     end
-    
+
     Express --> Prometheus
     CF --> Prometheus
 ```
@@ -36,12 +38,14 @@ graph TB
 The Fire22 Dashboard runs in a dual-deployment architecture:
 
 #### Cloudflare Workers (Edge)
+
 - **Runtime**: Bun-compiled JavaScript at the edge
 - **Database**: Cloudflare D1 (SQLite at edge locations)
 - **Caching**: KV storage for session and API cache
 - **Performance**: `&lt;Component50ms cold start, global distribution
 
 #### Express.js Server (Origin)
+
 - **Runtime**: Bun native execution
 - **Database**: PostgreSQL with connection pooling
 - **Caching**: Redis + in-memory caching
@@ -55,7 +59,7 @@ A unified development pattern system with 13 core patterns:
 // Pattern categories
 const PATTERNS = {
   LOADER: 'Dynamic loading with caching',
-  STYLER: 'CSS processing and optimization', 
+  STYLER: 'CSS processing and optimization',
   TABULAR: 'Data display and pagination',
   SECURE: 'Authentication and authorization',
   TIMING: 'Performance measurement',
@@ -66,7 +70,7 @@ const PATTERNS = {
   INTERACTIVE: 'User interface components',
   STREAM: 'Real-time data streaming',
   FILESYSTEM: 'File operations',
-  UTILITIES: 'Helper functions'
+  UTILITIES: 'Helper functions',
 };
 ```
 
@@ -93,6 +97,7 @@ fire22-workspaces/
 ```
 
 Each workspace can be:
+
 - **Split**: Into separate repositories
 - **Published**: To multiple registries (npm, Cloudflare, private)
 - **Benchmarked**: With nanosecond precision
@@ -108,11 +113,11 @@ Advanced DNS optimization using Bun's native DNS capabilities:
 // DNS prefetching at application startup
 const PREFETCH_DOMAINS = [
   'fire22.ag',
-  'api.fire22.ag', 
+  'api.fire22.ag',
   'cloud.fire22.ag',
   'api.cloudflare.com',
   'workers.dev',
-  'pages.dev'
+  'pages.dev',
 ];
 
 // Bun-native DNS cache statistics
@@ -120,7 +125,7 @@ const stats = dns.getCacheStats();
 // {
 //   cacheHitsCompleted: 0,
 //   cacheMisses: 6,
-//   cacheSize: 6, 
+//   cacheSize: 6,
 //   totalCount: 13,
 //   errors: 0
 // }
@@ -167,13 +172,15 @@ console.log(`Operation took ${duration}ns`);
 ### Database Strategy
 
 **Development & Testing:**
+
 - PostgreSQL with connection pooling (max 20 connections)
 - Full ACID compliance
 - Complex queries and joins
 - Local development database
 
 **Production Edge:**
-- Cloudflare D1 (SQLite) at edge locations  
+
+- Cloudflare D1 (SQLite) at edge locations
 - Global distribution
 - Simplified schema optimized for edge
 - Automatic replication
@@ -223,7 +230,7 @@ app.get('/api/live', (req, res) => {
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive'
   });
-  
+
   // Stream real-time data
   const interval = setInterval(() => `{
     const data = {
@@ -231,7 +238,7 @@ app.get('/api/live', (req, res) => {
       fire22Status: checkFire22Status(),
       systemMetrics: getSystemMetrics()
     }`;
-    
+
     res.write(`data: ${JSON.stringify(data)}\n\n`);
   }, 5000);
 });
@@ -290,17 +297,20 @@ Automated alerts when performance degrades:
 ## Technology Stack
 
 ### Runtime & Language
+
 - **Bun** (&gt;`=1.2.20) - Primary runtime
 - **TypeScript** - Direct execution, no transpilation
 - **JavaScript** - Edge Workers deployment
 
 ### Databases
+
 - **PostgreSQL** - Development and complex queries
 - **Cloudflare D1** - Edge distribution
 - **SQLite** - Local development and testing
 - **Redis** - Session and cache storage
 
-### Infrastructure  
+### Infrastructure
+
 - **Cloudflare Workers** - Serverless compute
 - **Cloudflare Pages** - Static site hosting
 - **Express.js** - Traditional server deployment

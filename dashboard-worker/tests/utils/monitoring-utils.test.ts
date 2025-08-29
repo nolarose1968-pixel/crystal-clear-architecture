@@ -1,5 +1,10 @@
 import { MonitoringUtils, MetricsAggregator } from '../../src/utils/monitoring-utils';
-import { PerformanceMetrics, SecurityEvent, HealthStatus, MonitoringConfig } from '../../src/types/enhanced-types';
+import {
+  PerformanceMetrics,
+  SecurityEvent,
+  HealthStatus,
+  MonitoringConfig,
+} from '../../src/types/enhanced-types';
 
 // Simple test implementation without Jest
 const describe = (name: string, fn: () => void) => {
@@ -51,7 +56,7 @@ const expect = (actual: any) => ({
     if (actual === undefined || actual === null) {
       throw new Error('Expected value to be defined');
     }
-  }
+  },
 });
 
 describe('MonitoringUtils', () => {
@@ -108,9 +113,9 @@ describe('MonitoringUtils', () => {
         type: 'authentication',
         severity: 'medium',
         details: { userId: '123' },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      
+
       expect(MonitoringUtils.validateSecurityEvent(event)).toBe(true);
     });
 
@@ -119,9 +124,9 @@ describe('MonitoringUtils', () => {
         type: 'invalid' as any,
         severity: 'invalid' as any,
         details: {},
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      
+
       expect(MonitoringUtils.validateSecurityEvent(event)).toBe(false);
     });
 
@@ -129,10 +134,10 @@ describe('MonitoringUtils', () => {
       const event = {
         type: 'authentication',
         severity: 'medium',
-        details: {}
+        details: {},
         // Missing timestamp
       } as any;
-      
+
       expect(MonitoringUtils.validateSecurityEvent(event)).toBe(false);
     });
   });
@@ -143,9 +148,9 @@ describe('MonitoringUtils', () => {
         username: 'user',
         password: 'secret123',
         token: 'abc123',
-        normalField: 'value'
+        normalField: 'value',
       };
-      
+
       const sanitized = MonitoringUtils.sanitizeData(data);
       expect(sanitized.password).toBe('[REDACTED]');
       expect(sanitized.token).toBe('[REDACTED]');
@@ -160,9 +165,9 @@ describe('MonitoringUtils', () => {
     it('should handle custom sensitive fields', () => {
       const data = {
         apiKey: 'secret123',
-        normalField: 'value'
+        normalField: 'value',
       };
-      
+
       const sanitized = MonitoringUtils.sanitizeData(data, ['apiKey']);
       expect(sanitized.apiKey).toBe('[REDACTED]');
       expect(sanitized.normalField).toBe('value');
@@ -172,7 +177,7 @@ describe('MonitoringUtils', () => {
   describe('calculateRateLimit', () => {
     it('should calculate rate limit correctly', () => {
       const result = MonitoringUtils.calculateRateLimit(50, 60000, 100);
-      
+
       expect(result.current).toBe(50);
       expect(result.remaining).toBe(50);
       expect(result.reset).toBeDefined();
@@ -181,7 +186,7 @@ describe('MonitoringUtils', () => {
 
     it('should detect rate limit exceeded', () => {
       const result = MonitoringUtils.calculateRateLimit(100, 60000, 100);
-      
+
       expect(result.isLimited).toBe(true);
       expect(result.remaining).toBe(0);
     });
@@ -189,17 +194,19 @@ describe('MonitoringUtils', () => {
 
   describe('debounce', () => {
     it('should debounce function calls', () => {
-      return new Promise<void>((done) => {
+      return new Promise<void>(done => {
         let callCount = 0;
-        const fn = () => { callCount++; };
+        const fn = () => {
+          callCount++;
+        };
         const debouncedFn = MonitoringUtils.debounce(fn, 100);
-        
+
         debouncedFn();
         debouncedFn();
         debouncedFn();
-        
+
         expect(callCount).toBe(0);
-        
+
         setTimeout(() => {
           expect(callCount).toBe(1);
           done();
@@ -210,17 +217,19 @@ describe('MonitoringUtils', () => {
 
   describe('throttle', () => {
     it('should throttle function calls', () => {
-      return new Promise<void>((done) => {
+      return new Promise<void>(done => {
         let callCount = 0;
-        const fn = () => { callCount++; };
+        const fn = () => {
+          callCount++;
+        };
         const throttledFn = MonitoringUtils.throttle(fn, 100);
-        
+
         throttledFn();
         throttledFn();
         throttledFn();
-        
+
         expect(callCount).toBe(1);
-        
+
         setTimeout(() => {
           throttledFn();
           expect(callCount).toBe(2);
@@ -234,7 +243,7 @@ describe('MonitoringUtils', () => {
     it('should calculate EMA correctly', () => {
       const values = [10, 20, 30, 40, 50];
       const ema = MonitoringUtils.calculateEMA(values);
-      
+
       expect(ema).toBeDefined();
       expect(typeof ema).toBe('number');
       expect(ema > 0).toBe(true);
@@ -249,14 +258,14 @@ describe('MonitoringUtils', () => {
     it('should calculate 50th percentile (median)', () => {
       const values = [10, 20, 30, 40, 50];
       const percentile = MonitoringUtils.calculatePercentile(values, 50);
-      
+
       expect(percentile).toBe(30);
     });
 
     it('should calculate 95th percentile', () => {
       const values = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
       const percentile = MonitoringUtils.calculatePercentile(values, 95);
-      
+
       expect(percentile).toBe(95);
     });
 
@@ -269,7 +278,7 @@ describe('MonitoringUtils', () => {
     it('should create histogram correctly', () => {
       const values = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
       const histogram = MonitoringUtils.createHistogram(values, 5);
-      
+
       expect(histogram).toHaveProperty('min');
       expect(histogram).toHaveProperty('max');
       expect(histogram).toHaveProperty('bucketSize');
@@ -281,7 +290,7 @@ describe('MonitoringUtils', () => {
 
     it('should handle empty values', () => {
       const histogram = MonitoringUtils.createHistogram([], 5);
-      
+
       expect(histogram.min).toBe(0);
       expect(histogram.max).toBe(0);
       expect(histogram.counts).toEqual([0, 0, 0, 0, 0]);
@@ -295,9 +304,9 @@ describe('MonitoringUtils', () => {
         logLevel: 'info',
         metricsInterval: 5000,
         securityEventRetention: 86400000,
-        healthCheckInterval: 30000
+        healthCheckInterval: 30000,
       };
-      
+
       expect(MonitoringUtils.validateMonitoringConfig(config)).toBe(true);
     });
 
@@ -307,9 +316,9 @@ describe('MonitoringUtils', () => {
         logLevel: 'invalid' as any, // Should be valid log level
         metricsInterval: -1, // Should be positive
         securityEventRetention: 86400000,
-        healthCheckInterval: 30000
+        healthCheckInterval: 30000,
       };
-      
+
       expect(MonitoringUtils.validateMonitoringConfig(config)).toBe(false);
     });
   });
@@ -321,11 +330,11 @@ describe('MonitoringUtils', () => {
         cpuUsage: 50,
         memoryUsage: 60,
         activeConnections: 10,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      
+
       const payload = MonitoringUtils.createMetricsPayload(metrics);
-      
+
       expect(payload).toHaveProperty('timestamp');
       expect(payload).toHaveProperty('metrics');
       expect(payload).toHaveProperty('tags');
@@ -338,12 +347,12 @@ describe('MonitoringUtils', () => {
         cpuUsage: 50,
         memoryUsage: 60,
         activeConnections: 10,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      
+
       const tags = { environment: 'test', version: '1.0.0' };
       const payload = MonitoringUtils.createMetricsPayload(metrics, tags);
-      
+
       expect(payload.tags).toEqual(tags);
     });
   });
@@ -354,13 +363,13 @@ describe('MonitoringUtils', () => {
         status: 'healthy',
         components: {
           api: { status: 'healthy', lastChecked: new Date().toISOString() },
-          database: { status: 'healthy', lastChecked: new Date().toISOString() }
+          database: { status: 'healthy', lastChecked: new Date().toISOString() },
         },
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
-      
+
       const alert = MonitoringUtils.formatHealthAlert(health);
-      
+
       expect(alert).toContain('✅ System health: HEALTHY');
       expect(alert).toContain('api: HEALTHY');
       expect(alert).toContain('database: HEALTHY');
@@ -370,14 +379,18 @@ describe('MonitoringUtils', () => {
       const health: HealthStatus = {
         status: 'degraded',
         components: {
-          api: { status: 'degraded', lastChecked: new Date().toISOString(), message: 'Slow response' },
-          database: { status: 'healthy', lastChecked: new Date().toISOString() }
+          api: {
+            status: 'degraded',
+            lastChecked: new Date().toISOString(),
+            message: 'Slow response',
+          },
+          database: { status: 'healthy', lastChecked: new Date().toISOString() },
         },
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
-      
+
       const alert = MonitoringUtils.formatHealthAlert(health);
-      
+
       expect(alert).toContain('⚠️ System health: DEGRADED');
       expect(alert).toContain('api: DEGRADED - Slow response');
       expect(alert).toContain('database: HEALTHY');
@@ -388,7 +401,7 @@ describe('MonitoringUtils', () => {
     it('should create unique correlation IDs', () => {
       const id1 = MonitoringUtils.createCorrelationId();
       const id2 = MonitoringUtils.createCorrelationId();
-      
+
       expect(id1).toBeDefined();
       expect(id2).toBeDefined();
       expect(id1 !== id2).toBe(true);
@@ -397,7 +410,7 @@ describe('MonitoringUtils', () => {
 
     it('should return undefined when no correlation ID', () => {
       const request = new Request('http://localhost/test');
-      
+
       const correlationId = MonitoringUtils.extractCorrelationId(request);
       expect(correlationId === undefined).toBe(true);
     });
@@ -407,9 +420,9 @@ describe('MonitoringUtils', () => {
     it('should add correlation ID to response', () => {
       const response = new Response();
       const correlationId = 'test-123';
-      
+
       const newResponse = MonitoringUtils.addCorrelationId(response, correlationId);
-      
+
       expect(newResponse.headers.get('X-Correlation-ID')).toBe(correlationId);
     });
   });
@@ -418,14 +431,14 @@ describe('MonitoringUtils', () => {
     it('should create request log entry', () => {
       const request = new Request('http://localhost/test', {
         method: 'GET',
-        headers: { 
+        headers: {
           'User-Agent': 'test-agent',
-          'CF-Connecting-IP': '192.168.1.1'
-        }
+          'CF-Connecting-IP': '192.168.1.1',
+        },
       });
-      
+
       const log = MonitoringUtils.createRequestLog(request, 100, 'user123', 'corr-123');
-      
+
       expect(log.method).toBe('GET');
       expect(log.url).toBe('http://localhost/test');
       expect(log.userAgent).toBe('test-agent');
@@ -445,7 +458,7 @@ describe('MetricsAggregator', () => {
   const setupBeforeEach = () => {
     aggregator = new MetricsAggregator(100);
   };
-  
+
   setupBeforeEach();
 
   describe('constructor', () => {
@@ -464,7 +477,7 @@ describe('MetricsAggregator', () => {
     it('should add data point to existing key', () => {
       aggregator.addDataPoint('response_time', 100);
       aggregator.addDataPoint('response_time', 200);
-      
+
       const metrics = aggregator.getAggregatedMetrics('response_time');
       expect(metrics).toBeDefined();
       expect(metrics!.count).toBe(2);
@@ -474,7 +487,7 @@ describe('MetricsAggregator', () => {
 
     it('should add data point to new key', () => {
       aggregator.addDataPoint('cpu_usage', 75);
-      
+
       const metrics = aggregator.getAggregatedMetrics('cpu_usage');
       expect(metrics).toBeDefined();
       expect(metrics!.count).toBe(1);
@@ -491,9 +504,9 @@ describe('MetricsAggregator', () => {
     it('should return correct aggregated metrics', () => {
       const values = [10, 20, 30, 40, 50];
       values.forEach(value => aggregator.addDataPoint('test', value));
-      
+
       const metrics = aggregator.getAggregatedMetrics('test');
-      
+
       expect(metrics).toBeDefined();
       expect(metrics!.count).toBe(5);
       expect(metrics!.min).toBe(10);
@@ -515,9 +528,9 @@ describe('MetricsAggregator', () => {
       aggregator.addDataPoint('metric1', 10);
       aggregator.addDataPoint('metric1', 20);
       aggregator.addDataPoint('metric2', 30);
-      
+
       const allMetrics = aggregator.getAllMetrics();
-      
+
       expect(allMetrics).toHaveProperty('metric1');
       expect(allMetrics).toHaveProperty('metric2');
       expect(allMetrics.metric1!.count).toBe(2);
@@ -529,9 +542,9 @@ describe('MetricsAggregator', () => {
     it('should clear all data', () => {
       aggregator.addDataPoint('test', 100);
       expect(aggregator.getAggregatedMetrics('test') !== null).toBe(true);
-      
+
       aggregator.clear();
-      
+
       expect(aggregator.getAggregatedMetrics('test') === null).toBe(true);
       expect(JSON.stringify(aggregator.getAllMetrics()) === JSON.stringify({})).toBe(true);
     });
@@ -540,13 +553,13 @@ describe('MetricsAggregator', () => {
   describe('max data points limit', () => {
     it('should respect max data points limit', () => {
       const agg = new MetricsAggregator(3);
-      
+
       agg.addDataPoint('test', 1);
       agg.addDataPoint('test', 2);
       agg.addDataPoint('test', 3);
       agg.addDataPoint('test', 4);
       agg.addDataPoint('test', 5);
-      
+
       const metrics = agg.getAggregatedMetrics('test');
       expect(metrics!.count).toBe(3);
       expect(metrics!.min).toBe(3);

@@ -34,11 +34,7 @@ class R2ErrorMonitor {
       `The bucket you tried to create already exists, and you own it. [code: 10004]`
     );
 
-    const response = this.errorHandler.handleR2BucketError(
-      bucketName,
-      10004,
-      simulatedError
-    );
+    const response = this.errorHandler.handleR2BucketError(bucketName, 10004, simulatedError);
 
     // Parse response to log
     response.json().then(data => {
@@ -49,7 +45,7 @@ class R2ErrorMonitor {
         cloudflareErrorCode: 10004,
         message: 'Bucket already exists and is owned by account',
         correlationId: data.error.correlationId,
-        resolution: 'No action needed - bucket is ready for use'
+        resolution: 'No action needed - bucket is ready for use',
       };
 
       this.errorLogs.push(errorLog);
@@ -67,17 +63,17 @@ class R2ErrorMonitor {
       type: 'R2_STORAGE_ERROR',
       priority: 'low', // Bucket exists errors are low priority
       ...errorLog,
-      actionRequired: errorLog.cloudflareErrorCode === 10004 
-        ? 'None - bucket exists and is ready' 
-        : 'Investigation required',
-      teamEmails: [
-        'infrastructure@fire22.ag',
-        'platform-team@fire22.ag',
-        'head@technology.fire22'
-      ]
+      actionRequired:
+        errorLog.cloudflareErrorCode === 10004
+          ? 'None - bucket exists and is ready'
+          : 'Investigation required',
+      teamEmails: ['infrastructure@fire22.ag', 'platform-team@fire22.ag', 'head@technology.fire22'],
     };
 
-    console.log('📧 INFRASTRUCTURE_TEAM_NOTIFICATION:', JSON.stringify(infrastructureNotification, null, 2));
+    console.log(
+      '📧 INFRASTRUCTURE_TEAM_NOTIFICATION:',
+      JSON.stringify(infrastructureNotification, null, 2)
+    );
 
     // Cloudflare team notification (for all R2/Wrangler issues)
     const cloudflareNotification = {
@@ -91,18 +87,21 @@ class R2ErrorMonitor {
         operation: 'CreateBucket',
         accountId: '80693377f3abb78e00820aa69a415ce4',
         errorCode: errorLog.cloudflareErrorCode,
-        endpoint: '/accounts/80693377f3abb78e00820aa69a415ce4/r2/buckets'
+        endpoint: '/accounts/80693377f3abb78e00820aa69a415ce4/r2/buckets',
       },
       teamEmails: [
         'cloudflare-team@fire22.ag',
         'cloudflare-workers@fire22.ag',
         'cloudflare-r2@fire22.ag',
         'wrangler-support@fire22.ag',
-        'edge-team@fire22.ag'
-      ]
+        'edge-team@fire22.ag',
+      ],
     };
 
-    console.log('☁️ CLOUDFLARE_TEAM_NOTIFICATION:', JSON.stringify(cloudflareNotification, null, 2));
+    console.log(
+      '☁️ CLOUDFLARE_TEAM_NOTIFICATION:',
+      JSON.stringify(cloudflareNotification, null, 2)
+    );
 
     // CI team notification (if this could affect deployments)
     if (errorLog.cloudflareErrorCode) {
@@ -113,17 +112,18 @@ class R2ErrorMonitor {
         ciContext: {
           potentialImpact: 'R2 bucket creation during CI/CD pipeline',
           affectedPipelines: ['wrangler deploy', 'r2 bucket create'],
-          recommendation: errorLog.cloudflareErrorCode === 10004 
-            ? 'Safe to continue - bucket exists' 
-            : 'May need manual intervention'
+          recommendation:
+            errorLog.cloudflareErrorCode === 10004
+              ? 'Safe to continue - bucket exists'
+              : 'May need manual intervention',
         },
         teamEmails: [
           'ci@fire22.ag',
           'ci-cd@fire22.ag',
           'github-actions@fire22.ag',
           'build-team@fire22.ag',
-          'release-automation@fire22.ag'
-        ]
+          'release-automation@fire22.ag',
+        ],
       };
 
       console.log('🔧 CI_TEAM_NOTIFICATION:', JSON.stringify(ciNotification, null, 2));
@@ -135,19 +135,22 @@ class R2ErrorMonitor {
    */
   generateReport(): void {
     console.log('\n📊 R2 Error Monitoring Report');
-    console.log('=' .repeat(50));
-    
+    console.log('='.repeat(50));
+
     if (this.errorLogs.length === 0) {
       console.log('✅ No R2 errors detected');
       return;
     }
 
     // Group errors by type
-    const errorsByCode = this.errorLogs.reduce((acc, log) => {
-      const code = log.cloudflareErrorCode || 'unknown';
-      acc[code] = (acc[code] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const errorsByCode = this.errorLogs.reduce(
+      (acc, log) => {
+        const code = log.cloudflareErrorCode || 'unknown';
+        acc[code] = (acc[code] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     console.log('\n📈 Error Summary:');
     Object.entries(errorsByCode).forEach(([code, count]) => {
@@ -165,8 +168,8 @@ class R2ErrorMonitor {
 
     console.log('\n👥 Team Notifications Sent:');
     console.log('  • Infrastructure Team: Notified');
-    console.log('  • Platform Team: CC\'d');
-    console.log('  • Head of Technology: CC\'d');
+    console.log("  • Platform Team: CC'd");
+    console.log("  • Head of Technology: CC'd");
     console.log('  • Cloudflare Team: Notified (R2/Wrangler issues)');
     console.log('  • CI Team: Notified (Deployment impact assessment)');
   }
@@ -178,7 +181,7 @@ class R2ErrorMonitor {
     return {
       active: true,
       errorCount: this.errorLogs.length,
-      lastError: this.errorLogs[this.errorLogs.length - 1]
+      lastError: this.errorLogs[this.errorLogs.length - 1],
     };
   }
 }
@@ -186,17 +189,17 @@ class R2ErrorMonitor {
 // Run monitor if executed directly
 if (import.meta.main) {
   console.log('🚀 Starting R2 Error Monitor...\n');
-  
+
   const monitor = new R2ErrorMonitor();
-  
+
   // Simulate the bucket exists error
   console.log('📍 Simulating R2 bucket exists error...');
   monitor.simulateBucketExistsError('fire22-packages');
-  
+
   // Generate report
   setTimeout(() => {
     monitor.generateReport();
-    
+
     // Show monitoring status
     const status = monitor.getStatus();
     console.log('\n✅ Monitor Status:', JSON.stringify(status, null, 2));

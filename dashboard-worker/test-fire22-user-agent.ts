@@ -18,24 +18,24 @@ async function testFire22Connection() {
   try {
     const headers = Fire22Config.getDefaultHeaders();
     const config = Fire22Config.getConnectionConfig();
-    
+
     console.log('\nRequest Headers:');
     console.log(JSON.stringify(headers, null, 2));
-    
+
     // Test with echo service to verify headers
     const response = await fetch('https://echo.hoppscotch.io/', {
       method: 'POST',
       headers: {
         ...headers,
-        'Accept': 'application/json'
+        Accept: 'application/json',
       },
       body: JSON.stringify({
         test: 'Fire22 Dashboard Connection Test',
         agentID: Fire22Config.AGENT_ID,
-        version: Fire22Config.VERSION
-      })
+        version: Fire22Config.VERSION,
+      }),
     });
-    
+
     if (response.ok) {
       const data = await response.json();
       console.log('\n✅ Connection Successful!');
@@ -45,7 +45,6 @@ async function testFire22Connection() {
     } else {
       console.log('❌ Connection failed:', response.status);
     }
-    
   } catch (error) {
     console.error('❌ Test failed:', error);
   }

@@ -24,7 +24,7 @@ zone_name = "nolarose1968.workers.dev"
 
 # Build configuration
 [build]
-command = "npm run build"
+command = "bun run build"
 
 # Development settings
 [dev]
@@ -32,8 +32,9 @@ port = 8787
 local_protocol = "http"
 
 # Analytics and monitoring
-[analytics_engine_datasets]
-docs_requests = "docs_requests_dataset"
+[[analytics_engine_datasets]]
+binding = "docs_requests"
+dataset = "docs_requests_dataset"
 
 # Rate limiting (optional)
 # [rate_limiting]

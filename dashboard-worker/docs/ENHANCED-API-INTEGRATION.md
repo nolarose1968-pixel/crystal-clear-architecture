@@ -3,13 +3,15 @@
 <div className="fire22-notice">
 <strong>🔧 Documentation Under Maintenance</strong>
 
-This documentation file has been temporarily archived due to MDX compilation issues. 
-We're working on restoring the full content with improved formatting.
+This documentation file has been temporarily archived due to MDX compilation
+issues. We're working on restoring the full content with improved formatting.
+
 </div>
 
 ## Overview
 
-This section covers **ENHANCED API INTEGRATION** functionality in the Fire22 Dashboard system.
+This section covers **ENHANCED API INTEGRATION** functionality in the Fire22
+Dashboard system.
 
 ### Key Features
 
@@ -31,7 +33,7 @@ bun run dev
 // Configuration example
 const config = {
   enabled: true,
-  mode: 'development'
+  mode: 'development',
 };
 ```
 
@@ -54,4 +56,5 @@ const config = {
 
 ---
 
-*This is a temporary placeholder. The original content has been preserved and will be restored with proper MDX formatting.*
+_This is a temporary placeholder. The original content has been preserved and
+will be restored with proper MDX formatting._

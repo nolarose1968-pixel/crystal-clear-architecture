@@ -1,10 +1,9 @@
-
 import { Fire22Integration } from './src/fire22-integration.ts';
 
 const env = {
   FIRE22_API_URL: 'https://api.fire22.ag',
   FIRE22_TOKEN: 'fire22_api_token_wqaay',
-  JWT_SECRET: 'jwt_secret_min_32_chars_2t4vh'
+  JWT_SECRET: 'jwt_secret_min_32_chars_2t4vh',
 };
 
 const integration = new Fire22Integration(env);

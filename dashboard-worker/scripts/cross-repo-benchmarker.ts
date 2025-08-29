@@ -2,21 +2,21 @@
 
 /**
  * 📊 Cross-Repository Benchmarking System
- * 
+ *
  * Advanced benchmarking infrastructure for Fire22 workspace orchestration:
  * - Package-level performance benchmarking
  * - Integration benchmarking across repositories
  * - Deployment benchmarking for Cloudflare Workers
  * - Performance regression detection and alerting
  * - Benchmark dashboard generation and reporting
- * 
+ *
  * Features:
  * - Multi-tier benchmarking (package, integration, deployment)
  * - Performance budgets and fail-fast on regressions
  * - Historical comparison and trend analysis
  * - Automated alerts and notifications
  * - Integration with CI/CD pipelines
- * 
+ *
  * @version 1.0.0
  * @author Fire22 Development Team
  */
@@ -123,27 +123,30 @@ export class CrossRepoBenchmarker {
   /**
    * 📊 Run comprehensive benchmark suite
    */
-  async runBenchmarks(options: {
-    suites?: string[];
-    packages?: string[];
-    comparison?: boolean;
-    dashboard?: boolean;
-    alerts?: boolean;
-    export?: boolean;
-    verbose?: boolean;
-  } = {}): Promise<{
+  async runBenchmarks(
+    options: {
+      suites?: string[];
+      packages?: string[];
+      comparison?: boolean;
+      dashboard?: boolean;
+      alerts?: boolean;
+      export?: boolean;
+      verbose?: boolean;
+    } = {}
+  ): Promise<{
     results: Map<string, BenchmarkResult>;
     budgets: { passed: number; failed: number; violations: string[] };
     performance: { regression: boolean; improvement: boolean; trend: 'up' | 'down' | 'stable' };
     status: 'success' | 'warning' | 'failed';
   }> {
     console.log('📊 Starting comprehensive benchmark suite...');
-    
+
     const targetSuites = options.suites || Array.from(this.suites.keys());
     const results = new Map<string, BenchmarkResult>();
     const violations: string[] = [];
-    let budgetsPassed = 0, budgetsFailed = 0;
-    
+    let budgetsPassed = 0,
+      budgetsFailed = 0;
+
     // Run each benchmark suite
     for (const suiteName of targetSuites) {
       const suite = this.suites.get(suiteName);
@@ -151,15 +154,15 @@ export class CrossRepoBenchmarker {
         console.warn(`⚠️ Unknown benchmark suite: ${suiteName}`);
         continue;
       }
-      
+
       console.log(`🏃 Running ${suite.type} benchmarks: ${suite.name}`);
-      
+
       try {
         const suiteResults = await this.runBenchmarkSuite(suite, options);
-        
+
         for (const [benchmarkName, result] of suiteResults) {
           results.set(`${suiteName}.${benchmarkName}`, result);
-          
+
           if (result.budget.passed) {
             budgetsPassed++;
           } else {
@@ -172,44 +175,50 @@ export class CrossRepoBenchmarker {
         budgetsFailed++;
       }
     }
-    
+
     // Analyze performance trends
-    const performance = options.comparison ? await this.analyzePerformanceTrends(results) : {
-      regression: false,
-      improvement: false,
-      trend: 'stable' as const
-    };
-    
+    const performance = options.comparison
+      ? await this.analyzePerformanceTrends(results)
+      : {
+          regression: false,
+          improvement: false,
+          trend: 'stable' as const,
+        };
+
     // Store results for historical comparison
     await this.storeResults(results);
-    
+
     // Generate reports
     if (options.dashboard) {
       await this.generateDashboard(results, performance);
     }
-    
+
     if (options.export) {
       await this.exportResults(results);
     }
-    
+
     // Send alerts if needed
     if (options.alerts && (budgetsFailed > 0 || performance.regression)) {
       await this.sendAlerts(results, performance, violations);
     }
-    
+
     const budgets = { passed: budgetsPassed, failed: budgetsFailed, violations };
-    const status = budgetsFailed === 0 && !performance.regression ? 'success' :
-                  budgetsPassed > 0 || performance.improvement ? 'warning' : 'failed';
-    
+    const status =
+      budgetsFailed === 0 && !performance.regression
+        ? 'success'
+        : budgetsPassed > 0 || performance.improvement
+          ? 'warning'
+          : 'failed';
+
     console.log('\n📊 Benchmark Summary:');
     console.log(`✅ Budgets passed: ${budgetsPassed}`);
     console.log(`❌ Budgets failed: ${budgetsFailed}`);
     console.log(`📈 Performance trend: ${performance.trend}`);
     console.log(`🎯 Status: ${status}`);
-    
+
     return { results, budgets, performance, status };
   }
-  
+
   /**
    * 📦 Benchmark specific packages
    */
@@ -222,25 +231,25 @@ export class CrossRepoBenchmarker {
     } = {}
   ): Promise<Map<string, BenchmarkResult[]>> {
     console.log(`📦 Benchmarking packages: ${packages.join(', ')}`);
-    
+
     const results = new Map<string, BenchmarkResult[]>();
     const suiteTypes = options.suiteTypes || ['package', 'integration'];
-    
+
     for (const packageName of packages) {
       const packagePath = join(this.rootPath, 'packages', packageName.replace('@fire22/', ''));
       if (!existsSync(packagePath)) {
         console.warn(`⚠️ Package not found: ${packageName}`);
         continue;
       }
-      
+
       const packageResults: BenchmarkResult[] = [];
-      
+
       // Run relevant benchmark suites for this package
       for (const [suiteName, suite] of this.suites) {
         if (!suiteTypes.includes(suite.type)) continue;
-        
+
         console.log(`🏃 Running ${suite.type} benchmarks for ${packageName}...`);
-        
+
         try {
           const suiteResults = await this.runPackageBenchmarks(packagePath, suite, options);
           packageResults.push(...Array.from(suiteResults.values()));
@@ -248,22 +257,24 @@ export class CrossRepoBenchmarker {
           console.error(`❌ Failed to benchmark ${packageName} with ${suiteName}: ${error}`);
         }
       }
-      
+
       results.set(packageName, packageResults);
     }
-    
+
     return results;
   }
-  
+
   /**
    * 🚀 Benchmark Cloudflare Worker deployment
    */
-  async benchmarkDeployment(options: {
-    environment?: 'staging' | 'production';
-    duration?: number;
-    concurrency?: number;
-    verbose?: boolean;
-  } = {}): Promise<{
+  async benchmarkDeployment(
+    options: {
+      environment?: 'staging' | 'production';
+      duration?: number;
+      concurrency?: number;
+      verbose?: boolean;
+    } = {}
+  ): Promise<{
     coldStart: number;
     memoryUsage: number;
     cpuUsage: number;
@@ -272,44 +283,44 @@ export class CrossRepoBenchmarker {
     errorRate: number;
   }> {
     console.log('🚀 Benchmarking Cloudflare Worker deployment...');
-    
+
     const environment = options.environment || 'staging';
     const duration = options.duration || 60; // seconds
     const concurrency = options.concurrency || 10;
-    
+
     // Deploy to test environment
     const deployResult = await this.processManager.execute({
       command: ['wrangler', 'deploy', '--env', environment],
-      timeout: 120000
+      timeout: 120000,
     });
-    
+
     if (!deployResult.success) {
       throw new Error('Deployment failed');
     }
-    
+
     // Run deployment benchmarks
     const benchmarks = await Promise.all([
       this.measureColdStart(environment),
       this.measureResourceUsage(environment, duration),
       this.measureThroughput(environment, duration, concurrency),
       this.measureLatency(environment, duration),
-      this.measureErrorRate(environment, duration)
+      this.measureErrorRate(environment, duration),
     ]);
-    
+
     const [coldStart, resourceUsage, throughput, latency, errorRate] = benchmarks;
-    
+
     return {
       coldStart,
       memoryUsage: resourceUsage.memory,
       cpuUsage: resourceUsage.cpu,
       throughput,
       latency,
-      errorRate
+      errorRate,
     };
   }
-  
+
   // === PRIVATE METHODS ===
-  
+
   private initializeBenchmarkSuites(): void {
     // Package-level benchmark suite
     this.suites.set('package-benchmarks', {
@@ -327,7 +338,7 @@ export class CrossRepoBenchmarker {
           environment: { NODE_ENV: 'production' },
           expectations: {
             maxLatency: 30000, // 30 seconds max build time
-          }
+          },
         },
         {
           name: 'test-performance',
@@ -339,8 +350,8 @@ export class CrossRepoBenchmarker {
           environment: { NODE_ENV: 'test' },
           expectations: {
             maxLatency: 10000, // 10 seconds max test time
-          }
-        }
+          },
+        },
       ],
       budget: {
         buildTime: 30000,
@@ -349,17 +360,17 @@ export class CrossRepoBenchmarker {
         cpuUsage: 80,
         throughput: 100,
         latency: 1000,
-        errorRate: 0.01
+        errorRate: 0.01,
       },
       reporting: {
         dashboard: true,
         alerts: true,
         comparison: true,
         export: { json: true, html: true, csv: false },
-        storage: { local: true, cloudflare: true, s3: false }
-      }
+        storage: { local: true, cloudflare: true, s3: false },
+      },
     });
-    
+
     // Integration benchmark suite
     this.suites.set('integration-benchmarks', {
       name: 'Integration Benchmarks',
@@ -376,9 +387,9 @@ export class CrossRepoBenchmarker {
           environment: { NODE_ENV: 'test' },
           expectations: {
             maxLatency: 5000,
-            maxMemoryUsage: 64 * 1024 * 1024
-          }
-        }
+            maxMemoryUsage: 64 * 1024 * 1024,
+          },
+        },
       ],
       budget: {
         buildTime: 60000,
@@ -387,17 +398,17 @@ export class CrossRepoBenchmarker {
         cpuUsage: 70,
         throughput: 50,
         latency: 2000,
-        errorRate: 0.01
+        errorRate: 0.01,
       },
       reporting: {
         dashboard: true,
         alerts: true,
         comparison: true,
         export: { json: true, html: true, csv: true },
-        storage: { local: true, cloudflare: true, s3: false }
-      }
+        storage: { local: true, cloudflare: true, s3: false },
+      },
     });
-    
+
     // Deployment benchmark suite
     this.suites.set('deployment-benchmarks', {
       name: 'Deployment Benchmarks',
@@ -414,7 +425,7 @@ export class CrossRepoBenchmarker {
           environment: {},
           expectations: {
             maxLatency: 1000, // 1 second max cold start
-          }
+          },
         },
         {
           name: 'memory-usage',
@@ -426,8 +437,8 @@ export class CrossRepoBenchmarker {
           environment: {},
           expectations: {
             maxMemoryUsage: 128 * 1024 * 1024, // 128MB max
-          }
-        }
+          },
+        },
       ],
       budget: {
         buildTime: 120000,
@@ -436,39 +447,39 @@ export class CrossRepoBenchmarker {
         cpuUsage: 50,
         throughput: 1000,
         latency: 100,
-        errorRate: 0.001
+        errorRate: 0.001,
       },
       reporting: {
         dashboard: true,
         alerts: true,
         comparison: true,
         export: { json: true, html: true, csv: true },
-        storage: { local: true, cloudflare: true, s3: true }
-      }
+        storage: { local: true, cloudflare: true, s3: true },
+      },
     });
   }
-  
+
   private async runBenchmarkSuite(
-    suite: BenchmarkSuite, 
+    suite: BenchmarkSuite,
     options: any
   ): Promise<Map<string, BenchmarkResult>> {
     const results = new Map<string, BenchmarkResult>();
-    
+
     for (const benchmark of suite.benchmarks) {
       if (options.verbose) {
         console.log(`  🔍 Running ${benchmark.name}...`);
       }
-      
+
       const result = await this.runSingleBenchmark(benchmark, suite, options);
       results.set(benchmark.name, result);
     }
-    
+
     return results;
   }
-  
+
   private async runSingleBenchmark(
-    config: BenchmarkConfig, 
-    suite: BenchmarkSuite, 
+    config: BenchmarkConfig,
+    suite: BenchmarkSuite,
     options: any
   ): Promise<BenchmarkResult> {
     const startTime = Date.now();
@@ -478,53 +489,53 @@ export class CrossRepoBenchmarker {
       memoryUsage: 0,
       cpuUsage: 0,
       errorRate: 0,
-      customMetrics: {} as Record<string, number>
+      customMetrics: {} as Record<string, number>,
     };
-    
+
     // Run warmup iterations
     for (let i = 0; i < config.warmupIterations; i++) {
       await this.processManager.execute({
         command: config.script.split(' '),
         env: { ...process.env, ...config.environment },
-        timeout: config.timeout
+        timeout: config.timeout,
       });
     }
-    
+
     // Run actual benchmark iterations
     let totalLatency = 0;
     let errors = 0;
-    
+
     for (let i = 0; i < config.iterations; i++) {
       const iterationStart = Date.now();
-      
+
       const result = await this.processManager.execute({
         command: config.script.split(' '),
         env: { ...process.env, ...config.environment },
-        timeout: config.timeout
+        timeout: config.timeout,
       });
-      
+
       const iterationLatency = Date.now() - iterationStart;
       totalLatency += iterationLatency;
-      
+
       if (!result.success) {
         errors++;
       }
-      
+
       // Collect resource usage
       if (result.resourceUsage) {
         metrics.memoryUsage = Math.max(metrics.memoryUsage, result.resourceUsage.memory);
         metrics.cpuUsage = Math.max(metrics.cpuUsage, result.resourceUsage.cpu);
       }
     }
-    
+
     const duration = Date.now() - startTime;
     metrics.latency = totalLatency / config.iterations;
     metrics.throughput = config.iterations / (duration / 1000);
     metrics.errorRate = errors / config.iterations;
-    
+
     // Check performance budget
     const budgetResult = this.checkPerformanceBudget(metrics, suite.budget);
-    
+
     return {
       benchmark: config.name,
       suite: suite.name,
@@ -538,102 +549,117 @@ export class CrossRepoBenchmarker {
         arch: process.arch,
         nodeVersion: process.version,
         bunVersion: await this.getBunVersion(),
-        memoryTotal: process.memoryUsage().rss
-      }
+        memoryTotal: process.memoryUsage().rss,
+      },
     };
   }
-  
-  private checkPerformanceBudget(metrics: any, budget: PerformanceBudget): { passed: boolean; violations: string[] } {
+
+  private checkPerformanceBudget(
+    metrics: any,
+    budget: PerformanceBudget
+  ): { passed: boolean; violations: string[] } {
     const violations: string[] = [];
-    
+
     if (metrics.latency > budget.latency) {
       violations.push(`Latency exceeded budget: ${metrics.latency}ms > ${budget.latency}ms`);
     }
-    
+
     if (metrics.throughput < budget.throughput) {
       violations.push(`Throughput below budget: ${metrics.throughput} < ${budget.throughput}`);
     }
-    
+
     if (metrics.memoryUsage > budget.memoryUsage) {
-      violations.push(`Memory usage exceeded budget: ${metrics.memoryUsage} > ${budget.memoryUsage}`);
+      violations.push(
+        `Memory usage exceeded budget: ${metrics.memoryUsage} > ${budget.memoryUsage}`
+      );
     }
-    
+
     if (metrics.cpuUsage > budget.cpuUsage) {
       violations.push(`CPU usage exceeded budget: ${metrics.cpuUsage}% > ${budget.cpuUsage}%`);
     }
-    
+
     if (metrics.errorRate > budget.errorRate) {
       violations.push(`Error rate exceeded budget: ${metrics.errorRate} > ${budget.errorRate}`);
     }
-    
+
     return { passed: violations.length === 0, violations };
   }
-  
-  private async runPackageBenchmarks(packagePath: string, suite: BenchmarkSuite, options: any): Promise<Map<string, BenchmarkResult>> {
+
+  private async runPackageBenchmarks(
+    packagePath: string,
+    suite: BenchmarkSuite,
+    options: any
+  ): Promise<Map<string, BenchmarkResult>> {
     const results = new Map<string, BenchmarkResult>();
-    
+
     for (const benchmark of suite.benchmarks) {
       console.log(`  🏃 Running package benchmark: ${benchmark.name}`);
-      
+
       try {
         // Run the benchmark in the package directory
         const result = await this.runSingleBenchmark(benchmark, suite, {
           ...options,
-          cwd: packagePath
+          cwd: packagePath,
         });
-        
+
         results.set(benchmark.name, result);
       } catch (error) {
         console.error(`❌ Package benchmark failed: ${benchmark.name} - ${error}`);
       }
     }
-    
+
     return results;
   }
-  
+
   private async analyzePerformanceTrends(results: Map<string, BenchmarkResult>): Promise<any> {
     console.log('📈 Analyzing performance trends...');
-    
+
     const currentMetrics = this.extractMetrics(results);
     const historicalMetrics = await this.loadHistoricalMetrics();
-    
+
     let regression = false;
     let improvement = false;
     let trend: 'up' | 'down' | 'stable' = 'stable';
-    
+
     if (historicalMetrics.length > 0) {
       const lastMetrics = historicalMetrics[historicalMetrics.length - 1];
-      
+
       // Compare current vs last metrics
       const latencyDiff = currentMetrics.avgLatency - lastMetrics.avgLatency;
       const throughputDiff = currentMetrics.avgThroughput - lastMetrics.avgThroughput;
       const memoryDiff = currentMetrics.avgMemoryUsage - lastMetrics.avgMemoryUsage;
-      
+
       // Determine trends (5% threshold)
       const latencyRegression = latencyDiff > lastMetrics.avgLatency * 0.05;
       const throughputRegression = throughputDiff < -lastMetrics.avgThroughput * 0.05;
       const memoryRegression = memoryDiff > lastMetrics.avgMemoryUsage * 0.05;
-      
+
       const latencyImprovement = latencyDiff < -lastMetrics.avgLatency * 0.05;
       const throughputImprovement = throughputDiff > lastMetrics.avgThroughput * 0.05;
       const memoryImprovement = memoryDiff < -lastMetrics.avgMemoryUsage * 0.05;
-      
+
       regression = latencyRegression || throughputRegression || memoryRegression;
       improvement = latencyImprovement || throughputImprovement || memoryImprovement;
-      
+
       if (improvement && !regression) trend = 'up';
       else if (regression && !improvement) trend = 'down';
       else trend = 'stable';
-      
+
       console.log(`📊 Performance comparison:`);
-      console.log(`  Latency: ${latencyDiff > 0 ? '+' : ''}${latencyDiff.toFixed(2)}ms (${latencyRegression ? '⬆️ regression' : latencyImprovement ? '⬇️ improvement' : '➡️ stable'})`);
-      console.log(`  Throughput: ${throughputDiff > 0 ? '+' : ''}${throughputDiff.toFixed(2)}/s (${throughputRegression ? '⬇️ regression' : throughputImprovement ? '⬆️ improvement' : '➡️ stable'})`);
-      console.log(`  Memory: ${memoryDiff > 0 ? '+' : ''}${(memoryDiff / 1024 / 1024).toFixed(2)}MB (${memoryRegression ? '⬆️ regression' : memoryImprovement ? '⬇️ improvement' : '➡️ stable'})`);
+      console.log(
+        `  Latency: ${latencyDiff > 0 ? '+' : ''}${latencyDiff.toFixed(2)}ms (${latencyRegression ? '⬆️ regression' : latencyImprovement ? '⬇️ improvement' : '➡️ stable'})`
+      );
+      console.log(
+        `  Throughput: ${throughputDiff > 0 ? '+' : ''}${throughputDiff.toFixed(2)}/s (${throughputRegression ? '⬇️ regression' : throughputImprovement ? '⬆️ improvement' : '➡️ stable'})`
+      );
+      console.log(
+        `  Memory: ${memoryDiff > 0 ? '+' : ''}${(memoryDiff / 1024 / 1024).toFixed(2)}MB (${memoryRegression ? '⬆️ regression' : memoryImprovement ? '⬇️ improvement' : '➡️ stable'})`
+      );
     }
-    
+
     return { regression, improvement, trend };
   }
-  
+
   private extractMetrics(results: Map<string, BenchmarkResult>): {
     avgLatency: number;
     avgThroughput: number;
@@ -641,43 +667,45 @@ export class CrossRepoBenchmarker {
     avgCpuUsage: number;
   } {
     const allResults = Array.from(results.values());
-    
+
     if (allResults.length === 0) {
       return { avgLatency: 0, avgThroughput: 0, avgMemoryUsage: 0, avgCpuUsage: 0 };
     }
-    
+
     const totals = allResults.reduce(
       (acc, result) => ({
         latency: acc.latency + result.metrics.latency,
         throughput: acc.throughput + result.metrics.throughput,
         memoryUsage: acc.memoryUsage + result.metrics.memoryUsage,
-        cpuUsage: acc.cpuUsage + result.metrics.cpuUsage
+        cpuUsage: acc.cpuUsage + result.metrics.cpuUsage,
       }),
       { latency: 0, throughput: 0, memoryUsage: 0, cpuUsage: 0 }
     );
-    
+
     const count = allResults.length;
     return {
       avgLatency: totals.latency / count,
       avgThroughput: totals.throughput / count,
       avgMemoryUsage: totals.memoryUsage / count,
-      avgCpuUsage: totals.cpuUsage / count
+      avgCpuUsage: totals.cpuUsage / count,
     };
   }
-  
-  private async loadHistoricalMetrics(): Promise<Array<{
-    timestamp: number;
-    avgLatency: number;
-    avgThroughput: number;
-    avgMemoryUsage: number;
-    avgCpuUsage: number;
-  }>> {
+
+  private async loadHistoricalMetrics(): Promise<
+    Array<{
+      timestamp: number;
+      avgLatency: number;
+      avgThroughput: number;
+      avgMemoryUsage: number;
+      avgCpuUsage: number;
+    }>
+  > {
     const historyFile = join(this.rootPath, 'benchmark-results', 'performance-history.json');
-    
+
     if (!existsSync(historyFile)) {
       return [];
     }
-    
+
     try {
       const historyData = JSON.parse(readFileSync(historyFile, 'utf-8'));
       return historyData.metrics || [];
@@ -685,59 +713,65 @@ export class CrossRepoBenchmarker {
       return [];
     }
   }
-  
+
   private async storeResults(results: Map<string, BenchmarkResult>): Promise<void> {
     const resultsDir = join(this.rootPath, 'benchmark-results');
     if (!existsSync(resultsDir)) {
       mkdirSync(resultsDir, { recursive: true });
     }
-    
+
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const resultsFile = join(resultsDir, `benchmark-results-${timestamp}.json`);
-    
+
     const resultsArray = Array.from(results.entries()).map(([key, result]) => ({
       key,
-      ...result
+      ...result,
     }));
-    
+
     writeFileSync(resultsFile, JSON.stringify(resultsArray, null, 2));
     console.log(`💾 Benchmark results saved to: ${resultsFile}`);
   }
-  
-  private async generateDashboard(results: Map<string, BenchmarkResult>, performance: any): Promise<void> {
+
+  private async generateDashboard(
+    results: Map<string, BenchmarkResult>,
+    performance: any
+  ): Promise<void> {
     console.log('📊 Generating benchmark dashboard...');
-    
+
     const dashboardDir = join(this.rootPath, 'benchmark-results', 'dashboard');
     if (!existsSync(dashboardDir)) {
       mkdirSync(dashboardDir, { recursive: true });
     }
-    
+
     // Generate HTML dashboard
     const dashboardHtml = await this.generateDashboardHtml(results, performance);
     writeFileSync(join(dashboardDir, 'index.html'), dashboardHtml);
-    
+
     // Generate JSON data for dynamic charts
     const dashboardData = {
       timestamp: new Date().toISOString(),
       summary: {
         totalBenchmarks: results.size,
         performance,
-        metrics: this.extractMetrics(results)
+        metrics: this.extractMetrics(results),
       },
       results: Array.from(results.entries()).map(([key, result]) => ({
         key,
-        ...result
-      }))
+        ...result,
+      })),
     };
     writeFileSync(join(dashboardDir, 'data.json'), JSON.stringify(dashboardData, null, 2));
-    
+
     console.log(`📊 Dashboard generated: ${join(dashboardDir, 'index.html')}`);
   }
-  
-  private async generateDashboardHtml(results: Map<string, BenchmarkResult>, performance: any): Promise<string> {
+
+  private async generateDashboardHtml(
+    results: Map<string, BenchmarkResult>,
+    performance: any
+  ): Promise<string> {
     const metrics = this.extractMetrics(results);
     const timestamp = new Date().toLocaleString();
-    
+
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -826,7 +860,9 @@ export class CrossRepoBenchmarker {
             <div class="card" style="grid-column: span 2;">
                 <h3>📋 Benchmark Results</h3>
                 <ul class="benchmark-list">
-                    ${Array.from(results.entries()).map(([key, result]) => `
+                    ${Array.from(results.entries())
+                      .map(
+                        ([key, result]) => `
                         <li class="benchmark-item">
                             <strong>${key}</strong>
                             <div style="margin-top: 0.5rem; font-size: 0.875rem; color: #666;">
@@ -840,7 +876,9 @@ export class CrossRepoBenchmarker {
                                 </span>
                             </div>
                         </li>
-                    `).join('')}
+                    `
+                      )
+                      .join('')}
                 </ul>
             </div>
         </div>
@@ -853,53 +891,64 @@ export class CrossRepoBenchmarker {
 </body>
 </html>`;
   }
-  
+
   private async exportResults(results: Map<string, BenchmarkResult>): Promise<void> {
     console.log('📤 Exporting benchmark results...');
-    
+
     const exportDir = join(this.rootPath, 'benchmark-results', 'exports');
     if (!existsSync(exportDir)) {
       mkdirSync(exportDir, { recursive: true });
     }
-    
+
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    
+
     // Export as JSON
     const jsonData = {
       timestamp: new Date().toISOString(),
       results: Array.from(results.entries()).map(([key, result]) => ({ key, ...result })),
-      summary: this.extractMetrics(results)
+      summary: this.extractMetrics(results),
     };
-    writeFileSync(join(exportDir, `benchmark-results-${timestamp}.json`), JSON.stringify(jsonData, null, 2));
-    
+    writeFileSync(
+      join(exportDir, `benchmark-results-${timestamp}.json`),
+      JSON.stringify(jsonData, null, 2)
+    );
+
     // Export as CSV
-    const csvHeader = 'Benchmark,Suite,Duration,Latency,Throughput,MemoryUsage,CPUUsage,BudgetPassed\\n';
-    const csvRows = Array.from(results.entries()).map(([key, result]) => 
-      `${key},${result.suite},${result.duration},${result.metrics.latency},${result.metrics.throughput},${result.metrics.memoryUsage},${result.metrics.cpuUsage},${result.budget.passed}`
-    ).join('\\n');
+    const csvHeader =
+      'Benchmark,Suite,Duration,Latency,Throughput,MemoryUsage,CPUUsage,BudgetPassed\\n';
+    const csvRows = Array.from(results.entries())
+      .map(
+        ([key, result]) =>
+          `${key},${result.suite},${result.duration},${result.metrics.latency},${result.metrics.throughput},${result.metrics.memoryUsage},${result.metrics.cpuUsage},${result.budget.passed}`
+      )
+      .join('\\n');
     writeFileSync(join(exportDir, `benchmark-results-${timestamp}.csv`), csvHeader + csvRows);
-    
+
     console.log(`📁 Results exported to: ${exportDir}`);
   }
-  
-  private async sendAlerts(results: Map<string, BenchmarkResult>, performance: any, violations: string[]): Promise<void> {
+
+  private async sendAlerts(
+    results: Map<string, BenchmarkResult>,
+    performance: any,
+    violations: string[]
+  ): Promise<void> {
     console.log('🚨 Sending performance alerts...');
-    
+
     const alertMessage = this.generateAlertMessage(results, performance, violations);
-    
+
     // Console alert (always shown)
     console.log('\\n' + '='.repeat(80));
     console.log('🚨 PERFORMANCE ALERT');
     console.log('='.repeat(80));
     console.log(alertMessage);
     console.log('='.repeat(80));
-    
+
     // Save alert to file
     const alertsDir = join(this.rootPath, 'benchmark-results', 'alerts');
     if (!existsSync(alertsDir)) {
       mkdirSync(alertsDir, { recursive: true });
     }
-    
+
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const alertData = {
       timestamp: new Date().toISOString(),
@@ -907,21 +956,25 @@ export class CrossRepoBenchmarker {
       message: alertMessage,
       performance,
       violations,
-      metrics: this.extractMetrics(results)
+      metrics: this.extractMetrics(results),
     };
-    
+
     writeFileSync(join(alertsDir, `alert-${timestamp}.json`), JSON.stringify(alertData, null, 2));
-    
+
     // Future: Could integrate with Slack, email, webhook, etc.
     console.log(`📧 Alert logged to: ${join(alertsDir, `alert-${timestamp}.json`)}`);
   }
-  
-  private generateAlertMessage(results: Map<string, BenchmarkResult>, performance: any, violations: string[]): string {
+
+  private generateAlertMessage(
+    results: Map<string, BenchmarkResult>,
+    performance: any,
+    violations: string[]
+  ): string {
     const metrics = this.extractMetrics(results);
-    
+
     let message = `Fire22 Performance Alert\\n`;
     message += `Generated: ${new Date().toLocaleString()}\\n\\n`;
-    
+
     if (performance.regression) {
       message += `🔴 REGRESSION DETECTED\\n`;
       message += `Performance has degraded compared to previous run.\\n\\n`;
@@ -929,13 +982,13 @@ export class CrossRepoBenchmarker {
       message += `🟡 BUDGET VIOLATIONS\\n`;
       message += `Some benchmarks exceeded their performance budgets.\\n\\n`;
     }
-    
+
     message += `📊 Current Metrics:\\n`;
     message += `• Average Latency: ${metrics.avgLatency.toFixed(2)}ms\\n`;
     message += `• Average Throughput: ${metrics.avgThroughput.toFixed(2)}/s\\n`;
     message += `• Average Memory: ${(metrics.avgMemoryUsage / 1024 / 1024).toFixed(2)}MB\\n`;
     message += `• Average CPU: ${metrics.avgCpuUsage.toFixed(1)}%\\n\\n`;
-    
+
     if (violations.length > 0) {
       message += `❌ Budget Violations:\\n`;
       violations.forEach(violation => {
@@ -943,45 +996,52 @@ export class CrossRepoBenchmarker {
       });
       message += `\\n`;
     }
-    
+
     message += `📈 Trend: ${performance.trend.toUpperCase()}\\n`;
     message += `Total Benchmarks: ${results.size}\\n`;
-    
+
     return message;
   }
-  
+
   private loadHistoricalData(): void {
     // Load historical benchmark data for comparison
   }
-  
+
   private async getBunVersion(): Promise<string> {
     const result = await this.processManager.execute({
       command: ['bun', '--version'],
-      timeout: 5000
+      timeout: 5000,
     });
     return result.success ? result.output.trim() : 'unknown';
   }
-  
+
   private async measureColdStart(environment: string): Promise<number> {
     // Implementation would measure Worker cold start time
     return 150; // placeholder
   }
-  
-  private async measureResourceUsage(environment: string, duration: number): Promise<{ memory: number; cpu: number }> {
+
+  private async measureResourceUsage(
+    environment: string,
+    duration: number
+  ): Promise<{ memory: number; cpu: number }> {
     // Implementation would measure resource usage
     return { memory: 64 * 1024 * 1024, cpu: 25 }; // placeholder
   }
-  
-  private async measureThroughput(environment: string, duration: number, concurrency: number): Promise<number> {
+
+  private async measureThroughput(
+    environment: string,
+    duration: number,
+    concurrency: number
+  ): Promise<number> {
     // Implementation would measure requests per second
     return 500; // placeholder
   }
-  
+
   private async measureLatency(environment: string, duration: number): Promise<number> {
     // Implementation would measure response latency
     return 85; // placeholder
   }
-  
+
   private async measureErrorRate(environment: string, duration: number): Promise<number> {
     // Implementation would measure error rate
     return 0.001; // placeholder

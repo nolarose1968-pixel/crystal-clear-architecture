@@ -1,10 +1,14 @@
 /**
  * Fire22 Agent Management API
- * 
+ *
  * Comprehensive agent configuration and management endpoints
  */
 
-import { createSuccessResponse, createNotFoundError, createValidationError } from '../errors/middleware';
+import {
+  createSuccessResponse,
+  createNotFoundError,
+  createValidationError,
+} from '../errors/middleware';
 import { RetryUtils } from '../errors/RetryUtils';
 import { ErrorHandler } from '../errors/ErrorHandler';
 import { ERROR_CODES } from '../errors/types';
@@ -47,7 +51,10 @@ export class AgentManager {
   async getAllAgents(request: Request): Promise<Response> {
     try {
       const agents = await RetryUtils.retryDatabaseOperation(
-        () => this.db.prepare(`
+        () =>
+          this.db
+            .prepare(
+              `
           SELECT 
             agent_id,
             agent_name,
@@ -67,7 +74,9 @@ export class AgentManager {
             sub_agent_count
           FROM agent_summary
           ORDER BY agent_name
-        `).all(),
+        `
+            )
+            .all(),
         'get-all-agents',
         request
       );
@@ -90,9 +99,15 @@ export class AgentManager {
   async getAgent(agentId: string, request: Request): Promise<Response> {
     try {
       const agent = await RetryUtils.retryDatabaseOperation(
-        () => this.db.prepare(`
+        () =>
+          this.db
+            .prepare(
+              `
           SELECT * FROM agent_summary WHERE agent_id = ?
-        `).bind(agentId).first(),
+        `
+            )
+            .bind(agentId)
+            .first(),
         'get-agent',
         request
       );
@@ -102,25 +117,35 @@ export class AgentManager {
       }
 
       // Get agent permissions
-      const permissions = await this.db.prepare(`
+      const permissions = await this.db
+        .prepare(
+          `
         SELECT permission_name, permission_value, granted_by, granted_at
         FROM agent_permissions
         WHERE agent_id = ?
-      `).bind(agentId).all();
+      `
+        )
+        .bind(agentId)
+        .all();
 
       // Get recent configuration history
-      const configHistory = await this.db.prepare(`
+      const configHistory = await this.db
+        .prepare(
+          `
         SELECT field_name, old_value, new_value, changed_by, change_reason, changed_at
         FROM agent_config_history
         WHERE agent_id = ?
         ORDER BY changed_at DESC
         LIMIT 10
-      `).bind(agentId).all();
+      `
+        )
+        .bind(agentId)
+        .all();
 
       return createSuccessResponse({
         agent,
         permissions: permissions.results,
-        configHistory: configHistory.results
+        configHistory: configHistory.results,
       });
     } catch (error) {
       const errorHandler = ErrorHandler.getInstance();
@@ -136,12 +161,22 @@ export class AgentManager {
   /**
    * Update agent configuration
    */
-  async updateAgent(agentId: string, updates: Partial<AgentConfig>, changedBy: string, request: Request): Promise<Response> {
+  async updateAgent(
+    agentId: string,
+    updates: Partial<AgentConfig>,
+    changedBy: string,
+    request: Request
+  ): Promise<Response> {
     try {
       // First get current agent data for history tracking
-      const currentAgent = await this.db.prepare(`
+      const currentAgent = await this.db
+        .prepare(
+          `
         SELECT * FROM agents WHERE agent_id = ?
-      `).bind(agentId).first();
+      `
+        )
+        .bind(agentId)
+        .first();
 
       if (!currentAgent) {
         return createNotFoundError(`Agent ${agentId}`, request);
@@ -156,7 +191,7 @@ export class AgentManager {
       // Build update query dynamically
       const updateFields: string[] = [];
       const updateValues: any[] = [];
-      
+
       Object.entries(updates).forEach(([key, value]) => {
         if (value !== undefined && key !== 'agent_id') {
           updateFields.push(`${key} = ?`);
@@ -174,21 +209,31 @@ export class AgentManager {
       await RetryUtils.retryDatabaseOperation(
         async () => {
           // Update agent
-          await this.db.prepare(`
+          await this.db
+            .prepare(
+              `
             UPDATE agents 
             SET ${updateFields.join(', ')}, updated_at = datetime('now')
             WHERE agent_id = ?
-          `).bind(...updateValues).run();
+          `
+            )
+            .bind(...updateValues)
+            .run();
 
           // Record changes in history
           for (const [field, newValue] of Object.entries(updates)) {
             if (newValue !== undefined) {
               const oldValue = (currentAgent as any)[field];
               if (oldValue !== newValue) {
-                await this.db.prepare(`
+                await this.db
+                  .prepare(
+                    `
                   INSERT INTO agent_config_history (agent_id, field_name, old_value, new_value, changed_by)
                   VALUES (?, ?, ?, ?, ?)
-                `).bind(agentId, field, String(oldValue), String(newValue), changedBy).run();
+                `
+                  )
+                  .bind(agentId, field, String(oldValue), String(newValue), changedBy)
+                  .run();
               }
             }
           }
@@ -199,7 +244,6 @@ export class AgentManager {
 
       // Get updated agent data
       return await this.getAgent(agentId, request);
-
     } catch (error) {
       const errorHandler = ErrorHandler.getInstance();
       throw errorHandler.createError(
@@ -214,21 +258,36 @@ export class AgentManager {
   /**
    * Update agent permissions
    */
-  async updateAgentPermissions(agentId: string, permissions: AgentPermission[], grantedBy: string, request: Request): Promise<Response> {
+  async updateAgentPermissions(
+    agentId: string,
+    permissions: AgentPermission[],
+    grantedBy: string,
+    request: Request
+  ): Promise<Response> {
     try {
       await RetryUtils.retryDatabaseOperation(
         async () => {
           // Clear existing permissions
-          await this.db.prepare(`
+          await this.db
+            .prepare(
+              `
             DELETE FROM agent_permissions WHERE agent_id = ?
-          `).bind(agentId).run();
+          `
+            )
+            .bind(agentId)
+            .run();
 
           // Insert new permissions
           for (const permission of permissions) {
-            await this.db.prepare(`
+            await this.db
+              .prepare(
+                `
               INSERT INTO agent_permissions (agent_id, permission_name, permission_value, granted_by)
               VALUES (?, ?, ?, ?)
-            `).bind(agentId, permission.permission_name, permission.permission_value, grantedBy).run();
+            `
+              )
+              .bind(agentId, permission.permission_name, permission.permission_value, grantedBy)
+              .run();
           }
         },
         'update-agent-permissions',
@@ -237,9 +296,8 @@ export class AgentManager {
 
       return createSuccessResponse({
         message: `Updated ${permissions.length} permissions for agent ${agentId}`,
-        permissions
+        permissions,
       });
-
     } catch (error) {
       const errorHandler = ErrorHandler.getInstance();
       throw errorHandler.createError(
@@ -255,30 +313,50 @@ export class AgentManager {
    * Enable betting for agent
    */
   async enableBetting(agentId: string, enabledBy: string, request: Request): Promise<Response> {
-    return this.updateAgent(agentId, { 
-      can_place_bet: true,
-      status: 'active' as const
-    }, enabledBy, request);
+    return this.updateAgent(
+      agentId,
+      {
+        can_place_bet: true,
+        status: 'active' as const,
+      },
+      enabledBy,
+      request
+    );
   }
 
   /**
    * Disable betting for agent
    */
-  async disableBetting(agentId: string, disabledBy: string, reason: string, request: Request): Promise<Response> {
+  async disableBetting(
+    agentId: string,
+    disabledBy: string,
+    reason: string,
+    request: Request
+  ): Promise<Response> {
     try {
       // Update agent and record reason in history
       await RetryUtils.retryDatabaseOperation(
         async () => {
-          await this.db.prepare(`
+          await this.db
+            .prepare(
+              `
             UPDATE agents 
             SET can_place_bet = 0, updated_at = datetime('now')
             WHERE agent_id = ?
-          `).bind(agentId).run();
+          `
+            )
+            .bind(agentId)
+            .run();
 
-          await this.db.prepare(`
+          await this.db
+            .prepare(
+              `
             INSERT INTO agent_config_history (agent_id, field_name, old_value, new_value, changed_by, change_reason)
             VALUES (?, ?, ?, ?, ?, ?)
-          `).bind(agentId, 'can_place_bet', '1', '0', disabledBy, reason).run();
+          `
+            )
+            .bind(agentId, 'can_place_bet', '1', '0', disabledBy, reason)
+            .run();
         },
         'disable-betting',
         request
@@ -286,9 +364,8 @@ export class AgentManager {
 
       return createSuccessResponse({
         message: `Betting disabled for agent ${agentId}`,
-        reason
+        reason,
       });
-
     } catch (error) {
       const errorHandler = ErrorHandler.getInstance();
       throw errorHandler.createError(
@@ -306,7 +383,10 @@ export class AgentManager {
   async getAgentHierarchy(request: Request): Promise<Response> {
     try {
       const hierarchy = await RetryUtils.retryDatabaseOperation(
-        () => this.db.prepare(`
+        () =>
+          this.db
+            .prepare(
+              `
           WITH RECURSIVE agent_hierarchy AS (
             SELECT agent_id, agent_name, master_agent_id, status, 0 as level
             FROM agents
@@ -320,7 +400,9 @@ export class AgentManager {
           )
           SELECT * FROM agent_hierarchy
           ORDER BY level, agent_name
-        `).all(),
+        `
+            )
+            .all(),
         'get-agent-hierarchy',
         request
       );
@@ -361,7 +443,11 @@ export class AgentManager {
       }
 
       const performance = await RetryUtils.retryDatabaseOperation(
-        () => this.db.prepare(query).bind(...binding).all(),
+        () =>
+          this.db
+            .prepare(query)
+            .bind(...binding)
+            .all(),
         'get-agent-performance',
         request || new Request('http://localhost')
       );
@@ -398,8 +484,11 @@ export class AgentManager {
       return 'Credit limit cannot be negative';
     }
 
-    if (config.max_bet_amount && config.min_bet_amount && 
-        config.max_bet_amount < config.min_bet_amount) {
+    if (
+      config.max_bet_amount &&
+      config.min_bet_amount &&
+      config.max_bet_amount < config.min_bet_amount
+    ) {
       return 'Maximum bet amount cannot be less than minimum bet amount';
     }
 

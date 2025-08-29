@@ -1,5 +1,13 @@
-import { describe, test, expect, beforeEach } from "bun:test";
-import { WagerSystem, WagerRequest, Wager, Customer, Agent, Event, Selection } from '../src/index.ts';
+import { describe, test, expect, beforeEach } from 'bun:test';
+import {
+  WagerSystem,
+  WagerRequest,
+  Wager,
+  Customer,
+  Agent,
+  Event,
+  Selection,
+} from '../src/index.ts';
 
 describe('WagerSystem', () => {
   let wagerSystem: WagerSystem;
@@ -10,7 +18,7 @@ describe('WagerSystem', () => {
 
   beforeEach(() => {
     wagerSystem = new WagerSystem();
-    
+
     // Setup test data
     testCustomer = {
       id: 'cust-001',
@@ -25,15 +33,15 @@ describe('WagerSystem', () => {
         maxBet: 100,
         maxDaily: 500,
         maxWeekly: 2000,
-        maxMonthly: 5000
+        maxMonthly: 5000,
       },
       preferences: {
         favoriteSports: ['football'],
         favoriteTeams: ['team-001'],
-        notificationSettings: { email: true, sms: false }
+        notificationSettings: { email: true, sms: false },
       },
       createdAt: new Date().toISOString(),
-      lastActivity: new Date().toISOString()
+      lastActivity: new Date().toISOString(),
     };
 
     testAgent = {
@@ -47,22 +55,22 @@ describe('WagerSystem', () => {
       commission: {
         baseRate: 0.05,
         bonusRate: 0.02,
-        performanceMultiplier: 1.0
+        performanceMultiplier: 1.0,
       },
       limits: {
         maxCustomerBet: 1000,
         maxTotalExposure: 10000,
-        maxDailyVolume: 50000
+        maxDailyVolume: 50000,
       },
       hierarchy: {
-        childAgentIds: []
+        childAgentIds: [],
       },
       performance: {
         totalVolume: 0,
         totalCommission: 0,
         customerCount: 1,
-        averageBet: 0
-      }
+        averageBet: 0,
+      },
     };
 
     testEvent = {
@@ -74,7 +82,7 @@ describe('WagerSystem', () => {
       eventDate: new Date().toISOString(),
       status: 'upcoming',
       startTime: new Date().toISOString(),
-      venue: 'Test Stadium'
+      venue: 'Test Stadium',
     };
 
     testSelection = {
@@ -85,9 +93,9 @@ describe('WagerSystem', () => {
       odds: {
         american: -110,
         decimal: 1.91,
-        fractional: '10/11'
+        fractional: '10/11',
       },
-      status: 'active'
+      status: 'active',
     };
 
     // Add test data to system
@@ -104,12 +112,14 @@ describe('WagerSystem', () => {
         agentId: 'agent-001',
         eventId: 'event-001',
         betTypeId: 'bet-001',
-        selections: [{
-          selectionId: 'sel-001',
-          odds: -110
-        }],
+        selections: [
+          {
+            selectionId: 'sel-001',
+            odds: -110,
+          },
+        ],
         amountWagered: 50,
-        betType: 'straight'
+        betType: 'straight',
       };
 
       const wager = await wagerSystem.createWager(wagerRequest);
@@ -128,12 +138,14 @@ describe('WagerSystem', () => {
         agentId: 'agent-001',
         eventId: 'event-001',
         betTypeId: 'bet-001',
-        selections: [{
-          selectionId: 'sel-001',
-          odds: -110
-        }],
+        selections: [
+          {
+            selectionId: 'sel-001',
+            odds: -110,
+          },
+        ],
         amountWagered: 100,
-        betType: 'straight'
+        betType: 'straight',
       };
 
       const wager = await wagerSystem.createWager(wagerRequest);
@@ -150,12 +162,14 @@ describe('WagerSystem', () => {
         agentId: 'agent-001',
         eventId: 'event-001',
         betTypeId: 'bet-001',
-        selections: [{
-          selectionId: 'sel-001',
-          odds: -110
-        }],
+        selections: [
+          {
+            selectionId: 'sel-001',
+            odds: -110,
+          },
+        ],
         amountWagered: 0, // Invalid amount
-        betType: 'straight'
+        betType: 'straight',
       };
 
       await expect(wagerSystem.createWager(wagerRequest)).rejects.toThrow();
@@ -169,12 +183,14 @@ describe('WagerSystem', () => {
         agentId: 'agent-001',
         eventId: 'event-001',
         betTypeId: 'bet-001',
-        selections: [{
-          selectionId: 'sel-001',
-          odds: -110
-        }],
+        selections: [
+          {
+            selectionId: 'sel-001',
+            odds: -110,
+          },
+        ],
         amountWagered: 50,
-        betType: 'straight'
+        betType: 'straight',
       };
 
       const createdWager = await wagerSystem.createWager(wagerRequest);
@@ -211,17 +227,19 @@ describe('WagerSystem', () => {
         agentId: 'agent-001',
         eventId: 'event-001',
         betTypeId: 'bet-001',
-        selections: [{
-          selectionId: 'sel-001',
-          odds: -110
-        }],
+        selections: [
+          {
+            selectionId: 'sel-001',
+            odds: -110,
+          },
+        ],
         amountWagered: 50,
-        betType: 'straight'
+        betType: 'straight',
       };
 
       await wagerSystem.createWager(wagerRequest);
       const customer = await wagerSystem.getCustomer('cust-001');
-      
+
       expect(customer?.lastActivity).toBeDefined();
       expect(new Date(customer!.lastActivity).getTime()).toBeGreaterThan(Date.now() - 1000);
     });
@@ -230,7 +248,7 @@ describe('WagerSystem', () => {
   describe('System Statistics', () => {
     test('should return correct system statistics', async () => {
       const stats = await wagerSystem.getSystemStats();
-      
+
       expect(stats.totalWagers).toBe(0);
       expect(stats.totalVolume).toBe(0);
       expect(stats.totalExposure).toBe(0);
@@ -244,17 +262,19 @@ describe('WagerSystem', () => {
         agentId: 'agent-001',
         eventId: 'event-001',
         betTypeId: 'bet-001',
-        selections: [{
-          selectionId: 'sel-001',
-          odds: -110
-        }],
+        selections: [
+          {
+            selectionId: 'sel-001',
+            odds: -110,
+          },
+        ],
         amountWagered: 50,
-        betType: 'straight'
+        betType: 'straight',
       };
 
       await wagerSystem.createWager(wagerRequest);
       const stats = await wagerSystem.getSystemStats();
-      
+
       expect(stats.totalWagers).toBe(1);
       expect(stats.totalVolume).toBe(50);
       expect(stats.pendingWagers).toBe(1);
@@ -268,17 +288,19 @@ describe('WagerSystem', () => {
         agentId: 'agent-001',
         eventId: 'event-001',
         betTypeId: 'bet-001',
-        selections: [{
-          selectionId: 'sel-001',
-          odds: -110
-        }],
+        selections: [
+          {
+            selectionId: 'sel-001',
+            odds: -110,
+          },
+        ],
         amountWagered: 50,
-        betType: 'straight'
+        betType: 'straight',
       };
 
       await wagerSystem.createWager(wagerRequest);
       const customerWagers = await wagerSystem.getWagersByCustomer('cust-001');
-      
+
       expect(customerWagers).toHaveLength(1);
       expect(customerWagers[0].customerId).toBe('cust-001');
     });
@@ -289,17 +311,19 @@ describe('WagerSystem', () => {
         agentId: 'agent-001',
         eventId: 'event-001',
         betTypeId: 'bet-001',
-        selections: [{
-          selectionId: 'sel-001',
-          odds: -110
-        }],
+        selections: [
+          {
+            selectionId: 'sel-001',
+            odds: -110,
+          },
+        ],
         amountWagered: 50,
-        betType: 'straight'
+        betType: 'straight',
       };
 
       await wagerSystem.createWager(wagerRequest);
       const agentWagers = await wagerSystem.getWagersByAgent('agent-001');
-      
+
       expect(agentWagers).toHaveLength(1);
       expect(agentWagers[0].agentId).toBe('agent-001');
     });

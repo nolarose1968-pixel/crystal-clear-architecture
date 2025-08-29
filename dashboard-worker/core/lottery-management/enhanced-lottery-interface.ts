@@ -3,7 +3,13 @@
  * Comprehensive lottery system integrated with player management, cashier, and P2P features
  */
 
-import { Fantasy402AgentClient, LotteryGame, LotteryBet, LotteryDraw, LotterySettings } from '../../src/api/fantasy402-agent-client';
+import {
+  Fantasy402AgentClient,
+  LotteryGame,
+  LotteryBet,
+  LotteryDraw,
+  LotterySettings,
+} from '../../src/api/fantasy402-agent-client';
 import { EnhancedPlayerInterface } from '../player-management/enhanced-player-interface';
 import { EnhancedCashierSystem } from '../cashier/enhanced-cashier-system';
 import { PeerGroupManager } from '../peer-network/peer-group-manager';
@@ -87,7 +93,11 @@ export class EnhancedLotteryInterface {
     const sessionId = this.generateLotterySessionId();
 
     // Start player management session first
-    const playerSession = await this.playerInterface.startPlayerSession(agentId, customerId, 'lottery_session');
+    const playerSession = await this.playerInterface.startPlayerSession(
+      agentId,
+      customerId,
+      'lottery_session'
+    );
 
     // Get customer's lottery settings
     const settings = await this.fantasyClient.getLotterySettings(customerId);
@@ -109,7 +119,7 @@ export class EnhancedLotteryInterface {
       totalWagered: 0,
       totalWins: 0,
       netResult: 0,
-      status: 'active'
+      status: 'active',
     };
 
     this.activeLotterySessions.set(sessionId, session);
@@ -141,25 +151,28 @@ export class EnhancedLotteryInterface {
     // Get recent bets
     const recentBets = await this.fantasyClient.getLotteryBets(session.customerId, {
       limit: 10,
-      status: 'pending'
+      status: 'pending',
     });
 
     // Get win history
     const winHistory = await this.fantasyClient.getLotteryBets(session.customerId, {
       limit: 10,
-      status: 'won'
+      status: 'won',
     });
 
     // Get upcoming draws
     const upcomingDraws = await this.fantasyClient.getLotteryDraws({
-      limit: 5
+      limit: 5,
     });
 
     // Calculate statistics
     const statistics = await this.calculateLotteryStatistics(session.customerId);
 
     // Generate recommendations
-    const recommendations = await this.generateLotteryRecommendations(session.customerId, games.games);
+    const recommendations = await this.generateLotteryRecommendations(
+      session.customerId,
+      games.games
+    );
 
     return {
       session,
@@ -168,12 +181,12 @@ export class EnhancedLotteryInterface {
         currentBalance: customer.financialProfile.currentBalance,
         lotterySettings: settings.settings!,
         recentBets: recentBets.success ? recentBets.bets : [],
-        winHistory: winHistory.success ? winHistory.bets : []
+        winHistory: winHistory.success ? winHistory.bets : [],
       },
       availableGames: games.success ? games.games : [],
       upcomingDraws: upcomingDraws.success ? upcomingDraws.draws : [],
       statistics,
-      recommendations
+      recommendations,
     };
   }
 
@@ -208,7 +221,7 @@ export class EnhancedLotteryInterface {
         success: false,
         bet: null,
         paymentMethod: 'none',
-        error: 'Lottery betting not enabled for this customer'
+        error: 'Lottery betting not enabled for this customer',
       };
     }
 
@@ -218,7 +231,7 @@ export class EnhancedLotteryInterface {
         success: false,
         bet: null,
         paymentMethod: 'none',
-        error: `Bet amount exceeds maximum wager limit of $${settings.settings.lottoMaxWager}`
+        error: `Bet amount exceeds maximum wager limit of $${settings.settings.lottoMaxWager}`,
       };
     }
 
@@ -227,25 +240,26 @@ export class EnhancedLotteryInterface {
         success: false,
         bet: null,
         paymentMethod: 'none',
-        error: `Bet amount is below minimum wager limit of $${settings.settings.lottoMinWager}`
+        error: `Bet amount is below minimum wager limit of $${settings.settings.lottoMinWager}`,
       };
     }
 
     // Check daily limits
     const todayBets = await this.fantasyClient.getLotteryBets(session.customerId, {
       dateFrom: new Date().toISOString().split('T')[0],
-      status: 'pending'
+      status: 'pending',
     });
 
-    const todayWagered = todayBets.success ?
-      todayBets.bets.reduce((sum, bet) => sum + bet.betAmount, 0) : 0;
+    const todayWagered = todayBets.success
+      ? todayBets.bets.reduce((sum, bet) => sum + bet.betAmount, 0)
+      : 0;
 
     if (todayWagered + betData.betAmount > settings.settings.lottoDailyLimit) {
       return {
         success: false,
         bet: null,
         paymentMethod: 'none',
-        error: `Daily limit exceeded. Current: $${todayWagered}, Limit: $${settings.settings.lottoDailyLimit}`
+        error: `Daily limit exceeded. Current: $${todayWagered}, Limit: $${settings.settings.lottoDailyLimit}`,
       };
     }
 
@@ -268,7 +282,7 @@ export class EnhancedLotteryInterface {
           success: false,
           bet: null,
           paymentMethod: 'none',
-          error: `Insufficient balance. Available: $${playerDashboard.customer.financialProfile.currentBalance}`
+          error: `Insufficient balance. Available: $${playerDashboard.customer.financialProfile.currentBalance}`,
         };
       }
     }
@@ -279,7 +293,7 @@ export class EnhancedLotteryInterface {
       betAmount: betData.betAmount,
       numbers: betData.numbers,
       specialNumbers: betData.specialNumbers,
-      multiplier: betData.multiplier
+      multiplier: betData.multiplier,
     });
 
     if (betResult.success && betResult.bet) {
@@ -296,7 +310,7 @@ export class EnhancedLotteryInterface {
           {
             betId: betResult.bet.betId,
             gameId: betData.gameId,
-            numbers: betData.numbers.join(',')
+            numbers: betData.numbers.join(','),
           }
         );
       }
@@ -304,14 +318,14 @@ export class EnhancedLotteryInterface {
       return {
         success: true,
         bet: betResult.bet,
-        paymentMethod
+        paymentMethod,
       };
     } else {
       return {
         success: false,
         bet: null,
         paymentMethod,
-        error: betResult.error || 'Failed to place lottery bet'
+        error: betResult.error || 'Failed to place lottery bet',
       };
     }
   }
@@ -338,9 +352,11 @@ export class EnhancedLotteryInterface {
   /**
    * Get lottery statistics and recommendations
    */
-  private async calculateLotteryStatistics(customerId: string): Promise<LotteryDashboard['statistics']> {
+  private async calculateLotteryStatistics(
+    customerId: string
+  ): Promise<LotteryDashboard['statistics']> {
     const bets = await this.fantasyClient.getLotteryBets(customerId, {
-      dateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      dateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     });
 
     if (!bets.success) {
@@ -350,7 +366,7 @@ export class EnhancedLotteryInterface {
         totalWins: 0,
         winRate: 0,
         favoriteGame: '',
-        lastWin: { amount: 0, game: '', date: '' }
+        lastWin: { amount: 0, game: '', date: '' },
       };
     }
 
@@ -364,8 +380,7 @@ export class EnhancedLotteryInterface {
     bets.bets.forEach(bet => {
       gameCounts[bet.gameName] = (gameCounts[bet.gameName] || 0) + 1;
     });
-    const favoriteGame = Object.entries(gameCounts)
-      .sort(([,a], [,b]) => b - a)[0]?.[0] || '';
+    const favoriteGame = Object.entries(gameCounts).sort(([, a], [, b]) => b - a)[0]?.[0] || '';
 
     // Find last win
     const lastWin = bets.bets
@@ -378,11 +393,13 @@ export class EnhancedLotteryInterface {
       totalWins,
       winRate: Math.round(winRate * 100) / 100,
       favoriteGame,
-      lastWin: lastWin ? {
-        amount: lastWin.winAmount || 0,
-        game: lastWin.gameName,
-        date: lastWin.placedAt
-      } : { amount: 0, game: '', date: '' }
+      lastWin: lastWin
+        ? {
+            amount: lastWin.winAmount || 0,
+            game: lastWin.gameName,
+            date: lastWin.placedAt,
+          }
+        : { amount: 0, game: '', date: '' },
     };
   }
 
@@ -415,22 +432,21 @@ export class EnhancedLotteryInterface {
       });
 
       const topGames = Object.entries(gameWins)
-        .sort(([,a], [,b]) => b - a)
+        .sort(([, a], [, b]) => b - a)
         .slice(0, 3)
         .map(([gameName]) => gameName);
 
-      suggestedGames.push(...availableGames.filter(game =>
-        topGames.includes(game.gameName)
-      ));
+      suggestedGames.push(...availableGames.filter(game => topGames.includes(game.gameName)));
 
       // Calculate optimal bet amounts (based on successful bets)
       const successfulAmounts = winningBets.map(bet => bet.betAmount);
       if (successfulAmounts.length > 0) {
-        const avgSuccessful = successfulAmounts.reduce((a, b) => a + b, 0) / successfulAmounts.length;
+        const avgSuccessful =
+          successfulAmounts.reduce((a, b) => a + b, 0) / successfulAmounts.length;
         optimalBetAmounts.push(
           Math.round(avgSuccessful * 0.8), // Slightly lower
-          Math.round(avgSuccessful),        // Same amount
-          Math.round(avgSuccessful * 1.2)   // Slightly higher
+          Math.round(avgSuccessful), // Same amount
+          Math.round(avgSuccessful * 1.2) // Slightly higher
         );
       }
 
@@ -442,17 +458,23 @@ export class EnhancedLotteryInterface {
         });
       });
 
-      luckyNumbers.push(...Object.entries(numberFrequency)
-        .sort(([,a], [,b]) => b - a)
-        .slice(0, 5)
-        .map(([num]) => num));
+      luckyNumbers.push(
+        ...Object.entries(numberFrequency)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 5)
+          .map(([num]) => num)
+      );
     }
 
     // Add popular games if no history
     if (suggestedGames.length === 0) {
-      suggestedGames.push(...availableGames.filter(game =>
-        game.status === 'active' && game.jackpotAmount && game.jackpotAmount > 1000
-      ).slice(0, 3));
+      suggestedGames.push(
+        ...availableGames
+          .filter(
+            game => game.status === 'active' && game.jackpotAmount && game.jackpotAmount > 1000
+          )
+          .slice(0, 3)
+      );
     }
 
     // Add default bet amounts based on settings
@@ -476,17 +498,19 @@ export class EnhancedLotteryInterface {
         });
       });
 
-      hotNumbers.push(...Object.entries(drawNumberFrequency)
-        .sort(([,a], [,b]) => b - a)
-        .slice(0, 5)
-        .map(([num]) => num));
+      hotNumbers.push(
+        ...Object.entries(drawNumberFrequency)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 5)
+          .map(([num]) => num)
+      );
     }
 
     return {
       suggestedGames: suggestedGames.slice(0, 5),
       optimalBetAmounts: [...new Set(optimalBetAmounts)].slice(0, 3),
       luckyNumbers: luckyNumbers.slice(0, 6),
-      hotNumbers: hotNumbers.slice(0, 6)
+      hotNumbers: hotNumbers.slice(0, 6),
     };
   }
 
@@ -516,7 +540,7 @@ export class EnhancedLotteryInterface {
           {
             purpose: 'lottery_bet_funding',
             betAmount: amount,
-            description: `Lottery bet funding - $${amount}`
+            description: `Lottery bet funding - $${amount}`,
           }
         );
 
@@ -573,7 +597,7 @@ export class EnhancedLotteryInterface {
           game: null,
           recentDraws: [],
           statistics: { totalDraws: 0, averageJackpot: 0, totalWinners: 0, odds: '' },
-          error: 'Failed to load games'
+          error: 'Failed to load games',
         };
       }
 
@@ -584,22 +608,23 @@ export class EnhancedLotteryInterface {
           game: null,
           recentDraws: [],
           statistics: { totalDraws: 0, averageJackpot: 0, totalWinners: 0, odds: '' },
-          error: 'Game not found'
+          error: 'Game not found',
         };
       }
 
       // Get recent draws for this game
       const draws = await this.fantasyClient.getLotteryDraws({
         gameId,
-        limit: 10
+        limit: 10,
       });
 
       // Calculate statistics
       const recentDraws = draws.success ? draws.draws : [];
       const totalDraws = recentDraws.length;
-      const averageJackpot = totalDraws > 0
-        ? recentDraws.reduce((sum, draw) => sum + draw.jackpotAmount, 0) / totalDraws
-        : 0;
+      const averageJackpot =
+        totalDraws > 0
+          ? recentDraws.reduce((sum, draw) => sum + draw.jackpotAmount, 0) / totalDraws
+          : 0;
       const totalWinners = recentDraws.reduce((sum, draw) => sum + draw.totalWinners, 0);
 
       // Calculate odds (simplified)
@@ -613,8 +638,8 @@ export class EnhancedLotteryInterface {
           totalDraws,
           averageJackpot: Math.round(averageJackpot),
           totalWinners,
-          odds
-        }
+          odds,
+        },
       };
     } catch (error) {
       console.error('Failed to get lottery game details:', error);
@@ -623,7 +648,7 @@ export class EnhancedLotteryInterface {
         game: null,
         recentDraws: [],
         statistics: { totalDraws: 0, averageJackpot: 0, totalWinners: 0, odds: '' },
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -631,7 +656,11 @@ export class EnhancedLotteryInterface {
   /**
    * Calculate lottery odds
    */
-  private calculateLotteryOdds(game: LotteryGame, totalDraws: number, totalWinners: number): string {
+  private calculateLotteryOdds(
+    game: LotteryGame,
+    totalDraws: number,
+    totalWinners: number
+  ): string {
     if (totalDraws === 0) return 'N/A';
 
     const winRate = totalWinners / totalDraws;
@@ -689,9 +718,10 @@ export class EnhancedLotteryInterface {
       .filter(s => s.endTime)
       .map(s => new Date(s.endTime!).getTime() - new Date(s.startTime).getTime());
 
-    const averageSessionTime = sessionTimes.length > 0
-      ? sessionTimes.reduce((a, b) => a + b, 0) / sessionTimes.length / 1000 / 60 // minutes
-      : 0;
+    const averageSessionTime =
+      sessionTimes.length > 0
+        ? sessionTimes.reduce((a, b) => a + b, 0) / sessionTimes.length / 1000 / 60 // minutes
+        : 0;
 
     const averageBetAmount = totalBets > 0 ? totalWagered / totalBets : 0;
     const winRate = totalBets > 0 ? (totalWins / totalBets) * 100 : 0;
@@ -705,13 +735,13 @@ export class EnhancedLotteryInterface {
       performance: {
         averageSessionTime: Math.round(averageSessionTime * 100) / 100,
         averageBetAmount: Math.round(averageBetAmount * 100) / 100,
-        winRate: Math.round(winRate * 100) / 100
+        winRate: Math.round(winRate * 100) / 100,
       },
       peerFunding: {
         totalPeerTransactions: 0, // Would need to track this separately
         successRate: 95, // Mock data
-        averageAmount: 25 // Mock data
-      }
+        averageAmount: 25, // Mock data
+      },
     };
   }
 }

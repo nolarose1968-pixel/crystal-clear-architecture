@@ -21,22 +21,22 @@ interface CacheStats {
 
 class DependencyCacheManager {
   private cacheDir: string;
-  
+
   constructor() {
     this.cacheDir = CACHE_DIR;
     this.ensureCacheDirectory();
   }
-  
+
   private ensureCacheDirectory(): void {
     if (!existsSync(this.cacheDir)) {
       mkdirSync(this.cacheDir, { recursive: true });
       console.log(`📁 Created cache directory: ${this.cacheDir}`);
     }
   }
-  
+
   async warmCache(): Promise<void> {
     console.log('🔥 Warming dependency cache...');
-    
+
     // Prefetch heavy packages
     const heavyPackages = [
       'sharp',
@@ -44,9 +44,9 @@ class DependencyCacheManager {
       '@swc/core',
       '@docusaurus/core',
       '@docusaurus/preset-classic',
-      'fsevents'
+      'fsevents',
     ];
-    
+
     for (const pkg of heavyPackages) {
       console.log(`  📦 Prefetching ${pkg}...`);
       try {
@@ -55,39 +55,39 @@ class DependencyCacheManager {
         console.log(`  ⚠️ Could not prefetch ${pkg}`);
       }
     }
-    
+
     console.log('✅ Cache warming complete');
   }
-  
+
   async getCacheStats(): Promise<CacheStats> {
     const localSize = await $`du -sh ${this.cacheDir} 2>/dev/null || echo "0"`.text();
     const globalSize = await $`du -sh ${GLOBAL_CACHE} 2>/dev/null || echo "0"`.text();
     const packageCount = await $`find ${this.cacheDir} -name "*.tgz" 2>/dev/null | wc -l`.text();
-    
+
     return {
       localCacheSize: localSize.trim().split('\t')[0] || '0',
       globalCacheSize: globalSize.trim().split('\t')[0] || '0',
       packagesCount: parseInt(packageCount.trim()) || 0,
-      lastUpdate: new Date()
+      lastUpdate: new Date(),
     };
   }
-  
+
   async optimizeCache(): Promise<void> {
     console.log('🔧 Optimizing cache...');
-    
+
     // Remove old cache entries (older than 30 days)
     await $`find ${this.cacheDir} -type f -mtime +30 -delete 2>/dev/null`.quiet();
-    
+
     // Deduplicate cache entries
     console.log('  🔍 Deduplicating cache entries...');
     await $`bun pm cache prune`.quiet();
-    
+
     console.log('✅ Cache optimization complete');
   }
-  
+
   async setupCDNMirrors(): Promise<void> {
     console.log('🌐 Setting up CDN mirrors...');
-    
+
     // Create .npmrc with mirror configurations for CI/CD
     const npmrcContent = `
 # CDN Mirrors for heavy packages
@@ -108,24 +108,27 @@ fetch-retry-mintimeout=10000
 fetch-retry-maxtimeout=60000
 cache-min=3600
 `.trim();
-    
+
     await Bun.write('.npmrc', npmrcContent);
     console.log('✅ CDN mirrors configured');
   }
-  
+
   async createLocalRegistry(): Promise<void> {
     console.log('🏗️ Setting up local registry proxy...');
-    
+
     // Check if Verdaccio is available
-    const hasVerdaccio = await $`which verdaccio`.quiet().then(() => true).catch(() => false);
-    
+    const hasVerdaccio = await $`which verdaccio`
+      .quiet()
+      .then(() => true)
+      .catch(() => false);
+
     if (!hasVerdaccio) {
       console.log('  ℹ️ Verdaccio not installed. For local registry, run:');
       console.log('    bun add -g verdaccio');
       console.log('    verdaccio --config ./verdaccio.yaml');
       return;
     }
-    
+
     // Create Verdaccio configuration
     const verdaccioConfig = `
 storage: ./storage
@@ -155,39 +158,42 @@ logs:
   level: warn
   path: ./verdaccio.log
 `.trim();
-    
+
     await Bun.write('verdaccio.yaml', verdaccioConfig);
     console.log('✅ Local registry configuration created');
   }
-  
+
   async generateReport(): Promise<void> {
     console.log('\n📊 Cache Report');
     console.log('═'.repeat(50));
-    
+
     const stats = await this.getCacheStats();
-    
+
     console.log(`📦 Local Cache: ${stats.localCacheSize}`);
     console.log(`🌍 Global Cache: ${stats.globalCacheSize}`);
     console.log(`📚 Cached Packages: ${stats.packagesCount}`);
     console.log(`🕐 Last Update: ${stats.lastUpdate.toLocaleString()}`);
-    
+
     // Test registry connectivity
     console.log('\n🔗 Registry Connectivity:');
-    
+
     const registries = [
       { name: 'NPM', url: 'https://registry.npmjs.org/-/ping' },
       { name: 'Yarn', url: 'https://registry.yarnpkg.com/-/ping' },
       { name: 'JSDelivr CDN', url: 'https://cdn.jsdelivr.net/' },
-      { name: 'Fire22', url: 'https://fire22-security-registry.nolarose1968-806.workers.dev/health' }
+      {
+        name: 'Fire22',
+        url: 'https://fire22-security-registry.nolarose1968-806.workers.dev/health',
+      },
     ];
-    
+
     for (const registry of registries) {
       try {
         const start = Bun.nanoseconds();
         const response = await fetch(registry.url, { signal: AbortSignal.timeout(5000) });
         const end = Bun.nanoseconds();
         const ms = (end - start) / 1_000_000;
-        
+
         if (response.ok) {
           console.log(`  ✅ ${registry.name}: ${ms.toFixed(2)}ms`);
         } else {
@@ -197,7 +203,7 @@ logs:
         console.log(`  ❌ ${registry.name}: Offline`);
       }
     }
-    
+
     console.log('\n💡 Optimization Tips:');
     console.log('  • Use "bun run install:optimized" for fastest installs');
     console.log('  • Run "bun run cache:warm" before CI builds');
@@ -209,9 +215,9 @@ logs:
 // Main execution
 async function main() {
   const manager = new DependencyCacheManager();
-  
+
   const command = process.argv[2] || 'report';
-  
+
   switch (command) {
     case 'warm':
       await manager.warmCache();

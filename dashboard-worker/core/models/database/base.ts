@@ -3,14 +3,14 @@
  * Foundational types and interfaces for all database entities
  */
 
-import type { 
-  DatabaseStatus, 
-  TransactionType, 
-  WagerStatus, 
+import type {
+  DatabaseStatus,
+  TransactionType,
+  WagerStatus,
   BetType,
   CustomerTier,
   RiskLevel,
-  AgentLevel
+  AgentLevel,
 } from '../../constants';
 
 // === BASE ENTITY INTERFACE ===
@@ -68,12 +68,14 @@ export interface DatabaseConfig {
   database: string;
   username?: string;
   password?: string;
-  ssl?: boolean | {
-    rejectUnauthorized?: boolean;
-    ca?: string;
-    cert?: string;
-    key?: string;
-  };
+  ssl?:
+    | boolean
+    | {
+        rejectUnauthorized?: boolean;
+        ca?: string;
+        cert?: string;
+        key?: string;
+      };
   connectionTimeoutMillis?: number;
   idleTimeoutMillis?: number;
   max?: number;
@@ -419,5 +421,5 @@ export type {
   PoolConfig,
   PoolStats,
   Repository,
-  AuditableRepository
+  AuditableRepository,
 };

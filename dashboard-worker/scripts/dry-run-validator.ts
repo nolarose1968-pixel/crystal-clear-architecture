@@ -1,10 +1,10 @@
 #!/usr/bin/env bun
 /**
  * 🧪 Fire22 Dry-Run Validator
- * 
+ *
  * Quick dry-run validation for common operations
  * Integrates with health checks and provides safety validation
- * 
+ *
  * @version 3.0.9
  * @author Fire22 Development Team
  */
@@ -22,13 +22,12 @@ interface DryRunValidation {
 }
 
 class DryRunValidator {
-  
   /**
    * Validate deployment readiness
    */
   async validateDeployment(): Promise<DryRunValidation> {
     console.log('🚀 Validating deployment readiness...\n');
-    
+
     const warnings: string[] = [];
     const blockers: string[] = [];
     const recommendations: string[] = [];
@@ -59,7 +58,7 @@ class DryRunValidator {
     console.log('   🔧 Checking environment configuration...');
     const envFiles = ['.env', '.env.production', 'wrangler.toml'];
     const missingEnv = envFiles.filter(f => !existsSync(f));
-    
+
     if (missingEnv.length > 0) {
       warnings.push(`Missing environment files: ${missingEnv.join(', ')}`);
       console.log('   ⚠️  Environment: INCOMPLETE');
@@ -95,7 +94,7 @@ class DryRunValidator {
       warnings,
       blockers,
       recommendations,
-      estimatedTime: safe ? 180 : 0
+      estimatedTime: safe ? 180 : 0,
     };
   }
 
@@ -104,7 +103,7 @@ class DryRunValidator {
    */
   async validateConfiguration(): Promise<DryRunValidation> {
     console.log('⚙️  Validating configuration changes...\n');
-    
+
     const warnings: string[] = [];
     const blockers: string[] = [];
     const recommendations: string[] = [];
@@ -156,7 +155,7 @@ class DryRunValidator {
       warnings,
       blockers,
       recommendations,
-      estimatedTime: 60
+      estimatedTime: 60,
     };
   }
 
@@ -165,7 +164,7 @@ class DryRunValidator {
    */
   async validateDependencies(): Promise<DryRunValidation> {
     console.log('📚 Validating dependency updates...\n');
-    
+
     const warnings: string[] = [];
     const blockers: string[] = [];
     const recommendations: string[] = [];
@@ -212,7 +211,7 @@ class DryRunValidator {
       warnings,
       blockers,
       recommendations,
-      estimatedTime: 300
+      estimatedTime: 300,
     };
   }
 
@@ -223,7 +222,7 @@ class DryRunValidator {
     return new Promise((resolve, reject) => {
       const child = spawn(command, args, {
         stdio: 'pipe',
-        shell: true
+        shell: true,
       });
 
       const timeoutId = setTimeout(() => {
@@ -231,7 +230,7 @@ class DryRunValidator {
         reject(new Error('Command timed out'));
       }, timeout);
 
-      child.on('close', (code) => {
+      child.on('close', code => {
         clearTimeout(timeoutId);
         if (code === 0) {
           resolve();
@@ -240,7 +239,7 @@ class DryRunValidator {
         }
       });
 
-      child.on('error', (error) => {
+      child.on('error', error => {
         clearTimeout(timeoutId);
         reject(error);
       });
@@ -252,7 +251,7 @@ class DryRunValidator {
    */
   displayResults(validations: DryRunValidation[]): void {
     console.log('\n🧪 Dry-Run Validation Summary');
-    console.log('=' .repeat(40));
+    console.log('='.repeat(40));
 
     let allSafe = true;
     let totalWarnings = 0;
@@ -260,11 +259,13 @@ class DryRunValidator {
 
     validations.forEach(validation => {
       const statusIcon = validation.safe ? '✅' : '❌';
-      const timeStr = validation.estimatedTime > 0 ? 
-        ` (Est. ${Math.floor(validation.estimatedTime / 60)}m ${validation.estimatedTime % 60}s)` : '';
-      
+      const timeStr =
+        validation.estimatedTime > 0
+          ? ` (Est. ${Math.floor(validation.estimatedTime / 60)}m ${validation.estimatedTime % 60}s)`
+          : '';
+
       console.log(`\n${statusIcon} ${validation.operation}${timeStr}`);
-      
+
       if (validation.blockers.length > 0) {
         console.log('   🚫 Blockers:');
         validation.blockers.forEach(b => console.log(`     • ${b}`));
@@ -305,7 +306,7 @@ class DryRunValidator {
     const validations = await Promise.all([
       this.validateDeployment(),
       this.validateConfiguration(),
-      this.validateDependencies()
+      this.validateDependencies(),
     ]);
 
     this.displayResults(validations);
@@ -317,7 +318,7 @@ class DryRunValidator {
 async function main() {
   const args = process.argv.slice(2);
   const validator = new DryRunValidator();
-  
+
   if (args.includes('--help') || args.includes('-h')) {
     console.log(`
 🧪 Fire22 Dry-Run Validator
@@ -345,7 +346,7 @@ EXAMPLES:
   }
 
   const operation = args[0] || 'all';
-  
+
   try {
     let validations: DryRunValidation[] = [];
 
@@ -376,7 +377,6 @@ EXAMPLES:
     } else {
       process.exit(0);
     }
-    
   } catch (error) {
     console.error('💥 Dry-run validation failed:', error);
     process.exit(1);

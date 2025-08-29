@@ -1,7 +1,7 @@
 // Fire22 Dashboard Worker - Task Assignment & Quick Actions API
 // Specialized endpoints for common task operations
 
-import { SQL } from "bun";
+import { SQL } from 'bun';
 import { Env } from '../types/env';
 import { getDatabase } from '../database/connection';
 import { TaskService } from './tasks-enhanced';
@@ -57,19 +57,16 @@ export class TaskActionsService {
     try {
       // Get current task to check if assignment changed
       const currentTask = await this.taskService.getTaskByUuid(taskUuid);
-      
+
       if (currentTask.assigneeId === assigneeId) {
         return {
           success: false,
-          message: 'Task is already assigned to this user'
+          message: 'Task is already assigned to this user',
         };
       }
 
       // Update assignment
-      const updatedTask = await this.taskService.updateTask(
-        { uuid: taskUuid, assigneeId },
-        userId
-      );
+      const updatedTask = await this.taskService.updateTask({ uuid: taskUuid, assigneeId }, userId);
 
       // Log assignment activity
       await this.logActivity(
@@ -84,9 +81,8 @@ export class TaskActionsService {
       return {
         success: true,
         task: updatedTask,
-        message: `Task assigned to ${updatedTask.assignee?.name || 'user'}`
+        message: `Task assigned to ${updatedTask.assignee?.name || 'user'}`,
       };
-
     } catch (error) {
       throw new Error(`Failed to assign task: ${error}`);
     }
@@ -104,7 +100,7 @@ export class TaskActionsService {
 
     try {
       const currentTask = await this.taskService.getTaskByUuid(taskUuid);
-      
+
       // Auto-update status based on progress
       let newStatus = currentTask.status;
       if (progress === 100 && currentTask.status !== 'completed') {
@@ -114,11 +110,11 @@ export class TaskActionsService {
       }
 
       const updatedTask = await this.taskService.updateTask(
-        { 
-          uuid: taskUuid, 
+        {
+          uuid: taskUuid,
           progress,
           status: newStatus,
-          completedDate: progress === 100 ? new Date().toISOString() : undefined
+          completedDate: progress === 100 ? new Date().toISOString() : undefined,
         },
         userId
       );
@@ -136,9 +132,8 @@ export class TaskActionsService {
       return {
         success: true,
         task: updatedTask,
-        message: `Progress updated to ${progress}%${newStatus !== currentTask.status ? ` and status changed to ${newStatus}` : ''}`
+        message: `Progress updated to ${progress}%${newStatus !== currentTask.status ? ` and status changed to ${newStatus}` : ''}`,
       };
-
     } catch (error) {
       throw new Error(`Failed to update progress: ${error}`);
     }
@@ -165,16 +160,16 @@ export class TaskActionsService {
       for (const taskUuid of taskUuids) {
         try {
           const currentTask = await this.taskService.getTaskByUuid(taskUuid);
-          
+
           if (currentTask.status === status) {
             continue; // Skip if already in target status
           }
 
           const updatedTask = await this.taskService.updateTask(
-            { 
-              uuid: taskUuid, 
+            {
+              uuid: taskUuid,
               status,
-              completedDate: status === 'completed' ? new Date().toISOString() : undefined
+              completedDate: status === 'completed' ? new Date().toISOString() : undefined,
             },
             userId
           );
@@ -190,11 +185,10 @@ export class TaskActionsService {
           );
 
           updatedTasks.push(updatedTask);
-
         } catch (error) {
           errors.push({
             taskUuid,
-            error: error instanceof Error ? error.message : 'Unknown error'
+            error: error instanceof Error ? error.message : 'Unknown error',
           });
         }
       }
@@ -205,9 +199,8 @@ export class TaskActionsService {
         errors: errors.length,
         tasks: updatedTasks,
         errorDetails: errors,
-        message: `Updated ${updatedTasks.length} tasks to ${status}${errors.length > 0 ? ` (${errors.length} errors)` : ''}`
+        message: `Updated ${updatedTasks.length} tasks to ${status}${errors.length > 0 ? ` (${errors.length} errors)` : ''}`,
       };
-
     } catch (error) {
       throw new Error(`Bulk status update failed: ${error}`);
     }
@@ -228,20 +221,12 @@ export class TaskActionsService {
       await this.taskService.getTaskByUuid(taskUuid);
 
       // Log comment
-      await this.logActivity(
-        taskUuid,
-        userId || null,
-        'comment',
-        null,
-        null,
-        comment.trim()
-      );
+      await this.logActivity(taskUuid, userId || null, 'comment', null, null, comment.trim());
 
       return {
         success: true,
-        message: 'Comment added successfully'
+        message: 'Comment added successfully',
       };
-
     } catch (error) {
       throw new Error(`Failed to add comment: ${error}`);
     }
@@ -254,8 +239,12 @@ export class TaskActionsService {
     try {
       const now = new Date();
       const today = now.toISOString().split('T')[0];
-      const weekStart = new Date(now.setDate(now.getDate() - now.getDay())).toISOString().split('T')[0];
-      const weekEnd = new Date(now.setDate(now.getDate() - now.getDay() + 6)).toISOString().split('T')[0];
+      const weekStart = new Date(now.setDate(now.getDate() - now.getDay()))
+        .toISOString()
+        .split('T')[0];
+      const weekEnd = new Date(now.setDate(now.getDate() - now.getDay() + 6))
+        .toISOString()
+        .split('T')[0];
 
       let departmentFilter = '';
       const params: any[] = [];
@@ -279,8 +268,8 @@ export class TaskActionsService {
       `;
 
       const queryParams = [today, today, weekStart, weekEnd, weekStart, weekEnd, ...params];
-      const result = await this.db.query(statsQuery, queryParams) as any[];
-      
+      const result = (await this.db.query(statsQuery, queryParams)) as any[];
+
       if (result.length === 0) {
         return {
           overdue: 0,
@@ -289,7 +278,7 @@ export class TaskActionsService {
           unassigned: 0,
           inProgress: 0,
           blocked: 0,
-          completedThisWeek: 0
+          completedThisWeek: 0,
         };
       }
 
@@ -301,9 +290,8 @@ export class TaskActionsService {
         unassigned: Number(stats.unassigned) || 0,
         inProgress: Number(stats.in_progress) || 0,
         blocked: Number(stats.blocked) || 0,
-        completedThisWeek: Number(stats.completed_this_week) || 0
+        completedThisWeek: Number(stats.completed_this_week) || 0,
       };
-
     } catch (error) {
       console.error('Error getting quick stats:', error);
       throw new Error(`Failed to get task statistics: ${error}`);
@@ -338,15 +326,16 @@ export class TaskActionsService {
           oldValue: activity.old_value,
           newValue: activity.new_value,
           comment: activity.comment,
-          user: activity.user_name ? {
-            id: activity.user_id,
-            name: activity.user_name,
-            email: activity.user_email
-          } : null,
-          createdAt: activity.created_at
-        }))
+          user: activity.user_name
+            ? {
+                id: activity.user_id,
+                name: activity.user_name,
+                email: activity.user_email,
+              }
+            : null,
+          createdAt: activity.created_at,
+        })),
       };
-
     } catch (error) {
       throw new Error(`Failed to get task activity: ${error}`);
     }
@@ -382,7 +371,7 @@ export async function handleTaskActionsAPI(request: Request, env: Env): Promise<
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-User-ID',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     };
 
     if (method === 'OPTIONS') {
@@ -431,10 +420,13 @@ export async function handleTaskActionsAPI(request: Request, env: Env): Promise<
     if (method === 'GET' && url.pathname === '/api/tasks/stats') {
       const departmentId = url.searchParams.get('department') || undefined;
       const result = await actionsService.getQuickStats(departmentId);
-      return new Response(JSON.stringify({
-        success: true,
-        stats: result
-      }), { headers: corsHeaders });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          stats: result,
+        }),
+        { headers: corsHeaders }
+      );
     }
 
     // Route: GET /api/tasks/{uuid}/activity
@@ -445,23 +437,28 @@ export async function handleTaskActionsAPI(request: Request, env: Env): Promise<
       return new Response(JSON.stringify(result), { headers: corsHeaders });
     }
 
-    return new Response(JSON.stringify({
-      success: false,
-      error: 'Not found'
-    }), { status: 404, headers: corsHeaders });
-
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'Not found',
+      }),
+      { status: 404, headers: corsHeaders }
+    );
   } catch (error) {
     console.error('Task Actions API Error:', error);
 
-    return new Response(JSON.stringify({
-      success: false,
-      error: error instanceof Error ? error.message : 'Internal server error'
-    }), {
-      status: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : 'Internal server error',
+      }),
+      {
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
+        },
       }
-    });
+    );
   }
 }

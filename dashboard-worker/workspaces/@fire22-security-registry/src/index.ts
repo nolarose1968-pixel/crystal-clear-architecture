@@ -1,6 +1,6 @@
 /**
  * @fire22/security-registry
- * 
+ *
  * Enterprise-grade security registry with comprehensive scanning and bunx integration
  */
 

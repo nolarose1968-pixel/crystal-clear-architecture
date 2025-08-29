@@ -121,24 +121,28 @@
 The Crystal Clear Architecture includes a comprehensive health check system with **25+ endpoints** covering:
 
 #### **System Resources**
+
 - **CPU Usage & Load**: Real-time CPU monitoring with load averages
 - **Memory Management**: Heap usage, garbage collection, memory pressure
 - **Disk Space**: Filesystem monitoring with usage alerts
 - **Network Interfaces**: Connectivity and bandwidth monitoring
 
 #### **Database Health**
+
 - **Connection Pool**: Active/idle connections, pool utilization
 - **Query Performance**: Slow query detection, execution metrics
 - **Migration Status**: Schema migrations and pending changes
 - **Storage Metrics**: Database size, table counts, index health
 
 #### **Application Monitoring**
+
 - **Domain Health**: 17 business domains with individual status
 - **Task Processing**: Background jobs, queue depth, failure rates
 - **API Endpoints**: Endpoint availability, response times
 - **Performance Metrics**: Throughput, error rates, latency tracking
 
 #### **Security & Compliance**
+
 - **Authentication**: Active sessions, failed attempts monitoring
 - **SSL/TLS**: Certificate validity, expiration tracking
 - **Firewall**: Blocked attempts, security rule monitoring
@@ -168,6 +172,7 @@ curl https://dashboard-worker.brendawill2233.workers.dev/api/health/metrics
 The analytics system provides comprehensive data visualization and reporting capabilities:
 
 #### **Key Features**
+
 - **Real-time Data Visualization** with interactive charts and graphs
 - **Customizable Dashboards** with drag-and-drop interface
 - **Performance Metrics** tracking across all system components
@@ -176,6 +181,7 @@ The analytics system provides comprehensive data visualization and reporting cap
 - **Mobile-Responsive Design** optimized for all devices
 
 #### **Analytics Capabilities**
+
 - **KPI Monitoring**: Key performance indicators with alerts
 - **Trend Analysis**: Historical data patterns and forecasting
 - **Comparative Analysis**: Side-by-side metric comparisons
@@ -196,23 +202,27 @@ Access the live analytics dashboard at:
 The Fire22 Manager Dashboard is a fully-featured, production-ready management interface deployed on Cloudflare Workers.
 
 #### **Live Dashboard**
+
 🌐 **https://dashboard-worker.brendawill2233.workers.dev/dashboard**
 
 ### **🎯 Dashboard Features**
 
 #### **Real-time Monitoring**
+
 - **Live KPI Streaming** via Server-Sent Events
 - **Real-time Updates** without page refresh
 - **Performance Metrics** with automatic refresh
 - **System Health** indicators and alerts
 
 #### **Management Capabilities**
+
 - **Customer Management**: Complete customer lifecycle management
 - **Transaction Processing**: Real-time transaction monitoring
 - **Betting Operations**: Comprehensive betting system management
 - **Financial Reporting**: Revenue, profit, and performance analytics
 
 #### **Agent Management**
+
 - **Agent Performance**: Weekly figures and KPIs by agent
 - **Commission Tracking**: Real-time commission calculations
 - **Agent Analytics**: Performance metrics and trends
@@ -221,6 +231,7 @@ The Fire22 Manager Dashboard is a fully-featured, production-ready management in
 ### **📊 Database Integration**
 
 #### **PostgreSQL Schema**
+
 ```sql
 -- Core tables for Fire22 operations
 customers      -- Customer information and profiles
@@ -233,29 +244,31 @@ pending_wagers -- Pending wager processing
 
 #### **API Endpoints**
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/dashboard` | GET | Main dashboard interface |
-| `/api/live` | GET | Real-time KPI streaming |
-| `/api/manager/getWeeklyFigureByAgent` | POST | Agent performance data |
-| `/api/manager/getPending` | POST | Pending transactions |
-| `/api/manager/getCustomerDetails` | GET | Customer information |
-| `/api/manager/getTransactionHistory` | POST | Transaction history |
-| `/api/manager/getCustomerSummary` | GET | Customer summary |
-| `/api/manager/getTransactions` | GET | Customer transactions |
-| `/api/manager/getBets` | GET | Customer betting history |
+| Endpoint                              | Method | Description              |
+| ------------------------------------- | ------ | ------------------------ |
+| `/dashboard`                          | GET    | Main dashboard interface |
+| `/api/live`                           | GET    | Real-time KPI streaming  |
+| `/api/manager/getWeeklyFigureByAgent` | POST   | Agent performance data   |
+| `/api/manager/getPending`             | POST   | Pending transactions     |
+| `/api/manager/getCustomerDetails`     | GET    | Customer information     |
+| `/api/manager/getTransactionHistory`  | POST   | Transaction history      |
+| `/api/manager/getCustomerSummary`     | GET    | Customer summary         |
+| `/api/manager/getTransactions`        | GET    | Customer transactions    |
+| `/api/manager/getBets`                | GET    | Customer betting history |
 
 ---
 
 ## 🚀 **Quick Start**
 
 ### **1. Clone the Repository**
+
 ```bash
 git clone https://github.com/nolarose1968-pixel/crystal-clear-architecture.git
 cd crystal-clear-architecture
 ```
 
 ### **2. Install Dependencies**
+
 ```bash
 # Install Bun runtime (if not already installed)
 curl -fsSL https://bun.sh/install | bash
@@ -265,6 +278,7 @@ bun install
 ```
 
 ### **3. Set Up Database**
+
 ```bash
 # Set your PostgreSQL connection
 export DATABASE_URL="postgresql://username:password@host:port/database_name"
@@ -274,6 +288,7 @@ psql $DATABASE_URL -f schema.sql
 ```
 
 ### **4. Configure Environment**
+
 ```bash
 # Copy environment template
 cp .env.example .env
@@ -283,6 +298,7 @@ nano .env
 ```
 
 ### **5. Run Health Check System**
+
 ```bash
 # Start the health check API
 node health-example.js
@@ -292,6 +308,7 @@ curl http://localhost:3000/api/health
 ```
 
 ### **6. Deploy to Production**
+
 ```bash
 # Deploy dashboard worker
 cd dashboard-worker

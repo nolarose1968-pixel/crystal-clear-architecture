@@ -11,103 +11,102 @@ import { AIWagerAnalysis } from '../analytics/wager-analysis';
 import { Fantasy42AgentClient } from '../../src/api/fantasy42-agent-client';
 
 export class Fantasy42AlertIntegration {
-	private alerts: Fantasy42TelegramAlerts | null = null;
-	private isInitialized: boolean = false;
-	private alertHistory: any[] = [];
+  private alerts: Fantasy42TelegramAlerts | null = null;
+  private isInitialized: boolean = false;
+  private alertHistory: any[] = [];
 
-	/**
-	 * Initialize Fantasy42 alert integration
-	 */
-	async initialize(): Promise<boolean> {
-	try {
-	  console.log('🚨 Initializing Fantasy42 Alert Integration...');
+  /**
+   * Initialize Fantasy42 alert integration
+   */
+  async initialize(): Promise<boolean> {
+    try {
+      console.log('🚨 Initializing Fantasy42 Alert Integration...');
 
-	  // Create alert configuration
-	  const config: TelegramAlertConfig = {
-	    wagerAlertXPath: '//label[@data-language="L-1144"]',
-	    alertThresholds: {
-	      highAmount: 1000,
-	      vipCustomer: true,
-	      riskLevel: 'medium',
-	      unusualPattern: true
-	    },
-	    notificationChannels: {
-	      telegram: true,
-	      signal: true,
-	      email: false,
-	      sms: false
-	    },
-	    autoSendEnabled: true,
-	    escalationRules: {
-	      highRisk: true,
-	      largeAmount: true,
-	      vipCustomer: true,
-	      unusualActivity: true
-	    }
-	  };
+      // Create alert configuration
+      const config: TelegramAlertConfig = {
+        wagerAlertXPath: '//label[@data-language="L-1144"]',
+        alertThresholds: {
+          highAmount: 1000,
+          vipCustomer: true,
+          riskLevel: 'medium',
+          unusualPattern: true,
+        },
+        notificationChannels: {
+          telegram: true,
+          signal: true,
+          email: false,
+          sms: false,
+        },
+        autoSendEnabled: true,
+        escalationRules: {
+          highRisk: true,
+          largeAmount: true,
+          vipCustomer: true,
+          unusualActivity: true,
+        },
+      };
 
-	  // Initialize required systems
-	  const fantasyClient = new Fantasy42AgentClient('username', 'password');
-	  const telegramBot = new DepartmentalTelegramBot();
-	  const signalIntegration = new SignalIntegration({});
-	  const wagerAnalysis = new AIWagerAnalysis();
+      // Initialize required systems
+      const fantasyClient = new Fantasy42AgentClient('username', 'password');
+      const telegramBot = new DepartmentalTelegramBot();
+      const signalIntegration = new SignalIntegration({});
+      const wagerAnalysis = new AIWagerAnalysis();
 
-	  // Initialize Fantasy42 client
-	  await fantasyClient.initialize();
+      // Initialize Fantasy42 client
+      await fantasyClient.initialize();
 
-	  // Create and initialize alerts system
-	  this.alerts = new Fantasy42TelegramAlerts(
-	    fantasyClient,
-	    telegramBot,
-	    signalIntegration,
-	    wagerAnalysis,
-	    config
-	  );
+      // Create and initialize alerts system
+      this.alerts = new Fantasy42TelegramAlerts(
+        fantasyClient,
+        telegramBot,
+        signalIntegration,
+        wagerAnalysis,
+        config
+      );
 
-	  const alertsReady = await this.alerts.initialize();
+      const alertsReady = await this.alerts.initialize();
 
-	  if (alertsReady) {
-	    this.isInitialized = true;
-	    console.log('✅ Fantasy42 Alert Integration complete');
+      if (alertsReady) {
+        this.isInitialized = true;
+        console.log('✅ Fantasy42 Alert Integration complete');
 
-	    // Setup additional UI enhancements
-	    await this.setupAlertEnhancements();
+        // Setup additional UI enhancements
+        await this.setupAlertEnhancements();
 
-	    return true;
-	  } else {
-	    console.warn('⚠️ Alert system not ready, but integration initialized');
-	    return false;
-	  }
+        return true;
+      } else {
+        console.warn('⚠️ Alert system not ready, but integration initialized');
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ Failed to initialize Fantasy42 Alert Integration:', error);
+      return false;
+    }
+  }
 
-	} catch (error) {
-	  console.error('❌ Failed to initialize Fantasy42 Alert Integration:', error);
-	  return false;
-	}
-	}
+  /**
+   * Setup alert enhancements
+   */
+  private async setupAlertEnhancements(): Promise<void> {
+    // Add alert status indicator
+    await this.addAlertStatusIndicator();
 
-	/**
-	 * Setup alert enhancements
-	 */
-	private async setupAlertEnhancements(): Promise<void> {
-	// Add alert status indicator
-	await this.addAlertStatusIndicator();
+    // Setup keyboard shortcuts
+    await this.setupAlertKeyboardShortcuts();
 
-	// Setup keyboard shortcuts
-	await this.setupAlertKeyboardShortcuts();
+    // Add alert history viewer
+    await this.addAlertHistoryViewer();
 
-	// Add alert history viewer
-	await this.addAlertHistoryViewer();
+    console.log('✅ Alert enhancements setup');
+  }
 
-	console.log('✅ Alert enhancements setup');
-	}
-
-	/**
-	 * Add alert status indicator
-	 */
-	private async addAlertStatusIndicator(): Promise<void> {
-	const statusIndicator = document.createElement('div');
-	statusIndicator.id = 'fantasy42-alert-status';
-	statusIndicator.innerHTML = `
+  /**
+   * Add alert status indicator
+   */
+  private async addAlertStatusIndicator(): Promise<void> {
+    const statusIndicator = document.createElement('div');
+    statusIndicator.id = 'fantasy42-alert-status';
+    statusIndicator.innerHTML = `
 	  <div class="alert-status-indicator">
 	    <span class="alert-icon">🚨</span>
 	    <span class="alert-text">Wager Alerts Active</span>
@@ -115,7 +114,7 @@ export class Fantasy42AlertIntegration {
 	  </div>
 	`;
 
-	statusIndicator.style.cssText = `
+    statusIndicator.style.cssText = `
 	  position: fixed;
 	  top: 50px;
 	  right: 10px;
@@ -131,58 +130,60 @@ export class Fantasy42AlertIntegration {
 	  cursor: pointer;
 	`;
 
-	document.body.appendChild(statusIndicator);
+    document.body.appendChild(statusIndicator);
 
-	// Add click handler to show alert status
-	statusIndicator.addEventListener('click', () => {
-	  this.showAlertStatusModal();
-	});
+    // Add click handler to show alert status
+    statusIndicator.addEventListener('click', () => {
+      this.showAlertStatusModal();
+    });
 
-	// Update count periodically
-	setInterval(() => {
-	  this.updateAlertCount();
-	}, 5000);
-	}
+    // Update count periodically
+    setInterval(() => {
+      this.updateAlertCount();
+    }, 5000);
+  }
 
-	/**
-	 * Setup keyboard shortcuts for alerts
-	 */
-	private async setupAlertKeyboardShortcuts(): Promise<void> {
-	document.addEventListener('keydown', (event) => {
-	  // Ctrl+Shift+T to toggle alerts
-	  if (event.ctrlKey && event.shiftKey && event.key === 'T') {
-	    event.preventDefault();
-	    this.toggleAlertsShortcut();
-	  }
+  /**
+   * Setup keyboard shortcuts for alerts
+   */
+  private async setupAlertKeyboardShortcuts(): Promise<void> {
+    document.addEventListener('keydown', event => {
+      // Ctrl+Shift+T to toggle alerts
+      if (event.ctrlKey && event.shiftKey && event.key === 'T') {
+        event.preventDefault();
+        this.toggleAlertsShortcut();
+      }
 
-	  // Ctrl+Shift+H to show alert history
-	  if (event.ctrlKey && event.shiftKey && event.key === 'H') {
-	    event.preventDefault();
-	    this.showAlertHistoryModal();
-	  }
+      // Ctrl+Shift+H to show alert history
+      if (event.ctrlKey && event.shiftKey && event.key === 'H') {
+        event.preventDefault();
+        this.showAlertHistoryModal();
+      }
 
-	  // Ctrl+Shift+R to refresh alerts
-	  if (event.ctrlKey && event.shiftKey && event.key === 'R') {
-	    event.preventDefault();
-	    this.refreshAlertsShortcut();
-	  }
-	});
+      // Ctrl+Shift+R to refresh alerts
+      if (event.ctrlKey && event.shiftKey && event.key === 'R') {
+        event.preventDefault();
+        this.refreshAlertsShortcut();
+      }
+    });
 
-	console.log('✅ Alert keyboard shortcuts setup: Ctrl+Shift+T (Toggle), Ctrl+Shift+H (History), Ctrl+Shift+R (Refresh)');
-	}
+    console.log(
+      '✅ Alert keyboard shortcuts setup: Ctrl+Shift+T (Toggle), Ctrl+Shift+H (History), Ctrl+Shift+R (Refresh)'
+    );
+  }
 
-	/**
-	 * Add alert history viewer
-	 */
-	private async addAlertHistoryViewer(): Promise<void> {
-	// Find the alert label
-	const alertLabel = document.querySelector('label[data-language="L-1144"]');
+  /**
+   * Add alert history viewer
+   */
+  private async addAlertHistoryViewer(): Promise<void> {
+    // Find the alert label
+    const alertLabel = document.querySelector('label[data-language="L-1144"]');
 
-	if (alertLabel) {
-	  const historyButton = document.createElement('button');
-	  historyButton.id = 'alert-history-btn';
-	  historyButton.innerHTML = '📋 History';
-	  historyButton.style.cssText = `
+    if (alertLabel) {
+      const historyButton = document.createElement('button');
+      historyButton.id = 'alert-history-btn';
+      historyButton.innerHTML = '📋 History';
+      historyButton.style.cssText = `
 	    margin-left: 10px;
 	    padding: 4px 8px;
 	    font-size: 11px;
@@ -194,29 +195,29 @@ export class Fantasy42AlertIntegration {
 	    transition: all 0.2s;
 	  `;
 
-	  historyButton.addEventListener('click', () => {
-	    this.showAlertHistoryModal();
-	  });
+      historyButton.addEventListener('click', () => {
+        this.showAlertHistoryModal();
+      });
 
-	  // Insert after the label
-	  alertLabel.parentElement?.appendChild(historyButton);
-	}
+      // Insert after the label
+      alertLabel.parentElement?.appendChild(historyButton);
+    }
 
-	console.log('✅ Alert history viewer added');
-	}
+    console.log('✅ Alert history viewer added');
+  }
 
-	/**
-	 * Show alert status modal
-	 */
-	private showAlertStatusModal(): void {
-	if (!this.alerts) return;
+  /**
+   * Show alert status modal
+   */
+  private showAlertStatusModal(): void {
+    if (!this.alerts) return;
 
-	const status = this.alerts.getStatus();
+    const status = this.alerts.getStatus();
 
-	// Create modal
-	const modal = document.createElement('div');
-	modal.id = 'alert-status-modal';
-	modal.innerHTML = `
+    // Create modal
+    const modal = document.createElement('div');
+    modal.id = 'alert-status-modal';
+    modal.innerHTML = `
 	  <div class="alert-modal-overlay">
 	    <div class="alert-modal">
 	      <div class="modal-header">
@@ -268,9 +269,9 @@ export class Fantasy42AlertIntegration {
 	  </div>
 	`;
 
-	// Add modal styles
-	const modalStyle = document.createElement('style');
-	modalStyle.textContent = `
+    // Add modal styles
+    const modalStyle = document.createElement('style');
+    modalStyle.textContent = `
 	  .alert-modal-overlay {
 	    position: fixed;
 	    top: 0;
@@ -358,48 +359,48 @@ export class Fantasy42AlertIntegration {
 	  }
 	`;
 
-	document.head.appendChild(modalStyle);
-	document.body.appendChild(modal);
+    document.head.appendChild(modalStyle);
+    document.body.appendChild(modal);
 
-	// Add event listeners
-	const closeModal = () => {
-	  modal.remove();
-	  modalStyle.remove();
-	};
+    // Add event listeners
+    const closeModal = () => {
+      modal.remove();
+      modalStyle.remove();
+    };
 
-	modal.querySelector('.modal-close')?.addEventListener('click', closeModal);
-	modal.querySelector('#btn-close-status')?.addEventListener('click', closeModal);
-	modal.querySelector('#btn-toggle-alerts')?.addEventListener('click', () => {
-	  this.toggleAlertsShortcut();
-	  closeModal();
-	});
-	modal.querySelector('#btn-view-history')?.addEventListener('click', () => {
-	  closeModal();
-	  this.showAlertHistoryModal();
-	});
+    modal.querySelector('.modal-close')?.addEventListener('click', closeModal);
+    modal.querySelector('#btn-close-status')?.addEventListener('click', closeModal);
+    modal.querySelector('#btn-toggle-alerts')?.addEventListener('click', () => {
+      this.toggleAlertsShortcut();
+      closeModal();
+    });
+    modal.querySelector('#btn-view-history')?.addEventListener('click', () => {
+      closeModal();
+      this.showAlertHistoryModal();
+    });
 
-	// Close on overlay click
-	modal.querySelector('.alert-modal-overlay')?.addEventListener('click', (e) => {
-	  if (e.target === e.currentTarget) {
-	    closeModal();
-	  }
-	});
+    // Close on overlay click
+    modal.querySelector('.alert-modal-overlay')?.addEventListener('click', e => {
+      if (e.target === e.currentTarget) {
+        closeModal();
+      }
+    });
 
-	console.log('📊 Alert status modal displayed');
-	}
+    console.log('📊 Alert status modal displayed');
+  }
 
-	/**
-	 * Show alert history modal
-	 */
-	private showAlertHistoryModal(): void {
-	if (!this.alerts) return;
+  /**
+   * Show alert history modal
+   */
+  private showAlertHistoryModal(): void {
+    if (!this.alerts) return;
 
-	const history = this.alerts.getAlertHistory(20); // Last 20 alerts
+    const history = this.alerts.getAlertHistory(20); // Last 20 alerts
 
-	// Create modal
-	const modal = document.createElement('div');
-	modal.id = 'alert-history-modal';
-	modal.innerHTML = `
+    // Create modal
+    const modal = document.createElement('div');
+    modal.id = 'alert-history-modal';
+    modal.innerHTML = `
 	  <div class="alert-modal-overlay">
 	    <div class="alert-modal">
 	      <div class="modal-header">
@@ -408,8 +409,12 @@ export class Fantasy42AlertIntegration {
 	      </div>
 	      <div class="modal-body">
 	        <div class="alert-history-list">
-	          ${history.length === 0 ? '<p>No alerts in history</p>' :
-	            history.map(alert => `
+	          ${
+              history.length === 0
+                ? '<p>No alerts in history</p>'
+                : history
+                    .map(
+                      alert => `
 	              <div class="alert-item">
 	                <div class="alert-header">
 	                  <span class="alert-id">${alert.wagerId}</span>
@@ -425,7 +430,10 @@ export class Fantasy42AlertIntegration {
 	                </div>
 	                <div class="alert-reason">${alert.alertReason}</div>
 	              </div>
-	            `).join('')}
+	            `
+                    )
+                    .join('')
+            }
 	        </div>
 	      </div>
 	      <div class="modal-footer">
@@ -436,9 +444,9 @@ export class Fantasy42AlertIntegration {
 	  </div>
 	`;
 
-	// Add history-specific styles
-	const historyStyle = document.createElement('style');
-	historyStyle.textContent = `
+    // Add history-specific styles
+    const historyStyle = document.createElement('style');
+    historyStyle.textContent = `
 	  .alert-history-list {
 	    max-height: 400px;
 	    overflow-y: auto;
@@ -498,187 +506,187 @@ export class Fantasy42AlertIntegration {
 	  }
 	`;
 
-	document.head.appendChild(historyStyle);
-	document.body.appendChild(modal);
+    document.head.appendChild(historyStyle);
+    document.body.appendChild(modal);
 
-	// Add event listeners
-	const closeModal = () => {
-	  modal.remove();
-	  historyStyle.remove();
-	};
+    // Add event listeners
+    const closeModal = () => {
+      modal.remove();
+      historyStyle.remove();
+    };
 
-	modal.querySelector('.modal-close')?.addEventListener('click', closeModal);
-	modal.querySelector('#btn-close-history')?.addEventListener('click', closeModal);
-	modal.querySelector('#btn-refresh-history')?.addEventListener('click', () => {
-	  closeModal();
-	  this.showAlertHistoryModal(); // Refresh by reopening
-	});
+    modal.querySelector('.modal-close')?.addEventListener('click', closeModal);
+    modal.querySelector('#btn-close-history')?.addEventListener('click', closeModal);
+    modal.querySelector('#btn-refresh-history')?.addEventListener('click', () => {
+      closeModal();
+      this.showAlertHistoryModal(); // Refresh by reopening
+    });
 
-	// Close on overlay click
-	modal.querySelector('.alert-modal-overlay')?.addEventListener('click', (e) => {
-	  if (e.target === e.currentTarget) {
-	    closeModal();
-	  }
-	});
+    // Close on overlay click
+    modal.querySelector('.alert-modal-overlay')?.addEventListener('click', e => {
+      if (e.target === e.currentTarget) {
+        closeModal();
+      }
+    });
 
-	console.log('📋 Alert history modal displayed');
-	}
+    console.log('📋 Alert history modal displayed');
+  }
 
-	/**
-	 * Toggle alerts shortcut
-	 */
-	private async toggleAlertsShortcut(): Promise<void> {
-	if (!this.alerts) return;
+  /**
+   * Toggle alerts shortcut
+   */
+  private async toggleAlertsShortcut(): Promise<void> {
+    if (!this.alerts) return;
 
-	const status = this.alerts.getStatus();
-	const newState = !status.config.autoSendEnabled;
+    const status = this.alerts.getStatus();
+    const newState = !status.config.autoSendEnabled;
 
-	// Update configuration (this would need to be implemented in the alerts class)
-	console.log(`🚨 Alerts ${newState ? 'enabled' : 'disabled'} via shortcut`);
+    // Update configuration (this would need to be implemented in the alerts class)
+    console.log(`🚨 Alerts ${newState ? 'enabled' : 'disabled'} via shortcut`);
 
-	// Visual feedback
-	const statusIndicator = document.getElementById('fantasy42-alert-status');
-	if (statusIndicator) {
-	  statusIndicator.style.background = newState
-	    ? 'rgba(220, 53, 69, 0.9)'
-	    : 'rgba(108, 117, 125, 0.9)';
-	}
-	}
+    // Visual feedback
+    const statusIndicator = document.getElementById('fantasy42-alert-status');
+    if (statusIndicator) {
+      statusIndicator.style.background = newState
+        ? 'rgba(220, 53, 69, 0.9)'
+        : 'rgba(108, 117, 125, 0.9)';
+    }
+  }
 
-	/**
-	 * Refresh alerts shortcut
-	 */
-	private async refreshAlertsShortcut(): Promise<void> {
-	console.log('🔄 Refreshing alerts...');
+  /**
+   * Refresh alerts shortcut
+   */
+  private async refreshAlertsShortcut(): Promise<void> {
+    console.log('🔄 Refreshing alerts...');
 
-	// This would trigger a refresh of the alert system
-	if (this.alerts) {
-	  // Force a check for new wagers
-	  console.log('✅ Alerts refreshed');
-	}
-	}
+    // This would trigger a refresh of the alert system
+    if (this.alerts) {
+      // Force a check for new wagers
+      console.log('✅ Alerts refreshed');
+    }
+  }
 
-	/**
-	 * Update alert count in status indicator
-	 */
-	private updateAlertCount(): void {
-	if (!this.alerts) return;
+  /**
+   * Update alert count in status indicator
+   */
+  private updateAlertCount(): void {
+    if (!this.alerts) return;
 
-	const status = this.alerts.getStatus();
-	const countElement = document.getElementById('alert-count');
+    const status = this.alerts.getStatus();
+    const countElement = document.getElementById('alert-count');
 
-	if (countElement) {
-	  countElement.textContent = status.alertsActive.toString();
+    if (countElement) {
+      countElement.textContent = status.alertsActive.toString();
 
-	  // Update color based on count
-	  if (status.alertsActive > 0) {
-	    countElement.style.color = '#ffc107'; // Warning yellow
-	  } else {
-	    countElement.style.color = 'white';
-	  }
-	}
-	}
+      // Update color based on count
+      if (status.alertsActive > 0) {
+        countElement.style.color = '#ffc107'; // Warning yellow
+      } else {
+        countElement.style.color = 'white';
+      }
+    }
+  }
 
-	/**
-	 * Create test alert (for demonstration)
-	 */
-	async createTestAlert(): Promise<void> {
-	if (!this.alerts) return;
+  /**
+   * Create test alert (for demonstration)
+   */
+  async createTestAlert(): Promise<void> {
+    if (!this.alerts) return;
 
-	const testAlert = {
-	  wagerId: 'TEST_' + Date.now(),
-	  customerId: 'TEST_CUSTOMER',
-	  amount: 2500,
-	  sport: 'Basketball',
-	  event: 'NBA Finals Game 7',
-	  odds: 2.5,
-	  riskLevel: 'high' as const,
-	  customerTier: 'vip' as const,
-	  timestamp: new Date().toISOString(),
-	  alertReason: 'Test alert for demonstration',
-	  recommendedAction: 'Review and monitor closely'
-	};
+    const testAlert = {
+      wagerId: 'TEST_' + Date.now(),
+      customerId: 'TEST_CUSTOMER',
+      amount: 2500,
+      sport: 'Basketball',
+      event: 'NBA Finals Game 7',
+      odds: 2.5,
+      riskLevel: 'high' as const,
+      customerTier: 'vip' as const,
+      timestamp: new Date().toISOString(),
+      alertReason: 'Test alert for demonstration',
+      recommendedAction: 'Review and monitor closely',
+    };
 
-	console.log('🧪 Creating test alert...');
+    console.log('🧪 Creating test alert...');
 
-	// This would normally be triggered by the wager monitoring system
-	// For demo purposes, we'll simulate it
-	this.alertHistory.push(testAlert);
-	this.updateAlertCount();
+    // This would normally be triggered by the wager monitoring system
+    // For demo purposes, we'll simulate it
+    this.alertHistory.push(testAlert);
+    this.updateAlertCount();
 
-	console.log('✅ Test alert created');
-	}
+    console.log('✅ Test alert created');
+  }
 
-	/**
-	 * Get integration status
-	 */
-	getStatus(): {
-	isInitialized: boolean;
-	alertsStatus: any;
-	historyCount: number;
-	lastActivity: string;
-	} {
-	return {
-	  isInitialized: this.isInitialized,
-	  alertsStatus: this.alerts?.getStatus(),
-	  historyCount: this.alertHistory.length,
-	  lastActivity: new Date().toISOString()
-	};
-	}
+  /**
+   * Get integration status
+   */
+  getStatus(): {
+    isInitialized: boolean;
+    alertsStatus: any;
+    historyCount: number;
+    lastActivity: string;
+  } {
+    return {
+      isInitialized: this.isInitialized,
+      alertsStatus: this.alerts?.getStatus(),
+      historyCount: this.alertHistory.length,
+      lastActivity: new Date().toISOString(),
+    };
+  }
 
-	/**
-	 * Cleanup integration
-	 */
-	cleanup(): void {
-	if (this.alerts) {
-	  this.alerts.clearActiveAlerts();
-	}
+  /**
+   * Cleanup integration
+   */
+  cleanup(): void {
+    if (this.alerts) {
+      this.alerts.clearActiveAlerts();
+    }
 
-	// Remove added elements
-	const statusIndicator = document.getElementById('fantasy42-alert-status');
-	if (statusIndicator) {
-	  statusIndicator.remove();
-	}
+    // Remove added elements
+    const statusIndicator = document.getElementById('fantasy42-alert-status');
+    if (statusIndicator) {
+      statusIndicator.remove();
+    }
 
-	const historyBtn = document.getElementById('alert-history-btn');
-	if (historyBtn) {
-	  historyBtn.remove();
-	}
+    const historyBtn = document.getElementById('alert-history-btn');
+    if (historyBtn) {
+      historyBtn.remove();
+    }
 
-	console.log('🧹 Fantasy42 Alert Integration cleaned up');
-	}
+    console.log('🧹 Fantasy42 Alert Integration cleaned up');
+  }
 }
 
 // Convenience functions
 export const createFantasy42AlertIntegration = (): Fantasy42AlertIntegration => {
-	return new Fantasy42AlertIntegration();
+  return new Fantasy42AlertIntegration();
 };
 
 export const initializeFantasy42Alerts = async (): Promise<boolean> => {
-	const integration = new Fantasy42AlertIntegration();
-	return await integration.initialize();
+  const integration = new Fantasy42AlertIntegration();
+  return await integration.initialize();
 };
 
 // Auto-initialize if running in Fantasy42 environment
 if (typeof window !== 'undefined' && window.location.hostname.includes('fantasy42')) {
-	console.log('🚨 Fantasy42 environment detected, auto-initializing alert integration...');
-	initializeFantasy42Alerts().then(success => {
-	if (success) {
-	  console.log('✅ Fantasy42 Alert Integration auto-initialized');
+  console.log('🚨 Fantasy42 environment detected, auto-initializing alert integration...');
+  initializeFantasy42Alerts().then(success => {
+    if (success) {
+      console.log('✅ Fantasy42 Alert Integration auto-initialized');
 
-	  // Add test alert button for demonstration
-	  setTimeout(() => {
-	    const testBtn = document.createElement('button');
-	    testBtn.textContent = 'Create Test Alert';
-	    testBtn.style.cssText = 'position: fixed; bottom: 10px; right: 10px; z-index: 9999;';
-	    testBtn.addEventListener('click', () => {
-	      const integration = new Fantasy42AlertIntegration();
-	      integration.createTestAlert();
-	    });
-	    document.body.appendChild(testBtn);
-	  }, 3000);
-	} else {
-	  console.log('⚠️ Fantasy42 Alert Integration failed to auto-initialize');
-	}
-	});
+      // Add test alert button for demonstration
+      setTimeout(() => {
+        const testBtn = document.createElement('button');
+        testBtn.textContent = 'Create Test Alert';
+        testBtn.style.cssText = 'position: fixed; bottom: 10px; right: 10px; z-index: 9999;';
+        testBtn.addEventListener('click', () => {
+          const integration = new Fantasy42AlertIntegration();
+          integration.createTestAlert();
+        });
+        document.body.appendChild(testBtn);
+      }, 3000);
+    } else {
+      console.log('⚠️ Fantasy42 Alert Integration failed to auto-initialize');
+    }
+  });
 }

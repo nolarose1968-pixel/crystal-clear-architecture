@@ -3,21 +3,21 @@
  * Tests real-time task updates across all departments
  */
 
-import { describe, test, expect, beforeAll, afterAll } from "bun:test";
-import { TaskService } from "../../src/api/tasks-enhanced";
-import { TaskEventService } from "../../src/api/task-events";
-import { DesignTeamIntegrationService } from "../../src/api/design-team-integration";
-import { getDatabase } from "../../src/database/connection";
-import { Database } from "bun:sqlite";
+import { describe, test, expect, beforeAll, afterAll } from 'bun:test';
+import { TaskService } from '../../src/api/tasks-enhanced';
+import { TaskEventService } from '../../src/api/task-events';
+import { DesignTeamIntegrationService } from '../../src/api/design-team-integration';
+import { getDatabase } from '../../src/database/connection';
+import { Database } from 'bun:sqlite';
 
 // Test environment
 const TEST_ENV = {
-  DATABASE_URL: "sqlite://test-sse.db",
-  JWT_SECRET: "test-secret-sse",
-  ENVIRONMENT: "test"
+  DATABASE_URL: 'sqlite://test-sse.db',
+  JWT_SECRET: 'test-secret-sse',
+  ENVIRONMENT: 'test',
 };
 
-describe("Fire22 Task Events SSE Integration", () => {
+describe('Fire22 Task Events SSE Integration', () => {
   let db: Database;
   let taskService: TaskService;
   let eventService: TaskEventService;
@@ -39,34 +39,34 @@ describe("Fire22 Task Events SSE Integration", () => {
     await cleanupTestDatabase(db);
   });
 
-  describe("SSE Stream Creation", () => {
-    test("should create SSE stream for departments", async () => {
+  describe('SSE Stream Creation', () => {
+    test('should create SSE stream for departments', async () => {
       const stream = eventService.createEventStream({
-        departments: ["technology", "design"],
-        eventTypes: ["task_created", "task_updated"]
+        departments: ['technology', 'design'],
+        eventTypes: ['task_created', 'task_updated'],
       });
 
       expect(stream).toBeInstanceOf(ReadableStream);
-      
+
       const reader = stream.getReader();
       expect(reader).toBeDefined();
-      
+
       await reader.cancel();
     });
 
-    test("should handle multiple concurrent connections", async () => {
+    test('should handle multiple concurrent connections', async () => {
       const streams = [];
-      
+
       for (let i = 0; i < 3; i++) {
         const stream = eventService.createEventStream({
-          departments: ["technology"],
-          eventTypes: ["task_created"]
+          departments: ['technology'],
+          eventTypes: ['task_created'],
         });
         streams.push(stream);
       }
 
       expect(streams).toHaveLength(3);
-      
+
       for (const stream of streams) {
         const reader = stream.getReader();
         await reader.cancel();
@@ -74,29 +74,29 @@ describe("Fire22 Task Events SSE Integration", () => {
     });
   });
 
-  describe("Real-time Task Events", () => {
-    test("should emit task_created events", async () => {
+  describe('Real-time Task Events', () => {
+    test('should emit task_created events', async () => {
       const events: any[] = [];
-      
+
       const stream = eventService.createEventStream({
-        departments: ["technology"],
-        eventTypes: ["task_created"]
+        departments: ['technology'],
+        eventTypes: ['task_created'],
       });
 
       const reader = stream.getReader();
-      
+
       // Create task and read event with timeout
       const taskPromise = taskService.createTask({
-        title: "SSE Test Task",
-        priority: "medium",
-        status: "planning",
+        title: 'SSE Test Task',
+        priority: 'medium',
+        status: 'planning',
         progress: 0,
-        departmentId: "technology",
-        tags: ["sse-test"]
+        departmentId: 'technology',
+        tags: ['sse-test'],
       });
 
-      const eventPromise = readEventsWithTimeout(reader, 1000, (event) => {
-        if (event.type === "task_created") {
+      const eventPromise = readEventsWithTimeout(reader, 1000, event => {
+        if (event.type === 'task_created') {
           events.push(event);
           return true;
         }
@@ -107,22 +107,22 @@ describe("Fire22 Task Events SSE Integration", () => {
 
       expect(taskResult.success).toBe(true);
       expect(events).toHaveLength(1);
-      expect(events[0].type).toBe("task_created");
-      expect(events[0].departmentId).toBe("technology");
+      expect(events[0].type).toBe('task_created');
+      expect(events[0].departmentId).toBe('technology');
 
       await reader.cancel();
     });
 
-    test("should emit task_updated events", async () => {
+    test('should emit task_updated events', async () => {
       const events: any[] = [];
-      
+
       // Create initial task
       const createResult = await taskService.createTask({
-        title: "SSE Update Test",
-        priority: "high",
-        status: "planning",
+        title: 'SSE Update Test',
+        priority: 'high',
+        status: 'planning',
         progress: 0,
-        departmentId: "design"
+        departmentId: 'design',
       });
 
       expect(createResult.success).toBe(true);
@@ -130,21 +130,21 @@ describe("Fire22 Task Events SSE Integration", () => {
 
       // Setup event listener
       const stream = eventService.createEventStream({
-        departments: ["design"],
-        eventTypes: ["task_updated"]
+        departments: ['design'],
+        eventTypes: ['task_updated'],
       });
 
       const reader = stream.getReader();
-      
+
       // Update task and read event
       const updatePromise = taskService.updateTask({
         uuid: taskUuid,
-        status: "in-progress",
-        progress: 50
+        status: 'in-progress',
+        progress: 50,
       });
 
-      const eventPromise = readEventsWithTimeout(reader, 1000, (event) => {
-        if (event.type === "task_updated") {
+      const eventPromise = readEventsWithTimeout(reader, 1000, event => {
+        if (event.type === 'task_updated') {
           events.push(event);
           return true;
         }
@@ -155,110 +155,105 @@ describe("Fire22 Task Events SSE Integration", () => {
 
       expect(updateResult.success).toBe(true);
       expect(events).toHaveLength(1);
-      expect(events[0].type).toBe("task_updated");
-      expect(events[0].departmentId).toBe("design");
+      expect(events[0].type).toBe('task_updated');
+      expect(events[0].departmentId).toBe('design');
 
       await reader.cancel();
     });
   });
 
-  describe("Department Filtering", () => {
-    test("should filter events by department", async () => {
+  describe('Department Filtering', () => {
+    test('should filter events by department', async () => {
       const techEvents: any[] = [];
       const designEvents: any[] = [];
-      
+
       const techStream = eventService.createEventStream({
-        departments: ["technology"],
-        eventTypes: ["task_created"]
+        departments: ['technology'],
+        eventTypes: ['task_created'],
       });
 
       const designStream = eventService.createEventStream({
-        departments: ["design"],
-        eventTypes: ["task_created"]
+        departments: ['design'],
+        eventTypes: ['task_created'],
       });
 
       const techReader = techStream.getReader();
       const designReader = designStream.getReader();
-      
+
       // Create tasks in both departments
       const techTaskPromise = taskService.createTask({
-        title: "Tech Task",
-        priority: "medium",
-        status: "planning",
+        title: 'Tech Task',
+        priority: 'medium',
+        status: 'planning',
         progress: 0,
-        departmentId: "technology"
+        departmentId: 'technology',
       });
 
       const designTaskPromise = taskService.createTask({
-        title: "Design Task",
-        priority: "medium",
-        status: "planning",
+        title: 'Design Task',
+        priority: 'medium',
+        status: 'planning',
         progress: 0,
-        departmentId: "design"
+        departmentId: 'design',
       });
 
       // Read events from both streams
-      const techEventPromise = readEventsWithTimeout(techReader, 1000, (event) => {
-        if (event.type === "task_created") {
+      const techEventPromise = readEventsWithTimeout(techReader, 1000, event => {
+        if (event.type === 'task_created') {
           techEvents.push(event);
           return true;
         }
         return false;
       });
 
-      const designEventPromise = readEventsWithTimeout(designReader, 1000, (event) => {
-        if (event.type === "task_created") {
+      const designEventPromise = readEventsWithTimeout(designReader, 1000, event => {
+        if (event.type === 'task_created') {
           designEvents.push(event);
           return true;
         }
         return false;
       });
 
-      await Promise.all([
-        techTaskPromise,
-        designTaskPromise,
-        techEventPromise,
-        designEventPromise
-      ]);
+      await Promise.all([techTaskPromise, designTaskPromise, techEventPromise, designEventPromise]);
 
       // Verify proper filtering
       expect(techEvents).toHaveLength(1);
-      expect(techEvents[0].departmentId).toBe("technology");
+      expect(techEvents[0].departmentId).toBe('technology');
 
       expect(designEvents).toHaveLength(1);
-      expect(designEvents[0].departmentId).toBe("design");
+      expect(designEvents[0].departmentId).toBe('design');
 
       await techReader.cancel();
       await designReader.cancel();
     });
   });
 
-  describe("Event Data Integrity", () => {
-    test("should include complete task data", async () => {
+  describe('Event Data Integrity', () => {
+    test('should include complete task data', async () => {
       const events: any[] = [];
-      
+
       const stream = eventService.createEventStream({
-        departments: ["technology"],
-        eventTypes: ["task_created"]
+        departments: ['technology'],
+        eventTypes: ['task_created'],
       });
 
       const reader = stream.getReader();
-      
+
       const taskData = {
-        title: "Complete Data Test",
-        description: "Testing complete event data",
-        priority: "high" as const,
-        status: "planning" as const,
+        title: 'Complete Data Test',
+        description: 'Testing complete event data',
+        priority: 'high' as const,
+        status: 'planning' as const,
         progress: 0,
-        departmentId: "technology",
+        departmentId: 'technology',
         estimatedHours: 16,
-        tags: ["test", "sse"]
+        tags: ['test', 'sse'],
       };
 
       const taskPromise = taskService.createTask(taskData);
 
-      const eventPromise = readEventsWithTimeout(reader, 1000, (event) => {
-        if (event.type === "task_created") {
+      const eventPromise = readEventsWithTimeout(reader, 1000, event => {
+        if (event.type === 'task_created') {
           events.push(event);
           return true;
         }
@@ -269,11 +264,11 @@ describe("Fire22 Task Events SSE Integration", () => {
 
       expect(events).toHaveLength(1);
       const event = events[0];
-      
-      expect(event.type).toBe("task_created");
+
+      expect(event.type).toBe('task_created');
       expect(event.taskUuid).toBeDefined();
       expect(event.timestamp).toBeDefined();
-      expect(event.departmentId).toBe("technology");
+      expect(event.departmentId).toBe('technology');
       expect(event.task.title).toBe(taskData.title);
       expect(event.task.description).toBe(taskData.description);
 
@@ -332,7 +327,7 @@ async function readEventsWithTimeout(
   timeoutMs: number,
   eventHandler: (event: any) => boolean
 ): Promise<void> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const timeout = setTimeout(() => {
       resolve();
     }, timeoutMs);
@@ -341,7 +336,7 @@ async function readEventsWithTimeout(
       try {
         while (true) {
           const { done, value } = await reader.read();
-          
+
           if (done) {
             clearTimeout(timeout);
             resolve();
@@ -349,12 +344,12 @@ async function readEventsWithTimeout(
           }
 
           const eventData = new TextDecoder().decode(value);
-          
-          if (eventData.startsWith("data: ")) {
+
+          if (eventData.startsWith('data: ')) {
             try {
               const event = JSON.parse(eventData.slice(6));
               const shouldStop = eventHandler(event);
-              
+
               if (shouldStop) {
                 clearTimeout(timeout);
                 resolve();

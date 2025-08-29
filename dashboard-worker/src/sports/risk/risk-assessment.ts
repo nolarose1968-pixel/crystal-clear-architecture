@@ -12,7 +12,7 @@ import type {
   SportsEvent,
   VIPProfile,
   RiskLevel,
-  SportsSystemHealth
+  SportsSystemHealth,
 } from '../core/sports-types';
 
 export class RiskAssessmentEngine {
@@ -56,7 +56,7 @@ export class RiskAssessmentEngine {
       recommendations,
       lastUpdated: new Date(),
       reviewedBy: 'system',
-      reviewNotes: 'Automated assessment'
+      reviewNotes: 'Automated assessment',
     };
 
     this.assessments.set(playerId, assessment);
@@ -85,7 +85,7 @@ export class RiskAssessmentEngine {
     const updatedAssessment: RiskAssessment = {
       ...assessment,
       ...updates,
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     };
 
     this.assessments.set(playerId, updatedAssessment);
@@ -145,14 +145,18 @@ export class RiskAssessmentEngine {
       approved,
       riskLevel,
       reasons,
-      recommendations
+      recommendations,
     };
   }
 
   /**
    * Monitor player activity for unusual patterns
    */
-  monitorPlayerActivity(playerId: string, newBet: SportsBet, recentBets: SportsBet[]): {
+  monitorPlayerActivity(
+    playerId: string,
+    newBet: SportsBet,
+    recentBets: SportsBet[]
+  ): {
     alerts: string[];
     riskIncrease: number;
     recommendations: string[];
@@ -170,8 +174,8 @@ export class RiskAssessmentEngine {
     }
 
     // Check for rapid betting
-    const recentBetCount = recentBets.filter(b =>
-      b.placedAt > new Date(Date.now() - 10 * 60 * 1000) // Last 10 minutes
+    const recentBetCount = recentBets.filter(
+      b => b.placedAt > new Date(Date.now() - 10 * 60 * 1000) // Last 10 minutes
     ).length;
 
     if (recentBetCount >= 5) {
@@ -181,9 +185,7 @@ export class RiskAssessmentEngine {
     }
 
     // Check for loss chasing
-    const recentLosses = recentBets
-      .slice(-5)
-      .filter(b => b.status === 'lost').length;
+    const recentLosses = recentBets.slice(-5).filter(b => b.status === 'lost').length;
 
     if (recentLosses >= 4 && newBet.stake > recentBets[recentBets.length - 1]?.stake * 1.5) {
       alerts.push('Potential loss chasing behavior');
@@ -194,7 +196,7 @@ export class RiskAssessmentEngine {
     return {
       alerts,
       riskIncrease,
-      recommendations
+      recommendations,
     };
   }
 
@@ -212,7 +214,7 @@ export class RiskAssessmentEngine {
       low: 0,
       medium: 0,
       high: 0,
-      extreme: 0
+      extreme: 0,
     };
 
     let totalRiskScore = 0;
@@ -239,7 +241,7 @@ export class RiskAssessmentEngine {
       overallRiskScore,
       riskDistribution,
       highRiskPlayers,
-      alerts
+      alerts,
     };
   }
 
@@ -254,7 +256,7 @@ export class RiskAssessmentEngine {
     const strategies = {
       immediate: [] as string[],
       shortTerm: [] as string[],
-      longTerm: [] as string[]
+      longTerm: [] as string[],
     };
 
     // Immediate actions for high risk
@@ -299,7 +301,7 @@ export class RiskAssessmentEngine {
         weight: 0.3,
         score: 0,
         impact: 'positive',
-        description: 'Historical win rate'
+        description: 'Historical win rate',
       },
       {
         category: 'financial',
@@ -307,7 +309,7 @@ export class RiskAssessmentEngine {
         weight: 0.2,
         score: 0,
         impact: 'neutral',
-        description: 'Stake amount consistency'
+        description: 'Stake amount consistency',
       },
       {
         category: 'behavioral',
@@ -315,7 +317,7 @@ export class RiskAssessmentEngine {
         weight: 0.25,
         score: 0,
         impact: 'neutral',
-        description: 'Betting frequency patterns'
+        description: 'Betting frequency patterns',
       },
       {
         category: 'external',
@@ -323,7 +325,7 @@ export class RiskAssessmentEngine {
         weight: 0.15,
         score: 0,
         impact: 'neutral',
-        description: 'Market volatility exposure'
+        description: 'Market volatility exposure',
       },
       {
         category: 'behavioral',
@@ -331,8 +333,8 @@ export class RiskAssessmentEngine {
         weight: 0.1,
         score: 0,
         impact: 'negative',
-        description: 'Loss chasing behavior'
-      }
+        description: 'Loss chasing behavior',
+      },
     ];
   }
 
@@ -411,7 +413,7 @@ export class RiskAssessmentEngine {
 
       return {
         ...factor,
-        score: Math.min(score, 100)
+        score: Math.min(score, 100),
       };
     });
   }
@@ -460,14 +462,14 @@ export class RiskAssessmentEngine {
     const stdDev = Math.sqrt(variance);
 
     // Coefficient of variation (lower is more consistent)
-    return mean > 0 ? Math.max(0, 1 - (stdDev / mean)) : 0;
+    return mean > 0 ? Math.max(0, 1 - stdDev / mean) : 0;
   }
 
   private calculateFrequencyRisk(bets: SportsBet[]): number {
     if (bets.length === 0) return 0;
 
     const now = Date.now();
-    const lastWeek = now - (7 * 24 * 60 * 60 * 1000);
+    const lastWeek = now - 7 * 24 * 60 * 60 * 1000;
     const weeklyBets = bets.filter(b => b.placedAt.getTime() > lastWeek).length;
 
     // Risk score based on weekly betting frequency
@@ -487,14 +489,16 @@ export class RiskAssessmentEngine {
     // Check for increasing stakes after losses
     let increasingStakes = 0;
     for (let i = 1; i < recentBets.length; i++) {
-      if (recentBets[i - 1].status === 'lost' &&
-          recentBets[i].stake > recentBets[i - 1].stake * 1.2) {
+      if (
+        recentBets[i - 1].status === 'lost' &&
+        recentBets[i].stake > recentBets[i - 1].stake * 1.2
+      ) {
         increasingStakes++;
       }
     }
 
     const stakeIncreaseRatio = increasingStakes / losses;
-    return (lossRatio * 50) + (stakeIncreaseRatio * 50);
+    return lossRatio * 50 + stakeIncreaseRatio * 50;
   }
 
   private calculateVIPAdjustment(vipProfile: VIPProfile): number {
@@ -504,7 +508,7 @@ export class RiskAssessmentEngine {
       silver: 0.8,
       gold: 0.7,
       platinum: 0.6,
-      diamond: 0.5
+      diamond: 0.5,
     };
 
     return tierMultipliers[vipProfile.currentTier] || 1.0;
@@ -515,7 +519,7 @@ export class RiskAssessmentEngine {
       low: 1000,
       medium: 500,
       high: 250,
-      extreme: 100
+      extreme: 100,
     };
     return limits[vipTier] || 500;
   }
@@ -525,7 +529,7 @@ export class RiskAssessmentEngine {
       low: 5000,
       medium: 2500,
       high: 1000,
-      extreme: 500
+      extreme: 500,
     };
     return limits[vipTier] || 2500;
   }
@@ -534,9 +538,7 @@ export class RiskAssessmentEngine {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    return bets
-      .filter(b => b.placedAt >= today)
-      .reduce((sum, b) => sum + b.stake, 0);
+    return bets.filter(b => b.placedAt >= today).reduce((sum, b) => sum + b.stake, 0);
   }
 
   private calculateAverageStake(bets: SportsBet[]): number {
@@ -544,7 +546,10 @@ export class RiskAssessmentEngine {
     return bets.reduce((sum, b) => sum + b.stake, 0) / bets.length;
   }
 
-  private analyzeBettingPattern(bets: SportsBet[], newBet: SportsBet): {
+  private analyzeBettingPattern(
+    bets: SportsBet[],
+    newBet: SportsBet
+  ): {
     riskLevel: RiskLevel;
     reason: string;
     recommendation: string;
@@ -553,7 +558,11 @@ export class RiskAssessmentEngine {
     const recentBets = bets.slice(-20);
 
     if (recentBets.length < 5) {
-      return { riskLevel: 'low', reason: 'Insufficient history', recommendation: 'Continue monitoring' };
+      return {
+        riskLevel: 'low',
+        reason: 'Insufficient history',
+        recommendation: 'Continue monitoring',
+      };
     }
 
     // Check for same game betting
@@ -562,19 +571,17 @@ export class RiskAssessmentEngine {
       return {
         riskLevel: 'high',
         reason: 'Multiple bets on same event',
-        recommendation: 'Limit bets per event'
+        recommendation: 'Limit bets per event',
       };
     }
 
     // Check for high frequency
-    const lastHourBets = recentBets.filter(b =>
-      b.placedAt > new Date(Date.now() - 60 * 60 * 1000)
-    );
+    const lastHourBets = recentBets.filter(b => b.placedAt > new Date(Date.now() - 60 * 60 * 1000));
     if (lastHourBets.length >= 10) {
       return {
         riskLevel: 'medium',
         reason: 'High betting frequency',
-        recommendation: 'Consider pacing bets'
+        recommendation: 'Consider pacing bets',
       };
     }
 

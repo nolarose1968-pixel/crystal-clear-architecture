@@ -228,11 +228,11 @@ export class CryptoExchangeIntegration {
       fees: {
         networkFee: this.calculateNetworkFee(cryptoCurrency, amount),
         exchangeFee: this.calculateExchangeFee(exchange, amount, 'deposit'),
-        totalFees: 0
+        totalFees: 0,
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      metadata: {}
+      metadata: {},
     };
 
     transaction.fees.totalFees = transaction.fees.networkFee + transaction.fees.exchangeFee;
@@ -259,7 +259,11 @@ export class CryptoExchangeIntegration {
     }
 
     // Compliance check
-    const complianceCheck = await this.performComplianceCheck(customerId, amount, destinationAddress);
+    const complianceCheck = await this.performComplianceCheck(
+      customerId,
+      amount,
+      destinationAddress
+    );
     if (complianceCheck.overallResult === 'rejected') {
       throw new Error('Compliance check failed');
     }
@@ -285,11 +289,11 @@ export class CryptoExchangeIntegration {
       fees: {
         networkFee: this.calculateNetworkFee(cryptoCurrency, amount),
         exchangeFee: this.calculateExchangeFee(exchange, amount, 'withdrawal'),
-        totalFees: 0
+        totalFees: 0,
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      metadata: {}
+      metadata: {},
     };
 
     transaction.fees.totalFees = transaction.fees.networkFee + transaction.fees.exchangeFee;
@@ -338,13 +342,15 @@ export class CryptoExchangeIntegration {
       status: 'pending',
       exchangeRate,
       fees: {
-        networkFee: this.isCryptoCurrency(fromCurrency) ? this.calculateNetworkFee(fromCurrency, amount) : 0,
+        networkFee: this.isCryptoCurrency(fromCurrency)
+          ? this.calculateNetworkFee(fromCurrency, amount)
+          : 0,
         exchangeFee: this.calculateExchangeFee(exchange, amount, 'exchange'),
-        totalFees: 0
+        totalFees: 0,
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      metadata: {}
+      metadata: {},
     };
 
     transaction.fees.totalFees = transaction.fees.networkFee + transaction.fees.exchangeFee;
@@ -394,18 +400,20 @@ export class CryptoExchangeIntegration {
       fees: {
         networkFee: this.calculateNetworkFee(cryptoCurrency, amount),
         exchangeFee: this.calculateExchangeFee(exchange, amount, 'staking'),
-        totalFees: 0
+        totalFees: 0,
       },
       stakingDetails: {
         validatorAddress: opportunity.validatorAddress,
         stakingPool: opportunity.id,
         rewardRate: opportunity.annualRewardRate,
         lockPeriod: opportunity.lockPeriodDays,
-        unstakingAt: new Date(Date.now() + opportunity.lockPeriodDays * 24 * 60 * 60 * 1000).toISOString()
+        unstakingAt: new Date(
+          Date.now() + opportunity.lockPeriodDays * 24 * 60 * 60 * 1000
+        ).toISOString(),
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      metadata: {}
+      metadata: {},
     };
 
     transaction.fees.totalFees = transaction.fees.networkFee + transaction.fees.exchangeFee;
@@ -439,7 +447,7 @@ export class CryptoExchangeIntegration {
       source: 'coingecko',
       spread: 0.001, // 0.1% spread
       volume24h: 0,
-      marketCap: 0
+      marketCap: 0,
     };
 
     this.exchangeRates.set(cacheKey, exchangeRate);
@@ -449,12 +457,17 @@ export class CryptoExchangeIntegration {
   /**
    * Get customer crypto wallet
    */
-  async getCustomerWallet(customerId: string, exchange?: string): Promise<CryptoWallet | undefined> {
+  async getCustomerWallet(
+    customerId: string,
+    exchange?: string
+  ): Promise<CryptoWallet | undefined> {
     const customerWallets = this.wallets.get(customerId);
     if (!customerWallets) return undefined;
 
     if (exchange) {
-      return customerWallets.find(w => w.provider === 'exchange_wallet' && w.exchangeWalletId === exchange);
+      return customerWallets.find(
+        w => w.provider === 'exchange_wallet' && w.exchangeWalletId === exchange
+      );
     }
 
     return customerWallets[0]; // Return first wallet
@@ -483,7 +496,11 @@ export class CryptoExchangeIntegration {
   }
 
   // Private helper methods
-  private async getOrCreateWallet(customerId: string, exchange: string, cryptoCurrency: string): Promise<CryptoWallet> {
+  private async getOrCreateWallet(
+    customerId: string,
+    exchange: string,
+    cryptoCurrency: string
+  ): Promise<CryptoWallet> {
     let wallet = await this.getCustomerWallet(customerId, exchange);
 
     if (!wallet) {
@@ -498,7 +515,11 @@ export class CryptoExchangeIntegration {
     return wallet;
   }
 
-  private async createExchangeWallet(customerId: string, exchange: string, cryptoCurrency: string): Promise<CryptoWallet> {
+  private async createExchangeWallet(
+    customerId: string,
+    exchange: string,
+    cryptoCurrency: string
+  ): Promise<CryptoWallet> {
     // In real implementation, would create wallet with exchange API
     const wallet: CryptoWallet = {
       id: this.generateWalletId(),
@@ -514,7 +535,7 @@ export class CryptoExchangeIntegration {
       riskScore: 0,
       createdAt: new Date().toISOString(),
       lastUsedAt: new Date().toISOString(),
-      metadata: {}
+      metadata: {},
     };
 
     return wallet;
@@ -532,7 +553,9 @@ export class CryptoExchangeIntegration {
 
   private async submitCryptoWithdrawal(transaction: CryptoTransaction): Promise<void> {
     // In real implementation, would call exchange API
-    console.log(`Submitting crypto withdrawal: ${transaction.amount} ${transaction.cryptoCurrency}`);
+    console.log(
+      `Submitting crypto withdrawal: ${transaction.amount} ${transaction.cryptoCurrency}`
+    );
 
     // Simulate processing
     setTimeout(() => {
@@ -550,7 +573,9 @@ export class CryptoExchangeIntegration {
 
   private async submitStakingTransaction(transaction: CryptoTransaction): Promise<void> {
     // In real implementation, would call exchange API
-    console.log(`Submitting staking transaction: ${transaction.amount} ${transaction.cryptoCurrency}`);
+    console.log(
+      `Submitting staking transaction: ${transaction.amount} ${transaction.cryptoCurrency}`
+    );
 
     // Simulate processing
     setTimeout(() => {
@@ -564,16 +589,16 @@ export class CryptoExchangeIntegration {
     // In real implementation, would call exchange rate API
     // Simulate exchange rate
     const baseRates: Record<string, number> = {
-      'BTC': 45000,
-      'ETH': 3000,
-      'USDT': 1,
-      'USDC': 1,
-      'BNB': 300,
-      'ADA': 0.5,
-      'SOL': 100,
-      'DOT': 15,
-      'DOGE': 0.08,
-      'SHIB': 0.00001
+      BTC: 45000,
+      ETH: 3000,
+      USDT: 1,
+      USDC: 1,
+      BNB: 300,
+      ADA: 0.5,
+      SOL: 100,
+      DOT: 15,
+      DOGE: 0.08,
+      SHIB: 0.00001,
     };
 
     const fromRate = baseRates[fromCurrency] || 1;
@@ -582,7 +607,11 @@ export class CryptoExchangeIntegration {
     return fromRate / toRate;
   }
 
-  private async performComplianceCheck(customerId: string, amount: number, destinationAddress?: string): Promise<CryptoComplianceCheck> {
+  private async performComplianceCheck(
+    customerId: string,
+    amount: number,
+    destinationAddress?: string
+  ): Promise<CryptoComplianceCheck> {
     const check: CryptoComplianceCheck = {
       transactionId: this.generateTransactionId(),
       customerId,
@@ -592,14 +621,16 @@ export class CryptoExchangeIntegration {
         sanctions: { passed: true, matches: [] },
         travelRule: {
           required: amount > 1000,
-          beneficiaryInfo: destinationAddress ? {
-            name: 'Unknown',
-            address: destinationAddress
-          } : undefined
-        }
+          beneficiaryInfo: destinationAddress
+            ? {
+                name: 'Unknown',
+                address: destinationAddress,
+              }
+            : undefined,
+        },
       },
       overallResult: 'approved',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     this.complianceChecks.set(check.transactionId, check);
@@ -616,14 +647,14 @@ export class CryptoExchangeIntegration {
 
   private getRequiredConfirmations(cryptoCurrency: string): number {
     const confirmations: Record<string, number> = {
-      'BTC': 6,
-      'ETH': 12,
-      'BNB': 15,
-      'SOL': 32,
-      'ADA': 20,
-      'DOT': 10,
-      'DOGE': 20,
-      'SHIB': 15
+      BTC: 6,
+      ETH: 12,
+      BNB: 15,
+      SOL: 32,
+      ADA: 20,
+      DOT: 10,
+      DOGE: 20,
+      SHIB: 15,
     };
 
     return confirmations[cryptoCurrency] || 1;
@@ -631,14 +662,14 @@ export class CryptoExchangeIntegration {
 
   private calculateNetworkFee(cryptoCurrency: string, amount: number): number {
     const fees: Record<string, number> = {
-      'BTC': 0.0001,
-      'ETH': 0.001,
-      'BNB': 0.0005,
-      'SOL': 0.000005,
-      'ADA': 0.1,
-      'DOT': 0.01,
-      'DOGE': 1,
-      'SHIB': 10000
+      BTC: 0.0001,
+      ETH: 0.001,
+      BNB: 0.0005,
+      SOL: 0.000005,
+      ADA: 0.1,
+      DOT: 0.01,
+      DOGE: 1,
+      SHIB: 10000,
     };
 
     return fees[cryptoCurrency] || 0.001;
@@ -649,7 +680,7 @@ export class CryptoExchangeIntegration {
       coinbase: { deposit: 0.01, withdrawal: 0.01, exchange: 0.005, staking: 0.002 },
       binance: { deposit: 0.001, withdrawal: 0.001, exchange: 0.001, staking: 0.001 },
       kraken: { deposit: 0.0026, withdrawal: 0.0026, exchange: 0.0026, staking: 0.001 },
-      gemini: { deposit: 0.0035, withdrawal: 0.0035, exchange: 0.0035, staking: 0.002 }
+      gemini: { deposit: 0.0035, withdrawal: 0.0035, exchange: 0.0035, staking: 0.002 },
     };
 
     const exchangeFees = feeRates[exchange] || feeRates.coinbase;
@@ -658,16 +689,16 @@ export class CryptoExchangeIntegration {
 
   private getBlockchainForCurrency(cryptoCurrency: string): CryptoWallet['blockchain'] {
     const blockchains: Record<string, CryptoWallet['blockchain']> = {
-      'BTC': 'bitcoin',
-      'ETH': 'ethereum',
-      'USDT': 'ethereum',
-      'USDC': 'ethereum',
-      'BNB': 'bsc',
-      'ADA': 'cardano',
-      'SOL': 'solana',
-      'DOT': 'polkadot',
-      'DOGE': 'dogecoin',
-      'SHIB': 'ethereum'
+      BTC: 'bitcoin',
+      ETH: 'ethereum',
+      USDT: 'ethereum',
+      USDC: 'ethereum',
+      BNB: 'bsc',
+      ADA: 'cardano',
+      SOL: 'solana',
+      DOT: 'polkadot',
+      DOGE: 'dogecoin',
+      SHIB: 'ethereum',
     };
 
     return blockchains[cryptoCurrency] || 'ethereum';
@@ -687,7 +718,7 @@ export class CryptoExchangeIntegration {
         totalStaked: 1000000,
         availableCapacity: 500000,
         isActive: true,
-        terms: 'Flexible staking with daily rewards'
+        terms: 'Flexible staking with daily rewards',
       },
       {
         exchange: 'binance',
@@ -701,7 +732,7 @@ export class CryptoExchangeIntegration {
         totalStaked: 500000,
         availableCapacity: 200000,
         isActive: true,
-        terms: '30-day lock period with monthly compounding'
+        terms: '30-day lock period with monthly compounding',
       },
       {
         exchange: 'kraken',
@@ -715,15 +746,15 @@ export class CryptoExchangeIntegration {
         totalStaked: 200000,
         availableCapacity: 100000,
         isActive: true,
-        terms: '90-day lock with monthly payouts'
-      }
+        terms: '90-day lock with monthly payouts',
+      },
     ];
 
     opportunities.forEach(opp => {
       const opportunity: StakingOpportunity = {
         ...opp,
         id: this.generateOpportunityId(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
       this.stakingOpportunities.set(opportunity.id, opportunity);
     });
@@ -755,8 +786,10 @@ export class CryptoExchangeIntegration {
     const transactions = Array.from(this.transactions.values());
     const totalTransactions = transactions.length;
 
-    const activeWallets = Array.from(this.wallets.values())
-      .reduce((sum, wallets) => sum + wallets.filter(w => w.isActive).length, 0);
+    const activeWallets = Array.from(this.wallets.values()).reduce(
+      (sum, wallets) => sum + wallets.filter(w => w.isActive).length,
+      0
+    );
 
     const totalVolume = transactions
       .filter(t => t.status === 'completed')
@@ -764,8 +797,9 @@ export class CryptoExchangeIntegration {
 
     const stakingOpportunities = this.stakingOpportunities.size;
     const supportedCurrencies = this.config.supportedCurrencies.length;
-    const enabledExchanges = Object.values(this.config.exchanges)
-      .filter(exchange => exchange.enabled).length;
+    const enabledExchanges = Object.values(this.config.exchanges).filter(
+      exchange => exchange.enabled
+    ).length;
 
     return {
       totalTransactions,
@@ -773,7 +807,7 @@ export class CryptoExchangeIntegration {
       totalVolume,
       stakingOpportunities,
       supportedCurrencies,
-      enabledExchanges
+      enabledExchanges,
     };
   }
 }

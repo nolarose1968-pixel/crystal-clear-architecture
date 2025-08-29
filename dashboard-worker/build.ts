@@ -2,7 +2,7 @@
 
 /**
  * Fire22 Dashboard Worker - Build Launcher
- * 
+ *
  * Simple interface for different build profiles
  */
 
@@ -13,48 +13,48 @@ import CloudflareBuildSystem from './scripts/build-cloudflare.ts';
 async function main() {
   const args = process.argv.slice(2);
   const command = args[0] || 'help';
-  
+
   switch (command) {
     case 'help':
       showHelp();
       break;
-      
+
     case 'list':
       listProfiles();
       break;
-      
+
     case 'quick':
       await runBuild('quick');
       break;
-      
+
     case 'standard':
       await runBuild('standard');
       break;
-      
+
     case 'production':
       await runBuild('production');
       break;
-      
+
     case 'full':
       await runBuild('full');
       break;
-      
+
     case 'packages':
       await runBuild('packages-only');
       break;
-      
+
     case 'docs':
       await runBuild('docs-only');
       break;
-      
+
     case 'version':
       await runBuild('version-only');
       break;
-      
+
     case 'cloudflare':
       await runCloudflare(args.slice(1));
       break;
-      
+
     default:
       if (command.startsWith('--')) {
         // Handle flags like --production, --quick, etc.
@@ -93,7 +93,9 @@ Examples:
   bun run build --quick         # Quick build
 
 Profiles:
-  ${listBuildProfiles().map(p => `  ${p}`).join('\n  ')}
+  ${listBuildProfiles()
+    .map(p => `  ${p}`)
+    .join('\n  ')}
 
 For more information, see docs/BUILD-SYSTEM.md
 `);
@@ -101,7 +103,7 @@ For more information, see docs/BUILD-SYSTEM.md
 
 function listProfiles() {
   console.log('\n📋 Available Build Profiles:\n');
-  
+
   const profiles = listBuildProfiles();
   for (const profileName of profiles) {
     const profile = getBuildProfile(profileName);
@@ -118,10 +120,10 @@ function listProfiles() {
 async function runBuild(profileName: string) {
   try {
     const profile = getBuildProfile(profileName);
-    
+
     console.log(`🚀 Starting ${profile.name} build...`);
     console.log(`📝 ${profile.description}\n`);
-    
+
     // Convert profile to build config
     const buildConfig = {
       version: profile.version,
@@ -129,12 +131,12 @@ async function runBuild(profileName: string) {
       dependencies: profile.dependencies,
       metadata: profile.metadata,
       packaging: profile.packaging,
-      quality: profile.quality
+      quality: profile.quality,
     };
-    
+
     const automation = new BuildAutomation(buildConfig);
     const result = await automation.run();
-    
+
     if (result.success) {
       console.log(`\n🎉 ${profile.name} build completed successfully!`);
       console.log(`📊 Version: ${result.version}`);
@@ -143,7 +145,6 @@ async function runBuild(profileName: string) {
       console.error(`\n❌ ${profile.name} build failed!`);
       process.exit(1);
     }
-    
   } catch (error) {
     console.error(`\n💥 Build failed:`, error);
     process.exit(1);
@@ -153,54 +154,53 @@ async function runBuild(profileName: string) {
 async function runCloudflare(args: string[]) {
   const cloudflare = new CloudflareBuildSystem();
   const subcommand = args[0] || 'pipeline';
-  
+
   console.log('☁️  Cloudflare Build & Deploy');
   console.log('='.repeat(50));
-  
+
   try {
     switch (subcommand) {
       case 'build':
         await cloudflare.buildWorker({
           minify: args.includes('--minify'),
-          environment: args.find(a => ['development', 'staging', 'production'].includes(a)) as any
+          environment: args.find(a => ['development', 'staging', 'production'].includes(a)) as any,
         });
         break;
-        
+
       case 'deploy':
         await cloudflare.deploy({
           dryRun: args.includes('--dry-run'),
-          environment: args.find(a => ['development', 'staging', 'production'].includes(a)) as any
+          environment: args.find(a => ['development', 'staging', 'production'].includes(a)) as any,
         });
         break;
-        
+
       case 'local':
         const port = args.find(a => a.startsWith('--port='))?.split('=')[1];
         await cloudflare.runLocal(port ? parseInt(port) : 8787);
         break;
-        
+
       case 'verify':
         await cloudflare.verifyDeployment();
         break;
-        
+
       case 'info':
         await cloudflare.showInfo();
         break;
-        
+
       case 'pipeline':
       default:
         // Run the standard build first
         await runBuild('cloudflare');
-        
+
         // Then deploy to Cloudflare
         await cloudflare.pipeline({
           environment: args.find(a => ['development', 'staging', 'production'].includes(a)) as any,
-          minify: args.includes('--minify')
+          minify: args.includes('--minify'),
         });
         break;
     }
-    
+
     console.log('\n✅ Cloudflare operation completed!');
-    
   } catch (error) {
     console.error('\n❌ Cloudflare operation failed:', error);
     process.exit(1);

@@ -2,43 +2,52 @@
 
 ## 🔍 Overview
 
-The Enhanced Monitoring System provides comprehensive observability for the Fire22 Dashboard through standardized error handling, security monitoring, performance tracking, and health checks. This system is designed to be lightweight, efficient, and easily integrable with existing components.
+The Enhanced Monitoring System provides comprehensive observability for the
+Fire22 Dashboard through standardized error handling, security monitoring,
+performance tracking, and health checks. This system is designed to be
+lightweight, efficient, and easily integrable with existing components.
 
 ## Architecture
 
 ### Core Components
 
 1. **Error Handling System** (`src/error/enhanced-error-handler.ts`)
+
    - Standardized error creation and handling
    - HTTP response formatting
    - Request validation utilities
    - Error code registry
 
 2. **Performance Monitor** (`src/monitoring/performance-monitor.ts`)
+
    - Request/response time tracking
    - System metrics collection
    - Active request monitoring
    - Performance analytics
 
 3. **Security Monitor** (`src/monitoring/security-monitor.ts`)
+
    - Security event recording
    - Suspicious activity detection
    - Security event aggregation
    - Security reporting
 
 4. **Health Monitor** (`src/monitoring/health-check.ts`)
+
    - Component health checks
    - System health status
    - Health check scheduling
    - Health trend analysis
 
 5. **Metrics Collector** (`src/monitoring/metrics-collector.ts`)
+
    - Metrics aggregation
    - Data retention management
    - Export capabilities
    - Statistical analysis
 
 6. **Logging System** (`src/utils/logger.ts`)
+
    - Structured logging
    - Log level management
    - Context-aware logging
@@ -54,123 +63,107 @@ The Enhanced Monitoring System provides comprehensive observability for the Fire
 
 ### Error Handling
 
-```typescript
+````typescript
 ```javascript
 import { createEnhancedError, handleApiError, validateRequiredFields } from '../error/enhanced-error-handler';
-```
+````
 
-// Creating enhanced errors
-const error = createEnhancedError(
-  'VALIDATION_ERROR',
-  'Missing required fields',
-  { missingFields: ['email', 'password'] },
-  400
-);
+// Creating enhanced errors const error = createEnhancedError(
+'VALIDATION_ERROR', 'Missing required fields', { missingFields: ['email',
+'password'] }, 400 );
 
-// Handling API errors
-try {
-  // Some operation that might fail
-} catch (error) {
-  return handleApiError(error);
-}
+// Handling API errors try { // Some operation that might fail } catch (error) {
+return handleApiError(error); }
 
-// Validating input
-validateRequiredFields(userData, ['email', 'password'], 'User Registration');
-```
+// Validating input validateRequiredFields(userData, ['email', 'password'],
+'User Registration');
+
+````
 
 ### Performance Monitoring
 
 ```typescript
 ```javascript
 import { PerformanceMonitor, withRequestTracking } from '../monitoring/performance-monitor';
-```
+````
 
 const monitor = new PerformanceMonitor(config);
 
-// Manual request tracking
-monitor.startRequest('req_123');
-// ... perform operation
-const metrics = monitor.endRequest('req_123');
+// Manual request tracking monitor.startRequest('req_123'); // ... perform
+operation const metrics = monitor.endRequest('req_123');
 
-// Automatic request tracking
-const handler = withRequestTracking(monitor, originalHandler);
-```
+// Automatic request tracking const handler = withRequestTracking(monitor,
+originalHandler);
+
+````
 
 ### Security Monitoring
 
 ```typescript
 ```javascript
 import { SecurityMonitor } from '../monitoring/security-monitor';
-```
+````
 
 const securityMonitor = new SecurityMonitor(config);
 
-// Record security events
-await securityMonitor.recordEvent({
-  type: 'authentication',
-  severity: 'high',
-  details: { failedAttempts: 5, ip: '192.168.1.100' },
-  userId: 'user123'
-});
+// Record security events await securityMonitor.recordEvent({ type:
+'authentication', severity: 'high', details: { failedAttempts: 5, ip:
+'192.168.1.100' }, userId: 'user123' });
 
-// Get security report
-const report = await securityMonitor.getSecurityReport();
-```
+// Get security report const report = await securityMonitor.getSecurityReport();
+
+````
 
 ### Health Checks
 
 ```typescript
 ```javascript
 import { HealthMonitor } from '../monitoring/health-check';
-```
+````
 
 const healthMonitor = new HealthMonitor(['database', 'api', 'cache']);
 
-// Check specific component
-const health = await healthMonitor.checkComponent('database');
+// Check specific component const health = await
+healthMonitor.checkComponent('database');
 
-// Get system health
-const systemHealth = await healthMonitor.getSystemHealth();
-```
+// Get system health const systemHealth = await healthMonitor.getSystemHealth();
+
+````
 
 ### Metrics Collection
 
 ```typescript
 ```javascript
 import { MetricsCollector } from '../monitoring/metrics-collector';
-```
+````
 
 const collector = new MetricsCollector();
 
-// Record metrics
-collector.recordMetrics({
-  responseTime: 150,
-  cpuUsage: 45,
-  memoryUsage: 60,
-  activeConnections: 25
-});
+// Record metrics collector.recordMetrics({ responseTime: 150, cpuUsage: 45,
+memoryUsage: 60, activeConnections: 25 });
 
-// Get aggregated metrics
-const aggregated = collector.getAggregatedMetrics(3600000); // Last hour
-```
+// Get aggregated metrics const aggregated =
+collector.getAggregatedMetrics(3600000); // Last hour
+
+````
 
 ### Logging
 
 ```typescript
 ```javascript
 import { createLogger } from '../utils/logger';
-```
+````
 
 const logger = createLogger(config);
 
-// Basic logging
-logger.info('User logged in', { userId: 'user123' });
+// Basic logging logger.info('User logged in', { userId: 'user123' });
 logger.error('Database connection failed', error);
 
-// Context-aware logging
-const requestLogger = logger.forRequest('req_123', 'POST', '/api/users');
-requestLogger.info('Request processed', { duration: 150 });
-```
+// Context-aware logging const requestLogger = logger.forRequest('req_123',
+'POST', '/api/users'); requestLogger.info('Request processed', { duration: 150
+});
+
+````
 
 ## Configuration
 
@@ -184,7 +177,7 @@ const monitoringConfig: MonitoringConfig = {
   securityEventRetention: 7 * 24 * 60 * 60 * 1000, // 7 days
   healthCheckInterval: 300000 // 5 minutes
 };
-```
+````
 
 ### Security Configuration
 
@@ -193,7 +186,7 @@ const securityConfig: SecurityConfig = {
   enableSecurityMonitoring: true,
   securityEventRetention: 7 * 24 * 60 * 60 * 1000, // 7 days
   suspiciousActivityThreshold: 10,
-  enableRateLimiting: true
+  enableRateLimiting: true,
 };
 ```
 
@@ -215,13 +208,18 @@ export class MainWorker {
     // Initialize monitoring components
     this.monitoringConfig = createMonitoringConfig(config);
     this.securityConfig = createSecurityConfig(config);
-    
+
     this.performanceMonitor = new PerformanceMonitor(this.monitoringConfig);
     this.securityMonitor = new SecurityMonitor(this.securityConfig);
-    this.healthMonitor = new HealthMonitor(['database', 'api', 'authentication', 'cache']);
+    this.healthMonitor = new HealthMonitor([
+      'database',
+      'api',
+      'authentication',
+      'cache',
+    ]);
     this.metricsCollector = getMetricsCollector();
     this.logger = createLogger(this.monitoringConfig);
-    
+
     // Start periodic monitoring
     if (this.monitoringConfig.enabled) {
       this.performanceMonitor.startPeriodicCollection();
@@ -238,7 +236,7 @@ All requests are automatically tracked and monitored:
 ```typescript
 async processRequest(request: Request): Promise<Response> {
   const requestId = this.performanceMonitor.startTracking(request);
-  
+
   try {
     const response = await this.handleRequest(request);
     this.performanceMonitor.endTracking(requestId);
@@ -347,11 +345,13 @@ npm run benchmark:monitoring
 ### Common Issues
 
 1. **High Memory Usage**
+
    - Check metrics retention period
    - Implement cleanup routines
    - Monitor for memory leaks
 
 2. **Performance Overhead**
+
    - Adjust monitoring intervals
    - Optimize metrics collection
    - Consider sampling for high-volume systems
@@ -376,16 +376,19 @@ const config: MonitoringConfig = {
 ## Future Enhancements
 
 1. **Alerting System**
+
    - Configurable alerts based on metrics
    - Multiple notification channels
    - Alert escalation policies
 
 2. **Distributed Tracing**
+
    - Trace requests across services
    - Correlation ID propagation
    - Performance analysis
 
 3. **Advanced Analytics**
+
    - Machine learning for anomaly detection
    - Predictive alerting
    - Capacity planning
@@ -407,4 +410,5 @@ When adding new monitoring features:
 
 ## License
 
-This monitoring system is part of the Fire22 Dashboard project and is subject to the same license terms.
+This monitoring system is part of the Fire22 Dashboard project and is subject to
+the same license terms.

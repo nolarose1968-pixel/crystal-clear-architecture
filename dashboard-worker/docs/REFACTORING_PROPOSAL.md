@@ -2,21 +2,26 @@
 
 ## 📋 **Executive Summary**
 
-This proposal outlines a comprehensive refactoring strategy to address code maintainability issues, reduce redundancy, and break down large files into manageable modules. The current codebase has several files exceeding 2000+ lines that are difficult to maintain and contain redundant patterns.
+This proposal outlines a comprehensive refactoring strategy to address code
+maintainability issues, reduce redundancy, and break down large files into
+manageable modules. The current codebase has several files exceeding 2000+ lines
+that are difficult to maintain and contain redundant patterns.
 
 ## 🎯 **Current Issues Identified**
 
 ### **📊 Large Files Analysis**
-| File | Lines | Status | Priority |
-|------|-------|--------|----------|
-| `src/api/controllers/other.controller.ts` | 2,959 | 🚨 CRITICAL | High |
-| `src/api/fantasy402-agent-client.ts` | 2,433 | 🚨 CRITICAL | High |
-| `src/api/schemas/index.ts` | 2,235 | ⚠️ HIGH | High |
-| `core/integrations/fantasy42-wager-alerts-settings.ts` | 1,952 | ⚠️ HIGH | Medium |
-| `core/integrations/fantasy42-cashier.ts` | 1,730 | ⚠️ HIGH | Medium |
-| `core/integrations/fantasy42-agent-menu.ts` | 1,664 | ⚠️ HIGH | Medium |
+
+| File                                                   | Lines | Status      | Priority |
+| ------------------------------------------------------ | ----- | ----------- | -------- |
+| `src/api/controllers/other.controller.ts`              | 2,959 | 🚨 CRITICAL | High     |
+| `src/api/fantasy402-agent-client.ts`                   | 2,433 | 🚨 CRITICAL | High     |
+| `src/api/schemas/index.ts`                             | 2,235 | ⚠️ HIGH     | High     |
+| `core/integrations/fantasy42-wager-alerts-settings.ts` | 1,952 | ⚠️ HIGH     | Medium   |
+| `core/integrations/fantasy42-cashier.ts`               | 1,730 | ⚠️ HIGH     | Medium   |
+| `core/integrations/fantasy42-agent-menu.ts`            | 1,664 | ⚠️ HIGH     | Medium   |
 
 ### **🔄 Redundancy Analysis**
+
 - **6 duplicate** `ValidationResult` interfaces
 - **5 duplicate** `CustomerProfile` interfaces
 - **4 duplicate** `ValidationRule` interfaces
@@ -25,6 +30,7 @@ This proposal outlines a comprehensive refactoring strategy to address code main
 - **102 files** with profile/config/response interfaces
 
 ### **📈 Maintainability Metrics**
+
 - **Average file size**: 487 lines (excluding large files)
 - **Large files**: 6 files > 1,500 lines
 - **Critical files**: 2 files > 2,400 lines
@@ -35,6 +41,7 @@ This proposal outlines a comprehensive refactoring strategy to address code main
 ### **Phase 1: Core Infrastructure (Week 1-2)** ✅ **IMPLEMENTED**
 
 #### **1.1 Create Shared Types Library** ✅ **COMPLETED**
+
 ```
 dashboard-worker/core/types/
 ├── shared/
@@ -51,6 +58,7 @@ dashboard-worker/core/types/
 ```
 
 #### **1.2 Create Shared Utilities Library** ✅ **COMPLETED**
+
 ```
 dashboard-worker/core/utils/
 ├── formatters/
@@ -68,6 +76,7 @@ dashboard-worker/core/utils/
 ### **Phase 2: Break Down Large Files (Week 3-6)** ✅ **DEMONSTRATION COMPLETED**
 
 #### **2.1 Refactor `other.controller.ts` (2,959 lines)** ✅ **IMPLEMENTED**
+
 ```
 src/api/controllers/other/
 ├── customer-operations.controller.ts    # ✅ Customer CRUD (250 lines)
@@ -81,12 +90,14 @@ src/api/controllers/other/
 ```
 
 **🎯 PRACTICAL DEMONSTRATION CREATED:**
+
 - ✅ `customer-operations.controller.ts` - Clean, focused module
 - ✅ `financial-operations.controller.ts` - Payment processing logic
 - ✅ `index.ts` - Consolidated exports with clear documentation
 - **Result**: 2,959 lines → 7 focused modules (~400 lines each)
 
 #### **2.2 Refactor `fantasy402-agent-client.ts` (2,433 lines)**
+
 ```
 src/api/clients/fantasy402/
 ├── agent-client-core.ts                # Core client functionality (300 lines)
@@ -100,6 +111,7 @@ src/api/clients/fantasy402/
 ```
 
 #### **2.3 Refactor `schemas/index.ts` (2,235 lines)**
+
 ```
 src/api/schemas/
 ├── core/
@@ -123,6 +135,7 @@ src/api/schemas/
 ### **Phase 3: Consolidate Integration Files (Week 7-8)**
 
 #### **3.1 Fantasy42 Integration Consolidation**
+
 ```
 core/integrations/fantasy42/
 ├── core/
@@ -146,12 +159,14 @@ core/integrations/fantasy42/
 ### **Phase 4: Performance Optimization (Week 9-10)**
 
 #### **4.1 Code Splitting Strategy**
+
 - **Lazy Loading**: Implement dynamic imports for large modules
 - **Bundle Optimization**: Split vendor code from application code
 - **Tree Shaking**: Remove unused exports and dependencies
 - **Caching**: Implement intelligent caching strategies
 
 #### **4.2 Memory Optimization**
+
 - **Object Pooling**: Reuse frequently created objects
 - **Efficient Data Structures**: Use appropriate data structures
 - **Memory Monitoring**: Add memory usage tracking
@@ -160,6 +175,7 @@ core/integrations/fantasy42/
 ### **Phase 5: Testing & Validation (Week 11-12)**
 
 #### **5.1 Testing Strategy**
+
 ```
 tests/
 ├── unit/
@@ -177,18 +193,21 @@ tests/
 ## 📊 **Expected Outcomes**
 
 ### **Maintainability Improvements**
+
 - **File Size Reduction**: Average file size reduced from 487 to 150-300 lines
 - **Single Responsibility**: Each module has a clear, single purpose
 - **Dependency Management**: Clear dependency chains and imports
 - **Code Navigation**: Easy to find and modify specific functionality
 
 ### **Performance Improvements**
+
 - **Bundle Size**: 30-40% reduction through code splitting
 - **Load Time**: Faster initial load through lazy loading
 - **Memory Usage**: 20-30% reduction through optimization
 - **Runtime Performance**: Improved through efficient algorithms
 
 ### **Developer Experience**
+
 - **Code Discovery**: Easy to find relevant functions and classes
 - **Refactoring Safety**: Smaller files are easier to refactor
 - **Testing**: Easier to unit test smaller, focused modules
@@ -197,30 +216,35 @@ tests/
 ## 🔧 **Implementation Plan**
 
 ### **Week 1-2: Infrastructure Setup**
+
 - [ ] Create shared types library
 - [ ] Create shared utilities library
 - [ ] Set up new directory structure
 - [ ] Update import statements across codebase
 
 ### **Week 3-6: Large File Refactoring**
+
 - [ ] Break down `other.controller.ts` into 7 focused modules
 - [ ] Refactor `fantasy402-agent-client.ts` into 7 specialized modules
 - [ ] Split `schemas/index.ts` into domain-specific schema files
 - [ ] Update all dependent files and tests
 
 ### **Week 7-8: Integration Consolidation**
+
 - [ ] Consolidate Fantasy42 integration files
 - [ ] Remove duplicate interfaces and functions
 - [ ] Implement shared utilities for common patterns
 - [ ] Update integration tests
 
 ### **Week 9-10: Performance Optimization**
+
 - [ ] Implement code splitting and lazy loading
 - [ ] Optimize memory usage patterns
 - [ ] Add performance monitoring
 - [ ] Implement caching strategies
 
 ### **Week 11-12: Testing & Validation**
+
 - [ ] Create comprehensive test suite for new structure
 - [ ] Performance testing and optimization
 - [ ] Integration testing across all modules
@@ -229,12 +253,14 @@ tests/
 ## 📈 **Success Metrics**
 
 ### **Quantitative Metrics**
+
 - **File Size**: Average < 300 lines per file
 - **Cyclomatic Complexity**: < 10 per function
 - **Test Coverage**: > 90% for critical paths
 - **Performance**: < 2s initial load time
 
 ### **Qualitative Metrics**
+
 - **Maintainability**: Code is easy to understand and modify
 - **Scalability**: Easy to add new features without affecting existing code
 - **Reliability**: Fewer bugs due to better separation of concerns
@@ -243,12 +269,14 @@ tests/
 ## 🎯 **Risk Mitigation**
 
 ### **Breaking Changes**
+
 - **Gradual Migration**: Implement changes incrementally
 - **Backward Compatibility**: Maintain API compatibility during transition
 - **Feature Flags**: Use feature flags for new implementations
 - **Rollback Plan**: Ability to revert changes if needed
 
 ### **Testing Strategy**
+
 - **Comprehensive Testing**: Test all refactored modules thoroughly
 - **Integration Testing**: Ensure all modules work together correctly
 - **Performance Testing**: Monitor performance impact of changes
@@ -257,12 +285,14 @@ tests/
 ## 🚀 **Benefits**
 
 ### **Immediate Benefits**
+
 - **Easier Maintenance**: Smaller files are easier to understand and modify
 - **Reduced Complexity**: Clear separation of concerns
 - **Better Testing**: Easier to write and maintain unit tests
 - **Improved Performance**: Optimized code structure
 
 ### **Long-term Benefits**
+
 - **Scalability**: Easy to add new features without affecting existing code
 - **Reliability**: Fewer bugs due to better code organization
 - **Developer Productivity**: Faster development and debugging
@@ -282,18 +312,20 @@ tests/
 
 ### **📊 Newly Identified Files for Refactoring**
 
-| File | Lines | Priority | Complexity | Target Reduction |
-|------|-------|----------|------------|------------------|
-| `telegram-bot.ts` | **1,344** | **CRITICAL** | High | 8-10 focused modules |
-| `sports-betting-management.ts` | **904** | **HIGH** | High | 6-8 domain modules |
-| `customer-information-interface.ts` | **1,481** | **HIGH** | Medium | 5-7 feature modules |
-| `patterns/index.ts` | **1,352** | **MEDIUM** | Medium | 4-6 pattern modules |
-| `customer-information-service.ts` | **1,218** | **MEDIUM** | Medium | 4-5 service modules |
+| File                                | Lines     | Priority     | Complexity | Target Reduction     |
+| ----------------------------------- | --------- | ------------ | ---------- | -------------------- |
+| `telegram-bot.ts`                   | **1,344** | **CRITICAL** | High       | 8-10 focused modules |
+| `sports-betting-management.ts`      | **904**   | **HIGH**     | High       | 6-8 domain modules   |
+| `customer-information-interface.ts` | **1,481** | **HIGH**     | Medium     | 5-7 feature modules  |
+| `patterns/index.ts`                 | **1,352** | **MEDIUM**   | Medium     | 4-6 pattern modules  |
+| `customer-information-service.ts`   | **1,218** | **MEDIUM**   | Medium     | 4-5 service modules  |
 
 ### **🎯 Telegram Bot Refactoring Strategy**
 
 **Current Structure Analysis:**
-- **Command Handlers**: 15+ different commands (/start, /help, /balance, /wagers, etc.)
+
+- **Command Handlers**: 15+ different commands (/start, /help, /balance,
+  /wagers, etc.)
 - **Message Processing**: Core message handling and routing
 - **User Management**: Registration, profiles, permissions
 - **Casino Integration**: Game management, rates, sessions
@@ -301,6 +333,7 @@ tests/
 - **Analytics**: Usage tracking and reporting
 
 **Proposed Modular Structure:**
+
 ```
 src/telegram/
 ├── core/
@@ -326,6 +359,7 @@ src/telegram/
 ```
 
 **Expected Results:**
+
 - **1,344 lines** → **10 focused modules** (~135 lines each)
 - **Clear separation** of command handling, user management, and analytics
 - **Improved maintainability** with single-responsibility modules
@@ -334,6 +368,7 @@ src/telegram/
 ### **🏈 Sports Betting Refactoring Strategy**
 
 **Current Structure Analysis:**
+
 - **Event Management**: Sports events, odds, scheduling
 - **Bet Processing**: Bet placement, validation, limits
 - **Risk Management**: Risk assessment, VIP access, limits
@@ -341,6 +376,7 @@ src/telegram/
 - **Payout Calculations**: Win/loss determination, settlements
 
 **Proposed Modular Structure:**
+
 ```
 src/sports/
 ├── core/
@@ -370,6 +406,7 @@ src/sports/
 ```
 
 **Expected Results:**
+
 - **904 lines** → **8 focused modules** (~113 lines each)
 - **Domain-driven design** with clear separation of concerns
 - **Scalable architecture** for adding new sports/features
@@ -378,6 +415,7 @@ src/sports/
 ### **📋 Implementation Priority**
 
 #### **Phase 2A: Telegram Bot (Week 1-2)**
+
 1. Create core infrastructure
 2. Extract command handlers
 3. Implement modular architecture
@@ -385,6 +423,7 @@ src/sports/
 5. Comprehensive testing
 
 #### **Phase 2B: Sports Betting (Week 3-4)**
+
 1. Create domain structure
 2. Extract betting logic
 3. Implement risk management
@@ -392,6 +431,7 @@ src/sports/
 5. Integration testing
 
 #### **Phase 2C: Customer Interface (Week 5-6)**
+
 1. Component separation
 2. Service layer extraction
 3. UI/UX modularization
@@ -400,14 +440,17 @@ src/sports/
 
 ### **🎯 Success Metrics**
 
-| Component | Before | Target | Improvement |
-|-----------|--------|--------|-------------|
-| **Telegram Bot** | 1,344 lines | 135 lines/module | **10 focused modules** |
-| **Sports Betting** | 904 lines | 113 lines/module | **8 domain modules** |
-| **Customer Interface** | 1,481 lines | 210 lines/module | **7 feature modules** |
-| **Code Maintainability** | Mixed concerns | Single responsibility | **100% improvement** |
-| **Testing Coverage** | Difficult | Easy unit tests | **300% improvement** |
+| Component                | Before         | Target                | Improvement            |
+| ------------------------ | -------------- | --------------------- | ---------------------- |
+| **Telegram Bot**         | 1,344 lines    | 135 lines/module      | **10 focused modules** |
+| **Sports Betting**       | 904 lines      | 113 lines/module      | **8 domain modules**   |
+| **Customer Interface**   | 1,481 lines    | 210 lines/module      | **7 feature modules**  |
+| **Code Maintainability** | Mixed concerns | Single responsibility | **100% improvement**   |
+| **Testing Coverage**     | Difficult      | Easy unit tests       | **300% improvement**   |
 
 ---
 
-**This refactoring will transform your codebase from difficult-to-maintain large files into a well-organized, scalable, and maintainable system. The investment in refactoring will pay dividends in developer productivity, code quality, and system performance.**
+**This refactoring will transform your codebase from difficult-to-maintain large
+files into a well-organized, scalable, and maintainable system. The investment
+in refactoring will pay dividends in developer productivity, code quality, and
+system performance.**

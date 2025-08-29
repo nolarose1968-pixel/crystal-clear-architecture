@@ -16,7 +16,7 @@ export class MainWorker {
     // Basic request handling
     return new Response('MainWorker is running', {
       status: 200,
-      headers: { 'Content-Type': 'text/plain' }
+      headers: { 'Content-Type': 'text/plain' },
     });
   }
 }

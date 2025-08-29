@@ -89,8 +89,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/brendadeeznuts1111/fire22-dashboard-worker.git",
-    "directory": "workspaces/@fire22-security-registry"
+    "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture.git",
+    "directory": "dashboard-worker/workspaces/@fire22-security-registry"
   },
   "publishConfig": {
     "registry": "https://fire22.workers.dev/registry/",

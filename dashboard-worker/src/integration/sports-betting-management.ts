@@ -1,11 +1,19 @@
 /**
  * Fire22 Sports Betting Management Integration
- * 
+ *
  * Integrates the comprehensive wager system with dashboard tooling endpoints
  * Provides real-time data for Bet Ticker, Ticketwriter, Sportsbook Lines, and Scores
  */
 
-import { WagerSystem, wagerSystem, type Wager, type WagerRequest, type Agent, type Customer, type Event } from '../../packages/wager-system/src/index';
+import {
+  WagerSystem,
+  wagerSystem,
+  type Wager,
+  type WagerRequest,
+  type Agent,
+  type Customer,
+  type Event,
+} from '../../packages/wager-system/src/index';
 
 /**
  * Sports Betting Management System for Dashboard Tooling
@@ -13,7 +21,7 @@ import { WagerSystem, wagerSystem, type Wager, type WagerRequest, type Agent, ty
 export class SportsBettingManagementSystem {
   private wagerSystem: WagerSystem;
   private cache = new Map<string, { data: any; expiry: number }>();
-  
+
   constructor() {
     this.wagerSystem = wagerSystem;
     this.initializeTestData();
@@ -35,10 +43,14 @@ export class SportsBettingManagementSystem {
         vipLevel: 'gold' as const,
         status: 'active' as const,
         bettingLimits: { maxBet: 1000, maxDaily: 5000, maxWeekly: 25000, maxMonthly: 100000 },
-        preferences: { favoriteSports: ['football', 'basketball'], favoriteTeams: ['Cowboys', 'Lakers'], notificationSettings: {} },
+        preferences: {
+          favoriteSports: ['football', 'basketball'],
+          favoriteTeams: ['Cowboys', 'Lakers'],
+          notificationSettings: {},
+        },
         createdAt: new Date().toISOString(),
-        lastActivity: new Date().toISOString()
-      }
+        lastActivity: new Date().toISOString(),
+      },
     ];
 
     // Add test agents
@@ -54,8 +66,13 @@ export class SportsBettingManagementSystem {
         commission: { baseRate: 0.02, bonusRate: 0.005, performanceMultiplier: 1.0 },
         limits: { maxCustomerBet: 10000, maxTotalExposure: 100000, maxDailyVolume: 500000 },
         hierarchy: { childAgentIds: [] },
-        performance: { totalVolume: 150000, totalCommission: 3000, customerCount: 25, averageBet: 250 }
-      }
+        performance: {
+          totalVolume: 150000,
+          totalCommission: 3000,
+          customerCount: 25,
+          averageBet: 250,
+        },
+      },
     ];
 
     // Add test events
@@ -69,8 +86,8 @@ export class SportsBettingManagementSystem {
         eventDate: new Date(Date.now() + 3600000).toISOString(),
         status: 'upcoming' as const,
         startTime: new Date(Date.now() + 3600000).toISOString(),
-        venue: 'AT&T Stadium'
-      }
+        venue: 'AT&T Stadium',
+      },
     ];
 
     // Store test data (in a real implementation, this would come from a database)
@@ -78,7 +95,7 @@ export class SportsBettingManagementSystem {
     testCustomers.forEach(customer => this.wagerSystem.customers.set(customer.id, customer as any));
     // @ts-ignore - Accessing private members for test setup
     testAgents.forEach(agent => this.wagerSystem.agents.set(agent.id, agent as any));
-    // @ts-ignore - Accessing private members for test setup  
+    // @ts-ignore - Accessing private members for test setup
     testEvents.forEach(event => this.wagerSystem.events.set(event.id, event as any));
   }
 
@@ -110,7 +127,7 @@ export class SportsBettingManagementSystem {
         odds: wager.odds.american,
         potentialWin: wager.toWinAmount,
         timestamp: wager.insertDateTime,
-        status: wager.status
+        status: wager.status,
       }));
 
     // Add some mock live activity if no real data
@@ -123,11 +140,11 @@ export class SportsBettingManagementSystem {
           sport: 'football',
           eventName: 'Cowboys vs Giants',
           betType: 'moneyline',
-          amount: 100.00,
+          amount: 100.0,
           odds: -110,
-          potentialWin: 190.90,
+          potentialWin: 190.9,
           timestamp: new Date().toISOString(),
-          status: 'pending'
+          status: 'pending',
         },
         {
           betId: 'BT002',
@@ -136,11 +153,11 @@ export class SportsBettingManagementSystem {
           sport: 'basketball',
           eventName: 'Lakers vs Warriors',
           betType: 'spread',
-          amount: 250.00,
+          amount: 250.0,
           odds: -110,
           potentialWin: 477.27,
           timestamp: new Date().toISOString(),
-          status: 'pending'
+          status: 'pending',
         }
       );
     }
@@ -159,16 +176,16 @@ export class SportsBettingManagementSystem {
 
     const stats = await this.wagerSystem.getSystemStats();
     const today = new Date().toDateString();
-    
+
     // Calculate today's metrics (mock data if no real data)
     const metrics = {
       totalBetsToday: stats.totalWagers || 1247,
-      totalVolumeToday: stats.totalVolume || 156780.00,
+      totalVolumeToday: stats.totalVolume || 156780.0,
       avgBetSize: stats.averageWager || 125.75,
       winRate: 47.3, // This would be calculated from settled wagers
       activeWagers: stats.activeWagers || 89,
       pendingWagers: stats.pendingWagers || 34,
-      riskScore: stats.riskScore || 25
+      riskScore: stats.riskScore || 25,
     };
 
     this.setCache(cacheKey, metrics, 5000); // 5 second cache
@@ -195,9 +212,9 @@ export class SportsBettingManagementSystem {
         markets: {
           moneyline: { home: -150, away: 130 },
           spread: { home: -3.5, away: 3.5, odds: -110 },
-          total: { over: 45.5, under: 45.5, odds: -110 }
+          total: { over: 45.5, under: 45.5, odds: -110 },
         },
-        limits: { maxBet: 10000.00, minBet: 10.00 }
+        limits: { maxBet: 10000.0, minBet: 10.0 },
       },
       {
         eventId: 'EVT002',
@@ -209,9 +226,9 @@ export class SportsBettingManagementSystem {
         markets: {
           moneyline: { home: -120, away: 102 },
           spread: { home: -2.5, away: 2.5, odds: -110 },
-          total: { over: 215.5, under: 215.5, odds: -110 }
+          total: { over: 215.5, under: 215.5, odds: -110 },
         },
-        limits: { maxBet: 5000.00, minBet: 10.00 }
+        limits: { maxBet: 5000.0, minBet: 10.0 },
       },
       {
         eventId: 'EVT003',
@@ -223,10 +240,10 @@ export class SportsBettingManagementSystem {
         markets: {
           moneyline: { home: -110, away: -110 },
           spread: { home: -1.5, away: 1.5, odds: -110 },
-          total: { over: 52.5, under: 52.5, odds: -110 }
+          total: { over: 52.5, under: 52.5, odds: -110 },
         },
-        limits: { maxBet: 15000.00, minBet: 10.00 }
-      }
+        limits: { maxBet: 15000.0, minBet: 10.0 },
+      },
     ];
 
     // Filter by sport if specified
@@ -261,15 +278,15 @@ export class SportsBettingManagementSystem {
               opening: -145,
               high: -155,
               low: -140,
-              lastMove: new Date().toISOString()
+              lastMove: new Date().toISOString(),
             },
             away: {
               current: 130,
               opening: 125,
               high: 135,
               low: 120,
-              lastMove: new Date().toISOString()
-            }
+              lastMove: new Date().toISOString(),
+            },
           },
           spread: {
             home: {
@@ -277,30 +294,30 @@ export class SportsBettingManagementSystem {
               opening: -3.0,
               high: -4.0,
               low: -2.5,
-              lastMove: new Date().toISOString()
-            }
+              lastMove: new Date().toISOString(),
+            },
           },
           total: {
             current: 45.5,
             opening: 46.0,
             high: 46.5,
             low: 44.5,
-            lastMove: new Date().toISOString()
-          }
+            lastMove: new Date().toISOString(),
+          },
         },
         volume: {
           totalBets: 247,
-          totalAmount: 31250.00,
+          totalAmount: 31250.0,
           homePercent: 65.2,
           awayPercent: 34.8,
           spreadPercent: 58.3,
-          totalPercent: 41.7
+          totalPercent: 41.7,
         },
         risk: {
-          exposure: 5680.00,
+          exposure: 5680.0,
           level: 'medium',
-          alerts: ['high_volume_home', 'line_movement_alert']
-        }
+          alerts: ['high_volume_home', 'line_movement_alert'],
+        },
       },
       {
         eventId: 'EVT002',
@@ -317,29 +334,29 @@ export class SportsBettingManagementSystem {
               opening: -115,
               high: -125,
               low: -110,
-              lastMove: new Date(Date.now() - 300000).toISOString()
+              lastMove: new Date(Date.now() - 300000).toISOString(),
             },
             away: {
               current: 102,
               opening: 98,
               high: 105,
               low: 95,
-              lastMove: new Date(Date.now() - 300000).toISOString()
-            }
-          }
+              lastMove: new Date(Date.now() - 300000).toISOString(),
+            },
+          },
         },
         volume: {
           totalBets: 189,
-          totalAmount: 24750.00,
+          totalAmount: 24750.0,
           homePercent: 52.1,
-          awayPercent: 47.9
+          awayPercent: 47.9,
         },
         risk: {
-          exposure: 3200.00,
+          exposure: 3200.0,
           level: 'low',
-          alerts: []
-        }
-      }
+          alerts: [],
+        },
+      },
     ];
 
     this.setCache(cacheKey, events, 5000); // 5 second cache
@@ -370,7 +387,7 @@ export class SportsBettingManagementSystem {
         possessionTeam: 'home',
         down: 2,
         yardLine: 25,
-        yardsToGo: 7
+        yardsToGo: 7,
       },
       {
         gameId: 'GAME002',
@@ -383,8 +400,8 @@ export class SportsBettingManagementSystem {
         quarter: 4,
         timeRemaining: '3:45',
         status: 'in_progress',
-        lastUpdate: new Date().toISOString()
-      }
+        lastUpdate: new Date().toISOString(),
+      },
     ];
 
     this.setCache(cacheKey, liveScores, 1000); // 1 second cache for live scores
@@ -407,7 +424,7 @@ export class SportsBettingManagementSystem {
         finalScore: { home: 21, away: 17 },
         completedAt: new Date(Date.now() - 3600000).toISOString(),
         betsSettled: 89,
-        totalPayout: 12450.00
+        totalPayout: 12450.0,
       },
       {
         gameId: 'GAME004',
@@ -416,8 +433,8 @@ export class SportsBettingManagementSystem {
         finalScore: { home: 108, away: 102 },
         completedAt: new Date(Date.now() - 7200000).toISOString(),
         betsSettled: 156,
-        totalPayout: 23780.00
-      }
+        totalPayout: 23780.0,
+      },
     ];
 
     this.setCache(cacheKey, results, 30000); // 30 second cache
@@ -440,7 +457,7 @@ export class SportsBettingManagementSystem {
         scheduledStart: new Date(Date.now() + 10800000).toISOString(),
         status: 'scheduled',
         venue: 'Arrowhead Stadium',
-        weather: 'Clear, 45°F'
+        weather: 'Clear, 45°F',
       },
       {
         gameId: 'GAME006',
@@ -448,8 +465,8 @@ export class SportsBettingManagementSystem {
         awayTeam: 'Denver Nuggets',
         scheduledStart: new Date(Date.now() + 14400000).toISOString(),
         status: 'scheduled',
-        venue: 'Footprint Center'
-      }
+        venue: 'Footprint Center',
+      },
     ];
 
     this.setCache(cacheKey, upcoming, 60000); // 1 minute cache
@@ -467,25 +484,27 @@ export class SportsBettingManagementSystem {
         agentId: betData.agentId,
         eventId: betData.eventId,
         betTypeId: betData.betType || 'moneyline',
-        selections: [{
-          selectionId: `${betData.eventId}-${betData.selection}`,
-          odds: betData.odds,
-          line: betData.line
-        }],
+        selections: [
+          {
+            selectionId: `${betData.eventId}-${betData.selection}`,
+            odds: betData.odds,
+            line: betData.line,
+          },
+        ],
         amountWagered: betData.amount,
         betType: betData.betType === 'parlay' ? 'parlay' : 'straight',
-        customerNotes: betData.notes
+        customerNotes: betData.notes,
       };
 
       const validation = await this.wagerSystem.validateWager(wagerRequest);
       return {
         valid: validation.isValid,
-        error: validation.errors.length > 0 ? validation.errors.join(', ') : undefined
+        error: validation.errors.length > 0 ? validation.errors.join(', ') : undefined,
       };
     } catch (error: any) {
       return {
         valid: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -499,24 +518,26 @@ export class SportsBettingManagementSystem {
       agentId: betData.agentId,
       eventId: betData.eventId,
       betTypeId: betData.betType || 'moneyline',
-      selections: [{
-        selectionId: `${betData.eventId}-${betData.selection}`,
-        odds: betData.odds,
-        line: betData.line
-      }],
+      selections: [
+        {
+          selectionId: `${betData.eventId}-${betData.selection}`,
+          odds: betData.odds,
+          line: betData.line,
+        },
+      ],
       amountWagered: betData.amount,
-      betType: betData.betType === 'parlay' ? 'parlay' : 'straight'
+      betType: betData.betType === 'parlay' ? 'parlay' : 'straight',
     };
 
     const wager = await this.wagerSystem.createWager(wagerRequest);
-    
+
     return {
       betId: `BT${wager.wagerNumber}`,
       ticketNumber: `T${new Date().toISOString().slice(0, 10).replace(/-/g, '')}${String(wager.wagerNumber).slice(-3)}`,
       amount: wager.amountWagered,
       toWin: wager.toWinAmount,
       commission: wager.commission.totalCommission,
-      status: 'confirmed'
+      status: 'confirmed',
     };
   }
 
@@ -528,13 +549,13 @@ export class SportsBettingManagementSystem {
       moneyline: [
         { timestamp: new Date(Date.now() - 3600000).toISOString(), home: -145, away: 125 },
         { timestamp: new Date(Date.now() - 1800000).toISOString(), home: -148, away: 128 },
-        { timestamp: new Date().toISOString(), home: -150, away: 130 }
+        { timestamp: new Date().toISOString(), home: -150, away: 130 },
       ],
       spread: [
         { timestamp: new Date(Date.now() - 3600000).toISOString(), line: -3.0, odds: -110 },
         { timestamp: new Date(Date.now() - 1800000).toISOString(), line: -3.5, odds: -108 },
-        { timestamp: new Date().toISOString(), line: -3.5, odds: -110 }
-      ]
+        { timestamp: new Date().toISOString(), line: -3.5, odds: -110 },
+      ],
     };
   }
 
@@ -543,12 +564,12 @@ export class SportsBettingManagementSystem {
    */
   async getRiskAnalysis(eventId: string): Promise<any> {
     return {
-      totalExposure: 15680.00,
-      maxLiability: 23450.00,
+      totalExposure: 15680.0,
+      maxLiability: 23450.0,
       riskScore: 35,
       concentrationRisk: 0.15,
       alerts: ['high_volume_home'],
-      recommendations: ['Monitor line movement', 'Consider adjusting limits']
+      recommendations: ['Monitor line movement', 'Consider adjusting limits'],
     };
   }
 
@@ -565,7 +586,7 @@ export class SportsBettingManagementSystem {
   private setCache(key: string, data: any, ttl: number): void {
     this.cache.set(key, {
       data,
-      expiry: Date.now() + ttl
+      expiry: Date.now() + ttl,
     });
   }
 }

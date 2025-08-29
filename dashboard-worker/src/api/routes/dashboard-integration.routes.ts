@@ -66,11 +66,14 @@ export async function handleDashboardIntegrationRoutes(req: Request): Promise<Re
   }
 
   // Route not found
-  return new Response(JSON.stringify({
-    success: false,
-    error: 'Dashboard integration endpoint not found'
-  }), {
-    status: 404,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return new Response(
+    JSON.stringify({
+      success: false,
+      error: 'Dashboard integration endpoint not found',
+    }),
+    {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' },
+    }
+  );
 }

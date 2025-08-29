@@ -1,6 +1,7 @@
 # 🛡️ Fire22 Security System Documentation
 
-Complete documentation for the Fire22 dashboard security infrastructure powered by Bun's native security APIs.
+Complete documentation for the Fire22 dashboard security infrastructure powered
+by Bun's native security APIs.
 
 ## Table of Contents
 
@@ -22,16 +23,24 @@ Complete documentation for the Fire22 dashboard security infrastructure powered 
 
 ## Overview
 
-The Fire22 Security System is an enterprise-grade security infrastructure built on Bun's native security APIs. It provides comprehensive protection against supply chain attacks, credential leaks, and malicious packages while maintaining excellent developer experience.
+The Fire22 Security System is an enterprise-grade security infrastructure built
+on Bun's native security APIs. It provides comprehensive protection against
+supply chain attacks, credential leaks, and malicious packages while maintaining
+excellent developer experience.
 
 ### Key Features
 
-- 🔐 **Native Credential Storage** - OS keychain integration (Keychain, libsecret, Credential Manager)
-- 🛡️ **Security Scanner** - Production-ready Bun Security Scanner API implementation
-- 📦 **Scoped Package Security** - Granular control over package scopes and registries
-- 🔍 **Threat Detection** - CVE scanning, typosquatting detection, malware blocking
+- 🔐 **Native Credential Storage** - OS keychain integration (Keychain,
+  libsecret, Credential Manager)
+- 🛡️ **Security Scanner** - Production-ready Bun Security Scanner API
+  implementation
+- 📦 **Scoped Package Security** - Granular control over package scopes and
+  registries
+- 🔍 **Threat Detection** - CVE scanning, typosquatting detection, malware
+  blocking
 - ⚡ **Zero Dependencies** - Pure Bun native APIs for maximum performance
-- 🏗️ **Workspace Integration** - Seamless integration with Fire22 package ecosystem
+- 🏗️ **Workspace Integration** - Seamless integration with Fire22 package
+  ecosystem
 
 ### System Requirements
 
@@ -114,23 +123,26 @@ scripts/
 Core security utilities and credential management for Fire22 dashboard.
 
 #### Installation
+
 ```bash
 bun add @fire22/security-core
 ```
 
 #### Features
+
 - Secure credential storage using OS keychain
 - Environment management with validation
 - Security auditing and reporting
 - Integration with Fire22 package ecosystem
 
 #### Usage
+
 ```typescript
 import { initializeFire22Security } from '@fire22/security-core';
 
 const security = await initializeFire22Security({
   service: 'fire22-dashboard',
-  environments: ['development', 'staging', 'production']
+  environments: ['development', 'staging', 'production'],
 });
 
 // Store credentials
@@ -148,11 +160,13 @@ await security.auditSecurity();
 Production-ready implementation of Bun's Security Scanner API.
 
 #### Installation
+
 ```bash
 bun add -d @fire22/security-scanner
 ```
 
 #### Features
+
 - Fatal/warn advisory levels
 - CVE vulnerability detection
 - Typosquatting protection
@@ -161,6 +175,7 @@ bun add -d @fire22/security-scanner
 - Scope squatting detection
 
 #### Configuration
+
 ```toml
 # bunfig.toml
 [install.security]
@@ -173,9 +188,11 @@ scanner = "@fire22/security-scanner"
 
 ### Bun.secrets Integration
 
-The Fire22 security system uses Bun's native `secrets` API for secure credential storage.
+The Fire22 security system uses Bun's native `secrets` API for secure credential
+storage.
 
 #### Storing Credentials
+
 ```typescript
 import { secrets } from 'bun';
 
@@ -183,32 +200,34 @@ import { secrets } from 'bun';
 await secrets.set({
   service: 'fire22-dashboard',
   name: 'database_url',
-  value: 'postgresql://user:pass@localhost:5432/fire22'
+  value: 'postgresql://user:pass@localhost:5432/fire22',
 });
 
 // Store API tokens
 await secrets.set({
   service: 'fire22-dashboard',
   name: 'fire22_api_token',
-  value: 'f22_live_api_xxxxx'
+  value: 'f22_live_api_xxxxx',
 });
 ```
 
 #### Retrieving Credentials
+
 ```typescript
 // Get credentials during app startup
 const dbUrl = await secrets.get({
   service: 'fire22-dashboard',
-  name: 'database_url'
+  name: 'database_url',
 });
 
 const apiToken = await secrets.get({
   service: 'fire22-dashboard',
-  name: 'fire22_api_token'
+  name: 'fire22_api_token',
 });
 ```
 
 #### Environment-Specific Credentials
+
 ```typescript
 const envManager = new SecureEnvironmentManager();
 
@@ -221,20 +240,20 @@ const env = await envManager.loadEnvironment('production');
 
 ### Platform-Specific Storage
 
-| Platform | Storage Location | Access Method |
-|----------|-----------------|---------------|
-| **macOS** | Keychain Services | Keychain Access app |
-| **Linux** | libsecret (GNOME Keyring/KWallet) | seahorse or kwalletmanager |
-| **Windows** | Credential Manager | Control Panel → Credential Manager |
+| Platform    | Storage Location                  | Access Method                      |
+| ----------- | --------------------------------- | ---------------------------------- |
+| **macOS**   | Keychain Services                 | Keychain Access app                |
+| **Linux**   | libsecret (GNOME Keyring/KWallet) | seahorse or kwalletmanager         |
+| **Windows** | Credential Manager                | Control Panel → Credential Manager |
 
 ### Migration from .env Files
 
 ```typescript
 // Migrate existing .env files to secure storage
 const migration = await security.credentialManager.migrateFromEnv({
-  'DATABASE_URL': 'database_url',
-  'FIRE22_API_TOKEN': 'fire22_api_token',
-  'JWT_SECRET': 'jwt_secret'
+  DATABASE_URL: 'database_url',
+  FIRE22_API_TOKEN: 'fire22_api_token',
+  JWT_SECRET: 'jwt_secret',
 });
 
 console.log('Migrated:', migration.migrated);
@@ -251,12 +270,14 @@ console.log('Errors:', migration.errors);
 The security scanner implements two advisory levels as per Bun's specification:
 
 #### Fatal Level
+
 - **Behavior**: Installation stops immediately
 - **Exit Code**: Non-zero
 - **Examples**: Malware, backdoors, token stealers, critical CVEs
 - **Fire22 Policies**: Cryptocurrency mining, known malicious packages
 
 #### Warning Level
+
 - **Behavior**: User prompted in TTY, auto-cancel in CI
 - **Exit Code**: Zero in interactive mode (if user continues)
 - **Examples**: Deprecated packages, pre-release versions, policy violations
@@ -265,6 +286,7 @@ The security scanner implements two advisory levels as per Bun's specification:
 ### Threat Detection
 
 #### CVE Vulnerability Detection
+
 ```typescript
 // Uses Bun.semver.satisfies for precise version checking
 if (Bun.semver.satisfies(version, '>=1.0.0 <1.2.5')) {
@@ -272,12 +294,13 @@ if (Bun.semver.satisfies(version, '>=1.0.0 <1.2.5')) {
   return {
     level: 'fatal',
     cve: 'CVE-2021-23337',
-    description: 'Command injection vulnerability'
+    description: 'Command injection vulnerability',
   };
 }
 ```
 
 #### Typosquatting Detection
+
 ```typescript
 // Levenshtein distance algorithm
 const popularPackages = ['react', 'lodash', 'express'];
@@ -285,26 +308,27 @@ if (isTyposquat(packageName, popularPackage)) {
   return {
     level: 'fatal',
     title: 'Potential typosquatting detected',
-    description: `Suspicious similarity to ${popularPackage}`
+    description: `Suspicious similarity to ${popularPackage}`,
   };
 }
 ```
 
 #### Fire22 Custom Policies
+
 ```typescript
 const fire22Policies = [
   {
     name: 'no-crypto-mining',
     pattern: /(crypto|mining|bitcoin)/i,
     level: 'fatal',
-    description: 'Cryptocurrency mining not allowed'
+    description: 'Cryptocurrency mining not allowed',
   },
   {
     name: 'gambling-restriction',
     pattern: /(gambling|casino|poker)/i,
     level: 'warn',
-    description: 'Requires security team approval'
-  }
+    description: 'Requires security team approval',
+  },
 ];
 ```
 
@@ -315,12 +339,14 @@ const fire22Policies = [
 const ThreatFeedSchema = z.object({
   version: z.string(),
   lastUpdated: z.string(),
-  items: z.array(z.object({
-    package: z.string(),
-    version: z.string(),
-    severity: z.enum(['fatal', 'warn']),
-    categories: z.array(z.enum(['backdoor', 'malware', 'token-stealer']))
-  }))
+  items: z.array(
+    z.object({
+      package: z.string(),
+      version: z.string(),
+      severity: z.enum(['fatal', 'warn']),
+      categories: z.array(z.enum(['backdoor', 'malware', 'token-stealer'])),
+    })
+  ),
 });
 
 // Validated threat feed updates
@@ -379,6 +405,7 @@ Automatically detects and blocks suspicious scope names:
 ```
 
 Benefits:
+
 - No network requests (zero supply chain risk)
 - Local-only resolution
 - Automatic trust
@@ -391,6 +418,7 @@ Benefits:
 ### Quick Start
 
 #### 1. Install Security Packages
+
 ```bash
 # Install security core
 bun add @fire22/security-core
@@ -400,6 +428,7 @@ bun add -d @fire22/security-scanner
 ```
 
 #### 2. Configure bunfig.toml
+
 ```toml
 [install.security]
 scanner = "@fire22/security-scanner"
@@ -414,6 +443,7 @@ production = true
 ```
 
 #### 3. Setup Credentials
+
 ```bash
 # Run interactive setup
 bun run env-setup production
@@ -423,6 +453,7 @@ bun run security:setup
 ```
 
 #### 4. Verify Installation
+
 ```bash
 # Run security demos
 bun run security:complete
@@ -434,6 +465,7 @@ bun run security:scanner-test
 ### Production Setup
 
 #### CI/CD Integration
+
 ```yaml
 # .github/workflows/security.yml
 name: Security Scan
@@ -446,20 +478,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: oven-sh/setup-bun@v1
-      
+
       - name: Configure Security Scanner
         run: |
           echo '[install.security]' > bunfig.toml
           echo 'scanner = "@fire22/security-scanner"' >> bunfig.toml
-      
+
       - name: Install with Security Scanning
         run: bun install --frozen-lockfile
-        
+
       - name: Security Audit
         run: bun audit --audit-level=high --prod
 ```
 
 #### Docker Integration
+
 ```dockerfile
 FROM oven/bun:1.2.20
 
@@ -540,21 +573,21 @@ export const securityConfig = {
         name: 'no-eval',
         pattern: /eval/i,
         level: 'fatal',
-        description: 'eval() usage prohibited'
-      }
-    ]
+        description: 'eval() usage prohibited',
+      },
+    ],
   },
   credentials: {
     validation: true,
     rotation: {
       enabled: true,
-      interval: '30d'
-    }
+      interval: '30d',
+    },
   },
   audit: {
     enabled: true,
-    schedule: '0 0 * * *' // Daily at midnight
-  }
+    schedule: '0 0 * * *', // Daily at midnight
+  },
 };
 ```
 
@@ -565,6 +598,7 @@ export const securityConfig = {
 ### Security Core API
 
 #### initializeFire22Security(config?)
+
 Initialize the security system with optional configuration.
 
 ```typescript
@@ -573,12 +607,13 @@ const security = await initializeFire22Security({
   environments: ['development', 'staging', 'production'],
   scanner: {
     enabled: true,
-    excludePackages: ['@fire22/testing-framework']
-  }
+    excludePackages: ['@fire22/testing-framework'],
+  },
 });
 ```
 
 #### storeCredential(name, value, description?, environment?)
+
 Store a credential securely in OS keychain.
 
 ```typescript
@@ -591,16 +626,18 @@ await security.storeCredential(
 ```
 
 #### getCredential(name, options?)
+
 Retrieve a credential from secure storage.
 
 ```typescript
 const dbUrl = await security.getCredential('database_url', {
   environment: 'production',
-  fallback: process.env.DATABASE_URL
+  fallback: process.env.DATABASE_URL,
 });
 ```
 
 #### scanDependencies()
+
 Scan all project dependencies for security issues.
 
 ```typescript
@@ -613,22 +650,24 @@ if (!result.passed) {
 ### Security Scanner API
 
 #### scan(request)
+
 Main scanner function (Bun Security Scanner API compliant).
 
 ```typescript
 const result = await scanner.scan({
   packages: [
     { name: 'express', version: '4.18.2' },
-    { name: 'lodash', version: '4.17.21' }
+    { name: 'lodash', version: '4.17.21' },
   ],
   context: {
     production: true,
-    environment: 'production'
-  }
+    environment: 'production',
+  },
 });
 ```
 
 #### Response Format
+
 ```typescript
 interface ScanResult {
   advisories: Array<{
@@ -656,30 +695,30 @@ interface ScanResult {
 
 ### Security Commands
 
-| Command | Description |
-|---------|-------------|
-| `bun run security:complete` | Run all security demos |
-| `bun run security:integration` | Fire22 workspace integration demo |
-| `bun run security:scanner-demo` | Security scanner capabilities demo |
-| `bun run security:scoped-demo` | Scoped package security demo |
-| `bun run security:scanner-test` | Run security scanner tests |
-| `bun run security:setup` | Install and configure security |
-| `bun run security:publish-scanner` | Prepare scanner for publishing |
+| Command                            | Description                        |
+| ---------------------------------- | ---------------------------------- |
+| `bun run security:complete`        | Run all security demos             |
+| `bun run security:integration`     | Fire22 workspace integration demo  |
+| `bun run security:scanner-demo`    | Security scanner capabilities demo |
+| `bun run security:scoped-demo`     | Scoped package security demo       |
+| `bun run security:scanner-test`    | Run security scanner tests         |
+| `bun run security:setup`           | Install and configure security     |
+| `bun run security:publish-scanner` | Prepare scanner for publishing     |
 
 ### Credential Commands
 
-| Command | Description |
-|---------|-------------|
-| `bun run secrets-demo` | Interactive credential management demo |
-| `bun run env-setup [env]` | Setup environment credentials |
-| `bun run env-audit` | Security audit of environment |
+| Command                   | Description                            |
+| ------------------------- | -------------------------------------- |
+| `bun run secrets-demo`    | Interactive credential management demo |
+| `bun run env-setup [env]` | Setup environment credentials          |
+| `bun run env-audit`       | Security audit of environment          |
 
 ### Workspace Commands
 
-| Command | Description |
-|---------|-------------|
-| `bun run workspace:security` | Workspace security integration |
-| `bun audit --audit-level=high --prod` | Audit production dependencies |
+| Command                               | Description                    |
+| ------------------------------------- | ------------------------------ |
+| `bun run workspace:security`          | Workspace security integration |
+| `bun audit --audit-level=high --prod` | Audit production dependencies  |
 
 ---
 
@@ -711,19 +750,19 @@ import { initializeFire22Security } from '@fire22/security-core';
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const security = await initializeFire22Security();
-    
+
     // Get Fire22 API token from secure storage
     const apiToken = await security.getCredential('fire22_api_token');
-    
+
     // Use for API requests
     const fire22Response = await fetch('https://api.fire22.com/data', {
       headers: {
-        'Authorization': `Bearer ${apiToken}`
-      }
+        Authorization: `Bearer ${apiToken}`,
+      },
     });
-    
+
     return new Response('Secure!');
-  }
+  },
 };
 ```
 
@@ -736,13 +775,13 @@ import { initializeFire22Security } from '@fire22/security-core';
 async function createDatabasePool() {
   const security = await initializeFire22Security();
   const dbUrl = await security.getCredential('database_url', {
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
   });
-  
+
   return new Pool({
     connectionString: dbUrl,
     max: 20,
-    idleTimeoutMillis: 30000
+    idleTimeoutMillis: 30000,
   });
 }
 ```
@@ -756,11 +795,13 @@ import { Fire22SecurityScanner } from '@fire22/security-scanner';
 export async function preInstall(packages) {
   const scanner = new Fire22SecurityScanner();
   const result = await scanner.scan({ packages });
-  
+
   if (!result.passed) {
     const fatalIssues = result.advisories.filter(a => a.level === 'fatal');
     if (fatalIssues.length > 0) {
-      throw new Error(`Security threats detected: ${fatalIssues.length} fatal issues`);
+      throw new Error(
+        `Security threats detected: ${fatalIssues.length} fatal issues`
+      );
     }
   }
 }
@@ -773,6 +814,7 @@ export async function preInstall(packages) {
 ### Credential Management
 
 #### DO:
+
 - ✅ Use Bun.secrets for all sensitive credentials
 - ✅ Store environment-specific credentials separately
 - ✅ Rotate credentials regularly (30-90 days)
@@ -780,6 +822,7 @@ export async function preInstall(packages) {
 - ✅ Audit credential access regularly
 
 #### DON'T:
+
 - ❌ Store credentials in .env files in production
 - ❌ Commit credentials to version control
 - ❌ Use the same credentials across environments
@@ -789,6 +832,7 @@ export async function preInstall(packages) {
 ### Package Security
 
 #### DO:
+
 - ✅ Enable security scanner in bunfig.toml
 - ✅ Use exact versions in production (`exact = true`)
 - ✅ Prefer scoped packages from trusted organizations
@@ -796,6 +840,7 @@ export async function preInstall(packages) {
 - ✅ Use workspace protocol for internal packages
 
 #### DON'T:
+
 - ❌ Disable security scanner in production
 - ❌ Use auto-install in production (`auto = false`)
 - ❌ Install packages from untrusted sources
@@ -805,6 +850,7 @@ export async function preInstall(packages) {
 ### Registry Management
 
 #### DO:
+
 - ✅ Configure private registry for internal packages
 - ✅ Use scoped registries in bunfig.toml
 - ✅ Authenticate private registry with Bun.secrets
@@ -812,6 +858,7 @@ export async function preInstall(packages) {
 - ✅ Monitor registry access logs
 
 #### DON'T:
+
 - ❌ Allow fallback to public registry for private packages
 - ❌ Store registry tokens in plaintext
 - ❌ Use insecure registry connections (HTTP)
@@ -821,6 +868,7 @@ export async function preInstall(packages) {
 ### Development Workflow
 
 #### DO:
+
 - ✅ Run security scanner in CI/CD pipelines
 - ✅ Test security policies locally before deployment
 - ✅ Document security requirements in README
@@ -828,6 +876,7 @@ export async function preInstall(packages) {
 - ✅ Regular security reviews and updates
 
 #### DON'T:
+
 - ❌ Skip security checks for "quick fixes"
 - ❌ Disable security for development convenience
 - ❌ Assume internal packages are always safe
@@ -841,11 +890,13 @@ export async function preInstall(packages) {
 ### Common Issues
 
 #### Issue: Credentials not found in keychain
+
 ```bash
 Error: Credential 'database_url' not found in keychain
 ```
 
 **Solution:**
+
 ```bash
 # Setup credentials for current environment
 bun run env-setup development
@@ -855,11 +906,13 @@ bun run scripts/bun-secrets-demo.ts
 ```
 
 #### Issue: Security scanner blocking legitimate package
+
 ```bash
 Fatal: Package 'crypto-js' blocked by security policy
 ```
 
 **Solution:**
+
 ```typescript
 // Add exception in security config
 const policies = [
@@ -867,17 +920,19 @@ const policies = [
     name: 'crypto-policy',
     pattern: /crypto/i,
     excludePatterns: ['crypto-js'], // Add exception
-    level: 'fatal'
-  }
+    level: 'fatal',
+  },
 ];
 ```
 
 #### Issue: Private registry authentication failing
+
 ```bash
 Error: 401 Unauthorized - @fire22/core
 ```
 
 **Solution:**
+
 ```bash
 # Store registry token securely
 await secrets.set({
@@ -888,11 +943,13 @@ await secrets.set({
 ```
 
 #### Issue: Scope squatting false positive
+
 ```bash
 Warning: @firebase/core detected as potential squatting
 ```
 
 **Solution:**
+
 ```toml
 # Add to trusted scopes in bunfig.toml
 [install.scopes]
@@ -916,11 +973,13 @@ FIRE22_DEBUG=security bun install
 ### Performance Issues
 
 #### Slow credential retrieval
+
 - Check keychain access permissions
 - Clear keychain cache
 - Reduce concurrent credential operations
 
 #### Slow security scanning
+
 - Update threat feed cache
 - Reduce package scan batch size
 - Enable parallel scanning
@@ -930,7 +989,7 @@ FIRE22_DEBUG=security bun install
 const scanner = new Fire22SecurityScanner({
   caching: { enabled: true, ttl: 3600000 },
   parallel: true,
-  batchSize: 50
+  batchSize: 50,
 });
 ```
 
@@ -939,6 +998,7 @@ const scanner = new Fire22SecurityScanner({
 ## Support & Resources
 
 ### Documentation
+
 - [Fire22 Endpoints Security](./FIRE22-ENDPOINTS-SECURITY.md)
 - [Security Integration Guide](./SECURITY-INTEGRATION-GUIDE.md)
 - [@fire22/validator Documentation](./packages/fire22-validator/README.md)
@@ -948,11 +1008,14 @@ const scanner = new Fire22SecurityScanner({
 - [Fire22 Security GitHub](https://github.com/fire22/security)
 
 ### Community
+
 - Fire22 Discord: [discord.gg/fire22](https://discord.gg/fire22)
 - Security Issues: security@fire22.com
-- Bug Reports: [GitHub Issues](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues)
+- Bug Reports:
+  [GitHub Issues](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues)
 
 ### Version History
+
 - v1.0.0 - Initial release with Bun.secrets and scanner
 - v1.1.0 - Added scoped package security
 - v1.2.0 - Workspace protocol integration

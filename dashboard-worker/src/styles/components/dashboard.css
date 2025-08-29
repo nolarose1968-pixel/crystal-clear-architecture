@@ -213,11 +213,12 @@
 
 /* Dashboard Animations */
 @keyframes flame-flicker {
-  0%, 100% { 
+  0%,
+  100% {
     transform: scale(1) rotate(-2deg);
     filter: brightness(1);
   }
-  50% { 
+  50% {
     transform: scale(1.1) rotate(2deg);
     filter: brightness(1.2);
   }
@@ -244,19 +245,19 @@
     flex-direction: column;
     gap: var(--space-lg);
   }
-  
+
   .dashboard-nav {
     width: 100%;
     justify-content: center;
     flex-wrap: wrap;
   }
-  
+
   .dashboard-tabs {
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
-  
+
   .dashboard-grid--cols-4 {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
@@ -281,5 +282,7 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

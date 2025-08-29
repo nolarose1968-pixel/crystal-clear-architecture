@@ -4,7 +4,13 @@
  */
 
 import { EventEmitter } from 'events';
-import { CashierService, CashierTransaction, CashierSession, DepositRequest, WithdrawalRequest } from '../services/cashier-service';
+import {
+  CashierService,
+  CashierTransaction,
+  CashierSession,
+  DepositRequest,
+  WithdrawalRequest,
+} from '../services/cashier-service';
 
 export interface CashierInterfaceOptions {
   container: HTMLElement;
@@ -19,7 +25,8 @@ export class CashierInterface extends EventEmitter {
   private container: HTMLElement;
   private cashierService: CashierService;
   private options: CashierInterfaceOptions;
-  private currentView: 'dashboard' | 'deposit' | 'withdrawal' | 'approvals' | 'history' = 'dashboard';
+  private currentView: 'dashboard' | 'deposit' | 'withdrawal' | 'approvals' | 'history' =
+    'dashboard';
   private isInitialized = false;
 
   constructor(options: CashierInterfaceOptions) {
@@ -72,9 +79,11 @@ export class CashierInterface extends EventEmitter {
     });
 
     // Listen for DOM events
-    this.container.addEventListener('click', (event) => {
+    this.container.addEventListener('click', event => {
       const target = event.target as HTMLElement;
-      const action = target.getAttribute('data-action') || target.closest('[data-action]')?.getAttribute('data-action');
+      const action =
+        target.getAttribute('data-action') ||
+        target.closest('[data-action]')?.getAttribute('data-action');
 
       if (action) {
         this.handleAction(action, target, event);
@@ -82,7 +91,7 @@ export class CashierInterface extends EventEmitter {
     });
 
     // Listen for form submissions
-    this.container.addEventListener('submit', (event) => {
+    this.container.addEventListener('submit', event => {
       const form = event.target as HTMLFormElement;
       if (form.hasAttribute('data-cashier-form')) {
         event.preventDefault();
@@ -280,7 +289,9 @@ export class CashierInterface extends EventEmitter {
         </div>
 
         <!-- Session Info -->
-        ${session ? `
+        ${
+          session
+            ? `
           <div class="session-info-card">
             <h5>Current Session</h5>
             <div class="row">
@@ -312,7 +323,8 @@ export class CashierInterface extends EventEmitter {
               </div>
             </div>
           </div>
-        ` : `
+        `
+            : `
           <div class="no-session-card">
             <div class="text-center py-4">
               <i class="fas fa-user-clock fa-3x text-muted mb-3"></i>
@@ -323,7 +335,8 @@ export class CashierInterface extends EventEmitter {
               </button>
             </div>
           </div>
-        `}
+        `
+        }
 
         <!-- Quick Actions -->
         <div class="quick-actions">
@@ -551,7 +564,9 @@ export class CashierInterface extends EventEmitter {
       `;
     }
 
-    const transactionsHtml = pendingTransactions.map(transaction => `
+    const transactionsHtml = pendingTransactions
+      .map(
+        transaction => `
       <div class="approval-item" data-transaction-id="${transaction.id}">
         <div class="d-flex justify-content-between align-items-center">
           <div>
@@ -573,7 +588,9 @@ export class CashierInterface extends EventEmitter {
           </div>
         </div>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
 
     return `
       <div class="approvals-list">
@@ -601,7 +618,9 @@ export class CashierInterface extends EventEmitter {
       `;
     }
 
-    const transactionsHtml = transactions.map(transaction => `
+    const transactionsHtml = transactions
+      .map(
+        transaction => `
       <div class="transaction-item" data-transaction-id="${transaction.id}">
         <div class="d-flex justify-content-between align-items-center">
           <div class="transaction-info">
@@ -630,7 +649,9 @@ export class CashierInterface extends EventEmitter {
           </div>
         </div>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
 
     return `
       <div class="transaction-history">
@@ -695,7 +716,10 @@ export class CashierInterface extends EventEmitter {
 
       const pendingCount = this.cashierService.getPendingApprovals().length;
       if (pendingCount > 0) {
-        approvalsTab.insertAdjacentHTML('beforeend', `<span class="badge badge-danger ml-1">${pendingCount}</span>`);
+        approvalsTab.insertAdjacentHTML(
+          'beforeend',
+          `<span class="badge badge-danger ml-1">${pendingCount}</span>`
+        );
       }
     }
   }
@@ -820,11 +844,17 @@ export class CashierInterface extends EventEmitter {
     const request: DepositRequest = {
       customerId: formData.get('customerId') as string,
       amount: parseFloat(formData.get('amount') as string),
-      paymentMethod: formData.get('paymentMethod') as 'cash' | 'check' | 'wire' | 'credit' | 'debit' | 'crypto',
+      paymentMethod: formData.get('paymentMethod') as
+        | 'cash'
+        | 'check'
+        | 'wire'
+        | 'credit'
+        | 'debit'
+        | 'crypto',
       description: formData.get('description') as string,
       reference: formData.get('reference') as string,
       notes: formData.get('notes') as string,
-      fee: formData.get('fee') ? parseFloat(formData.get('fee') as string) : undefined
+      fee: formData.get('fee') ? parseFloat(formData.get('fee') as string) : undefined,
     };
 
     const transaction = await this.cashierService.processDeposit(request, this.options.cashierId);
@@ -847,10 +877,13 @@ export class CashierInterface extends EventEmitter {
       description: formData.get('description') as string,
       reference: formData.get('reference') as string,
       notes: formData.get('notes') as string,
-      fee: formData.get('fee') ? parseFloat(formData.get('fee') as string) : undefined
+      fee: formData.get('fee') ? parseFloat(formData.get('fee') as string) : undefined,
     };
 
-    const transaction = await this.cashierService.processWithdrawal(request, this.options.cashierId);
+    const transaction = await this.cashierService.processWithdrawal(
+      request,
+      this.options.cashierId
+    );
 
     this.showSuccess(`Withdrawal processed successfully: $${transaction.amount.toFixed(2)}`);
     this.clearCurrentForm();
@@ -863,7 +896,11 @@ export class CashierInterface extends EventEmitter {
   private async startSession(): Promise<void> {
     try {
       const openingBalance = parseFloat(prompt('Enter opening balance:', '0') || '0');
-      await this.cashierService.startSession(this.options.cashierId, this.options.cashierName, openingBalance);
+      await this.cashierService.startSession(
+        this.options.cashierId,
+        this.options.cashierName,
+        openingBalance
+      );
       this.showSuccess('Cashier session started successfully');
       this.updateDisplay();
     } catch (error) {
@@ -908,7 +945,11 @@ export class CashierInterface extends EventEmitter {
     const reason = prompt('Enter rejection reason:');
     if (reason) {
       try {
-        await this.cashierService.rejectTransaction(transactionId, this.options.cashierName, reason);
+        await this.cashierService.rejectTransaction(
+          transactionId,
+          this.options.cashierName,
+          reason
+        );
         this.showSuccess('Transaction rejected');
         this.refreshApprovalsView();
         this.updateDisplay();
@@ -1056,11 +1097,16 @@ export class CashierInterface extends EventEmitter {
    */
   private getStatusBadgeClass(status: string): string {
     switch (status) {
-      case 'completed': return 'success';
-      case 'pending': return 'warning';
-      case 'failed': return 'danger';
-      case 'processing': return 'info';
-      default: return 'secondary';
+      case 'completed':
+        return 'success';
+      case 'pending':
+        return 'warning';
+      case 'failed':
+        return 'danger';
+      case 'processing':
+        return 'info';
+      default:
+        return 'secondary';
     }
   }
 
@@ -1106,14 +1152,18 @@ export class CashierInterface extends EventEmitter {
 }
 
 // Global functions for easy access
-export async function createCashierInterface(container: HTMLElement, cashierId: string, cashierName: string): Promise<CashierInterface> {
+export async function createCashierInterface(
+  container: HTMLElement,
+  cashierId: string,
+  cashierName: string
+): Promise<CashierInterface> {
   const options: CashierInterfaceOptions = {
     container,
     cashierId,
     cashierName,
     enableSessionManagement: true,
     enableApprovalWorkflow: true,
-    enableRealTimeUpdates: true
+    enableRealTimeUpdates: true,
   };
 
   const cashierInterface = new CashierInterface(options);

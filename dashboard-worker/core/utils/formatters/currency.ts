@@ -34,16 +34,13 @@ const CURRENCY_INFO: Record<CurrencyCode, CurrencyInfo> = {
   AUD: { code: 'AUD', symbol: 'A$', name: 'Australian Dollar', decimals: 2, position: 'before' },
   JPY: { code: 'JPY', symbol: '¥', name: 'Japanese Yen', decimals: 0, position: 'before' },
   CNY: { code: 'CNY', symbol: '¥', name: 'Chinese Yuan', decimals: 2, position: 'before' },
-  INR: { code: 'INR', symbol: '₹', name: 'Indian Rupee', decimals: 2, position: 'before' }
+  INR: { code: 'INR', symbol: '₹', name: 'Indian Rupee', decimals: 2, position: 'before' },
 };
 
 /**
  * Format currency amount with various options
  */
-export function formatCurrency(
-  amount: number,
-  options: CurrencyOptions = {}
-): string {
+export function formatCurrency(amount: number, options: CurrencyOptions = {}): string {
   const {
     currency = 'USD',
     locale = 'en-US',
@@ -52,7 +49,7 @@ export function formatCurrency(
     maximumFractionDigits,
     useGrouping = true,
     showSymbol = true,
-    compact = false
+    compact = false,
   } = options;
 
   const currencyInfo = CURRENCY_INFO[currency];
@@ -71,17 +68,18 @@ export function formatCurrency(
   }
 
   // Determine decimal places
-  const decimals = maximumFractionDigits !== undefined
-    ? maximumFractionDigits
-    : minimumFractionDigits !== undefined
-      ? minimumFractionDigits
-      : currencyInfo.decimals;
+  const decimals =
+    maximumFractionDigits !== undefined
+      ? maximumFractionDigits
+      : minimumFractionDigits !== undefined
+        ? minimumFractionDigits
+        : currencyInfo.decimals;
 
   // Format the number
   const formattedNumber = new Intl.NumberFormat(locale, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
-    useGrouping
+    useGrouping,
   }).format(Math.abs(amount));
 
   // Add currency symbol/code
@@ -170,9 +168,12 @@ export function parseCurrency(currencyString: string, currency: CurrencyCode = '
     const num = parseFloat(numStr);
 
     switch (suffix.toUpperCase()) {
-      case 'K': return num * 1000;
-      case 'M': return num * 1000000;
-      case 'B': return num * 1000000000;
+      case 'K':
+        return num * 1000;
+      case 'M':
+        return num * 1000000;
+      case 'B':
+        return num * 1000000000;
     }
   }
 
@@ -187,7 +188,10 @@ export function parseCurrency(currencyString: string, currency: CurrencyCode = '
 /**
  * Calculate percentage change between two amounts
  */
-export function calculatePercentageChange(oldAmount: number, newAmount: number): {
+export function calculatePercentageChange(
+  oldAmount: number,
+  newAmount: number
+): {
   change: number;
   percentage: number;
   direction: 'up' | 'down' | 'unchanged';
@@ -196,7 +200,7 @@ export function calculatePercentageChange(oldAmount: number, newAmount: number):
     return {
       change: newAmount,
       percentage: newAmount > 0 ? 100 : 0,
-      direction: newAmount > 0 ? 'up' : newAmount < 0 ? 'down' : 'unchanged'
+      direction: newAmount > 0 ? 'up' : newAmount < 0 ? 'down' : 'unchanged',
     };
   }
 
@@ -213,7 +217,10 @@ export function calculatePercentageChange(oldAmount: number, newAmount: number):
 /**
  * Format percentage change
  */
-export function formatPercentageChange(change: number, options: { showSign?: boolean; decimals?: number } = {}): string {
+export function formatPercentageChange(
+  change: number,
+  options: { showSign?: boolean; decimals?: number } = {}
+): string {
   const { showSign = true, decimals = 2 } = options;
 
   const formatted = change.toFixed(decimals);
@@ -247,7 +254,10 @@ export function calculateSimpleInterest(principal: number, rate: number, time: n
 /**
  * Format interest rate
  */
-export function formatInterestRate(rate: number, options: { showPercent?: boolean; decimals?: number } = {}): string {
+export function formatInterestRate(
+  rate: number,
+  options: { showPercent?: boolean; decimals?: number } = {}
+): string {
   const { showPercent = true, decimals = 2 } = options;
   const formatted = (rate * 100).toFixed(decimals);
   return showPercent ? `${formatted}%` : formatted;
@@ -348,6 +358,6 @@ export function formatCurrencyWithTrend(
   return {
     formatted,
     trend: direction,
-    change
+    change,
   };
 }

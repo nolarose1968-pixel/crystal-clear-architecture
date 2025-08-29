@@ -10,7 +10,7 @@ import type {
   ApiResponse,
   PaginationParams,
   DateRangeParams,
-  FilterParams
+  FilterParams,
 } from '../../../../core/types/controllers';
 
 /**
@@ -34,7 +34,7 @@ export async function getSettlementHistory(
         event: 'Chiefs vs Bills',
         betType: 'moneyline',
         selection: 'Chiefs',
-        stake: 100.00,
+        stake: 100.0,
         odds: -150,
         potentialPayout: 166.67,
         outcome: 'won',
@@ -47,7 +47,7 @@ export async function getSettlementHistory(
         updatedAt: new Date(),
         isActive: true,
         createdBy: 'system',
-        updatedBy: 'system'
+        updatedBy: 'system',
       },
       {
         id: 'set_002',
@@ -58,12 +58,12 @@ export async function getSettlementHistory(
         event: 'Lakers vs Warriors',
         betType: 'spread',
         selection: 'Lakers -2.5',
-        stake: 50.00,
+        stake: 50.0,
         odds: -110,
         potentialPayout: 95.45,
         outcome: 'lost',
         status: 'settled',
-        settledAmount: -50.00,
+        settledAmount: -50.0,
         settledDate: new Date('2025-01-25T16:00:00Z'),
         processedBy: 'Agent Johnson',
         notes: 'Spread bet loss',
@@ -71,8 +71,8 @@ export async function getSettlementHistory(
         updatedAt: new Date(),
         isActive: true,
         createdBy: 'system',
-        updatedBy: 'system'
-      }
+        updatedBy: 'system',
+      },
     ];
 
     // Apply filters
@@ -87,14 +87,14 @@ export async function getSettlementHistory(
     }
 
     if (dateFrom) {
-      filteredSettlements = filteredSettlements.filter(s =>
-        s.settledDate && s.settledDate >= dateFrom
+      filteredSettlements = filteredSettlements.filter(
+        s => s.settledDate && s.settledDate >= dateFrom
       );
     }
 
     if (dateTo) {
-      filteredSettlements = filteredSettlements.filter(s =>
-        s.settledDate && s.settledDate <= dateTo
+      filteredSettlements = filteredSettlements.filter(
+        s => s.settledDate && s.settledDate <= dateTo
       );
     }
 
@@ -112,7 +112,7 @@ export async function getSettlementHistory(
       message: 'Settlement history retrieved successfully',
       data: {
         settlements: paginatedSettlements,
-        summary: calculateSettlementSummary(filteredSettlements)
+        summary: calculateSettlementSummary(filteredSettlements),
       },
       metadata: {
         timestamp: new Date(),
@@ -122,16 +122,15 @@ export async function getSettlementHistory(
           page,
           limit,
           total,
-          totalPages
-        }
-      }
+          totalPages,
+        },
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     const errorResponse: ApiResponse = {
       status: 'error',
@@ -140,13 +139,13 @@ export async function getSettlementHistory(
       metadata: {
         timestamp: new Date(),
         requestId: `settlement_history_error_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
@@ -172,7 +171,7 @@ export async function getPendingSettlements(
         event: 'Giants vs Dodgers',
         betType: 'total',
         selection: 'Over 8.5',
-        stake: 75.00,
+        stake: 75.0,
         odds: -115,
         potentialPayout: 139.13,
         outcome: 'pending',
@@ -184,8 +183,8 @@ export async function getPendingSettlements(
         updatedAt: new Date(),
         isActive: true,
         createdBy: 'system',
-        updatedBy: 'system'
-      }
+        updatedBy: 'system',
+      },
     ];
 
     let filteredSettlements = mockPendingSettlements;
@@ -208,9 +207,9 @@ export async function getPendingSettlements(
       message: 'Pending settlements retrieved successfully',
       data: {
         settlements: paginatedSettlements,
-        urgentCount: mockPendingSettlements.filter(s =>
-          s.createdAt.getTime() < Date.now() - 24 * 60 * 60 * 1000 // Older than 24 hours
-        ).length
+        urgentCount: mockPendingSettlements.filter(
+          s => s.createdAt.getTime() < Date.now() - 24 * 60 * 60 * 1000 // Older than 24 hours
+        ).length,
       },
       metadata: {
         timestamp: new Date(),
@@ -220,16 +219,15 @@ export async function getPendingSettlements(
           page,
           limit,
           total,
-          totalPages
-        }
-      }
+          totalPages,
+        },
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     const errorResponse: ApiResponse = {
       status: 'error',
@@ -238,13 +236,13 @@ export async function getPendingSettlements(
       metadata: {
         timestamp: new Date(),
         requestId: `pending_settlements_error_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
@@ -269,12 +267,12 @@ export async function processSettlement(
       event: 'Test Event',
       betType: 'moneyline',
       selection: 'Test Selection',
-      stake: 100.00,
+      stake: 100.0,
       odds: -110,
       potentialPayout: 190.91,
       outcome,
       status: 'settled',
-      settledAmount: outcome === 'won' ? 190.91 : outcome === 'lost' ? -100.00 : 0,
+      settledAmount: outcome === 'won' ? 190.91 : outcome === 'lost' ? -100.0 : 0,
       settledDate: new Date(),
       processedBy: 'Current User', // Would get from request context
       notes,
@@ -282,7 +280,7 @@ export async function processSettlement(
       updatedAt: new Date(),
       isActive: true,
       createdBy: 'system',
-      updatedBy: 'system'
+      updatedBy: 'system',
     };
 
     const response: ApiResponse<SettlementRecord> = {
@@ -292,15 +290,14 @@ export async function processSettlement(
       metadata: {
         timestamp: new Date(),
         requestId: `process_settlement_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     const errorResponse: ApiResponse = {
       status: 'error',
@@ -309,13 +306,13 @@ export async function processSettlement(
       metadata: {
         timestamp: new Date(),
         requestId: `process_settlement_error_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
@@ -333,14 +330,14 @@ export async function getSettlementStats(
     // Mock statistics - in real implementation, this would aggregate from database
     const mockStats: SettlementSummary = {
       totalSettlements: 1250,
-      totalAmount: 245670.50,
+      totalAmount: 245670.5,
       pendingCount: 23,
       settledCount: 1227,
       wonCount: 623,
       lostCount: 604,
       averageStake: 127.85,
       averagePayout: 189.32,
-      totalProfit: 15670.50
+      totalProfit: 15670.5,
     };
 
     const response: ApiResponse<SettlementSummary> = {
@@ -350,15 +347,14 @@ export async function getSettlementStats(
       metadata: {
         timestamp: new Date(),
         requestId: `settlement_stats_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     const errorResponse: ApiResponse = {
       status: 'error',
@@ -367,13 +363,13 @@ export async function getSettlementStats(
       metadata: {
         timestamp: new Date(),
         requestId: `settlement_stats_error_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
@@ -397,6 +393,6 @@ function calculateSettlementSummary(settlements: SettlementRecord[]): Settlement
     lostCount: lostSettlements.length,
     averageStake: settlements.length > 0 ? totalStake / settlements.length : 0,
     averagePayout: wonSettlements.length > 0 ? totalPayout / wonSettlements.length : 0,
-    totalProfit: totalPayout - totalStake
+    totalProfit: totalPayout - totalStake,
   };
 }

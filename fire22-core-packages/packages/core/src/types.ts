@@ -6,8 +6,8 @@ export interface User {
   id: string;
   username: string;
   email: string;
-  role: 'admin' | 'agent' | 'customer';
-  status: 'active' | 'inactive' | 'suspended';
+  role: "admin" | "agent" | "customer";
+  status: "active" | "inactive" | "suspended";
 }
 
 export interface Agent {
@@ -17,7 +17,7 @@ export interface Agent {
   level: number;
   parentId?: string;
   commission: number;
-  status: 'active' | 'inactive';
+  status: "active" | "inactive";
 }
 
 export interface Wager {
@@ -27,16 +27,16 @@ export interface Wager {
   amount: number;
   risk: number;
   toWin: number;
-  status: 'pending' | 'won' | 'lost' | 'void';
+  status: "pending" | "won" | "lost" | "void";
   placedAt: Date;
 }
 
 export interface Transaction {
   id: string;
-  type: 'deposit' | 'withdrawal' | 'wager' | 'payout';
+  type: "deposit" | "withdrawal" | "wager" | "payout";
   amount: number;
   customerId: string;
-  status: 'pending' | 'completed' | 'failed';
+  status: "pending" | "completed" | "failed";
   timestamp: Date;
 }
 

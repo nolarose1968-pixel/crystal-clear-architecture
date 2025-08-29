@@ -33,7 +33,7 @@
       ],
       "timeline": {
         "monday": "Review definition document",
-        "tuesday": "Approve 16-specialist team structure", 
+        "tuesday": "Approve 16-specialist team structure",
         "wednesday": "Begin infrastructure preparation",
         "friday": "Technology stack readiness verification"
       }
@@ -42,14 +42,14 @@
   "department_status": {
     "sportsbook_operations": {
       "head": "Marcus Rodriguez",
-      "comms_lead": "Linda Chen", 
+      "comms_lead": "Linda Chen",
       "task_lead": "Robert Taylor",
       "status": "ready_for_review"
     },
     "live_casino_operations": {
       "head": "Jennifer Wilson",
       "comms_lead": "TBD",
-      "task_lead": "TBD", 
+      "task_lead": "TBD",
       "status": "ready_for_review"
     },
     "technology_enhancement": {

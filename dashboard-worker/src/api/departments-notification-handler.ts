@@ -31,30 +31,30 @@ export interface DepartmentStatus {
 
 export class DepartmentNotificationHandler {
   private static readonly DEPARTMENT_HEADS = {
-    'sportsbook_operations': {
+    sportsbook_operations: {
       head: 'Marcus Rodriguez',
       email: 'marcus.rodriguez@sportsbook.fire22',
       comms_lead: 'Linda Chen',
-      task_coordinator: 'Robert Taylor'
+      task_coordinator: 'Robert Taylor',
     },
-    'live_casino_operations': {
-      head: 'Jennifer Wilson', 
+    live_casino_operations: {
+      head: 'Jennifer Wilson',
       email: 'jennifer.wilson@casino.fire22',
       comms_lead: null,
-      task_coordinator: null
+      task_coordinator: null,
     },
-    'technology_enhancement': {
+    technology_enhancement: {
       head: 'Mike Hunt',
-      email: 'mike.hunt@technology.fire22', 
+      email: 'mike.hunt@technology.fire22',
       comms_lead: null,
-      task_coordinator: null
+      task_coordinator: null,
     },
-    'finance_cashier_operations': {
+    finance_cashier_operations: {
       head: 'Michael Chen',
       email: 'michael.chen@finance.fire22',
       comms_lead: 'Emily Rodriguez',
-      task_coordinator: null
-    }
+      task_coordinator: null,
+    },
   };
 
   /**
@@ -92,16 +92,16 @@ Critical Timeline: Day 1-2 approvals → Day 3-4 TBD filling → Day 5 implement
       acknowledgments: {
         'marcus.rodriguez@sportsbook.fire22': false,
         'jennifer.wilson@casino.fire22': false,
-        'mike.hunt@technology.fire22': false, 
-        'michael.chen@finance.fire22': false
+        'mike.hunt@technology.fire22': false,
+        'michael.chen@finance.fire22': false,
       },
       deadline: '2025-08-30T17:00:00Z',
       actions_required: [
         'Review department definition document',
         'Approve specialist team structure',
         'Identify remaining TBD positions',
-        'Submit approval response by Tuesday EOD'
-      ]
+        'Submit approval response by Tuesday EOD',
+      ],
     };
 
     return notification;
@@ -121,10 +121,10 @@ Critical Timeline: Day 1-2 approvals → Day 3-4 TBD filling → Day 5 implement
         status: 'ready_for_review',
         specialist_count: 18,
         l_keys: ['L-12', 'L-15', 'L-16', 'L-85', 'L-1390'],
-        last_updated: '2025-08-28T20:00:00Z'
+        last_updated: '2025-08-28T20:00:00Z',
       },
       {
-        department: 'live_casino_operations', 
+        department: 'live_casino_operations',
         head: 'Jennifer Wilson',
         head_email: 'jennifer.wilson@casino.fire22',
         comms_lead: null,
@@ -132,7 +132,7 @@ Critical Timeline: Day 1-2 approvals → Day 3-4 TBD filling → Day 5 implement
         status: 'ready_for_review',
         specialist_count: 15,
         l_keys: ['NEW-L-KEYS-NEEDED'],
-        last_updated: '2025-08-28T20:00:00Z'
+        last_updated: '2025-08-28T20:00:00Z',
       },
       {
         department: 'technology_enhancement',
@@ -143,19 +143,19 @@ Critical Timeline: Day 1-2 approvals → Day 3-4 TBD filling → Day 5 implement
         status: 'ready_for_review',
         specialist_count: 16,
         l_keys: ['L-407', 'L-449', 'L-792', 'L-880', 'L-1351'],
-        last_updated: '2025-08-28T20:30:00Z'
+        last_updated: '2025-08-28T20:30:00Z',
       },
       {
         department: 'finance_cashier_operations',
-        head: 'Michael Chen', 
+        head: 'Michael Chen',
         head_email: 'michael.chen@finance.fire22',
         comms_lead: 'Emily Rodriguez',
         task_coordinator: null,
         status: 'ready_for_review',
         specialist_count: 16,
         l_keys: ['L-69', 'L-187', 'L-202', 'L-206', 'L-627', 'L-628'],
-        last_updated: '2025-08-28T20:00:00Z'
-      }
+        last_updated: '2025-08-28T20:00:00Z',
+      },
     ];
   }
 
@@ -165,7 +165,7 @@ Critical Timeline: Day 1-2 approvals → Day 3-4 TBD filling → Day 5 implement
   static generateSSEUpdate(): string {
     const notification = this.getMikeHuntAssignmentNotification();
     const departments = this.getDepartmentStatusAll();
-    
+
     const update = {
       type: 'critical_notification',
       timestamp: new Date().toISOString(),
@@ -177,14 +177,14 @@ Critical Timeline: Day 1-2 approvals → Day 3-4 TBD filling → Day 5 implement
         task_coordinators_assigned: '1/4 (25%)',
         approvals_pending: '4/4 (ALL)',
         critical_path_status: 'ON_TRACK',
-        implementation_ready: 'PENDING_APPROVALS'
+        implementation_ready: 'PENDING_APPROVALS',
       },
       next_deadline: '2025-08-30T17:00:00Z',
       rss_feeds: {
         changelog: './CHANGELOG-DEPARTMENTS.md',
         notifications: './src/notifications/department-updates.json',
-        live_stream: '/api/departments/stream'
-      }
+        live_stream: '/api/departments/stream',
+      },
     };
 
     return `data: ${JSON.stringify(update)}\n\n`;
@@ -198,10 +198,10 @@ Critical Timeline: Day 1-2 approvals → Day 3-4 TBD filling → Day 5 implement
     const pending = Object.entries(notification.acknowledgments)
       .filter(([email, acked]) => !acked)
       .map(([email]) => email);
-    
+
     return {
       complete: pending.length === 0,
-      pending
+      pending,
     };
   }
 }
@@ -220,6 +220,6 @@ export const DEPARTMENT_RSS_CONFIG = {
   webMaster: 'technical@fire22.ag',
   ttl: 5, // 5 minutes
   custom_namespaces: {
-    fire22: 'https://fire22.ag/xmlns/departments'
-  }
+    fire22: 'https://fire22.ag/xmlns/departments',
+  },
 } as const;

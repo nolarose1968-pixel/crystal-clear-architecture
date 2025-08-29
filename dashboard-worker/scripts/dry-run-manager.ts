@@ -3,7 +3,7 @@
 /**
  * 🔥 Fire22 Dashboard Dry Run Manager
  * Safe testing and simulation of operations without making actual changes
- * 
+ *
  * Usage:
  *   bun run dry-run:config     # Test configuration changes
  *   bun run dry-run:api        # Test API operations
@@ -54,31 +54,31 @@ class DryRunManager {
           permissions: {
             can_place_bets: true,
             can_withdraw: true,
-            can_deposit: true
+            can_deposit: true,
           },
           betting_limits: {
             single_bet: 1000,
             daily_total: 5000,
-            weekly_total: 25000
-          }
+            weekly_total: 25000,
+          },
         },
         agentConfig: {
           agent_id: 'TEST_AGENT_001',
           commission_rate: 0.05,
-          max_wager: 10000
-        }
+          max_wager: 10000,
+        },
       },
       validationRules: [
         'Validate permission structure',
         'Check betting limit ranges',
         'Verify agent commission rates',
-        'Test configuration validation'
+        'Test configuration validation',
       ],
       rollbackSteps: [
         'Restore previous configuration',
         'Clear test data',
-        'Reset validation state'
-      ]
+        'Reset validation state',
+      ],
     });
 
     // API Operations Dry Run
@@ -91,25 +91,21 @@ class DryRunManager {
           '/api/agent-configs',
           '/api/live-casino/dashboard-data',
           '/api/health/permissions',
-          '/api/fire22/customers'
+          '/api/fire22/customers',
         ],
         testRequests: [
           { method: 'GET', endpoint: '/api/health/permissions' },
           { method: 'POST', endpoint: '/api/customer-config', data: { customer_id: 'TEST' } },
-          { method: 'GET', endpoint: '/api/fire22/customers' }
-        ]
+          { method: 'GET', endpoint: '/api/fire22/customers' },
+        ],
       },
       validationRules: [
         'Test endpoint accessibility',
         'Validate request/response formats',
         'Check authentication requirements',
-        'Test error handling'
+        'Test error handling',
       ],
-      rollbackSteps: [
-        'Clear test data',
-        'Reset API state',
-        'Restore original endpoints'
-      ]
+      rollbackSteps: ['Clear test data', 'Reset API state', 'Restore original endpoints'],
     });
 
     // Database Operations Dry Run
@@ -120,25 +116,17 @@ class DryRunManager {
         queries: [
           'SELECT COUNT(*) FROM customers',
           'SELECT * FROM agent_configs LIMIT 5',
-          'SELECT * FROM live_casino_games LIMIT 3'
+          'SELECT * FROM live_casino_games LIMIT 3',
         ],
-        operations: [
-          'INSERT test record',
-          'UPDATE test record',
-          'DELETE test record'
-        ]
+        operations: ['INSERT test record', 'UPDATE test record', 'DELETE test record'],
       },
       validationRules: [
         'Validate query syntax',
         'Check table existence',
         'Test data integrity',
-        'Verify transaction handling'
+        'Verify transaction handling',
       ],
-      rollbackSteps: [
-        'Rollback test transactions',
-        'Clear test data',
-        'Restore original state'
-      ]
+      rollbackSteps: ['Rollback test transactions', 'Clear test data', 'Restore original state'],
     });
 
     // Deployment Dry Run
@@ -151,27 +139,27 @@ class DryRunManager {
           'Dependency validation',
           'Environment variable check',
           'Configuration validation',
-          'Test suite execution'
+          'Test suite execution',
         ],
         deploymentSteps: [
           'Worker build',
           'D1 database binding',
           'Environment variable injection',
           'Route configuration',
-          'Health check validation'
-        ]
+          'Health check validation',
+        ],
       },
       validationRules: [
         'Validate build process',
         'Check environment configuration',
         'Test dependency resolution',
-        'Verify deployment configuration'
+        'Verify deployment configuration',
       ],
       rollbackSteps: [
         'Keep previous deployment',
         'Restore previous configuration',
-        'Clear deployment artifacts'
-      ]
+        'Clear deployment artifacts',
+      ],
     });
   }
 
@@ -192,7 +180,7 @@ class DryRunManager {
       errors: [],
       estimatedImpact: 'low',
       rollbackPlan: config.rollbackSteps,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     try {
@@ -220,7 +208,6 @@ class DryRunManager {
       }
 
       console.log(`✅ ${config.operation} dry run completed successfully!`);
-
     } catch (error) {
       result.success = false;
       result.errors.push(error.message);
@@ -235,17 +222,18 @@ class DryRunManager {
   private async simulateValidation(rule: string): Promise<void> {
     // Simulate validation delay
     await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
-    
+
     // Check for success mode environment variable
     const successMode = process.env.DRY_RUN_SUCCESS_MODE === 'true';
-    
+
     if (successMode) {
       // Always succeed in success mode
       return;
     }
-    
+
     // Simulate validation success/failure
-    if (Math.random() < 0.01) { // 1% failure rate for testing
+    if (Math.random() < 0.01) {
+      // 1% failure rate for testing
       throw new Error(`Validation failed: ${rule}`);
     }
   }
@@ -253,7 +241,7 @@ class DryRunManager {
   private async simulateOperation(testData: any): Promise<void> {
     // Simulate operation execution
     await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 300));
-    
+
     // Simulate different operation types
     if (testData.endpoints) {
       console.log(`🌐 Testing ${testData.endpoints.length} API endpoints...`);
@@ -282,7 +270,7 @@ class DryRunManager {
 
   async runAllDryRuns(): Promise<DryRunResult[]> {
     console.log('🚀 Running All Dry Run Tests...\n');
-    
+
     const types = ['config', 'api', 'db', 'deploy'];
     const results: DryRunResult[] = [];
 
@@ -306,7 +294,7 @@ class DryRunManager {
 
     let report = `
 📊 DRY RUN REPORT
-================
+!==!==!==
 Generated: ${new Date().toLocaleString()}
 Total Tests: ${totalTests}
 Successful: ${successfulTests}
@@ -318,7 +306,7 @@ Success Rate: ${((successfulTests / totalTests) * 100).toFixed(1)}%
     for (const result of this.results) {
       const status = result.success ? '✅' : '❌';
       const impact = result.estimatedImpact.toUpperCase();
-      
+
       report += `
 ${status} ${result.operation}
 Impact Level: ${impact}
@@ -340,21 +328,21 @@ ${result.rollbackPlan.map(r => `  🔄 ${r}`).join('\n')}
 
   async exportResults(format: 'json' | 'html' | 'markdown' = 'json'): Promise<void> {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    
+
     switch (format) {
       case 'json':
         const jsonFile = `dry-run-results-${timestamp}.json`;
         await Bun.write(jsonFile, JSON.stringify(this.results, null, 2));
         console.log(`📄 Results exported to ${jsonFile}`);
         break;
-        
+
       case 'html':
         const htmlFile = `dry-run-results-${timestamp}.html`;
         const htmlContent = this.generateHTMLReport();
         await Bun.write(htmlFile, htmlContent);
         console.log(`📄 Results exported to ${htmlFile}`);
         break;
-        
+
       case 'markdown':
         const mdFile = `dry-run-results-${timestamp}.md`;
         await Bun.write(mdFile, this.generateReport());
@@ -387,7 +375,9 @@ ${result.rollbackPlan.map(r => `  🔄 ${r}`).join('\n')}
         <p>Generated: ${new Date().toLocaleString()}</p>
     </div>
     
-    ${this.results.map(result => `
+    ${this.results
+      .map(
+        result => `
         <div class="result ${result.success ? 'success' : 'failure'} impact-${result.estimatedImpact}">
             <h2>${result.success ? '✅' : '❌'} ${result.operation}</h2>
             <p><strong>Impact:</strong> ${result.estimatedImpact.toUpperCase()}</p>
@@ -396,20 +386,30 @@ ${result.rollbackPlan.map(r => `  🔄 ${r}`).join('\n')}
             <h3>Changes Made:</h3>
             <ul>${result.changes.map(c => `<li>${c}</li>`).join('')}</ul>
             
-            ${result.warnings.length > 0 ? `
+            ${
+              result.warnings.length > 0
+                ? `
                 <h3>Warnings:</h3>
                 <ul>${result.warnings.map(w => `<li>⚠️ ${w}</li>`).join('')}</ul>
-            ` : ''}
+            `
+                : ''
+            }
             
-            ${result.errors.length > 0 ? `
+            ${
+              result.errors.length > 0
+                ? `
                 <h3>Errors:</h3>
                 <ul>${result.errors.map(e => `<li>❌ ${e}</li>`).join('')}</ul>
-            ` : ''}
+            `
+                : ''
+            }
             
             <h3>Rollback Plan:</h3>
             <ul>${result.rollbackPlan.map(r => `<li>🔄 ${r}</li>`).join('')}</ul>
         </div>
-    `).join('')}
+    `
+      )
+      .join('')}
 </body>
 </html>`;
   }
@@ -419,7 +419,7 @@ ${result.rollbackPlan.map(r => `  🔄 ${r}`).join('\n')}
 async function main() {
   const args = process.argv.slice(2);
   const command = args[0];
-  const format = args[1] as 'json' | 'html' | 'markdown' || 'json';
+  const format = (args[1] as 'json' | 'html' | 'markdown') || 'json';
 
   const manager = new DryRunManager();
 
@@ -428,31 +428,31 @@ async function main() {
       case 'config':
         await manager.runDryRun('config');
         break;
-        
+
       case 'api':
         await manager.runDryRun('api');
         break;
-        
+
       case 'db':
         await manager.runDryRun('db');
         break;
-        
+
       case 'deploy':
         await manager.runDryRun('deploy');
         break;
-        
+
       case 'all':
         await manager.runAllDryRuns();
         break;
-        
+
       case 'report':
         console.log(manager.generateReport());
         break;
-        
+
       case 'export':
         await manager.exportResults(format);
         break;
-        
+
       default:
         console.log('🚀 Fire22 Dashboard Dry Run Manager\n');
         console.log('Usage:');
@@ -474,7 +474,6 @@ async function main() {
     if (command !== 'report' && command !== 'export') {
       console.log('\n' + manager.generateReport());
     }
-
   } catch (error) {
     console.error('❌ Dry run error:', error.message);
     process.exit(1);

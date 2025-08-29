@@ -1,17 +1,19 @@
 # 🔑 Marketing Department Access Credentials Template
+
 **FIRE22 SECURE EMAIL SYSTEM**
 
 ---
 
 **DEPARTMENT**: Marketing Department  
 **EMAIL DOMAIN**: marketing@fire22.com  
-**SECURITY TIER**: TIER_3_MEDIUM  
+**SECURITY TIER**: TIER_3_MEDIUM
 
 ---
 
 ## 👤 **USER ACCESS TEMPLATE**
 
 ### **Primary Department Head**
+
 - **Name**: Emily Davis
 - **Email**: emily.davis@marketing.fire22
 - **Role**: Department Administrator
@@ -39,6 +41,7 @@
 ## 🔐 **SECURITY CONFIGURATION**
 
 ### **Authentication Requirements**
+
 - **Multi-Factor Authentication**: REQUIRED
 - **Password Policy**: 12+ characters, complexity required
 - **Session Timeout**: 8 hours
@@ -46,6 +49,7 @@
 - **Password Rotation**: Every 90 days
 
 ### **Access Permissions**
+
 - **Email Access**: Department-specific inbox
 - **Audit Logs**: Read-only access to own actions
 - **Backup Access**: Restore own emails only

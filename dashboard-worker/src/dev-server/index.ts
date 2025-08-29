@@ -13,11 +13,13 @@ export class DevelopmentServer {
   private hmrManager: HMRManager;
   private initialized = false;
 
-  constructor(config: {
-    server?: Partial<any>;
-    hmr?: Partial<any>;
-    watch?: Partial<any>;
-  } = {}) {
+  constructor(
+    config: {
+      server?: Partial<any>;
+      hmr?: Partial<any>;
+      watch?: Partial<any>;
+    } = {}
+  ) {
     this.serverCore = new ServerCore(config.server);
     this.hmrManager = new HMRManager(config.hmr, config.watch);
   }
@@ -37,7 +39,6 @@ export class DevelopmentServer {
 
       this.initialized = true;
       console.log('✅ Development Server initialized successfully');
-
     } catch (error) {
       console.error('❌ Failed to initialize Development Server:', error);
       throw error;
@@ -62,7 +63,6 @@ export class DevelopmentServer {
       if (this.serverCore.getConfig().hmrEnabled) {
         console.log('🔥 HMR enabled - watching for file changes...');
       }
-
     } catch (error) {
       console.error('❌ Failed to start Development Server:', error);
       throw error;
@@ -79,7 +79,6 @@ export class DevelopmentServer {
       await this.serverCore.stop();
       this.hmrManager.cleanup();
       console.log('✅ Development Server stopped successfully');
-
     } catch (error) {
       console.error('❌ Failed to stop Development Server:', error);
       throw error;
@@ -93,7 +92,7 @@ export class DevelopmentServer {
     return {
       server: this.serverCore.getStats(),
       hmr: this.hmrManager.getStats(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -103,7 +102,7 @@ export class DevelopmentServer {
   getConfig(): any {
     return {
       server: this.serverCore.getConfig(),
-      hmr: this.hmrManager.getStats().config
+      hmr: this.hmrManager.getStats().config,
     };
   }
 
@@ -121,7 +120,7 @@ export class DevelopmentServer {
     this.serverCore.registerRoute({
       method: 'GET',
       path: '/hmr',
-      handler: this.handleHMRUpgrade.bind(this)
+      handler: this.handleHMRUpgrade.bind(this),
     });
 
     // HMR status route
@@ -132,23 +131,23 @@ export class DevelopmentServer {
         const stats = this.hmrManager.getStats();
         return new Response(JSON.stringify(stats), {
           status: 200,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
         });
-      }
+      },
     });
 
     // Development dashboard route
     this.serverCore.registerRoute({
       method: 'GET',
       path: '/',
-      handler: this.serveDevDashboard.bind(this)
+      handler: this.serveDevDashboard.bind(this),
     });
 
     // Static file serving
     this.serverCore.registerRoute({
       method: 'GET',
       path: '/static/:path*',
-      handler: this.serveStaticFile.bind(this)
+      handler: this.serveStaticFile.bind(this),
     });
   }
 
@@ -157,7 +156,7 @@ export class DevelopmentServer {
     // For now, return a placeholder response
     return new Response('HMR WebSocket endpoint', {
       status: 200,
-      headers: { 'Content-Type': 'text/plain' }
+      headers: { 'Content-Type': 'text/plain' },
     });
   }
 
@@ -165,7 +164,7 @@ export class DevelopmentServer {
     const html = this.generateDevDashboardHTML();
     return new Response(html, {
       status: 200,
-      headers: { 'Content-Type': 'text/html' }
+      headers: { 'Content-Type': 'text/html' },
     });
   }
 
@@ -174,7 +173,7 @@ export class DevelopmentServer {
     // For now, return a placeholder response
     return new Response('Static file serving not implemented', {
       status: 404,
-      headers: { 'Content-Type': 'text/plain' }
+      headers: { 'Content-Type': 'text/plain' },
     });
   }
 
@@ -510,7 +509,6 @@ export async function runDevServer(options: any = {}): Promise<void> {
       await server.stop();
       process.exit(0);
     });
-
   } catch (error) {
     console.error('❌ Failed to run development server:', error);
     process.exit(1);

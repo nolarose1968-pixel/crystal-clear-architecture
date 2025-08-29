@@ -113,7 +113,12 @@ export interface FraudScore {
 
 export interface FraudAlert {
   id: string;
-  alertType: 'transaction_anomaly' | 'behavioral_change' | 'device_compromise' | 'network_risk' | 'rule_violation';
+  alertType:
+    | 'transaction_anomaly'
+    | 'behavioral_change'
+    | 'device_compromise'
+    | 'network_risk'
+    | 'rule_violation';
   severity: 'low' | 'medium' | 'high' | 'critical';
   transactionId?: string;
   customerId: string;
@@ -140,7 +145,11 @@ export interface FraudAlert {
 export interface FraudModel {
   id: string;
   name: string;
-  type: 'transaction_scoring' | 'behavioral_analysis' | 'network_analysis' | 'device_fingerprinting';
+  type:
+    | 'transaction_scoring'
+    | 'behavioral_analysis'
+    | 'network_analysis'
+    | 'device_fingerprinting';
   version: string;
   status: 'training' | 'active' | 'deprecated' | 'failed';
   performance: {
@@ -163,7 +172,13 @@ export interface FraudModel {
 
 export interface FraudPattern {
   id: string;
-  patternType: 'velocity_attack' | 'smurfing' | 'money_mule' | 'phishing' | 'account_takeover' | 'synthetic_id';
+  patternType:
+    | 'velocity_attack'
+    | 'smurfing'
+    | 'money_mule'
+    | 'phishing'
+    | 'account_takeover'
+    | 'synthetic_id';
   description: string;
   indicators: string[];
   riskWeight: number;
@@ -178,7 +193,12 @@ export interface FraudPattern {
 
 export interface FraudReport {
   id: string;
-  reportType: 'daily_summary' | 'weekly_summary' | 'monthly_summary' | 'incident_report' | 'compliance_report';
+  reportType:
+    | 'daily_summary'
+    | 'weekly_summary'
+    | 'monthly_summary'
+    | 'incident_report'
+    | 'compliance_report';
   period: {
     startDate: string;
     endDate: string;
@@ -259,7 +279,7 @@ export class AdvancedFraudDetection {
       this.calculateBehavioralScore(transactionData.customerId, features),
       this.calculateNetworkScore(transactionData.customerId, features),
       this.calculateDeviceScore(features),
-      this.calculateRulesScore(features)
+      this.calculateRulesScore(features),
     ]);
 
     // Combine scores
@@ -268,7 +288,7 @@ export class AdvancedFraudDetection {
       behavioral: scores[1],
       network: scores[2],
       device: scores[3],
-      rules: scores[4]
+      rules: scores[4],
     };
 
     // Calculate overall score
@@ -291,9 +311,9 @@ export class AdvancedFraudDetection {
         modelVersion: '1.0.0',
         processingTime: Date.now() - startTime,
         featuresUsed: Object.keys(features).length,
-        confidence: this.calculateConfidence(features)
+        confidence: this.calculateConfidence(features),
       },
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     this.fraudScores.set(fraudScore.transactionId, fraudScore);
@@ -309,7 +329,11 @@ export class AdvancedFraudDetection {
   /**
    * Detect behavioral anomalies
    */
-  async detectBehavioralAnomaly(customerId: string, currentActivity: any, historicalData: any[]): Promise<{
+  async detectBehavioralAnomaly(
+    customerId: string,
+    currentActivity: any,
+    historicalData: any[]
+  ): Promise<{
     isAnomaly: boolean;
     anomalyScore: number;
     reasons: string[];
@@ -322,14 +346,17 @@ export class AdvancedFraudDetection {
     let anomalyScore = 0;
 
     // Amount anomaly
-    if (currentActivity.amount > historicalData.reduce((sum, h) => sum + h.amount, 0) / historicalData.length * 3) {
+    if (
+      currentActivity.amount >
+      (historicalData.reduce((sum, h) => sum + h.amount, 0) / historicalData.length) * 3
+    ) {
       anomalies.push('Unusual transaction amount');
       anomalyScore += 30;
     }
 
     // Frequency anomaly
-    const recentTransactions = historicalData.filter(h =>
-      new Date(h.timestamp) > new Date(Date.now() - 24 * 60 * 60 * 1000)
+    const recentTransactions = historicalData.filter(
+      h => new Date(h.timestamp) > new Date(Date.now() - 24 * 60 * 60 * 1000)
     );
     if (recentTransactions.length > 10) {
       anomalies.push('High transaction frequency');
@@ -357,14 +384,17 @@ export class AdvancedFraudDetection {
     return {
       isAnomaly,
       anomalyScore: Math.min(anomalyScore, 100),
-      reasons: anomalies
+      reasons: anomalies,
     };
   }
 
   /**
    * Analyze transaction network
    */
-  async analyzeTransactionNetwork(customerId: string, transactionId: string): Promise<{
+  async analyzeTransactionNetwork(
+    customerId: string,
+    transactionId: string
+  ): Promise<{
     riskScore: number;
     connections: string[];
     patterns: string[];
@@ -374,28 +404,25 @@ export class AdvancedFraudDetection {
     }
 
     // Simulate network analysis
-    const connections = [
-      'merchant_connection',
-      'device_connection',
-      'ip_connection'
-    ];
+    const connections = ['merchant_connection', 'device_connection', 'ip_connection'];
 
-    const patterns = [
-      'first_party_fraud',
-      'merchant_fraud'
-    ];
+    const patterns = ['first_party_fraud', 'merchant_fraud'];
 
     return {
       riskScore: 25,
       connections,
-      patterns
+      patterns,
     };
   }
 
   /**
    * Update fraud model with feedback
    */
-  async updateModelWithFeedback(transactionId: string, actualOutcome: 'legitimate' | 'fraudulent', feedback: any): Promise<void> {
+  async updateModelWithFeedback(
+    transactionId: string,
+    actualOutcome: 'legitimate' | 'fraudulent',
+    feedback: any
+  ): Promise<void> {
     // Store feedback for model retraining
     console.log(`Updating model with feedback for transaction ${transactionId}: ${actualOutcome}`);
   }
@@ -409,21 +436,21 @@ export class AdvancedFraudDetection {
     generatedBy: string
   ): Promise<FraudReport> {
     // Gather data for the period
-    const periodScores = Array.from(this.fraudScores.values())
-      .filter(score => {
-        const scoreDate = new Date(score.createdAt);
-        return scoreDate >= new Date(period.startDate) && scoreDate <= new Date(period.endDate);
-      });
+    const periodScores = Array.from(this.fraudScores.values()).filter(score => {
+      const scoreDate = new Date(score.createdAt);
+      return scoreDate >= new Date(period.startDate) && scoreDate <= new Date(period.endDate);
+    });
 
-    const periodAlerts = Array.from(this.fraudAlerts.values())
-      .filter(alert => {
-        const alertDate = new Date(alert.createdAt);
-        return alertDate >= new Date(period.startDate) && alertDate <= new Date(period.endDate);
-      });
+    const periodAlerts = Array.from(this.fraudAlerts.values()).filter(alert => {
+      const alertDate = new Date(alert.createdAt);
+      return alertDate >= new Date(period.startDate) && alertDate <= new Date(period.endDate);
+    });
 
     // Calculate summary metrics
     const totalTransactions = periodScores.length;
-    const fraudulentTransactions = periodScores.filter(s => s.riskLevel === 'high' || s.riskLevel === 'critical').length;
+    const fraudulentTransactions = periodScores.filter(
+      s => s.riskLevel === 'high' || s.riskLevel === 'critical'
+    ).length;
     const fraudRate = totalTransactions > 0 ? fraudulentTransactions / totalTransactions : 0;
 
     const blockedAmount = periodScores
@@ -435,7 +462,7 @@ export class AdvancedFraudDetection {
       low: periodScores.filter(s => s.riskLevel === 'low').length,
       medium: periodScores.filter(s => s.riskLevel === 'medium').length,
       high: periodScores.filter(s => s.riskLevel === 'high').length,
-      critical: periodScores.filter(s => s.riskLevel === 'critical').length
+      critical: periodScores.filter(s => s.riskLevel === 'critical').length,
     };
 
     const report: FraudReport = {
@@ -448,13 +475,13 @@ export class AdvancedFraudDetection {
         fraudRate,
         blockedAmount,
         falsePositives: 0, // Would be calculated from feedback
-        averageResponseTime: 0 // Would be calculated from alert resolution times
+        averageResponseTime: 0, // Would be calculated from alert resolution times
       },
       topPatterns: [], // Would be calculated from pattern analysis
       riskDistribution,
       recommendations: this.generateReportRecommendations(riskDistribution, fraudRate),
       generatedAt: new Date().toISOString(),
-      generatedBy
+      generatedBy,
     };
 
     this.fraudReports.set(report.id, report);
@@ -480,7 +507,7 @@ export class AdvancedFraudDetection {
       transactionHour: new Date().getHours(),
       transactionDay: new Date().getDay(),
       isWeekend: [0, 6].includes(new Date().getDay()),
-      isBusinessHours: new Date().getHours() >= 9 && new Date().getHours() <= 17
+      isBusinessHours: new Date().getHours() >= 9 && new Date().getHours() <= 17,
     };
 
     return features;
@@ -518,7 +545,10 @@ export class AdvancedFraudDetection {
     return Math.min(score, 100);
   }
 
-  private async calculateBehavioralScore(customerId: string, features: Record<string, any>): Promise<number> {
+  private async calculateBehavioralScore(
+    customerId: string,
+    features: Record<string, any>
+  ): Promise<number> {
     if (!this.config.models.behavioralAnalysis.enabled) return 0;
 
     // Simplified behavioral scoring
@@ -535,7 +565,10 @@ export class AdvancedFraudDetection {
     return Math.min(score, 100);
   }
 
-  private async calculateNetworkScore(customerId: string, features: Record<string, any>): Promise<number> {
+  private async calculateNetworkScore(
+    customerId: string,
+    features: Record<string, any>
+  ): Promise<number> {
     if (!this.config.models.networkAnalysis.enabled) return 0;
 
     // Simplified network scoring
@@ -602,11 +635,14 @@ export class AdvancedFraudDetection {
     return 'low';
   }
 
-  private identifyFactors(features: Record<string, any>, breakdown: FraudScore['scoreBreakdown']): FraudScore['factors'] {
+  private identifyFactors(
+    features: Record<string, any>,
+    breakdown: FraudScore['scoreBreakdown']
+  ): FraudScore['factors'] {
     const factors = {
       positive: [] as string[],
       negative: [] as string[],
-      neutral: [] as string[]
+      neutral: [] as string[],
     };
 
     // Analyze each score component
@@ -647,14 +683,16 @@ export class AdvancedFraudDetection {
     return {
       action,
       confidence: 0.85,
-      reasoning
+      reasoning,
     };
   }
 
   private calculateConfidence(features: Record<string, any>): number {
     // Calculate confidence based on feature completeness
     const totalFeatures = Object.keys(features).length;
-    const completeFeatures = Object.values(features).filter(v => v !== undefined && v !== null).length;
+    const completeFeatures = Object.values(features).filter(
+      v => v !== undefined && v !== null
+    ).length;
 
     return completeFeatures / totalFeatures;
   }
@@ -669,22 +707,22 @@ export class AdvancedFraudDetection {
       description: `High-risk transaction detected with score ${fraudScore.overallScore}`,
       details: {
         fraudScore,
-        riskFactors: fraudScore.factors.negative
+        riskFactors: fraudScore.factors.negative,
       },
       status: 'active',
       riskScore: fraudScore.overallScore,
       impact: {
         financial: 0, // Would be calculated
         reputation: 0,
-        operational: 0
+        operational: 0,
       },
       response: {
         actionTaken: '',
         actionTimestamp: new Date().toISOString(),
-        outcome: 'pending'
+        outcome: 'pending',
       },
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.fraudAlerts.set(alert.id, alert);
@@ -720,15 +758,15 @@ export class AdvancedFraudDetection {
           precision: 0.88,
           recall: 0.85,
           f1Score: 0.86,
-          auc: 0.91
+          auc: 0.91,
         },
         trainingData: {
           size: 100000,
           lastTrained: '2024-01-01T00:00:00Z',
-          nextTraining: '2024-02-01T00:00:00Z'
+          nextTraining: '2024-02-01T00:00:00Z',
         },
         features: ['amount', 'currency', 'payment_method', 'location', 'time'],
-        hyperparameters: { learningRate: 0.01, maxDepth: 10 }
+        hyperparameters: { learningRate: 0.01, maxDepth: 10 },
       },
       {
         name: 'Behavioral Analysis Model',
@@ -740,16 +778,16 @@ export class AdvancedFraudDetection {
           precision: 0.82,
           recall: 0.88,
           f1Score: 0.85,
-          auc: 0.87
+          auc: 0.87,
         },
         trainingData: {
           size: 50000,
           lastTrained: '2024-01-01T00:00:00Z',
-          nextTraining: '2024-02-01T00:00:00Z'
+          nextTraining: '2024-02-01T00:00:00Z',
         },
         features: ['transaction_history', 'amount_patterns', 'location_patterns'],
-        hyperparameters: { windowSize: 30, threshold: 0.95 }
-      }
+        hyperparameters: { windowSize: 30, threshold: 0.95 },
+      },
     ];
 
     models.forEach(model => {
@@ -757,7 +795,7 @@ export class AdvancedFraudDetection {
         ...model,
         id: this.generateModelId(),
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
       this.fraudModels.set(fraudModel.id, fraudModel);
     });
@@ -773,7 +811,7 @@ export class AdvancedFraudDetection {
         detectionThreshold: 0.7,
         falsePositiveRate: 0.05,
         affectedTransactions: 0,
-        status: 'active'
+        status: 'active',
       },
       {
         patternType: 'smurfing',
@@ -783,7 +821,7 @@ export class AdvancedFraudDetection {
         detectionThreshold: 0.8,
         falsePositiveRate: 0.02,
         affectedTransactions: 0,
-        status: 'active'
+        status: 'active',
       },
       {
         patternType: 'account_takeover',
@@ -793,8 +831,8 @@ export class AdvancedFraudDetection {
         detectionThreshold: 0.85,
         falsePositiveRate: 0.03,
         affectedTransactions: 0,
-        status: 'active'
-      }
+        status: 'active',
+      },
     ];
 
     patterns.forEach(pattern => {
@@ -802,7 +840,7 @@ export class AdvancedFraudDetection {
         ...pattern,
         id: this.generatePatternId(),
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
       this.fraudPatterns.set(fraudPattern.id, fraudPattern);
     });
@@ -839,8 +877,11 @@ export class AdvancedFraudDetection {
     const alerts = Array.from(this.fraudAlerts.values());
 
     const totalScores = scores.length;
-    const averageScore = totalScores > 0 ? scores.reduce((sum, s) => sum + s.overallScore, 0) / totalScores : 0;
-    const highRiskTransactions = scores.filter(s => s.riskLevel === 'high' || s.riskLevel === 'critical').length;
+    const averageScore =
+      totalScores > 0 ? scores.reduce((sum, s) => sum + s.overallScore, 0) / totalScores : 0;
+    const highRiskTransactions = scores.filter(
+      s => s.riskLevel === 'high' || s.riskLevel === 'critical'
+    ).length;
     const activeAlerts = alerts.filter(a => a.status === 'active').length;
 
     // Simplified calculations
@@ -853,7 +894,7 @@ export class AdvancedFraudDetection {
       highRiskTransactions,
       activeAlerts,
       blockedAmount,
-      falsePositiveRate
+      falsePositiveRate,
     };
   }
 }

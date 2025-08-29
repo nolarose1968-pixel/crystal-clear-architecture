@@ -2,7 +2,7 @@
 
 /**
  * Fire22 Dashboard Launch Script
- * 
+ *
  * This script launches the complete dashboard system:
  * 1. Starts the DashboardBridge server
  * 2. Opens the real-time dashboard in the browser
@@ -13,13 +13,13 @@ import { $ } from 'bun';
 import { DashboardBridge } from './dashboard-bridge';
 
 console.log('🔥 Fire22 Dashboard Launch Script');
-console.log('==================================');
+console.log('!==!==!==!==!==!====');
 
 async function launchDashboard() {
   try {
     // Check if DashboardBridge is already running
     console.log('🔍 Checking if DashboardBridge is already running...');
-    
+
     try {
       const response = await fetch('http://localhost:3001/api/status');
       if (response.ok) {
@@ -33,11 +33,11 @@ async function launchDashboard() {
 
     // Start DashboardBridge
     console.log('🚀 Starting DashboardBridge...');
-    
+
     // Start the bridge in the background
     const bridgeProcess = Bun.spawn(['bun', 'run', 'scripts/dashboard-bridge.ts'], {
       stdio: ['inherit', 'inherit', 'inherit'],
-      detached: true
+      detached: true,
     });
 
     // Wait a moment for the bridge to start
@@ -47,7 +47,7 @@ async function launchDashboard() {
     // Check if bridge started successfully
     let retries = 0;
     const maxRetries = 10;
-    
+
     while (retries < maxRetries) {
       try {
         const response = await fetch('http://localhost:3001/api/status');
@@ -58,7 +58,7 @@ async function launchDashboard() {
       } catch (error) {
         // Bridge not ready yet
       }
-      
+
       retries++;
       if (retries < maxRetries) {
         console.log(`⏳ Waiting for bridge to start... (${retries}/${maxRetries})`);
@@ -77,7 +77,6 @@ async function launchDashboard() {
 
     // Show status
     showStatus();
-
   } catch (error) {
     console.error('❌ Error launching dashboard:', error);
     console.log('💡 Try running manually: bun run scripts/dashboard-bridge.ts');
@@ -86,7 +85,7 @@ async function launchDashboard() {
 
 function openDashboard() {
   console.log('🌐 Opening real-time dashboard...');
-  
+
   // Open the enhanced dashboard
   try {
     $`open docs/real-time-dashboard.html`;
@@ -99,8 +98,8 @@ function openDashboard() {
 
 async function showStatus() {
   console.log('\n📊 Dashboard System Status:');
-  console.log('============================');
-  
+  console.log('!==!==!==!==!===');
+
   try {
     const response = await fetch('http://localhost:3001/api/status');
     if (response.ok) {
@@ -119,7 +118,7 @@ async function showStatus() {
   console.log('   2. Click "Start Real Build" to test the system');
   console.log('   3. Monitor real-time updates in the terminal');
   console.log('   4. Use the dashboard to control your builds');
-  
+
   console.log('\n🛑 To stop the dashboard:');
   console.log('   - Close the browser tab');
   console.log('   - Press Ctrl+C in this terminal');

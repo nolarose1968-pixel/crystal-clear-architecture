@@ -1,6 +1,6 @@
 /**
  * Fire22 Dashboard Worker - Build Configuration
- * 
+ *
  * Defines different build profiles and configurations
  */
 
@@ -51,39 +51,39 @@ export const developmentProfile: BuildProfile = {
   description: 'Fast build for development with minimal overhead',
   version: {
     autoIncrement: false,
-    type: 'patch'
+    type: 'patch',
   },
   documentation: {
     generate: false,
     embed: false,
-    formats: []
+    formats: [],
   },
   dependencies: {
     analyze: false,
     update: false,
-    audit: false
+    audit: false,
   },
   metadata: {
     generate: false,
     update: false,
-    validate: false
+    validate: false,
   },
   packaging: {
     embed: false,
     bundle: true,
-    optimize: false
+    optimize: false,
   },
   quality: {
     lint: false,
     test: false,
-    coverage: false
+    coverage: false,
   },
   optimization: {
     minify: false,
     sourcemap: true,
     analyze: false,
-    treeShaking: false
-  }
+    treeShaking: false,
+  },
 };
 
 // Quick build profile
@@ -92,39 +92,39 @@ export const quickProfile: BuildProfile = {
   description: 'Fast build with package building only',
   version: {
     autoIncrement: false,
-    type: 'patch'
+    type: 'patch',
   },
   documentation: {
     generate: false,
     embed: false,
-    formats: []
+    formats: [],
   },
   dependencies: {
     analyze: false,
     update: false,
-    audit: false
+    audit: false,
   },
   metadata: {
     generate: false,
     update: false,
-    validate: false
+    validate: false,
   },
   packaging: {
     embed: false,
     bundle: true,
-    optimize: false
+    optimize: false,
   },
   quality: {
     lint: false,
     test: false,
-    coverage: false
+    coverage: false,
   },
   optimization: {
     minify: false,
     sourcemap: true,
     analyze: false,
-    treeShaking: false
-  }
+    treeShaking: false,
+  },
 };
 
 // Standard build profile
@@ -133,39 +133,39 @@ export const standardProfile: BuildProfile = {
   description: 'Standard build with documentation and metadata',
   version: {
     autoIncrement: true,
-    type: 'patch'
+    type: 'patch',
   },
   documentation: {
     generate: true,
     embed: true,
-    formats: ['html', 'md', 'json']
+    formats: ['html', 'md', 'json'],
   },
   dependencies: {
     analyze: true,
     update: false,
-    audit: true
+    audit: true,
   },
   metadata: {
     generate: true,
     update: true,
-    validate: true
+    validate: true,
   },
   packaging: {
     embed: true,
     bundle: true,
-    optimize: true
+    optimize: true,
   },
   quality: {
     lint: true,
     test: true,
-    coverage: false
+    coverage: false,
   },
   optimization: {
     minify: false,
     sourcemap: true,
     analyze: false,
-    treeShaking: true
-  }
+    treeShaking: true,
+  },
 };
 
 // Production build profile
@@ -174,39 +174,39 @@ export const productionProfile: BuildProfile = {
   description: 'Production build with full optimization and quality checks',
   version: {
     autoIncrement: true,
-    type: 'minor'
+    type: 'minor',
   },
   documentation: {
     generate: true,
     embed: true,
-    formats: ['html', 'md', 'json']
+    formats: ['html', 'md', 'json'],
   },
   dependencies: {
     analyze: true,
     update: true,
-    audit: true
+    audit: true,
   },
   metadata: {
     generate: true,
     update: true,
-    validate: true
+    validate: true,
   },
   packaging: {
     embed: true,
     bundle: true,
-    optimize: true
+    optimize: true,
   },
   quality: {
     lint: true,
     test: true,
-    coverage: true
+    coverage: true,
   },
   optimization: {
     minify: true,
     sourcemap: false,
     analyze: true,
-    treeShaking: true
-  }
+    treeShaking: true,
+  },
 };
 
 // Full build profile
@@ -215,39 +215,39 @@ export const fullProfile: BuildProfile = {
   description: 'Complete build with all features and optimizations',
   version: {
     autoIncrement: true,
-    type: 'patch'
+    type: 'patch',
   },
   documentation: {
     generate: true,
     embed: true,
-    formats: ['html', 'md', 'json']
+    formats: ['html', 'md', 'json'],
   },
   dependencies: {
     analyze: true,
     update: true,
-    audit: true
+    audit: true,
   },
   metadata: {
     generate: true,
     update: true,
-    validate: true
+    validate: true,
   },
   packaging: {
     embed: true,
     bundle: true,
-    optimize: true
+    optimize: true,
   },
   quality: {
     lint: true,
     test: true,
-    coverage: true
+    coverage: true,
   },
   optimization: {
     minify: true,
     sourcemap: true,
     analyze: true,
-    treeShaking: true
-  }
+    treeShaking: true,
+  },
 };
 
 // Package-only build profile
@@ -256,39 +256,39 @@ export const packagesOnlyProfile: BuildProfile = {
   description: 'Build only the modular packages',
   version: {
     autoIncrement: false,
-    type: 'patch'
+    type: 'patch',
   },
   documentation: {
     generate: false,
     embed: false,
-    formats: []
+    formats: [],
   },
   dependencies: {
     analyze: false,
     update: false,
-    audit: false
+    audit: false,
   },
   metadata: {
     generate: false,
     update: false,
-    validate: false
+    validate: false,
   },
   packaging: {
     embed: false,
     bundle: true,
-    optimize: false
+    optimize: false,
   },
   quality: {
     lint: false,
     test: false,
-    coverage: false
+    coverage: false,
   },
   optimization: {
     minify: false,
     sourcemap: false,
     analyze: false,
-    treeShaking: false
-  }
+    treeShaking: false,
+  },
 };
 
 // Documentation-only build profile
@@ -297,39 +297,39 @@ export const docsOnlyProfile: BuildProfile = {
   description: 'Generate documentation only',
   version: {
     autoIncrement: false,
-    type: 'patch'
+    type: 'patch',
   },
   documentation: {
     generate: true,
     embed: false,
-    formats: ['html', 'md', 'json']
+    formats: ['html', 'md', 'json'],
   },
   dependencies: {
     analyze: false,
     update: false,
-    audit: false
+    audit: false,
   },
   metadata: {
     generate: true,
     update: true,
-    validate: false
+    validate: false,
   },
   packaging: {
     embed: false,
     bundle: false,
-    optimize: false
+    optimize: false,
   },
   quality: {
     lint: false,
     test: false,
-    coverage: false
+    coverage: false,
   },
   optimization: {
     minify: false,
     sourcemap: false,
     analyze: false,
-    treeShaking: false
-  }
+    treeShaking: false,
+  },
 };
 
 // Cloudflare build profile
@@ -338,39 +338,39 @@ export const cloudflareProfile: BuildProfile = {
   description: 'Build and deploy to Cloudflare Workers',
   version: {
     autoIncrement: true,
-    type: 'patch'
+    type: 'patch',
   },
   documentation: {
     generate: false,
     embed: false,
-    formats: []
+    formats: [],
   },
   dependencies: {
     analyze: false,
     update: false,
-    audit: true
+    audit: true,
   },
   metadata: {
     generate: true,
     update: true,
-    validate: true
+    validate: true,
   },
   packaging: {
     embed: false,
     bundle: true,
-    optimize: true
+    optimize: true,
   },
   quality: {
     lint: true,
     test: false,
-    coverage: false
+    coverage: false,
   },
   optimization: {
     minify: true,
     sourcemap: false,
     analyze: false,
-    treeShaking: true
-  }
+    treeShaking: true,
+  },
 };
 
 // Version-only build profile
@@ -379,39 +379,39 @@ export const versionOnlyProfile: BuildProfile = {
   description: 'Update version only',
   version: {
     autoIncrement: true,
-    type: 'patch'
+    type: 'patch',
   },
   documentation: {
     generate: false,
     embed: false,
-    formats: []
+    formats: [],
   },
   dependencies: {
     analyze: false,
     update: false,
-    audit: false
+    audit: false,
   },
   metadata: {
     generate: false,
     update: true,
-    validate: false
+    validate: false,
   },
   packaging: {
     embed: false,
     bundle: false,
-    optimize: false
+    optimize: false,
   },
   quality: {
     lint: false,
     test: false,
-    coverage: false
+    coverage: false,
   },
   optimization: {
     minify: false,
     sourcemap: false,
     analyze: false,
-    treeShaking: false
-  }
+    treeShaking: false,
+  },
 };
 
 // Profile registry
@@ -424,7 +424,7 @@ export const buildProfiles: Record<string, BuildProfile> = {
   'packages-only': packagesOnlyProfile,
   'docs-only': docsOnlyProfile,
   'version-only': versionOnlyProfile,
-  cloudflare: cloudflareProfile
+  cloudflare: cloudflareProfile,
 };
 
 // Default profile

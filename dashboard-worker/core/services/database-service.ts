@@ -64,7 +64,9 @@ export class DatabaseService extends BaseService {
 
   async insert(table: string, data: Record<string, any>): Promise<number> {
     const columns = Object.keys(data).join(', ');
-    const placeholders = Object.keys(data).map(() => '?').join(', ');
+    const placeholders = Object.keys(data)
+      .map(() => '?')
+      .join(', ');
     const values = Object.values(data);
 
     const result = await this.query(
@@ -76,13 +78,12 @@ export class DatabaseService extends BaseService {
   }
 
   async update(table: string, id: string | number, data: Record<string, any>): Promise<boolean> {
-    const updates = Object.keys(data).map(key => `${key} = ?`).join(', ');
+    const updates = Object.keys(data)
+      .map(key => `${key} = ?`)
+      .join(', ');
     const values = [...Object.values(data), id];
 
-    const result = await this.query(
-      `UPDATE ${table} SET ${updates} WHERE id = ?`,
-      values
-    );
+    const result = await this.query(`UPDATE ${table} SET ${updates} WHERE id = ?`, values);
 
     return result.affectedRows > 0;
   }

@@ -7,8 +7,14 @@
 
 import { TelegramBot } from 'https://deno.land/x/telegram_bot_api/mod.ts';
 import { createBusinessManagementSystem, BusinessManagementSystem } from './business-management';
-import { createLiveCasinoManagementSystem, LiveCasinoManagementSystem } from './live-casino-management';
-import { createSportsBettingManagementSystem, SportsBettingManagementSystem } from './sports-betting-management';
+import {
+  createLiveCasinoManagementSystem,
+  LiveCasinoManagementSystem,
+} from './live-casino-management';
+import {
+  createSportsBettingManagementSystem,
+  SportsBettingManagementSystem,
+} from './sports-betting-management';
 import { TelegramNotificationService } from './notifications/telegram-notification-service';
 
 export interface TelegramUser {
@@ -83,31 +89,31 @@ export class Fire22TelegramBot {
     this.commandHandlers.set('/wagers', this.handleWagers.bind(this));
     this.commandHandlers.set('/profile', this.handleProfile.bind(this));
     this.commandHandlers.set('/support', this.handleSupport.bind(this));
-    
+
     // Admin commands
     this.commandHandlers.set('/admin', this.handleAdmin.bind(this));
     this.commandHandlers.set('/stats', this.handleStats.bind(this));
     this.commandHandlers.set('/broadcast', this.handleBroadcast.bind(this));
-    
+
     // User management
     this.commandHandlers.set('/register', this.handleRegister.bind(this));
     this.commandHandlers.set('/unregister', this.handleUnregister.bind(this));
     this.commandHandlers.set('/settings', this.handleSettings.bind(this));
-    
+
     // Business management commands
     this.commandHandlers.set('/vip', this.handleVIP.bind(this));
     this.commandHandlers.set('/groups', this.handleGroups.bind(this));
     this.commandHandlers.set('/affiliate', this.handleAffiliate.bind(this));
     this.commandHandlers.set('/commission', this.handleCommission.bind(this));
     this.commandHandlers.set('/link', this.handleLink.bind(this));
-    
+
     // Live casino management commands
     this.commandHandlers.set('/casino', this.handleCasino.bind(this));
     this.commandHandlers.set('/casino-games', this.handleCasinoGames.bind(this));
     this.commandHandlers.set('/casino-rates', this.handleCasinoRates.bind(this));
     this.commandHandlers.set('/casino-sessions', this.handleCasinoSessions.bind(this));
     this.commandHandlers.set('/casino-revenue', this.handleCasinoRevenue.bind(this));
-    
+
     // Sports betting management commands
     this.commandHandlers.set('/sports', this.handleSports.bind(this));
     this.commandHandlers.set('/sports-events', this.handleSportsEvents.bind(this));
@@ -122,7 +128,6 @@ export class Fire22TelegramBot {
    */
   async start() {
     try {
-      
       // Set webhook if configured
       if (this.config.webhookUrl) {
         await this.bot.setWebhook(this.config.webhookUrl);
@@ -130,12 +135,11 @@ export class Fire22TelegramBot {
         // Start polling
         await this.startPolling();
       }
-      
+
       this.isRunning = true;
-      
+
       // Send startup notification to admins
       await this.notifyAdmins('🚀 Fire22 Telegram Bot has started successfully!');
-      
     } catch (error) {
       console.error('❌ Failed to start Telegram Bot:', error);
       throw error;
@@ -147,21 +151,20 @@ export class Fire22TelegramBot {
    */
   private async startPolling() {
     let offset = 0;
-    
+
     while (this.isRunning) {
       try {
         const updates = await this.bot.getUpdates({ offset, timeout: 30 });
-        
+
         for (const update of updates) {
           if (update.message) {
             await this.handleMessage(update.message);
           }
           offset = update.update_id + 1;
         }
-        
+
         // Small delay to prevent overwhelming the API
         await new Promise(resolve => setTimeout(resolve, 100));
-        
       } catch (error) {
         console.error('❌ Polling error:', error);
         await new Promise(resolve => setTimeout(resolve, 5000));
@@ -175,21 +178,20 @@ export class Fire22TelegramBot {
   async handleMessage(message: TelegramMessage) {
     try {
       const { text, from, chat } = message;
-      
+
       if (!text || !from) return;
-      
-      
+
       // Check if user is allowed
       if (!this.isUserAllowed(from.username || from.first_name || '')) {
         await this.sendMessage(chat.id, '❌ Access denied. Please contact support for access.');
         return;
       }
-      
+
       // Handle commands
       if (text.startsWith('/')) {
         const command = text.split(' ')[0].toLowerCase();
         const handler = this.commandHandlers.get(command);
-        
+
         if (handler) {
           await handler(message);
         } else {
@@ -197,13 +199,15 @@ export class Fire22TelegramBot {
         }
         return;
       }
-      
+
       // Handle regular messages
       await this.handleRegularMessage(message);
-      
     } catch (error) {
       console.error('❌ Error handling message:', error);
-      await this.sendMessage(message.chat.id, '❌ An error occurred while processing your message.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ An error occurred while processing your message.'
+      );
     }
   }
 
@@ -228,7 +232,7 @@ Use /support for help
 
 🔗 **Fire22 Dashboard:** https://dashboard.fire22.com
     `;
-    
+
     await this.sendMessage(message.chat.id, welcomeMessage);
   }
 
@@ -284,7 +288,7 @@ Use /support for help
 💡 **Need Help?**
 Contact support: support@fire22.com
     `;
-    
+
     await this.sendMessage(message.chat.id, helpMessage);
   }
 
@@ -295,14 +299,17 @@ Contact support: support@fire22.com
     try {
       const username = message.from.username;
       if (!username) {
-        await this.sendMessage(message.chat.id, '❌ Please set a username in Telegram to use this feature.');
+        await this.sendMessage(
+          message.chat.id,
+          '❌ Please set a username in Telegram to use this feature.'
+        );
         return;
       }
-      
+
       // Get user balance from database
       const user = await this.getUserByTelegramUsername(username);
       const balance = user?.balance || 0;
-      
+
       const balanceMessage = `
 💰 **Your Balance**
 
@@ -312,12 +319,14 @@ Contact support: support@fire22.com
 
 💡 **To update your balance, please visit the dashboard.**
       `;
-      
+
       await this.sendMessage(message.chat.id, balanceMessage);
-      
     } catch (error) {
       console.error('❌ Error getting balance:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve balance. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve balance. Please try again later.'
+      );
     }
   }
 
@@ -332,11 +341,16 @@ Contact support: support@fire22.com
       }
 
       // Query the database for user with matching telegram_username
-      const user = await this.config.database.prepare(`
+      const user = await this.config.database
+        .prepare(
+          `
         SELECT customer_id, name, balance, telegram_username, telegram_id
         FROM players
         WHERE telegram_username = ?
-      `).bind(username).first();
+      `
+        )
+        .bind(username)
+        .first();
 
       return user;
     } catch (error) {
@@ -352,9 +366,9 @@ Contact support: support@fire22.com
     return {
       customer_id: 'mock_' + username,
       name: username,
-      balance: 1000.00,
+      balance: 1000.0,
       telegram_username: username,
-      telegram_id: null
+      telegram_id: null,
     };
   }
 
@@ -365,10 +379,13 @@ Contact support: support@fire22.com
     try {
       const username = message.from.username;
       if (!username) {
-        await this.sendMessage(message.chat.id, '❌ Please set a username in Telegram to use this feature.');
+        await this.sendMessage(
+          message.chat.id,
+          '❌ Please set a username in Telegram to use this feature.'
+        );
         return;
       }
-      
+
       const wagersMessage = `
 🎯 **Recent Wagers**
 
@@ -376,12 +393,14 @@ Contact support: support@fire22.com
 
 💡 **Visit the dashboard to place wagers and view your history.**
       `;
-      
+
       await this.sendMessage(message.chat.id, wagersMessage);
-      
     } catch (error) {
       console.error('❌ Error getting wagers:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve wagers. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve wagers. Please try again later.'
+      );
     }
   }
 
@@ -391,7 +410,7 @@ Contact support: support@fire22.com
   private async handleProfile(message: TelegramMessage) {
     try {
       const { username, first_name, last_name } = message.from;
-      
+
       const profileMessage = `
 👤 **Your Profile**
 
@@ -403,12 +422,14 @@ Contact support: support@fire22.com
 
 💡 **To link your Fire22 account, use /register**
       `;
-      
+
       await this.sendMessage(message.chat.id, profileMessage);
-      
     } catch (error) {
       console.error('❌ Error getting profile:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve profile. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve profile. Please try again later.'
+      );
     }
   }
 
@@ -419,10 +440,13 @@ Contact support: support@fire22.com
     try {
       const username = message.from.username;
       if (!username) {
-        await this.sendMessage(message.chat.id, '❌ Please set a username in Telegram first, then try again.');
+        await this.sendMessage(
+          message.chat.id,
+          '❌ Please set a username in Telegram first, then try again.'
+        );
         return;
       }
-      
+
       const registerMessage = `
 ✅ **Registration Successful!**
 
@@ -440,9 +464,8 @@ Contact support: support@fire22.com
 • Wager updates
 • System alerts
       `;
-      
+
       await this.sendMessage(message.chat.id, registerMessage);
-      
     } catch (error) {
       console.error('❌ Error during registration:', error);
       await this.sendMessage(message.chat.id, '❌ Registration failed. Please try again later.');
@@ -458,7 +481,7 @@ Contact support: support@fire22.com
         await this.sendMessage(message.chat.id, '❌ Admin access required.');
         return;
       }
-      
+
       const adminMessage = `
 🛡️ **Admin Panel**
 
@@ -473,9 +496,8 @@ Contact support: support@fire22.com
 
 💡 **Use /stats for detailed information**
       `;
-      
+
       await this.sendMessage(message.chat.id, adminMessage);
-      
     } catch (error) {
       console.error('❌ Error in admin panel:', error);
       await this.sendMessage(message.chat.id, '❌ Admin panel error. Please try again later.');
@@ -491,7 +513,7 @@ Contact support: support@fire22.com
         await this.sendMessage(message.chat.id, '❌ Admin access required.');
         return;
       }
-      
+
       const statsMessage = `
 📊 **System Statistics**
 
@@ -512,12 +534,14 @@ Contact support: support@fire22.com
 
 🔄 **Last Updated:** ${new Date().toLocaleString()}
       `;
-      
+
       await this.sendMessage(message.chat.id, statsMessage);
-      
     } catch (error) {
       console.error('❌ Error getting stats:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve statistics. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve statistics. Please try again later.'
+      );
     }
   }
 
@@ -530,13 +554,13 @@ Contact support: support@fire22.com
         await this.sendMessage(message.chat.id, '❌ Admin access required.');
         return;
       }
-      
+
       const text = message.text?.replace('/broadcast', '').trim();
       if (!text) {
         await this.sendMessage(message.chat.id, '❌ Usage: /broadcast <message>');
         return;
       }
-      
+
       const broadcastMessage = `
 📢 **Broadcast Message**
 
@@ -545,9 +569,8 @@ ${text}
 📅 **Sent:** ${new Date().toLocaleString()}
 👤 **By:** @${message.from.username}
       `;
-      
+
       await this.sendMessage(message.chat.id, `✅ Broadcast sent: ${text}`);
-      
     } catch (error) {
       console.error('❌ Error broadcasting message:', error);
       await this.sendMessage(message.chat.id, '❌ Broadcast failed. Please try again later.');
@@ -565,7 +588,7 @@ ${text}
 
 💡 **Use /help to see available commands**
     `;
-    
+
     await this.sendMessage(message.chat.id, response);
   }
 
@@ -576,13 +599,16 @@ ${text}
     try {
       const username = message.from.username;
       if (!username) {
-        await this.sendMessage(message.chat.id, '❌ Please set a username in Telegram to use this feature.');
+        await this.sendMessage(
+          message.chat.id,
+          '❌ Please set a username in Telegram to use this feature.'
+        );
         return;
       }
 
       const vipTiers = this.businessSystem.getAllVIPTiers();
       let vipMessage = '👑 **VIP Tiers Available**\n\n';
-      
+
       vipTiers.forEach(tier => {
         vipMessage += `**${tier.name}** (Level ${tier.level})\n`;
         vipMessage += `💰 Min Balance: $${tier.minBalance.toLocaleString()}\n`;
@@ -593,12 +619,14 @@ ${text}
       });
 
       vipMessage += '💡 **To check your VIP status, use /profile**';
-      
+
       await this.sendMessage(message.chat.id, vipMessage);
-      
     } catch (error) {
       console.error('❌ Error handling VIP command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve VIP information. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve VIP information. Please try again later.'
+      );
     }
   }
 
@@ -609,19 +637,22 @@ ${text}
     try {
       const username = message.from.username;
       if (!username) {
-        await this.sendMessage(message.chat.id, '❌ Please set a username in Telegram to use this feature.');
+        await this.sendMessage(
+          message.chat.id,
+          '❌ Please set a username in Telegram to use this feature.'
+        );
         return;
       }
 
       const userGroups = this.businessSystem.getUserGroups(username);
       const allGroups = Array.from(this.businessSystem['groups'].values());
-      
+
       let groupsMessage = '👥 **Available Groups**\n\n';
-      
+
       allGroups.forEach(group => {
         const isMember = userGroups.some(ug => ug.id === group.id);
         const memberStatus = isMember ? '✅ Member' : '❌ Not Member';
-        
+
         groupsMessage += `**${group.name}**\n`;
         groupsMessage += `📋 Type: ${group.type}\n`;
         groupsMessage += `👤 Members: ${group.members.length}/${group.settings.maxMembers}\n`;
@@ -636,12 +667,14 @@ ${text}
       }
 
       groupsMessage += '\n💡 **Contact admins to join groups**';
-      
+
       await this.sendMessage(message.chat.id, groupsMessage);
-      
     } catch (error) {
       console.error('❌ Error handling groups command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve group information. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve group information. Please try again later.'
+      );
     }
   }
 
@@ -652,7 +685,10 @@ ${text}
     try {
       const username = message.from.username;
       if (!username) {
-        await this.sendMessage(message.chat.id, '❌ Please set a username in Telegram to use this feature.');
+        await this.sendMessage(
+          message.chat.id,
+          '❌ Please set a username in Telegram to use this feature.'
+        );
         return;
       }
 
@@ -663,10 +699,10 @@ ${text}
       }
 
       let affiliateMessage = '🤝 **Fire22 Affiliate Program**\n\n';
-      
+
       affiliateMessage += `**Commission Structure:**\n`;
       affiliateMessage += `💰 Base Rate: ${(affiliateProgram.commissionStructure.baseRate * 100).toFixed(1)}%\n\n`;
-      
+
       affiliateMessage += `**Volume Tiers:**\n`;
       affiliateProgram.commissionStructure.volumeTiers.forEach(tier => {
         const maxVol = tier.maxVolume === Infinity ? '∞' : tier.maxVolume.toLocaleString();
@@ -684,12 +720,14 @@ ${text}
       });
 
       affiliateMessage += '\n💡 **Use /link to create your referral link**';
-      
+
       await this.sendMessage(message.chat.id, affiliateMessage);
-      
     } catch (error) {
       console.error('❌ Error handling affiliate command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve affiliate information. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve affiliate information. Please try again later.'
+      );
     }
   }
 
@@ -700,7 +738,10 @@ ${text}
     try {
       const username = message.from.username;
       if (!username) {
-        await this.sendMessage(message.chat.id, '❌ Please set a username in Telegram to use this feature.');
+        await this.sendMessage(
+          message.chat.id,
+          '❌ Please set a username in Telegram to use this feature.'
+        );
         return;
       }
 
@@ -709,7 +750,7 @@ ${text}
         volume: 150000,
         riskScore: 0.92,
         complianceScore: 98,
-        performanceMetrics: { newCustomers: 15 }
+        performanceMetrics: { newCustomers: 15 },
       };
 
       const commission = this.businessSystem.calculateCommission(
@@ -722,31 +763,33 @@ ${text}
       );
 
       let commissionMessage = '💰 **Commission Calculation**\n\n';
-      
+
       commissionMessage += `**Period:** ${commission.period}\n`;
       commissionMessage += `📊 **Handle:** $${commission.handle.toLocaleString()}\n`;
       commissionMessage += `📈 **Volume:** $${mockData.volume.toLocaleString()}\n`;
       commissionMessage += `⚠️ **Risk Score:** ${(mockData.riskScore * 100).toFixed(0)}%\n`;
       commissionMessage += `✅ **Compliance:** ${mockData.complianceScore}%\n\n`;
-      
+
       commissionMessage += `**Commission Breakdown:**\n`;
       commissionMessage += `💰 Base Commission: $${commission.commission.toFixed(2)}\n`;
       commissionMessage += `🚀 Performance Bonuses: $${commission.bonuses.toFixed(2)}\n`;
       commissionMessage += `⚖️ Risk Adjustments: $${commission.adjustments.toFixed(2)}\n`;
       commissionMessage += `💵 **Total Payout: $${commission.totalPayout.toFixed(2)}**\n\n`;
-      
+
       commissionMessage += `**Status:** ${commission.status.toUpperCase()}\n`;
       commissionMessage += `📅 Calculated: ${commission.calculatedAt.toLocaleDateString()}\n`;
-      
+
       if (commission.paidAt) {
         commissionMessage += `💸 Paid: ${commission.paidAt.toLocaleDateString()}`;
       }
 
       await this.sendMessage(message.chat.id, commissionMessage);
-      
     } catch (error) {
       console.error('❌ Error handling commission command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to calculate commission. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to calculate commission. Please try again later.'
+      );
     }
   }
 
@@ -757,25 +800,28 @@ ${text}
     try {
       const username = message.from.username;
       if (!username) {
-        await this.sendMessage(message.chat.id, '❌ Please set a username in Telegram to use this feature.');
+        await this.sendMessage(
+          message.chat.id,
+          '❌ Please set a username in Telegram to use this feature.'
+        );
         return;
       }
 
       const args = message.text?.split(' ').slice(1) || [];
-      const linkType = args[0] as 'referral' | 'affiliate' | 'vip' || 'referral';
+      const linkType = (args[0] as 'referral' | 'affiliate' | 'vip') || 'referral';
 
       const link = this.businessSystem.createUserLink(username, linkType);
-      
+
       let linkMessage = '🔗 **Your Referral Link**\n\n';
-      
+
       linkMessage += `**Type:** ${linkType.charAt(0).toUpperCase() + linkType.slice(1)}\n`;
       linkMessage += `**Link:** ${link}\n\n`;
-      
+
       linkMessage += `**How it works:**\n`;
       linkMessage += `• Share this link with potential customers\n`;
       linkMessage += `• When they join using your link, you earn commission\n`;
       linkMessage += `• Track your referrals and earnings\n\n`;
-      
+
       linkMessage += `**Commission Rates:**\n`;
       if (linkType === 'referral') {
         linkMessage += `• Direct referral: 3% + 1% bonus\n`;
@@ -789,10 +835,12 @@ ${text}
       }
 
       await this.sendMessage(message.chat.id, linkMessage);
-      
     } catch (error) {
       console.error('❌ Error handling link command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to create referral link. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to create referral link. Please try again later.'
+      );
     }
   }
 
@@ -802,15 +850,15 @@ ${text}
   private async handleCasino(message: TelegramMessage) {
     try {
       const stats = this.liveCasinoSystem.getSystemStats();
-      
+
       let casinoMessage = '🎰 **Live Casino System Overview**\n\n';
-      
+
       casinoMessage += `**Games:** ${stats.totalGames} total, ${stats.activeGames} active\n`;
       casinoMessage += `**Rates:** ${stats.totalRates} total, ${stats.activeRates} active\n`;
       casinoMessage += `**Sessions:** ${stats.totalSessions} total, ${stats.activeSessions} active\n`;
       casinoMessage += `**Revenue:** $${stats.totalRevenue.toLocaleString()}\n`;
       casinoMessage += `**Commission Paid:** $${stats.totalCommission.toLocaleString()}\n\n`;
-      
+
       casinoMessage += `**Available Commands:**\n`;
       casinoMessage += `• /casino-games - View all games\n`;
       casinoMessage += `• /casino-rates - Check rates\n`;
@@ -818,10 +866,12 @@ ${text}
       casinoMessage += `• /casino-revenue - Revenue data\n`;
 
       await this.sendMessage(message.chat.id, casinoMessage);
-      
     } catch (error) {
       console.error('❌ Error handling casino command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve casino information. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve casino information. Please try again later.'
+      );
     }
   }
 
@@ -831,9 +881,9 @@ ${text}
   private async handleCasinoGames(message: TelegramMessage) {
     try {
       const games = this.liveCasinoSystem.getAllGames();
-      
+
       let gamesMessage = '🎮 **Live Casino Games**\n\n';
-      
+
       games.forEach(game => {
         gamesMessage += `**${game.name}**\n`;
         gamesMessage += `📋 Category: ${game.category}\n`;
@@ -846,10 +896,12 @@ ${text}
       });
 
       await this.sendMessage(message.chat.id, gamesMessage);
-      
     } catch (error) {
       console.error('❌ Error handling casino games command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve casino games. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve casino games. Please try again later.'
+      );
     }
   }
 
@@ -860,16 +912,19 @@ ${text}
     try {
       const username = message.from.username;
       if (!username) {
-        await this.sendMessage(message.chat.id, '❌ Please set a username in Telegram to use this feature.');
+        await this.sendMessage(
+          message.chat.id,
+          '❌ Please set a username in Telegram to use this feature.'
+        );
         return;
       }
 
       // For demo purposes, use a default agent ID
       const agentId = 'agent1';
       const rates = this.liveCasinoSystem.getAgentRates(agentId);
-      
+
       let ratesMessage = '💎 **Your Casino Rates**\n\n';
-      
+
       if (rates.length > 0) {
         rates.forEach(rate => {
           const game = this.liveCasinoSystem.getGame(rate.gameId);
@@ -887,10 +942,12 @@ ${text}
       }
 
       await this.sendMessage(message.chat.id, ratesMessage);
-      
     } catch (error) {
       console.error('❌ Error handling casino rates command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve casino rates. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve casino rates. Please try again later.'
+      );
     }
   }
 
@@ -901,7 +958,10 @@ ${text}
     try {
       const username = message.from.username;
       if (!username) {
-        await this.sendMessage(message.chat.id, '❌ Please set a username in Telegram to use this feature.');
+        await this.sendMessage(
+          message.chat.id,
+          '❌ Please set a username in Telegram to use this feature.'
+        );
         return;
       }
 
@@ -910,12 +970,12 @@ ${text}
       const activeSessions = this.liveCasinoSystem.getActiveSessions(agentId);
       const currentPeriod = new Date().toISOString().slice(0, 7);
       const completedSessions = this.liveCasinoSystem.getCompletedSessions(agentId, currentPeriod);
-      
+
       let sessionsMessage = '🎯 **Casino Sessions**\n\n';
-      
+
       sessionsMessage += `**Active Sessions:** ${activeSessions.length}\n`;
       sessionsMessage += `**Completed This Month:** ${completedSessions.length}\n\n`;
-      
+
       if (activeSessions.length > 0) {
         sessionsMessage += `**Active Sessions:**\n`;
         activeSessions.slice(0, 3).forEach(session => {
@@ -932,7 +992,7 @@ ${text}
         const totalBets = completedSessions.reduce((sum, s) => sum + s.totalBets, 0);
         const totalWins = completedSessions.reduce((sum, s) => sum + s.totalWins, 0);
         const totalCommission = completedSessions.reduce((sum, s) => sum + s.commissionEarned, 0);
-        
+
         sessionsMessage += `**Monthly Summary:**\n`;
         sessionsMessage += `💰 Total Bets: $${totalBets.toLocaleString()}\n`;
         sessionsMessage += `🏆 Total Wins: $${totalWins.toLocaleString()}\n`;
@@ -940,10 +1000,12 @@ ${text}
       }
 
       await this.sendMessage(message.chat.id, sessionsMessage);
-      
     } catch (error) {
       console.error('❌ Error handling casino sessions command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve casino sessions. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve casino sessions. Please try again later.'
+      );
     }
   }
 
@@ -954,7 +1016,10 @@ ${text}
     try {
       const username = message.from.username;
       if (!username) {
-        await this.sendMessage(message.chat.id, '❌ Please set a username in Telegram to use this feature.');
+        await this.sendMessage(
+          message.chat.id,
+          '❌ Please set a username in Telegram to use this feature.'
+        );
         return;
       }
 
@@ -962,9 +1027,9 @@ ${text}
       const agentId = 'agent1';
       const currentPeriod = new Date().toISOString().slice(0, 7);
       const revenue = this.liveCasinoSystem.calculateMonthlyRevenue(agentId, currentPeriod);
-      
+
       let revenueMessage = '💰 **Casino Revenue Report**\n\n';
-      
+
       revenueMessage += `**Period:** ${revenue.period}\n`;
       revenueMessage += `💰 Total Bets: $${revenue.totalBets.toLocaleString()}\n`;
       revenueMessage += `🏆 Total Wins: $${revenue.totalWins.toLocaleString()}\n`;
@@ -976,10 +1041,12 @@ ${text}
       revenueMessage += `📅 Calculated: ${revenue.calculatedAt.toLocaleDateString()}\n`;
 
       await this.sendMessage(message.chat.id, revenueMessage);
-      
     } catch (error) {
       console.error('❌ Error handling casino revenue command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve casino revenue. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve casino revenue. Please try again later.'
+      );
     }
   }
 
@@ -989,15 +1056,15 @@ ${text}
   private async handleSports(message: TelegramMessage) {
     try {
       const stats = this.sportsBettingSystem.getSystemStats();
-      
+
       let sportsMessage = '🏈 **Sports Betting System Overview**\n\n';
-      
+
       sportsMessage += `**Events:** ${stats.totalEvents} total, ${stats.activeEvents} active\n`;
       sportsMessage += `**Bets:** ${stats.totalBets} total, ${stats.activeBets} active\n`;
       sportsMessage += `**Rates:** ${stats.totalRates} total, ${stats.activeRates} active\n`;
       sportsMessage += `**VIP Profiles:** ${stats.totalVIPProfiles}\n`;
       sportsMessage += `**Risk Assessments:** ${stats.totalRiskAssessments}\n\n`;
-      
+
       sportsMessage += `**Available Commands:**\n`;
       sportsMessage += `• /sports-events - View all sports events\n`;
       sportsMessage += `• /sports-bets - Check your betting history\n`;
@@ -1006,10 +1073,12 @@ ${text}
       sportsMessage += `• /vip-profile - View VIP status and benefits`;
 
       await this.sendMessage(message.chat.id, sportsMessage);
-      
     } catch (error) {
       console.error('❌ Error handling sports command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve sports information. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve sports information. Please try again later.'
+      );
     }
   }
 
@@ -1019,9 +1088,9 @@ ${text}
   private async handleSportsEvents(message: TelegramMessage) {
     try {
       const events = this.sportsBettingSystem.getAllEvents();
-      
+
       let eventsMessage = '🏆 **Available Sports Events**\n\n';
-      
+
       events.forEach(event => {
         eventsMessage += `**${event.name}**\n`;
         eventsMessage += `🏈 Sport: ${event.sport}\n`;
@@ -1035,10 +1104,12 @@ ${text}
       });
 
       await this.sendMessage(message.chat.id, eventsMessage);
-      
     } catch (error) {
       console.error('❌ Error handling sports events command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve sports events. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve sports events. Please try again later.'
+      );
     }
   }
 
@@ -1049,16 +1120,19 @@ ${text}
     try {
       const username = message.from.username;
       if (!username) {
-        await this.sendMessage(message.chat.id, '❌ Please set a username in Telegram to use this feature.');
+        await this.sendMessage(
+          message.chat.id,
+          '❌ Please set a username in Telegram to use this feature.'
+        );
         return;
       }
 
       // For demo purposes, use a default player ID
       const playerId = 'player1';
       const bettingHistory = this.sportsBettingSystem.getPlayerBettingHistory(playerId);
-      
+
       let betsMessage = '🎯 **Your Sports Betting History**\n\n';
-      
+
       if (bettingHistory.length > 0) {
         bettingHistory.slice(0, 5).forEach(bet => {
           betsMessage += `**Bet ID:** ${bet.id}\n`;
@@ -1080,7 +1154,7 @@ ${text}
         const totalBets = bettingHistory.length;
         const wonBets = bettingHistory.filter(bet => bet.status === 'won').length;
         const winRate = totalBets > 0 ? (wonBets / totalBets) * 100 : 0;
-        
+
         betsMessage += `**Summary:**\n`;
         betsMessage += `🎯 Total Bets: ${totalBets}\n`;
         betsMessage += `🏆 Won Bets: ${wonBets}\n`;
@@ -1090,10 +1164,12 @@ ${text}
       }
 
       await this.sendMessage(message.chat.id, betsMessage);
-      
     } catch (error) {
       console.error('❌ Error handling sports bets command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve betting history. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve betting history. Please try again later.'
+      );
     }
   }
 
@@ -1104,7 +1180,10 @@ ${text}
     try {
       const username = message.from.username;
       if (!username) {
-        await this.sendMessage(message.chat.id, '❌ Please set a username in Telegram to use this feature.');
+        await this.sendMessage(
+          message.chat.id,
+          '❌ Please set a username in Telegram to use this feature.'
+        );
         return;
       }
 
@@ -1112,12 +1191,12 @@ ${text}
       const agentId = 'agent1';
       const sports = ['football', 'basketball', 'soccer'];
       const betTypes = ['moneyline', 'spread', 'over_under'];
-      
+
       let ratesMessage = '💎 **Sports Betting Rates**\n\n';
-      
+
       sports.forEach(sport => {
         ratesMessage += `**${sport.charAt(0).toUpperCase() + sport.slice(1)}**\n`;
-        
+
         betTypes.forEach(betType => {
           const rate = this.sportsBettingSystem.getRate(agentId, sport, betType);
           if (rate) {
@@ -1134,10 +1213,12 @@ ${text}
       ratesMessage += `• Rates are updated based on performance`;
 
       await this.sendMessage(message.chat.id, ratesMessage);
-      
     } catch (error) {
       console.error('❌ Error handling sports rates command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve sports rates. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve sports rates. Please try again later.'
+      );
     }
   }
 
@@ -1148,28 +1229,32 @@ ${text}
     try {
       const username = message.from.username;
       if (!username) {
-        await this.sendMessage(message.chat.id, '❌ Please set a username in Telegram to use this feature.');
+        await this.sendMessage(
+          message.chat.id,
+          '❌ Please set a username in Telegram to use this feature.'
+        );
         return;
       }
 
       // For demo purposes, use a default player ID
       const playerId = 'player1';
       const assessment = this.sportsBettingSystem.getRiskAssessment(playerId);
-      
+
       if (assessment) {
         let riskMessage = '⚠️ **Risk Assessment Report**\n\n';
-        
+
         riskMessage += `**Overall Risk Level:** ${assessment.overallRisk.toUpperCase()}\n`;
         riskMessage += `📊 Risk Score: ${assessment.riskScore}/100\n`;
         riskMessage += `📅 Last Assessed: ${assessment.lastAssessed.toLocaleDateString()}\n`;
         riskMessage += `📅 Next Assessment: ${assessment.nextAssessment.toLocaleDateString()}\n\n`;
-        
+
         riskMessage += `**Risk Factors:**\n`;
         assessment.factors.forEach(factor => {
-          const emoji = factor.impact === 'positive' ? '✅' : factor.impact === 'negative' ? '❌' : '⚖️';
+          const emoji =
+            factor.impact === 'positive' ? '✅' : factor.impact === 'negative' ? '❌' : '⚖️';
           riskMessage += `${emoji} ${factor.factor}: ${factor.score}/100 (${factor.description})\n`;
         });
-        
+
         riskMessage += `\n**Recommendations:**\n`;
         assessment.recommendations.forEach(rec => {
           riskMessage += `• ${rec}\n`;
@@ -1180,10 +1265,12 @@ ${text}
       }
 
       await this.sendMessage(message.chat.id, riskMessage);
-      
     } catch (error) {
       console.error('❌ Error handling risk assessment command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve risk assessment. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve risk assessment. Please try again later.'
+      );
     }
   }
 
@@ -1194,30 +1281,33 @@ ${text}
     try {
       const username = message.from.username;
       if (!username) {
-        await this.sendMessage(message.chat.id, '❌ Please set a username in Telegram to use this feature.');
+        await this.sendMessage(
+          message.chat.id,
+          '❌ Please set a username in Telegram to use this feature.'
+        );
         return;
       }
 
       // For demo purposes, use a default player ID
       const playerId = 'player1';
       const profile = this.sportsBettingSystem.getVIPProfile(playerId);
-      
+
       if (profile) {
         let vipMessage = '👑 **VIP Profile**\n\n';
-        
+
         vipMessage += `**Current Tier:** ${profile.currentTier.toUpperCase()}\n`;
         vipMessage += `📊 Points: ${profile.points.toLocaleString()}\n`;
         vipMessage += `📅 Joined: ${profile.joinedAt.toLocaleDateString()}\n`;
         vipMessage += `📅 Last Updated: ${profile.lastUpdated.toLocaleDateString()}\n`;
         vipMessage += `📊 Status: ${profile.status}\n\n`;
-        
+
         vipMessage += `**Requirements for ${profile.currentTier.toUpperCase()}:**\n`;
         vipMessage += `💰 Min Balance: $${profile.requirements.minBalance.toLocaleString()}\n`;
         vipMessage += `📊 Min Volume: $${profile.requirements.minVolume.toLocaleString()}\n`;
         vipMessage += `🎯 Min Bets: ${profile.requirements.minBets}\n`;
         vipMessage += `🏆 Min Win Rate: ${profile.requirements.minWinRate}%\n`;
         vipMessage += `⚠️ Risk Threshold: ${profile.requirements.riskThreshold}%\n\n`;
-        
+
         vipMessage += `**Benefits:**\n`;
         vipMessage += `💰 Max Bet Increase: ${profile.benefits.maxBetIncrease}x\n`;
         vipMessage += `📊 Rate Discount: ${(profile.benefits.rateDiscount * 100).toFixed(1)}%\n`;
@@ -1231,10 +1321,12 @@ ${text}
       }
 
       await this.sendMessage(message.chat.id, vipMessage);
-      
     } catch (error) {
       console.error('❌ Error handling VIP profile command:', error);
-      await this.sendMessage(message.chat.id, '❌ Unable to retrieve VIP profile. Please try again later.');
+      await this.sendMessage(
+        message.chat.id,
+        '❌ Unable to retrieve VIP profile. Please try again later.'
+      );
     }
   }
 
@@ -1246,7 +1338,7 @@ ${text}
       await this.bot.sendMessage({
         chat_id: chatId,
         text: text,
-        parse_mode: parseMode
+        parse_mode: parseMode,
       });
     } catch (error) {
       console.error('❌ Error sending message:', error);
@@ -1284,7 +1376,10 @@ ${text}
   /**
    * Send bulk notifications
    */
-  async sendBulkNotifications(recipients: Array<{ telegramId?: number; username?: string }>, message: string) {
+  async sendBulkNotifications(
+    recipients: Array<{ telegramId?: number; username?: string }>,
+    message: string
+  ) {
     try {
       const notificationIds = await this.notificationService.sendBulk(recipients, message);
       console.log(`📋 Bulk notification queued for ${recipients.length} recipients`);
@@ -1359,11 +1454,10 @@ ${text}
   async stop() {
     try {
       this.isRunning = false;
-      
+
       if (this.config.webhookUrl) {
         await this.bot.deleteWebhook();
       }
-      
     } catch (error) {
       console.error('❌ Error stopping bot:', error);
     }
@@ -1377,7 +1471,7 @@ ${text}
       isRunning: this.isRunning,
       config: this.config,
       userSessions: this.userSessions.size,
-      commandHandlers: this.commandHandlers.size
+      commandHandlers: this.commandHandlers.size,
     };
   }
 }
@@ -1385,16 +1479,19 @@ ${text}
 /**
  * Create and configure Fire22 Telegram Bot
  */
-export function createFire22TelegramBot(token: string, config?: Partial<TelegramBotConfig>): Fire22TelegramBot {
+export function createFire22TelegramBot(
+  token: string,
+  config?: Partial<TelegramBotConfig>
+): Fire22TelegramBot {
   const defaultConfig: TelegramBotConfig = {
     token,
     notificationSettings: {
       wagerUpdates: true,
       balanceChanges: true,
       systemAlerts: true,
-      weeklyReports: true
+      weeklyReports: true,
     },
-    ...config
+    ...config,
   };
 
   return new Fire22TelegramBot(defaultConfig);
@@ -1402,12 +1499,12 @@ export function createFire22TelegramBot(token: string, config?: Partial<Telegram
 
 /**
  * Example usage:
- * 
+ *
  * const bot = createFire22TelegramBot(Bun.env.BOT_TOKEN, {
  *   adminUsers: ['admin_username'],
  *   allowedUsers: ['user1', 'user2'],
  *   webhookUrl: 'https://your-domain.com/webhook'
  * });
- * 
+ *
  * await bot.start();
  */

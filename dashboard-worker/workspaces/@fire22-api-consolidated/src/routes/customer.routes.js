@@ -7,6 +7,6 @@ import { authorize } from '../middleware/authorize.middleware';
 import * as controller from '../controllers/customer.controller';
 const router = Router({ base: '/customer' });
 // /api/customer/getHeriarchy (from server.js:954)
-router.post('/getHeriarchy', authorize(["customer.*"]), controller.getHeriarchy);
+router.post('/getHeriarchy', authorize(['customer.*']), controller.getHeriarchy);
 export const customerRoutes = router;
 //# sourceMappingURL=customer.routes.js.map

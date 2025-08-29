@@ -8,7 +8,7 @@ import type {
   WagerRecord,
   ApiResponse,
   PaginatedResponse,
-  ClientError
+  ClientError,
 } from '../../../../../core/types/fantasy402';
 
 export class FinancialOperations {
@@ -25,7 +25,9 @@ export class FinancialOperations {
   /**
    * Get agent balance
    */
-  async getBalance(agentId?: string): Promise<ApiResponse<{ balance: number; availableBalance: number; pendingWagers: number }>> {
+  async getBalance(
+    agentId?: string
+  ): Promise<ApiResponse<{ balance: number; availableBalance: number; pendingWagers: number }>> {
     try {
       const targetAgentId = agentId || this.agentId;
       if (!targetAgentId) {
@@ -47,22 +49,21 @@ export class FinancialOperations {
       const balanceData = {
         balance: response.data?.balance || 0,
         availableBalance: response.data?.availableBalance || 0,
-        pendingWagers: response.data?.pendingWagers || 0
+        pendingWagers: response.data?.pendingWagers || 0,
       };
 
       return {
         success: true,
         data: balanceData,
         timestamp: new Date(),
-        requestId: `get_balance_${Date.now()}`
+        requestId: `get_balance_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
-        requestId: `get_balance_error_${Date.now()}`
+        requestId: `get_balance_error_${Date.now()}`,
       };
     }
   }
@@ -107,32 +108,34 @@ export class FinancialOperations {
         );
       }
 
-      const transactions: TransactionRecord[] = (response.data?.transactions || []).map((tx: any) => ({
-        id: tx.transactionID,
-        transactionID: tx.transactionID,
-        customerID: tx.customerID,
-        agentID: tx.agentID,
-        type: tx.type,
-        amount: tx.amount,
-        currency: tx.currency || 'USD',
-        description: tx.description,
-        timestamp: new Date(tx.timestamp),
-        status: tx.status || 'completed',
-        reference: tx.reference,
-        processedBy: tx.processedBy,
-        metadata: tx.metadata,
-        createdAt: new Date(tx.createdAt),
-        updatedAt: new Date(tx.updatedAt),
-        isActive: true,
-        createdBy: 'system',
-        updatedBy: 'system'
-      }));
+      const transactions: TransactionRecord[] = (response.data?.transactions || []).map(
+        (tx: any) => ({
+          id: tx.transactionID,
+          transactionID: tx.transactionID,
+          customerID: tx.customerID,
+          agentID: tx.agentID,
+          type: tx.type,
+          amount: tx.amount,
+          currency: tx.currency || 'USD',
+          description: tx.description,
+          timestamp: new Date(tx.timestamp),
+          status: tx.status || 'completed',
+          reference: tx.reference,
+          processedBy: tx.processedBy,
+          metadata: tx.metadata,
+          createdAt: new Date(tx.createdAt),
+          updatedAt: new Date(tx.updatedAt),
+          isActive: true,
+          createdBy: 'system',
+          updatedBy: 'system',
+        })
+      );
 
       const pagination = response.data?.pagination || {
         page: params?.page || 1,
         limit: params?.limit || 10,
         total: transactions.length,
-        totalPages: Math.ceil(transactions.length / (params?.limit || 10))
+        totalPages: Math.ceil(transactions.length / (params?.limit || 10)),
       };
 
       return {
@@ -140,16 +143,15 @@ export class FinancialOperations {
         data: transactions,
         pagination,
         timestamp: new Date(),
-        requestId: `get_transactions_${Date.now()}`
+        requestId: `get_transactions_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         pagination: { page: 1, limit: 10, total: 0, totalPages: 0 },
         timestamp: new Date(),
-        requestId: `get_transactions_error_${Date.now()}`
+        requestId: `get_transactions_error_${Date.now()}`,
       };
     }
   }
@@ -188,12 +190,7 @@ export class FinancialOperations {
       const response = await this.makeRequest(url);
 
       if (!response.success) {
-        throw new ClientError(
-          response.error || 'Failed to get wagers',
-          'WAGERS_ERROR',
-          500,
-          true
-        );
+        throw new ClientError(response.error || 'Failed to get wagers', 'WAGERS_ERROR', 500, true);
       }
 
       const wagers: WagerRecord[] = (response.data?.wagers || []).map((wager: any) => ({
@@ -219,14 +216,14 @@ export class FinancialOperations {
         updatedAt: new Date(wager.updatedAt),
         isActive: true,
         createdBy: 'system',
-        updatedBy: 'system'
+        updatedBy: 'system',
       }));
 
       const pagination = response.data?.pagination || {
         page: params?.page || 1,
         limit: params?.limit || 10,
         total: wagers.length,
-        totalPages: Math.ceil(wagers.length / (params?.limit || 10))
+        totalPages: Math.ceil(wagers.length / (params?.limit || 10)),
       };
 
       return {
@@ -234,16 +231,15 @@ export class FinancialOperations {
         data: wagers,
         pagination,
         timestamp: new Date(),
-        requestId: `get_wagers_${Date.now()}`
+        requestId: `get_wagers_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         pagination: { page: 1, limit: 10, total: 0, totalPages: 0 },
         timestamp: new Date(),
-        requestId: `get_wagers_error_${Date.now()}`
+        requestId: `get_wagers_error_${Date.now()}`,
       };
     }
   }
@@ -290,22 +286,21 @@ export class FinancialOperations {
         updatedAt: new Date(wager.updatedAt),
         isActive: true,
         createdBy: 'system',
-        updatedBy: 'system'
+        updatedBy: 'system',
       }));
 
       return {
         success: true,
         data: liveWagers,
         timestamp: new Date(),
-        requestId: `get_live_wagers_${Date.now()}`
+        requestId: `get_live_wagers_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
-        requestId: `get_live_wagers_error_${Date.now()}`
+        requestId: `get_live_wagers_error_${Date.now()}`,
       };
     }
   }
@@ -357,7 +352,7 @@ export class FinancialOperations {
         updatedAt: new Date(),
         isActive: true,
         createdBy: 'system',
-        updatedBy: 'system'
+        updatedBy: 'system',
       };
 
       return {
@@ -365,15 +360,14 @@ export class FinancialOperations {
         data: transaction,
         message: 'Transaction processed successfully',
         timestamp: new Date(),
-        requestId: `process_transaction_${Date.now()}`
+        requestId: `process_transaction_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
-        requestId: `process_transaction_error_${Date.now()}`
+        requestId: `process_transaction_error_${Date.now()}`,
       };
     }
   }
@@ -426,7 +420,7 @@ export class FinancialOperations {
         updatedAt: new Date(),
         isActive: true,
         createdBy: 'system',
-        updatedBy: 'system'
+        updatedBy: 'system',
       };
 
       return {
@@ -434,15 +428,14 @@ export class FinancialOperations {
         data: settledWager,
         message: `Wager settled as ${outcome}`,
         timestamp: new Date(),
-        requestId: `settle_wager_${Date.now()}`
+        requestId: `settle_wager_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
-        requestId: `settle_wager_error_${Date.now()}`
+        requestId: `settle_wager_error_${Date.now()}`,
       };
     }
   }
@@ -476,15 +469,14 @@ export class FinancialOperations {
         success: true,
         data: response.data,
         timestamp: new Date(),
-        requestId: `financial_summary_${Date.now()}`
+        requestId: `financial_summary_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
-        requestId: `financial_summary_error_${Date.now()}`
+        requestId: `financial_summary_error_${Date.now()}`,
       };
     }
   }
@@ -498,7 +490,7 @@ export class FinancialOperations {
   ): Promise<ApiResponse> {
     try {
       const headers: Record<string, string> = {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       };
 
       if (this.authToken) {
@@ -507,7 +499,7 @@ export class FinancialOperations {
 
       const requestOptions: RequestInit = {
         method,
-        headers
+        headers,
       };
 
       if (body && (method === 'POST' || method === 'PUT')) {
@@ -522,15 +514,14 @@ export class FinancialOperations {
         data: responseData,
         error: response.ok ? undefined : responseData.error,
         timestamp: new Date(),
-        requestId: `http_${Date.now()}`
+        requestId: `http_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Network error',
         timestamp: new Date(),
-        requestId: `http_error_${Date.now()}`
+        requestId: `http_error_${Date.now()}`,
       };
     }
   }

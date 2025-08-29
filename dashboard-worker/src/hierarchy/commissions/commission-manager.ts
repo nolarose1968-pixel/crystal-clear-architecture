@@ -12,7 +12,7 @@ import type {
   AgentProfile,
   CommissionTier,
   CommissionCondition,
-  CommissionAdjustment
+  CommissionAdjustment,
 } from '../../../core/types/hierarchy';
 
 export class CommissionManager {
@@ -29,23 +29,30 @@ export class CommissionManager {
   /**
    * Create commission structure
    */
-  createCommissionStructure(structure: Omit<CommissionStructure, 'id' | 'createdAt' | 'updatedAt'>): CommissionStructure {
+  createCommissionStructure(
+    structure: Omit<CommissionStructure, 'id' | 'createdAt' | 'updatedAt'>
+  ): CommissionStructure {
     const commissionStructure: CommissionStructure = {
       ...structure,
       id: this.generateStructureId(),
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     this.commissionStructures.set(commissionStructure.id, commissionStructure);
-    console.log(`💰 Created commission structure: ${commissionStructure.name} (${commissionStructure.id})`);
+    console.log(
+      `💰 Created commission structure: ${commissionStructure.name} (${commissionStructure.id})`
+    );
     return commissionStructure;
   }
 
   /**
    * Update commission structure
    */
-  updateCommissionStructure(structureId: string, updates: Partial<CommissionStructure>): CommissionStructure | null {
+  updateCommissionStructure(
+    structureId: string,
+    updates: Partial<CommissionStructure>
+  ): CommissionStructure | null {
     const structure = this.commissionStructures.get(structureId);
     if (!structure) {
       console.warn(`⚠️ Commission structure not found: ${structureId}`);
@@ -55,7 +62,7 @@ export class CommissionManager {
     const updatedStructure: CommissionStructure = {
       ...structure,
       ...updates,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     this.commissionStructures.set(structureId, updatedStructure);
@@ -113,18 +120,22 @@ export class CommissionManager {
       commissionRate: this.getEffectiveCommissionRate(structure, revenue),
       commissionAmount,
       adjustments: [
-        ...conditionAdjustments > 0 ? [{
-          type: 'bonus',
-          amount: conditionAdjustments,
-          reason: 'Condition-based adjustment',
-          appliedBy: 'system',
-          appliedAt: new Date()
-        }] : [],
-        ...overrideAdjustments.adjustment !== 0 ? [overrideAdjustments] : []
+        ...(conditionAdjustments > 0
+          ? [
+              {
+                type: 'bonus',
+                amount: conditionAdjustments,
+                reason: 'Condition-based adjustment',
+                appliedBy: 'system',
+                appliedAt: new Date(),
+              },
+            ]
+          : []),
+        ...(overrideAdjustments.adjustment !== 0 ? [overrideAdjustments] : []),
       ],
       finalAmount: commissionAmount,
       status: 'calculated',
-      calculatedBy: 'system'
+      calculatedBy: 'system',
     };
 
     // Store calculation
@@ -151,13 +162,15 @@ export class CommissionManager {
       updatedAt: new Date(),
       isActive: true,
       createdBy: payoutData.processedBy,
-      updatedBy: payoutData.processedBy
+      updatedBy: payoutData.processedBy,
     };
 
     this.payouts.set(payout.id, payout);
     this.pendingPayouts.set(payout.id, payout);
 
-    console.log(`💸 Created commission payout: $${payout.netAmount.toFixed(2)} for ${payout.agentId}`);
+    console.log(
+      `💸 Created commission payout: $${payout.netAmount.toFixed(2)} for ${payout.agentId}`
+    );
     return payout;
   }
 
@@ -182,7 +195,7 @@ export class CommissionManager {
       processedBy,
       processedAt: new Date(),
       updatedAt: new Date(),
-      updatedBy: processedBy
+      updatedBy: processedBy,
     };
 
     this.payouts.set(payoutId, updatedPayout);
@@ -212,7 +225,7 @@ export class CommissionManager {
       status: 'completed',
       paymentReference,
       paidAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     this.payouts.set(payoutId, updatedPayout);
@@ -225,8 +238,7 @@ export class CommissionManager {
    * Get pending payouts for agent
    */
   getPendingPayouts(agentId: string): AgentCommissionPayout[] {
-    return Array.from(this.pendingPayouts.values())
-      .filter(payout => payout.agentId === agentId);
+    return Array.from(this.pendingPayouts.values()).filter(payout => payout.agentId === agentId);
   }
 
   /**
@@ -249,7 +261,10 @@ export class CommissionManager {
   /**
    * Get commission summary for agent
    */
-  getCommissionSummary(agentId: string, period: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'monthly'): {
+  getCommissionSummary(
+    agentId: string,
+    period: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'monthly'
+  ): {
     totalEarned: number;
     totalPaid: number;
     pendingPayout: number;
@@ -258,8 +273,7 @@ export class CommissionManager {
     lastPayoutDate?: Date;
   } {
     const calculations = this.getAgentCommissionCalculations(agentId);
-    const payouts = Array.from(this.payouts.values())
-      .filter(payout => payout.agentId === agentId);
+    const payouts = Array.from(this.payouts.values()).filter(payout => payout.agentId === agentId);
 
     const totalEarned = calculations.reduce((sum, calc) => sum + calc.finalAmount, 0);
     const totalPaid = payouts
@@ -272,15 +286,21 @@ export class CommissionManager {
     // Current period calculations
     const now = new Date();
     const currentPeriodStart = this.getPeriodStart(now, period);
-    const currentPeriodCalculations = calculations.filter(calc =>
-      calc.startDate >= currentPeriodStart && calc.startDate <= now
+    const currentPeriodCalculations = calculations.filter(
+      calc => calc.startDate >= currentPeriodStart && calc.startDate <= now
     );
-    const currentPeriod = currentPeriodCalculations.reduce((sum, calc) => sum + calc.finalAmount, 0);
+    const currentPeriod = currentPeriodCalculations.reduce(
+      (sum, calc) => sum + calc.finalAmount,
+      0
+    );
 
     const completedPayouts = payouts.filter(payout => payout.status === 'completed');
-    const lastPayoutDate = completedPayouts.length > 0
-      ? completedPayouts.sort((a, b) => (b.paidAt?.getTime() || 0) - (a.paidAt?.getTime() || 0))[0].paidAt
-      : undefined;
+    const lastPayoutDate =
+      completedPayouts.length > 0
+        ? completedPayouts.sort(
+            (a, b) => (b.paidAt?.getTime() || 0) - (a.paidAt?.getTime() || 0)
+          )[0].paidAt
+        : undefined;
 
     return {
       totalEarned,
@@ -288,7 +308,7 @@ export class CommissionManager {
       pendingPayout,
       currentPeriod,
       averageCommission: calculations.length > 0 ? totalEarned / calculations.length : 0,
-      lastPayoutDate
+      lastPayoutDate,
     };
   }
 
@@ -313,8 +333,7 @@ export class CommissionManager {
       .filter(payout => payout.status === 'completed')
       .reduce((sum, payout) => sum + payout.netAmount, 0);
 
-    const totalCommissionCalculated = calculations
-      .reduce((sum, calc) => sum + calc.finalAmount, 0);
+    const totalCommissionCalculated = calculations.reduce((sum, calc) => sum + calc.finalAmount, 0);
 
     return {
       totalStructures: structures.length,
@@ -324,9 +343,12 @@ export class CommissionManager {
       pendingPayouts: payouts.filter(p => p.status === 'pending').length,
       completedPayouts: payouts.filter(p => p.status === 'completed').length,
       totalCommissionPaid,
-      averageCommissionRate: calculations.length > 0
-        ? (totalCommissionCalculated / calculations.reduce((sum, calc) => sum + calc.baseRevenue, 0)) * 100
-        : 0
+      averageCommissionRate:
+        calculations.length > 0
+          ? (totalCommissionCalculated /
+              calculations.reduce((sum, calc) => sum + calc.baseRevenue, 0)) *
+            100
+          : 0,
     };
   }
 
@@ -341,9 +363,9 @@ export class CommissionManager {
         isActive: true,
         baseRate: 0.15, // 15%
         tiers: [
-          { minAmount: 0, maxAmount: 10000, rate: 0.10 },
+          { minAmount: 0, maxAmount: 10000, rate: 0.1 },
           { minAmount: 10000, maxAmount: 50000, rate: 0.15 },
-          { minAmount: 50000, rate: 0.20 }
+          { minAmount: 50000, rate: 0.2 },
         ],
         effectiveFrom: new Date('2024-01-01'),
         conditions: [
@@ -351,9 +373,9 @@ export class CommissionManager {
             type: 'volume',
             operator: 'gt',
             value: 100000,
-            adjustment: 0.02 // +2% for high volume
-          }
-        ]
+            adjustment: 0.02, // +2% for high volume
+          },
+        ],
       },
       {
         name: 'VIP Agent Commission',
@@ -361,12 +383,12 @@ export class CommissionManager {
         isActive: true,
         baseRate: 0.25, // 25%
         tiers: [
-          { minAmount: 0, maxAmount: 25000, rate: 0.20 },
+          { minAmount: 0, maxAmount: 25000, rate: 0.2 },
           { minAmount: 25000, maxAmount: 100000, rate: 0.25 },
-          { minAmount: 100000, rate: 0.30 }
+          { minAmount: 100000, rate: 0.3 },
         ],
-        effectiveFrom: new Date('2024-01-01')
-      }
+        effectiveFrom: new Date('2024-01-01'),
+      },
     ];
 
     structures.forEach(structure => {
@@ -392,8 +414,8 @@ export class CommissionManager {
     if (structure.type === 'percentage') {
       if (structure.tiers && structure.tiers.length > 0) {
         // Find appropriate tier
-        const tier = structure.tiers.find(t =>
-          revenue >= t.minAmount && (!t.maxAmount || revenue <= t.maxAmount)
+        const tier = structure.tiers.find(
+          t => revenue >= t.minAmount && (!t.maxAmount || revenue <= t.maxAmount)
         );
         return revenue * (tier?.rate || structure.baseRate);
       }
@@ -406,8 +428,8 @@ export class CommissionManager {
   private getEffectiveCommissionRate(structure: CommissionStructure, revenue: number): number {
     if (structure.type === 'percentage') {
       if (structure.tiers && structure.tiers.length > 0) {
-        const tier = structure.tiers.find(t =>
-          revenue >= t.minAmount && (!t.maxAmount || revenue <= t.maxAmount)
+        const tier = structure.tiers.find(
+          t => revenue >= t.minAmount && (!t.maxAmount || revenue <= t.maxAmount)
         );
         return tier?.rate || structure.baseRate;
       }
@@ -416,7 +438,11 @@ export class CommissionManager {
     return 0;
   }
 
-  private applyCommissionConditions(structure: CommissionStructure, revenue: number, period: string): number {
+  private applyCommissionConditions(
+    structure: CommissionStructure,
+    revenue: number,
+    period: string
+  ): number {
     if (!structure.conditions) return 0;
 
     let adjustment = 0;
@@ -430,7 +456,10 @@ export class CommissionManager {
     return adjustment;
   }
 
-  private applyCommissionOverrides(agentId: string, commissionAmount: number): CommissionAdjustment {
+  private applyCommissionOverrides(
+    agentId: string,
+    commissionAmount: number
+  ): CommissionAdjustment {
     // Check for agent-specific overrides (would be stored in a database)
     // For now, return no adjustment
     return {
@@ -438,11 +467,15 @@ export class CommissionManager {
       amount: 0,
       reason: 'No overrides applied',
       appliedBy: 'system',
-      appliedAt: new Date()
+      appliedAt: new Date(),
     };
   }
 
-  private evaluateCondition(condition: CommissionCondition, revenue: number, period: string): boolean {
+  private evaluateCondition(
+    condition: CommissionCondition,
+    revenue: number,
+    period: string
+  ): boolean {
     const value = condition.value;
 
     switch (condition.operator) {

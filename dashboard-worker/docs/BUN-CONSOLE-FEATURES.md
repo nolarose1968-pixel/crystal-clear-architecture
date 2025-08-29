@@ -2,11 +2,13 @@
 
 ## Overview
 
-Fire22 Dashboard Worker leverages advanced Bun console features for superior development experience and debugging capabilities.
+Fire22 Dashboard Worker leverages advanced Bun console features for superior
+development experience and debugging capabilities.
 
 ## Object Inspection Depth Configuration
 
 ### bunfig.toml Configuration
+
 ```toml
 [console]
 # Object inspection depth for console.log() output
@@ -15,6 +17,7 @@ depth = 4
 ```
 
 ### CLI Override
+
 ```bash
 # Set depth for single execution
 bun --console-depth 6 run scripts/analyze-deps.sh
@@ -35,15 +38,15 @@ const nestedConfig = {
       'api-client': {
         dependencies: {
           zod: '^3.23.8',
-          typescript: '^5.9.2'
+          typescript: '^5.9.2',
         },
         scripts: {
           build: 'tsc',
-          test: 'bun test'
-        }
-      }
-    }
-  }
+          test: 'bun test',
+        },
+      },
+    },
+  },
 };
 
 console.log(nestedConfig);
@@ -55,19 +58,21 @@ console.log(nestedConfig);
 ## Console as AsyncIterable
 
 ### Reading from stdin
+
 ```typescript
 // Interactive workspace selector
 console.log('🚀 Select workspace:');
 for await (const line of console) {
   const workspace = line.trim();
   if (workspace === 'exit') break;
-  
+
   console.log(`Switching to: @fire22-${workspace}`);
   // Process workspace selection
 }
 ```
 
 ### Fire22 Development Console
+
 ```bash
 # Launch interactive development console
 bun run console
@@ -85,6 +90,7 @@ bun run console
 ## Advanced Console Utilities
 
 ### 1. Deep Object Inspection
+
 ```typescript
 // Automatic deep inspection with configured depth
 const complexSystem = {
@@ -93,16 +99,17 @@ const complexSystem = {
       console: {
         asyncIterable: true,
         depthControl: true,
-        performance: 'native'
-      }
-    }
-  }
+        performance: 'native',
+      },
+    },
+  },
 };
 
 console.log('🔍 System analysis:', complexSystem);
 ```
 
 ### 2. Error Analysis with Context
+
 ```typescript
 try {
   await processWorkspace();
@@ -112,23 +119,24 @@ try {
     error: {
       name: error.name,
       message: error.message,
-      stack: error.stack?.split('\n').slice(0, 5)
+      stack: error.stack?.split('\n').slice(0, 5),
     },
     context: {
       workspace: currentWorkspace,
       timestamp: new Date().toISOString(),
-      sessionInfo: getSessionContext()
+      sessionInfo: getSessionContext(),
     },
     bunEnv: {
       version: process.versions.bun,
       platform: process.platform,
-      memory: process.memoryUsage()
-    }
+      memory: process.memoryUsage(),
+    },
   });
 }
 ```
 
 ### 3. Interactive Development Tools
+
 ```typescript
 // Real-time dependency analyzer
 console.log('📊 Starting dependency analysis...');
@@ -136,7 +144,7 @@ console.write('Enter package name (or "exit"): ');
 
 for await (const packageName of console) {
   if (packageName.trim() === 'exit') break;
-  
+
   const analysis = await analyzeDependency(packageName.trim());
   console.log('📋 Analysis Result:', analysis);
   console.write('Enter package name (or "exit"): ');
@@ -146,6 +154,7 @@ for await (const packageName of console) {
 ## Performance Benefits
 
 ### Native Bun Console vs Node.js
+
 ```bash
 # Bun native console (Zero overhead)
 bun --console-depth 6 run complex-analysis.ts
@@ -157,6 +166,7 @@ bun --console-depth 6 run complex-analysis.ts
 ```
 
 ### Memory-Efficient Deep Inspection
+
 - **Bun native**: Direct object traversal in C++
 - **Zero serialization overhead**: Objects inspected in-place
 - **Configurable depth**: Prevents memory exhaustion
@@ -165,6 +175,7 @@ bun --console-depth 6 run complex-analysis.ts
 ## Fire22-Specific Console Workflows
 
 ### 1. Workspace Development
+
 ```bash
 # Interactive workspace development session
 bun run console
@@ -189,6 +200,7 @@ bun run console
 ```
 
 ### 2. Multi-Workspace Analysis
+
 ```typescript
 // Analyze all 15 Fire22 workspaces
 const workspaceAnalysis = {};
@@ -201,6 +213,7 @@ console.log('🏢 Complete Fire22 Workspace Analysis:', workspaceAnalysis);
 ```
 
 ### 3. Real-Time Debugging
+
 ```bash
 # Start with deep debugging
 bun --console-depth 8 run dev-server.ts
@@ -213,18 +226,21 @@ bun --console-depth 8 run dev-server.ts
 ## Configuration Best Practices
 
 ### Development Environment
+
 ```toml
 [console]
 depth = 4  # Balanced depth for development
 ```
 
 ### Testing/CI Environment
+
 ```toml
 [console]
 depth = 2  # Shallow for performance
 ```
 
 ### Debug Environment
+
 ```toml
 [console]
 depth = 8  # Deep inspection for troubleshooting
@@ -233,6 +249,7 @@ depth = 8  # Deep inspection for troubleshooting
 ## Integration with Fire22 Tools
 
 ### 1. Enhanced Dependency Analysis
+
 ```bash
 # Uses configured console depth for output
 bun run deps:analyze
@@ -242,6 +259,7 @@ bun --console-depth 6 run deps:analyze
 ```
 
 ### 2. Package Management
+
 ```bash
 # Interactive package manager with deep inspection
 bun run pkg:manage
@@ -251,6 +269,7 @@ bun run pkg:manage check-tools
 ```
 
 ### 3. Editor Integration
+
 ```bash
 # Console depth affects error output in editor
 bun run editor:errors
@@ -287,12 +306,14 @@ bun run dev:console                     # Start in development mode
 ## Performance Metrics
 
 ### Console Depth Impact
+
 - **Depth 1-2**: ~0ms overhead, basic structure
 - **Depth 3-4**: ~1ms overhead, recommended for development
 - **Depth 5-6**: ~2ms overhead, detailed debugging
 - **Depth 7-10**: ~5ms overhead, deep debugging only
 
 ### Memory Usage
+
 - **Shallow inspection**: Minimal memory impact
 - **Deep inspection**: Memory scales with object complexity
 - **Streaming output**: Large objects handled efficiently
@@ -303,17 +324,20 @@ bun run dev:console                     # Start in development mode
 ## Quick Start
 
 1. **Configure depth** in `bunfig.toml`:
+
    ```toml
    [console]
    depth = 4
    ```
 
 2. **Start interactive console**:
+
    ```bash
    bun run console
    ```
 
 3. **Override depth for specific commands**:
+
    ```bash
    bun --console-depth 6 run deps:analyze
    ```
@@ -325,4 +349,6 @@ bun run dev:console                     # Start in development mode
    🔥 fire22> build
    ```
 
-The Fire22 enhanced console features provide **native Bun performance** with **zero Node.js overhead**, making complex object inspection and interactive development workflows seamless and efficient.
+The Fire22 enhanced console features provide **native Bun performance** with
+**zero Node.js overhead**, making complex object inspection and interactive
+development workflows seamless and efficient.

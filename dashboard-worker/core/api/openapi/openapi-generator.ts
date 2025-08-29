@@ -50,10 +50,13 @@ export interface OpenAPIOperation {
   requestBody?: {
     description: string;
     required?: boolean;
-    content: Record<string, {
-      schema: OpenAPISchema;
-      examples?: Record<string, any>;
-    }>;
+    content: Record<
+      string,
+      {
+        schema: OpenAPISchema;
+        examples?: Record<string, any>;
+      }
+    >;
   };
   responses: Record<string, OpenAPIResponse>;
   security?: Array<Record<string, string[]>>;
@@ -89,14 +92,20 @@ export interface OpenAPIParameter {
 
 export interface OpenAPIResponse {
   description: string;
-  content?: Record<string, {
-    schema: OpenAPISchema;
-    examples?: Record<string, any>;
-  }>;
-  headers?: Record<string, {
-    description: string;
-    schema: OpenAPISchema;
-  }>;
+  content?: Record<
+    string,
+    {
+      schema: OpenAPISchema;
+      examples?: Record<string, any>;
+    }
+  >;
+  headers?: Record<
+    string,
+    {
+      description: string;
+      schema: OpenAPISchema;
+    }
+  >;
 }
 
 export interface OpenAPISecurityScheme {
@@ -141,36 +150,36 @@ export class OpenAPIGenerator {
         version: '1.0.0',
         contact: {
           name: 'Fire22 Team',
-          email: 'api@fire22.com'
+          email: 'api@fire22.com',
         },
         license: {
           name: 'MIT',
-          url: 'https://opensource.org/licenses/MIT'
-        }
+          url: 'https://opensource.org/licenses/MIT',
+        },
       },
       servers: [
         {
           url: 'https://api.fire22.com/v1',
-          description: 'Production server'
+          description: 'Production server',
         },
         {
           url: 'https://staging-api.fire22.com/v1',
-          description: 'Staging server'
+          description: 'Staging server',
         },
         {
           url: 'http://localhost:8787/v1',
-          description: 'Local development server'
-        }
+          description: 'Local development server',
+        },
       ],
       paths: {},
       components: {
         schemas: {},
         securitySchemes: {},
         responses: {},
-        parameters: {}
+        parameters: {},
       },
       security: [],
-      tags: []
+      tags: [],
     };
   }
 
@@ -248,7 +257,11 @@ export class OpenAPIGenerator {
   /**
    * Add a tag
    */
-  addTag(name: string, description: string, externalDocs?: { description: string; url: string }): void {
+  addTag(
+    name: string,
+    description: string,
+    externalDocs?: { description: string; url: string }
+  ): void {
     if (!this.spec.tags) {
       this.spec.tags = [];
     }
@@ -256,7 +269,7 @@ export class OpenAPIGenerator {
     this.spec.tags.push({
       name,
       description,
-      externalDocs
+      externalDocs,
     });
   }
 
@@ -303,14 +316,14 @@ export class OpenAPIGenerator {
           properties: {
             code: { type: 'string', example: 'VALIDATION_ERROR' },
             message: { type: 'string', example: 'Invalid input data' },
-            details: { type: 'object', additionalProperties: true }
+            details: { type: 'object', additionalProperties: true },
           },
-          required: ['code', 'message']
+          required: ['code', 'message'],
         },
         timestamp: { type: 'string', format: 'date-time' },
-        requestId: { type: 'string', example: 'req_1234567890' }
+        requestId: { type: 'string', example: 'req_1234567890' },
       },
-      required: ['success', 'error', 'timestamp']
+      required: ['success', 'error', 'timestamp'],
     });
 
     // Success response schema
@@ -320,9 +333,9 @@ export class OpenAPIGenerator {
         success: { type: 'boolean', example: true },
         data: { type: 'object', additionalProperties: true },
         timestamp: { type: 'string', format: 'date-time' },
-        requestId: { type: 'string', example: 'req_1234567890' }
+        requestId: { type: 'string', example: 'req_1234567890' },
       },
-      required: ['success', 'timestamp']
+      required: ['success', 'timestamp'],
     });
 
     // User schema
@@ -335,13 +348,13 @@ export class OpenAPIGenerator {
         role: {
           type: 'string',
           enum: ['admin', 'user', 'moderator'],
-          example: 'user'
+          example: 'user',
         },
         isActive: { type: 'boolean', example: true },
         createdAt: { type: 'string', format: 'date-time' },
-        updatedAt: { type: 'string', format: 'date-time' }
+        updatedAt: { type: 'string', format: 'date-time' },
       },
-      required: ['id', 'email', 'name', 'role', 'isActive', 'createdAt', 'updatedAt']
+      required: ['id', 'email', 'name', 'role', 'isActive', 'createdAt', 'updatedAt'],
     });
 
     // Pagination schema
@@ -353,9 +366,9 @@ export class OpenAPIGenerator {
         total: { type: 'integer', example: 150 },
         totalPages: { type: 'integer', example: 8 },
         hasNext: { type: 'boolean', example: true },
-        hasPrev: { type: 'boolean', example: false }
+        hasPrev: { type: 'boolean', example: false },
       },
-      required: ['page', 'limit', 'total', 'totalPages', 'hasNext', 'hasPrev']
+      required: ['page', 'limit', 'total', 'totalPages', 'hasNext', 'hasPrev'],
     });
   }
 
@@ -367,14 +380,14 @@ export class OpenAPIGenerator {
       type: 'http',
       scheme: 'bearer',
       bearerFormat: 'JWT',
-      description: 'JWT Authorization header using the Bearer scheme'
+      description: 'JWT Authorization header using the Bearer scheme',
     });
 
     this.addSecurityScheme('apiKeyAuth', {
       type: 'apiKey',
       in: 'header',
       name: 'X-API-Key',
-      description: 'API Key authentication'
+      description: 'API Key authentication',
     });
   }
 
@@ -395,15 +408,15 @@ export class OpenAPIGenerator {
                 error: {
                   code: 'VALIDATION_ERROR',
                   message: 'Invalid input data',
-                  details: { email: 'Invalid email format' }
+                  details: { email: 'Invalid email format' },
                 },
                 timestamp: '2024-01-01T12:00:00Z',
-                requestId: 'req_1234567890'
-              }
-            }
-          }
-        }
-      }
+                requestId: 'req_1234567890',
+              },
+            },
+          },
+        },
+      },
     });
 
     this.addResponse('Unauthorized', {
@@ -418,15 +431,15 @@ export class OpenAPIGenerator {
                 success: false,
                 error: {
                   code: 'UNAUTHORIZED',
-                  message: 'Authentication required'
+                  message: 'Authentication required',
                 },
                 timestamp: '2024-01-01T12:00:00Z',
-                requestId: 'req_1234567890'
-              }
-            }
-          }
-        }
-      }
+                requestId: 'req_1234567890',
+              },
+            },
+          },
+        },
+      },
     });
 
     this.addResponse('Forbidden', {
@@ -441,15 +454,15 @@ export class OpenAPIGenerator {
                 success: false,
                 error: {
                   code: 'FORBIDDEN',
-                  message: 'Insufficient permissions'
+                  message: 'Insufficient permissions',
                 },
                 timestamp: '2024-01-01T12:00:00Z',
-                requestId: 'req_1234567890'
-              }
-            }
-          }
-        }
-      }
+                requestId: 'req_1234567890',
+              },
+            },
+          },
+        },
+      },
     });
 
     this.addResponse('NotFound', {
@@ -464,15 +477,15 @@ export class OpenAPIGenerator {
                 success: false,
                 error: {
                   code: 'NOT_FOUND',
-                  message: 'Resource not found'
+                  message: 'Resource not found',
                 },
                 timestamp: '2024-01-01T12:00:00Z',
-                requestId: 'req_1234567890'
-              }
-            }
-          }
-        }
-      }
+                requestId: 'req_1234567890',
+              },
+            },
+          },
+        },
+      },
     });
 
     this.addResponse('InternalServerError', {
@@ -487,15 +500,15 @@ export class OpenAPIGenerator {
                 success: false,
                 error: {
                   code: 'INTERNAL_ERROR',
-                  message: 'An unexpected error occurred'
+                  message: 'An unexpected error occurred',
                 },
                 timestamp: '2024-01-01T12:00:00Z',
-                requestId: 'req_1234567890'
-              }
-            }
-          }
-        }
-      }
+                requestId: 'req_1234567890',
+              },
+            },
+          },
+        },
+      },
     });
   }
 
@@ -508,7 +521,7 @@ export class OpenAPIGenerator {
       in: 'query',
       description: 'Page number for pagination',
       required: false,
-      schema: { type: 'integer', minimum: 1, default: 1 }
+      schema: { type: 'integer', minimum: 1, default: 1 },
     });
 
     this.addParameter('limit', {
@@ -516,7 +529,7 @@ export class OpenAPIGenerator {
       in: 'query',
       description: 'Number of items per page',
       required: false,
-      schema: { type: 'integer', minimum: 1, maximum: 100, default: 20 }
+      schema: { type: 'integer', minimum: 1, maximum: 100, default: 20 },
     });
 
     this.addParameter('sortBy', {
@@ -524,7 +537,7 @@ export class OpenAPIGenerator {
       in: 'query',
       description: 'Field to sort by',
       required: false,
-      schema: { type: 'string', example: 'createdAt' }
+      schema: { type: 'string', example: 'createdAt' },
     });
 
     this.addParameter('sortOrder', {
@@ -532,7 +545,7 @@ export class OpenAPIGenerator {
       in: 'query',
       description: 'Sort order',
       required: false,
-      schema: { type: 'string', enum: ['asc', 'desc'], default: 'desc' }
+      schema: { type: 'string', enum: ['asc', 'desc'], default: 'desc' },
     });
   }
 
@@ -542,27 +555,27 @@ export class OpenAPIGenerator {
   private addDefaultTags(): void {
     this.addTag('Authentication', 'User authentication and authorization operations', {
       description: 'Authentication API Documentation',
-      url: 'https://docs.fire22.com/auth'
+      url: 'https://docs.fire22.com/auth',
     });
 
     this.addTag('Users', 'User management operations', {
       description: 'User Management API Documentation',
-      url: 'https://docs.fire22.com/users'
+      url: 'https://docs.fire22.com/users',
     });
 
     this.addTag('Dashboard', 'Dashboard and analytics operations', {
       description: 'Dashboard API Documentation',
-      url: 'https://docs.fire22.com/dashboard'
+      url: 'https://docs.fire22.com/dashboard',
     });
 
     this.addTag('Monitoring', 'System monitoring and health check operations', {
       description: 'Monitoring API Documentation',
-      url: 'https://docs.fire22.com/monitoring'
+      url: 'https://docs.fire22.com/monitoring',
     });
 
     this.addTag('Admin', 'Administrative operations', {
       description: 'Admin API Documentation',
-      url: 'https://docs.fire22.com/admin'
+      url: 'https://docs.fire22.com/admin',
     });
   }
 

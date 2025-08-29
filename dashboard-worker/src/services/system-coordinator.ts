@@ -37,7 +37,12 @@ export interface CoordinationRule {
 }
 
 export interface CoordinationAction {
-  type: 'update_user' | 'create_ticket' | 'send_notification' | 'route_department' | 'update_permissions';
+  type:
+    | 'update_user'
+    | 'create_ticket'
+    | 'send_notification'
+    | 'route_department'
+    | 'update_permissions';
   target: string;
   parameters: Record<string, any>;
 }
@@ -58,35 +63,32 @@ export class SystemCoordinator {
     this.initializeCoordinationRules();
   }
 
-  // ===== CORE SYNCHRONIZATION METHODS =====
+  // !== CORE SYNCHRONIZATION METHODS !==
 
   /**
    * Synchronize all systems
    */
   public async syncAllSystems(): Promise<SyncResult[]> {
     const results: SyncResult[] = [];
-    
-    
+
     try {
       // 1. Sync Fire22 data first (customers, agents, transactions)
-      results.push(...await this.syncFire22Data());
-      
+      results.push(...(await this.syncFire22Data()));
+
       // 2. Sync Telegram users and link to Fire22 customers
-      results.push(...await this.syncTelegramData());
-      
+      results.push(...(await this.syncTelegramData()));
+
       // 3. Process coordination rules
       await this.processCoordinationRules();
-      
+
       // 4. Update sync status
       await this.updateSyncStatus('all_systems', 'completed', results.length);
-      
-      
     } catch (error) {
       console.error('❌ System synchronization failed:', error);
       await this.updateSyncStatus('all_systems', 'failed', 0, [error.message]);
       throw error;
     }
-    
+
     return results;
   }
 
@@ -104,7 +106,6 @@ export class SystemCoordinator {
     this.syncInProgress.add('fire22');
 
     try {
-
       // Sync customers
       const customerResult = await this.syncFire22Customers();
       results.push(customerResult);
@@ -118,7 +119,6 @@ export class SystemCoordinator {
       results.push(transactionResult);
 
       this.lastSyncTimes.set('fire22', new Date());
-
     } finally {
       this.syncInProgress.delete('fire22');
     }
@@ -139,7 +139,7 @@ export class SystemCoordinator {
       recordsCreated: 0,
       errors: [],
       duration: 0,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     try {
@@ -151,7 +151,7 @@ export class SystemCoordinator {
         try {
           // Check if unified user exists
           let user = await this.findUserByFire22Id(customerData.customer_id);
-          
+
           if (!user) {
             // Create unified user record
             user = await this.createUnifiedUser({
@@ -161,7 +161,7 @@ export class SystemCoordinator {
               last_name: customerData.last_name,
               email: customerData.email,
               role: 'customer',
-              status: customerData.status || 'active'
+              status: customerData.status || 'active',
             });
             result.recordsCreated++;
           } else {
@@ -175,14 +175,12 @@ export class SystemCoordinator {
           await this.applyCoordinationRules('fire22_update', {
             user_id: user.id,
             customer_data: customerData,
-            is_new: result.recordsCreated > result.recordsUpdated
+            is_new: result.recordsCreated > result.recordsUpdated,
           });
-
         } catch (error) {
           result.errors.push(`Customer ${customerData.customer_id}: ${error.message}`);
         }
       }
-
     } catch (error) {
       result.errors.push(`Fire22 API error: ${error.message}`);
     }
@@ -192,7 +190,7 @@ export class SystemCoordinator {
   }
 
   /**
-   * Sync Telegram users and link to Fire22 customers  
+   * Sync Telegram users and link to Fire22 customers
    */
   public async syncTelegramData(): Promise<SyncResult[]> {
     const results: SyncResult[] = [];
@@ -205,7 +203,6 @@ export class SystemCoordinator {
     this.syncInProgress.add('telegram');
 
     try {
-
       // Sync telegram users and messages
       const telegramResult = await this.syncTelegramUsers();
       results.push(telegramResult);
@@ -215,7 +212,6 @@ export class SystemCoordinator {
       results.push(messageResult);
 
       this.lastSyncTimes.set('telegram', new Date());
-
     } finally {
       this.syncInProgress.delete('telegram');
     }
@@ -223,7 +219,7 @@ export class SystemCoordinator {
     return results;
   }
 
-  // ===== COORDINATION RULE ENGINE =====
+  // !== COORDINATION RULE ENGINE !==
 
   /**
    * Initialize default coordination rules
@@ -236,29 +232,29 @@ export class SystemCoordinator {
         trigger: 'fire22_update',
         conditions: {
           field: 'vip_status',
-          changed_to: true
+          changed_to: true,
         },
         actions: [
           {
             type: 'update_user',
             target: 'users',
-            parameters: { role: 'vip_customer' }
+            parameters: { role: 'vip_customer' },
           },
           {
             type: 'update_permissions',
-            target: 'team_permissions', 
-            parameters: { service_level: 'vip' }
+            target: 'team_permissions',
+            parameters: { service_level: 'vip' },
           },
           {
             type: 'send_notification',
             target: 'telegram',
             parameters: {
               message: 'Congratulations! You have been upgraded to VIP status.',
-              priority: 'high'
-            }
-          }
+              priority: 'high',
+            },
+          },
         ],
-        active: true
+        active: true,
       },
 
       {
@@ -268,7 +264,7 @@ export class SystemCoordinator {
         conditions: {
           field: 'amount',
           operator: 'greater_than',
-          value: 10000
+          value: 10000,
         },
         actions: [
           {
@@ -278,19 +274,19 @@ export class SystemCoordinator {
               department: 'finance',
               priority: 'high',
               category: 'high_value_transaction',
-              auto_assign: true
-            }
+              auto_assign: true,
+            },
           },
           {
             type: 'send_notification',
             target: 'telegram',
             parameters: {
               channel: 'finance_alerts',
-              message: 'High value transaction requires review: {{amount}} for {{customer}}'
-            }
-          }
+              message: 'High value transaction requires review: {{amount}} for {{customer}}',
+            },
+          },
         ],
-        active: true
+        active: true,
       },
 
       {
@@ -299,7 +295,7 @@ export class SystemCoordinator {
         trigger: 'telegram_message',
         conditions: {
           field: 'message_type',
-          value: 'support_request'
+          value: 'support_request',
         },
         actions: [
           {
@@ -310,21 +306,21 @@ export class SystemCoordinator {
                 'withdrawal|deposit|financial': 'finance',
                 'vip|premium|exclusive': 'vip',
                 'technical|bug|error': 'technical',
-                'default': 'support'
-              }
-            }
+                default: 'support',
+              },
+            },
           },
           {
             type: 'create_ticket',
             target: 'support_tickets',
             parameters: {
               auto_assign: true,
-              sla_based_on_customer_tier: true
-            }
-          }
+              sla_based_on_customer_tier: true,
+            },
+          },
         ],
-        active: true
-      }
+        active: true,
+      },
     ];
   }
 
@@ -359,7 +355,7 @@ export class SystemCoordinator {
 
     if (conditions.field && conditions.operator && conditions.value !== undefined) {
       const currentValue = this.getNestedValue(context, conditions.field);
-      
+
       switch (conditions.operator) {
         case 'greater_than':
           return currentValue > conditions.value;
@@ -368,7 +364,9 @@ export class SystemCoordinator {
         case 'equals':
           return currentValue === conditions.value;
         case 'contains':
-          return String(currentValue).toLowerCase().includes(String(conditions.value).toLowerCase());
+          return String(currentValue)
+            .toLowerCase()
+            .includes(String(conditions.value).toLowerCase());
         default:
           return false;
       }
@@ -387,23 +385,23 @@ export class SystemCoordinator {
           case 'update_user':
             await this.executeUpdateUser(action, context);
             break;
-          
+
           case 'create_ticket':
             await this.executeCreateTicket(action, context);
             break;
-            
+
           case 'send_notification':
             await this.executeSendNotification(action, context);
             break;
-            
+
           case 'route_department':
             await this.executeRouteDepartment(action, context);
             break;
-            
+
           case 'update_permissions':
             await this.executeUpdatePermissions(action, context);
             break;
-            
+
           default:
             console.warn(`Unknown action type: ${action.type}`);
         }
@@ -413,7 +411,7 @@ export class SystemCoordinator {
     }
   }
 
-  // ===== DATABASE OPERATIONS =====
+  // !== DATABASE OPERATIONS !==
 
   /**
    * Create unified user record
@@ -437,10 +435,13 @@ export class SystemCoordinator {
       userData.fire22_customer_id,
       userData.role,
       userData.status,
-      new Date().toISOString()
+      new Date().toISOString(),
     ];
 
-    const result = await this.db.prepare(query).bind(...params).first();
+    const result = await this.db
+      .prepare(query)
+      .bind(...params)
+      .first();
     return result;
   }
 
@@ -456,9 +457,9 @@ export class SystemCoordinator {
    * Update sync status in database
    */
   private async updateSyncStatus(
-    systemName: string, 
-    status: string, 
-    recordsCount: number, 
+    systemName: string,
+    status: string,
+    recordsCount: number,
     errors: string[] = []
   ): Promise<void> {
     const query = `
@@ -475,13 +476,16 @@ export class SystemCoordinator {
       status,
       recordsCount,
       JSON.stringify(errors),
-      new Date().toISOString()
+      new Date().toISOString(),
     ];
 
-    await this.db.prepare(query).bind(...params).run();
+    await this.db
+      .prepare(query)
+      .bind(...params)
+      .run();
   }
 
-  // ===== UTILITY METHODS =====
+  // !== UTILITY METHODS !==
 
   /**
    * Get nested value from object using dot notation
@@ -499,7 +503,7 @@ export class SystemCoordinator {
     });
   }
 
-  // ===== ACTION EXECUTORS (to be implemented) =====
+  // !== ACTION EXECUTORS (to be implemented) !==
 
   private async executeUpdateUser(action: CoordinationAction, context: any): Promise<void> {
     // Implementation for updating user records
@@ -521,7 +525,7 @@ export class SystemCoordinator {
     // Implementation for updating permissions
   }
 
-  // ===== EXTERNAL API METHODS (to be implemented) =====
+  // !== EXTERNAL API METHODS (to be implemented) !==
 
   private async fetchFire22Customers(): Promise<any[]> {
     // Mock data for now - replace with actual Fire22 API call
@@ -534,8 +538,8 @@ export class SystemCoordinator {
         login: 'johndoe',
         status: 'active',
         vip_status: false,
-        balance: 1500.00
-      }
+        balance: 1500.0,
+      },
     ];
   }
 
@@ -549,7 +553,7 @@ export class SystemCoordinator {
       recordsCreated: 0,
       errors: [],
       duration: 0,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -563,7 +567,7 @@ export class SystemCoordinator {
       recordsCreated: 0,
       errors: [],
       duration: 0,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -577,7 +581,7 @@ export class SystemCoordinator {
       recordsCreated: 0,
       errors: [],
       duration: 0,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -591,7 +595,7 @@ export class SystemCoordinator {
       recordsCreated: 0,
       errors: [],
       duration: 0,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -603,7 +607,7 @@ export class SystemCoordinator {
     // Process any pending coordination rules
   }
 
-  // ===== PUBLIC API METHODS =====
+  // !== PUBLIC API METHODS !==
 
   /**
    * Get system sync status
@@ -647,7 +651,7 @@ export const systemCoordinator = new SystemCoordinator({
   fire22Token: process.env.FIRE22_TOKEN || '',
   telegramBotToken: process.env.BOT_TOKEN || '',
   syncIntervalMinutes: 15,
-  enableAutoSync: true
+  enableAutoSync: true,
 });
 
 export default SystemCoordinator;

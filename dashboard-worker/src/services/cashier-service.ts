@@ -4,7 +4,11 @@
  */
 
 import { EventEmitter } from 'events';
-import { TransactionItemSchema, TransactionTypeSchema, TransactionStatusSchema } from '../api/schemas';
+import {
+  TransactionItemSchema,
+  TransactionTypeSchema,
+  TransactionStatusSchema,
+} from '../api/schemas';
 
 export interface CashierTransaction {
   id: string;
@@ -115,7 +119,6 @@ export class CashierService extends EventEmitter {
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-
     // Load existing transactions and sessions
     await this.loadExistingData();
 
@@ -140,8 +143,8 @@ export class CashierService extends EventEmitter {
         cashDeposit: 0,
         cashWithdrawal: 0,
         wireTransfer: 25,
-        checkDeposit: 0
-      }
+        checkDeposit: 0,
+      },
     };
   }
 
@@ -176,7 +179,11 @@ export class CashierService extends EventEmitter {
   /**
    * Start a new cashier session
    */
-  async startSession(cashierId: string, cashierName: string, openingBalance: number = 0): Promise<CashierSession> {
+  async startSession(
+    cashierId: string,
+    cashierName: string,
+    openingBalance: number = 0
+  ): Promise<CashierSession> {
     if (this.currentSession) {
       throw new Error('A cashier session is already active');
     }
@@ -192,7 +199,7 @@ export class CashierService extends EventEmitter {
       totalDeposits: 0,
       totalWithdrawals: 0,
       totalFees: 0,
-      transactionCount: 0
+      transactionCount: 0,
     };
 
     this.currentSession = session;
@@ -235,7 +242,9 @@ export class CashierService extends EventEmitter {
     this.validateDepositRequest(request);
 
     // Calculate fees
-    const fee = this.config.autoCalculateFees ? this.calculateFee(request.paymentMethod, 'deposit') : (request.fee || 0);
+    const fee = this.config.autoCalculateFees
+      ? this.calculateFee(request.paymentMethod, 'deposit')
+      : request.fee || 0;
     const netAmount = request.amount - fee;
 
     // Create transaction
@@ -254,7 +263,7 @@ export class CashierService extends EventEmitter {
       notes: request.notes,
       fee,
       netAmount,
-      approvalRequired: this.requiresApproval(request.amount)
+      approvalRequired: this.requiresApproval(request.amount),
     };
 
     // Save transaction
@@ -276,7 +285,10 @@ export class CashierService extends EventEmitter {
   /**
    * Process a withdrawal transaction
    */
-  async processWithdrawal(request: WithdrawalRequest, cashierId: string): Promise<CashierTransaction> {
+  async processWithdrawal(
+    request: WithdrawalRequest,
+    cashierId: string
+  ): Promise<CashierTransaction> {
     if (!this.currentSession) {
       throw new Error('No active cashier session');
     }
@@ -285,7 +297,9 @@ export class CashierService extends EventEmitter {
     this.validateWithdrawalRequest(request);
 
     // Calculate fees
-    const fee = this.config.autoCalculateFees ? this.calculateFee(request.paymentMethod, 'withdrawal') : (request.fee || 0);
+    const fee = this.config.autoCalculateFees
+      ? this.calculateFee(request.paymentMethod, 'withdrawal')
+      : request.fee || 0;
     const totalAmount = request.amount + fee;
 
     // Check if sufficient funds
@@ -309,7 +323,7 @@ export class CashierService extends EventEmitter {
       notes: request.notes,
       fee,
       netAmount: request.amount,
-      approvalRequired: this.requiresApproval(request.amount)
+      approvalRequired: this.requiresApproval(request.amount),
     };
 
     // Save transaction
@@ -360,7 +374,11 @@ export class CashierService extends EventEmitter {
   /**
    * Reject a pending transaction
    */
-  async rejectTransaction(transactionId: string, rejectedBy: string, reason?: string): Promise<CashierTransaction> {
+  async rejectTransaction(
+    transactionId: string,
+    rejectedBy: string,
+    reason?: string
+  ): Promise<CashierTransaction> {
     const transaction = this.transactions.get(transactionId);
     if (!transaction) {
       throw new Error('Transaction not found');
@@ -421,7 +439,7 @@ export class CashierService extends EventEmitter {
       pendingApprovals,
       activeSessions: this.currentSession ? 1 : 0,
       totalCashOnHand: this.currentSession?.currentBalance || 0,
-      totalChecks: this.calculateCheckTotal()
+      totalChecks: this.calculateCheckTotal(),
     };
   }
 
@@ -467,7 +485,9 @@ export class CashierService extends EventEmitter {
     }
 
     // Sort by processed date (newest first)
-    return transactions.sort((a, b) => new Date(b.processedAt).getTime() - new Date(a.processedAt).getTime());
+    return transactions.sort(
+      (a, b) => new Date(b.processedAt).getTime() - new Date(a.processedAt).getTime()
+    );
   }
 
   /**
@@ -514,7 +534,9 @@ export class CashierService extends EventEmitter {
     }
 
     if (request.amount > this.config.dailyWithdrawalLimit) {
-      throw new Error(`Withdrawal amount exceeds daily limit of $${this.config.dailyWithdrawalLimit}`);
+      throw new Error(
+        `Withdrawal amount exceeds daily limit of $${this.config.dailyWithdrawalLimit}`
+      );
     }
 
     if (!this.currentSession || this.currentSession.currentBalance < request.amount) {
@@ -538,7 +560,10 @@ export class CashierService extends EventEmitter {
   }
 
   private requiresApproval(amount: number): boolean {
-    return this.config.requireApprovalForLargeTransactions && amount >= this.config.largeTransactionThreshold;
+    return (
+      this.config.requireApprovalForLargeTransactions &&
+      amount >= this.config.largeTransactionThreshold
+    );
   }
 
   private updateSessionBalance(): void {
@@ -568,17 +593,13 @@ export class CashierService extends EventEmitter {
 
   // Event handlers
 
-  private onTransactionCreated(transaction: CashierTransaction): void {
-  }
+  private onTransactionCreated(transaction: CashierTransaction): void {}
 
-  private onTransactionUpdated(transaction: CashierTransaction): void {
-  }
+  private onTransactionUpdated(transaction: CashierTransaction): void {}
 
-  private onSessionStarted(session: CashierSession): void {
-  }
+  private onSessionStarted(session: CashierSession): void {}
 
-  private onSessionClosed(session: CashierSession): void {
-  }
+  private onSessionClosed(session: CashierSession): void {}
 }
 
 // Global functions for easy access

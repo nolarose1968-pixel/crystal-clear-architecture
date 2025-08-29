@@ -1,7 +1,7 @@
-import "../../shared-styles/highlight.css";
+import '../../shared-styles/highlight.css';
 
-console.log("🔥 CSS imported successfully!");
-console.log("📦 Testing Bun CSS bundling");
+console.log('🔥 CSS imported successfully!');
+console.log('📦 Testing Bun CSS bundling');
 
 // Create a test element
 const testDiv = document.createElement('div');

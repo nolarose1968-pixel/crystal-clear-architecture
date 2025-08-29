@@ -1,6 +1,7 @@
 # 🛡️ Fire22 Security - Security - Security Integration Guide v4.0.0-staging
 
-Complete step-by-step guide for integrating the Fire22 security system with dashboard-worker.
+Complete step-by-step guide for integrating the Fire22 security system with
+dashboard-worker.
 
 ## 📋 Table of Contents
 
@@ -84,7 +85,7 @@ import { initializeFire22Security } from '@fire22/security-core';
 export async function setupSecureDashboard() {
   const security = await initializeFire22Security({
     service: 'fire22-dashboard',
-    environments: ['development', 'staging', 'production']
+    environments: ['development', 'staging', 'production'],
   });
 
   // Load secure credentials
@@ -92,21 +93,21 @@ export async function setupSecureDashboard() {
     database: {
       url: await security.getCredential('database_url'),
       maxConnections: 20,
-      ssl: process.env.NODE_ENV === 'production'
+      ssl: process.env.NODE_ENV === 'production',
     },
     api: {
       fire22Token: await security.getCredential('fire22_api_token'),
-      jwtSecret: await security.getCredential('jwt_secret')
+      jwtSecret: await security.getCredential('jwt_secret'),
     },
     telegram: {
       botToken: await security.getCredential('bot_token'),
-      cashierToken: await security.getCredential('cashier_bot_token')
-    }
+      cashierToken: await security.getCredential('cashier_bot_token'),
+    },
   };
 
   // Audit security configuration
   await security.auditSecurity();
-  
+
   return config;
 }
 ```
@@ -119,7 +120,8 @@ export async function setupSecureDashboard() {
   // Content Security Policy
   const meta = document.createElement('meta');
   meta.httpEquiv = 'Content-Security-Policy';
-  meta.content = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'";
+  meta.content =
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'";
   document.head.appendChild(meta);
 
   // Secure API configuration
@@ -127,8 +129,9 @@ export async function setupSecureDashboard() {
     apiEndpoint: '/api',
     headers: {
       'X-Requested-With': 'XMLHttpRequest',
-      'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content
-    }
+      'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')
+        ?.content,
+    },
   };
 </script>
 ```
@@ -152,41 +155,40 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     // Initialize security
     const security = await initializeFire22Security();
-    
+
     // Verify request authentication
     const authHeader = request.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return new Response('Unauthorized', { status: 401 });
     }
-    
+
     // Get secure token from Bun.secrets
     const apiToken = await security.getCredential('fire22_api_token');
-    
+
     if (authHeader.substring(7) !== apiToken) {
       return new Response('Invalid token', { status: 403 });
     }
-    
+
     // Security headers
     const securityHeaders = {
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
       'X-XSS-Protection': '1; mode=block',
       'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-      'Content-Security-Policy': "default-src 'self'"
+      'Content-Security-Policy': "default-src 'self'",
     };
-    
+
     // Process request with security context
     const response = await handleSecureRequest(request, env, security);
-    
+
     // Add security headers to response
     Object.entries(securityHeaders).forEach(([key, value]) => {
       response.headers.set(key, value);
     });
-    
-    return response;
-  }
-};
 
+    return response;
+  },
+};
 ```
 
 ### Wrangler Configuration
@@ -231,32 +233,34 @@ import { initializeFire22Security } from '@fire22/security-core';
 async function createSecureServer() {
   const app = express();
   const security = await initializeFire22Security();
-  
+
   // Security middleware
-  app.use(helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "https:"]
-      }
-    }
-  }));
-  
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          scriptSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", 'data:', 'https:'],
+        },
+      },
+    })
+  );
+
   // Rate limiting
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // limit each IP to 100 requests per windowMs
-    message: 'Too many requests from this IP'
+    message: 'Too many requests from this IP',
   });
   app.use('/api', limiter);
-  
+
   // Load secure configuration
   const dbUrl = await security.getCredential('database_url');
   const jwtSecret = await security.getCredential('jwt_secret');
   const fire22Token = await security.getCredential('fire22_api_token');
-  
+
   // JWT middleware
   app.use('/api/manager', async (req, res, next) => {
     const token = req.headers.authorization?.replace('Bearer ', '');
@@ -265,7 +269,7 @@ async function createSecureServer() {
     }
     next();
   });
-  
+
   return app;
 }
 
@@ -276,7 +280,6 @@ createSecureServer().then(app => {
     console.log(`🔐 Secure server running on port ${PORT}`);
   });
 });
-
 ```
 
 ---
@@ -292,31 +295,34 @@ import { initializeFire22Security } from '@fire22/security-core';
 
 export async function createSecurePool() {
   const security = await initializeFire22Security();
-  
+
   // Get database URL from secure storage
   const databaseUrl = await security.getCredential('database_url', {
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
   });
-  
+
   const pool = new Pool({
     connectionString: databaseUrl,
     max: 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
-    ssl: process.env.NODE_ENV === 'production' ? {
-      rejectUnauthorized: true
-    } : undefined,
+    ssl:
+      process.env.NODE_ENV === 'production'
+        ? {
+            rejectUnauthorized: true,
+          }
+        : undefined,
     // Connection security
     statement_timeout: 30000,
     query_timeout: 30000,
-    application_name: 'fire22-dashboard'
+    application_name: 'fire22-dashboard',
   });
-  
+
   // Monitor pool security
   pool.on('error', (err, client) => {
     console.error('Unexpected database error:', err);
   });
-  
+
   return pool;
 }
 
@@ -326,7 +332,7 @@ export async function secureQuery(pool: Pool, query: string, params?: any[]) {
   if (query.includes('--') || query.includes(';')) {
     throw new Error('Potentially dangerous SQL detected');
   }
-  
+
   try {
     const result = await pool.query(query, params);
     return result;
@@ -378,50 +384,50 @@ import { initializeFire22Security } from '@fire22/security-core';
 class SecureFire22API {
   private security: any;
   private apiToken: string | null = null;
-  
+
   async initialize() {
     this.security = await initializeFire22Security();
     this.apiToken = await this.security.getCredential('fire22_api_token');
   }
-  
+
   async makeSecureRequest(endpoint: string, data?: any) {
     if (!this.apiToken) {
       await this.initialize();
     }
-    
+
     const response = await fetch(`https://api.fire22.com${endpoint}`, {
       method: data ? 'POST' : 'GET',
       headers: {
-        'Authorization': `Bearer ${this.apiToken}`,
+        Authorization: `Bearer ${this.apiToken}`,
         'Content-Type': 'application/json',
         'X-API-Version': '2.0',
-        'X-Request-ID': crypto.randomUUID()
+        'X-Request-ID': crypto.randomUUID(),
       },
-      body: data ? JSON.stringify(data) : undefined
+      body: data ? JSON.stringify(data) : undefined,
     });
-    
+
     if (!response.ok) {
       // Don't leak sensitive error details
       throw new Error(`API request failed: ${response.status}`);
     }
-    
+
     return response.json();
   }
-  
+
   // Secure customer sync
   async syncCustomers() {
     const customers = await this.makeSecureRequest('/customers');
-    
+
     // Validate and sanitize data
     return customers.map((customer: any) => ({
       id: String(customer.id).substring(0, 50),
       name: String(customer.name).substring(0, 100),
       agentId: String(customer.agentId).substring(0, 20),
       // Remove sensitive fields
-      ...this.sanitizeCustomerData(customer)
+      ...this.sanitizeCustomerData(customer),
     }));
   }
-  
+
   private sanitizeCustomerData(customer: any) {
     const safe = { ...customer };
     delete safe.password;
@@ -432,7 +438,6 @@ class SecureFire22API {
 }
 
 export const secureFire22API = new SecureFire22API();
-
 ```
 
 ---
@@ -472,7 +477,6 @@ bun run dev-secure
     "pre-push": "bun run security:verify"
   }
 }
-
 ```
 
 ### Git Hooks (lefthook.yml)
@@ -484,7 +488,7 @@ pre-commit:
       run: bun run security:audit
     scanner-test:
       run: bun run security:scanner-test
-    
+
 pre-push:
   commands:
     security-verify:
@@ -518,7 +522,6 @@ pre-push:
 - [ ] Error messages sanitized
 - [ ] Logging configured (no sensitive data)
 - [ ] Backup and recovery tested
-
 ```
 
 ### CI/CD Pipeline
@@ -537,28 +540,27 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: oven-sh/setup-bun@v1
-      
+
       - name: Configure Security Scanner
         run: |
           echo '[install.security]' > bunfig.toml
           echo 'scanner = "@fire22/security-scanner"' >> bunfig.toml
-      
+
       - name: Install with Security Scanning
         run: bun install --frozen-lockfile
-        
+
       - name: Security Audit
         run: bun audit --audit-level=high --prod
-        
+
       - name: Run Tests
         run: bun test
-        
+
       - name: Deploy to Cloudflare
         if: success()
         run: |
           bun run deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-
 ```
 
 ---
@@ -577,40 +579,39 @@ export class SecurityMonitor {
     authFailures: 0,
     suspiciousRequests: 0,
     blockedPackages: 0,
-    credentialAccess: 0
+    credentialAccess: 0,
   };
-  
+
   async initialize() {
     this.security = await initializeFire22Security();
     this.startMonitoring();
   }
-  
+
   private startMonitoring() {
     // Monitor authentication failures
     setInterval(async () => {
       const audit = await this.security.auditSecurity();
       console.log('🔐 Security Status:', {
         ...this.metrics,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }, 60000); // Every minute
   }
-  
+
   recordAuthFailure(ip: string, reason: string) {
     this.metrics.authFailures++;
     console.warn(`Auth failure from ${ip}: ${reason}`);
   }
-  
+
   recordSuspiciousRequest(details: any) {
     this.metrics.suspiciousRequests++;
     // Log to security monitoring service
   }
-  
+
   getMetrics() {
     return { ...this.metrics };
   }
 }
-
 ```
 
 ### Security Alerts
@@ -623,11 +624,11 @@ export class SecurityAlertSystem {
       // Send immediate notification
       await this.notifyAdmins(message);
     }
-    
+
     // Log to security audit
     console.log(`[SECURITY ${level.toUpperCase()}] ${message}`);
   }
-  
+
   private async notifyAdmins(message: string) {
     // Implement admin notification
     // Could be email, Telegram, SMS, etc.

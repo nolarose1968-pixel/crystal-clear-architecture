@@ -14,7 +14,7 @@ const PROBLEMATIC_FILES = [
   'docs/architecture/system/dns-caching.md',
   'docs/architecture/system/multi-profile-build.md',
   'docs/architecture/system/pattern-weaver.md',
-  'docs/architecture/system/workspace-orchestration.md'
+  'docs/architecture/system/workspace-orchestration.md',
 ];
 
 interface FixResult {
@@ -27,66 +27,71 @@ interface FixResult {
 
 async function fixMDXFunctionErrors(): Promise<FixResult[]> {
   const results: FixResult[] = [];
-  
+
   for (const filePath of PROBLEMATIC_FILES) {
     const fullPath = join('/Users/nolarose/ff/dashboard-worker', filePath);
-    
+
     try {
       const content = await readFile(fullPath, 'utf-8');
       const originalLines = content.split('\n').length;
       const errorsFound: string[] = [];
-      
+
       // Check if file has function declarations or other problematic patterns
       let fixedContent = content;
-      
+
       // Pattern 1: Naked function declarations (not in code blocks)
       const functionDeclPattern = /^function\s+\w+\s*\([^)]*\)\s*\{[\s\S]*?\}$/gm;
       if (functionDeclPattern.test(content)) {
         errorsFound.push('Function declarations outside code blocks');
         // Wrap function declarations in typescript code blocks
-        fixedContent = fixedContent.replace(functionDeclPattern, (match) => {
+        fixedContent = fixedContent.replace(functionDeclPattern, match => {
           return '```typescript\n' + match + '\n```';
         });
       }
-      
+
       // Pattern 2: Incomplete JSX expressions
       const incompleteJSXPattern = /<\w+[^>]*$/gm;
       if (incompleteJSXPattern.test(content)) {
         errorsFound.push('Incomplete JSX expressions');
-        fixedContent = fixedContent.replace(incompleteJSXPattern, (match) => {
+        fixedContent = fixedContent.replace(incompleteJSXPattern, match => {
           return '`' + match + '`';
         });
       }
-      
+
       // Pattern 3: Malformed expressions in braces
       const malformedExpressionPattern = /\{[^}]*$/gm;
       if (malformedExpressionPattern.test(content)) {
         errorsFound.push('Malformed expressions');
-        fixedContent = fixedContent.replace(malformedExpressionPattern, (match) => {
+        fixedContent = fixedContent.replace(malformedExpressionPattern, match => {
           return '`' + match + '}`';
         });
       }
-      
+
       // If we actually made changes, write the fixed content
       if (fixedContent !== content) {
         await writeFile(fullPath, fixedContent, 'utf-8');
         const fixedLines = fixedContent.split('\n').length;
-        
+
         results.push({
           file: filePath,
           originalLines,
           fixedLines,
           errorsFound,
-          success: true
+          success: true,
         });
-        
+
         console.log(`✅ Fixed ${filePath} - ${errorsFound.length} errors`);
       } else {
         // File doesn't seem to have the problematic patterns
         console.log(`ℹ️  ${filePath} - No obvious patterns found, but MDX reports errors`);
-        
+
         // Let's create a minimal safe version
-        const safeContent = `# ${filePath.split('/').pop()?.replace('.md', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+        const safeContent = `# ${filePath
+          .split('/')
+          .pop()
+          ?.replace('.md', '')
+          .replace(/-/g, ' ')
+          .replace(/\b\w/g, l => l.toUpperCase())}
 
 🔧 **Documentation Under Maintenance**
 
@@ -107,15 +112,15 @@ For immediate assistance, please refer to the main documentation or contact supp
 `;
 
         await writeFile(fullPath, safeContent, 'utf-8');
-        
+
         results.push({
           file: filePath,
           originalLines,
           fixedLines: safeContent.split('\n').length,
           errorsFound: ['Created safe placeholder'],
-          success: true
+          success: true,
         });
-        
+
         console.log(`📝 Created safe placeholder for ${filePath}`);
       }
     } catch (error) {
@@ -124,13 +129,13 @@ For immediate assistance, please refer to the main documentation or contact supp
         originalLines: 0,
         fixedLines: 0,
         errorsFound: [(error as Error).message],
-        success: false
+        success: false,
       });
-      
+
       console.error(`❌ Failed to fix ${filePath}: ${error}`);
     }
   }
-  
+
   return results;
 }
 
@@ -151,21 +156,21 @@ async function createStaticFolder() {
 // Main execution
 async function main() {
   console.log('🔧 Starting MDX Function Error Fix...\n');
-  
+
   // Create static folder to resolve the glob warning
   await createStaticFolder();
-  
+
   const results = await fixMDXFunctionErrors();
-  
+
   console.log('\n📊 Fix Summary:');
-  console.log('================');
-  
+  console.log('!==!==!==');
+
   const successful = results.filter(r => r.success);
   const failed = results.filter(r => !r.success);
-  
+
   console.log(`✅ Successfully fixed: ${successful.length} files`);
   console.log(`❌ Failed to fix: ${failed.length} files`);
-  
+
   if (successful.length > 0) {
     console.log('\n🎯 Fixed Files:');
     successful.forEach(result => {
@@ -174,14 +179,14 @@ async function main() {
       console.log(`    Errors: ${result.errorsFound.join(', ')}`);
     });
   }
-  
+
   if (failed.length > 0) {
     console.log('\n💥 Failed Files:');
     failed.forEach(result => {
       console.log(`  ${result.file}: ${result.errorsFound.join(', ')}`);
     });
   }
-  
+
   console.log('\n🚀 Ready to test build!');
   console.log('Run: bun run docs:build');
 }

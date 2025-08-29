@@ -2,10 +2,10 @@
 
 /**
  * 🏗️ Enhanced Fire22 Workspace Isolator with Bun Isolated Installs
- * 
+ *
  * Creates isolated workspace environments using Bun's isolated install strategy.
  * Each workspace gets complete isolation while maintaining efficient development linking.
- * 
+ *
  * Features:
  * - Bun isolated installs for strict dependency isolation
  * - Linked versions (development with workspace:* dependencies)
@@ -13,7 +13,7 @@
  * - Independent package.json and configs for each workspace
  * - Separate build outputs and deployment targets
  * - Cross-workspace dependency management with isolation
- * 
+ *
  * @version 2.0.0
  * @author Fire22 Development Team
  */
@@ -46,56 +46,56 @@ export class EnhancedWorkspaceIsolator {
   private rootPath: string;
   private workspacesPath: string;
   private config: any;
-  
+
   constructor(rootPath: string = process.cwd()) {
     this.rootPath = rootPath;
     this.workspacesPath = join(rootPath, 'workspaces');
     this.config = this.loadWorkspaceConfig();
   }
-  
+
   /**
    * 🚀 Create all isolated workspaces with Bun isolated installs
    */
   async createAllIsolatedWorkspaces(): Promise<void> {
     const timer = new PerformanceTimer('enhanced-workspace-isolation');
-    
+
     Logger.info('🏗️  Enhanced Fire22 Workspace Isolator v2.0.0');
     Logger.info('='.repeat(60));
     Logger.info('🔨 Creating isolated workspace environments with Bun isolated installs...');
-    
+
     const workspaces = Object.entries(this.config.workspaces);
     Logger.info(`📦 Processing ${workspaces.length} workspaces`);
-    
+
     for (const [workspaceKey, workspace] of workspaces) {
       const workspaceConfig = workspace as any;
       Logger.info(`\n🔧 Isolating workspace: ${workspaceConfig.name}`);
-      
+
       // Create workspace isolation config
       const isolationConfig = this.createIsolationConfig(workspaceKey, workspaceConfig);
-      
+
       // Create isolated workspace environment
       await this.createIsolatedWorkspace(workspaceKey, isolationConfig);
-      
+
       // Create linked version (development)
       await this.createLinkedVersion(workspaceKey, isolationConfig);
-      
+
       // Create standalone version (production)
       await this.createStandaloneVersion(workspaceKey, isolationConfig);
-      
+
       // Create Bun configurations
       await this.createBunConfigurations(workspaceKey, isolationConfig);
-      
+
       Logger.info(`✅ ${workspaceConfig.name} isolation complete`);
     }
-    
+
     // Create workspace orchestration files
     await this.createWorkspaceOrchestration();
-    
+
     const performance = timer.finish();
     Logger.info(`\n🎉 Enhanced workspace isolation completed in ${performance.totalTime}ms`);
     this.logIsolationSummary();
   }
-  
+
   /**
    * 🔧 Create isolation configuration
    */
@@ -109,22 +109,24 @@ export class EnhancedWorkspaceIsolator {
       dependencies: workspace.dependencies || {},
       devDependencies: {
         '@types/bun': '^1.2.21',
-        'typescript': '^5.9.2'
+        typescript: '^5.9.2',
       },
       scripts: {
-        'dev': 'bun run src/index.ts',
-        'build': 'bun build src/index.ts --outdir dist --target bun --format esm',
-        'build:standalone': 'bun build src/index.ts --outdir dist/standalone --target bun --format esm --minify',
-        'build:cloudflare': 'bun build src/index.ts --outdir dist/cloudflare --target bun --format esm --minify',
-        'test': 'bun test',
+        dev: 'bun run src/index.ts',
+        build: 'bun build src/index.ts --outdir dist --target bun --format esm',
+        'build:standalone':
+          'bun build src/index.ts --outdir dist/standalone --target bun --format esm --minify',
+        'build:cloudflare':
+          'bun build src/index.ts --outdir dist/cloudflare --target bun --format esm --minify',
+        test: 'bun test',
         'test:watch': 'bun test --watch',
-        'lint': 'bunx eslint src/',
-        'typecheck': 'bunx tsc --noEmit',
+        lint: 'bunx eslint src/',
+        typecheck: 'bunx tsc --noEmit',
         'install:isolated': 'bun install --linker isolated',
         'install:linked': 'bun install --linker isolated',
         'install:standalone': 'bun install --linker isolated --frozen-lockfile',
         'deploy:linked': 'wrangler deploy --config wrangler.linked.toml',
-        'deploy:standalone': 'wrangler deploy --config wrangler.standalone.toml'
+        'deploy:standalone': 'wrangler deploy --config wrangler.standalone.toml',
       },
       include: workspace.include || [],
       exclude: workspace.exclude || [],
@@ -133,51 +135,64 @@ export class EnhancedWorkspaceIsolator {
         standalone: true,
         linked: true,
         separateTests: true,
-        independentDeploy: true
-      }
+        independentDeploy: true,
+      },
     };
   }
-  
+
   /**
    * 🏗️ Create isolated workspace environment
    */
-  private async createIsolatedWorkspace(workspaceKey: string, config: WorkspaceIsolationConfig): Promise<void> {
+  private async createIsolatedWorkspace(
+    workspaceKey: string,
+    config: WorkspaceIsolationConfig
+  ): Promise<void> {
     const workspacePath = join(this.workspacesPath, workspaceKey);
-    
+
     // Ensure workspace directory structure
     const dirs = [
-      'src', 'dist', 'dist/linked', 'dist/standalone', 'dist/cloudflare',
-      'tests', 'docs', '.wrangler', 'node_modules'
+      'src',
+      'dist',
+      'dist/linked',
+      'dist/standalone',
+      'dist/cloudflare',
+      'tests',
+      'docs',
+      '.wrangler',
+      'node_modules',
     ];
-    
+
     dirs.forEach(dir => {
       const dirPath = join(workspacePath, dir);
       if (!existsSync(dirPath)) {
         mkdirSync(dirPath, { recursive: true });
       }
     });
-    
+
     // Create base package.json
     await this.createPackageJson(workspacePath, config);
-    
+
     // Create TypeScript config
     await this.createTypeScriptConfig(workspacePath, config);
-    
+
     // Create workspace README
     await this.createWorkspaceReadme(workspacePath, config);
-    
+
     // Copy source files
     await this.copySourceFiles(workspaceKey, config, workspacePath);
-    
+
     Logger.debug(`Created isolated environment: ${config.packageName}`);
   }
-  
+
   /**
    * 🔗 Create linked version (development)
    */
-  private async createLinkedVersion(workspaceKey: string, config: WorkspaceIsolationConfig): Promise<void> {
+  private async createLinkedVersion(
+    workspaceKey: string,
+    config: WorkspaceIsolationConfig
+  ): Promise<void> {
     const workspacePath = join(this.workspacesPath, workspaceKey);
-    
+
     // Create linked package.json with workspace:* dependencies
     const linkedPackageJson = {
       name: config.packageName,
@@ -187,29 +202,30 @@ export class EnhancedWorkspaceIsolator {
       main: config.main,
       scripts: {
         ...config.scripts,
-        'build': 'bun build src/index.ts --outdir dist/linked --target bun --format esm --external @fire22/*',
-        'dev': 'bun run --watch src/index.ts',
-        'install': 'bun install --linker isolated'
+        build:
+          'bun build src/index.ts --outdir dist/linked --target bun --format esm --external @fire22/*',
+        dev: 'bun run --watch src/index.ts',
+        install: 'bun install --linker isolated',
       },
       dependencies: config.dependencies, // Keep workspace:* dependencies
       devDependencies: config.devDependencies,
       workspaces: {
         linked: true,
-        development: true
+        development: true,
       },
       fire22: {
         workspace: workspaceKey,
         isolation: 'linked',
         buildTarget: 'development',
-        linker: 'isolated'
-      }
+        linker: 'isolated',
+      },
     };
-    
+
     writeFileSync(
       join(workspacePath, 'package.linked.json'),
       JSON.stringify(linkedPackageJson, null, 2)
     );
-    
+
     // Create linked Wrangler config
     if (config.cloudflare) {
       const linkedWranglerConfig = {
@@ -221,28 +237,31 @@ export class EnhancedWorkspaceIsolator {
         vars: {
           WORKSPACE_MODE: 'linked',
           WORKSPACE_NAME: config.packageName,
-          BUILD_TARGET: 'development'
-        }
+          BUILD_TARGET: 'development',
+        },
       };
-      
+
       writeFileSync(
         join(workspacePath, 'wrangler.linked.toml'),
         this.tomlStringify(linkedWranglerConfig)
       );
     }
-    
+
     Logger.debug(`Created linked version: ${config.packageName}`);
   }
-  
+
   /**
    * 📦 Create standalone version (production)
    */
-  private async createStandaloneVersion(workspaceKey: string, config: WorkspaceIsolationConfig): Promise<void> {
+  private async createStandaloneVersion(
+    workspaceKey: string,
+    config: WorkspaceIsolationConfig
+  ): Promise<void> {
     const workspacePath = join(this.workspacesPath, workspaceKey);
-    
+
     // Resolve workspace:* dependencies to actual versions
     const resolvedDependencies = this.resolveDependencies(config.dependencies);
-    
+
     // Create standalone package.json with resolved dependencies
     const standalonePackageJson = {
       name: `${config.packageName}-standalone`,
@@ -252,29 +271,30 @@ export class EnhancedWorkspaceIsolator {
       main: config.main,
       scripts: {
         ...config.scripts,
-        'build': 'bun build src/index.ts --outdir dist/standalone --target bun --format esm --minify --splitting',
-        'start': 'bun run dist/standalone/index.js',
-        'install': 'bun install --linker isolated --frozen-lockfile'
+        build:
+          'bun build src/index.ts --outdir dist/standalone --target bun --format esm --minify --splitting',
+        start: 'bun run dist/standalone/index.js',
+        install: 'bun install --linker isolated --frozen-lockfile',
       },
       dependencies: resolvedDependencies, // Resolved actual dependencies
       devDependencies: config.devDependencies,
       workspaces: {
         linked: false,
-        standalone: true
+        standalone: true,
       },
       fire22: {
         workspace: workspaceKey,
         isolation: 'standalone',
         buildTarget: 'production',
-        linker: 'isolated'
-      }
+        linker: 'isolated',
+      },
     };
-    
+
     writeFileSync(
       join(workspacePath, 'package.standalone.json'),
       JSON.stringify(standalonePackageJson, null, 2)
     );
-    
+
     // Create standalone Wrangler config
     if (config.cloudflare) {
       const standaloneWranglerConfig = {
@@ -286,25 +306,28 @@ export class EnhancedWorkspaceIsolator {
         vars: {
           WORKSPACE_MODE: 'standalone',
           WORKSPACE_NAME: config.packageName,
-          BUILD_TARGET: 'production'
-        }
+          BUILD_TARGET: 'production',
+        },
       };
-      
+
       writeFileSync(
         join(workspacePath, 'wrangler.standalone.toml'),
         this.tomlStringify(standaloneWranglerConfig)
       );
     }
-    
+
     Logger.debug(`Created standalone version: ${config.packageName}`);
   }
-  
+
   /**
    * 🔧 Create Bun configurations for isolated installs
    */
-  private async createBunConfigurations(workspaceKey: string, config: WorkspaceIsolationConfig): Promise<void> {
+  private async createBunConfigurations(
+    workspaceKey: string,
+    config: WorkspaceIsolationConfig
+  ): Promise<void> {
     const workspacePath = join(this.workspacesPath, workspaceKey);
-    
+
     // Create bunfig.toml for isolated installs
     const bunfigContent = `# Bun configuration for ${config.packageName}
 # Uses isolated installs for strict dependency isolation
@@ -345,41 +368,44 @@ coverage = true
 bun = true
 hot = true
 `;
-    
+
     writeFileSync(join(workspacePath, 'bunfig.toml'), bunfigContent);
-    
+
     // Create .bunrc for additional configuration
     const bunrcContent = {
-      "install": {
-        "linker": "isolated",
-        "cache": true,
-        "exact": false,
-        "dev": true,
-        "optional": true,
-        "registry": "https://registry.npmjs.org"
+      install: {
+        linker: 'isolated',
+        cache: true,
+        exact: false,
+        dev: true,
+        optional: true,
+        registry: 'https://registry.npmjs.org',
       },
-      "build": {
-        "target": "bun",
-        "format": "esm",
-        "splitting": true,
-        "minify": false
+      build: {
+        target: 'bun',
+        format: 'esm',
+        splitting: true,
+        minify: false,
       },
-      "workspace": {
-        "isolation": true,
-        "linked": workspaceKey,
-        "mode": "development"
-      }
+      workspace: {
+        isolation: true,
+        linked: workspaceKey,
+        mode: 'development',
+      },
     };
-    
+
     writeFileSync(join(workspacePath, '.bunrc'), JSON.stringify(bunrcContent, null, 2));
-    
+
     Logger.debug(`Created Bun configurations for: ${config.packageName}`);
   }
-  
+
   /**
    * 📄 Create package.json for workspace
    */
-  private async createPackageJson(workspacePath: string, config: WorkspaceIsolationConfig): Promise<void> {
+  private async createPackageJson(
+    workspacePath: string,
+    config: WorkspaceIsolationConfig
+  ): Promise<void> {
     const packageJson = {
       name: config.packageName,
       version: config.version,
@@ -395,24 +421,24 @@ hot = true
           standalone: config.isolation.standalone,
           linked: config.isolation.linked,
           separateTests: config.isolation.separateTests,
-          independentDeploy: config.isolation.independentDeploy
+          independentDeploy: config.isolation.independentDeploy,
         },
         include: config.include,
         exclude: config.exclude,
-        bunIsolated: true
-      }
+        bunIsolated: true,
+      },
     };
-    
-    writeFileSync(
-      join(workspacePath, 'package.json'),
-      JSON.stringify(packageJson, null, 2)
-    );
+
+    writeFileSync(join(workspacePath, 'package.json'), JSON.stringify(packageJson, null, 2));
   }
-  
+
   /**
    * 📝 Create TypeScript configuration
    */
-  private async createTypeScriptConfig(workspacePath: string, config: WorkspaceIsolationConfig): Promise<void> {
+  private async createTypeScriptConfig(
+    workspacePath: string,
+    config: WorkspaceIsolationConfig
+  ): Promise<void> {
     const tsConfig = {
       compilerOptions: {
         target: 'ES2022',
@@ -423,26 +449,26 @@ hot = true
         strict: true,
         skipLibCheck: true,
         forceConsistentCasingInFileNames: true,
-        types: ['bun-types']
+        types: ['bun-types'],
       },
       include: ['src/**/*', 'tests/**/*'],
-      exclude: ['node_modules', 'dist']
+      exclude: ['node_modules', 'dist'],
     };
-    
-    writeFileSync(
-      join(workspacePath, 'tsconfig.json'),
-      JSON.stringify(tsConfig, null, 2)
-    );
+
+    writeFileSync(join(workspacePath, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2));
   }
-  
+
   /**
    * 📚 Create workspace README
    */
-  private async createWorkspaceReadme(workspacePath: string, config: WorkspaceIsolationConfig): Promise<void> {
+  private async createWorkspaceReadme(
+    workspacePath: string,
+    config: WorkspaceIsolationConfig
+  ): Promise<void> {
     const dependencyList = Object.entries(config.dependencies)
       .map(([dep, ver]) => `- \`${dep}\`: ${ver}`)
       .join('\n');
-    
+
     const readme = `# ${config.packageName}
 
 ${config.description}
@@ -522,20 +548,24 @@ node_modules/
 - **Testing**: Isolated test environment prevents phantom dependencies
 - **Building**: Separate build outputs for each mode with strict dependency resolution
 `;
-    
+
     writeFileSync(join(workspacePath, 'README.md'), readme);
   }
-  
+
   /**
    * 📁 Copy source files to workspace
    */
-  private async copySourceFiles(workspaceKey: string, config: WorkspaceIsolationConfig, workspacePath: string): Promise<void> {
+  private async copySourceFiles(
+    workspaceKey: string,
+    config: WorkspaceIsolationConfig,
+    workspacePath: string
+  ): Promise<void> {
     const srcPath = join(workspacePath, 'src');
-    
+
     // Create index.ts based on workspace main file
     let mainContent = '';
     const mainFile = join(this.rootPath, config.main);
-    
+
     if (existsSync(mainFile)) {
       mainContent = readFileSync(mainFile, 'utf-8');
     } else {
@@ -561,9 +591,9 @@ export default {
 console.log('🚀 ${config.packageName} initialized with Bun isolated installs');
 `;
     }
-    
+
     writeFileSync(join(srcPath, 'index.ts'), mainContent);
-    
+
     // Copy included files
     config.include.forEach(pattern => {
       const sourcePath = join(this.rootPath, pattern);
@@ -578,14 +608,14 @@ console.log('🚀 ${config.packageName} initialized with Bun isolated installs')
       }
     });
   }
-  
+
   /**
    * 🎛️ Create workspace orchestration files
    */
   private async createWorkspaceOrchestration(): Promise<void> {
     const orchestrationPath = join(this.workspacesPath, 'orchestration.json');
     const workspaceList = Object.keys(this.config.workspaces);
-    
+
     const orchestration = {
       version: '2.0.0',
       created: new Date().toISOString(),
@@ -594,22 +624,30 @@ console.log('🚀 ${config.packageName} initialized with Bun isolated installs')
         type: 'bun-isolated',
         modes: ['linked', 'standalone'],
         deployments: ['development', 'production'],
-        linker: 'isolated'
+        linker: 'isolated',
       },
       workspaceList,
       buildOrder: this.calculateBuildOrder(),
       scripts: {
         'build:all:linked': workspaceList.map(w => `cd ${w} && bun run build`).join(' && '),
-        'build:all:standalone': workspaceList.map(w => `cd ${w} && bun run build:standalone`).join(' && '),
-        'install:all:isolated': workspaceList.map(w => `cd ${w} && bun install --linker isolated`).join(' && '),
+        'build:all:standalone': workspaceList
+          .map(w => `cd ${w} && bun run build:standalone`)
+          .join(' && '),
+        'install:all:isolated': workspaceList
+          .map(w => `cd ${w} && bun install --linker isolated`)
+          .join(' && '),
         'test:all': workspaceList.map(w => `cd ${w} && bun test`).join(' && '),
-        'deploy:all:linked': workspaceList.map(w => `cd ${w} && bun run deploy:linked`).join(' && '),
-        'deploy:all:standalone': workspaceList.map(w => `cd ${w} && bun run deploy:standalone`).join(' && ')
-      }
+        'deploy:all:linked': workspaceList
+          .map(w => `cd ${w} && bun run deploy:linked`)
+          .join(' && '),
+        'deploy:all:standalone': workspaceList
+          .map(w => `cd ${w} && bun run deploy:standalone`)
+          .join(' && '),
+      },
     };
-    
+
     writeFileSync(orchestrationPath, JSON.stringify(orchestration, null, 2));
-    
+
     // Create enhanced orchestration script
     const orchestrationScript = `#!/usr/bin/env bun
 
@@ -662,16 +700,16 @@ switch (command) {
     console.log('  test:all         - Run tests for all workspaces');
 }
 `;
-    
+
     writeFileSync(join(this.workspacesPath, 'orchestration.ts'), orchestrationScript);
   }
-  
+
   /**
    * 🔄 Resolve workspace:* dependencies to actual versions
    */
   private resolveDependencies(dependencies: Record<string, string>): Record<string, string> {
     const resolved: Record<string, string> = {};
-    
+
     Object.entries(dependencies).forEach(([dep, version]) => {
       if (version === 'workspace:*') {
         // Find the actual workspace version
@@ -679,7 +717,7 @@ switch (command) {
         const workspace = Object.values(this.config.workspaces).find(
           (ws: any) => ws.name === dep
         ) as any;
-        
+
         if (workspace) {
           resolved[dep] = workspace.version;
         } else {
@@ -690,10 +728,10 @@ switch (command) {
         resolved[dep] = version;
       }
     });
-    
+
     return resolved;
   }
-  
+
   /**
    * 📐 Calculate build order
    */
@@ -701,24 +739,24 @@ switch (command) {
     // Use the orchestration build order from config
     return this.config.orchestration?.buildOrder || Object.keys(this.config.workspaces);
   }
-  
+
   /**
    * 📊 Log isolation summary
    */
   private logIsolationSummary(): void {
     const workspaceCount = Object.keys(this.config.workspaces).length;
-    
+
     Logger.info('');
     Logger.info('='.repeat(60));
     Logger.info('🎉 ENHANCED WORKSPACE ISOLATION SUMMARY');
     Logger.info('='.repeat(60));
-    
+
     Logger.info(`📦 Workspaces Created: ${workspaceCount}`);
     Logger.info(`🔗 Linked Versions: ${workspaceCount} (development)`);
     Logger.info(`📦 Standalone Versions: ${workspaceCount} (production)`);
     Logger.info(`🏗️  Total Environments: ${workspaceCount * 2}`);
     Logger.info(`🔒 Isolation Strategy: Bun isolated installs`);
-    
+
     Logger.info('');
     Logger.info('📋 Workspace Structure:');
     Object.entries(this.config.workspaces).forEach(([key, workspace]: [string, any]) => {
@@ -730,7 +768,7 @@ switch (command) {
       Logger.info(`        ├── ☁️  Cloudflare configs: wrangler.{linked|standalone}.toml`);
       Logger.info(`        └── 🎯 Independent deployment ready`);
     });
-    
+
     Logger.info('');
     Logger.info('💡 Next Steps:');
     Logger.info('  1. Navigate to any workspace: cd workspaces/pattern-system');
@@ -740,19 +778,19 @@ switch (command) {
     Logger.info('  5. Deploy linked: bun run deploy:linked');
     Logger.info('  6. Deploy standalone: bun run deploy:standalone');
     Logger.info('  7. Orchestrate all: bun workspaces/orchestration.ts install:isolated');
-    
+
     Logger.info('');
     Logger.info('🔒 Bun Isolated Installs Benefits:');
     Logger.info('  ✅ Prevents phantom dependencies');
     Logger.info('  ✅ Ensures deterministic builds');
     Logger.info('  ✅ Provides workspace isolation');
     Logger.info('  ✅ Optimizes with symlinks and efficient storage');
-    
+
     Logger.info('='.repeat(60));
   }
-  
+
   // === UTILITY METHODS ===
-  
+
   private loadWorkspaceConfig(): any {
     const configPath = join(this.rootPath, 'workspace-config.json');
     if (!existsSync(configPath)) {
@@ -760,11 +798,11 @@ switch (command) {
     }
     return JSON.parse(readFileSync(configPath, 'utf-8'));
   }
-  
+
   private tomlStringify(obj: any): string {
     // Simple TOML stringifier - in production, use a proper TOML library
     let result = '';
-    
+
     Object.entries(obj).forEach(([key, value]) => {
       if (typeof value === 'object' && !Array.isArray(value)) {
         result += `[${key}]\n`;
@@ -776,7 +814,7 @@ switch (command) {
         result += `${key} = ${JSON.stringify(value)}\n`;
       }
     });
-    
+
     return result;
   }
 }
@@ -786,19 +824,21 @@ switch (command) {
 if (import.meta.main) {
   const args = process.argv.slice(2);
   const command = args[0] || 'isolate';
-  
+
   const isolator = new EnhancedWorkspaceIsolator();
-  
+
   try {
     switch (command) {
       case 'isolate':
       case 'create':
         await isolator.createAllIsolatedWorkspaces();
         break;
-        
+
       default:
         console.log('Usage: bun enhanced-workspace-isolator.ts [isolate|create]');
-        console.log('  isolate - Create isolated workspace environments with Bun isolated installs');
+        console.log(
+          '  isolate - Create isolated workspace environments with Bun isolated installs'
+        );
         console.log('  create  - Alias for isolate');
         process.exit(1);
     }

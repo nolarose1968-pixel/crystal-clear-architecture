@@ -3,36 +3,43 @@
 **Complete API documentation for the Natural Hierarchy Aggregation System**
 
 ## Base URL
+
 ```
 https://dashboard-worker.fire22.workers.dev/api/hierarchy
 ```
 
 ## Authentication
-Most hierarchy endpoints are read-only and don't require authentication. Future write operations will use JWT tokens.
+
+Most hierarchy endpoints are read-only and don't require authentication. Future
+write operations will use JWT tokens.
 
 ## Endpoints Overview
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/aggregated` | GET | Complete aggregated hierarchy view |
-| `/query` | POST | Natural search across all systems |
-| `/cross-references` | GET | Discovered cross-system connections |
-| `/view/{system}` | GET | System-specific hierarchy views |
-| `/unified` | GET | Legacy unified endpoint (deprecated) |
+| Endpoint            | Method | Description                          |
+| ------------------- | ------ | ------------------------------------ |
+| `/aggregated`       | GET    | Complete aggregated hierarchy view   |
+| `/query`            | POST   | Natural search across all systems    |
+| `/cross-references` | GET    | Discovered cross-system connections  |
+| `/view/{system}`    | GET    | System-specific hierarchy views      |
+| `/unified`          | GET    | Legacy unified endpoint (deprecated) |
 
 ---
 
 ## 🏢 Main Aggregation Endpoints
 
 ### GET `/api/hierarchy/aggregated`
-Returns the complete aggregated hierarchy that preserves all source systems while providing unified access.
+
+Returns the complete aggregated hierarchy that preserves all source systems
+while providing unified access.
 
 #### Request
+
 ```bash
 curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/aggregated
 ```
 
 #### Response
+
 ```json
 {
   "success": true,
@@ -140,13 +147,13 @@ curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/aggregated
         "nodeCount": 2
       },
       {
-        "system": "organizational", 
+        "system": "organizational",
         "lastSync": "2024-01-15T10:30:00Z",
         "nodeCount": 2
       },
       {
         "system": "departments",
-        "lastSync": "2024-01-15T10:30:00Z", 
+        "lastSync": "2024-01-15T10:30:00Z",
         "nodeCount": 3
       }
     ]
@@ -157,23 +164,25 @@ curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/aggregated
 
 #### Response Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `roots` | Array | Multiple root nodes (reflects organizational reality) |
-| `fire22View` | Array | Fire22 agents in original 8-level structure |
-| `organizationalView` | Array | Corporate org chart structure |
-| `departmentViews` | Object | Department-specific hierarchies |
-| `leadership` | Array | Natural leadership grouping (emergent) |
-| `managers` | Array | Natural manager grouping (emergent) |
-| `crossReferences` | Array | Discovered connections between systems |
-| `sources` | Array | Metadata about source system sync status |
+| Field                | Type   | Description                                           |
+| -------------------- | ------ | ----------------------------------------------------- |
+| `roots`              | Array  | Multiple root nodes (reflects organizational reality) |
+| `fire22View`         | Array  | Fire22 agents in original 8-level structure           |
+| `organizationalView` | Array  | Corporate org chart structure                         |
+| `departmentViews`    | Object | Department-specific hierarchies                       |
+| `leadership`         | Array  | Natural leadership grouping (emergent)                |
+| `managers`           | Array  | Natural manager grouping (emergent)                   |
+| `crossReferences`    | Array  | Discovered connections between systems                |
+| `sources`            | Array  | Metadata about source system sync status              |
 
 ---
 
 ### POST `/api/hierarchy/query`
+
 Natural search across all hierarchy systems with flexible filtering.
 
 #### Request
+
 ```bash
 curl -X POST https://dashboard-worker.fire22.workers.dev/api/hierarchy/query \
   -H "Content-Type: application/json" \
@@ -188,15 +197,16 @@ curl -X POST https://dashboard-worker.fire22.workers.dev/api/hierarchy/query \
 
 #### Request Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `name` | string | No | Search by person name (partial match) |
-| `department` | string | No | Filter by department |
-| `sourceSystem` | string | No | Filter by source system (`fire22`, `organizational`, `department`) |
-| `isLeadership` | boolean | No | Filter by leadership role |
-| `isManager` | boolean | No | Filter by manager role |
+| Parameter      | Type    | Required | Description                                                        |
+| -------------- | ------- | -------- | ------------------------------------------------------------------ |
+| `name`         | string  | No       | Search by person name (partial match)                              |
+| `department`   | string  | No       | Filter by department                                               |
+| `sourceSystem` | string  | No       | Filter by source system (`fire22`, `organizational`, `department`) |
+| `isLeadership` | boolean | No       | Filter by leadership role                                          |
+| `isManager`    | boolean | No       | Filter by manager role                                             |
 
 #### Response
+
 ```json
 {
   "success": true,
@@ -218,7 +228,7 @@ curl -X POST https://dashboard-worker.fire22.workers.dev/api/hierarchy/query \
     },
     {
       "id": "dept_marketing_mar001",
-      "name": "Sarah Johnson", 
+      "name": "Sarah Johnson",
       "title": "Marketing Director",
       "department": "Marketing",
       "sourceSystem": "department",
@@ -247,6 +257,7 @@ curl -X POST https://dashboard-worker.fire22.workers.dev/api/hierarchy/query \
 #### Example Queries
 
 **Find all leadership:**
+
 ```json
 {
   "isLeadership": true
@@ -254,6 +265,7 @@ curl -X POST https://dashboard-worker.fire22.workers.dev/api/hierarchy/query \
 ```
 
 **Find Marketing managers:**
+
 ```json
 {
   "department": "Marketing",
@@ -262,6 +274,7 @@ curl -X POST https://dashboard-worker.fire22.workers.dev/api/hierarchy/query \
 ```
 
 **Find Fire22 agents only:**
+
 ```json
 {
   "sourceSystem": "fire22"
@@ -269,6 +282,7 @@ curl -X POST https://dashboard-worker.fire22.workers.dev/api/hierarchy/query \
 ```
 
 **Search by partial name:**
+
 ```json
 {
   "name": "John"
@@ -278,14 +292,17 @@ curl -X POST https://dashboard-worker.fire22.workers.dev/api/hierarchy/query \
 ---
 
 ### GET `/api/hierarchy/cross-references`
+
 Discover natural connections between different hierarchy systems.
 
 #### Request
+
 ```bash
 curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/cross-references
 ```
 
 #### Response
+
 ```json
 {
   "success": true,
@@ -301,7 +318,7 @@ curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/cross-refe
         },
         {
           "id": "dept_marketing_mar001",
-          "system": "department", 
+          "system": "department",
           "title": "Marketing Director",
           "confidence": 0.95
         }
@@ -315,7 +332,7 @@ curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/cross-refe
         {
           "id": "dept_operations_ops001",
           "system": "department",
-          "title": "VP of Operations", 
+          "title": "VP of Operations",
           "confidence": 1.0
         }
       ],
@@ -329,34 +346,39 @@ curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/cross-refe
 
 #### Confidence Levels
 
-| Range | Meaning | Action |
-|-------|---------|---------|
-| 0.95 - 1.0 | High confidence | Auto-suggest connection |
-| 0.8 - 0.94 | Medium confidence | Flag for review |
-| 0.7 - 0.79 | Low confidence | Manual verification needed |
-| < 0.7 | No connection | Not suggested |
+| Range      | Meaning           | Action                     |
+| ---------- | ----------------- | -------------------------- |
+| 0.95 - 1.0 | High confidence   | Auto-suggest connection    |
+| 0.8 - 0.94 | Medium confidence | Flag for review            |
+| 0.7 - 0.79 | Low confidence    | Manual verification needed |
+| < 0.7      | No connection     | Not suggested              |
 
 ---
 
 ## 🎯 System-Specific Views
 
 ### GET `/api/hierarchy/view/{system}`
+
 Get hierarchy data from a specific source system in its original structure.
 
 #### Supported Systems
+
 - `fire22` - Fire22 agent hierarchy
-- `organizational` - Corporate org chart  
+- `organizational` - Corporate org chart
 - `departments` - Department-specific structures
 
 ### GET `/api/hierarchy/view/fire22`
+
 Fire22 agent hierarchy in original 8-level structure.
 
 #### Request
+
 ```bash
 curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/view/fire22
 ```
 
 #### Response
+
 ```json
 {
   "success": true,
@@ -379,7 +401,7 @@ curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/view/fire2
         }
       },
       {
-        "id": "fire22_A002", 
+        "id": "fire22_A002",
         "name": "Senior Agent Two",
         "level": 3,
         "title": "Senior Agent",
@@ -399,32 +421,36 @@ curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/view/fire2
 ```
 
 #### Fire22 Level Structure
-| Level | Title | Typical Role |
-|-------|-------|-------------|
-| 1 | Master Agent | Top-level agent |
-| 2 | Senior Master Agent | Senior leadership |
-| 3 | Agent | Standard agent |
-| 4 | Senior Agent | Experienced agent |
-| 5 | Sub-Agent | Junior agent |
-| 6 | Senior Sub-Agent | Experienced sub-agent |
-| 7 | Basic Agent | Entry level |
-| 8 | Clerk | Administrative |
+
+| Level | Title               | Typical Role          |
+| ----- | ------------------- | --------------------- |
+| 1     | Master Agent        | Top-level agent       |
+| 2     | Senior Master Agent | Senior leadership     |
+| 3     | Agent               | Standard agent        |
+| 4     | Senior Agent        | Experienced agent     |
+| 5     | Sub-Agent           | Junior agent          |
+| 6     | Senior Sub-Agent    | Experienced sub-agent |
+| 7     | Basic Agent         | Entry level           |
+| 8     | Clerk               | Administrative        |
 
 ### GET `/api/hierarchy/view/organizational`
+
 Corporate organizational chart structure.
 
 #### Request
+
 ```bash
 curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/view/organizational
 ```
 
 #### Response
+
 ```json
 {
   "success": true,
   "view": {
     "system": "Organizational Chart",
-    "preserves": "Company org structure", 
+    "preserves": "Company org structure",
     "nodes": [
       {
         "id": "org_ceo_001",
@@ -438,7 +464,7 @@ curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/view/organ
         "id": "org_cmo_001",
         "name": "Sarah Johnson",
         "title": "Chief Marketing Officer",
-        "department": "Marketing", 
+        "department": "Marketing",
         "parentId": "org_ceo_001",
         "children": []
       }
@@ -449,14 +475,17 @@ curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/view/organ
 ```
 
 ### GET `/api/hierarchy/view/departments`
+
 Department-specific hierarchy structures.
 
 #### Request
+
 ```bash
 curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/view/departments
 ```
 
 #### Response
+
 ```json
 {
   "success": true,
@@ -467,7 +496,7 @@ curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/view/depar
       "Marketing": [
         {
           "id": "dept_marketing_mar001",
-          "name": "Sarah Johnson", 
+          "name": "Sarah Johnson",
           "title": "Marketing Director",
           "department": "Marketing",
           "metrics": {
@@ -481,7 +510,7 @@ curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/view/depar
         {
           "id": "dept_marketing_mar002",
           "name": "Michelle Rodriguez",
-          "title": "Marketing Manager", 
+          "title": "Marketing Manager",
           "department": "Marketing",
           "parentId": "dept_marketing_mar001",
           "metrics": {
@@ -495,7 +524,7 @@ curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/view/depar
           "id": "dept_operations_ops001",
           "name": "Jennifer Wilson",
           "title": "VP of Operations",
-          "department": "Operations", 
+          "department": "Operations",
           "metrics": {
             "implementations": 71,
             "teamSize": 24
@@ -504,7 +533,7 @@ curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/view/depar
       ],
       "Technology": [
         {
-          "id": "dept_technology_tech001", 
+          "id": "dept_technology_tech001",
           "name": "Chris Brown",
           "title": "Chief Technology Officer",
           "department": "Technology",
@@ -525,6 +554,7 @@ curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/view/depar
 ## 🔧 Error Handling
 
 ### Standard Error Response
+
 ```json
 {
   "success": false,
@@ -538,17 +568,18 @@ curl -X GET https://dashboard-worker.fire22.workers.dev/api/hierarchy/view/depar
 
 ### Common Error Codes
 
-| Code | HTTP Status | Description |
-|------|-------------|-------------|
-| `INVALID_QUERY` | 400 | Invalid query parameters |
-| `SYSTEM_NOT_FOUND` | 404 | Invalid system in view request |
-| `NO_RESULTS` | 404 | Query returned no results |
-| `AGGREGATION_ERROR` | 500 | Error during data aggregation |
-| `SYNC_FAILURE` | 503 | Source system sync failed |
+| Code                | HTTP Status | Description                    |
+| ------------------- | ----------- | ------------------------------ |
+| `INVALID_QUERY`     | 400         | Invalid query parameters       |
+| `SYSTEM_NOT_FOUND`  | 404         | Invalid system in view request |
+| `NO_RESULTS`        | 404         | Query returned no results      |
+| `AGGREGATION_ERROR` | 500         | Error during data aggregation  |
+| `SYNC_FAILURE`      | 503         | Source system sync failed      |
 
 ### Example Error Responses
 
 **Invalid system view:**
+
 ```bash
 curl -X GET /api/hierarchy/view/invalid-system
 ```
@@ -562,6 +593,7 @@ curl -X GET /api/hierarchy/view/invalid-system
 ```
 
 **Invalid query parameters:**
+
 ```bash
 curl -X POST /api/hierarchy/query -d '{"invalidField": true}'
 ```
@@ -572,7 +604,13 @@ curl -X POST /api/hierarchy/query -d '{"invalidField": true}'
   "error": "Invalid query parameters",
   "code": "INVALID_QUERY",
   "details": {
-    "validFields": ["name", "department", "sourceSystem", "isLeadership", "isManager"]
+    "validFields": [
+      "name",
+      "department",
+      "sourceSystem",
+      "isLeadership",
+      "isManager"
+    ]
   }
 }
 ```
@@ -581,14 +619,15 @@ curl -X POST /api/hierarchy/query -d '{"invalidField": true}'
 
 ## 🚀 Rate Limiting
 
-| Endpoint | Rate Limit | Window |
-|----------|------------|---------|
-| `/aggregated` | 100 requests | 1 hour |
-| `/query` | 200 requests | 1 hour |
-| `/cross-references` | 50 requests | 1 hour |
-| `/view/*` | 150 requests | 1 hour |
+| Endpoint            | Rate Limit   | Window |
+| ------------------- | ------------ | ------ |
+| `/aggregated`       | 100 requests | 1 hour |
+| `/query`            | 200 requests | 1 hour |
+| `/cross-references` | 50 requests  | 1 hour |
+| `/view/*`           | 150 requests | 1 hour |
 
 Rate limit headers included in responses:
+
 - `X-RateLimit-Limit`: Total requests allowed
 - `X-RateLimit-Remaining`: Requests remaining
 - `X-RateLimit-Reset`: Unix timestamp of rate limit reset
@@ -598,6 +637,7 @@ Rate limit headers included in responses:
 ## 📊 Response Caching
 
 ### Cache Headers
+
 All endpoints include appropriate cache headers:
 
 ```
@@ -607,8 +647,9 @@ Last-Modified: Mon, 15 Jan 2024 10:30:00 GMT
 ```
 
 ### Cache Strategy
+
 - **Aggregated data**: 5-minute cache
-- **System views**: 10-minute cache  
+- **System views**: 10-minute cache
 - **Cross-references**: 15-minute cache
 - **Query results**: 2-minute cache
 
@@ -619,6 +660,7 @@ Last-Modified: Mon, 15 Jan 2024 10:30:00 GMT
 ### JavaScript/TypeScript
 
 #### Basic Hierarchy Query
+
 ```typescript
 interface HierarchyQueryRequest {
   name?: string;
@@ -632,13 +674,13 @@ async function searchHierarchy(query: HierarchyQueryRequest) {
   const response = await fetch('/api/hierarchy/query', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(query)
+    body: JSON.stringify(query),
   });
-  
+
   if (!response.ok) {
     throw new Error(`Hierarchy query failed: ${response.statusText}`);
   }
-  
+
   return response.json();
 }
 
@@ -649,38 +691,41 @@ const fire22Agents = await searchHierarchy({ sourceSystem: 'fire22' });
 ```
 
 #### Cross-Reference Analysis
+
 ```typescript
 async function analyzeCrossReferences() {
   const response = await fetch('/api/hierarchy/cross-references');
   const data = await response.json();
-  
+
   const highConfidenceMatches = data.crossReferences.filter(
     ref => ref.confidence > 0.9 && ref.likely_same_person
   );
-  
+
   console.log('Potential duplicate entries:', highConfidenceMatches);
-  
+
   return highConfidenceMatches;
 }
 ```
 
 #### Department Integration
+
 ```typescript
 async function loadDepartmentHierarchy(department: string) {
   // Get all people in department across all systems
   const allPeople = await searchHierarchy({ department });
-  
+
   // Get department-specific view
-  const deptView = await fetch('/api/hierarchy/view/departments')
-    .then(r => r.json());
-    
+  const deptView = await fetch('/api/hierarchy/view/departments').then(r =>
+    r.json()
+  );
+
   const deptSpecific = deptView.view.departments[department] || [];
-  
+
   return {
     allSystems: allPeople.results,
     departmentSpecific: deptSpecific,
     crossSystemCount: allPeople.results.length,
-    departmentCount: deptSpecific.length
+    departmentCount: deptSpecific.length,
   };
 }
 ```
@@ -694,35 +739,35 @@ from typing import Dict, List, Optional
 class HierarchyAPI:
     def __init__(self, base_url: str):
         self.base_url = base_url.rstrip('/') + '/api/hierarchy'
-    
-    def search(self, 
+
+    def search(self,
                name: Optional[str] = None,
-               department: Optional[str] = None, 
+               department: Optional[str] = None,
                source_system: Optional[str] = None,
                is_leadership: Optional[bool] = None,
                is_manager: Optional[bool] = None) -> Dict:
-        
+
         query = {}
         if name: query['name'] = name
         if department: query['department'] = department
         if source_system: query['sourceSystem'] = source_system
         if is_leadership is not None: query['isLeadership'] = is_leadership
         if is_manager is not None: query['isManager'] = is_manager
-        
+
         response = requests.post(f'{self.base_url}/query', json=query)
         response.raise_for_status()
         return response.json()
-    
+
     def get_aggregated(self) -> Dict:
         response = requests.get(f'{self.base_url}/aggregated')
         response.raise_for_status()
         return response.json()
-    
+
     def get_cross_references(self) -> Dict:
         response = requests.get(f'{self.base_url}/cross-references')
         response.raise_for_status()
         return response.json()
-    
+
     def get_system_view(self, system: str) -> Dict:
         response = requests.get(f'{self.base_url}/view/{system}')
         response.raise_for_status()
@@ -746,13 +791,16 @@ cross_refs = api.get_cross_references()
 ## 🔄 Webhooks & Real-time Updates
 
 ### Coming Soon
+
 Real-time hierarchy updates via WebSockets and webhooks.
 
 **Planned endpoints:**
+
 - `GET /api/hierarchy/stream` - WebSocket connection for live updates
 - `POST /api/hierarchy/webhooks` - Register webhook for hierarchy changes
 
 **Update event types:**
+
 - `node_added` - New person added to any system
 - `node_updated` - Person information changed
 - `connection_discovered` - New cross-reference found
@@ -760,4 +808,7 @@ Real-time hierarchy updates via WebSockets and webhooks.
 
 ---
 
-This API provides comprehensive access to the Fire22 organizational hierarchy while preserving the natural structure of all existing systems. The flexible query interface allows for powerful cross-system analysis while maintaining the integrity of each source system.
+This API provides comprehensive access to the Fire22 organizational hierarchy
+while preserving the natural structure of all existing systems. The flexible
+query interface allows for powerful cross-system analysis while maintaining the
+integrity of each source system.

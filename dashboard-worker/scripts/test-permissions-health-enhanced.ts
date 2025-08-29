@@ -119,7 +119,7 @@ class PermissionsHealthTester {
       retries: parseInt(process.env.PERMISSIONS_TEST_RETRIES || '3'),
       retryDelay: parseInt(process.env.PERMISSIONS_TEST_RETRY_DELAY || '1000'),
       enableVerboseLogging: process.env.PERMISSIONS_TEST_VERBOSE === 'true',
-      ...config
+      ...config,
     };
 
     if (this.config.enableVerboseLogging) {
@@ -167,9 +167,12 @@ class PermissionsHealthTester {
         return response;
       } catch (error) {
         lastError = error as NetworkError;
-        
+
         if (this.config.enableVerboseLogging) {
-          console.log(`⚠️ **Attempt ${attempt} failed**:`, error instanceof Error ? error.message : String(error));
+          console.log(
+            `⚠️ **Attempt ${attempt} failed**:`,
+            error instanceof Error ? error.message : String(error)
+          );
         }
 
         if (attempt < this.config.retries) {
@@ -186,11 +189,11 @@ class PermissionsHealthTester {
    */
   async testPermissionsHealth(): Promise<void> {
     console.log('🔐 **Testing Enhanced Permissions Health Endpoint**\n');
-    
+
     try {
       const response = await this.fetchWithRetry(`${this.config.baseUrl}/api/health/permissions`);
       const data: HealthResponse = await response.json();
-      
+
       if (data.success) {
         console.log('✅ **Permissions Health Check Successful**\n');
         console.log(`📊 **Overall Status**: ${data.status}`);
@@ -198,24 +201,38 @@ class PermissionsHealthTester {
         console.log(`👥 **Total Agents**: ${data.total_agents}`);
         console.log(`⚠️ **Agents with Errors**: ${data.agents_with_errors}`);
         console.log(`📅 **Timestamp**: ${data.timestamp}\n`);
-        
+
         // Display validation summary
         if (data.validation_summary) {
           console.log('📋 **Validation Summary**:');
-          console.log(`  • Valid Permissions: ${data.validation_summary.valid_permissions}/${data.total_agents}`);
-          console.log(`  • Valid Commission Rates: ${data.validation_summary.valid_commission_rates}/${data.total_agents}`);
-          console.log(`  • Has Required Fields: ${data.validation_summary.has_required_fields}/${data.total_agents}`);
-          console.log(`  • Valid Max Wager Type: ${data.validation_summary.valid_max_wager_type}/${data.total_agents}\n`);
+          console.log(
+            `  • Valid Permissions: ${data.validation_summary.valid_permissions}/${data.total_agents}`
+          );
+          console.log(
+            `  • Valid Commission Rates: ${data.validation_summary.valid_commission_rates}/${data.total_agents}`
+          );
+          console.log(
+            `  • Has Required Fields: ${data.validation_summary.has_required_fields}/${data.total_agents}`
+          );
+          console.log(
+            `  • Valid Max Wager Type: ${data.validation_summary.valid_max_wager_type}/${data.total_agents}\n`
+          );
         }
-        
+
         // Display live casino validation
         if (data.live_casino_validation) {
           console.log('🎰 **Live Casino Validation**:');
-          console.log(`  • Agents with Casino Rates: ${data.live_casino_validation.has_live_casino_rates}/${data.total_agents} (${data.live_casino_validation.casino_rate_coverage}%)`);
-          console.log(`  • Valid Casino Rates: ${data.live_casino_validation.valid_casino_rates}/${data.total_agents}`);
-          console.log(`  • Performance Ready: ${data.live_casino_validation.casino_performance_ready}/${data.total_agents}\n`);
+          console.log(
+            `  • Agents with Casino Rates: ${data.live_casino_validation.has_live_casino_rates}/${data.total_agents} (${data.live_casino_validation.casino_rate_coverage}%)`
+          );
+          console.log(
+            `  • Valid Casino Rates: ${data.live_casino_validation.valid_casino_rates}/${data.total_agents}`
+          );
+          console.log(
+            `  • Performance Ready: ${data.live_casino_validation.casino_performance_ready}/${data.total_agents}\n`
+          );
         }
-        
+
         // Display live casino stats
         if (data.live_casino_stats) {
           console.log('🎮 **Live Casino System Stats**:');
@@ -224,7 +241,7 @@ class PermissionsHealthTester {
           console.log(`  • Total Sessions: ${data.live_casino_stats.totalSessions}`);
           console.log(`  • Active Sessions: ${data.live_casino_stats.activeSessions}\n`);
         }
-        
+
         // Display agent details if available
         if (data.agent_validation_details && data.agent_validation_details.length > 0) {
           console.log('👤 **Agent Validation Details**:');
@@ -238,12 +255,10 @@ class PermissionsHealthTester {
           });
           console.log();
         }
-        
       } else {
         console.log('❌ **Permissions Health Check Failed**');
         console.log(`Error: ${data.message || 'Unknown error'}`);
       }
-      
     } catch (error) {
       this.handleTestError('permissions health', error);
     }
@@ -254,17 +269,19 @@ class PermissionsHealthTester {
    */
   async testPermissionsMatrixHealth(): Promise<void> {
     console.log('🔐 **Testing Enhanced Permissions Matrix Health Endpoint**\n');
-    
+
     try {
-      const response = await this.fetchWithRetry(`${this.config.baseUrl}/api/health/permissions-matrix`);
+      const response = await this.fetchWithRetry(
+        `${this.config.baseUrl}/api/health/permissions-matrix`
+      );
       const data: MatrixHealthResponse = await response.json();
-      
+
       if (data.success) {
         console.log('✅ **Permissions Matrix Health Check Successful**\n');
         console.log(`📊 **Matrix Status**: ${data.status}`);
         console.log(`🏥 **Matrix Health Score**: ${data.matrix_health_score}%`);
         console.log(`📅 **Timestamp**: ${data.timestamp}\n`);
-        
+
         // Display matrix stats
         if (data.matrix_stats) {
           console.log('📋 **Matrix Statistics**:');
@@ -276,16 +293,20 @@ class PermissionsHealthTester {
           console.log(`  • Permission Coverage: ${data.matrix_stats.permission_coverage}%`);
           console.log(`  • Agent Data Quality: ${data.matrix_stats.agent_data_quality}%\n`);
         }
-        
+
         // Display live casino matrix stats
         if (data.live_casino_matrix_stats) {
           console.log('🎰 **Live Casino Matrix Integration**:');
           console.log(`  • Total Games: ${data.live_casino_matrix_stats.totalGames}`);
           console.log(`  • Active Games: ${data.live_casino_matrix_stats.activeGames}`);
-          console.log(`  • Agents with Casino Rates: ${data.live_casino_matrix_stats.totalRates}/${data.matrix_stats?.total_agents || 'N/A'}`);
-          console.log(`  • Casino Rate Coverage: ${data.live_casino_matrix_stats.casinoRateCoverage}%\n`);
+          console.log(
+            `  • Agents with Casino Rates: ${data.live_casino_matrix_stats.totalRates}/${data.matrix_stats?.total_agents || 'N/A'}`
+          );
+          console.log(
+            `  • Casino Rate Coverage: ${data.live_casino_matrix_stats.casinoRateCoverage}%\n`
+          );
         }
-        
+
         // Display cell validation
         if (data.cell_validation) {
           console.log('🔍 **Cell Validation**:');
@@ -294,13 +315,13 @@ class PermissionsHealthTester {
           console.log(`  • Warning Cells: ${data.cell_validation.warning_cells}`);
           console.log(`  • Invalid Cells: ${data.cell_validation.invalid_cells}\n`);
         }
-        
+
         // Display permission keys
         if (data.permission_keys && data.permission_keys.length > 0) {
           console.log('🔑 **Permission Keys**:');
           console.log(`  ${data.permission_keys.join(', ')}\n`);
         }
-        
+
         // Display matrix issues if any
         if (data.matrix_issues && data.matrix_issues.length > 0) {
           console.log('⚠️ **Matrix Issues**:');
@@ -309,7 +330,7 @@ class PermissionsHealthTester {
           });
           console.log();
         }
-        
+
         // Display recommendations if any
         if (data.recommendations && data.recommendations.length > 0) {
           console.log('💡 **Recommendations**:');
@@ -318,12 +339,10 @@ class PermissionsHealthTester {
           });
           console.log();
         }
-        
       } else {
         console.log('❌ **Permissions Matrix Health Check Failed**');
         console.log(`Error: ${data.error || 'Unknown error'}`);
       }
-      
     } catch (error) {
       this.handleTestError('permissions matrix health', error);
     }
@@ -334,26 +353,28 @@ class PermissionsHealthTester {
    */
   private handleTestError(testName: string, error: unknown): void {
     console.error(`❌ **Error testing ${testName}**:`);
-    
+
     if (error instanceof Error) {
       console.error(`  Message: ${error.message}`);
-      
+
       const networkError = error as NetworkError;
       if (networkError.code) {
         console.error(`  Code: ${networkError.code}`);
       }
-      
+
       if (networkError.response) {
-        console.error(`  HTTP Status: ${networkError.response.status} ${networkError.response.statusText}`);
+        console.error(
+          `  HTTP Status: ${networkError.response.status} ${networkError.response.statusText}`
+        );
       }
-      
+
       if (this.config.enableVerboseLogging) {
         console.error(`  Stack: ${error.stack}`);
       }
     } else {
       console.error(`  Unknown error: ${String(error)}`);
     }
-    
+
     console.error();
   }
 
@@ -362,18 +383,20 @@ class PermissionsHealthTester {
    */
   async runComprehensiveTest(): Promise<void> {
     console.log('🔐 **Fire22 Enhanced Permissions Health Test Suite**\n');
-    console.log('This test suite validates the enhanced permissions health system with live casino integration.\n');
+    console.log(
+      'This test suite validates the enhanced permissions health system with live casino integration.\n'
+    );
     console.log('🔧 **Configuration**:');
     console.log(`  • Base URL: ${this.config.baseUrl}`);
     console.log(`  • Timeout: ${this.config.timeout}ms`);
     console.log(`  • Retries: ${this.config.retries}`);
     console.log(`  • Verbose Logging: ${this.config.enableVerboseLogging}\n`);
-    
+
     try {
       await this.testPermissionsHealth();
       console.log('='.repeat(80));
       await this.testPermissionsMatrixHealth();
-      
+
       console.log('🎉 **Permissions Health Test Suite Complete!**\n');
       console.log('✅ Enhanced permissions health with live casino integration');
       console.log('✅ Comprehensive validation and error detection');
@@ -383,7 +406,6 @@ class PermissionsHealthTester {
       console.log('✅ Improved type safety and error handling');
       console.log('✅ Network resilience with retry logic');
       console.log('✅ Flexible configuration management');
-      
     } catch (error) {
       console.error('❌ **Test suite execution failed**:', error);
       throw error;
@@ -395,7 +417,7 @@ class PermissionsHealthTester {
    */
   async testSpecificEndpoint(endpoint: string): Promise<void> {
     console.log(`🎯 **Testing Specific Endpoint**: ${endpoint}\n`);
-    
+
     switch (endpoint.toLowerCase()) {
       case 'permissions':
         await this.testPermissionsHealth();
@@ -416,7 +438,7 @@ class PermissionsHealthTester {
    */
   updateConfig(newConfig: Partial<TestConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    
+
     if (this.config.enableVerboseLogging) {
       console.log('🔧 **Configuration Updated**:', JSON.stringify(this.config, null, 2));
     }
@@ -435,16 +457,16 @@ async function main(): Promise<void> {
   try {
     const tester = new PermissionsHealthTester();
     const endpoint = process.argv[2];
-    
+
     // Parse additional command line arguments for configuration
     const args = process.argv.slice(2);
     const configOverrides: Partial<TestConfig> = {};
-    
+
     args.forEach((arg, index) => {
       if (arg.startsWith('--')) {
         const key = arg.slice(2);
         const value = args[index + 1];
-        
+
         switch (key) {
           case 'url':
             configOverrides.baseUrl = value;
@@ -461,18 +483,17 @@ async function main(): Promise<void> {
         }
       }
     });
-    
+
     // Apply any configuration overrides
     if (Object.keys(configOverrides).length > 0) {
       tester.updateConfig(configOverrides);
     }
-    
+
     if (endpoint && !endpoint.startsWith('--')) {
       await tester.testSpecificEndpoint(endpoint);
     } else {
       await tester.runComprehensiveTest();
     }
-    
   } catch (error) {
     console.error('💥 **Fatal error in test execution**:', error);
     process.exit(1);
@@ -481,7 +502,7 @@ async function main(): Promise<void> {
 
 // Run if called directly
 if (import.meta.main) {
-  main().catch((error) => {
+  main().catch(error => {
     console.error('💥 **Unhandled error**:', error);
     process.exit(1);
   });

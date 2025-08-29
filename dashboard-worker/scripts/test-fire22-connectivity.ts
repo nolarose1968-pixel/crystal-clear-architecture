@@ -5,7 +5,7 @@
  * Working solution for E7001: FIRE22_API_CONNECTION_FAILED
  */
 
-import { $ } from "bun";
+import { $ } from 'bun';
 
 interface Fire22Config {
   apiUrl: string;
@@ -27,7 +27,7 @@ class Fire22ConnectivityTester {
       apiSecret: process.env.FIRE22_API_SECRET || '',
       timeout: parseInt(process.env.FIRE22_TIMEOUT || '30000'),
       retryAttempts: parseInt(process.env.FIRE22_RETRY_ATTEMPTS || '3'),
-      retryDelay: parseInt(process.env.FIRE22_RETRY_DELAY || '1000')
+      retryDelay: parseInt(process.env.FIRE22_RETRY_DELAY || '1000'),
     };
   }
 
@@ -43,15 +43,15 @@ class Fire22ConnectivityTester {
       { name: 'Test SSL Certificate', fn: this.testSslCertificate },
       { name: 'Test Fire22 API Health', fn: this.testApiHealth },
       { name: 'Test Authentication', fn: this.testAuthentication },
-      { name: 'Generate Fix Configuration', fn: this.generateFixConfiguration }
+      { name: 'Generate Fix Configuration', fn: this.generateFixConfiguration },
     ];
 
-    const results: Array<{name: string; success: boolean; error?: string}> = [];
+    const results: Array<{ name: string; success: boolean; error?: string }> = [];
 
     for (let i = 0; i < tests.length; i++) {
       const test = tests[i];
       console.log(`\n[${i + 1}/${tests.length}] ${test.name}...`);
-      
+
       try {
         await test.fn.call(this);
         console.log(`✅ ${test.name} passed`);
@@ -68,11 +68,11 @@ class Fire22ConnectivityTester {
 
   private async checkEnvironmentConfig(): Promise<void> {
     console.log(`  🔍 Checking Fire22 environment configuration...`);
-    
+
     const requiredVars = [
       { name: 'FIRE22_API_URL', value: this.config.apiUrl, required: true },
       { name: 'FIRE22_API_KEY', value: this.config.apiKey, required: true, sensitive: true },
-      { name: 'FIRE22_API_SECRET', value: this.config.apiSecret, required: true, sensitive: true }
+      { name: 'FIRE22_API_SECRET', value: this.config.apiSecret, required: true, sensitive: true },
     ];
 
     const issues: string[] = [];
@@ -85,12 +85,12 @@ class Fire22ConnectivityTester {
       } else {
         const displayValue = varConfig.sensitive ? '***' : varConfig.value;
         console.log(`    ✅ ${varConfig.name}: ${displayValue}`);
-        
+
         // Validate format
         if (varConfig.name === 'FIRE22_API_URL' && !varConfig.value.startsWith('http')) {
           issues.push(`${varConfig.name} must start with http:// or https://`);
         }
-        
+
         if (varConfig.name === 'FIRE22_API_KEY' && varConfig.value.length < 16) {
           issues.push(`${varConfig.name} appears to be too short (expected 16+ chars)`);
         }
@@ -106,18 +106,18 @@ class Fire22ConnectivityTester {
 
   private async testDnsResolution(): Promise<void> {
     console.log(`  🌐 Testing DNS resolution...`);
-    
+
     const url = new URL(this.config.apiUrl);
     const hostname = url.hostname;
-    
+
     try {
       // Test DNS resolution
       const lookupResult = await $`nslookup ${hostname}`.quiet();
-      
+
       if (lookupResult.exitCode === 0) {
         console.log(`  ✅ DNS resolution successful for ${hostname}`);
         this.dnsCache.set(hostname, true);
-        
+
         // Extract IP addresses from nslookup output
         const output = lookupResult.stdout.toString();
         const ipMatches = output.match(/Address: (\d+\.\d+\.\d+\.\d+)/g);
@@ -135,15 +135,15 @@ class Fire22ConnectivityTester {
 
   private async testNetworkConnectivity(): Promise<void> {
     console.log(`  🔌 Testing network connectivity...`);
-    
+
     const url = new URL(this.config.apiUrl);
     const hostname = url.hostname;
     const port = url.port || (url.protocol === 'https:' ? '443' : '80');
-    
+
     try {
       // Test basic TCP connectivity
       const result = await $`timeout 10 nc -z ${hostname} ${port}`.quiet();
-      
+
       if (result.exitCode === 0) {
         console.log(`  ✅ Network connectivity successful to ${hostname}:${port}`);
       } else {
@@ -152,7 +152,8 @@ class Fire22ConnectivityTester {
     } catch (error) {
       // Try alternative test with curl
       try {
-        const curlResult = await $`timeout 10 curl -I --connect-timeout 5 ${this.config.apiUrl}`.quiet();
+        const curlResult =
+          await $`timeout 10 curl -I --connect-timeout 5 ${this.config.apiUrl}`.quiet();
         if (curlResult.exitCode === 0) {
           console.log(`  ✅ HTTP connectivity verified with curl`);
         } else {
@@ -166,7 +167,7 @@ class Fire22ConnectivityTester {
 
   private async testSslCertificate(): Promise<void> {
     console.log(`  🔐 Testing SSL certificate...`);
-    
+
     if (!this.config.apiUrl.startsWith('https://')) {
       console.log(`  ⚠️  API URL uses HTTP - SSL test skipped`);
       return;
@@ -174,14 +175,15 @@ class Fire22ConnectivityTester {
 
     const url = new URL(this.config.apiUrl);
     const hostname = url.hostname;
-    
+
     try {
       // Test SSL certificate
-      const sslResult = await $`timeout 10 openssl s_client -connect ${hostname}:443 -servername ${hostname} < /dev/null`.quiet();
-      
+      const sslResult =
+        await $`timeout 10 openssl s_client -connect ${hostname}:443 -servername ${hostname} < /dev/null`.quiet();
+
       if (sslResult.exitCode === 0) {
         console.log(`  ✅ SSL certificate is valid`);
-        
+
         // Extract certificate info
         const output = sslResult.stdout.toString();
         if (output.includes('Verify return code: 0 (ok)')) {
@@ -199,26 +201,26 @@ class Fire22ConnectivityTester {
 
   private async testApiHealth(): Promise<void> {
     console.log(`  🏥 Testing Fire22 API health...`);
-    
+
     try {
       const healthEndpoints = [
         `${this.config.apiUrl}/health`,
         `${this.config.apiUrl}/api/health`,
         `${this.config.apiUrl}/status`,
-        `${this.config.apiUrl}/ping`
+        `${this.config.apiUrl}/ping`,
       ];
 
       let healthSuccess = false;
-      
+
       for (const endpoint of healthEndpoints) {
         try {
           const response = await fetch(endpoint, {
             method: 'GET',
             headers: {
               'User-Agent': 'Fire22-Dashboard-Worker/1.0',
-              'Accept': 'application/json'
+              Accept: 'application/json',
             },
-            signal: AbortSignal.timeout(this.config.timeout)
+            signal: AbortSignal.timeout(this.config.timeout),
           });
 
           if (response.ok) {
@@ -242,11 +244,13 @@ class Fire22ConnectivityTester {
         const response = await fetch(this.config.apiUrl, {
           method: 'GET',
           headers: { 'User-Agent': 'Fire22-Dashboard-Worker/1.0' },
-          signal: AbortSignal.timeout(this.config.timeout)
+          signal: AbortSignal.timeout(this.config.timeout),
         });
 
         if (response.status < 500) {
-          console.log(`  ✅ API is responding (${response.status}) - health endpoint may not exist`);
+          console.log(
+            `  ✅ API is responding (${response.status}) - health endpoint may not exist`
+          );
         } else {
           throw new Error(`API returned server error: ${response.status}`);
         }
@@ -261,7 +265,7 @@ class Fire22ConnectivityTester {
 
   private async testAuthentication(): Promise<void> {
     console.log(`  🔑 Testing Fire22 authentication...`);
-    
+
     if (!this.config.apiKey || !this.config.apiSecret) {
       throw new Error('API key or secret not configured - cannot test authentication');
     }
@@ -272,22 +276,22 @@ class Fire22ConnectivityTester {
         `${this.config.apiUrl}/api/auth/validate`,
         `${this.config.apiUrl}/auth/token`,
         `${this.config.apiUrl}/api/me`,
-        `${this.config.apiUrl}/user/profile`
+        `${this.config.apiUrl}/user/profile`,
       ];
 
       let authSuccess = false;
-      
+
       for (const endpoint of authEndpoints) {
         try {
           const response = await fetch(endpoint, {
             method: 'GET',
             headers: {
-              'Authorization': `Bearer ${this.config.apiKey}`,
+              Authorization: `Bearer ${this.config.apiKey}`,
               'X-API-Secret': this.config.apiSecret,
               'User-Agent': 'Fire22-Dashboard-Worker/1.0',
-              'Accept': 'application/json'
+              Accept: 'application/json',
             },
-            signal: AbortSignal.timeout(this.config.timeout)
+            signal: AbortSignal.timeout(this.config.timeout),
           });
 
           if (response.ok) {
@@ -316,20 +320,20 @@ class Fire22ConnectivityTester {
 
   private async generateFixConfiguration(): Promise<void> {
     console.log(`  🔧 Generating optimized configuration...`);
-    
+
     const optimizedConfig = {
       // DNS caching optimization
       dnsCache: Object.fromEntries(this.dnsCache),
-      
+
       // Connection settings
       connection: {
         timeout: Math.max(this.config.timeout, 15000),
         retryAttempts: this.config.retryAttempts,
         retryDelay: this.config.retryDelay,
         keepAlive: true,
-        maxSockets: 10
+        maxSockets: 10,
       },
-      
+
       // Fire22 specific settings
       fire22: {
         apiUrl: this.config.apiUrl,
@@ -337,9 +341,9 @@ class Fire22ConnectivityTester {
         userAgent: 'Fire22-Dashboard-Worker/1.0',
         rateLimit: {
           requests: 100,
-          window: 60000 // 1 minute
-        }
-      }
+          window: 60000, // 1 minute
+        },
+      },
     };
 
     // Write optimized configuration
@@ -371,7 +375,7 @@ FIRE22_HEALTH_CHECK_TIMEOUT=10000
 
     await Bun.write('.env.fire22', configContent);
     console.log(`  ✅ Created .env.fire22 with optimized settings`);
-    
+
     // Create Fire22 client wrapper with error handling
     const clientCode = `#!/usr/bin/env bun
 
@@ -457,7 +461,7 @@ export const fire22Client = new Fire22Client();
 
   private async provideSolution(testName: string, error: Error): Promise<void> {
     console.log(`\n💡 Solutions for ${testName}:`);
-    
+
     switch (testName) {
       case 'Check Environment Configuration':
         console.log(`  1. Set required environment variables:`);
@@ -467,42 +471,44 @@ export const fire22Client = new Fire22Client();
         console.log(`  2. Copy from .env.example if available`);
         console.log(`  3. Contact Fire22 support to obtain API credentials`);
         break;
-        
+
       case 'Test DNS Resolution':
         console.log(`  1. Try alternative DNS servers: 8.8.8.8, 1.1.1.1`);
         console.log(`  2. Flush DNS cache: sudo dscacheutil -flushcache`);
         console.log(`  3. Check /etc/hosts for conflicting entries`);
         console.log(`  4. Test with dig: dig api.fire22.com`);
         break;
-        
+
       case 'Test Network Connectivity':
         console.log(`  1. Check firewall settings and proxy configuration`);
         console.log(`  2. Test with curl: curl -I https://api.fire22.com`);
         console.log(`  3. Verify no VPN or network restrictions`);
         console.log(`  4. Contact network administrator if corporate network`);
         break;
-        
+
       case 'Test SSL Certificate':
         console.log(`  1. Update certificates: brew install ca-certificates`);
-        console.log(`  2. Check certificate expiration: openssl s_client -connect api.fire22.com:443`);
+        console.log(
+          `  2. Check certificate expiration: openssl s_client -connect api.fire22.com:443`
+        );
         console.log(`  3. Verify system time is correct`);
         console.log(`  4. Check for SSL/TLS version compatibility`);
         break;
-        
+
       case 'Test Fire22 API Health':
         console.log(`  1. Check Fire22 status page for service disruptions`);
         console.log(`  2. Try different endpoints: /status, /ping, /health`);
         console.log(`  3. Increase timeout if network is slow`);
         console.log(`  4. Contact Fire22 support if persistent issues`);
         break;
-        
+
       case 'Test Authentication':
         console.log(`  1. Verify API key and secret are correct`);
         console.log(`  2. Check if API key is activated and not expired`);
         console.log(`  3. Ensure proper header format: Authorization: Bearer <token>`);
         console.log(`  4. Regenerate API credentials if compromised`);
         break;
-        
+
       default:
         console.log(`  1. Check detailed logs for more information`);
         console.log(`  2. Try manual testing with curl or postman`);
@@ -510,14 +516,14 @@ export const fire22Client = new Fire22Client();
     }
   }
 
-  private printSummary(results: Array<{name: string; success: boolean; error?: string}>): void {
+  private printSummary(results: Array<{ name: string; success: boolean; error?: string }>): void {
     console.log(`\n${'━'.repeat(50)}`);
     console.log(`📊 Fire22 Connectivity Test Summary`);
     console.log(`${'━'.repeat(50)}`);
 
     const passed = results.filter(r => r.success).length;
     const total = results.length;
-    
+
     console.log(`\n✅ Passed: ${passed}/${total} tests`);
     console.log(`❌ Failed: ${total - passed}/${total} tests`);
 
@@ -532,7 +538,7 @@ export const fire22Client = new Fire22Client();
     console.log(`\n📁 Generated Files:`);
     console.log(`  • .env.fire22 - Optimized configuration`);
     console.log(`  • src/clients/fire22-client.ts - Error-handling client`);
-    
+
     console.log(`\n📚 Related Documentation:`);
     console.log(`  • /docs/integrations/fire22 - Integration guide`);
     console.log(`  • /docs/api/fire22-endpoints - API reference`);
@@ -543,7 +549,7 @@ export const fire22Client = new Fire22Client();
 // Main execution
 async function main() {
   const args = process.argv.slice(2);
-  
+
   if (args.includes('--help') || args.includes('-h')) {
     console.log(`
 🔧 Fire22 API Connectivity Test & Fix Script

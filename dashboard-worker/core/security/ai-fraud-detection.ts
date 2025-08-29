@@ -138,14 +138,13 @@ export class AIFraudDetection {
         features: modelFeatures,
         anomalies,
         recommendations,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       // Log analysis for monitoring
       await this.logAnalysis(prediction, Date.now() - startTime);
 
       return prediction;
-
     } catch (error) {
       console.error('Error analyzing transaction:', error);
 
@@ -158,7 +157,7 @@ export class AIFraudDetection {
         features: {},
         anomalies: [],
         recommendations: ['Manual review recommended due to analysis error'],
-        timestamp: new Date()
+        timestamp: new Date(),
       };
     }
   }
@@ -195,8 +194,10 @@ export class AIFraudDetection {
       suspicious_pattern: features.riskFactors.suspiciousPattern ? 1 : 0,
 
       // Derived features
-      amount_time_interaction: this.normalizeAmount(features.amount) * (features.timestamp.getHours() / 24),
-      location_amount_interaction: this.calculateLocationRisk(features.location) * this.normalizeAmount(features.amount)
+      amount_time_interaction:
+        this.normalizeAmount(features.amount) * (features.timestamp.getHours() / 24),
+      location_amount_interaction:
+        this.calculateLocationRisk(features.location) * this.normalizeAmount(features.amount),
     };
   }
 
@@ -248,7 +249,7 @@ export class AIFraudDetection {
       features.unusual_amount,
       features.unusual_location,
       features.unusual_device,
-      features.suspicious_pattern
+      features.suspicious_pattern,
     ].filter(Boolean).length;
 
     confidence += strongIndicators * 0.1; // +0.1 per strong indicator
@@ -393,7 +394,7 @@ export class AIFraudDetection {
       f1Score: 0.86,
       trainedAt: new Date(),
       features: this.config.features,
-      trainingSamples: 10000
+      trainingSamples: 10000,
     };
 
     console.log('📊 Fraud detection model loaded:', this.currentModel);
@@ -403,11 +404,14 @@ export class AIFraudDetection {
    * Start periodic model updates
    */
   private startModelUpdates(): void {
-    setInterval(async () => {
-      if (!this.isTraining) {
-        await this.updateModel();
-      }
-    }, this.config.modelUpdateFrequency * 60 * 60 * 1000); // Convert hours to ms
+    setInterval(
+      async () => {
+        if (!this.isTraining) {
+          await this.updateModel();
+        }
+      },
+      this.config.modelUpdateFrequency * 60 * 60 * 1000
+    ); // Convert hours to ms
   }
 
   /**
@@ -462,7 +466,7 @@ export class AIFraudDetection {
       totalAnalyses: analysisCount,
       riskDistribution: riskCounts,
       isTraining: this.isTraining,
-      averageProcessingTime: analysisCount > 0 ? totalTime / analysisCount : 0
+      averageProcessingTime: analysisCount > 0 ? totalTime / analysisCount : 0,
     };
   }
 
@@ -504,7 +508,7 @@ export class AIFraudDetection {
       probability: prediction.fraudProbability.toFixed(3),
       confidence: prediction.confidence.toFixed(3),
       time: `${processingTime}ms`,
-      anomalies: prediction.anomalies.length
+      anomalies: prediction.anomalies.length,
     });
   }
 
@@ -526,14 +530,14 @@ export const defaultFraudDetectionConfig: FraudDetectionConfig = {
     'device_fingerprint',
     'betting_pattern',
     'time_of_day',
-    'unusual_activity'
+    'unusual_activity',
   ],
   alertThresholds: {
     low: 0.2,
     medium: 0.4,
     high: 0.7,
-    critical: 0.9
-  }
+    critical: 0.9,
+  },
 };
 
 // Export main instance

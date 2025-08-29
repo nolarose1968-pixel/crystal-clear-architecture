@@ -3,7 +3,13 @@
  * Connects to backend services for real-time data and VIP management
  */
 
-import { getApiClient, fetchVIPData, fetchEmployeeData, fetchSportsData, getSystemHealth } from './api-integration';
+import {
+  getApiClient,
+  fetchVIPData,
+  fetchEmployeeData,
+  fetchSportsData,
+  getSystemHealth,
+} from './api-integration';
 
 interface EmployeeData {
   id?: string;
@@ -49,7 +55,11 @@ export default {
     }
 
     // Extract subdomain
-    const subdomain = hostname.replace('fire22.workers.dev', '').replace('sportsfire.co', '').replace('dashboard.', '').replace('test-dashboard.', '');
+    const subdomain = hostname
+      .replace('fire22.workers.dev', '')
+      .replace('sportsfire.co', '')
+      .replace('dashboard.', '')
+      .replace('test-dashboard.', '');
 
     // Handle root domain
     if (subdomain === '' || subdomain === 'fire22') {
@@ -68,37 +78,37 @@ export default {
         case '/api/health':
           const health = await getSystemHealth(env);
           return new Response(JSON.stringify(health), {
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
           });
 
         case '/api/vip/clients':
           const vipClients = await fetchVIPData(env);
           return new Response(JSON.stringify(vipClients), {
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
           });
 
         case '/api/employees':
           const employees = await fetchEmployeeData(env);
           return new Response(JSON.stringify(employees), {
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
           });
 
         case '/api/fantasy402/sports':
           const sportsData = await fetchSportsData(env);
           return new Response(JSON.stringify(sportsData), {
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
           });
 
         default:
           return new Response(JSON.stringify({ error: 'API endpoint not found' }), {
             status: 404,
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
           });
       }
     } catch (error) {
       return new Response(JSON.stringify({ error: 'API request failed', details: error.message }), {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
     }
   },
@@ -110,7 +120,7 @@ export default {
         fetchVIPData(env),
         fetchEmployeeData(env),
         fetchSportsData(env),
-        getSystemHealth(env)
+        getSystemHealth(env),
       ]);
 
       const vipCount = vipClients.status === 'fulfilled' ? vipClients.value.length : 0;
@@ -122,9 +132,10 @@ export default {
       let systemMessage = 'Checking system status...';
 
       // Check if all major APIs are failing (backend offline)
-      const allApisFailed = vipClients.status === 'rejected' &&
-                           employees.status === 'rejected' &&
-                           sportsData.status === 'rejected';
+      const allApisFailed =
+        vipClients.status === 'rejected' &&
+        employees.status === 'rejected' &&
+        sportsData.status === 'rejected';
 
       if (allApisFailed) {
         systemHealth = 'backend-offline';
@@ -283,7 +294,9 @@ export default {
           </div>
         </div>
 
-        ${systemHealth !== 'ok' ? `
+        ${
+          systemHealth !== 'ok'
+            ? `
         <div class="system-status-section" style="margin: 2rem auto; max-width: 1000px; background: rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 2rem;">
           <h3 style="text-align: center; margin-bottom: 1.5rem; color: white;">🔧 System Status Details</h3>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
@@ -308,13 +321,19 @@ export default {
               <div style="font-size: 0.8rem; opacity: 0.8;">${healthStatus.status === 'fulfilled' ? 'System healthy' : 'Service unavailable'}</div>
             </div>
           </div>
-          ${systemHealth === 'backend-offline' ? `
+          ${
+            systemHealth === 'backend-offline'
+              ? `
           <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255, 165, 0, 0.2); border-radius: 8px; text-align: center;">
             <strong>💡 Next Steps:</strong> Deploy Crystal Clear Architecture backend services to enable full functionality
           </div>
-          ` : ''}
+          `
+              : ''
+          }
         </div>
-        ` : ''}
+        `
+            : ''
+        }
 
         <div class="quick-actions">
           <h2>Quick Access</h2>
@@ -407,17 +426,23 @@ export default {
     });
   },
 
-  async handleEmployeeSubdomain(request: Request, env: Env, subdomain: string, pathname: string): Promise<Response> {
+  async handleEmployeeSubdomain(
+    request: Request,
+    env: Env,
+    subdomain: string,
+    pathname: string
+  ): Promise<Response> {
     try {
       let employee: EmployeeData;
 
       // Try to get employee data from Crystal Clear Architecture API first
       try {
         const employees = await fetchEmployeeData(env);
-        const apiEmployee = employees.find(emp =>
-          emp.name?.toLowerCase().replace(/\s+/g, '') === subdomain ||
-          emp.email?.split('@')[0].toLowerCase() === subdomain ||
-          emp.id === subdomain
+        const apiEmployee = employees.find(
+          emp =>
+            emp.name?.toLowerCase().replace(/\s+/g, '') === subdomain ||
+            emp.email?.split('@')[0].toLowerCase() === subdomain ||
+            emp.id === subdomain
         );
 
         if (apiEmployee) {
@@ -437,8 +462,14 @@ export default {
             phone: '+1 (555) 123-4567',
             location: 'Las Vegas, NV',
             bio: 'Expert in VIP client management and high-value customer relations. Leading our high-value customer acquisition and retention strategies.',
-            skills: ['VIP Management', 'Customer Relations', 'Sports Analytics', 'Risk Assessment', 'Revenue Optimization'],
-            tier: 5
+            skills: [
+              'VIP Management',
+              'Customer Relations',
+              'Sports Analytics',
+              'Risk Assessment',
+              'Revenue Optimization',
+            ],
+            tier: 5,
           };
         } else {
           // Try KV storage as final fallback
@@ -540,20 +571,28 @@ export default {
               <strong>📱 Phone</strong><br>
               <a href="tel:${employee.phone}">${employee.phone}</a>
             </div>
-            ${employee.location ? `
+            ${
+              employee.location
+                ? `
             <div class="contact-item">
               <strong>📍 Location</strong><br>
               ${employee.location}
             </div>
-            ` : ''}
+            `
+                : ''
+            }
           </div>
 
-          ${employee.skills ? `
+          ${
+            employee.skills
+              ? `
           <h3>Skills & Expertise</h3>
           <div class="skills">
             ${employee.skills.map(skill => `<span class="skill">${skill}</span>`).join('')}
           </div>
-          ` : ''}
+          `
+              : ''
+          }
         </div>
 
         <div class="profile-card">
@@ -604,7 +643,7 @@ export default {
 
     return new Response(html, {
       status: 404,
-      headers: { 'Content-Type': 'text/html' }
+      headers: { 'Content-Type': 'text/html' },
     });
-  }
+  },
 };

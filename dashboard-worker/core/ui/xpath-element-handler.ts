@@ -97,7 +97,7 @@ export class XPathElementHandler {
       return {
         success: false,
         error,
-        xpath: config.xpath
+        xpath: config.xpath,
       };
     }
 
@@ -140,9 +140,8 @@ export class XPathElementHandler {
         success: true,
         element,
         data: result,
-        xpath: config.xpath
+        xpath: config.xpath,
       };
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
@@ -154,7 +153,7 @@ export class XPathElementHandler {
         success: false,
         element,
         error: errorMessage,
-        xpath: config.xpath
+        xpath: config.xpath,
       };
     }
   }
@@ -162,7 +161,10 @@ export class XPathElementHandler {
   /**
    * Handle the specific element you referenced
    */
-  async handleFantasy402Element(action: XPathElementConfig['action'], data?: any): Promise<XPathResult> {
+  async handleFantasy402Element(
+    action: XPathElementConfig['action'],
+    data?: any
+  ): Promise<XPathResult> {
     const xpath = '/html/body/div[3]/div[5]/div/div[5]/section/section/div/div/div/div[2]/div/div';
 
     return this.handleXPathElement({
@@ -172,14 +174,14 @@ export class XPathElementHandler {
       validation: {
         required: true,
         minLength: action === 'write' ? 1 : undefined,
-        maxLength: action === 'write' ? 5000 : undefined
+        maxLength: action === 'write' ? 5000 : undefined,
       },
       onSuccess: (element, result) => {
         console.log(`✅ Successfully handled Fantasy402 element:`, {
           xpath,
           action,
           elementType: element.tagName,
-          result
+          result,
         });
 
         // Additional success handling for Fantasy402 elements
@@ -190,12 +192,12 @@ export class XPathElementHandler {
           xpath,
           action,
           error,
-          elementType: element?.tagName
+          elementType: element?.tagName,
         });
 
         // Additional error handling for Fantasy402 elements
         this.handleFantasy402Error(error, element, action);
-      }
+      },
     });
   }
 
@@ -330,8 +332,8 @@ export class XPathElementHandler {
       this.observers.get(xpath)?.disconnect();
     }
 
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
         console.log(`Element changed at ${xpath}:`, mutation.type);
       });
     });
@@ -340,7 +342,7 @@ export class XPathElementHandler {
       childList: true,
       attributes: true,
       characterData: true,
-      subtree: true
+      subtree: true,
     });
 
     this.observers.set(xpath, observer);
@@ -371,7 +373,7 @@ export class XPathElementHandler {
       element: element.tagName,
       id: element.id,
       className: element.className,
-      result: typeof result === 'string' ? result.substring(0, 100) : result
+      result: typeof result === 'string' ? result.substring(0, 100) : result,
     });
   }
 
@@ -465,7 +467,7 @@ export class XPathElementHandler {
     console.log('Fantasy402 recovery attempted for:', {
       element: element?.id || element?.className,
       error,
-      action
+      action,
     });
   }
 
@@ -495,14 +497,16 @@ export const handleFantasy402Element = (action: XPathElementConfig['action'], da
   xpathHandler.handleFantasy402Element(action, data);
 
 export const findFantasy402Element = () =>
-  xpathHandler.findElementByXPath('/html/body/div[3]/div[5]/div/div[5]/section/section/div/div/div/div[2]/div/div');
+  xpathHandler.findElementByXPath(
+    '/html/body/div[3]/div[5]/div/div[5]/section/section/div/div/div/div[2]/div/div'
+  );
 
 // Specific element convenience functions
 export const handleSpecificElement = (action: XPathElementConfig['action'], data?: any) =>
   xpathHandler.handleXPathElement({
     xpath: '/html/body/div[3]/div[5]/div/div[4]/div[7]/div',
     action,
-    data
+    data,
   });
 
 export const findSpecificElement = () =>

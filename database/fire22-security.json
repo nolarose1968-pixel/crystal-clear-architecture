@@ -3,13 +3,7 @@
   "created": "2025-08-28T22:05:00.352Z",
   "tables": {
     "departments": {
-      "columns": [
-        "id",
-        "name",
-        "email",
-        "securityTier",
-        "status"
-      ],
+      "columns": ["id", "name", "email", "securityTier", "status"],
       "data": [
         {
           "id": "exec",

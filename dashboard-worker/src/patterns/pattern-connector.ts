@@ -533,7 +533,7 @@ export class PatternConnector {
             });
             
             // Security check for sensitive patterns
-            const hasSensitive = text.match(/password|key|secret|token/i) !=== null;
+            const hasSensitive = text.match(/password|key|secret|token/i) !== null;
             
             return {
               textWidth: width,

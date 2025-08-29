@@ -40,7 +40,7 @@ if (typeof Bun !== 'undefined') {
         hits: stats.cacheHitsCompleted,
         misses: stats.cacheMisses,
         size: stats.size,
-        hitRate: `${((stats.cacheHitsCompleted / stats.totalCount) * 100).toFixed(1)}%`
+        hitRate: `${((stats.cacheHitsCompleted / stats.totalCount) * 100).toFixed(1)}%`,
       });
     }
   }, 60000); // Log every minute
@@ -50,8 +50,10 @@ if (typeof Bun !== 'undefined') {
 const PORT = parseInt(process.env.PORT) || CONSTANTS.SERVER_CONFIG.DEFAULT_PORT;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const MAX_REQUEST_SIZE = process.env.MAX_REQUEST_SIZE || CONSTANTS.SERVER_CONFIG.MAX_REQUEST_SIZE;
-const RATE_LIMIT_WINDOW = parseInt(process.env.RATE_LIMIT_WINDOW) || CONSTANTS.SERVER_CONFIG.RATE_LIMIT.WINDOW_MS;
-const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX) || CONSTANTS.SERVER_CONFIG.RATE_LIMIT.MAX_REQUESTS;
+const RATE_LIMIT_WINDOW =
+  parseInt(process.env.RATE_LIMIT_WINDOW) || CONSTANTS.SERVER_CONFIG.RATE_LIMIT.WINDOW_MS;
+const RATE_LIMIT_MAX =
+  parseInt(process.env.RATE_LIMIT_MAX) || CONSTANTS.SERVER_CONFIG.RATE_LIMIT.MAX_REQUESTS;
 
 const app = express();
 
@@ -65,7 +67,10 @@ app.use((req, res, next) => {
   res.header('Referrer-Policy', 'strict-origin-when-cross-origin');
 
   // CORS - Restricted for production
-  const allowedOrigins = ['http://localhost:3003', 'https://dashboard-worker.brendawill2233.workers.dev'];
+  const allowedOrigins = [
+    'http://localhost:3003',
+    'https://dashboard-worker.brendawill2233.workers.dev',
+  ];
 
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
@@ -73,7 +78,10 @@ app.use((req, res, next) => {
   }
 
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-API-Key');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-API-Key'
+  );
   res.header('Access-Control-Allow-Credentials', 'true');
 
   if (req.method === 'OPTIONS') {
@@ -84,60 +92,74 @@ app.use((req, res, next) => {
 });
 
 // Rate limiting and request size limits
-app.use(express.json({
-  limit: '1mb',
-  verify: (req, res, buf) => {
-    // Verify JSON payload integrity
-    if (buf && buf.length) {
-      req.rawBody = buf;
-    }
-  }
-}));
+app.use(
+  express.json({
+    limit: '1mb',
+    verify: (req, res, buf) => {
+      // Verify JSON payload integrity
+      if (buf && buf.length) {
+        req.rawBody = buf;
+      }
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 // Secure SQLite connection with Fire22-compatible schema using constants
-const dbPath = process.env.DATABASE_URL?.replace('file:', '') || CONSTANTS.DATABASE_CONFIG.DEFAULT_PATH;
+const dbPath =
+  process.env.DATABASE_URL?.replace('file:', '') || CONSTANTS.DATABASE_CONFIG.DEFAULT_PATH;
 console.log('🗄️ Database path:', dbPath);
 console.log('🔍 Database file exists:', require('fs').existsSync(dbPath));
 const db = new Database(dbPath);
 
 // Serve static files with proper headers
-app.use(express.static('public', {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-cache');
-    }
-  }
-}));
+app.use(
+  express.static('public', {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache');
+      }
+    },
+  })
+);
 
 // Serve documentation files
-app.use('/docs', express.static('docs', {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-cache');
-    }
-  }
-}));
+app.use(
+  '/docs',
+  express.static('docs', {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache');
+      }
+    },
+  })
+);
 
 // Serve styles directory for documentation
-app.use('/src/styles', express.static('src/styles', {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.css')) {
-      res.setHeader('Content-Type', 'text/css');
-      res.setHeader('Cache-Control', 'public, max-age=3600');
-    }
-  }
-}));
+app.use(
+  '/src/styles',
+  express.static('src/styles', {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css');
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+      }
+    },
+  })
+);
 
 // Serve JavaScript files for theme toggle and other components
-app.use('/src/js', express.static('src/js', {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript');
-      res.setHeader('Cache-Control', 'public, max-age=3600');
-    }
-  }
-}));
+app.use(
+  '/src/js',
+  express.static('src/js', {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+      }
+    },
+  })
+);
 
 // Documentation diagnostics endpoint
 app.get('/api/docs/diagnostics', (req, res) => {
@@ -151,28 +173,30 @@ app.get('/api/docs/diagnostics', (req, res) => {
     const diagnostics = {
       docs: {
         exists: fs.existsSync(docsPath),
-        files: fs.existsSync(docsPath) ? fs.readdirSync(docsPath).filter(f => f.endsWith('.html')).length : 0
+        files: fs.existsSync(docsPath)
+          ? fs.readdirSync(docsPath).filter(f => f.endsWith('.html')).length
+          : 0,
       },
       styles: {
         exists: fs.existsSync(stylesPath),
-        framework: fs.existsSync(path.join(stylesPath, 'framework.css'))
+        framework: fs.existsSync(path.join(stylesPath, 'framework.css')),
       },
       routes: {
         docs: '/docs/*',
-        styles: '/src/styles/*'
-      }
+        styles: '/src/styles/*',
+      },
     };
 
     res.json({
       success: true,
       data: diagnostics,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: 'Diagnostics failed',
-      message: error.message
+      message: error.message,
     });
   }
 });
@@ -188,7 +212,7 @@ function secureLog(level, message, metadata = {}) {
     timestamp,
     level,
     message,
-    ...metadata
+    ...metadata,
   };
 
   // In production, send to proper logging service
@@ -208,31 +232,38 @@ async function checkDatabase() {
   try {
     console.log('🔍 Checking database tables...');
     // Check if database file exists and get table list
-    const result = db.query(`
+    const result = db
+      .query(
+        `
       SELECT name as table_name
       FROM sqlite_master
       WHERE type='table' AND name NOT LIKE 'sqlite_%'
-    `).all();
+    `
+      )
+      .all();
 
     console.log('📊 Raw database result:', result);
     dbConnected = result.length > 0;
 
     // Check for Fire22-specific tables
     const tableNames = result.map(r => r.table_name);
-    fire22Schema = tableNames.includes('customers') && tableNames.includes('transactions') && tableNames.includes('bets');
+    fire22Schema =
+      tableNames.includes('customers') &&
+      tableNames.includes('transactions') &&
+      tableNames.includes('bets');
 
     console.log('🔥 Fire22 schema check:', { tableNames, fire22Schema });
 
     secureLog('info', 'Database connection established', {
       tableCount: result.length,
       fire22Schema,
-      tables: tableNames
+      tables: tableNames,
     });
   } catch (error) {
     console.error('❌ Database error:', error);
     secureLog('warn', 'Database not available, using simulated data', {
       error: error.message,
-      code: error.code
+      code: error.code,
     });
     dbConnected = false;
     fire22Schema = false;
@@ -248,7 +279,7 @@ function authenticateAPI(req, res, next) {
   if (!apiKey || !validApiKeys.includes(apiKey)) {
     return res.status(401).json({
       success: false,
-      error: 'Invalid or missing API key'
+      error: 'Invalid or missing API key',
     });
   }
 
@@ -263,7 +294,7 @@ function validateAgentInput(req, res, next) {
   if (!agentID || !/^[A-Za-z0-9]{3,20}$/.test(agentID)) {
     return res.status(400).json({
       success: false,
-      error: 'Invalid agentID format'
+      error: 'Invalid agentID format',
     });
   }
 
@@ -285,7 +316,10 @@ function rateLimit(windowMs = RATE_LIMIT_WINDOW, maxRequests = RATE_LIMIT_MAX) {
 
     // Clean old entries
     for (const [ip, requests] of rateLimitStore.entries()) {
-      rateLimitStore.set(ip, requests.filter(time => time > windowStart));
+      rateLimitStore.set(
+        ip,
+        requests.filter(time => time > windowStart)
+      );
       if (rateLimitStore.get(ip).length === 0) {
         rateLimitStore.delete(ip);
       }
@@ -296,7 +330,7 @@ function rateLimit(windowMs = RATE_LIMIT_WINDOW, maxRequests = RATE_LIMIT_MAX) {
     if (clientRequests.length >= maxRequests) {
       return res.status(429).json({
         success: false,
-        error: 'Rate limit exceeded'
+        error: 'Rate limit exceeded',
       });
     }
 
@@ -311,18 +345,19 @@ function rateLimit(windowMs = RATE_LIMIT_WINDOW, maxRequests = RATE_LIMIT_MAX) {
 // Fire22-specific API endpoints matching real system
 
 // Get Live Wagers - matches Fire22 API (Secured)
-app.post('/api/manager/getLiveWagers', 
+app.post(
+  '/api/manager/getLiveWagers',
   rateLimit(RATE_LIMIT_WINDOW, RATE_LIMIT_MAX), // 50 requests per minute
   authenticateAPI,
   validateAgentInput,
   async (req, res) => {
-  try {
-    const { agentID, agentOwner } = req.body;
+    try {
+      const { agentID, agentOwner } = req.body;
 
-    if (fire22Schema) {
-      // Use SQLite syntax - for now, query from bets table since wagers table doesn't exist
-      const defaultAgent = CONSTANTS.API_CONFIG.DEFAULT_AGENT_ID;
-      const query = `
+      if (fire22Schema) {
+        // Use SQLite syntax - for now, query from bets table since wagers table doesn't exist
+        const defaultAgent = CONSTANTS.API_CONFIG.DEFAULT_AGENT_ID;
+        const query = `
         SELECT
           b.id as "WagerNumber",
           '${defaultAgent}' as "AgentID",
@@ -345,114 +380,127 @@ app.post('/api/manager/getLiveWagers',
         ORDER BY b.created_at DESC
         LIMIT 100
       `;
-      const wagers = db.query(query).all(agentID, agentID);
-      const agents = [...new Set(wagers.map(w => w.AgentID))];
-      const customers = [...new Set(wagers.map(w => w.CustomerID))];
+        const wagers = db.query(query).all(agentID, agentID);
+        const agents = [...new Set(wagers.map(w => w.AgentID))];
+        const customers = [...new Set(wagers.map(w => w.CustomerID))];
 
-      res.json({
-        success: true,
-        data: {
-          wagers,
-          totalWagers: wagers.length,
-          totalVolume: wagers.reduce((sum, w) => sum + (w.AmountWagered || 0), 0),
-          totalRisk: wagers.reduce((sum, w) => sum + (w.ToWinAmount || 0), 0),
-          agents,
-          customers
-        }
+        res.json({
+          success: true,
+          data: {
+            wagers,
+            totalWagers: wagers.length,
+            totalVolume: wagers.reduce((sum, w) => sum + (w.AmountWagered || 0), 0),
+            totalRisk: wagers.reduce((sum, w) => sum + (w.ToWinAmount || 0), 0),
+            agents,
+            customers,
+          },
+        });
+      } else {
+        // Enhanced Fire22 wager data matching REAL API structure
+        const wagers = Array.from({ length: 8 }, (_, i) => ({
+          // Core wager identifiers (matching real Fire22 format)
+          TicketNumber: 893038796 + i,
+          WagerNumber: i + 1,
+          PlayNumber: 1,
+
+          // Agent and customer info
+          agentID: agentID,
+          AgentID: agentID,
+          AgentLogin: agentID,
+          customerID: `BCC${2342 + i}`.padEnd(10),
+          CustomerID: `BCC${2342 + i}`.padEnd(10),
+          Login: `BCC${2342 + i}`,
+          NameFirst: ['Johnny', 'Sarah', 'Mike', 'Lisa', 'David', 'Emma', 'Chris', 'Anna'][i],
+
+          // Wager details (real Fire22 structure)
+          WagerType: ['P', 'M', 'S', 'I', 'T'][i % 5], // P=Parlay, M=Moneyline, S=Spread, I=Total, T=Teaser
+          WagerStatus: 'P', // P=Pending
+          AmountWagered: [1400, 500, 250, 1000, 750, 300, 2000, 150][i],
+          ToWinAmount: [30924, 950, 475, 1900, 1425, 570, 38000, 285][i],
+          VolumeAmount: [966, 500, 250, 1000, 750, 300, 1333, 150][i],
+
+          // Timestamps
+          InsertDateTime: new Date().toISOString().replace('T', ' ').substring(0, 19),
+          AcceptedDateTime: new Date().toISOString().replace('T', ' ').substring(0, 19) + '.657',
+          TicketWriter: 'Internet',
+          PlacedOn: 'Internet',
+
+          // Game descriptions (real Fire22 format)
+          Description: [
+            'Tennis #8620 D Shnaider -295 - For Game Tennis #8593 D Vekic +105 - For Game Tennis #8586 K Siniakova -165',
+            'NFL #101 Cowboys -3 -110 - For Game',
+            'NBA #205 Lakers +190 - For Game',
+            'MLB #88 Rangers O 8.5 +190 - For Game',
+            'NHL #301 Bruins -1.5 +110 - For Game',
+            'NCAAF #45 Alabama -7 -105 - For Game',
+            'Tennis Parlay: 12 team combination',
+            'Soccer #501 Real Madrid -1 +105',
+          ][i],
+          ShortDesc: [
+            'Tennis 8-Team Parlay',
+            'NFL Cowboys -3',
+            'NBA Lakers +190',
+            'MLB Rangers O8.5',
+            'NHL Bruins -1.5',
+            'NCAAF Alabama -7',
+            'Tennis 12-Team',
+            'Soccer Real Madrid',
+          ][i],
+
+          // Parlay details
+          totalPicks: [8, 1, 1, 1, 1, 1, 12, 1][i],
+          ParlayName:
+            i === 0 || i === 6 ? `${[8, 1, 1, 1, 1, 1, 12, 1][i]} team`.padEnd(25) : ''.padEnd(25),
+
+          // Sport information
+          SportType: [
+            'Tennis',
+            'Football',
+            'Basketball',
+            'Baseball',
+            'Hockey',
+            'Football',
+            'Tennis',
+            'Soccer',
+          ][i].padEnd(20),
+          SportSubType: ['WTA Matchups', 'NFL', 'NBA', 'MLB', 'NHL', 'NCAAF', 'ATP', 'EPL'][
+            i
+          ].padEnd(20),
+
+          // Status flags (Fire22 format)
+          VIP: Math.random() > 0.8 ? '1' : '0',
+          FreePlayFlag: 'N',
+          CreditAcctFlag: 'N',
+          Status: 'pending',
+          Outcome: 'P',
+        }));
+
+        res.json({
+          success: true,
+          data: {
+            wagers,
+            totalWagers: wagers.length,
+            totalVolume: wagers.reduce((sum, w) => sum + w.AmountWagered, 0),
+            totalRisk: wagers.reduce((sum, w) => sum + w.ToWinAmount, 0),
+            agents: [agentID],
+            customers: wagers.map(w => w.CustomerID),
+          },
+        });
+      }
+    } catch (error) {
+      secureLog('error', 'Error fetching live wagers', {
+        agentID: req.body.agentID,
+        error: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
       });
-    } else {
-      // Enhanced Fire22 wager data matching REAL API structure
-      const wagers = Array.from({ length: 8 }, (_, i) => ({
-        // Core wager identifiers (matching real Fire22 format)
-        TicketNumber: 893038796 + i,
-        WagerNumber: i + 1,
-        PlayNumber: 1,
 
-        // Agent and customer info
-        agentID: agentID,
-        AgentID: agentID,
-        AgentLogin: agentID,
-        customerID: `BCC${2342 + i}`.padEnd(10),
-        CustomerID: `BCC${2342 + i}`.padEnd(10),
-        Login: `BCC${2342 + i}`,
-        NameFirst: ['Johnny', 'Sarah', 'Mike', 'Lisa', 'David', 'Emma', 'Chris', 'Anna'][i],
-
-        // Wager details (real Fire22 structure)
-        WagerType: ['P', 'M', 'S', 'I', 'T'][i % 5], // P=Parlay, M=Moneyline, S=Spread, I=Total, T=Teaser
-        WagerStatus: 'P', // P=Pending
-        AmountWagered: [1400, 500, 250, 1000, 750, 300, 2000, 150][i],
-        ToWinAmount: [30924, 950, 475, 1900, 1425, 570, 38000, 285][i],
-        VolumeAmount: [966, 500, 250, 1000, 750, 300, 1333, 150][i],
-
-        // Timestamps
-        InsertDateTime: new Date().toISOString().replace('T', ' ').substring(0, 19),
-        AcceptedDateTime: new Date().toISOString().replace('T', ' ').substring(0, 19) + '.657',
-        TicketWriter: 'Internet',
-        PlacedOn: 'Internet',
-
-        // Game descriptions (real Fire22 format)
-        Description: [
-          'Tennis #8620 D Shnaider -295 - For Game Tennis #8593 D Vekic +105 - For Game Tennis #8586 K Siniakova -165',
-          'NFL #101 Cowboys -3 -110 - For Game',
-          'NBA #205 Lakers +190 - For Game',
-          'MLB #88 Rangers O 8.5 +190 - For Game',
-          'NHL #301 Bruins -1.5 +110 - For Game',
-          'NCAAF #45 Alabama -7 -105 - For Game',
-          'Tennis Parlay: 12 team combination',
-          'Soccer #501 Real Madrid -1 +105'
-        ][i],
-        ShortDesc: [
-          'Tennis 8-Team Parlay',
-          'NFL Cowboys -3',
-          'NBA Lakers +190',
-          'MLB Rangers O8.5',
-          'NHL Bruins -1.5',
-          'NCAAF Alabama -7',
-          'Tennis 12-Team',
-          'Soccer Real Madrid'
-        ][i],
-
-        // Parlay details
-        totalPicks: [8, 1, 1, 1, 1, 1, 12, 1][i],
-        ParlayName: i === 0 || i === 6 ? `${[8, 1, 1, 1, 1, 1, 12, 1][i]} team`.padEnd(25) : ''.padEnd(25),
-
-        // Sport information
-        SportType: ['Tennis', 'Football', 'Basketball', 'Baseball', 'Hockey', 'Football', 'Tennis', 'Soccer'][i].padEnd(20),
-        SportSubType: ['WTA Matchups', 'NFL', 'NBA', 'MLB', 'NHL', 'NCAAF', 'ATP', 'EPL'][i].padEnd(20),
-
-        // Status flags (Fire22 format)
-        VIP: Math.random() > 0.8 ? '1' : '0',
-        FreePlayFlag: 'N',
-        CreditAcctFlag: 'N',
-        Status: 'pending',
-        Outcome: 'P'
-      }));
-
-      res.json({
-        success: true,
-        data: {
-          wagers,
-          totalWagers: wagers.length,
-          totalVolume: wagers.reduce((sum, w) => sum + w.AmountWagered, 0),
-          totalRisk: wagers.reduce((sum, w) => sum + w.ToWinAmount, 0),
-          agents: [agentID],
-          customers: wagers.map(w => w.CustomerID)
-        }
+      res.status(500).json({
+        success: false,
+        error: process.env.NODE_ENV === 'production' ? 'Internal server error' : error.message,
       });
     }
-  } catch (error) {
-    secureLog('error', 'Error fetching live wagers', {
-      agentID: req.body.agentID,
-      error: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    });
-
-    res.status(500).json({
-      success: false,
-      error: process.env.NODE_ENV === 'production' ? 'Internal server error' : error.message
-    });
   }
-});
+);
 
 // Get Customer Admin - matches Fire22 API
 app.post('/api/manager/getCustomerAdmin', async (req, res) => {
@@ -503,8 +551,8 @@ app.post('/api/manager/getCustomerAdmin', async (req, res) => {
         success: true,
         data: {
           LIST: customers,
-          totalCustomers: customers.length
-        }
+          totalCustomers: customers.length,
+        },
       });
     } else {
       // Fallback simulated data
@@ -515,15 +563,15 @@ app.post('/api/manager/getCustomerAdmin', async (req, res) => {
         CurrentBalance: Math.floor(Math.random() * 10000),
         WagerLimit: 100000,
         Active: 'Y',
-        Login: `BBS${110 + i}`
+        Login: `BBS${110 + i}`,
       }));
 
       res.json({
         success: true,
         data: {
           LIST: customers,
-          totalCustomers: customers.length
-        }
+          totalCustomers: customers.length,
+        },
       });
     }
   } catch (error) {
@@ -536,7 +584,7 @@ app.post('/api/manager/getCustomerAdmin', async (req, res) => {
 app.post('/api/manager/getWeeklyFigureByAgent', async (req, res) => {
   try {
     const { agentID = 'BLAKEPPH' } = req.body;
-    
+
     if (dbConnected) {
       // Use SQLite syntax for weekly figures
       const query = `
@@ -562,9 +610,9 @@ app.post('/api/manager/getWeeklyFigureByAgent', async (req, res) => {
             handle: parseFloat(row.handle || 0),
             win: parseFloat(row.win || 0),
             volume: parseFloat(row.volume || 0),
-            bets: parseInt(row.bets || 0)
-          }))
-        }
+            bets: parseInt(row.bets || 0),
+          })),
+        },
       });
     } else {
       // Simulated data
@@ -574,9 +622,9 @@ app.post('/api/manager/getWeeklyFigureByAgent', async (req, res) => {
         handle: Math.floor(Math.random() * 50000) + 10000,
         win: Math.floor(Math.random() * 10000) - 5000,
         volume: Math.floor(Math.random() * 100000) + 50000,
-        bets: Math.floor(Math.random() * 500) + 100
+        bets: Math.floor(Math.random() * 500) + 100,
       }));
-      
+
       res.json({
         success: true,
         data: {
@@ -585,8 +633,8 @@ app.post('/api/manager/getWeeklyFigureByAgent', async (req, res) => {
           totalHandle: weeklyData.reduce((sum, day) => sum + day.handle, 0),
           totalWin: weeklyData.reduce((sum, day) => sum + day.win, 0),
           totalVolume: weeklyData.reduce((sum, day) => sum + day.volume, 0),
-          totalBets: weeklyData.reduce((sum, day) => sum + day.bets, 0)
-        }
+          totalBets: weeklyData.reduce((sum, day) => sum + day.bets, 0),
+        },
       });
     }
   } catch (error) {
@@ -598,9 +646,9 @@ app.post('/api/manager/getWeeklyFigureByAgent', async (req, res) => {
       handle: Math.floor(Math.random() * 50000) + 10000,
       win: Math.floor(Math.random() * 10000) - 5000,
       volume: Math.floor(Math.random() * 100000) + 50000,
-      bets: Math.floor(Math.random() * 500) + 100
+      bets: Math.floor(Math.random() * 500) + 100,
     }));
-    
+
     res.json({
       success: true,
       data: {
@@ -609,8 +657,8 @@ app.post('/api/manager/getWeeklyFigureByAgent', async (req, res) => {
         totalHandle: weeklyData.reduce((sum, day) => sum + day.handle, 0),
         totalWin: weeklyData.reduce((sum, day) => sum + day.win, 0),
         totalVolume: weeklyData.reduce((sum, day) => sum + day.volume, 0),
-        totalBets: weeklyData.reduce((sum, day) => sum + day.bets, 0)
-      }
+        totalBets: weeklyData.reduce((sum, day) => sum + day.bets, 0),
+      },
     });
   }
 });
@@ -618,7 +666,7 @@ app.post('/api/manager/getWeeklyFigureByAgent', async (req, res) => {
 app.post('/api/manager/getPending', async (req, res) => {
   try {
     const { agentID = 'BLAKEPPH', date = new Date().toISOString().split('T')[0] } = req.body;
-    
+
     if (dbConnected) {
       // Use SQLite syntax for pending bets
       const query = `
@@ -656,9 +704,9 @@ app.post('/api/manager/getPending', async (req, res) => {
             date: row.date.split(' ')[0], // Extract date part
             odds: row.odds,
             teams: row.teams,
-            time: row.time
-          }))
-        }
+            time: row.time,
+          })),
+        },
       });
     } else {
       // Simulated data
@@ -672,9 +720,9 @@ app.post('/api/manager/getPending', async (req, res) => {
         date: date || new Date().toISOString().split('T')[0],
         odds: Math.random() > 0.5 ? '-110' : '+120',
         teams: `Team A vs Team B`,
-        time: new Date().toLocaleTimeString()
+        time: new Date().toLocaleTimeString(),
       }));
-      
+
       res.json({
         success: true,
         data: {
@@ -682,8 +730,8 @@ app.post('/api/manager/getPending', async (req, res) => {
           date,
           pendingItems,
           totalPending: pendingItems.length,
-          totalAmount: pendingItems.reduce((sum, item) => sum + item.amount, 0)
-        }
+          totalAmount: pendingItems.reduce((sum, item) => sum + item.amount, 0),
+        },
       });
     }
   } catch (error) {
@@ -699,9 +747,9 @@ app.post('/api/manager/getPending', async (req, res) => {
       date: new Date().toISOString().split('T')[0],
       odds: Math.random() > 0.5 ? '-110' : '+120',
       teams: `Team A vs Team B`,
-      time: new Date().toLocaleTimeString()
+      time: new Date().toLocaleTimeString(),
     }));
-    
+
     res.json({
       success: true,
       data: {
@@ -709,8 +757,8 @@ app.post('/api/manager/getPending', async (req, res) => {
         date: new Date().toISOString().split('T')[0],
         pendingItems,
         totalPending: pendingItems.length,
-        totalAmount: pendingItems.reduce((sum, item) => sum + item.amount, 0)
-      }
+        totalAmount: pendingItems.reduce((sum, item) => sum + item.amount, 0),
+      },
     });
   }
 });
@@ -743,9 +791,9 @@ app.get('/api/manager/getCustomerSummary', async (req, res) => {
             Deposit: parseFloat(row.Deposit || 0),
             Withdrawal: parseFloat(row.Withdrawal || 0),
             FPDeposit: parseFloat(row.FPDeposit || 0),
-            FPWithdrawal: parseFloat(row.FPWithdrawal || 0)
-          }))
-        }
+            FPWithdrawal: parseFloat(row.FPWithdrawal || 0),
+          })),
+        },
       });
     } else {
       // Simulated customer data matching actual scale (2567 customers)
@@ -755,17 +803,17 @@ app.get('/api/manager/getCustomerSummary', async (req, res) => {
         Deposit: Math.floor(Math.random() * 100000) + 1000,
         Withdrawal: Math.floor(Math.random() * 50000),
         FPDeposit: Math.floor(Math.random() * 50000),
-        FPWithdrawal: Math.floor(Math.random() * 30000)
+        FPWithdrawal: Math.floor(Math.random() * 30000),
       }));
-      
+
       res.json({
         success: true,
         data: {
           LIST: customers,
           totalCustomers: customers.length,
           totalDeposit: customers.reduce((sum, cust) => sum + cust.Deposit, 0),
-          totalWithdrawal: customers.reduce((sum, cust) => sum + cust.Withdrawal, 0)
-        }
+          totalWithdrawal: customers.reduce((sum, cust) => sum + cust.Withdrawal, 0),
+        },
       });
     }
   } catch (error) {
@@ -777,17 +825,17 @@ app.get('/api/manager/getCustomerSummary', async (req, res) => {
       Deposit: Math.floor(Math.random() * 100000) + 1000,
       Withdrawal: Math.floor(Math.random() * 50000),
       FPDeposit: Math.floor(Math.random() * 50000),
-      FPWithdrawal: Math.floor(Math.random() * 30000)
+      FPWithdrawal: Math.floor(Math.random() * 30000),
     }));
-    
+
     res.json({
       success: true,
       data: {
         LIST: customers,
         totalCustomers: customers.length,
         totalDeposit: customers.reduce((sum, cust) => sum + cust.Deposit, 0),
-        totalWithdrawal: customers.reduce((sum, cust) => sum + cust.Withdrawal, 0)
-      }
+        totalWithdrawal: customers.reduce((sum, cust) => sum + cust.Withdrawal, 0),
+      },
     });
   }
 });
@@ -834,10 +882,11 @@ app.get('/api/manager/getTransactions', async (req, res) => {
             GradeNum: row.GradeNum || 0,
             Login: row.Login,
             ShortDesc: row.ShortDesc || 'Transaction',
-            TranDateTime: row.TranDateTime || new Date().toISOString().replace('T', ' ').substring(0, 19),
-            AgentID: row.AgentID || 'BLAKEPPH'
-          }))
-        }
+            TranDateTime:
+              row.TranDateTime || new Date().toISOString().replace('T', ' ').substring(0, 19),
+            AgentID: row.AgentID || 'BLAKEPPH',
+          })),
+        },
       });
     } else {
       // Simulated transaction data
@@ -854,17 +903,20 @@ app.get('/api/manager/getTransactions', async (req, res) => {
         GradeNum: null,
         Login: `CUST${Math.floor(Math.random() * 1000)}`,
         ShortDesc: `Transaction ${i + 1}`,
-        TranDateTime: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString().replace('T', ' ').substring(0, 23),
-        AgentID: 'BLAKEPPH'
+        TranDateTime: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .replace('T', ' ')
+          .substring(0, 23),
+        AgentID: 'BLAKEPPH',
       }));
-      
+
       res.json({
         success: true,
         data: {
           transactions,
           totalTransactions: transactions.length,
-          totalVolume: transactions.reduce((sum, tx) => sum + Math.abs(tx.Amount), 0)
-        }
+          totalVolume: transactions.reduce((sum, tx) => sum + Math.abs(tx.Amount), 0),
+        },
       });
     }
   } catch (error) {
@@ -883,17 +935,20 @@ app.get('/api/manager/getTransactions', async (req, res) => {
       GradeNum: null,
       Login: `CUST${Math.floor(Math.random() * 1000)}`,
       ShortDesc: `Transaction ${i + 1}`,
-      TranDateTime: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString().replace('T', ' ').substring(0, 23),
-      AgentID: 'BLAKEPPH'
+      TranDateTime: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .replace('T', ' ')
+        .substring(0, 23),
+      AgentID: 'BLAKEPPH',
     }));
-    
+
     res.json({
       success: true,
       data: {
         transactions,
         totalTransactions: transactions.length,
-        totalVolume: transactions.reduce((sum, tx) => sum + Math.abs(tx.Amount), 0)
-      }
+        totalVolume: transactions.reduce((sum, tx) => sum + Math.abs(tx.Amount), 0),
+      },
     });
   }
 });
@@ -929,11 +984,11 @@ app.get('/api/manager/getBets', async (req, res) => {
             status: row.status,
             date: row.date,
             teams: row.teams,
-            type: row.type
+            type: row.type,
           })),
           totalBets: betsData.length,
-          totalAmount: betsData.reduce((sum, bet) => sum + parseFloat(bet.amount || 0), 0)
-        }
+          totalAmount: betsData.reduce((sum, bet) => sum + parseFloat(bet.amount || 0), 0),
+        },
       });
     } else {
       // Simulated bet data
@@ -945,16 +1000,16 @@ app.get('/api/manager/getBets', async (req, res) => {
         status: ['pending', 'won', 'lost'][Math.floor(Math.random() * 3)],
         date: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
         teams: `Team ${String.fromCharCode(65 + Math.floor(Math.random() * 26))} vs Team ${String.fromCharCode(65 + Math.floor(Math.random() * 26))}`,
-        type: ['straight', 'parlay', 'teaser'][Math.floor(Math.random() * 3)]
+        type: ['straight', 'parlay', 'teaser'][Math.floor(Math.random() * 3)],
       }));
-      
+
       res.json({
         success: true,
         data: {
           bets,
           totalBets: bets.length,
-          totalAmount: bets.reduce((sum, bet) => sum + bet.amount, 0)
-        }
+          totalAmount: bets.reduce((sum, bet) => sum + bet.amount, 0),
+        },
       });
     }
   } catch (error) {
@@ -968,16 +1023,16 @@ app.get('/api/manager/getBets', async (req, res) => {
       status: ['pending', 'won', 'lost'][Math.floor(Math.random() * 3)],
       date: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
       teams: `Team ${String.fromCharCode(65 + Math.floor(Math.random() * 26))} vs Team ${String.fromCharCode(65 + Math.floor(Math.random() * 26))}`,
-      type: ['straight', 'parlay', 'teaser'][Math.floor(Math.random() * 3)]
+      type: ['straight', 'parlay', 'teaser'][Math.floor(Math.random() * 3)],
     }));
-    
+
     res.json({
       success: true,
       data: {
         bets,
         totalBets: bets.length,
-        totalAmount: bets.reduce((sum, bet) => sum + bet.amount, 0)
-      }
+        totalAmount: bets.reduce((sum, bet) => sum + bet.amount, 0),
+      },
     });
   }
 });
@@ -1008,27 +1063,29 @@ app.post('/api/manager/getAgentPerformance', async (req, res) => {
             total_wagers: row.total_wagers,
             total_volume: parseFloat(row.total_volume || 0),
             total_risk: parseFloat(row.total_risk || 0),
-            avg_wager: parseFloat(row.avg_wager || 0)
+            avg_wager: parseFloat(row.avg_wager || 0),
           })),
-          totalAgents: performanceData.length
-        }
+          totalAgents: performanceData.length,
+        },
       });
     } else {
       // Simulated performance data
-      const performance = [{
-        agent_id: agentID,
-        total_wagers: Math.floor(Math.random() * 100) + 50,
-        total_volume: Math.floor(Math.random() * 100000) + 50000,
-        total_risk: Math.floor(Math.random() * 150000) + 75000,
-        avg_wager: Math.floor(Math.random() * 500) + 100
-      }];
+      const performance = [
+        {
+          agent_id: agentID,
+          total_wagers: Math.floor(Math.random() * 100) + 50,
+          total_volume: Math.floor(Math.random() * 100000) + 50000,
+          total_risk: Math.floor(Math.random() * 150000) + 75000,
+          avg_wager: Math.floor(Math.random() * 500) + 100,
+        },
+      ];
 
       res.json({
         success: true,
         data: {
           performance,
-          totalAgents: 1
-        }
+          totalAgents: 1,
+        },
       });
     }
   } catch (error) {
@@ -1051,7 +1108,7 @@ app.post('/api/customer/getHeriarchy', async (req, res) => {
           agent_type: 'M',
           parent_agent: null,
           master_agent: 'BLAKEPPH',
-          active: true
+          active: true,
         },
         {
           agent_id: 'AGENT001',
@@ -1059,31 +1116,36 @@ app.post('/api/customer/getHeriarchy', async (req, res) => {
           agent_type: 'A',
           parent_agent: 'BLAKEPPH',
           master_agent: 'BLAKEPPH',
-          active: true
-        }
+          active: true,
+        },
       ];
 
       res.json({
         success: true,
         data: {
           hierarchy,
-          totalAgents: hierarchy.length
-        }
+          totalAgents: hierarchy.length,
+        },
       });
     } else {
       // Simulated hierarchy
       const hierarchy = [
         { agent_id: 'CSCALVIN', agent_name: 'Master Calvin', agent_type: 'M', parent_agent: null },
-        { agent_id: 'BLAKEPPH2', agent_name: 'Agent Blake2', agent_type: 'A', parent_agent: 'CSCALVIN' },
-        { agent_id: 'VALL', agent_name: 'Agent Vall', agent_type: 'A', parent_agent: 'BLAKEPPH2' }
+        {
+          agent_id: 'BLAKEPPH2',
+          agent_name: 'Agent Blake2',
+          agent_type: 'A',
+          parent_agent: 'CSCALVIN',
+        },
+        { agent_id: 'VALL', agent_name: 'Agent Vall', agent_type: 'A', parent_agent: 'BLAKEPPH2' },
       ];
 
       res.json({
         success: true,
         data: {
           hierarchy,
-          totalAgents: hierarchy.length
-        }
+          totalAgents: hierarchy.length,
+        },
       });
     }
   } catch (error) {
@@ -1100,7 +1162,7 @@ app.post('/api/admin/import-customers', async (req, res) => {
     if (!customers || !Array.isArray(customers)) {
       return res.status(400).json({
         success: false,
-        error: 'Invalid data format. Expected: {"customers": [...]}'
+        error: 'Invalid data format. Expected: {"customers": [...]}',
       });
     }
 
@@ -1143,14 +1205,14 @@ app.post('/api/admin/import-customers', async (req, res) => {
       imported,
       errors,
       total: customers.length,
-      message: `Successfully imported ${imported} customers with ${errors} errors`
+      message: `Successfully imported ${imported} customers with ${errors} errors`,
     });
   } catch (error) {
     console.error('Error in bulk import:', error);
     res.status(500).json({
       success: false,
       error: 'Import failed',
-      message: error.message
+      message: error.message,
     });
   }
 });
@@ -1221,7 +1283,7 @@ app.post('/api/admin/create-customer', async (req, res) => {
     if (!customerID || !name || !agentID) {
       return res.status(400).json({
         success: false,
-        error: 'Missing required fields: customerID, name, agentID'
+        error: 'Missing required fields: customerID, name, agentID',
       });
     }
 
@@ -1233,7 +1295,12 @@ app.post('/api/admin/create-customer', async (req, res) => {
       `;
 
       try {
-        db.query(insertQuery).run(customerID, customerID, name.split(' ')[0] || name, name.split(' ')[1] || '');
+        db.query(insertQuery).run(
+          customerID,
+          customerID,
+          name.split(' ')[0] || name,
+          name.split(' ')[1] || ''
+        );
 
         secureLog('info', 'Customer created', { customerID, agentID });
 
@@ -1244,14 +1311,14 @@ app.post('/api/admin/create-customer', async (req, res) => {
             name,
             agentID,
             created: true,
-            database: 'sqlite'
-          }
+            database: 'sqlite',
+          },
         });
       } catch (error) {
         if (error.message.includes('UNIQUE constraint failed')) {
           return res.status(409).json({
             success: false,
-            error: 'Customer ID already exists'
+            error: 'Customer ID already exists',
           });
         }
         throw error;
@@ -1267,59 +1334,85 @@ app.post('/api/admin/create-customer', async (req, res) => {
           name,
           agentID,
           created: true,
-          database: 'simulated'
-        }
+          database: 'simulated',
+        },
       });
     }
   } catch (error) {
     secureLog('error', 'Create customer error', {
       error: error.message,
-      customerID: req.body.customerID
+      customerID: req.body.customerID,
     });
 
     res.status(500).json({
       success: false,
-      error: process.env.NODE_ENV === 'production' ? 'Failed to create customer' : error.message
+      error: process.env.NODE_ENV === 'production' ? 'Failed to create customer' : error.message,
     });
   }
 });
 
 // Financial Management - Process deposit
-app.post('/api/admin/process-deposit',
+app.post(
+  '/api/admin/process-deposit',
   rateLimit(RATE_LIMIT_WINDOW, RATE_LIMIT_MAX),
   validateAgentInput,
   async (req, res) => {
-  try {
-    const { customerID, amount, agentID, notes } = req.body;
+    try {
+      const { customerID, amount, agentID, notes } = req.body;
 
-    if (!customerID || !amount || amount <= 0) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid customerID or amount'
-      });
-    }
-
-    if (dbConnected) {
-      // Use SQLite - check if customer exists first
-      const customerCheck = db.query(`SELECT customer_id FROM customers WHERE customer_id = ?`).get(customerID);
-
-      if (!customerCheck) {
-        return res.status(404).json({
+      if (!customerID || !amount || amount <= 0) {
+        return res.status(400).json({
           success: false,
-          error: 'Customer not found'
+          error: 'Invalid customerID or amount',
         });
       }
 
-      // Record transaction in SQLite
-      const insertTransaction = `
+      if (dbConnected) {
+        // Use SQLite - check if customer exists first
+        const customerCheck = db
+          .query(`SELECT customer_id FROM customers WHERE customer_id = ?`)
+          .get(customerID);
+
+        if (!customerCheck) {
+          return res.status(404).json({
+            success: false,
+            error: 'Customer not found',
+          });
+        }
+
+        // Record transaction in SQLite
+        const insertTransaction = `
         INSERT INTO transactions (customer_id, amount, tran_type, agent_id, short_desc, created_at)
         VALUES (?, ?, 'deposit', ?, ?, datetime('now'))
       `;
 
-      try {
-        db.query(insertTransaction).run(customerID, amount, agentID || 'BLAKEPPH', notes || 'Deposit');
+        try {
+          db.query(insertTransaction).run(
+            customerID,
+            amount,
+            agentID || 'BLAKEPPH',
+            notes || 'Deposit'
+          );
 
-        secureLog('info', 'Deposit processed', { customerID, amount, agentID });
+          secureLog('info', 'Deposit processed', { customerID, amount, agentID });
+
+          res.json({
+            success: true,
+            data: {
+              customerID,
+              amount,
+              type: 'deposit',
+              newBalance: 1000 + amount, // Simplified balance calculation
+              processed: true,
+              database: 'sqlite',
+            },
+          });
+        } catch (dbError) {
+          throw dbError;
+        }
+      } else {
+        // Simulated mode
+        secureLog('info', 'Deposit processed (simulated)', { customerID, amount, agentID });
 
         res.json({
           success: true,
@@ -1327,44 +1420,27 @@ app.post('/api/admin/process-deposit',
             customerID,
             amount,
             type: 'deposit',
-            newBalance: 1000 + amount, // Simplified balance calculation
+            newBalance: 1000 + amount, // Simulated balance
             processed: true,
-            database: 'sqlite'
-          }
+            database: 'simulated',
+          },
         });
-      } catch (dbError) {
-        throw dbError;
       }
-    } else {
-      // Simulated mode
-      secureLog('info', 'Deposit processed (simulated)', { customerID, amount, agentID });
+    } catch (error) {
+      // SQLite doesn't need rollback for single operations
 
-      res.json({
-        success: true,
-        data: {
-          customerID,
-          amount,
-          type: 'deposit',
-          newBalance: 1000 + amount, // Simulated balance
-          processed: true,
-          database: 'simulated'
-        }
+      secureLog('error', 'Process deposit error', {
+        error: error.message,
+        customerID: req.body.customerID,
+      });
+
+      res.status(500).json({
+        success: false,
+        error: process.env.NODE_ENV === 'production' ? 'Failed to process deposit' : error.message,
       });
     }
-  } catch (error) {
-    // SQLite doesn't need rollback for single operations
-
-    secureLog('error', 'Process deposit error', {
-      error: error.message,
-      customerID: req.body.customerID
-    });
-
-    res.status(500).json({
-      success: false,
-      error: process.env.NODE_ENV === 'production' ? 'Failed to process deposit' : error.message
-    });
   }
-});
+);
 
 // Enhanced health check
 app.get('/health', (req, res) => {
@@ -1373,7 +1449,7 @@ app.get('/health', (req, res) => {
     database: dbConnected ? 'connected' : 'simulated',
     fire22Schema: fire22Schema ? 'detected' : 'not detected',
     tables: dbConnected ? 'real' : 'simulated',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
@@ -1385,7 +1461,7 @@ app.get('/api/system/status', async (req, res) => {
         status: 'running',
         uptime: Math.floor(process.uptime()),
         memory: process.memoryUsage(),
-        version: process.version
+        version: process.version,
       },
       database: {
         connected: dbConnected,
@@ -1393,20 +1469,24 @@ app.get('/api/system/status', async (req, res) => {
         tables: 0,
         customers: 0,
         transactions: 0,
-        bets: 0
+        bets: 0,
       },
       api: {
         endpoints: 12,
-        status: 'operational'
-      }
+        status: 'operational',
+      },
     };
 
     if (dbConnected) {
       try {
-        const tableCount = db.query("SELECT COUNT(*) as count FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").get();
-        const customerCount = db.query("SELECT COUNT(*) as count FROM customers").get();
-        const transactionCount = db.query("SELECT COUNT(*) as count FROM transactions").get();
-        const betCount = db.query("SELECT COUNT(*) as count FROM bets").get();
+        const tableCount = db
+          .query(
+            "SELECT COUNT(*) as count FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+          )
+          .get();
+        const customerCount = db.query('SELECT COUNT(*) as count FROM customers').get();
+        const transactionCount = db.query('SELECT COUNT(*) as count FROM transactions').get();
+        const betCount = db.query('SELECT COUNT(*) as count FROM bets').get();
 
         systemStats.database.tables = tableCount.count;
         systemStats.database.customers = customerCount.count;
@@ -1420,13 +1500,13 @@ app.get('/api/system/status', async (req, res) => {
     res.json({
       success: true,
       data: systemStats,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: 'Failed to get system status',
-      message: error.message
+      message: error.message,
     });
   }
 });
@@ -1437,7 +1517,7 @@ app.use((error, req, res, next) => {
   res.status(500).json({
     success: false,
     error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+    message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong',
   });
 });
 
@@ -1446,7 +1526,7 @@ app.use((req, res) => {
   res.status(404).json({
     success: false,
     error: 'Not found',
-    message: `Endpoint ${req.method} ${req.path} not found`
+    message: `Endpoint ${req.method} ${req.path} not found`,
   });
 });
 
@@ -1483,7 +1563,7 @@ secureLog('info', 'Server configuration', {
   RATE_LIMIT_WINDOW,
   RATE_LIMIT_MAX,
   hasDatabase: !!process.env.DATABASE_URL,
-  hasApiKeys: !!process.env.API_KEYS
+  hasApiKeys: !!process.env.API_KEYS,
 });
 
 // Enhanced server startup
@@ -1544,15 +1624,15 @@ process.on('SIGINT', () => {
 process.on('unhandledRejection', (reason, promise) => {
   secureLog('error', 'Unhandled Promise Rejection', {
     reason: reason.toString(),
-    stack: reason.stack
+    stack: reason.stack,
   });
   // Don't exit process in production, just log
 });
 
-process.on('uncaughtException', (error) => {
+process.on('uncaughtException', error => {
   secureLog('fatal', 'Uncaught Exception', {
     error: error.message,
-    stack: error.stack
+    stack: error.stack,
   });
 
   // Graceful shutdown
@@ -1570,12 +1650,12 @@ app.use((error, req, res, next) => {
     error: error.message,
     url: req.url,
     method: req.method,
-    ip: req.ip
+    ip: req.ip,
   });
 
   res.status(500).json({
     success: false,
-    error: process.env.NODE_ENV === 'production' ? 'Internal server error' : error.message
+    error: process.env.NODE_ENV === 'production' ? 'Internal server error' : error.message,
   });
 });
 
@@ -1584,12 +1664,12 @@ app.use((req, res) => {
   secureLog('warn', '404 Not Found', {
     url: req.url,
     method: req.method,
-    ip: req.ip
+    ip: req.ip,
   });
 
   res.status(404).json({
     success: false,
-    error: 'Endpoint not found'
+    error: 'Endpoint not found',
   });
 });
 

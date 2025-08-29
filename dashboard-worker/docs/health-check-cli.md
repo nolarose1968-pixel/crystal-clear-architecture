@@ -1,11 +1,13 @@
 # 🩺 Fire22 Health Check CLI
 
-A comprehensive health monitoring and status reporting tool for the Fire22 Dashboard Worker.
+A comprehensive health monitoring and status reporting tool for the Fire22
+Dashboard Worker.
 
 ## Features
 
 - **Real-time Health Monitoring**: Check the status of all system components
-- **Performance Metrics**: Track response times, success rates, uptime, and error rates
+- **Performance Metrics**: Track response times, success rates, uptime, and
+  error rates
 - **Security Status**: Monitor SSL, firewall, DDoS protection, and encryption
 - **Multiple Output Formats**: Text, JSON, and detailed formats
 - **Component-specific Checks**: Test individual system components
@@ -15,6 +17,7 @@ A comprehensive health monitoring and status reporting tool for the Fire22 Dashb
 ## Quick Start
 
 ### Basic Health Check
+
 ```bash
 # Using npm scripts (recommended)
 bun run health
@@ -24,6 +27,7 @@ bun scripts/health-check-cli.ts
 ```
 
 ### Output Example
+
 ```
 💚 API Health Check
 🔍 Scanning all endpoints...
@@ -52,6 +56,7 @@ bun scripts/health-check-cli.ts
 ## Available Commands
 
 ### Health Check Commands
+
 - `bun run health` - Run comprehensive health check
 - `bun run health:check` - Same as above
 - `bun run health:component <name>` - Check specific component
@@ -59,6 +64,7 @@ bun scripts/health-check-cli.ts
 - `bun run health:stats` - Show health statistics
 
 ### Direct Script Usage
+
 ```bash
 # Basic check
 bun scripts/health-check-cli.ts
@@ -82,7 +88,9 @@ bun scripts/health-check-cli.ts stats
 ## Command Reference
 
 ### Options
-- `-f, --format <type>` - Output format: `text`, `json`, `detailed` (default: `text`)
+
+- `-f, --format <type>` - Output format: `text`, `json`, `detailed` (default:
+  `text`)
 - `-c, --component <name>` - Component to check (can be used multiple times)
 - `-t, --timeout <ms>` - Request timeout in milliseconds (default: `10000`)
 - `-v, --verbose` - Enable verbose output
@@ -90,6 +98,7 @@ bun scripts/health-check-cli.ts stats
 - `-h, --help` - Show help message
 
 ### Commands
+
 - `check` - Run comprehensive health check (default)
 - `component <name>` - Check specific component health
 - `endpoint` - Test health endpoint
@@ -108,10 +117,13 @@ The health check monitors these core system components:
 ## Output Formats
 
 ### Text Format (Default)
+
 Human-readable format with emojis and clear status indicators.
 
 ### JSON Format
+
 Structured JSON output for programmatic consumption:
+
 ```json
 {
   "title": "API Health Check",
@@ -143,7 +155,9 @@ Structured JSON output for programmatic consumption:
 ## Integration
 
 ### CI/CD Integration
+
 Add to your CI/CD pipeline for automated health monitoring:
+
 ```yaml
 # .github/workflows/health-check.yml
 - name: Health Check
@@ -151,16 +165,22 @@ Add to your CI/CD pipeline for automated health monitoring:
 ```
 
 ### Monitoring Integration
+
 Use with monitoring systems:
+
 ```bash
 # Cron job for regular health checks
 */5 * * * * /path/to/dashboard-worker/bun run health >> /var/log/health-check.log
 ```
 
 ### API Integration
+
 Parse JSON output in other systems:
+
 ```javascript
-const healthCheck = JSON.parse(await Bun.$`bun run health --format json`.text());
+const healthCheck = JSON.parse(
+  await Bun.$`bun run health --format json`.text()
+);
 if (healthCheck.status !== 'healthy') {
   // Alert or take action
 }
@@ -168,7 +188,8 @@ if (healthCheck.status !== 'healthy') {
 
 ## Configuration
 
-The health check CLI uses the existing `HealthMonitor` class from `src/monitoring/health-check.ts`. Configuration options include:
+The health check CLI uses the existing `HealthMonitor` class from
+`src/monitoring/health-check.ts`. Configuration options include:
 
 - **Component List**: Define which components to monitor
 - **Health Check Intervals**: Set periodic check frequency
@@ -180,10 +201,12 @@ The health check CLI uses the existing `HealthMonitor` class from `src/monitorin
 ### Common Issues
 
 1. **Component shows "Unknown" status**
+
    - Check component name spelling
    - Verify component is included in the monitor configuration
 
 2. **Endpoint test fails**
+
    - Verify endpoint URL is correct
    - Check if the service is running
    - Confirm network connectivity
@@ -193,7 +216,9 @@ The health check CLI uses the existing `HealthMonitor` class from `src/monitorin
    - Check for JSON parsing errors in consuming applications
 
 ### Debug Mode
+
 Enable verbose output for detailed information:
+
 ```bash
 bun run health --verbose
 ```
@@ -211,12 +236,15 @@ The health check CLI integrates with:
 ## Development
 
 ### Adding New Components
+
 1. Add component to `HealthMonitor` constructor
 2. Implement component-specific health check method
 3. Update CLI display logic if needed
 
 ### Custom Health Checks
+
 Extend the `HealthMonitor` class for custom health check logic:
+
 ```typescript
 class CustomHealthMonitor extends HealthMonitor {
   async checkCustomComponent(): Promise<ComponentHealth> {

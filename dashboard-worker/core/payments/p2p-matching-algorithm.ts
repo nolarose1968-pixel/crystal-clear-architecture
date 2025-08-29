@@ -16,7 +16,13 @@ export interface MatchingRule {
 }
 
 export interface MatchingCondition {
-  type: 'amount_exact' | 'amount_range' | 'time_since_request' | 'user_rating' | 'geographic_distance' | 'payment_method_preference';
+  type:
+    | 'amount_exact'
+    | 'amount_range'
+    | 'time_since_request'
+    | 'user_rating'
+    | 'geographic_distance'
+    | 'payment_method_preference';
   operator: 'equals' | 'greater_than' | 'less_than' | 'between' | 'in_list';
   value: any;
   weight: number;
@@ -25,15 +31,15 @@ export interface MatchingCondition {
 export interface MatchingScoring {
   baseScore: number;
   factors: {
-    timeMatch: number;       // How recent the request is
-    amountMatch: number;     // Exact amount match bonus
-    userTrust: number;       // User reputation/trust score
+    timeMatch: number; // How recent the request is
+    amountMatch: number; // Exact amount match bonus
+    userTrust: number; // User reputation/trust score
     geographicMatch: number; // Geographic proximity
     methodPreference: number; // User's preferred payment methods
   };
   decay: {
-    timeDecay: number;       // Score decay over time (per hour)
-    priorityDecay: number;   // Priority-based decay
+    timeDecay: number; // Score decay over time (per hour)
+    priorityDecay: number; // Priority-based decay
   };
 }
 
@@ -76,7 +82,10 @@ export class P2PMatchingAlgorithm {
     const startTime = Date.now();
 
     // Filter eligible withdrawals
-    const eligibleWithdrawals = this.filterEligibleWithdrawals(depositRequest, availableWithdrawals);
+    const eligibleWithdrawals = this.filterEligibleWithdrawals(
+      depositRequest,
+      availableWithdrawals
+    );
 
     // Generate candidates with scoring
     const candidates: MatchingCandidate[] = [];
@@ -100,8 +109,8 @@ export class P2PMatchingAlgorithm {
       searchMetadata: {
         totalCandidates: candidates.length,
         searchTime: Date.now() - startTime,
-        algorithmVersion: this.algorithmVersion
-      }
+        algorithmVersion: this.algorithmVersion,
+      },
     };
 
     return result;
@@ -142,8 +151,8 @@ export class P2PMatchingAlgorithm {
       searchMetadata: {
         totalCandidates: candidates.length,
         searchTime: Date.now() - startTime,
-        algorithmVersion: this.algorithmVersion
-      }
+        algorithmVersion: this.algorithmVersion,
+      },
     };
 
     return result;
@@ -174,7 +183,9 @@ export class P2PMatchingAlgorithm {
 
     // Generate recommendations
     if (demandSupplyRatio < 0.5) {
-      recommendations.push('Low withdrawal supply - consider increasing incentives for withdrawals');
+      recommendations.push(
+        'Low withdrawal supply - consider increasing incentives for withdrawals'
+      );
     } else if (demandSupplyRatio > 2) {
       recommendations.push('High withdrawal supply - consider prioritizing high-value deposits');
     }
@@ -196,7 +207,7 @@ export class P2PMatchingAlgorithm {
     return {
       recommendations,
       expectedWaitTimes,
-      demandSupplyRatio
+      demandSupplyRatio,
     };
   }
 
@@ -214,7 +225,11 @@ export class P2PMatchingAlgorithm {
     marketConditions: string;
   }> {
     // Analyze historical patterns
-    const historicalPatterns = await this.analyzeHistoricalPatterns(paymentMethod, amount, timeframe);
+    const historicalPatterns = await this.analyzeHistoricalPatterns(
+      paymentMethod,
+      amount,
+      timeframe
+    );
 
     // Predict future demand/supply
     const predictedMatches = this.predictMatches(historicalPatterns, amount);
@@ -230,7 +245,7 @@ export class P2PMatchingAlgorithm {
       predictedMatches,
       confidence,
       recommendedTiming,
-      marketConditions
+      marketConditions,
     };
   }
 
@@ -259,7 +274,8 @@ export class P2PMatchingAlgorithm {
 
     // Timing risk
     const timeDiff = this.calculateRequestTimeDifference(depositRequest, withdrawalRequest);
-    if (timeDiff > 24 * 60 * 60 * 1000) { // More than 24 hours apart
+    if (timeDiff > 24 * 60 * 60 * 1000) {
+      // More than 24 hours apart
       riskScore += 10;
       riskFactors.push('Requests are far apart in time');
       mitigationStrategies.push('Prioritize recent requests for matching');
@@ -284,7 +300,7 @@ export class P2PMatchingAlgorithm {
       riskScore,
       riskFactors,
       mitigationStrategies,
-      recommended
+      recommended,
     };
   }
 
@@ -302,8 +318,8 @@ export class P2PMatchingAlgorithm {
             type: 'amount_exact',
             operator: 'equals',
             value: true,
-            weight: 100
-          }
+            weight: 100,
+          },
         ],
         scoring: {
           baseScore: 100,
@@ -312,13 +328,13 @@ export class P2PMatchingAlgorithm {
             amountMatch: 50,
             userTrust: 15,
             geographicMatch: 10,
-            methodPreference: 5
+            methodPreference: 5,
           },
           decay: {
             timeDecay: 5,
-            priorityDecay: 2
-          }
-        }
+            priorityDecay: 2,
+          },
+        },
       },
       {
         id: 'recent_requests',
@@ -331,8 +347,8 @@ export class P2PMatchingAlgorithm {
             type: 'time_since_request',
             operator: 'less_than',
             value: 3600000, // 1 hour
-            weight: 30
-          }
+            weight: 30,
+          },
         ],
         scoring: {
           baseScore: 80,
@@ -341,13 +357,13 @@ export class P2PMatchingAlgorithm {
             amountMatch: 20,
             userTrust: 10,
             geographicMatch: 5,
-            methodPreference: 5
+            methodPreference: 5,
           },
           decay: {
             timeDecay: 10,
-            priorityDecay: 5
-          }
-        }
+            priorityDecay: 5,
+          },
+        },
       },
       {
         id: 'trusted_users',
@@ -360,8 +376,8 @@ export class P2PMatchingAlgorithm {
             type: 'user_rating',
             operator: 'greater_than',
             value: 4.5,
-            weight: 25
-          }
+            weight: 25,
+          },
         ],
         scoring: {
           baseScore: 70,
@@ -370,14 +386,14 @@ export class P2PMatchingAlgorithm {
             amountMatch: 25,
             userTrust: 20,
             geographicMatch: 5,
-            methodPreference: 5
+            methodPreference: 5,
           },
           decay: {
             timeDecay: 8,
-            priorityDecay: 3
-          }
-        }
-      }
+            priorityDecay: 3,
+          },
+        },
+      },
     ];
   }
 
@@ -479,7 +495,7 @@ export class P2PMatchingAlgorithm {
       score: totalScore,
       matchReasons,
       riskFactors,
-      estimatedSettlementTime
+      estimatedSettlementTime,
     };
   }
 
@@ -567,7 +583,9 @@ export class P2PMatchingAlgorithm {
     if (counterpartyRequests.length === 0) return Infinity;
 
     // Simple estimation based on current queue sizes
-    const matchRate = Math.min(activeRequests.length, counterpartyRequests.length) / Math.max(activeRequests.length, counterpartyRequests.length);
+    const matchRate =
+      Math.min(activeRequests.length, counterpartyRequests.length) /
+      Math.max(activeRequests.length, counterpartyRequests.length);
     const avgMatchTime = 30; // 30 minutes average
 
     return avgMatchTime / matchRate;
@@ -593,7 +611,8 @@ export class P2PMatchingAlgorithm {
       const withdrawalCount = withdrawalByAmount.get(amount) || 0;
       const ratio = withdrawalCount > 0 ? depositCount / withdrawalCount : Infinity;
 
-      if (ratio > 3) { // 3x more deposits than withdrawals
+      if (ratio > 3) {
+        // 3x more deposits than withdrawals
         bottlenecks.push(amount);
       }
     }
@@ -612,7 +631,7 @@ export class P2PMatchingAlgorithm {
       hourlyPatterns: {},
       amountDistribution: {},
       successRates: {},
-      averageWaitTimes: {}
+      averageWaitTimes: {},
     };
   }
 
@@ -633,10 +652,7 @@ export class P2PMatchingAlgorithm {
     return 'Supply meets demand - good matching conditions';
   }
 
-  private hasGeographicMismatch(
-    request1: P2PPaymentRequest,
-    request2: P2PPaymentRequest
-  ): boolean {
+  private hasGeographicMismatch(request1: P2PPaymentRequest, request2: P2PPaymentRequest): boolean {
     // Placeholder - would compare geographic data
     return false;
   }
@@ -660,10 +676,7 @@ export class P2PMatchingAlgorithm {
     return Math.floor(Math.random() * 30); // 0-30 risk score
   }
 
-  private hasSuspiciousPattern(
-    request1: P2PPaymentRequest,
-    request2: P2PPaymentRequest
-  ): boolean {
+  private hasSuspiciousPattern(request1: P2PPaymentRequest, request2: P2PPaymentRequest): boolean {
     // Check for suspicious patterns like same IP, same device, etc.
     return false;
   }
@@ -680,7 +693,7 @@ export class P2PMatchingAlgorithm {
       venmo: 1.0,
       cashapp: 1.0,
       paypal: 1.2,
-      zelle: 1.5
+      zelle: 1.5,
     };
 
     time *= methodMultipliers[depositRequest.paymentMethod] || 1.0;
@@ -734,7 +747,7 @@ export class P2PMatchingAlgorithm {
       activeRules,
       algorithmVersion: this.algorithmVersion,
       averageMatchingTime: 50, // ms
-      successRate: 0.85
+      successRate: 0.85,
     };
   }
 }

@@ -12,7 +12,7 @@ import type {
   CommandContext,
   CommandResult,
   TelegramCommand,
-  TelegramCommandHandler
+  TelegramCommandHandler,
 } from './telegram-types';
 
 export class TelegramBotCore {
@@ -34,7 +34,7 @@ export class TelegramBotCore {
       popularCommands: [],
       errorRate: 0,
       averageResponseTime: 0,
-      uptime: 0
+      uptime: 0,
     };
   }
 
@@ -177,7 +177,6 @@ export class TelegramBotCore {
       // Update response time
       const responseTime = Date.now() - startTime;
       this.updateResponseTime(responseTime);
-
     } catch (error) {
       console.error('❌ Error handling message:', error);
       this.analytics.errorRate += 1;
@@ -215,7 +214,7 @@ export class TelegramBotCore {
       user: message.from,
       chat: message.chat,
       isAdmin: this.isAdmin(message.from),
-      isAuthenticated: this.isAuthenticated(message.from)
+      isAuthenticated: this.isAuthenticated(message.from),
     };
 
     // Execute command
@@ -243,10 +242,7 @@ export class TelegramBotCore {
   /**
    * Register a command handler
    */
-  registerCommand(
-    command: TelegramCommand,
-    handler: TelegramCommandHandler
-  ): void {
+  registerCommand(command: TelegramCommand, handler: TelegramCommandHandler): void {
     this.commands.set(command.name, command);
     this.commandHandlers.set(command.name, handler);
 
@@ -285,7 +281,7 @@ export class TelegramBotCore {
         messageCount: 0,
         commandCount: 0,
         errors: 0,
-        isActive: true
+        isActive: true,
       };
       this.sessions.set(userId, session);
       this.analytics.totalUsers += 1;
@@ -311,9 +307,12 @@ export class TelegramBotCore {
    */
   private startAnalyticsTracking(): void {
     // Update popular commands every hour
-    setInterval(() => {
-      this.updatePopularCommands();
-    }, 60 * 60 * 1000); // 1 hour
+    setInterval(
+      () => {
+        this.updatePopularCommands();
+      },
+      60 * 60 * 1000
+    ); // 1 hour
   }
 
   /**

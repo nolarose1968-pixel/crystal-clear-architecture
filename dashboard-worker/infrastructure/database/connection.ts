@@ -1,7 +1,7 @@
 // Fire22 Dashboard Worker - Bun.SQL Unified Database Connection
 // Supports MySQL/MariaDB, PostgreSQL, and SQLite with zero dependencies
 
-import { SQL } from "bun";
+import { SQL } from 'bun';
 import { Env } from '../types/env';
 
 export type DatabaseAdapter = 'mysql' | 'postgres' | 'sqlite';
@@ -22,7 +22,7 @@ export interface DatabaseConfig {
 }
 
 export class DatabaseManager {
-  private sql: SQL | null = null;  // Unified SQL client for all database types
+  private sql: SQL | null = null; // Unified SQL client for all database types
   private config: DatabaseConfig;
   private isConnected: boolean = false;
   private connectionAttempts: number = 0;
@@ -38,7 +38,7 @@ export class DatabaseManager {
   static fromEnvironment(env: Env): DatabaseManager {
     // Determine database type from environment
     const dbUrl = env.DATABASE_URL;
-    
+
     if (dbUrl) {
       return this.fromUrl(dbUrl);
     }
@@ -65,7 +65,7 @@ export class DatabaseManager {
    */
   static fromUrl(url: string): DatabaseManager {
     const urlObj = new URL(url);
-    
+
     let adapter: DatabaseAdapter;
     switch (urlObj.protocol.replace(':', '')) {
       case 'mysql':
@@ -104,55 +104,56 @@ export class DatabaseManager {
     }
 
     this.connectionAttempts++;
-    
+
     try {
-      console.log(`🔗 Connecting to ${this.config.adapter} database (attempt ${this.connectionAttempts})`);
-      
+      console.log(
+        `🔗 Connecting to ${this.config.adapter} database (attempt ${this.connectionAttempts})`
+      );
+
       switch (this.config.adapter) {
         case 'mysql':
           // MySQL/MariaDB with Bun.SQL
           const mysqlUrl = `mysql://${this.config.username}:${this.config.password}@${this.config.hostname}:${this.config.port}/${this.config.database}`;
           this.sql = new SQL(mysqlUrl);
           break;
-          
+
         case 'postgres':
           // PostgreSQL with Bun.SQL
           const postgresUrl = `postgres://${this.config.username}:${this.config.password}@${this.config.hostname}:${this.config.port}/${this.config.database}`;
           this.sql = new SQL(postgresUrl);
           break;
-          
+
         case 'sqlite':
           // SQLite with Bun.SQL
           const sqliteFile = this.config.file || ':memory:';
           this.sql = new SQL(sqliteFile);
           break;
-          
+
         default:
           throw new Error(`Unsupported database adapter: ${this.config.adapter}`);
       }
-      
+
       // Test connection with a simple query
       const testResult = await this.sql`SELECT 1 as test`;
       if (!testResult || testResult.length === 0) {
         throw new Error('Failed to test database connection');
       }
-      
+
       this.isConnected = true;
       this.connectionAttempts = 0;
-      
+
       console.log(`✅ Connected to ${this.config.adapter} database successfully`);
-      
     } catch (error) {
       console.error(`❌ Database connection failed:`, error);
-      
+
       if (this.connectionAttempts < this.maxRetries) {
         const delay = Math.pow(2, this.connectionAttempts) * 1000; // Exponential backoff
         console.log(`⏳ Retrying connection in ${delay}ms...`);
-        
+
         await new Promise(resolve => setTimeout(resolve, delay));
         return this.connect();
       }
-      
+
       throw new Error(`Failed to connect to database after ${this.maxRetries} attempts: ${error}`);
     }
   }
@@ -164,30 +165,34 @@ export class DatabaseManager {
     if (!this.isConnected || !this.sql) {
       await this.connect();
     }
-    
+
     if (!this.sql) {
       throw new Error('Database connection not established');
     }
-    
+
     return this.sql;
   }
 
   /**
    * Execute health check query
    */
-  async healthCheck(): Promise<{ status: 'healthy' | 'unhealthy', adapter: DatabaseAdapter, details: any }> {
+  async healthCheck(): Promise<{
+    status: 'healthy' | 'unhealthy';
+    adapter: DatabaseAdapter;
+    details: any;
+  }> {
     try {
       const sql = await this.getClient();
       const startTime = Bun.nanoseconds();
-      
+
       const result = await sql`SELECT 1 as health_check`;
       if (!result || result.length === 0) {
         throw new Error('Health check query failed');
       }
-      
+
       const endTime = Bun.nanoseconds();
       const responseTime = Number(endTime - startTime) / 1_000_000; // Convert to milliseconds
-      
+
       return {
         status: 'healthy',
         adapter: this.config.adapter,
@@ -195,9 +200,8 @@ export class DatabaseManager {
           responseTime: `${responseTime.toFixed(2)}ms`,
           connected: this.isConnected,
           connectionAttempts: this.connectionAttempts,
-        }
+        },
       };
-      
     } catch (error) {
       return {
         status: 'unhealthy',
@@ -206,7 +210,7 @@ export class DatabaseManager {
           error: error instanceof Error ? error.message : 'Unknown error',
           connected: this.isConnected,
           connectionAttempts: this.connectionAttempts,
-        }
+        },
       };
     }
   }
@@ -236,7 +240,7 @@ export class DatabaseManager {
    */
   async transaction<T>(callback: (sql: SQL) => Promise<T>): Promise<T> {
     const sql = await this.getClient();
-    
+
     await sql`BEGIN`;
     try {
       const result = await callback(sql);
@@ -254,7 +258,7 @@ export class DatabaseManager {
   async batch(queries: string[]): Promise<any[]> {
     const results = [];
     const sql = await this.getClient();
-    
+
     for (const query of queries) {
       try {
         // Use raw SQL for batch operations
@@ -265,7 +269,7 @@ export class DatabaseManager {
         throw error;
       }
     }
-    
+
     return results;
   }
 }
@@ -277,11 +281,11 @@ export function getDatabase(env?: Env): DatabaseManager {
   if (!dbManager && env) {
     dbManager = DatabaseManager.fromEnvironment(env);
   }
-  
+
   if (!dbManager) {
     throw new Error('Database manager not initialized. Call getDatabase(env) first.');
   }
-  
+
   return dbManager;
 }
 

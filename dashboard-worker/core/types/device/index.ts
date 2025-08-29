@@ -5,13 +5,34 @@
 
 import type { BaseEntity, RiskLevel } from '../shared/common';
 
-export type DeviceType = 'desktop' | 'mobile' | 'tablet' | 'smart_tv' | 'console' | 'wearable' | 'other';
+export type DeviceType =
+  | 'desktop'
+  | 'mobile'
+  | 'tablet'
+  | 'smart_tv'
+  | 'console'
+  | 'wearable'
+  | 'other';
 
-export type BrowserType = 'chrome' | 'firefox' | 'safari' | 'edge' | 'opera' | 'brave' | 'vivaldi' | 'other';
+export type BrowserType =
+  | 'chrome'
+  | 'firefox'
+  | 'safari'
+  | 'edge'
+  | 'opera'
+  | 'brave'
+  | 'vivaldi'
+  | 'other';
 
 export type OSType = 'windows' | 'macos' | 'linux' | 'android' | 'ios' | 'other';
 
-export type BotType = 'search_engine' | 'social_media' | 'monitoring' | 'automation' | 'malicious' | 'other';
+export type BotType =
+  | 'search_engine'
+  | 'social_media'
+  | 'monitoring'
+  | 'automation'
+  | 'malicious'
+  | 'other';
 
 export interface UserAgentConfig {
   name: string;
@@ -217,7 +238,12 @@ export interface SessionEvent {
 
 export interface SecurityAlert extends BaseEntity {
   customerId: string;
-  alertType: 'suspicious_activity' | 'unusual_location' | 'device_change' | 'bot_detection' | 'fraud_attempt';
+  alertType:
+    | 'suspicious_activity'
+    | 'unusual_location'
+    | 'device_change'
+    | 'bot_detection'
+    | 'fraud_attempt';
   severity: RiskLevel;
   description: string;
   details: Record<string, any>;
@@ -232,7 +258,13 @@ export interface SecurityAlert extends BaseEntity {
 }
 
 export interface SecurityAction {
-  type: 'block_ip' | 'block_device' | 'require_2fa' | 'send_notification' | 'flag_account' | 'custom';
+  type:
+    | 'block_ip'
+    | 'block_device'
+    | 'require_2fa'
+    | 'send_notification'
+    | 'flag_account'
+    | 'custom';
   executed: boolean;
   executedAt?: Date;
   result?: string;
@@ -282,20 +314,20 @@ export type SecurityAlertCreate = Omit<SecurityAlert, keyof BaseEntity>;
 export const BROWSER_FINGERPRINTS: Record<string, Partial<ParsedUserAgent>> = {
   chrome: {
     browser: { name: 'chrome', version: '', major: 0, minor: 0 },
-    engine: { name: 'Blink', version: '' }
+    engine: { name: 'Blink', version: '' },
   },
   firefox: {
     browser: { name: 'firefox', version: '', major: 0, minor: 0 },
-    engine: { name: 'Gecko', version: '' }
+    engine: { name: 'Gecko', version: '' },
   },
   safari: {
     browser: { name: 'safari', version: '', major: 0, minor: 0 },
-    engine: { name: 'WebKit', version: '' }
+    engine: { name: 'WebKit', version: '' },
   },
   edge: {
     browser: { name: 'edge', version: '', major: 0, minor: 0 },
-    engine: { name: 'Blink', version: '' }
-  }
+    engine: { name: 'Blink', version: '' },
+  },
 };
 
 export const BOT_PATTERNS = [
@@ -310,7 +342,7 @@ export const BOT_PATTERNS = [
   'validator',
   'preview',
   'scan',
-  'archive'
+  'archive',
 ];
 
 export const SUSPICIOUS_PATTERNS = [
@@ -322,5 +354,5 @@ export const SUSPICIOUS_PATTERNS = [
   'testing',
   'crawl',
   'hack',
-  'exploit'
+  'exploit',
 ];

@@ -444,7 +444,7 @@ jobs:
       
     strategy:
       matrix:
-        environment: [production, ${this.config.departments.map(d => d.id).join(', ')}]
+        environment: [production, \${this.config.departments.map(d => d.id).join(', ')}]
         
     steps:
     - name: 📥 Checkout
@@ -460,25 +460,25 @@ jobs:
       
     - name: 🏢 Build department pages
       run: |
-        if [ "${{ matrix.environment }}" = "production" ]; then
+        if [ "\${{ matrix.environment }}" = "production" ]; then
           bun run build:pages
         else
-          bun run build:department --dept=${{ matrix.environment }}
+          bun run build:department --dept=\${{ matrix.environment }}
         fi
         
     - name: 🚀 Deploy to Cloudflare Pages
       uses: cloudflare/pages-action@v1
       with:
-        apiToken: \${{ secrets.CLOUDFLARE_API_TOKEN }}
-        accountId: \${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        apiToken: \$\{\{ secrets.CLOUDFLARE_API_TOKEN }}
+        accountId: \$\{\{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         projectName: ${this.config.projectName}
         directory: dist/pages
-        gitHubToken: \${{ secrets.GITHUB_TOKEN }}
+        gitHubToken: \$\{\{ secrets.GITHUB_TOKEN }}
         
     - name: 🔗 Update deployment status
       if: matrix.environment == 'production'
       run: |
-        echo "🚀 Deployment completed for ${{ matrix.environment }}"
+        echo "🚀 Deployment completed for \$\{\{ matrix.environment }}"
         echo "🔗 URL: https://${this.config.customDomain}"
 `;
   }
@@ -561,7 +561,7 @@ Generated: ${new Date().toISOString()}
 // 🚀 Main execution
 async function main() {
   console.log("🏢 Fire22 Cloudflare Department Automation");
-  console.log("==========================================");
+  console.log("!==!==!==!==!==!==!==!==");
   
   const automation = new CloudflareDepartmentAutomation();
   

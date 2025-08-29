@@ -56,7 +56,7 @@ class PackageInfoDisplay {
 
   private async loadPackageInfo(): Promise<PackageInfo> {
     if (this.packageInfo) return this.packageInfo;
-    
+
     try {
       // Use Bun.file() for cleaner JSON reading
       this.packageInfo = await Bun.file('package.json').json();
@@ -68,9 +68,9 @@ class PackageInfoDisplay {
 
   async displayCoreInfo() {
     await this.ensurePackageInfo();
-    
+
     console.log('🔥 Fire22 Dashboard - Core Package Information');
-    console.log('==============================================\n');
+    console.log('!==!==!==!==!==!==!==!=====\n');
 
     const coreInfo = [
       ['Package Name', this.packageInfo.name],
@@ -78,7 +78,7 @@ class PackageInfoDisplay {
       ['Description', this.packageInfo.description],
       ['Main Entry', this.packageInfo.main],
       ['Module Type', this.packageInfo.type],
-      ['License', this.packageInfo.license]
+      ['License', this.packageInfo.license],
     ];
 
     console.table(coreInfo);
@@ -86,12 +86,12 @@ class PackageInfoDisplay {
 
   displayAuthorInfo() {
     console.log('\n👥 Author & Contributors');
-    console.log('========================\n');
+    console.log('!==!==!==!====\n');
 
     const authorInfo = [
       ['Author Name', this.packageInfo.author.name],
       ['Author Email', this.packageInfo.author.email || 'N/A'],
-      ['Author URL', this.packageInfo.author.url || 'N/A']
+      ['Author URL', this.packageInfo.author.url || 'N/A'],
     ];
 
     console.table(authorInfo);
@@ -102,22 +102,22 @@ class PackageInfoDisplay {
         contributor.name,
         contributor.email || 'N/A',
         contributor.url || 'N/A',
-        contributor.role || 'Contributor'
+        contributor.role || 'Contributor',
       ]);
-      
+
       console.table(contributorsTable);
     }
   }
 
   displayRepositoryInfo() {
     console.log('\n📁 Repository Information');
-    console.log('==========================\n');
+    console.log('!==!==!==!==!==\n');
 
     const repoInfo = [
       ['Repository Type', this.packageInfo.repository.type],
       ['Repository URL', this.packageInfo.repository.url],
       ['Directory', this.packageInfo.repository.directory || 'Root'],
-      ['Homepage', this.packageInfo.homepage || 'N/A']
+      ['Homepage', this.packageInfo.homepage || 'N/A'],
     ];
 
     console.table(repoInfo);
@@ -125,7 +125,7 @@ class PackageInfoDisplay {
 
   displayKeywords() {
     console.log('\n🏷️ Keywords');
-    console.log('==========\n');
+    console.log('!==!==\n');
 
     if (this.packageInfo.keywords && this.packageInfo.keywords.length > 0) {
       const keywordsTable = this.packageInfo.keywords.map(keyword => [keyword]);
@@ -137,12 +137,12 @@ class PackageInfoDisplay {
 
   displayDependencies() {
     console.log('\n📦 Dependencies');
-    console.log('===============\n');
+    console.log('!==!==!==\n');
 
     if (this.packageInfo.dependencies && Object.keys(this.packageInfo.dependencies).length > 0) {
       const depsTable = Object.entries(this.packageInfo.dependencies).map(([name, version]) => [
         name,
-        version
+        version,
       ]);
       console.table(depsTable);
     } else {
@@ -152,12 +152,12 @@ class PackageInfoDisplay {
 
   displayScripts() {
     console.log('\n⚡ Available Scripts');
-    console.log('====================\n');
+    console.log('!==!==!=====\n');
 
     if (this.packageInfo.scripts && Object.keys(this.packageInfo.scripts).length > 0) {
       const scriptsTable = Object.entries(this.packageInfo.scripts).map(([name, command]) => [
         name,
-        command
+        command,
       ]);
       console.table(scriptsTable);
     } else {
@@ -167,12 +167,12 @@ class PackageInfoDisplay {
 
   displayEngines() {
     console.log('\n🔧 Engine Requirements');
-    console.log('======================\n');
+    console.log('!==!==!==!===\n');
 
     if (this.packageInfo.engines && Object.keys(this.packageInfo.engines).length > 0) {
       const enginesTable = Object.entries(this.packageInfo.engines).map(([engine, version]) => [
         engine,
-        version
+        version,
       ]);
       console.table(enginesTable);
     } else {
@@ -182,7 +182,7 @@ class PackageInfoDisplay {
 
   displayMatrixHealthInfo() {
     console.log('\n🔍 Matrix Health System Status');
-    console.log('================================\n');
+    console.log('!==!==!==!==!==!==\n');
 
     const matrixCommands = [
       ['matrix:health', 'Check matrix health'],
@@ -194,7 +194,7 @@ class PackageInfoDisplay {
       ['matrix:configs', 'Test matrix configs endpoint'],
       ['matrix:score', 'Test enhanced scoring'],
       ['matrix:test', 'Test all API endpoints'],
-      ['matrix:enhanced', 'Comprehensive enhanced testing']
+      ['matrix:enhanced', 'Comprehensive enhanced testing'],
     ];
 
     console.table(matrixCommands);
@@ -202,14 +202,14 @@ class PackageInfoDisplay {
 
   displayQuickStart() {
     console.log('\n🚀 Quick Start Commands');
-    console.log('========================\n');
+    console.log('!==!==!==!====\n');
 
     const quickStartCommands = [
       ['bun run matrix:health', 'Check system health'],
       ['bun run matrix:enhanced', 'Run comprehensive tests'],
       ['bun run matrix:status', 'View current status'],
       ['bun run matrix:validate', 'Validate system integrity'],
-      ['bun run matrix:repair', 'Fix any issues found']
+      ['bun run matrix:repair', 'Fix any issues found'],
     ];
 
     console.table(quickStartCommands);
@@ -217,14 +217,14 @@ class PackageInfoDisplay {
 
   displayBunxExamples() {
     console.log('\n⚡ Bunx Examples with --package Flag');
-    console.log('=====================================\n');
+    console.log('!==!==!==!==!==!==!==\n');
 
     const bunxExamples = [
       ['bunx --package renovate renovate-config-validator', 'Run renovate config validator'],
       ['bunx -p @angular/cli ng new my-app', 'Create new Angular app'],
       ['bunx -p @fire22/dashboard matrix:health', 'Run matrix health check'],
       ['bunx -p fire22-dashboard matrix:enhanced', 'Run enhanced matrix tests'],
-      ['bunx --package fire22-dashboard matrix:status', 'Check matrix status']
+      ['bunx --package fire22-dashboard matrix:status', 'Check matrix status'],
     ];
 
     console.table(bunxExamples);
@@ -245,9 +245,9 @@ class PackageInfoDisplay {
 
   async displaySummary() {
     await this.ensurePackageInfo();
-    
+
     console.log('\n📊 Package Summary');
-    console.log('==================\n');
+    console.log('!==!==!====\n');
 
     const summary = [
       ['Total Dependencies', Object.keys(this.packageInfo.dependencies || {}).length],
@@ -255,7 +255,7 @@ class PackageInfoDisplay {
       ['Total Scripts', Object.keys(this.packageInfo.scripts || {}).length],
       ['Total Keywords', this.packageInfo.keywords?.length || 0],
       ['Contributors', this.packageInfo.contributors?.length || 0],
-      ['Matrix Health Commands', 10]
+      ['Matrix Health Commands', 10],
     ];
 
     console.table(summary);
@@ -272,7 +272,7 @@ if (import.meta.main) {
       await display.displayAllInfo();
     } else {
       const command = args[0];
-      
+
       switch (command) {
         case 'core':
           await display.displayCoreInfo();

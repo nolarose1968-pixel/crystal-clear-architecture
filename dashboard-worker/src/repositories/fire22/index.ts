@@ -13,19 +13,12 @@ export type {
   RepositoryResult,
   PaginationOptions,
   SearchOptions,
-  QueryOptions
+  QueryOptions,
 } from './base-repository';
 
-export type {
-  CustomerSearchOptions,
-  CustomerMetrics
-} from './customer-repository';
+export type { CustomerSearchOptions, CustomerMetrics } from './customer-repository';
 
-export type {
-  AgentSearchOptions,
-  AgentMetrics,
-  AgentHierarchy
-} from './agent-repository';
+export type { AgentSearchOptions, AgentMetrics, AgentHierarchy } from './agent-repository';
 
 // Repository instances (singleton pattern)
 import { Fire22CustomerRepository } from './customer-repository';

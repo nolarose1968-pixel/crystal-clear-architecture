@@ -276,7 +276,9 @@
 
 /* Button Animations */
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Ripple Effect */
@@ -295,7 +297,9 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.5);
   transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
+  transition:
+    width 0.6s,
+    height 0.6s;
 }
 
 .btn--ripple:active::after {
@@ -314,14 +318,14 @@
     padding: var(--space-sm) var(--space-lg);
     font-size: var(--font-size-sm);
   }
-  
+
   .fab {
     width: 48px;
     height: 48px;
     bottom: var(--space-lg);
     right: var(--space-lg);
   }
-  
+
   .fab__icon {
     font-size: var(--font-size-xl);
   }

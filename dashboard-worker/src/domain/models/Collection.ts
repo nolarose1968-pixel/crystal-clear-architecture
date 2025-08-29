@@ -25,7 +25,7 @@ export enum CollectionStatus {
   PENDING = 'pending',
   PROCESSED = 'processed',
   FAILED = 'failed',
-  CANCELLED = 'cancelled'
+  CANCELLED = 'cancelled',
 }
 
 /**

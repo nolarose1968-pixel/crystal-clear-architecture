@@ -390,7 +390,7 @@ class PackageAnalyzer {
 
             for (const pattern of routePatterns) {
               let match;
-              while ((match = pattern.exec(content)) !=== null) {
+              while ((match = pattern.exec(content)) !== null) {
                 const endpoint = match[2] || match[1];
                 if (endpoint && endpoint.startsWith('/')) {
                   endpoints.push(endpoint);

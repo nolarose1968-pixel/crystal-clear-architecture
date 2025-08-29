@@ -2,14 +2,14 @@
 
 /**
  * 🏥 Fire22 Workspace Health Monitor
- * 
+ *
  * Monitors health and status of all Fire22 workspaces:
  * - Dependency resolution
  * - Build status
  * - Test coverage
  * - Size metrics
  * - Cross-workspace links
- * 
+ *
  * @version 1.0.0
  */
 
@@ -50,7 +50,7 @@ interface WorkspaceHealth {
 class WorkspaceHealthMonitor {
   private workspacesPath: string;
   private workspaces: string[];
-  
+
   constructor() {
     this.workspacesPath = join(process.cwd(), 'workspaces');
     this.workspaces = [
@@ -59,37 +59,37 @@ class WorkspaceHealthMonitor {
       '@fire22-core-dashboard',
       '@fire22-sports-betting',
       '@fire22-telegram-integration',
-      '@fire22-build-system'
+      '@fire22-build-system',
     ];
   }
-  
+
   /**
    * 🔍 Run complete health check
    */
   async runHealthCheck(): Promise<void> {
     console.log('🏥 Fire22 Workspace Health Monitor');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
     console.log('⏰ Timestamp:', new Date().toISOString());
     console.log('');
-    
+
     const healthResults: WorkspaceHealth[] = [];
-    
+
     for (const workspace of this.workspaces) {
       const health = await this.checkWorkspaceHealth(workspace);
       healthResults.push(health);
       this.printWorkspaceHealth(health);
     }
-    
+
     // Print summary
     this.printSummary(healthResults);
-    
+
     // Check cross-workspace dependencies
     await this.checkCrossWorkspaceDependencies(healthResults);
-    
+
     // Generate health report
     await this.generateHealthReport(healthResults);
   }
-  
+
   /**
    * 🔍 Check individual workspace health
    */
@@ -107,37 +107,37 @@ class WorkspaceHealthMonitor {
         tests: false,
         dependencies: false,
         size: 0,
-        lastModified: new Date()
+        lastModified: new Date(),
       },
       dependencies: {
         production: [],
         development: [],
         workspace: [],
         missing: [],
-        outdated: []
+        outdated: [],
       },
       metrics: {
         files: 0,
         size: '0KB',
         loc: 0,
-        coverage: null
+        coverage: null,
       },
-      issues: []
+      issues: [],
     };
-    
+
     // Check if workspace exists
     if (!existsSync(workspacePath)) {
       health.status = 'not-found';
       health.issues.push('Workspace directory not found');
       return health;
     }
-    
+
     // Check package.json
     const packageJsonPath = join(workspacePath, 'package.json');
     if (existsSync(packageJsonPath)) {
       health.checks.packageJson = true;
       const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
-      
+
       // Extract dependencies
       if (packageJson.dependencies) {
         for (const [dep, version] of Object.entries(packageJson.dependencies)) {
@@ -148,7 +148,7 @@ class WorkspaceHealthMonitor {
           }
         }
       }
-      
+
       if (packageJson.devDependencies) {
         for (const [dep, version] of Object.entries(packageJson.devDependencies)) {
           health.dependencies.development.push(`${dep}@${version}`);
@@ -158,7 +158,7 @@ class WorkspaceHealthMonitor {
       health.issues.push('package.json not found');
       health.status = 'error';
     }
-    
+
     // Check node_modules
     if (existsSync(join(workspacePath, 'node_modules'))) {
       health.checks.nodeModules = true;
@@ -166,39 +166,42 @@ class WorkspaceHealthMonitor {
       health.issues.push('node_modules not found - run install');
       if (health.status === 'healthy') health.status = 'warning';
     }
-    
+
     // Check source files
     if (existsSync(join(workspacePath, 'src'))) {
       health.checks.sourceFiles = true;
-      
+
       // Count files and LOC
       try {
-        const result = await $`find ${join(workspacePath, 'src')} -name "*.ts" -o -name "*.tsx" | wc -l`.quiet();
+        const result =
+          await $`find ${join(workspacePath, 'src')} -name "*.ts" -o -name "*.tsx" | wc -l`.quiet();
         health.metrics.files = parseInt(result.stdout.toString().trim());
       } catch {}
     } else {
       health.issues.push('src directory not found');
       if (health.status === 'healthy') health.status = 'warning';
     }
-    
+
     // Check build output
     if (existsSync(join(workspacePath, 'dist'))) {
       health.checks.buildOutput = true;
     }
-    
+
     // Check tests
-    if (existsSync(join(workspacePath, 'tests')) || 
-        existsSync(join(workspacePath, 'test')) ||
-        existsSync(join(workspacePath, '__tests__'))) {
+    if (
+      existsSync(join(workspacePath, 'tests')) ||
+      existsSync(join(workspacePath, 'test')) ||
+      existsSync(join(workspacePath, '__tests__'))
+    ) {
       health.checks.tests = true;
     }
-    
+
     // Check workspace size
     try {
       const result = await $`du -sh ${workspacePath}`.quiet();
       const sizeStr = result.stdout.toString().split('\t')[0];
       health.metrics.size = sizeStr;
-      
+
       // Parse size for health check
       const sizeMatch = sizeStr.match(/(\d+(\.\d+)?)(K|M|G)/);
       if (sizeMatch) {
@@ -208,21 +211,22 @@ class WorkspaceHealthMonitor {
         if (unit === 'M') sizeInKB = value * 1024;
         if (unit === 'G') sizeInKB = value * 1024 * 1024;
         health.checks.size = sizeInKB;
-        
+
         // Warn if workspace is too large
-        if (sizeInKB > 10240) { // 10MB
+        if (sizeInKB > 10240) {
+          // 10MB
           health.issues.push(`Workspace is large (${sizeStr})`);
           if (health.status === 'healthy') health.status = 'warning';
         }
       }
     } catch {}
-    
+
     // Get last modified time
     try {
       const stats = statSync(workspacePath);
       health.checks.lastModified = stats.mtime;
     } catch {}
-    
+
     // Check for missing workspace dependencies
     for (const dep of health.dependencies.workspace) {
       const depName = dep.replace('@fire22/', '@fire22-');
@@ -233,27 +237,27 @@ class WorkspaceHealthMonitor {
         health.status = 'error';
       }
     }
-    
+
     // All checks passed?
     health.checks.dependencies = health.dependencies.missing.length === 0;
-    
+
     return health;
   }
-  
+
   /**
    * 📊 Print workspace health status
    */
   private printWorkspaceHealth(health: WorkspaceHealth): void {
     const statusIcon = {
-      'healthy': '✅',
-      'warning': '⚠️ ',
-      'error': '❌',
-      'not-found': '❓'
+      healthy: '✅',
+      warning: '⚠️ ',
+      error: '❌',
+      'not-found': '❓',
     }[health.status];
-    
+
     console.log(`\n${statusIcon} ${health.name}`);
     console.log('  ' + '-'.repeat(40));
-    
+
     // Print checks
     console.log('  📋 Checks:');
     console.log(`    package.json:  ${health.checks.packageJson ? '✅' : '❌'}`);
@@ -262,12 +266,12 @@ class WorkspaceHealthMonitor {
     console.log(`    build output:  ${health.checks.buildOutput ? '✅' : '⚪'}`);
     console.log(`    tests:         ${health.checks.tests ? '✅' : '⚪'}`);
     console.log(`    dependencies:  ${health.checks.dependencies ? '✅' : '❌'}`);
-    
+
     // Print metrics
     console.log('  📊 Metrics:');
     console.log(`    Size: ${health.metrics.size}`);
     console.log(`    Files: ${health.metrics.files}`);
-    
+
     // Print dependencies
     if (health.dependencies.workspace.length > 0) {
       console.log('  🔗 Workspace Dependencies:');
@@ -276,7 +280,7 @@ class WorkspaceHealthMonitor {
         console.log(`    ${isMissing ? '❌' : '✅'} ${dep}`);
       });
     }
-    
+
     // Print issues
     if (health.issues.length > 0) {
       console.log('  ⚠️  Issues:');
@@ -285,43 +289,43 @@ class WorkspaceHealthMonitor {
       });
     }
   }
-  
+
   /**
    * 📊 Print summary
    */
   private printSummary(healthResults: WorkspaceHealth[]): void {
-    console.log('\n' + '=' .repeat(60));
+    console.log('\n' + '='.repeat(60));
     console.log('📊 HEALTH SUMMARY');
-    console.log('=' .repeat(60));
-    
+    console.log('='.repeat(60));
+
     const healthy = healthResults.filter(h => h.status === 'healthy').length;
     const warning = healthResults.filter(h => h.status === 'warning').length;
     const error = healthResults.filter(h => h.status === 'error').length;
     const notFound = healthResults.filter(h => h.status === 'not-found').length;
-    
+
     console.log(`✅ Healthy:   ${healthy}/${this.workspaces.length}`);
     console.log(`⚠️  Warning:   ${warning}/${this.workspaces.length}`);
     console.log(`❌ Error:     ${error}/${this.workspaces.length}`);
     console.log(`❓ Not Found: ${notFound}/${this.workspaces.length}`);
-    
+
     // Overall status
     let overallStatus = 'healthy';
     if (error > 0 || notFound > 0) overallStatus = 'critical';
     else if (warning > 0) overallStatus = 'degraded';
-    
+
     console.log(`\n🏥 Overall Status: ${overallStatus.toUpperCase()}`);
   }
-  
+
   /**
    * 🔗 Check cross-workspace dependencies
    */
   private async checkCrossWorkspaceDependencies(healthResults: WorkspaceHealth[]): Promise<void> {
-    console.log('\n' + '=' .repeat(60));
+    console.log('\n' + '='.repeat(60));
     console.log('🔗 CROSS-WORKSPACE DEPENDENCIES');
-    console.log('=' .repeat(60));
-    
+    console.log('='.repeat(60));
+
     const dependencyMap = new Map<string, string[]>();
-    
+
     // Build dependency map
     for (const health of healthResults) {
       for (const dep of health.dependencies.workspace) {
@@ -331,14 +335,14 @@ class WorkspaceHealthMonitor {
         dependencyMap.get(dep)!.push(health.name);
       }
     }
-    
+
     // Print dependency graph
     console.log('\n📊 Dependency Graph:');
     for (const [dep, dependents] of dependencyMap) {
       console.log(`  ${dep}:`);
       dependents.forEach(d => console.log(`    ← ${d}`));
     }
-    
+
     // Check for circular dependencies
     console.log('\n🔄 Circular Dependency Check:');
     const circular = this.findCircularDependencies(healthResults);
@@ -349,7 +353,7 @@ class WorkspaceHealthMonitor {
       console.log('  ✅ No circular dependencies found');
     }
   }
-  
+
   /**
    * 🔄 Find circular dependencies
    */
@@ -357,7 +361,7 @@ class WorkspaceHealthMonitor {
     const cycles: string[][] = [];
     const visited = new Set<string>();
     const stack = new Set<string>();
-    
+
     const dfs = (workspace: string, path: string[]): void => {
       if (stack.has(workspace)) {
         // Found a cycle
@@ -365,13 +369,13 @@ class WorkspaceHealthMonitor {
         cycles.push(path.slice(cycleStart));
         return;
       }
-      
+
       if (visited.has(workspace)) return;
-      
+
       visited.add(workspace);
       stack.add(workspace);
       path.push(workspace);
-      
+
       const health = healthResults.find(h => h.name === workspace);
       if (health) {
         for (const dep of health.dependencies.workspace) {
@@ -379,19 +383,19 @@ class WorkspaceHealthMonitor {
           dfs(depName, [...path]);
         }
       }
-      
+
       stack.delete(workspace);
     };
-    
+
     for (const health of healthResults) {
       if (!visited.has(health.name)) {
         dfs(health.name, []);
       }
     }
-    
+
     return cycles;
   }
-  
+
   /**
    * 📄 Generate health report
    */
@@ -404,16 +408,16 @@ class WorkspaceHealthMonitor {
         status: h.status,
         checks: h.checks,
         metrics: h.metrics,
-        issues: h.issues
+        issues: h.issues,
       })),
       summary: {
         healthy: healthResults.filter(h => h.status === 'healthy').length,
         warning: healthResults.filter(h => h.status === 'warning').length,
         error: healthResults.filter(h => h.status === 'error').length,
-        notFound: healthResults.filter(h => h.status === 'not-found').length
-      }
+        notFound: healthResults.filter(h => h.status === 'not-found').length,
+      },
     };
-    
+
     // Write report to file
     const reportPath = join(process.cwd(), 'workspace-health-report.json');
     await Bun.write(reportPath, JSON.stringify(report, null, 2));

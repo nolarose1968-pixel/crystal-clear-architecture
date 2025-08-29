@@ -3,15 +3,15 @@
 /**
  * Fire22 Dashboard Maintenance Scheduler
  * Automated scheduling and execution of maintenance tasks
- * 
+ *
  * @version 1.0.0
  * @author Fire22 Maintenance Team
  * @schedule Runs continuously as a service
  */
 
-import { spawn } from "bun";
-import { writeFileSync, existsSync, readFileSync } from "fs";
-import { join } from "path";
+import { spawn } from 'bun';
+import { writeFileSync, existsSync, readFileSync } from 'fs';
+import { join } from 'path';
 
 interface MaintenanceTask {
   id: string;
@@ -47,16 +47,16 @@ class MaintenanceScheduler {
    */
   async start(): Promise<void> {
     console.log('🕐 Fire22 Maintenance Scheduler Starting');
-    console.log('=======================================');
+    console.log('!==!==!==!==!==!==!====');
     console.log(`📅 Date: ${new Date().toISOString().split('T')[0]}`);
     console.log(`⏰ Time: ${new Date().toLocaleTimeString()}`);
     console.log(`📋 Loaded ${this.schedule.tasks.length} maintenance tasks\n`);
 
     this.isRunning = true;
-    
+
     // Update next run times
     this.updateNextRunTimes();
-    
+
     // Start the scheduler loop
     await this.schedulerLoop();
   }
@@ -81,7 +81,7 @@ class MaintenanceScheduler {
    */
   private async checkAndRunTasks(): Promise<void> {
     const now = new Date();
-    
+
     for (const task of this.schedule.tasks) {
       if (this.isTaskDue(task, now) && task.status !== 'running') {
         await this.runTask(task);
@@ -94,15 +94,15 @@ class MaintenanceScheduler {
    */
   private async runTask(task: MaintenanceTask): Promise<void> {
     console.log(`🏃 Running task: ${task.name}`);
-    
+
     // Update task status
     task.status = 'running';
     task.lastRun = new Date().toISOString();
     this.saveSchedule();
-    
+
     try {
       const startTime = Date.now();
-      
+
       // Check dependencies
       if (task.dependencies) {
         const dependenciesMet = await this.checkDependencies(task.dependencies);
@@ -113,12 +113,12 @@ class MaintenanceScheduler {
           return;
         }
       }
-      
+
       // Execute the task
       const result = await this.executeTask(task);
-      
+
       const duration = Math.round((Date.now() - startTime) / 1000 / 60);
-      
+
       if (result.success) {
         task.status = 'completed';
         console.log(`  ✅ Task completed: ${task.name} (${duration}m)`);
@@ -126,12 +126,11 @@ class MaintenanceScheduler {
         task.status = 'failed';
         console.log(`  ❌ Task failed: ${task.name} - ${result.error}`);
       }
-      
     } catch (error) {
       task.status = 'failed';
       console.log(`  ❌ Task error: ${task.name} - ${error}`);
     }
-    
+
     // Update next run time
     this.updateNextRunTime(task);
     this.saveSchedule();
@@ -141,39 +140,39 @@ class MaintenanceScheduler {
    * 🔧 Execute a maintenance task
    */
   private async executeTask(task: MaintenanceTask): Promise<{ success: boolean; error?: string }> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const scriptPath = join(process.cwd(), 'maintenance', task.script);
-      
+
       if (!existsSync(scriptPath)) {
         resolve({ success: false, error: `Script not found: ${task.script}` });
         return;
       }
-      
+
       const process = spawn(['bun', scriptPath], {
         stdio: ['pipe', 'pipe', 'pipe'],
-        cwd: process.cwd()
+        cwd: process.cwd(),
       });
-      
+
       let output = '';
       let errorOutput = '';
-      
-      process.stdout?.on('data', (data) => {
+
+      process.stdout?.on('data', data => {
         output += data.toString();
       });
-      
-      process.stderr?.on('data', (data) => {
+
+      process.stderr?.on('data', data => {
         errorOutput += data.toString();
       });
-      
-      process.on('close', (code) => {
+
+      process.on('close', code => {
         if (code === 0) {
           resolve({ success: true });
         } else {
           resolve({ success: false, error: errorOutput || `Exit code: ${code}` });
         }
       });
-      
-      process.on('error', (error) => {
+
+      process.on('error', error => {
         resolve({ success: false, error: error.message });
       });
     });
@@ -227,42 +226,42 @@ class MaintenanceScheduler {
   private calculateNextRun(cronSchedule: string, from: Date): Date {
     // Simple cron parser for common patterns
     const next = new Date(from);
-    
+
     switch (cronSchedule) {
       case '@daily':
       case '0 9 * * *': // Daily at 9 AM
         next.setDate(next.getDate() + 1);
         next.setHours(9, 0, 0, 0);
         break;
-        
+
       case '@weekly':
       case '0 9 * * 1': // Weekly on Monday at 9 AM
         const daysUntilMonday = (8 - next.getDay()) % 7 || 7;
         next.setDate(next.getDate() + daysUntilMonday);
         next.setHours(9, 0, 0, 0);
         break;
-        
+
       case '@monthly':
       case '0 9 1 * *': // Monthly on 1st at 9 AM
         next.setMonth(next.getMonth() + 1, 1);
         next.setHours(9, 0, 0, 0);
         break;
-        
+
       case '*/15 * * * *': // Every 15 minutes
         next.setMinutes(next.getMinutes() + 15);
         break;
-        
+
       case '0 */2 * * *': // Every 2 hours
         next.setHours(next.getHours() + 2);
         next.setMinutes(0, 0, 0);
         break;
-        
+
       default:
         // Default to daily if unknown
         next.setDate(next.getDate() + 1);
         next.setHours(9, 0, 0, 0);
     }
-    
+
     return next;
   }
 
@@ -277,7 +276,7 @@ class MaintenanceScheduler {
         console.warn('⚠️ Could not load schedule, using default');
       }
     }
-    
+
     return this.createDefaultSchedule();
   }
 
@@ -304,7 +303,7 @@ class MaintenanceScheduler {
           schedule: '0 9 * * *', // Daily at 9 AM
           status: 'pending',
           priority: 'high',
-          estimatedDuration: 5
+          estimatedDuration: 5,
         },
         {
           id: 'weekly-documentation-update',
@@ -313,7 +312,7 @@ class MaintenanceScheduler {
           schedule: '0 9 * * 3', // Wednesday at 9 AM
           status: 'pending',
           priority: 'medium',
-          estimatedDuration: 15
+          estimatedDuration: 15,
         },
         {
           id: 'weekly-dependency-check',
@@ -322,7 +321,7 @@ class MaintenanceScheduler {
           schedule: '0 10 * * 1', // Monday at 10 AM
           status: 'pending',
           priority: 'medium',
-          estimatedDuration: 10
+          estimatedDuration: 10,
         },
         {
           id: 'monthly-security-audit',
@@ -331,7 +330,7 @@ class MaintenanceScheduler {
           schedule: '0 9 1 * *', // 1st of month at 9 AM
           status: 'pending',
           priority: 'high',
-          estimatedDuration: 30
+          estimatedDuration: 30,
         },
         {
           id: 'quarterly-performance-review',
@@ -340,7 +339,7 @@ class MaintenanceScheduler {
           schedule: '0 9 1 */3 *', // Quarterly on 1st at 9 AM
           status: 'pending',
           priority: 'medium',
-          estimatedDuration: 60
+          estimatedDuration: 60,
         },
         {
           id: 'rss-feed-validation',
@@ -349,7 +348,7 @@ class MaintenanceScheduler {
           schedule: '0 */2 * * *', // Every 2 hours
           status: 'pending',
           priority: 'medium',
-          estimatedDuration: 5
+          estimatedDuration: 5,
         },
         {
           id: 'backup-verification',
@@ -359,9 +358,9 @@ class MaintenanceScheduler {
           status: 'pending',
           priority: 'high',
           estimatedDuration: 10,
-          dependencies: ['daily-health-check']
-        }
-      ]
+          dependencies: ['daily-health-check'],
+        },
+      ],
     };
   }
 
@@ -376,7 +375,7 @@ class MaintenanceScheduler {
         pending: this.schedule.tasks.filter(t => t.status === 'pending').length,
         running: this.schedule.tasks.filter(t => t.status === 'running').length,
         completed: this.schedule.tasks.filter(t => t.status === 'completed').length,
-        failed: this.schedule.tasks.filter(t => t.status === 'failed').length
+        failed: this.schedule.tasks.filter(t => t.status === 'failed').length,
       },
       upcomingTasks: this.schedule.tasks
         .filter(t => t.nextRun)
@@ -385,7 +384,7 @@ class MaintenanceScheduler {
         .map(t => ({
           name: t.name,
           nextRun: t.nextRun,
-          priority: t.priority
+          priority: t.priority,
         })),
       recentFailures: this.schedule.tasks
         .filter(t => t.status === 'failed' && t.lastRun)
@@ -394,13 +393,13 @@ class MaintenanceScheduler {
         .map(t => ({
           name: t.name,
           lastRun: t.lastRun,
-          priority: t.priority
-        }))
+          priority: t.priority,
+        })),
     };
-    
+
     const reportPath = join(process.cwd(), 'maintenance', 'reports', 'scheduler-status.json');
     writeFileSync(reportPath, JSON.stringify(report, null, 2));
-    
+
     console.log(`📊 Status report generated: ${reportPath}`);
   }
 
@@ -424,23 +423,23 @@ class MaintenanceScheduler {
 async function main() {
   const args = process.argv.slice(2);
   const command = args[0];
-  
+
   const scheduler = new MaintenanceScheduler();
-  
+
   switch (command) {
     case 'start':
       await scheduler.start();
       break;
-      
+
     case 'status':
       await scheduler.generateStatusReport();
       console.log('📊 Status report generated');
       break;
-      
+
     case 'stop':
       scheduler.stop();
       break;
-      
+
     default:
       console.log('Fire22 Maintenance Scheduler');
       console.log('');
@@ -449,7 +448,9 @@ async function main() {
       console.log('  bun maintenance/maintenance-scheduler.ts status  # Generate status report');
       console.log('  bun maintenance/maintenance-scheduler.ts stop    # Stop the scheduler');
       console.log('');
-      console.log('The scheduler runs continuously and executes maintenance tasks based on their schedules.');
+      console.log(
+        'The scheduler runs continuously and executes maintenance tasks based on their schedules.'
+      );
       process.exit(1);
   }
 }

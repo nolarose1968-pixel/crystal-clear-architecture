@@ -3,7 +3,7 @@
 /**
  * HTML Import Demo Script
  * Demonstrates Bun's HTML import capabilities with our standardization framework
- * 
+ *
  * Usage: bun run html-import-demo.ts
  */
 
@@ -27,7 +27,7 @@ class HTMLImportDemo {
     './docs/packages.html',
     './docs/environment-variables.html',
     './docs/api-integrations-index.html',
-    './p2p-queue-system.html'
+    './p2p-queue-system.html',
   ];
 
   constructor() {
@@ -47,7 +47,7 @@ class HTMLImportDemo {
       // 2. Analyze each file
       console.log('🔍 Step 2: Analyzing HTML files...');
       const analyses = await this.analyzeHTMLFiles(htmlContents);
-      
+
       // 3. Display analysis results
       console.log('📊 Step 3: Analysis Results');
       this.displayAnalysisResults(analyses);
@@ -59,7 +59,6 @@ class HTMLImportDemo {
       // 5. Show standardization recommendations
       console.log('\n💡 Step 5: Standardization Recommendations');
       this.showStandardizationRecommendations(analyses);
-
     } catch (error) {
       console.error('❌ Demo failed:', error);
     }
@@ -74,11 +73,11 @@ class HTMLImportDemo {
     for (const [filename, content] of Object.entries(htmlContents)) {
       const metadata = bunUtils.extractHTMLMetadata(content);
       const size = new Blob([content]).size;
-      
+
       // Check for standardization indicators
       const hasFrameworkCSS = content.includes('framework.css');
       const hasInlineStyles = content.includes('<style>') || content.includes('style=');
-      
+
       // Calculate standardization score (0-100)
       let score = 0;
       if (hasFrameworkCSS) score += 40;
@@ -93,7 +92,7 @@ class HTMLImportDemo {
         size,
         hasFrameworkCSS,
         hasInlineStyles,
-        standardizationScore: score
+        standardizationScore: score,
       });
     }
 
@@ -106,7 +105,13 @@ class HTMLImportDemo {
   private displayAnalysisResults(analyses: HTMLAnalysis[]): void {
     console.log('\n📋 HTML Files Analysis:');
     console.log('─'.repeat(100));
-    console.log('Filename'.padEnd(30) + 'Size'.padEnd(10) + 'Framework CSS'.padEnd(15) + 'Inline Styles'.padEnd(15) + 'Score'.padEnd(10));
+    console.log(
+      'Filename'.padEnd(30) +
+        'Size'.padEnd(10) +
+        'Framework CSS'.padEnd(15) +
+        'Inline Styles'.padEnd(15) +
+        'Score'.padEnd(10)
+    );
     console.log('─'.repeat(100));
 
     for (const analysis of analyses) {
@@ -117,15 +122,15 @@ class HTMLImportDemo {
 
       console.log(
         analysis.filename.padEnd(30) +
-        sizeKB.padEnd(10) +
-        frameworkStatus.padEnd(15) +
-        inlineStatus.padEnd(15) +
-        score
+          sizeKB.padEnd(10) +
+          frameworkStatus.padEnd(15) +
+          inlineStatus.padEnd(15) +
+          score
       );
     }
 
     console.log('─'.repeat(100));
-    
+
     // Calculate overall statistics
     const totalFiles = analyses.length;
     const filesWithFramework = analyses.filter(a => a.hasFrameworkCSS).length;
@@ -134,8 +139,12 @@ class HTMLImportDemo {
 
     console.log(`\n📊 Overall Statistics:`);
     console.log(`   Total Files: ${totalFiles}`);
-    console.log(`   Using Framework CSS: ${filesWithFramework}/${totalFiles} (${((filesWithFramework/totalFiles)*100).toFixed(1)}%)`);
-    console.log(`   No Inline Styles: ${filesWithoutInline}/${totalFiles} (${((filesWithoutInline/totalFiles)*100).toFixed(1)}%)`);
+    console.log(
+      `   Using Framework CSS: ${filesWithFramework}/${totalFiles} (${((filesWithFramework / totalFiles) * 100).toFixed(1)}%)`
+    );
+    console.log(
+      `   No Inline Styles: ${filesWithoutInline}/${totalFiles} (${((filesWithoutInline / totalFiles) * 100).toFixed(1)}%)`
+    );
     console.log(`   Average Standardization Score: ${avgScore.toFixed(1)}/100`);
   }
 
@@ -144,14 +153,14 @@ class HTMLImportDemo {
    */
   private async demonstrateFileWatching(): Promise<void> {
     const demoFile = './docs/@packages.html';
-    
+
     console.log(`   Watching ${demoFile} for changes...`);
     console.log('   (Make changes to the file to see live updates)');
-    
-    const unwatch = bunUtils.watchHTML(demoFile, (newContent) => {
+
+    const unwatch = bunUtils.watchHTML(demoFile, newContent => {
       const size = new Blob([newContent]).size;
       const timestamp = new Date().toLocaleTimeString();
-      console.log(`   🔄 File updated at ${timestamp} - New size: ${(size/1024).toFixed(1)}KB`);
+      console.log(`   🔄 File updated at ${timestamp} - New size: ${(size / 1024).toFixed(1)}KB`);
     });
 
     // Keep watching for a few seconds to demonstrate
@@ -165,25 +174,25 @@ class HTMLImportDemo {
    */
   private showStandardizationRecommendations(analyses: HTMLAnalysis[]): void {
     const needsImprovement = analyses.filter(a => a.standardizationScore < 70);
-    
+
     if (needsImprovement.length === 0) {
       console.log('🎉 All files are well standardized!');
       return;
     }
 
     console.log(`⚠️  ${needsImprovement.length} files need standardization improvements:`);
-    
+
     for (const analysis of needsImprovement) {
       console.log(`\n📁 ${analysis.filename} (Score: ${analysis.standardizationScore}/100)`);
-      
+
       if (!analysis.hasFrameworkCSS) {
         console.log('   ➕ Add framework.css import');
       }
-      
+
       if (analysis.hasInlineStyles) {
         console.log('   🔄 Convert inline styles to CSS classes');
       }
-      
+
       if (!analysis.content.includes('var(--')) {
         console.log('   🎨 Use CSS custom properties for consistent theming');
       }
@@ -201,23 +210,23 @@ class HTMLImportDemo {
   async generateReport(): Promise<string> {
     const htmlContents = await bunUtils.importMultipleHTML(this.htmlFiles);
     const analyses = await this.analyzeHTMLFiles(htmlContents);
-    
+
     let report = '# HTML Standardization Report\n\n';
     report += `Generated: ${new Date().toISOString()}\n`;
     report += `Total Files: ${analyses.length}\n\n`;
-    
+
     report += '## File Analysis\n\n';
     report += '| File | Size | Framework CSS | Inline Styles | Score |\n';
     report += '|------|------|---------------|---------------|-------|\n';
-    
+
     for (const analysis of analyses) {
       const sizeKB = (analysis.size / 1024).toFixed(1) + 'KB';
       const frameworkStatus = analysis.hasFrameworkCSS ? '✅' : '❌';
       const inlineStatus = analysis.hasInlineStyles ? '⚠️' : '✅';
-      
+
       report += `| ${analysis.filename} | ${sizeKB} | ${frameworkStatus} | ${inlineStatus} | ${analysis.standardizationScore}/100 |\n`;
     }
-    
+
     return report;
   }
 }
@@ -225,14 +234,14 @@ class HTMLImportDemo {
 // Main execution
 async function main() {
   const demo = new HTMLImportDemo();
-  
+
   // Check if --report flag is provided
   if (process.argv.includes('--report')) {
     const report = await demo.generateReport();
     console.log(report);
     return;
   }
-  
+
   await demo.runDemo();
 }
 

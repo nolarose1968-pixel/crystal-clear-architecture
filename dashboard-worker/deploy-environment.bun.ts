@@ -55,11 +55,11 @@ try {
   const env = execSync('bun pm pkg get config.environment', { encoding: 'utf8' });
   const port = execSync('bun pm pkg get config.port', { encoding: 'utf8' });
   const version = execSync('bun pm pkg get version', { encoding: 'utf8' });
-  
+
   console.log(`   Environment: ${env.trim()}`);
   console.log(`   Port: ${port.trim()}`);
   console.log(`   Version: ${version.trim()}`);
-  
+
   console.log('✅ Configuration management working');
 } catch (error) {
   console.log('❌ Configuration management failed');

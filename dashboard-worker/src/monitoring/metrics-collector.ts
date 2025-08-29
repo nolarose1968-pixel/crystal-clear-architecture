@@ -16,7 +16,7 @@ export class MetricsCollector {
   recordMetrics(metrics: PerformanceMetrics): void {
     this.metrics.push({
       ...metrics,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     // Clean up old metrics
@@ -29,7 +29,7 @@ export class MetricsCollector {
   recordSecurityEvent(event: SecurityEvent): void {
     this.securityEvents.push({
       ...event,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     // Clean up old events
@@ -42,7 +42,7 @@ export class MetricsCollector {
   recordHealthStatus(status: HealthStatus): void {
     this.healthStatuses.push({
       ...status,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     });
 
     // Keep only recent health statuses
@@ -56,9 +56,7 @@ export class MetricsCollector {
    */
   getAggregatedMetrics(period: number = 3600000): AggregatedMetrics {
     const cutoff = Date.now() - period;
-    const recentMetrics = this.metrics.filter(m => 
-      new Date(m.timestamp).getTime() > cutoff
-    );
+    const recentMetrics = this.metrics.filter(m => new Date(m.timestamp).getTime() > cutoff);
 
     if (recentMetrics.length === 0) {
       return {
@@ -69,7 +67,7 @@ export class MetricsCollector {
         averageCPUUsage: 0,
         averageMemoryUsage: 0,
         averageActiveConnections: 0,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
 
@@ -86,7 +84,7 @@ export class MetricsCollector {
       averageCPUUsage: totalCPUUsage / recentMetrics.length,
       averageMemoryUsage: totalMemoryUsage / recentMetrics.length,
       averageActiveConnections: totalActiveConnections / recentMetrics.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -95,26 +93,30 @@ export class MetricsCollector {
    */
   getSecurityEventStats(period: number = 86400000): SecurityEventStats {
     const cutoff = Date.now() - period;
-    const recentEvents = this.securityEvents.filter(e => 
-      new Date(e.timestamp).getTime() > cutoff
+    const recentEvents = this.securityEvents.filter(e => new Date(e.timestamp).getTime() > cutoff);
+
+    const byType = recentEvents.reduce(
+      (acc, event) => {
+        acc[event.type] = (acc[event.type] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
     );
 
-    const byType = recentEvents.reduce((acc, event) => {
-      acc[event.type] = (acc[event.type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    const bySeverity = recentEvents.reduce((acc, event) => {
-      acc[event.severity] = (acc[event.severity] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const bySeverity = recentEvents.reduce(
+      (acc, event) => {
+        acc[event.severity] = (acc[event.severity] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     return {
       totalEvents: recentEvents.length,
       byType,
       bySeverity,
       recentEvents: recentEvents.slice(-20), // Last 20 events
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -134,22 +136,24 @@ export class MetricsCollector {
         currentStatus: 'unknown',
         lastUpdated: new Date().toISOString(),
         componentStatus: {},
-        trend: 'stable'
+        trend: 'stable',
       };
     }
 
     const latestStatus = this.healthStatuses[this.healthStatuses.length - 1];
-    const previousStatus = this.healthStatuses.length > 1 ? 
-      this.healthStatuses[this.healthStatuses.length - 2] : null;
+    const previousStatus =
+      this.healthStatuses.length > 1 ? this.healthStatuses[this.healthStatuses.length - 2] : null;
 
     let trend: 'improving' | 'declining' | 'stable' = 'stable';
-    
+
     if (previousStatus) {
-      const currentHealthyCount = Object.values(latestStatus.components)
-        .filter(c => c.status === 'healthy').length;
-      const previousHealthyCount = Object.values(previousStatus.components)
-        .filter(c => c.status === 'healthy').length;
-      
+      const currentHealthyCount = Object.values(latestStatus.components).filter(
+        c => c.status === 'healthy'
+      ).length;
+      const previousHealthyCount = Object.values(previousStatus.components).filter(
+        c => c.status === 'healthy'
+      ).length;
+
       if (currentHealthyCount > previousHealthyCount) {
         trend = 'improving';
       } else if (currentHealthyCount < previousHealthyCount) {
@@ -161,7 +165,7 @@ export class MetricsCollector {
       currentStatus: latestStatus.status,
       lastUpdated: latestStatus.lastUpdated,
       componentStatus: latestStatus.components,
-      trend
+      trend,
     };
   }
 
@@ -170,12 +174,16 @@ export class MetricsCollector {
    */
   exportMetrics(format: 'json' | 'csv' = 'json'): string {
     if (format === 'json') {
-      return JSON.stringify({
-        performance: this.metrics.slice(-1000),
-        security: this.securityEvents.slice(-1000),
-        health: this.healthStatuses.slice(-100),
-        exportedAt: new Date().toISOString()
-      }, null, 2);
+      return JSON.stringify(
+        {
+          performance: this.metrics.slice(-1000),
+          security: this.securityEvents.slice(-1000),
+          health: this.healthStatuses.slice(-100),
+          exportedAt: new Date().toISOString(),
+        },
+        null,
+        2
+      );
     } else {
       // CSV format
       const headers = ['timestamp', 'type', 'metric', 'value'];
@@ -186,7 +194,12 @@ export class MetricsCollector {
         rows.push([m.timestamp, 'performance', 'responseTime', m.responseTime.toString()]);
         rows.push([m.timestamp, 'performance', 'cpuUsage', m.cpuUsage.toString()]);
         rows.push([m.timestamp, 'performance', 'memoryUsage', m.memoryUsage.toString()]);
-        rows.push([m.timestamp, 'performance', 'activeConnections', m.activeConnections.toString()]);
+        rows.push([
+          m.timestamp,
+          'performance',
+          'activeConnections',
+          m.activeConnections.toString(),
+        ]);
       });
 
       // Security events
@@ -204,9 +217,7 @@ export class MetricsCollector {
    */
   private cleanupMetrics(): void {
     const cutoff = Date.now() - this.retentionPeriod;
-    this.metrics = this.metrics.filter(m => 
-      new Date(m.timestamp).getTime() > cutoff
-    );
+    this.metrics = this.metrics.filter(m => new Date(m.timestamp).getTime() > cutoff);
   }
 
   /**
@@ -214,9 +225,7 @@ export class MetricsCollector {
    */
   private cleanupSecurityEvents(): void {
     const cutoff = Date.now() - this.retentionPeriod;
-    this.securityEvents = this.securityEvents.filter(e => 
-      new Date(e.timestamp).getTime() > cutoff
-    );
+    this.securityEvents = this.securityEvents.filter(e => new Date(e.timestamp).getTime() > cutoff);
   }
 
   /**
@@ -304,35 +313,35 @@ export function withMetricsCollection(
 ): (request: Request) => Promise<Response> {
   return async (request: Request): Promise<Response> => {
     const startTime = Date.now();
-    const requestId = MonitoringUtils.extractCorrelationId(request) || 
-                     MonitoringUtils.createCorrelationId();
+    const requestId =
+      MonitoringUtils.extractCorrelationId(request) || MonitoringUtils.createCorrelationId();
 
     try {
       const response = await handler(request);
-      
+
       // Calculate response time
       const responseTime = Date.now() - startTime;
-      
+
       // Record metrics
       collector.recordMetrics({
         responseTime,
         cpuUsage: 0, // Will be populated by performance monitor
         memoryUsage: 0, // Will be populated by performance monitor
         activeConnections: 0, // Will be populated by performance monitor
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       return response;
     } catch (error) {
       // Record error metrics
       const responseTime = Date.now() - startTime;
-      
+
       collector.recordMetrics({
         responseTime,
         cpuUsage: 0,
         memoryUsage: 0,
         activeConnections: 0,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       // Record security event for error
@@ -343,9 +352,9 @@ export function withMetricsCollection(
           method: request.method,
           url: request.url,
           error: error instanceof Error ? error.message : String(error),
-          requestId
+          requestId,
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       throw error;

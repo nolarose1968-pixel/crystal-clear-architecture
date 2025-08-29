@@ -59,14 +59,14 @@ export class ApiTestHelper {
     headers?: Record<string, string>
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     const requestOptions: RequestInit = {
       method,
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': this.apiKey,
-        ...headers
-      }
+        ...headers,
+      },
     };
 
     if (data && (method === 'POST' || method === 'PUT')) {
@@ -76,19 +76,19 @@ export class ApiTestHelper {
     try {
       const response = await fetch(url, requestOptions);
       const responseData = await response.json();
-      
+
       return {
         success: response.ok,
         data: responseData.data || responseData,
         error: responseData.error,
         message: responseData.message,
-        timestamp: responseData.timestamp
+        timestamp: responseData.timestamp,
       };
     } catch (error) {
       return {
         success: false,
         error: 'Network error',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -128,7 +128,7 @@ export class ApiTestHelper {
     return this.makeRequest('/api/admin/process-deposit', 'POST', {
       customerID,
       amount,
-      notes
+      notes,
     });
   }
 
@@ -183,7 +183,7 @@ export class MockDataGenerator {
       firstName: `First${id}`,
       lastName: `Last${id}`,
       agentID: 'BLAKEPPH',
-      ...overrides
+      ...overrides,
     };
   }
 
@@ -203,7 +203,7 @@ export class MockDataGenerator {
       amount: Math.floor(Math.random() * 1000) + 10,
       type: 'deposit',
       description: 'Mock transaction',
-      ...overrides
+      ...overrides,
     };
   }
 
@@ -222,7 +222,7 @@ export class MockDataGenerator {
       type: types[Math.floor(Math.random() * types.length)],
       teams: teams[Math.floor(Math.random() * teams.length)],
       status: statuses[Math.floor(Math.random() * statuses.length)],
-      ...overrides
+      ...overrides,
     };
   }
 }
@@ -298,7 +298,7 @@ export class TestAssertions {
     if (response.success) {
       throw new Error('Expected error response, got successful response');
     }
-    
+
     if (expectedError && response.error !== expectedError) {
       throw new Error(`Expected error "${expectedError}", got "${response.error}"`);
     }
@@ -317,14 +317,18 @@ export class TestAssertions {
   /**
    * Assert array response length
    */
-  static assertArrayLength(response: ApiResponse, expectedLength: number, arrayPath?: string): void {
+  static assertArrayLength(
+    response: ApiResponse,
+    expectedLength: number,
+    arrayPath?: string
+  ): void {
     this.assertHasData(response);
-    
+
     const array = arrayPath ? response.data[arrayPath] : response.data;
     if (!Array.isArray(array)) {
       throw new Error('Expected array in response data');
     }
-    
+
     if (array.length !== expectedLength) {
       throw new Error(`Expected array length ${expectedLength}, got ${array.length}`);
     }

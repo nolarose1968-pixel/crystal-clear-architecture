@@ -13,7 +13,15 @@ export * from './live-casino-management';
 export interface SportsEvent {
   id: string;
   name: string;
-  sport: 'football' | 'basketball' | 'baseball' | 'soccer' | 'tennis' | 'golf' | 'racing' | 'esports';
+  sport:
+    | 'football'
+    | 'basketball'
+    | 'baseball'
+    | 'soccer'
+    | 'tennis'
+    | 'golf'
+    | 'racing'
+    | 'esports';
   league: string;
   homeTeam: string;
   awayTeam: string;
@@ -65,13 +73,13 @@ export interface SportsBet {
   actualWin?: number;
 }
 
-export type BetType = 
-  | 'moneyline' 
-  | 'spread' 
-  | 'over_under' 
-  | 'parlay' 
-  | 'teaser' 
-  | 'futures' 
+export type BetType =
+  | 'moneyline'
+  | 'spread'
+  | 'over_under'
+  | 'parlay'
+  | 'teaser'
+  | 'futures'
   | 'live_bet'
   | 'special';
 
@@ -197,19 +205,35 @@ export class SportsBettingManagementSystem {
         startTime: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
         status: 'scheduled',
         odds: {
-          homeWin: 2.10,
+          homeWin: 2.1,
           awayWin: 1.85,
           overUnder: 48.5,
           handicap: -3.5,
           specialBets: [
-            { id: 'sb1', name: 'First Touchdown', odds: 8.50, description: 'First TD scorer', riskLevel: 'medium', maxBet: 1000, minBet: 10 },
-            { id: 'sb2', name: 'Total Yards', odds: 3.25, description: 'Over 400 yards', riskLevel: 'low', maxBet: 2000, minBet: 25 }
-          ]
+            {
+              id: 'sb1',
+              name: 'First Touchdown',
+              odds: 8.5,
+              description: 'First TD scorer',
+              riskLevel: 'medium',
+              maxBet: 1000,
+              minBet: 10,
+            },
+            {
+              id: 'sb2',
+              name: 'Total Yards',
+              odds: 3.25,
+              description: 'Over 400 yards',
+              riskLevel: 'low',
+              maxBet: 2000,
+              minBet: 25,
+            },
+          ],
         },
         riskLevel: 'medium',
         vipAccess: ['bronze', 'silver', 'gold', 'platinum'],
         isActive: true,
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       },
       {
         id: 'basketball-nba-001',
@@ -226,14 +250,30 @@ export class SportsBettingManagementSystem {
           totalPoints: 220.5,
           handicap: -2.0,
           specialBets: [
-            { id: 'sb3', name: 'Player Points', odds: 4.50, description: 'LeBron 30+ points', riskLevel: 'medium', maxBet: 1500, minBet: 20 },
-            { id: 'sb4', name: 'Quarter Winner', odds: 2.75, description: 'Lakers win Q1', riskLevel: 'low', maxBet: 2500, minBet: 50 }
-          ]
+            {
+              id: 'sb3',
+              name: 'Player Points',
+              odds: 4.5,
+              description: 'LeBron 30+ points',
+              riskLevel: 'medium',
+              maxBet: 1500,
+              minBet: 20,
+            },
+            {
+              id: 'sb4',
+              name: 'Quarter Winner',
+              odds: 2.75,
+              description: 'Lakers win Q1',
+              riskLevel: 'low',
+              maxBet: 2500,
+              minBet: 50,
+            },
+          ],
         },
         riskLevel: 'low',
         vipAccess: ['bronze', 'silver', 'gold', 'platinum'],
         isActive: true,
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       },
       {
         id: 'soccer-epl-001',
@@ -245,20 +285,36 @@ export class SportsBettingManagementSystem {
         startTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
         status: 'scheduled',
         odds: {
-          homeWin: 2.40,
-          awayWin: 2.80,
-          draw: 3.20,
+          homeWin: 2.4,
+          awayWin: 2.8,
+          draw: 3.2,
           overUnder: 2.5,
           specialBets: [
-            { id: 'sb5', name: 'First Goal', odds: 6.00, description: 'First goal scorer', riskLevel: 'high', maxBet: 800, minBet: 15 },
-            { id: 'sb6', name: 'Clean Sheet', odds: 4.50, description: 'No goals conceded', riskLevel: 'medium', maxBet: 1200, minBet: 30 }
-          ]
+            {
+              id: 'sb5',
+              name: 'First Goal',
+              odds: 6.0,
+              description: 'First goal scorer',
+              riskLevel: 'high',
+              maxBet: 800,
+              minBet: 15,
+            },
+            {
+              id: 'sb6',
+              name: 'Clean Sheet',
+              odds: 4.5,
+              description: 'No goals conceded',
+              riskLevel: 'medium',
+              maxBet: 1200,
+              minBet: 30,
+            },
+          ],
         },
         riskLevel: 'medium',
         vipAccess: ['bronze', 'silze', 'gold', 'platinum'],
         isActive: true,
-        lastUpdated: new Date()
-      }
+        lastUpdated: new Date(),
+      },
     ];
 
     defaultEvents.forEach(event => this.events.set(event.id, event));
@@ -269,7 +325,16 @@ export class SportsBettingManagementSystem {
    */
   private initializeDefaultRates() {
     const sports = ['football', 'basketball', 'soccer', 'tennis', 'golf', 'racing', 'esports'];
-    const betTypes: BetType[] = ['moneyline', 'spread', 'over_under', 'parlay', 'teaser', 'futures', 'live_bet', 'special'];
+    const betTypes: BetType[] = [
+      'moneyline',
+      'spread',
+      'over_under',
+      'parlay',
+      'teaser',
+      'futures',
+      'live_bet',
+      'special',
+    ];
     const agents = ['agent1', 'agent2', 'agent3', 'agent4', 'agent5'];
 
     agents.forEach(agentId => {
@@ -289,7 +354,7 @@ export class SportsBettingManagementSystem {
             effectiveFrom: new Date(),
             isActive: true,
             createdBy: 'system',
-            createdAt: new Date()
+            createdAt: new Date(),
           };
 
           this.rates.set(rate.id, rate);
@@ -303,15 +368,24 @@ export class SportsBettingManagementSystem {
    */
   private getBaseRateForBetType(betType: BetType): number {
     switch (betType) {
-      case 'moneyline': return 0.025;
-      case 'spread': return 0.030;
-      case 'over_under': return 0.028;
-      case 'parlay': return 0.040;
-      case 'teaser': return 0.035;
-      case 'futures': return 0.050;
-      case 'live_bet': return 0.045;
-      case 'special': return 0.060;
-      default: return 0.030;
+      case 'moneyline':
+        return 0.025;
+      case 'spread':
+        return 0.03;
+      case 'over_under':
+        return 0.028;
+      case 'parlay':
+        return 0.04;
+      case 'teaser':
+        return 0.035;
+      case 'futures':
+        return 0.05;
+      case 'live_bet':
+        return 0.045;
+      case 'special':
+        return 0.06;
+      default:
+        return 0.03;
     }
   }
 
@@ -320,7 +394,7 @@ export class SportsBettingManagementSystem {
    */
   private initializeDefaultRiskProfiles() {
     const players = ['player1', 'player2', 'player3', 'player4', 'player5'];
-    
+
     players.forEach(playerId => {
       const riskAssessment: RiskAssessment = {
         id: `risk_${playerId}`,
@@ -331,7 +405,7 @@ export class SportsBettingManagementSystem {
         factors: this.generateRiskFactors(),
         recommendations: this.generateRiskRecommendations(),
         lastAssessed: new Date(),
-        nextAssessment: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 1 week
+        nextAssessment: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week
       };
 
       this.riskAssessments.set(riskAssessment.id, riskAssessment);
@@ -351,11 +425,41 @@ export class SportsBettingManagementSystem {
    */
   private generateRiskFactors(): RiskFactor[] {
     const factors: RiskFactor[] = [
-      { factor: 'Betting Frequency', weight: 0.3, score: Math.floor(Math.random() * 100), description: 'How often player places bets', impact: 'neutral' },
-      { factor: 'Average Stake', weight: 0.25, score: Math.floor(Math.random() * 100), description: 'Average bet amount', impact: 'neutral' },
-      { factor: 'Win Rate', weight: 0.2, score: Math.floor(Math.random() * 100), description: 'Percentage of winning bets', impact: 'neutral' },
-      { factor: 'Account Balance', weight: 0.15, score: Math.floor(Math.random() * 100), description: 'Current account balance', impact: 'neutral' },
-      { factor: 'Risk Tolerance', weight: 0.1, score: Math.floor(Math.random() * 100), description: 'Player risk preference', impact: 'neutral' }
+      {
+        factor: 'Betting Frequency',
+        weight: 0.3,
+        score: Math.floor(Math.random() * 100),
+        description: 'How often player places bets',
+        impact: 'neutral',
+      },
+      {
+        factor: 'Average Stake',
+        weight: 0.25,
+        score: Math.floor(Math.random() * 100),
+        description: 'Average bet amount',
+        impact: 'neutral',
+      },
+      {
+        factor: 'Win Rate',
+        weight: 0.2,
+        score: Math.floor(Math.random() * 100),
+        description: 'Percentage of winning bets',
+        impact: 'neutral',
+      },
+      {
+        factor: 'Account Balance',
+        weight: 0.15,
+        score: Math.floor(Math.random() * 100),
+        description: 'Current account balance',
+        impact: 'neutral',
+      },
+      {
+        factor: 'Risk Tolerance',
+        weight: 0.1,
+        score: Math.floor(Math.random() * 100),
+        description: 'Player risk preference',
+        impact: 'neutral',
+      },
     ];
 
     // Calculate impact based on scores
@@ -377,7 +481,7 @@ export class SportsBettingManagementSystem {
       'Monitor betting patterns for potential issues',
       'Set daily betting limits to manage risk',
       'Focus on lower-risk bet types',
-      'Review and adjust betting strategy regularly'
+      'Review and adjust betting strategy regularly',
     ];
 
     return recommendations.slice(0, Math.floor(Math.random() * 3) + 2);
@@ -388,9 +492,10 @@ export class SportsBettingManagementSystem {
    */
   private initializeDefaultVIPProfiles() {
     const players = ['player1', 'player2', 'player3', 'player4', 'player5'];
-    
+
     players.forEach((playerId, index) => {
-      const tier: VIPTier = index === 0 ? 'platinum' : index === 1 ? 'gold' : index === 2 ? 'silver' : 'bronze';
+      const tier: VIPTier =
+        index === 0 ? 'platinum' : index === 1 ? 'gold' : index === 2 ? 'silver' : 'bronze';
       const profile: VIPProfile = {
         id: `vip_${playerId}`,
         playerId,
@@ -400,7 +505,7 @@ export class SportsBettingManagementSystem {
         benefits: this.getVIPBenefitsForTier(tier),
         status: 'active',
         joinedAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000), // Random join date
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       };
 
       this.vipProfiles.set(profile.id, profile);
@@ -412,11 +517,16 @@ export class SportsBettingManagementSystem {
    */
   private getVIPPointsForTier(tier: VIPTier): number {
     switch (tier) {
-      case 'bronze': return 1000 + Math.floor(Math.random() * 2000);
-      case 'silver': return 5000 + Math.floor(Math.random() * 5000);
-      case 'gold': return 15000 + Math.floor(Math.random() * 10000);
-      case 'platinum': return 50000 + Math.floor(Math.random() * 50000);
-      default: return 1000;
+      case 'bronze':
+        return 1000 + Math.floor(Math.random() * 2000);
+      case 'silver':
+        return 5000 + Math.floor(Math.random() * 5000);
+      case 'gold':
+        return 15000 + Math.floor(Math.random() * 10000);
+      case 'platinum':
+        return 50000 + Math.floor(Math.random() * 50000);
+      default:
+        return 1000;
     }
   }
 
@@ -426,15 +536,45 @@ export class SportsBettingManagementSystem {
   private getVIPRequirementsForTier(tier: VIPTier): VIPRequirements {
     switch (tier) {
       case 'bronze':
-        return { minBalance: 1000, minVolume: 5000, minBets: 50, minWinRate: 45, riskThreshold: 80 };
+        return {
+          minBalance: 1000,
+          minVolume: 5000,
+          minBets: 50,
+          minWinRate: 45,
+          riskThreshold: 80,
+        };
       case 'silver':
-        return { minBalance: 5000, minVolume: 25000, minBets: 200, minWinRate: 50, riskThreshold: 70 };
+        return {
+          minBalance: 5000,
+          minVolume: 25000,
+          minBets: 200,
+          minWinRate: 50,
+          riskThreshold: 70,
+        };
       case 'gold':
-        return { minBalance: 15000, minVolume: 100000, minBets: 500, minWinRate: 55, riskThreshold: 60 };
+        return {
+          minBalance: 15000,
+          minVolume: 100000,
+          minBets: 500,
+          minWinRate: 55,
+          riskThreshold: 60,
+        };
       case 'platinum':
-        return { minBalance: 50000, minVolume: 500000, minBets: 1000, minWinRate: 60, riskThreshold: 50 };
+        return {
+          minBalance: 50000,
+          minVolume: 500000,
+          minBets: 1000,
+          minWinRate: 60,
+          riskThreshold: 50,
+        };
       default:
-        return { minBalance: 1000, minVolume: 5000, minBets: 50, minWinRate: 45, riskThreshold: 80 };
+        return {
+          minBalance: 1000,
+          minVolume: 5000,
+          minBets: 50,
+          minWinRate: 45,
+          riskThreshold: 80,
+        };
     }
   }
 
@@ -444,15 +584,50 @@ export class SportsBettingManagementSystem {
   private getVIPBenefitsForTier(tier: VIPTier): VIPBenefits {
     switch (tier) {
       case 'bronze':
-        return { maxBetIncrease: 1.2, rateDiscount: 0.05, cashbackPercentage: 1, exclusiveEvents: [], prioritySupport: false, personalManager: false };
+        return {
+          maxBetIncrease: 1.2,
+          rateDiscount: 0.05,
+          cashbackPercentage: 1,
+          exclusiveEvents: [],
+          prioritySupport: false,
+          personalManager: false,
+        };
       case 'silver':
-        return { maxBetIncrease: 1.5, rateDiscount: 0.10, cashbackPercentage: 2, exclusiveEvents: ['Special Events'], prioritySupport: true, personalManager: false };
+        return {
+          maxBetIncrease: 1.5,
+          rateDiscount: 0.1,
+          cashbackPercentage: 2,
+          exclusiveEvents: ['Special Events'],
+          prioritySupport: true,
+          personalManager: false,
+        };
       case 'gold':
-        return { maxBetIncrease: 2.0, rateDiscount: 0.15, cashbackPercentage: 3, exclusiveEvents: ['Special Events', 'VIP Tournaments'], prioritySupport: true, personalManager: true };
+        return {
+          maxBetIncrease: 2.0,
+          rateDiscount: 0.15,
+          cashbackPercentage: 3,
+          exclusiveEvents: ['Special Events', 'VIP Tournaments'],
+          prioritySupport: true,
+          personalManager: true,
+        };
       case 'platinum':
-        return { maxBetIncrease: 3.0, rateDiscount: 0.25, cashbackPercentage: 5, exclusiveEvents: ['Special Events', 'VIP Tournaments', 'Private Events'], prioritySupport: true, personalManager: true };
+        return {
+          maxBetIncrease: 3.0,
+          rateDiscount: 0.25,
+          cashbackPercentage: 5,
+          exclusiveEvents: ['Special Events', 'VIP Tournaments', 'Private Events'],
+          prioritySupport: true,
+          personalManager: true,
+        };
       default:
-        return { maxBetIncrease: 1.0, rateDiscount: 0, cashbackPercentage: 0, exclusiveEvents: [], prioritySupport: false, personalManager: false };
+        return {
+          maxBetIncrease: 1.0,
+          rateDiscount: 0,
+          cashbackPercentage: 0,
+          exclusiveEvents: [],
+          prioritySupport: false,
+          personalManager: false,
+        };
     }
   }
 
@@ -513,7 +688,12 @@ export class SportsBettingManagementSystem {
     if (!riskAssessment) return null;
 
     // Calculate potential win
-    const potentialWin = this.calculatePotentialWin(stake, odds, player.currentTier, riskAssessment.overallRisk);
+    const potentialWin = this.calculatePotentialWin(
+      stake,
+      odds,
+      player.currentTier,
+      riskAssessment.overallRisk
+    );
 
     const bet: SportsBet = {
       id: `bet_${Date.now()}`,
@@ -528,7 +708,7 @@ export class SportsBettingManagementSystem {
       riskLevel: riskAssessment.overallRisk,
       vipTier: player.currentTier,
       status: 'pending',
-      placedAt: new Date()
+      placedAt: new Date(),
     };
 
     this.bets.set(bet.id, bet);
@@ -545,13 +725,14 @@ export class SportsBettingManagementSystem {
     riskLevel: RiskLevel
   ): number {
     let baseWin = stake * odds;
-    
+
     // Apply VIP multiplier
-    const vipProfile = Array.from(this.vipProfiles.values())
-      .find(profile => profile.currentTier === vipTier);
-    
+    const vipProfile = Array.from(this.vipProfiles.values()).find(
+      profile => profile.currentTier === vipTier
+    );
+
     if (vipProfile) {
-      baseWin *= (1 + vipProfile.benefits.rateDiscount);
+      baseWin *= 1 + vipProfile.benefits.rateDiscount;
     }
 
     // Apply risk adjustment
@@ -566,11 +747,16 @@ export class SportsBettingManagementSystem {
    */
   private getRiskMultiplier(riskLevel: RiskLevel): number {
     switch (riskLevel) {
-      case 'low': return 1.0;
-      case 'medium': return 0.95;
-      case 'high': return 0.90;
-      case 'extreme': return 0.80;
-      default: return 1.0;
+      case 'low':
+        return 1.0;
+      case 'medium':
+        return 0.95;
+      case 'high':
+        return 0.9;
+      case 'extreme':
+        return 0.8;
+      default:
+        return 1.0;
     }
   }
 
@@ -586,7 +772,7 @@ export class SportsBettingManagementSystem {
 
     if (won) {
       bet.actualWin = actualOdds ? bet.stake * actualOdds : bet.potentialWin;
-      
+
       // Create winning calculation
       const calculation = this.createWinningCalculation(bet);
       this.winningCalculations.set(calculation.id, calculation);
@@ -599,11 +785,13 @@ export class SportsBettingManagementSystem {
    * Create winning calculation
    */
   private createWinningCalculation(bet: SportsBet): WinningCalculation {
-    const vipProfile = Array.from(this.vipProfiles.values())
-      .find(profile => profile.playerId === bet.playerId);
-    
-    const riskAssessment = Array.from(this.riskAssessments.values())
-      .find(assessment => assessment.playerId === bet.playerId);
+    const vipProfile = Array.from(this.vipProfiles.values()).find(
+      profile => profile.playerId === bet.playerId
+    );
+
+    const riskAssessment = Array.from(this.riskAssessments.values()).find(
+      assessment => assessment.playerId === bet.playerId
+    );
 
     const calculation: WinningCalculation = {
       id: `calc_${bet.id}`,
@@ -614,10 +802,12 @@ export class SportsBettingManagementSystem {
       adjustedOdds: bet.odds,
       adjustedPotentialWin: bet.potentialWin,
       vipBonus: vipProfile ? vipProfile.benefits.rateDiscount * bet.stake : 0,
-      riskAdjustment: riskAssessment ? (1 - this.getRiskMultiplier(riskAssessment.overallRisk)) * bet.stake : 0,
+      riskAdjustment: riskAssessment
+        ? (1 - this.getRiskMultiplier(riskAssessment.overallRisk)) * bet.stake
+        : 0,
       finalWinAmount: bet.actualWin || 0,
       calculationFactors: this.generateCalculationFactors(bet, vipProfile, riskAssessment),
-      calculatedAt: new Date()
+      calculatedAt: new Date(),
     };
 
     return calculation;
@@ -638,7 +828,7 @@ export class SportsBettingManagementSystem {
         factor: 'VIP Tier Bonus',
         value: vipProfile.benefits.rateDiscount * 100,
         impact: 'positive',
-        description: `${vipProfile.currentTier} tier rate discount`
+        description: `${vipProfile.currentTier} tier rate discount`,
       });
     }
 
@@ -647,7 +837,7 @@ export class SportsBettingManagementSystem {
         factor: 'Risk Adjustment',
         value: (1 - this.getRiskMultiplier(riskAssessment.overallRisk)) * 100,
         impact: 'negative',
-        description: `${riskAssessment.overallRisk} risk level adjustment`
+        description: `${riskAssessment.overallRisk} risk level adjustment`,
       });
     }
 
@@ -655,7 +845,7 @@ export class SportsBettingManagementSystem {
       factor: 'Base Odds',
       value: bet.odds,
       impact: 'positive',
-      description: 'Original betting odds'
+      description: 'Original betting odds',
     });
 
     return factors;
@@ -704,7 +894,7 @@ export class SportsBettingManagementSystem {
       effectiveFrom: new Date(),
       isActive: true,
       createdBy,
-      createdAt: new Date()
+      createdAt: new Date(),
     };
 
     this.rates.set(newRateRecord.id, newRateRecord);
@@ -791,7 +981,7 @@ export class SportsBettingManagementSystem {
   private checkTierUpgrade(profile: VIPProfile): void {
     const currentTierIndex = this.getTierIndex(profile.currentTier);
     const nextTier = this.getNextTier(profile.currentTier);
-    
+
     if (nextTier && profile.points >= this.getVIPRequirementsForTier(nextTier).minVolume) {
       profile.currentTier = nextTier;
       profile.requirements = this.getVIPRequirementsForTier(nextTier);
@@ -833,7 +1023,10 @@ export class SportsBettingManagementSystem {
   /**
    * Get agent performance
    */
-  getAgentPerformance(agentId: string, period: string): {
+  getAgentPerformance(
+    agentId: string,
+    period: string
+  ): {
     totalBets: number;
     totalStake: number;
     totalWins: number;
@@ -842,19 +1035,21 @@ export class SportsBettingManagementSystem {
     riskDistribution: Record<RiskLevel, number>;
     vipDistribution: Record<VIPTier, number>;
   } {
-    const periodBets = Array.from(this.bets.values())
-      .filter(bet => 
-        bet.agentId === agentId && 
-        bet.placedAt.toISOString().slice(0, 7) === period
-      );
+    const periodBets = Array.from(this.bets.values()).filter(
+      bet => bet.agentId === agentId && bet.placedAt.toISOString().slice(0, 7) === period
+    );
 
     const totalBets = periodBets.length;
     const totalStake = periodBets.reduce((sum, bet) => sum + bet.stake, 0);
     const totalWins = periodBets
       .filter(bet => bet.status === 'won')
       .reduce((sum, bet) => sum + (bet.actualWin || 0), 0);
-    const winRate = totalBets > 0 ? (periodBets.filter(bet => bet.status === 'won').length / totalBets) * 100 : 0;
-    const averageOdds = periodBets.length > 0 ? periodBets.reduce((sum, bet) => sum + bet.odds, 0) / periodBets.length : 0;
+    const winRate =
+      totalBets > 0 ? (periodBets.filter(bet => bet.status === 'won').length / totalBets) * 100 : 0;
+    const averageOdds =
+      periodBets.length > 0
+        ? periodBets.reduce((sum, bet) => sum + bet.odds, 0) / periodBets.length
+        : 0;
 
     const riskDistribution: Record<RiskLevel, number> = { low: 0, medium: 0, high: 0, extreme: 0 };
     const vipDistribution: Record<VIPTier, number> = { bronze: 0, silver: 0, gold: 0, platinum: 0 };
@@ -871,7 +1066,7 @@ export class SportsBettingManagementSystem {
       winRate,
       averageOdds,
       riskDistribution,
-      vipDistribution
+      vipDistribution,
     };
   }
 
@@ -896,7 +1091,7 @@ export class SportsBettingManagementSystem {
       totalRates,
       activeRates,
       totalVIPProfiles,
-      totalRiskAssessments
+      totalRiskAssessments,
     };
   }
 }

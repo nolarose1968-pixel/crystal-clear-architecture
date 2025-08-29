@@ -64,9 +64,9 @@ export class Fire22Scoreboard extends EventEmitter {
         scoreUpdates: true,
         gameStarts: true,
         gameEnds: true,
-        significantPlays: true
+        significantPlays: true,
       },
-      ...options
+      ...options,
     };
 
     this.excelExporter = ExcelExportService.getInstance();
@@ -81,7 +81,6 @@ export class Fire22Scoreboard extends EventEmitter {
   }
 
   private async initializeScoreboard(): Promise<void> {
-
     // Setup event listeners for UI elements
     this.setupUIEventListeners();
 
@@ -95,12 +94,11 @@ export class Fire22Scoreboard extends EventEmitter {
 
     // Setup keyboard shortcuts
     this.setupKeyboardShortcuts();
-
   }
 
   private setupUIEventListeners(): void {
     // Handle scoreboard close button
-    document.addEventListener('click', (event) => {
+    document.addEventListener('click', event => {
       const target = event.target as HTMLElement;
       const closeButton = target.closest('[data-action="close-scores"]');
 
@@ -111,7 +109,7 @@ export class Fire22Scoreboard extends EventEmitter {
     });
 
     // Handle scoreboard title clicks
-    document.addEventListener('click', (event) => {
+    document.addEventListener('click', event => {
       const target = event.target as HTMLElement;
       const scoreboardTitle = target.closest('.header-score-title');
 
@@ -121,7 +119,7 @@ export class Fire22Scoreboard extends EventEmitter {
     });
 
     // Handle game card clicks
-    document.addEventListener('click', (event) => {
+    document.addEventListener('click', event => {
       const target = event.target as HTMLElement;
       const gameCard = target.closest('.game-card[data-game-id]');
 
@@ -135,7 +133,7 @@ export class Fire22Scoreboard extends EventEmitter {
   }
 
   private setupKeyboardShortcuts(): void {
-    document.addEventListener('keydown', (event) => {
+    document.addEventListener('keydown', event => {
       // ESC to close scoreboard
       if (event.key === 'Escape' && this.isVisible) {
         this.closeScoreboard();
@@ -171,12 +169,24 @@ export class Fire22Scoreboard extends EventEmitter {
           odds: {
             spread: -3.5,
             total: 47.5,
-            moneyline: { home: -150, away: 130 }
+            moneyline: { home: -150, away: 130 },
           },
           significantPlays: [
-            { time: '2:30 4Q', description: 'TD pass to Mahomes', points: 6, team: 'Chiefs', player: 'Patrick Mahomes' },
-            { time: '1:45 4Q', description: 'FG by McPherson', points: 3, team: 'Chiefs', player: 'Harrison Butker' }
-          ]
+            {
+              time: '2:30 4Q',
+              description: 'TD pass to Mahomes',
+              points: 6,
+              team: 'Chiefs',
+              player: 'Patrick Mahomes',
+            },
+            {
+              time: '1:45 4Q',
+              description: 'FG by McPherson',
+              points: 3,
+              team: 'Chiefs',
+              player: 'Harrison Butker',
+            },
+          ],
         },
         {
           id: 'nfl-002',
@@ -190,11 +200,17 @@ export class Fire22Scoreboard extends EventEmitter {
           odds: {
             spread: -7.5,
             total: 43.5,
-            moneyline: { home: -220, away: 180 }
+            moneyline: { home: -220, away: 180 },
           },
           significantPlays: [
-            { time: '5:20 3Q', description: 'TD run by Hurts', points: 6, team: 'Eagles', player: 'Jalen Hurts' }
-          ]
+            {
+              time: '5:20 3Q',
+              description: 'TD run by Hurts',
+              points: 6,
+              team: 'Eagles',
+              player: 'Jalen Hurts',
+            },
+          ],
         },
         {
           id: 'nba-001',
@@ -208,12 +224,18 @@ export class Fire22Scoreboard extends EventEmitter {
           odds: {
             spread: 2.5,
             total: 228.5,
-            moneyline: { home: -110, away: -110 }
+            moneyline: { home: -110, away: -110 },
           },
           significantPlays: [
-            { time: '1:30 4Q', description: '3PT by Curry', points: 3, team: 'Warriors', player: 'Stephen Curry' }
-          ]
-        }
+            {
+              time: '1:30 4Q',
+              description: '3PT by Curry',
+              points: 3,
+              team: 'Warriors',
+              player: 'Stephen Curry',
+            },
+          ],
+        },
       ];
 
       // Clear existing games
@@ -225,7 +247,6 @@ export class Fire22Scoreboard extends EventEmitter {
       });
 
       this.emit('games-loaded', mockGames);
-
     } catch (error) {
       console.error('❌ Failed to load games:', error);
       this.emit('games-error', error);
@@ -265,7 +286,9 @@ export class Fire22Scoreboard extends EventEmitter {
     scoreboardModal.style.display = 'flex';
 
     // Focus management
-    const closeButton = scoreboardModal.querySelector('[data-action="close-scores"]') as HTMLElement;
+    const closeButton = scoreboardModal.querySelector(
+      '[data-action="close-scores"]'
+    ) as HTMLElement;
     if (closeButton) {
       closeButton.focus();
     }
@@ -627,23 +650,36 @@ export class Fire22Scoreboard extends EventEmitter {
           </div>
         </div>
 
-        ${this.options.showOdds && game.odds ? `
+        ${
+          this.options.showOdds && game.odds
+            ? `
           <div class="game-odds">
             Spread: ${game.odds.spread > 0 ? '+' : ''}${game.odds.spread} |
             Total: ${game.odds.total} |
             ML: ${game.odds.moneyline.home}/${game.odds.moneyline.away}
           </div>
-        ` : ''}
+        `
+            : ''
+        }
 
-        ${game.significantPlays.length > 0 ? `
+        ${
+          game.significantPlays.length > 0
+            ? `
           <div class="significant-plays">
-            ${game.significantPlays.slice(-2).map(play => `
+            ${game.significantPlays
+              .slice(-2)
+              .map(
+                play => `
               <div class="play-item">
                 ${play.time}: ${play.description} (${play.points} pts)
               </div>
-            `).join('')}
+            `
+              )
+              .join('')}
           </div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
     `;
   }
@@ -688,9 +724,12 @@ export class Fire22Scoreboard extends EventEmitter {
    * Apply filters
    */
   private applyFilters(): void {
-    const sportFilter = (document.getElementById('sport-filter') as HTMLSelectElement)?.value || 'all';
-    const statusFilter = (document.getElementById('status-filter') as HTMLSelectElement)?.value || 'all';
-    const searchTerm = (document.getElementById('search-input') as HTMLInputElement)?.value.toLowerCase() || '';
+    const sportFilter =
+      (document.getElementById('sport-filter') as HTMLSelectElement)?.value || 'all';
+    const statusFilter =
+      (document.getElementById('status-filter') as HTMLSelectElement)?.value || 'all';
+    const searchTerm =
+      (document.getElementById('search-input') as HTMLInputElement)?.value.toLowerCase() || '';
 
     const gameCards = document.querySelectorAll('.game-card');
     gameCards.forEach(card => {
@@ -729,7 +768,6 @@ export class Fire22Scoreboard extends EventEmitter {
   private selectGame(gameId: string): void {
     const game = this.games.get(gameId);
     if (!game) return;
-
 
     // Show game details modal or trigger betting interface
     this.showGameDetails(game);
@@ -788,7 +826,9 @@ export class Fire22Scoreboard extends EventEmitter {
             </div>
           </div>
 
-          ${game.odds ? `
+          ${
+            game.odds
+              ? `
             <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
               <h3 style="margin-top: 0; color: #ffd700;">📊 Odds</h3>
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
@@ -806,12 +846,18 @@ export class Fire22Scoreboard extends EventEmitter {
                 </div>
               </div>
             </div>
-          ` : ''}
+          `
+              : ''
+          }
 
-          ${game.significantPlays.length > 0 ? `
+          ${
+            game.significantPlays.length > 0
+              ? `
             <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px;">
               <h3 style="margin-top: 0; color: #ffd700;">⚡ Recent Plays</h3>
-              ${game.significantPlays.map(play => `
+              ${game.significantPlays
+                .map(
+                  play => `
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
                   <div>
                     <div style="font-weight: bold;">${play.description}</div>
@@ -822,9 +868,13 @@ export class Fire22Scoreboard extends EventEmitter {
                     <div style="font-size: 12px; color: #adb5bd;">${play.time}</div>
                   </div>
                 </div>
-              `).join('')}
+              `
+                )
+                .join('')}
             </div>
-          ` : ''}
+          `
+              : ''
+          }
         </div>
       </div>
     `;
@@ -836,7 +886,6 @@ export class Fire22Scoreboard extends EventEmitter {
    * Refresh scoreboard
    */
   async refreshScoreboard(): Promise<void> {
-
     // Simulate refreshing game data
     await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -853,11 +902,15 @@ export class Fire22Scoreboard extends EventEmitter {
         // Add significant play
         if (Math.random() > 0.8) {
           game.significantPlays.push({
-            time: `${Math.floor(Math.random() * 15)}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')} ${game.period}`,
-            description: ['TD Pass', 'TD Run', 'Field Goal', 'Extra Point'][Math.floor(Math.random() * 4)],
+            time: `${Math.floor(Math.random() * 15)}:${Math.floor(Math.random() * 60)
+              .toString()
+              .padStart(2, '0')} ${game.period}`,
+            description: ['TD Pass', 'TD Run', 'Field Goal', 'Extra Point'][
+              Math.floor(Math.random() * 4)
+            ],
             points: [2, 3, 6, 7][Math.floor(Math.random() * 4)],
             team: Math.random() > 0.5 ? game.homeTeam : game.awayTeam,
-            player: ['QB', 'RB', 'WR', 'TE'][Math.floor(Math.random() * 4)]
+            player: ['QB', 'RB', 'WR', 'TE'][Math.floor(Math.random() * 4)],
           });
         }
       }
@@ -875,7 +928,6 @@ export class Fire22Scoreboard extends EventEmitter {
    */
   private async exportScoreboard(): Promise<void> {
     try {
-
       const games = Array.from(this.games.values());
       const timestamp = new Date().toISOString().slice(0, 10);
 
@@ -886,47 +938,47 @@ export class Fire22Scoreboard extends EventEmitter {
         'Away Team': game.awayTeam,
         'Home Score': game.homeScore,
         'Away Score': game.awayScore,
-        'Status': game.status,
-        'Period': game.period,
+        Status: game.status,
+        Period: game.period,
         'Time Remaining': game.timeRemaining,
-        'Spread': game.odds?.spread || '',
-        'Total': game.odds?.total || '',
+        Spread: game.odds?.spread || '',
+        Total: game.odds?.total || '',
         'Moneyline Home': game.odds?.moneyline.home || '',
         'Moneyline Away': game.odds?.moneyline.away || '',
-        'Last Updated': new Date().toLocaleString()
+        'Last Updated': new Date().toLocaleString(),
       }));
 
       // Use Excel Export Service
       await this.excelExporter.exportToExcel({
         filename: `fire22-scoreboard-${timestamp}.xlsx`,
-        sheets: [{
-          name: 'Live Scores',
-          data: exportData,
-          columns: [
-            { key: 'Game ID', header: 'Game ID', width: 15 },
-            { key: 'Home Team', header: 'Home Team', width: 20 },
-            { key: 'Away Team', header: 'Away Team', width: 20 },
-            { key: 'Home Score', header: 'Home Score', width: 10, type: 'number' },
-            { key: 'Away Score', header: 'Away Score', width: 10, type: 'number' },
-            { key: 'Status', header: 'Status', width: 12 },
-            { key: 'Period', header: 'Period', width: 8 },
-            { key: 'Time Remaining', header: 'Time Left', width: 12 },
-            { key: 'Spread', header: 'Spread', width: 8, type: 'number' },
-            { key: 'Total', header: 'Total', width: 8, type: 'number' },
-            { key: 'Moneyline Home', header: 'ML Home', width: 10 },
-            { key: 'Moneyline Away', header: 'ML Away', width: 10 },
-            { key: 'Last Updated', header: 'Updated', width: 15, type: 'date' }
-          ]
-        }],
+        sheets: [
+          {
+            name: 'Live Scores',
+            data: exportData,
+            columns: [
+              { key: 'Game ID', header: 'Game ID', width: 15 },
+              { key: 'Home Team', header: 'Home Team', width: 20 },
+              { key: 'Away Team', header: 'Away Team', width: 20 },
+              { key: 'Home Score', header: 'Home Score', width: 10, type: 'number' },
+              { key: 'Away Score', header: 'Away Score', width: 10, type: 'number' },
+              { key: 'Status', header: 'Status', width: 12 },
+              { key: 'Period', header: 'Period', width: 8 },
+              { key: 'Time Remaining', header: 'Time Left', width: 12 },
+              { key: 'Spread', header: 'Spread', width: 8, type: 'number' },
+              { key: 'Total', header: 'Total', width: 8, type: 'number' },
+              { key: 'Moneyline Home', header: 'ML Home', width: 10 },
+              { key: 'Moneyline Away', header: 'ML Away', width: 10 },
+              { key: 'Last Updated', header: 'Updated', width: 15, type: 'date' },
+            ],
+          },
+        ],
         metadata: {
           title: 'Fire22 Live Scoreboard',
           author: 'Fire22 System',
           created: new Date().toISOString(),
-          description: 'Live game scores and betting data'
-        }
+          description: 'Live game scores and betting data',
+        },
       });
-
-
     } catch (error) {
       console.error('❌ Failed to export scoreboard:', error);
     }
@@ -972,7 +1024,6 @@ export class Fire22Scoreboard extends EventEmitter {
 
     this.games.clear();
     this.removeAllListeners();
-
   }
 }
 

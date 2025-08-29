@@ -1,10 +1,12 @@
 # 🔧 Fire22 Diagram Tooling System
 
-> **Uses `mermaid.js` for initial diagram structure and logic, then translates to stunning ANSI-colored ASCII art for Node.js console display**
+> **Uses `mermaid.js` for initial diagram structure and logic, then translates
+> to stunning ANSI-colored ASCII art for Node.js console display**
 
 ## 🎯 Overview
 
-The Fire22 Diagram Tooling System is a powerful visualization tool that combines the best of both worlds:
+The Fire22 Diagram Tooling System is a powerful visualization tool that combines
+the best of both worlds:
 
 1. **🎨 Mermaid.js Integration** - Professional diagram structure and logic
 2. **🎭 ANSI ASCII Art Translation** - Beautiful terminal-based visualization
@@ -14,6 +16,7 @@ The Fire22 Diagram Tooling System is a powerful visualization tool that combines
 ## ✨ Features
 
 ### **🎨 Mermaid.js Support**
+
 - **Flowcharts** - Process flows and decision trees
 - **Sequence Diagrams** - System interactions and API calls
 - **Class Diagrams** - Object-oriented architecture
@@ -22,12 +25,14 @@ The Fire22 Diagram Tooling System is a powerful visualization tool that combines
 - **Pie Charts** - Data distribution visualization
 
 ### **🎭 ANSI ASCII Art Translation**
+
 - **Unicode Support** - Beautiful box-drawing characters
 - **Color Schemes** - Fire22, Professional, Vibrant, Monochrome
 - **Animation Ready** - Smooth transitions and effects
 - **Interactive Elements** - Hover states and click handlers
 
 ### **🌈 Color Library Support**
+
 - **Chalk** - Rich color formatting and styling
 - **Kleur** - Lightweight color library
 - **Ansi-colors** - Cross-platform compatibility
@@ -69,55 +74,65 @@ bun run diagram:all
 ## 📊 Available Diagrams
 
 ### **1. 🔄 Version Management Flow**
+
 ```bash
 bun run diagram:version
 ```
 
 **Shows:**
+
 - Version incrementing workflow
 - Patch, Minor, Major, Prerelease paths
 - Build process integration
 - Deployment pipeline
 
 ### **2. 🏗️ Build System Architecture**
+
 ```bash
 bun run diagram:build
 ```
 
 **Shows:**
+
 - Multiple build profiles (Quick, Standard, Production, Full)
 - Quality gates and security checks
 - Package building process
 - Testing integration
 
 ### **3. 📦 Package Architecture**
+
 ```bash
 bun run diagram:package
 ```
 
 **Shows:**
+
 - Four modular packages
 - Independent versioning
 - Build status tracking
 - Package relationships
 
 ### **4. 🚀 Deployment Pipeline**
+
 ```bash
 bun run diagram:deploy
 ```
 
 **Shows:**
+
 - CI/CD workflow
 - Testing and quality gates
 - Staging and production deployment
 - Rollback procedures
 
 ### **5. 🎯 Command Matrix**
+
 ```bash
 bun run diagram:commands
 ```
 
 **Shows:**
+
 - Complete command structure
 - Version management commands
 - Build system commands
@@ -128,7 +143,11 @@ bun run diagram:commands
 ### **Basic Structure**
 
 ```typescript
-import { Fire22DiagramTooling, DiagramConfig, AnsiArtConfig } from './scripts/diagram-tooling';
+import {
+  Fire22DiagramTooling,
+  DiagramConfig,
+  AnsiArtConfig,
+} from './scripts/diagram-tooling';
 
 const config: DiagramConfig = {
   type: 'flowchart',
@@ -142,14 +161,14 @@ const config: DiagramConfig = {
   outputFormat: 'ansi',
   colorScheme: 'fire22',
   width: 80,
-  height: 24
+  height: 24,
 };
 
 const ansiConfig: AnsiArtConfig = {
   useUnicode: true,
   colorPalette: 'fire22',
   animation: false,
-  interactive: false
+  interactive: false,
 };
 
 const tooling = new Fire22DiagramTooling(config, ansiConfig, 'chalk');
@@ -159,6 +178,7 @@ await tooling.run();
 ### **Mermaid.js Syntax Examples**
 
 #### **Flowchart**
+
 ```mermaid
 graph TD
   A[Start] --> B{Decision?}
@@ -169,6 +189,7 @@ graph TD
 ```
 
 #### **Sequence Diagram**
+
 ```mermaid
 sequenceDiagram
   participant U as User
@@ -179,6 +200,7 @@ sequenceDiagram
 ```
 
 #### **Class Diagram**
+
 ```mermaid
 classDiagram
   class Animal {
@@ -196,6 +218,7 @@ classDiagram
 ## 🌈 Color Schemes
 
 ### **Fire22 Theme** 🔥
+
 - **Primary**: Orange (#fdbb2d) for connections and highlights
 - **Secondary**: Red (#b21f1f) for states and actions
 - **Accent**: Blue for information and data
@@ -203,18 +226,21 @@ classDiagram
 - **Error**: Red for issues and failures
 
 ### **Professional Theme** 💼
+
 - **Primary**: Blue for connections and flow
 - **Secondary**: Cyan for containers and boxes
 - **Accent**: Magenta for states and decisions
 - **Neutral**: White for text and labels
 
 ### **Vibrant Theme** 🌈
+
 - **Primary**: Green for positive flows
 - **Secondary**: Red for negative paths
 - **Accent**: Yellow for containers
 - **Highlight**: Magenta for states
 
 ### **Monochrome Theme** ⚫
+
 - **Primary**: Gray for all elements
 - **Variations**: Different shades for hierarchy
 
@@ -239,10 +265,10 @@ interface DiagramConfig {
 
 ```typescript
 interface AnsiArtConfig {
-  useUnicode: boolean;        // Use Unicode box-drawing characters
-  colorPalette: string;       // Color scheme selection
-  animation: boolean;         // Enable animations
-  interactive: boolean;       // Enable interactive elements
+  useUnicode: boolean; // Use Unicode box-drawing characters
+  colorPalette: string; // Color scheme selection
+  animation: boolean; // Enable animations
+  interactive: boolean; // Enable interactive elements
 }
 ```
 
@@ -290,12 +316,14 @@ if (process.env.GENERATE_DIAGRAMS === 'true') {
 ## 📱 Terminal Compatibility
 
 ### **Supported Terminals**
+
 - **macOS**: Terminal.app, iTerm2, Hyper
 - **Linux**: GNOME Terminal, Konsole, xterm
 - **Windows**: Windows Terminal, ConEmu, PowerShell
 - **WSL**: Ubuntu, Debian, CentOS terminals
 
 ### **Unicode Support**
+
 - **Full Unicode**: Beautiful box-drawing characters
 - **Fallback Mode**: ASCII characters for compatibility
 - **Auto-detection**: Automatic terminal capability detection
@@ -303,18 +331,21 @@ if (process.env.GENERATE_DIAGRAMS === 'true') {
 ## 🎯 Use Cases
 
 ### **Development**
+
 - **Architecture Documentation** - Visual system design
 - **API Documentation** - Sequence diagrams for endpoints
 - **Database Design** - Entity relationship diagrams
 - **Workflow Documentation** - Process flows and decision trees
 
 ### **Operations**
+
 - **Deployment Documentation** - CI/CD pipeline visualization
 - **Monitoring Dashboards** - System health and metrics
 - **Troubleshooting Guides** - Error flow and resolution paths
 - **Training Materials** - Visual learning resources
 
 ### **Management**
+
 - **Project Planning** - Gantt charts and timelines
 - **System Overview** - High-level architecture diagrams
 - **Risk Assessment** - Failure mode and effect analysis
@@ -325,6 +356,7 @@ if (process.env.GENERATE_DIAGRAMS === 'true') {
 ### **Common Issues**
 
 #### **Colors Not Displaying**
+
 ```bash
 # Check terminal color support
 echo -e "\033[31mRed Text\033[0m"
@@ -334,6 +366,7 @@ bun list | grep chalk
 ```
 
 #### **Unicode Characters Not Rendering**
+
 ```bash
 # Check terminal Unicode support
 echo "┌─┬─┐"
@@ -345,6 +378,7 @@ export USE_ASCII_FALLBACK=true
 ```
 
 #### **Diagram Not Generating**
+
 ```bash
 # Check dependencies
 bun install
@@ -377,7 +411,7 @@ class Fire22DiagramTooling {
     ansiConfig?: AnsiArtConfig,
     colorLibrary?: 'chalk' | 'kleur' | 'ansi-colors'
   );
-  
+
   async generateMermaidDiagram(): Promise<string>;
   translateToAnsiArt(mermaidOutput: string): string;
   displayInConsole(asciiArt: string): void;
@@ -408,12 +442,12 @@ class VersionDiagramGenerator {
 
   📦 Package.json ──→ 🔧 Version Manager
   🔧 Version Manager ──→ {Version Type?}
-  
+
   {Version Type?} ──→ 📈 Patch Version
   {Version Type?} ──→ 🚀 Minor Version
   {Version Type?} ──→ 💥 Major Version
   {Version Type?} ──→ 🧪 Prerelease Version
-  
+
   📈 Patch Version ──→ 3.0.6 → 3.0.7
   🚀 Minor Version ──→ 3.0.6 → 3.1.0
   💥 Major Version ──→ 3.0.6 → 4.0.0
@@ -444,7 +478,8 @@ Type: flowchart | Format: ansi
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
+for details.
 
 ## 🙏 Acknowledgments
 
@@ -455,4 +490,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**🔥 Fire22 Diagram Tooling System** - Where professional diagrams meet beautiful terminal art! 🎨✨
+**🔥 Fire22 Diagram Tooling System** - Where professional diagrams meet
+beautiful terminal art! 🎨✨

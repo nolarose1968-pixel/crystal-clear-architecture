@@ -12,7 +12,7 @@ console.log(`📁 Dashboard file: ${DASHBOARD_PATH}`);
 
 const server = http.createServer((req, res) => {
   const url = req.url;
-  
+
   if (url === '/' || url === '/dashboard') {
     try {
       const dashboardHtml = fs.readFileSync(DASHBOARD_PATH, 'utf-8');
@@ -37,7 +37,7 @@ server.listen(PORT, () => {
   console.log(`📊 Open http://localhost:${PORT}/dashboard in your browser`);
 });
 
-server.on('error', (error) => {
+server.on('error', error => {
   if (error.code === 'EADDRINUSE') {
     console.error(`❌ Port ${PORT} is already in use`);
     console.log(`💡 Try a different port or stop the process using port ${PORT}`);

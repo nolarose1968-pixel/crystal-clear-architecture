@@ -7,12 +7,12 @@ import { AdvancedAnalyticsLogger } from './advanced-analytics-logger';
 import { LogLevel, LogContext } from './types';
 
 // Cloudflare-specific cache types
-export type CloudflareCacheType = 
-  | 'CF_KV' 
-  | 'CF_R2' 
-  | 'CF_D1' 
-  | 'CF_CACHE_API' 
-  | 'CF_DURABLE_OBJECTS' 
+export type CloudflareCacheType =
+  | 'CF_KV'
+  | 'CF_R2'
+  | 'CF_D1'
+  | 'CF_CACHE_API'
+  | 'CF_DURABLE_OBJECTS'
   | 'CF_WORKERS_AI'
   | 'CF_VECTORIZE'
   | 'CF_IMAGES'
@@ -21,7 +21,15 @@ export type CloudflareCacheType =
 // Cloudflare Analytics Event
 export interface CloudflareAnalyticsEvent {
   timestamp: Date;
-  eventType: 'WORKER_INVOCATION' | 'KV_OPERATION' | 'R2_OPERATION' | 'D1_QUERY' | 'CACHE_HIT' | 'CACHE_MISS' | 'AI_INFERENCE' | 'DURABLE_OBJECT_CALL';
+  eventType:
+    | 'WORKER_INVOCATION'
+    | 'KV_OPERATION'
+    | 'R2_OPERATION'
+    | 'D1_QUERY'
+    | 'CACHE_HIT'
+    | 'CACHE_MISS'
+    | 'AI_INFERENCE'
+    | 'DURABLE_OBJECT_CALL';
   workerId: string;
   requestId?: string;
   colo: string; // Cloudflare data center
@@ -131,7 +139,7 @@ export class CloudflareAnalyticsIntegration {
     this.analyticsLogger = analyticsLogger;
     this.config = config;
     this.performanceMetrics = this.initializeMetrics();
-    
+
     this.startCloudflareMonitoring();
   }
 
@@ -156,8 +164,8 @@ export class CloudflareAnalyticsIntegration {
       performance,
       billing: {
         requests: 1,
-        cpuTime: performance.cpuTime
-      }
+        cpuTime: performance.cpuTime,
+      },
     };
 
     this.eventBuffer.push(event);
@@ -170,7 +178,7 @@ export class CloudflareAnalyticsIntegration {
       {
         ...context,
         component: 'cloudflare-worker',
-        entityId: requestId
+        entityId: requestId,
       },
       {
         entityType: 'CLOUDFLARE_WORKER',
@@ -179,15 +187,15 @@ export class CloudflareAnalyticsIntegration {
           cpuUsage: performance.cpuTime / 1000, // Convert to ms
           memoryUsage: performance.memoryUsage || 0,
           diskIO: 0,
-          networkIO: performance.wallTime
-        }
+          networkIO: performance.wallTime,
+        },
       },
       {
         workerId,
         colo,
         country,
         cpuTime: performance.cpuTime,
-        wallTime: performance.wallTime
+        wallTime: performance.wallTime,
       }
     );
 
@@ -219,7 +227,7 @@ export class CloudflareAnalyticsIntegration {
       hit ? undefined : 'KEY_NOT_FOUND',
       {
         ...context,
-        component: 'cloudflare-kv'
+        component: 'cloudflare-kv',
       }
     );
 
@@ -232,13 +240,13 @@ export class CloudflareAnalyticsIntegration {
       country: 'unknown',
       performance: {
         cpuTime: latency * 10, // Estimate CPU time
-        wallTime: latency
+        wallTime: latency,
       },
       billing: {
         requests: 1,
         cpuTime: latency * 10,
-        kvOperations: 1
-      }
+        kvOperations: 1,
+      },
     };
 
     this.eventBuffer.push(event);
@@ -268,7 +276,7 @@ export class CloudflareAnalyticsIntegration {
       success ? undefined : 'KEY_NOT_FOUND',
       {
         ...context,
-        component: 'cloudflare-r2'
+        component: 'cloudflare-r2',
       }
     );
 
@@ -280,13 +288,13 @@ export class CloudflareAnalyticsIntegration {
       country: 'unknown',
       performance: {
         cpuTime: latency * 5,
-        wallTime: latency
+        wallTime: latency,
       },
       billing: {
         requests: 1,
         cpuTime: latency * 5,
-        r2Operations: 1
-      }
+        r2Operations: 1,
+      },
     };
 
     this.eventBuffer.push(event);
@@ -309,7 +317,7 @@ export class CloudflareAnalyticsIntegration {
       `🗄️ CF D1 Query: ${queryType}`,
       {
         ...context,
-        component: 'cloudflare-d1'
+        component: 'cloudflare-d1',
       },
       {
         entityType: 'DATABASE_QUERY',
@@ -319,15 +327,15 @@ export class CloudflareAnalyticsIntegration {
           cpuUsage: duration / 10,
           memoryUsage: 0,
           diskIO: duration,
-          networkIO: 0
-        }
+          networkIO: 0,
+        },
       },
       {
         query: query.substring(0, 100) + '...', // Truncate for privacy
         queryType,
         success,
         duration,
-        rowsAffected
+        rowsAffected,
       }
     );
 
@@ -339,13 +347,13 @@ export class CloudflareAnalyticsIntegration {
       country: 'unknown',
       performance: {
         cpuTime: duration * 100,
-        wallTime: duration
+        wallTime: duration,
       },
       billing: {
         requests: 1,
         cpuTime: duration * 100,
-        d1Queries: 1
-      }
+        d1Queries: 1,
+      },
     };
 
     this.eventBuffer.push(event);
@@ -368,7 +376,8 @@ export class CloudflareAnalyticsIntegration {
     const metrics = this.performanceMetrics;
 
     // Workers optimization
-    if (metrics.workers.averageCpuTime > 50000) { // 50ms CPU time
+    if (metrics.workers.averageCpuTime > 50000) {
+      // 50ms CPU time
       optimizations.push({
         service: 'WORKERS' as const,
         issue: `High CPU time: ${(metrics.workers.averageCpuTime / 1000).toFixed(1)}ms avg`,
@@ -379,10 +388,10 @@ export class CloudflareAnalyticsIntegration {
           'Optimize hot code paths and algorithms',
           'Implement caching for expensive computations',
           'Use WebAssembly for CPU-intensive tasks',
-          'Optimize JSON parsing and serialization'
+          'Optimize JSON parsing and serialization',
         ],
         estimatedCostSavings: `$${(metrics.workers.totalRequests * 0.0001).toFixed(2)}/month`,
-        priority: 'HIGH'
+        priority: 'HIGH',
       });
     }
 
@@ -398,10 +407,10 @@ export class CloudflareAnalyticsIntegration {
           'Implement key prefixing by region/user',
           'Use batch operations where possible',
           'Implement TTL-based cache warming',
-          'Monitor and optimize hot keys'
+          'Monitor and optimize hot keys',
         ],
         estimatedCostSavings: `$${(metrics.kv.operations * 0.0005).toFixed(2)}/month`,
-        priority: 'MEDIUM'
+        priority: 'MEDIUM',
       });
     }
 
@@ -417,10 +426,10 @@ export class CloudflareAnalyticsIntegration {
           'Use multipart uploads for large objects',
           'Enable R2 custom domains with Cloudflare CDN',
           'Implement intelligent prefetching',
-          'Optimize object metadata usage'
+          'Optimize object metadata usage',
         ],
         estimatedCostSavings: `$${(metrics.r2.dataTransfer * 0.09 * 0.3).toFixed(2)}/month`,
-        priority: 'MEDIUM'
+        priority: 'MEDIUM',
       });
     }
 
@@ -436,10 +445,10 @@ export class CloudflareAnalyticsIntegration {
           'Optimize JOIN operations and query structure',
           'Implement query result caching',
           'Use prepared statements for repeated queries',
-          'Implement connection pooling and reuse'
+          'Implement connection pooling and reuse',
         ],
         estimatedCostSavings: `$${(metrics.d1.queries * 0.001).toFixed(2)}/month`,
-        priority: 'HIGH'
+        priority: 'HIGH',
       });
     }
 
@@ -486,15 +495,17 @@ export class CloudflareAnalyticsIntegration {
     optimizations: ReturnType<typeof this.getCloudflareOptimizations>;
   } {
     const totalRequests = this.performanceMetrics.workers.totalRequests;
-    const totalCpuTime = totalRequests * this.performanceMetrics.workers.averageCpuTime / 1000000; // Convert to seconds
-    
+    const totalCpuTime = (totalRequests * this.performanceMetrics.workers.averageCpuTime) / 1000000; // Convert to seconds
+
     // Calculate costs (simplified pricing)
     const costs = {
       workers: totalRequests * 0.0001, // $0.0001 per request after free tier
       kv: this.performanceMetrics.kv.operations * 0.0005, // $0.50 per million operations
       r2: this.performanceMetrics.r2.dataTransfer * 0.09, // $0.09 per GB
       d1: this.performanceMetrics.d1.queries * 0.001, // $1 per million queries
-      get total() { return this.workers + this.kv + this.r2 + this.d1; }
+      get total() {
+        return this.workers + this.kv + this.r2 + this.d1;
+      },
     };
 
     // Generate geographic data
@@ -502,7 +513,7 @@ export class CloudflareAnalyticsIntegration {
       .map(([country, requests]) => ({
         country,
         requests,
-        percentage: (requests / totalRequests) * 100
+        percentage: (requests / totalRequests) * 100,
       }))
       .sort((a, b) => b.requests - a.requests)
       .slice(0, 10);
@@ -511,7 +522,7 @@ export class CloudflareAnalyticsIntegration {
       .map(([colo, requests]) => ({
         colo,
         requests,
-        latency: this.estimateColoLatency(colo) // This would come from real data
+        latency: this.estimateColoLatency(colo), // This would come from real data
       }))
       .sort((a, b) => b.requests - a.requests)
       .slice(0, 10);
@@ -524,7 +535,7 @@ export class CloudflareAnalyticsIntegration {
         severity: 'CRITICAL' as const,
         message: 'High error rate detected',
         threshold: 99,
-        current: this.performanceMetrics.workers.successRate * 100
+        current: this.performanceMetrics.workers.successRate * 100,
       });
     }
 
@@ -534,7 +545,7 @@ export class CloudflareAnalyticsIntegration {
         severity: 'WARNING' as const,
         message: 'High KV latency detected',
         threshold: this.config.alertThresholds.kvLatency,
-        current: this.performanceMetrics.kv.latency.p95
+        current: this.performanceMetrics.kv.latency.p95,
       });
     }
 
@@ -544,20 +555,20 @@ export class CloudflareAnalyticsIntegration {
         successRate: this.performanceMetrics.workers.successRate,
         averageResponseTime: this.performanceMetrics.workers.averageResponseTime,
         totalCpuTime,
-        totalCosts: costs
+        totalCosts: costs,
       },
       performance: {
         workers: this.performanceMetrics.workers,
         kv: this.performanceMetrics.kv,
         r2: this.performanceMetrics.r2,
-        d1: this.performanceMetrics.d1
+        d1: this.performanceMetrics.d1,
       },
       geographic: {
         topCountries,
-        topColos
+        topColos,
       },
       alerts,
-      optimizations: this.getCloudflareOptimizations()
+      optimizations: this.getCloudflareOptimizations(),
     };
   }
 
@@ -572,14 +583,14 @@ export class CloudflareAnalyticsIntegration {
         averageCpuTime: 0,
         errorsByType: new Map(),
         requestsByCountry: new Map(),
-        requestsByColo: new Map()
+        requestsByColo: new Map(),
       },
       kv: {
         operations: 0,
         hits: 0,
         misses: 0,
         latency: { p50: 0, p95: 0, p99: 0 },
-        dataTransfer: 0
+        dataTransfer: 0,
       },
       r2: {
         operations: 0,
@@ -587,7 +598,7 @@ export class CloudflareAnalyticsIntegration {
         puts: 0,
         deletes: 0,
         dataTransfer: 0,
-        latency: { p50: 0, p95: 0, p99: 0 }
+        latency: { p50: 0, p95: 0, p99: 0 },
       },
       d1: {
         queries: 0,
@@ -595,61 +606,73 @@ export class CloudflareAnalyticsIntegration {
         writes: 0,
         averageQueryTime: 0,
         rowsRead: 0,
-        rowsWritten: 0
+        rowsWritten: 0,
       },
       analytics: {
         graphqlQueries: 0,
         logpushMessages: 0,
-        realTimeEvents: 0
-      }
+        realTimeEvents: 0,
+      },
     };
   }
 
   private updatePerformanceMetrics(event: CloudflareAnalyticsEvent): void {
     const workers = this.performanceMetrics.workers;
-    
+
     workers.totalRequests++;
-    workers.averageResponseTime = (workers.averageResponseTime * (workers.totalRequests - 1) + event.performance.wallTime) / workers.totalRequests;
-    workers.averageCpuTime = (workers.averageCpuTime * (workers.totalRequests - 1) + event.performance.cpuTime) / workers.totalRequests;
-    
+    workers.averageResponseTime =
+      (workers.averageResponseTime * (workers.totalRequests - 1) + event.performance.wallTime) /
+      workers.totalRequests;
+    workers.averageCpuTime =
+      (workers.averageCpuTime * (workers.totalRequests - 1) + event.performance.cpuTime) /
+      workers.totalRequests;
+
     // Update geographic data
     const currentCountryRequests = workers.requestsByCountry.get(event.country) || 0;
     workers.requestsByCountry.set(event.country, currentCountryRequests + 1);
-    
+
     const currentColoRequests = workers.requestsByColo.get(event.colo) || 0;
     workers.requestsByColo.set(event.colo, currentColoRequests + 1);
-    
+
     // Update error tracking
     if (event.errors && event.errors.length > 0) {
       event.errors.forEach(error => {
         const currentErrors = workers.errorsByType.get(error.name) || 0;
         workers.errorsByType.set(error.name, currentErrors + 1);
       });
-      
+
       // Recalculate success rate
-      const totalErrors = Array.from(workers.errorsByType.values()).reduce((sum, count) => sum + count, 0);
+      const totalErrors = Array.from(workers.errorsByType.values()).reduce(
+        (sum, count) => sum + count,
+        0
+      );
       workers.successRate = (workers.totalRequests - totalErrors) / workers.totalRequests;
     }
   }
 
   private updateKVMetrics(operation: string, hit: boolean, latency: number, size: number): void {
     const kv = this.performanceMetrics.kv;
-    
+
     kv.operations++;
     if (hit) kv.hits++;
     else kv.misses++;
-    
+
     kv.dataTransfer += size;
-    
+
     // Update latency percentiles (simplified)
-    kv.latency.p50 = (kv.latency.p50 * 0.9) + (latency * 0.1);
+    kv.latency.p50 = kv.latency.p50 * 0.9 + latency * 0.1;
     kv.latency.p95 = Math.max(kv.latency.p95 * 0.95, latency);
     kv.latency.p99 = Math.max(kv.latency.p99 * 0.99, latency);
   }
 
-  private updateR2Metrics(operation: string, success: boolean, latency: number, size: number): void {
+  private updateR2Metrics(
+    operation: string,
+    success: boolean,
+    latency: number,
+    size: number
+  ): void {
     const r2 = this.performanceMetrics.r2;
-    
+
     r2.operations++;
     switch (operation) {
       case 'GET':
@@ -662,21 +685,26 @@ export class CloudflareAnalyticsIntegration {
         r2.deletes++;
         break;
     }
-    
+
     r2.dataTransfer += size;
-    
+
     // Update latency percentiles
-    r2.latency.p50 = (r2.latency.p50 * 0.9) + (latency * 0.1);
+    r2.latency.p50 = r2.latency.p50 * 0.9 + latency * 0.1;
     r2.latency.p95 = Math.max(r2.latency.p95 * 0.95, latency);
     r2.latency.p99 = Math.max(r2.latency.p99 * 0.99, latency);
   }
 
-  private updateD1Metrics(queryType: string, success: boolean, duration: number, rowsAffected: number): void {
+  private updateD1Metrics(
+    queryType: string,
+    success: boolean,
+    duration: number,
+    rowsAffected: number
+  ): void {
     const d1 = this.performanceMetrics.d1;
-    
+
     d1.queries++;
     d1.averageQueryTime = (d1.averageQueryTime * (d1.queries - 1) + duration) / d1.queries;
-    
+
     if (queryType === 'READ') {
       d1.reads++;
       d1.rowsRead += rowsAffected;
@@ -688,9 +716,10 @@ export class CloudflareAnalyticsIntegration {
 
   private checkCloudflareThresholds(event: CloudflareAnalyticsEvent): void {
     const thresholds = this.config.alertThresholds;
-    
+
     // Check CPU time threshold
-    if (event.performance.cpuTime > thresholds.cpuTime * 1000) { // Convert ms to microseconds
+    if (event.performance.cpuTime > thresholds.cpuTime * 1000) {
+      // Convert ms to microseconds
       this.analyticsLogger.logWithAnalytics(
         LogLevel.WARN,
         '⚠️ CF High CPU Time Alert',
@@ -703,14 +732,14 @@ export class CloudflareAnalyticsIntegration {
             cpuUsage: event.performance.cpuTime / 1000,
             memoryUsage: 0,
             diskIO: 0,
-            networkIO: event.performance.wallTime
-          }
+            networkIO: event.performance.wallTime,
+          },
         },
         {
           threshold: thresholds.cpuTime,
           actual: event.performance.cpuTime / 1000,
           workerId: event.workerId,
-          colo: event.colo
+          colo: event.colo,
         }
       );
     }
@@ -719,14 +748,14 @@ export class CloudflareAnalyticsIntegration {
   private estimateColoLatency(colo: string): number {
     // This would come from real latency data
     const coloLatencies: Record<string, number> = {
-      'LAX': 15,
-      'DFW': 25,
-      'ORD': 20,
-      'ATL': 18,
-      'LHR': 30,
-      'CDG': 35,
-      'NRT': 45,
-      'SIN': 50
+      LAX: 15,
+      DFW: 25,
+      ORD: 20,
+      ATL: 18,
+      LHR: 30,
+      CDG: 35,
+      NRT: 45,
+      SIN: 50,
     };
     return coloLatencies[colo] || 40;
   }
@@ -748,14 +777,14 @@ export class CloudflareAnalyticsIntegration {
 
     // In a real implementation, this would send events to Cloudflare Analytics API
     console.log(`📊 Flushing ${this.eventBuffer.length} Cloudflare events to analytics`);
-    
+
     // Clear buffer
     this.eventBuffer = [];
   }
 
   private checkAllThresholds(): void {
     const analytics = this.getCloudflareAnalytics();
-    
+
     // Check for any critical alerts
     const criticalAlerts = analytics.alerts.filter(alert => alert.severity === 'CRITICAL');
     if (criticalAlerts.length > 0) {
@@ -767,7 +796,7 @@ export class CloudflareAnalyticsIntegration {
           {
             entityType: 'CLOUDFLARE_CRITICAL_ALERT',
             action: 'CRITICAL_THRESHOLD_BREACH',
-            affectedUsers: Math.floor(analytics.overview.totalRequests * 0.1)
+            affectedUsers: Math.floor(analytics.overview.totalRequests * 0.1),
           },
           alert
         );

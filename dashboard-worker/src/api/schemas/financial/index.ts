@@ -26,7 +26,7 @@ export const TransactionItemSchema = z.object({
   createdAt: z.string().datetime(),
   processedAt: z.string().datetime().optional(),
   completedAt: z.string().datetime().optional(),
-  metadata: z.record(z.any()).optional()
+  metadata: z.record(z.any()).optional(),
 });
 
 /**
@@ -42,7 +42,7 @@ export const TransactionQuerySchema = z.object({
   dateFrom: z.string().datetime().optional(),
   dateTo: z.string().datetime().optional(),
   limit: z.number().int().min(1).max(1000).optional().default(50),
-  offset: z.number().int().min(0).optional().default(0)
+  offset: z.number().int().min(0).optional().default(0),
 });
 
 /**
@@ -55,9 +55,9 @@ export const TransactionResponseSchema = z.object({
     total: z.number().int().min(0),
     limit: z.number().int(),
     offset: z.number().int(),
-    hasMore: z.boolean()
+    hasMore: z.boolean(),
   }),
-  timestamp: z.string().datetime()
+  timestamp: z.string().datetime(),
 });
 
 /**
@@ -65,15 +65,30 @@ export const TransactionResponseSchema = z.object({
  */
 export const PaymentMethodSchema = z.object({
   id: z.string(),
-  type: z.enum(['credit_card', 'debit_card', 'bank_account', 'paypal', 'venmo', 'cashapp', 'zelle', 'crypto']),
+  type: z.enum([
+    'credit_card',
+    'debit_card',
+    'bank_account',
+    'paypal',
+    'venmo',
+    'cashapp',
+    'zelle',
+    'crypto',
+  ]),
   name: z.string(),
-  lastFour: z.string().regex(/^\d{4}$/).optional(),
+  lastFour: z
+    .string()
+    .regex(/^\d{4}$/)
+    .optional(),
   isDefault: z.boolean().default(false),
   isActive: z.boolean().default(true),
-  expiryDate: z.string().regex(/^\d{2}\/\d{2}$/).optional(),
+  expiryDate: z
+    .string()
+    .regex(/^\d{2}\/\d{2}$/)
+    .optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
-  metadata: z.record(z.any()).optional()
+  metadata: z.record(z.any()).optional(),
 });
 
 /**
@@ -86,7 +101,7 @@ export const DepositRequestSchema = z.object({
   paymentMethodId: z.string(),
   description: z.string().max(200).optional(),
   reference: z.string().max(100).optional(),
-  metadata: z.record(z.any()).optional()
+  metadata: z.record(z.any()).optional(),
 });
 
 /**
@@ -100,9 +115,9 @@ export const DepositResponseSchema = z.object({
     currency: z.string(),
     status: TransactionStatusSchema,
     estimatedCompletion: z.string().datetime().optional(),
-    gatewayTransactionId: z.string().optional()
+    gatewayTransactionId: z.string().optional(),
   }),
-  timestamp: z.string().datetime()
+  timestamp: z.string().datetime(),
 });
 
 /**
@@ -115,7 +130,7 @@ export const WithdrawalRequestSchema = z.object({
   paymentMethodId: z.string(),
   description: z.string().max(200).optional(),
   priority: z.enum(['standard', 'express', 'urgent']).default('standard'),
-  metadata: z.record(z.any()).optional()
+  metadata: z.record(z.any()).optional(),
 });
 
 /**
@@ -131,9 +146,9 @@ export const WithdrawalResponseSchema = z.object({
     netAmount: z.number(),
     status: TransactionStatusSchema,
     estimatedCompletion: z.string().datetime().optional(),
-    gatewayTransactionId: z.string().optional()
+    gatewayTransactionId: z.string().optional(),
   }),
-  timestamp: z.string().datetime()
+  timestamp: z.string().datetime(),
 });
 
 /**
@@ -147,12 +162,14 @@ export const TransferRequestSchema = z.object({
   description: z.string().max(200).optional(),
   transferType: z.enum(['instant', 'scheduled', 'recurring']).default('instant'),
   scheduledDate: z.string().datetime().optional(),
-  recurring: z.object({
-    frequency: z.enum(['daily', 'weekly', 'monthly']),
-    endDate: z.string().datetime().optional(),
-    maxOccurrences: z.number().int().positive().optional()
-  }).optional(),
-  metadata: z.record(z.any()).optional()
+  recurring: z
+    .object({
+      frequency: z.enum(['daily', 'weekly', 'monthly']),
+      endDate: z.string().datetime().optional(),
+      maxOccurrences: z.number().int().positive().optional(),
+    })
+    .optional(),
+  metadata: z.record(z.any()).optional(),
 });
 
 /**
@@ -171,9 +188,9 @@ export const TransferResponseSchema = z.object({
     status: TransactionStatusSchema,
     transferType: z.string(),
     scheduledDate: z.string().datetime().optional(),
-    completedAt: z.string().datetime().optional()
+    completedAt: z.string().datetime().optional(),
   }),
-  timestamp: z.string().datetime()
+  timestamp: z.string().datetime(),
 });
 
 /**
@@ -182,7 +199,7 @@ export const TransferResponseSchema = z.object({
 export const BalanceInquirySchema = z.object({
   customerID: z.string(),
   includePending: z.boolean().default(true),
-  includeCreditLimit: z.boolean().default(true)
+  includeCreditLimit: z.boolean().default(true),
 });
 
 /**
@@ -198,9 +215,9 @@ export const BalanceResponseSchema = z.object({
     creditLimit: z.number().optional(),
     currency: z.string().length(3).default('USD'),
     lastUpdated: z.string().datetime(),
-    overdraftProtection: z.boolean().optional()
+    overdraftProtection: z.boolean().optional(),
   }),
-  timestamp: z.string().datetime()
+  timestamp: z.string().datetime(),
 });
 
 /**
@@ -210,7 +227,7 @@ export const TransactionSummarySchema = z.object({
   customerID: z.string(),
   period: z.enum(['day', 'week', 'month', 'year']).default('month'),
   startDate: z.string().datetime().optional(),
-  endDate: z.string().datetime().optional()
+  endDate: z.string().datetime().optional(),
 });
 
 /**
@@ -229,16 +246,16 @@ export const TransactionSummaryResponseSchema = z.object({
       netFlow: z.number(),
       transactionCount: z.number(),
       averageTransaction: z.number(),
-      largestTransaction: z.number()
+      largestTransaction: z.number(),
     }),
     breakdown: z.object({
       deposits: z.array(TransactionItemSchema),
       withdrawals: z.array(TransactionItemSchema),
       transfers: z.array(TransactionItemSchema),
-      fees: z.array(TransactionItemSchema)
-    })
+      fees: z.array(TransactionItemSchema),
+    }),
   }),
-  timestamp: z.string().datetime()
+  timestamp: z.string().datetime(),
 });
 
 /**
@@ -246,10 +263,19 @@ export const TransactionSummaryResponseSchema = z.object({
  */
 export const AddPaymentMethodSchema = z.object({
   customerID: z.string(),
-  type: z.enum(['credit_card', 'debit_card', 'bank_account', 'paypal', 'venmo', 'cashapp', 'zelle', 'crypto']),
+  type: z.enum([
+    'credit_card',
+    'debit_card',
+    'bank_account',
+    'paypal',
+    'venmo',
+    'cashapp',
+    'zelle',
+    'crypto',
+  ]),
   token: z.string(), // Payment processor token
   isDefault: z.boolean().default(false),
-  metadata: z.record(z.any()).optional()
+  metadata: z.record(z.any()).optional(),
 });
 
 export const UpdatePaymentMethodSchema = z.object({
@@ -257,13 +283,13 @@ export const UpdatePaymentMethodSchema = z.object({
   updates: z.object({
     isDefault: z.boolean().optional(),
     isActive: z.boolean().optional(),
-    metadata: z.record(z.any()).optional()
-  })
+    metadata: z.record(z.any()).optional(),
+  }),
 });
 
 export const RemovePaymentMethodSchema = z.object({
   paymentMethodId: z.string(),
-  reason: z.string().optional()
+  reason: z.string().optional(),
 });
 
 /**
@@ -274,7 +300,7 @@ export const CurrencyConversionSchema = z.object({
   toCurrency: z.string().length(3),
   amount: z.number().positive(),
   rate: z.number().positive().optional(), // If not provided, will fetch current rate
-  timestamp: z.string().datetime().optional()
+  timestamp: z.string().datetime().optional(),
 });
 
 /**
@@ -290,8 +316,8 @@ export const CurrencyConversionResponseSchema = z.object({
     rate: z.number(),
     fee: z.number().optional(),
     netAmount: z.number().optional(),
-    timestamp: z.string().datetime()
-  })
+    timestamp: z.string().datetime(),
+  }),
 });
 
 // Export types for TypeScript

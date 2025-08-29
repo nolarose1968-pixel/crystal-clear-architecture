@@ -1,6 +1,7 @@
 # API Reference
 
-The Fire22 Dashboard provides a comprehensive RESTful API with real-time capabilities, DNS optimization, and enterprise-grade security.
+The Fire22 Dashboard provides a comprehensive RESTful API with real-time
+capabilities, DNS optimization, and enterprise-grade security.
 
 ## Base URL
 
@@ -9,7 +10,8 @@ The Fire22 Dashboard provides a comprehensive RESTful API with real-time capabil
 
 ## Authentication
 
-Most endpoints require JWT authentication. Include the token in the Authorization header:
+Most endpoints require JWT authentication. Include the token in the
+Authorization header:
 
 ```bash
 Authorization: Bearer <your-jwt-token>
@@ -50,22 +52,26 @@ All API responses follow a consistent format:
 ## API Categories
 
 ### 🏥 Health & Monitoring
+
 - [`GET /health`](./dashboard/health) - System health status
 - [`GET /api/live`](./dashboard/live-events) - Real-time events (SSE)
 - [`GET /api/system/stats`](./dashboard/system-stats) - System statistics
 
 ### 🔥 Fire22 Integration
+
 - [`GET /api/customers`](./fire22/customers) - Customer data (2,600+ records)
 - [`POST /api/fire22/sync-customers`](./fire22/customers) - Force sync
 - [`GET /api/agents/hierarchy`](./fire22/agents) - 8-level agent hierarchy
 - [`POST /api/manager/getLiveWagers`](./fire22/wagers) - Live wager data
 
 ### 🚀 Performance & DNS
+
 - [`GET /api/fire22/dns-stats`](./fire22/cache) - DNS cache statistics
 - [`POST /api/fire22/refresh-dns`](./fire22/cache) - Manual cache refresh
 - [`GET /api/fire22/dns-config`](./fire22/cache) - DNS configuration
 
 ### 🔒 Security
+
 - [`POST /api/auth/login`](./security/authentication) - User authentication
 - [`GET /api/security/scan`](./security/scanner) - Security scan results
 
@@ -78,12 +84,12 @@ The dashboard supports real-time updates via SSE:
 ```javascript
 const eventSource = new EventSource('/api/live');
 
-eventSource.addEventListener('fire22-status', (event) => {
+eventSource.addEventListener('fire22-status', event => {
   const data = JSON.parse(event.data);
   console.log('Fire22 Status:', data);
 });
 
-eventSource.addEventListener('system-metrics', (event) => {
+eventSource.addEventListener('system-metrics', event => {
   const metrics = JSON.parse(event.data);
   console.log('System Metrics:', metrics);
 });
@@ -102,8 +108,9 @@ eventSource.addEventListener('system-metrics', (event) => {
 Fire22 Dashboard includes advanced DNS optimization:
 
 ### Prefetched Domains
+
 - `fire22.ag` - Main Fire22 API
-- `api.fire22.ag` - API endpoints  
+- `api.fire22.ag` - API endpoints
 - `cloud.fire22.ag` - Cloud services
 - `api.cloudflare.com` - Cloudflare infrastructure
 - `workers.dev` - Workers platform
@@ -177,11 +184,12 @@ curl -N -H "Accept: text/event-stream" \
 
 ### JavaScript/TypeScript
 
-```typescript
+````typescript
 ```javascript
 ```javascript
 import { Fire22Client } from '@fire22/client';
-```
+````
+
 ```
 
 const client = new Fire22Client({
@@ -202,9 +210,9 @@ const customers = await client.customers.list({
 // Using Bun's native features
 const response = await fetch('http://localhost:3001/api/customers', {
   headers: {
-    'Authorization': `Bearer ${token}`,
-    'User-Agent': 'Fire22-Dashboard/1.0.0 Bun'
-  }
+    Authorization: `Bearer ${token}`,
+    'User-Agent': 'Fire22-Dashboard/1.0.0 Bun',
+  },
 });
 
 const data = await response.json();
@@ -215,7 +223,8 @@ const data = await response.json();
 - 🏥 [Health Monitoring](./dashboard/health) - System health endpoints
 - 🔥 [Fire22 Integration](./fire22/authentication) - Fire22 API details
 - 🔒 [Security Guide](./security/authentication) - Authentication & security
-- ⚡ [Performance Optimization](/architecture/performance/caching) - Advanced caching
+- ⚡ [Performance Optimization](/architecture/performance/caching) - Advanced
+  caching
 
 ---
 

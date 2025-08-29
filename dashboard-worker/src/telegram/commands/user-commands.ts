@@ -7,7 +7,7 @@ import type {
   CommandContext,
   CommandResult,
   TelegramCommand,
-  UserProfile
+  UserProfile,
 } from '../core/telegram-types';
 
 export class UserCommands {
@@ -16,34 +16,34 @@ export class UserCommands {
       name: 'start',
       description: 'Start interacting with the bot',
       usage: '/start',
-      examples: ['/start']
+      examples: ['/start'],
     },
     {
       name: 'help',
       description: 'Show available commands and usage',
       usage: '/help',
-      examples: ['/help']
+      examples: ['/help'],
     },
     {
       name: 'balance',
       description: 'Check your account balance',
       usage: '/balance',
       requiresAuth: true,
-      examples: ['/balance']
+      examples: ['/balance'],
     },
     {
       name: 'profile',
       description: 'View your profile information',
       usage: '/profile',
       requiresAuth: true,
-      examples: ['/profile']
+      examples: ['/profile'],
     },
     {
       name: 'register',
       description: 'Register your account',
       usage: '/register <customer_id>',
-      examples: ['/register CUST001']
-    }
+      examples: ['/register CUST001'],
+    },
   ];
 
   /**
@@ -78,13 +78,13 @@ How can I help you today?
 
       return {
         success: true,
-        response: welcomeMessage
+        response: welcomeMessage,
       };
     } catch (error) {
       console.error('Error handling start command:', error);
       return {
         success: false,
-        error: 'Failed to process start command'
+        error: 'Failed to process start command',
       };
     }
   }
@@ -122,12 +122,16 @@ How can I help you today?
 ⚙️ System Commands:
 /link - Link your account
 
-${context.isAdmin ? `
+${
+  context.isAdmin
+    ? `
 🔧 Admin Commands:
 /admin - Admin panel
 /stats - System statistics
 /broadcast - Send broadcast message
-` : ''}
+`
+    : ''
+}
 
 💡 Pro Tips:
 • All commands work in private messages
@@ -140,13 +144,13 @@ Need help? Contact support!
 
       return {
         success: true,
-        response: helpMessage
+        response: helpMessage,
       };
     } catch (error) {
       console.error('Error handling help command:', error);
       return {
         success: false,
-        error: 'Failed to generate help message'
+        error: 'Failed to generate help message',
       };
     }
   }
@@ -159,7 +163,7 @@ Need help? Contact support!
       if (!context.isAuthenticated) {
         return {
           success: false,
-          error: 'Please register your account first using /register'
+          error: 'Please register your account first using /register',
         };
       }
 
@@ -183,13 +187,13 @@ Pending Wagers: $${balance.pending.toFixed(2)}
 
       return {
         success: true,
-        response: balanceMessage
+        response: balanceMessage,
       };
     } catch (error) {
       console.error('Error handling balance command:', error);
       return {
         success: false,
-        error: 'Failed to retrieve balance information'
+        error: 'Failed to retrieve balance information',
       };
     }
   }
@@ -202,7 +206,7 @@ Pending Wagers: $${balance.pending.toFixed(2)}
       if (!context.isAuthenticated) {
         return {
           success: false,
-          error: 'Please register your account first using /register'
+          error: 'Please register your account first using /register',
         };
       }
 
@@ -225,27 +229,31 @@ VIP Status: ${profile.isVIP ? `✅ ${profile.vipTier || 'Active'}` : '❌ Not VI
 • Currency: ${profile.preferences.currency}
 • Timezone: ${profile.preferences.timezone}
 
-${profile.isVIP ? `
+${
+  profile.isVIP
+    ? `
 👑 VIP Benefits:
 • Priority Support
 • Exclusive Odds
 • Higher Bet Limits
 • Special Promotions
-` : `
+`
+    : `
 🚀 Ready to level up?
 Join our VIP program for exclusive benefits!
-`}
+`
+}
       `.trim();
 
       return {
         success: true,
-        response: profileMessage
+        response: profileMessage,
       };
     } catch (error) {
       console.error('Error handling profile command:', error);
       return {
         success: false,
-        error: 'Failed to retrieve profile information'
+        error: 'Failed to retrieve profile information',
       };
     }
   }
@@ -260,7 +268,7 @@ Join our VIP program for exclusive benefits!
       if (!customerId) {
         return {
           success: false,
-          error: 'Please provide your customer ID. Usage: /register <customer_id>'
+          error: 'Please provide your customer ID. Usage: /register <customer_id>',
         };
       }
 
@@ -268,7 +276,7 @@ Join our VIP program for exclusive benefits!
       if (!/^CUST\d{4,}$/.test(customerId)) {
         return {
           success: false,
-          error: 'Invalid customer ID format. Should be like: CUST0001'
+          error: 'Invalid customer ID format. Should be like: CUST0001',
         };
       }
 
@@ -276,7 +284,7 @@ Join our VIP program for exclusive benefits!
       if (context.isAuthenticated) {
         return {
           success: false,
-          error: 'You are already registered. Use /profile to view your information.'
+          error: 'You are already registered. Use /profile to view your information.',
         };
       }
 
@@ -304,19 +312,19 @@ Enjoy your betting experience! 🎰⚽
 
         return {
           success: true,
-          response: successMessage
+          response: successMessage,
         };
       } else {
         return {
           success: false,
-          error: registrationResult.error || 'Registration failed'
+          error: registrationResult.error || 'Registration failed',
         };
       }
     } catch (error) {
       console.error('Error handling register command:', error);
       return {
         success: false,
-        error: 'Registration failed. Please try again or contact support.'
+        error: 'Registration failed. Please try again or contact support.',
       };
     }
   }
@@ -330,9 +338,9 @@ Enjoy your betting experience! 🎰⚽
   }> {
     // Simulate API call to get balance
     return {
-      current: 1250.50,
-      available: 1000.00,
-      pending: 250.50
+      current: 1250.5,
+      available: 1000.0,
+      pending: 250.5,
     };
   }
 
@@ -344,7 +352,7 @@ Enjoy your betting experience! 🎰⚽
       customerId: `CUST${String(userId).slice(-4).padStart(4, '0')}`,
       isVIP: Math.random() > 0.7,
       vipTier: 'gold',
-      balance: 1250.50,
+      balance: 1250.5,
       totalWagers: 45,
       winRate: 0.62,
       lastActivity: new Date(),
@@ -356,8 +364,8 @@ Enjoy your betting experience! 🎰⚽
           wagers: true,
           balance: true,
           promotions: true,
-          results: true
-        }
+          results: true,
+        },
       },
       permissions: {
         canAccessAdmin: false,
@@ -367,14 +375,17 @@ Enjoy your betting experience! 🎰⚽
         canManageCasino: false,
         canManageSports: false,
         maxBetAmount: 1000,
-        maxDailyBets: 50
+        maxDailyBets: 50,
       },
       createdAt: '2024-01-15T10:30:00Z',
-      updatedAt: '2024-01-25T14:20:00Z'
+      updatedAt: '2024-01-25T14:20:00Z',
     };
   }
 
-  private async registerUser(telegramId: number, customerId: string): Promise<{
+  private async registerUser(
+    telegramId: number,
+    customerId: string
+  ): Promise<{
     success: boolean;
     error?: string;
   }> {
@@ -383,7 +394,7 @@ Enjoy your betting experience! 🎰⚽
     // and link it to the Telegram account
 
     return {
-      success: true
+      success: true,
     };
   }
 }

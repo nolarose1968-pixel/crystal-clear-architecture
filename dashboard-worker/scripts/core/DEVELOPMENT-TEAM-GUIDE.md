@@ -2,17 +2,21 @@
 
 ## 📋 **Overview**
 
-Welcome to the **Fire22 Enhanced Scripts Development Team Guide**! This document provides comprehensive guidance on how to use, extend, and maintain the enterprise-grade scripting patterns we've built.
+Welcome to the **Fire22 Enhanced Scripts Development Team Guide**! This document
+provides comprehensive guidance on how to use, extend, and maintain the
+enterprise-grade scripting patterns we've built.
 
 ## 🎯 **What We've Built**
 
 ### **Core Enhanced Scripts**
+
 1. **`enhanced-demo.ts`** - Comprehensive feature showcase
 2. **`real-database-demo.ts`** - Real PostgreSQL integration
 3. **`pattern-applicator.ts`** - Pattern application examples
 4. **`database-connector.ts`** - Production database connector
 
 ### **Core Utilities**
+
 1. **`script-runner.ts`** - Performance monitoring wrapper
 2. **`error-handler.ts`** - Enhanced error handling
 3. **`config-validator.ts`** - Configuration validation
@@ -35,22 +39,26 @@ import { handleError } from './core/error-handler';
 import { validateConfig } from './core/config-validator';
 
 async function myScript() {
-  return await runScript('my-script', async () => {
-    try {
-      // Your logic here
-      return result;
-    } catch (error) {
-      await handleError(error, {
-        scriptName: 'my-script',
-        operation: 'main-operation'
-      });
-      throw error;
+  return await runScript(
+    'my-script',
+    async () => {
+      try {
+        // Your logic here
+        return result;
+      } catch (error) {
+        await handleError(error, {
+          scriptName: 'my-script',
+          operation: 'main-operation',
+        });
+        throw error;
+      }
+    },
+    {
+      tags: ['my-category', 'enhanced'],
+      timeout: 30000,
+      logLevel: 'info',
     }
-  }, {
-    tags: ['my-category', 'enhanced'],
-    timeout: 30000,
-    logLevel: 'info'
-  });
+  );
 }
 ```
 
@@ -66,22 +74,22 @@ const configSchema = {
     type: 'string',
     required: true,
     min: 32,
-    pattern: /^[a-zA-Z0-9_-]+$/
+    pattern: /^[a-zA-Z0-9_-]+$/,
   },
   timeout: {
     type: 'number',
     required: false,
     min: 1000,
     max: 60000,
-    default: 30000
+    default: 30000,
   },
   retries: {
     type: 'number',
     required: false,
     min: 0,
     max: 10,
-    default: 3
-  }
+    default: 3,
+  },
 };
 
 // Validate before use
@@ -109,24 +117,28 @@ try {
   await handleError(error, {
     scriptName: 'my-script',
     operation: 'perform-operation',
-    environment: 'production'
+    environment: 'production',
   });
 }
 
 // Create custom errors
-throw createError('Operation failed', {
-  scriptName: 'my-script',
-  operation: 'operation-name'
-}, {
-  type: 'runtime',
-  severity: 'high',
-  recoverable: true,
-  suggestedActions: [
-    'Check system resources',
-    'Verify configuration',
-    'Contact support if issue persists'
-  ]
-});
+throw createError(
+  'Operation failed',
+  {
+    scriptName: 'my-script',
+    operation: 'operation-name',
+  },
+  {
+    type: 'runtime',
+    severity: 'high',
+    recoverable: true,
+    suggestedActions: [
+      'Check system resources',
+      'Verify configuration',
+      'Contact support if issue persists',
+    ],
+  }
+);
 ```
 
 ### **4. Database Integration**
@@ -141,7 +153,7 @@ const dbConfig = {
   port: parseInt(Bun.env.DB_PORT || '5432'),
   database: Bun.env.DB_NAME || 'fire22',
   user: Bun.env.DB_USER || 'postgres',
-  password: Bun.env.DB_PASSWORD || 'password'
+  password: Bun.env.DB_PASSWORD || 'password',
 };
 
 const connector = await createDatabaseConnector(dbConfig);
@@ -152,7 +164,8 @@ const result = await connector.query('SELECT * FROM customers LIMIT 10');
 // Transaction
 const transactionId = await connector.beginTransaction();
 try {
-  await connector.executeInTransaction(transactionId, 
+  await connector.executeInTransaction(
+    transactionId,
     'INSERT INTO customers (customer_id, username) VALUES ($1, $2)',
     ['CUST001', 'john_doe']
   );
@@ -168,6 +181,7 @@ try {
 ### **Automatic Metrics**
 
 Every enhanced script automatically tracks:
+
 - **Execution time** - How long operations take
 - **Memory usage** - Heap consumption and deltas
 - **CPU usage** - User and system CPU time
@@ -197,6 +211,7 @@ console.log(`Success rate: ${metrics.successRate}%`);
 ### **Error Categories**
 
 Our error handler categorizes errors by:
+
 - **Type**: `validation`, `runtime`, `network`, `database`, `system`
 - **Severity**: `low`, `medium`, `high`, `critical`
 - **Recoverability**: `true`/`false`
@@ -205,6 +220,7 @@ Our error handler categorizes errors by:
 ### **Recovery Strategies**
 
 Automatic recovery for common errors:
+
 - **File not found**: Wait and retry with backoff
 - **Network issues**: Exponential backoff retry
 - **Permission issues**: Clear guidance and suggestions
@@ -213,6 +229,7 @@ Automatic recovery for common errors:
 ### **Error Reporting**
 
 Structured error logs include:
+
 - **Error context**: Script, operation, environment
 - **Recovery suggestions**: Actionable advice
 - **Error history**: Track patterns over time
@@ -223,6 +240,7 @@ Structured error logs include:
 ### **Schema Types**
 
 Support for all common data types:
+
 - **Primitives**: `string`, `number`, `boolean`
 - **Complex**: `array`, `object`
 - **Special**: `enum`, `pattern`, `custom`
@@ -230,6 +248,7 @@ Support for all common data types:
 ### **Validation Rules**
 
 Built-in validation rules:
+
 - **String**: `min`, `max`, `pattern`, `required`
 - **Number**: `min`, `max`, `integer`, `positive`
 - **Array**: `min`, `max`, `unique`, `items`
@@ -246,15 +265,15 @@ const schema = {
     required: true,
     custom: (value: string) => {
       return value.includes('@') && value.includes('.');
-    }
+    },
   },
   age: {
     type: 'number',
     required: true,
     custom: (value: number) => {
       return value >= 18 && value <= 120;
-    }
-  }
+    },
+  },
 };
 ```
 
@@ -314,6 +333,7 @@ describe('🚀 My Enhanced Script', () => {
 ### **Test Coverage**
 
 Ensure comprehensive coverage:
+
 - **Configuration validation** - Test all schema rules
 - **Core functionality** - Test all operations
 - **Error scenarios** - Test failure modes
@@ -329,12 +349,12 @@ Every enhanced script should include:
 ```typescript
 /**
  * 🎯 Script Purpose
- * 
+ *
  * Brief description of what the script does:
  * - Key features and capabilities
  * - Input/output specifications
  * - Dependencies and requirements
- * 
+ *
  * @version 1.0.0
  * @author Your Name
  * @requires script-runner, error-handler, config-validator
@@ -348,12 +368,12 @@ Document all public functions:
 ```typescript
 /**
  * Performs a specific operation with enhanced features
- * 
+ *
  * @param config - Configuration object for the operation
  * @param options - Additional options for execution
  * @returns Promise resolving to operation result
  * @throws {Error} When operation fails
- * 
+ *
  * @example
  * const result = await performOperation(config, { timeout: 5000 });
  */
@@ -366,7 +386,7 @@ Document all configuration schemas:
 ```typescript
 /**
  * Configuration schema for the script
- * 
+ *
  * @property {string} apiKey - API key for external service
  * @property {number} timeout - Operation timeout in milliseconds
  * @property {boolean} retry - Whether to retry failed operations
@@ -410,10 +430,10 @@ class CustomScriptRunner extends ScriptRunner {
   async runCustomScript(name: string, operation: Function, options: any) {
     // Add custom logic here
     const result = await super.runScript(name, operation, options);
-    
+
     // Custom post-processing
     await this.customPostProcessing(result);
-    
+
     return result;
   }
 }
@@ -430,7 +450,7 @@ export class DatabaseConnectionError extends Error {
   constructor(message: string, context: any) {
     super(message);
     this.name = 'DatabaseConnectionError';
-    
+
     // Add custom error handling
     createError(message, context, {
       type: 'database',
@@ -439,8 +459,8 @@ export class DatabaseConnectionError extends Error {
       suggestedActions: [
         'Check database server status',
         'Verify network connectivity',
-        'Review connection configuration'
-      ]
+        'Review connection configuration',
+      ],
     });
   }
 }
@@ -455,20 +475,20 @@ import { getCommonRules } from './core/config-validator';
 
 export const customRules = {
   ...getCommonRules(),
-  
+
   validCustomerId: {
     validator: (value: string) => {
       return /^[A-Z]{2}\d{3}$/.test(value);
     },
-    message: 'Customer ID must be 2 letters followed by 3 digits'
+    message: 'Customer ID must be 2 letters followed by 3 digits',
   },
-  
+
   validAmount: {
     validator: (value: number) => {
       return value > 0 && value <= 1000000;
     },
-    message: 'Amount must be positive and less than 1,000,000'
-  }
+    message: 'Amount must be positive and less than 1,000,000',
+  },
 };
 ```
 
@@ -477,6 +497,7 @@ export const customRules = {
 ### **Code Review Checklist**
 
 When reviewing enhanced scripts, ensure:
+
 - ✅ **Performance monitoring** is integrated
 - ✅ **Error handling** is robust and informative
 - ✅ **Configuration validation** is comprehensive
@@ -561,9 +582,10 @@ DB_HOST=prod-db.example.com bun run scripts/core/real-database-demo.ts
 
 ---
 
-**🚀 Welcome to the future of enterprise scripting!** 
+**🚀 Welcome to the future of enterprise scripting!**
 
 Your Fire22 system now has:
+
 - ✅ **Professional-grade performance monitoring**
 - 🛡️ **Robust error handling and recovery**
 - 🔍 **Comprehensive configuration validation**

@@ -14,15 +14,15 @@ export interface BettingTransaction {
   type: 'CLUB' | 'AGENT' | 'DISTRIBUTION' | 'CORPORATE';
   category: 'Distribution' | 'Retail' | 'Online' | 'Mobile';
   betBreakdown: {
-    DT?: number;        // Daily Tickets
-    Inet?: number;      // Internet Bets
-    Phone?: number;     // Phone Bets
-    Live?: number;      // Live Betting
-    PropB?: number;     // Proposition Bets
-    LD?: number;        // Line Draws
-    ExtProps?: number;  // Extended Props
-    Crash?: number;     // Crash Games
-    Excl?: number;      // Exclusive Bets
+    DT?: number; // Daily Tickets
+    Inet?: number; // Internet Bets
+    Phone?: number; // Phone Bets
+    Live?: number; // Live Betting
+    PropB?: number; // Proposition Bets
+    LD?: number; // Line Draws
+    ExtProps?: number; // Extended Props
+    Crash?: number; // Crash Games
+    Excl?: number; // Exclusive Bets
   };
   totalAmount: number;
   netAmount: number;
@@ -182,7 +182,7 @@ export class FinancialReportingService extends EventEmitter {
           LD: 0,
           ExtProps: 0,
           Crash: 0,
-          Excl: 0
+          Excl: 0,
         },
         totalAmount: 340,
         netAmount: -340,
@@ -191,8 +191,8 @@ export class FinancialReportingService extends EventEmitter {
         metadata: {
           gameType: 'Mixed',
           sport: 'Multiple',
-          ticketNumber: 'TK-2025-001'
-        }
+          ticketNumber: 'TK-2025-001',
+        },
       },
       {
         id: 'TXN-2025-002',
@@ -210,7 +210,7 @@ export class FinancialReportingService extends EventEmitter {
           LD: 2,
           ExtProps: 1,
           Crash: 0,
-          Excl: 1
+          Excl: 1,
         },
         totalAmount: 850,
         netAmount: 125,
@@ -219,8 +219,8 @@ export class FinancialReportingService extends EventEmitter {
         metadata: {
           gameType: 'Sports',
           sport: 'NFL',
-          ticketNumber: 'TK-2025-002'
-        }
+          ticketNumber: 'TK-2025-002',
+        },
       },
       {
         id: 'TXN-2025-003',
@@ -238,7 +238,7 @@ export class FinancialReportingService extends EventEmitter {
           LD: 0,
           ExtProps: 3,
           Crash: 2,
-          Excl: 0
+          Excl: 0,
         },
         totalAmount: 1200,
         netAmount: -280,
@@ -247,9 +247,9 @@ export class FinancialReportingService extends EventEmitter {
         metadata: {
           gameType: 'Online',
           sport: 'Multiple',
-          ticketNumber: 'TK-2025-003'
-        }
-      }
+          ticketNumber: 'TK-2025-003',
+        },
+      },
     ];
 
     // Add sample transactions
@@ -276,7 +276,7 @@ export class FinancialReportingService extends EventEmitter {
       byAgent: this.calculateAgentPerformance(filteredTransactions),
       byBetType: this.calculateBetTypePerformance(filteredTransactions),
       byTime: this.calculateTimeSeriesData(filteredTransactions, filters),
-      byLocation: this.calculateLocationPerformance(filteredTransactions)
+      byLocation: this.calculateLocationPerformance(filteredTransactions),
     };
 
     // Generate insights
@@ -285,7 +285,7 @@ export class FinancialReportingService extends EventEmitter {
     const report: FinancialReport = {
       summary,
       breakdown,
-      insights
+      insights,
     };
 
     this.emit('report-generated', report);
@@ -312,7 +312,11 @@ export class FinancialReportingService extends EventEmitter {
       }
 
       // Location filter
-      if (filters.locations && filters.locations.length > 0 && !filters.locations.includes(txn.location)) {
+      if (
+        filters.locations &&
+        filters.locations.length > 0 &&
+        !filters.locations.includes(txn.location)
+      ) {
         return false;
       }
 
@@ -337,7 +341,10 @@ export class FinancialReportingService extends EventEmitter {
   /**
    * Calculate summary statistics
    */
-  private calculateSummary(transactions: BettingTransaction[], filters: FinancialFilters): FinancialReport['summary'] {
+  private calculateSummary(
+    transactions: BettingTransaction[],
+    filters: FinancialFilters
+  ): FinancialReport['summary'] {
     const totalTransactions = transactions.length;
     const totalVolume = transactions.reduce((sum, txn) => sum + txn.totalAmount, 0);
     const netProfit = transactions.reduce((sum, txn) => sum + txn.netAmount, 0);
@@ -360,8 +367,8 @@ export class FinancialReportingService extends EventEmitter {
       period: {
         startDate: filters.dateRange.startDate,
         endDate: filters.dateRange.endDate,
-        days
-      }
+        days,
+      },
     };
   }
 
@@ -406,11 +413,16 @@ export class FinancialReportingService extends EventEmitter {
         .map(([betType]) => betType);
 
       // Determine trend (simplified)
-      const trend: 'up' | 'down' | 'stable' = netProfit > 0 ? 'up' : netProfit < 0 ? 'down' : 'stable';
+      const trend: 'up' | 'down' | 'stable' =
+        netProfit > 0 ? 'up' : netProfit < 0 ? 'down' : 'stable';
 
       // Determine risk level
-      const riskLevel: 'low' | 'medium' | 'high' = Math.abs(netProfit) > totalVolume * 0.1 ? 'high' :
-                      Math.abs(netProfit) > totalVolume * 0.05 ? 'medium' : 'low';
+      const riskLevel: 'low' | 'medium' | 'high' =
+        Math.abs(netProfit) > totalVolume * 0.1
+          ? 'high'
+          : Math.abs(netProfit) > totalVolume * 0.05
+            ? 'medium'
+            : 'low';
 
       return {
         agentId,
@@ -422,7 +434,7 @@ export class FinancialReportingService extends EventEmitter {
         averageBetSize,
         topBetTypes,
         trend,
-        riskLevel
+        riskLevel,
       };
     });
   }
@@ -431,7 +443,10 @@ export class FinancialReportingService extends EventEmitter {
    * Calculate bet type performance
    */
   private calculateBetTypePerformance(transactions: BettingTransaction[]): BetTypePerformance[] {
-    const betTypeMap = new Map<string, { volume: number; profit: number; count: number; wins: number }>();
+    const betTypeMap = new Map<
+      string,
+      { volume: number; profit: number; count: number; wins: number }
+    >();
 
     // Aggregate data by bet type
     transactions.forEach(txn => {
@@ -451,7 +466,8 @@ export class FinancialReportingService extends EventEmitter {
     return Array.from(betTypeMap.entries()).map(([betType, data]) => {
       const winRate = data.count > 0 ? (data.wins / data.count) * 100 : 0;
       const averageBetSize = data.count > 0 ? data.volume / data.count : 0;
-      const trend: 'up' | 'down' | 'stable' = data.profit > 0 ? 'up' : data.profit < 0 ? 'down' : 'stable';
+      const trend: 'up' | 'down' | 'stable' =
+        data.profit > 0 ? 'up' : data.profit < 0 ? 'down' : 'stable';
 
       return {
         betType,
@@ -461,7 +477,7 @@ export class FinancialReportingService extends EventEmitter {
         transactionCount: data.count,
         averageBetSize,
         trend,
-        contribution: 0 // Would calculate as percentage of total volume
+        contribution: 0, // Would calculate as percentage of total volume
       };
     });
   }
@@ -469,8 +485,14 @@ export class FinancialReportingService extends EventEmitter {
   /**
    * Calculate time series data
    */
-  private calculateTimeSeriesData(transactions: BettingTransaction[], filters: FinancialFilters): TimeSeriesData[] {
-    const dailyMap = new Map<string, { volume: number; profit: number; count: number; wins: number }>();
+  private calculateTimeSeriesData(
+    transactions: BettingTransaction[],
+    filters: FinancialFilters
+  ): TimeSeriesData[] {
+    const dailyMap = new Map<
+      string,
+      { volume: number; profit: number; count: number; wins: number }
+    >();
 
     // Group by date
     transactions.forEach(txn => {
@@ -493,7 +515,7 @@ export class FinancialReportingService extends EventEmitter {
         volume: data.volume,
         profit: data.profit,
         transactionCount: data.count,
-        winRate: data.count > 0 ? (data.wins / data.count) * 100 : 0
+        winRate: data.count > 0 ? (data.wins / data.count) * 100 : 0,
       }));
   }
 
@@ -501,11 +523,19 @@ export class FinancialReportingService extends EventEmitter {
    * Calculate location performance
    */
   private calculateLocationPerformance(transactions: BettingTransaction[]): LocationPerformance[] {
-    const locationMap = new Map<string, { volume: number; profit: number; count: number; agents: Set<string> }>();
+    const locationMap = new Map<
+      string,
+      { volume: number; profit: number; count: number; agents: Set<string> }
+    >();
 
     // Group by location
     transactions.forEach(txn => {
-      const existing = locationMap.get(txn.location) || { volume: 0, profit: 0, count: 0, agents: new Set() };
+      const existing = locationMap.get(txn.location) || {
+        volume: 0,
+        profit: 0,
+        count: 0,
+        agents: new Set(),
+      };
 
       existing.volume += txn.totalAmount;
       existing.profit += txn.netAmount;
@@ -518,9 +548,13 @@ export class FinancialReportingService extends EventEmitter {
     // Calculate performance
     return Array.from(locationMap.entries()).map(([location, data]) => {
       const performance: 'excellent' | 'good' | 'fair' | 'poor' =
-        data.profit > data.volume * 0.05 ? 'excellent' :
-        data.profit > 0 ? 'good' :
-        data.profit > data.volume * -0.05 ? 'fair' : 'poor';
+        data.profit > data.volume * 0.05
+          ? 'excellent'
+          : data.profit > 0
+            ? 'good'
+            : data.profit > data.volume * -0.05
+              ? 'fair'
+              : 'poor';
 
       return {
         location,
@@ -528,7 +562,7 @@ export class FinancialReportingService extends EventEmitter {
         netProfit: data.profit,
         transactionCount: data.count,
         agentCount: data.agents.size,
-        performance
+        performance,
       };
     });
   }
@@ -567,7 +601,7 @@ export class FinancialReportingService extends EventEmitter {
         description: `${highLossAgents.length} agents showing significant losses`,
         affectedAgents: highLossAgents.map(a => a.agentId),
         recommendation: 'Review agent performance and implement risk controls',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
@@ -575,7 +609,7 @@ export class FinancialReportingService extends EventEmitter {
       topPerformingAgents,
       worstPerformingAgents,
       trendingBetTypes,
-      riskIndicators
+      riskIndicators,
     };
   }
 
@@ -596,12 +630,12 @@ export class FinancialReportingService extends EventEmitter {
         { Metric: 'Average Bet Size', Value: `$${report.summary.averageBetSize.toFixed(2)}` },
         { Metric: 'Period Start', Value: report.summary.period.startDate },
         { Metric: 'Period End', Value: report.summary.period.endDate },
-        { Metric: 'Days in Period', Value: report.summary.period.days }
+        { Metric: 'Days in Period', Value: report.summary.period.days },
       ],
       columns: [
         { key: 'Metric', header: 'Metric', width: 20 },
-        { key: 'Value', header: 'Value', width: 15 }
-      ]
+        { key: 'Value', header: 'Value', width: 15 },
+      ],
     };
 
     // Create agent performance sheet
@@ -616,8 +650,8 @@ export class FinancialReportingService extends EventEmitter {
         'Transaction Count': agent.transactionCount,
         'Average Bet Size': agent.averageBetSize,
         'Top Bet Types': agent.topBetTypes.join(', '),
-        'Trend': agent.trend,
-        'Risk Level': agent.riskLevel
+        Trend: agent.trend,
+        'Risk Level': agent.riskLevel,
       })),
       columns: [
         { key: 'Agent ID', header: 'Agent ID', width: 15 },
@@ -629,8 +663,8 @@ export class FinancialReportingService extends EventEmitter {
         { key: 'Average Bet Size', header: 'Avg Bet', width: 10, type: 'currency' },
         { key: 'Top Bet Types', header: 'Top Types', width: 15 },
         { key: 'Trend', header: 'Trend', width: 8 },
-        { key: 'Risk Level', header: 'Risk', width: 8 }
-      ]
+        { key: 'Risk Level', header: 'Risk', width: 8 },
+      ],
     };
 
     // Create bet type performance sheet
@@ -643,8 +677,8 @@ export class FinancialReportingService extends EventEmitter {
         'Win Rate': `${bt.winRate.toFixed(2)}%`,
         'Transaction Count': bt.transactionCount,
         'Average Bet Size': bt.averageBetSize,
-        'Trend': bt.trend,
-        'Contribution': `${bt.contribution.toFixed(2)}%`
+        Trend: bt.trend,
+        Contribution: `${bt.contribution.toFixed(2)}%`,
       })),
       columns: [
         { key: 'Bet Type', header: 'Bet Type', width: 15 },
@@ -654,8 +688,8 @@ export class FinancialReportingService extends EventEmitter {
         { key: 'Transaction Count', header: 'Transactions', width: 12, type: 'number' },
         { key: 'Average Bet Size', header: 'Avg Bet', width: 10, type: 'currency' },
         { key: 'Trend', header: 'Trend', width: 8 },
-        { key: 'Contribution', header: 'Contribution', width: 10 }
-      ]
+        { key: 'Contribution', header: 'Contribution', width: 10 },
+      ],
     };
 
     // Export to Excel
@@ -666,8 +700,8 @@ export class FinancialReportingService extends EventEmitter {
         title: 'Fire22 Financial Report',
         author: 'Fire22 Financial System',
         created: new Date().toISOString(),
-        description: `Financial performance report for ${report.summary.period.startDate} to ${report.summary.period.endDate}`
-      }
+        description: `Financial performance report for ${report.summary.period.startDate} to ${report.summary.period.endDate}`,
+      },
     });
 
     console.log('✅ Financial report exported successfully');
@@ -738,8 +772,10 @@ export class FinancialReportingService extends EventEmitter {
       activeTransactions: transactions.length,
       totalVolume: transactions.reduce((sum, txn) => sum + txn.totalAmount, 0),
       netProfit: transactions.reduce((sum, txn) => sum + txn.netAmount, 0),
-      winRate: transactions.length > 0 ?
-        (transactions.filter(t => t.netAmount > 0).length / transactions.length) * 100 : 0
+      winRate:
+        transactions.length > 0
+          ? (transactions.filter(t => t.netAmount > 0).length / transactions.length) * 100
+          : 0,
     };
   }
 

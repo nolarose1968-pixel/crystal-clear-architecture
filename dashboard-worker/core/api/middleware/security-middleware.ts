@@ -55,7 +55,7 @@ export class SecurityMiddleware {
       request: authRequest,
       isAuthenticated: !!authRequest.user,
       hasPermission: (permission: string) => this.checkPermission(authRequest, permission),
-      hasRole: (role: string) => this.checkRole(authRequest, role)
+      hasRole: (role: string) => this.checkRole(authRequest, role),
     };
 
     return context;
@@ -89,7 +89,7 @@ export class SecurityMiddleware {
           id: user.id,
           email: user.email,
           role: user.role,
-          permissions: user.permissions
+          permissions: user.permissions,
         };
       }
     } catch (error) {
@@ -103,7 +103,11 @@ export class SecurityMiddleware {
   /**
    * Check if request should be rate limited
    */
-  checkRateLimit(request: AuthenticatedRequest): { allowed: boolean; resetTime?: number; remaining?: number } {
+  checkRateLimit(request: AuthenticatedRequest): {
+    allowed: boolean;
+    resetTime?: number;
+    remaining?: number;
+  } {
     if (!this.config.enableRateLimit) {
       return { allowed: true };
     }
@@ -118,7 +122,7 @@ export class SecurityMiddleware {
       // Reset or initialize rate limit data
       clientData = {
         count: 0,
-        resetTime: now + this.config.rateLimitWindowMs
+        resetTime: now + this.config.rateLimitWindowMs,
       };
       this.rateLimitStore.set(clientId, clientData);
     }
@@ -129,21 +133,25 @@ export class SecurityMiddleware {
     const remaining = Math.max(0, this.config.rateLimitMaxRequests - clientData.count);
 
     // Clean up expired entries periodically
-    if (Math.random() < 0.01) { // 1% chance to clean up
+    if (Math.random() < 0.01) {
+      // 1% chance to clean up
       this.cleanupExpiredEntries(now);
     }
 
     return {
       allowed,
       resetTime: clientData.resetTime,
-      remaining
+      remaining,
     };
   }
 
   /**
    * Validate request input (basic implementation)
    */
-  validateRequest(request: AuthenticatedRequest, schema?: any): { valid: boolean; errors?: string[] } {
+  validateRequest(
+    request: AuthenticatedRequest,
+    schema?: any
+  ): { valid: boolean; errors?: string[] } {
     if (!this.config.enableValidation || !schema) {
       return { valid: true };
     }
@@ -155,7 +163,7 @@ export class SecurityMiddleware {
 
     return {
       valid: errors.length === 0,
-      errors: errors.length > 0 ? errors : undefined
+      errors: errors.length > 0 ? errors : undefined,
     };
   }
 
@@ -177,8 +185,8 @@ export class SecurityMiddleware {
             'Access-Control-Allow-Origin': origin,
             'Access-Control-Allow-Methods': this.config.allowedMethods.join(', '),
             'Access-Control-Allow-Headers': this.config.allowedHeaders.join(', '),
-            'Access-Control-Max-Age': '86400'
-          }
+            'Access-Control-Max-Age': '86400',
+          },
         });
       }
     }
@@ -220,7 +228,7 @@ export class SecurityMiddleware {
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
-      headers
+      headers,
     });
   }
 
@@ -239,20 +247,20 @@ export class SecurityMiddleware {
       error: {
         code,
         message: error,
-        details
+        details,
       },
       timestamp: new Date().toISOString(),
       requestId: request.requestId,
       path: new URL(request.url).pathname,
-      method: request.method
+      method: request.method,
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status,
       headers: {
         'Content-Type': 'application/json',
-        'X-Request-ID': request.requestId
-      }
+        'X-Request-ID': request.requestId,
+      },
     });
   }
 
@@ -275,7 +283,7 @@ export class SecurityMiddleware {
     let hash = 0;
     for (let i = 0; i < identifier.length; i++) {
       const char = identifier.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
 
@@ -290,9 +298,11 @@ export class SecurityMiddleware {
       return false;
     }
 
-    return request.user.permissions.includes(permission) ||
-           request.user.permissions.includes('*') ||
-           (request.user.role === 'admin' && permission !== 'super-admin');
+    return (
+      request.user.permissions.includes(permission) ||
+      request.user.permissions.includes('*') ||
+      (request.user.role === 'admin' && permission !== 'super-admin')
+    );
   }
 
   /**
@@ -304,10 +314,10 @@ export class SecurityMiddleware {
     }
 
     const roleHierarchy = {
-      'user': 1,
-      'moderator': 2,
-      'admin': 3,
-      'super-admin': 4
+      user: 1,
+      moderator: 2,
+      admin: 3,
+      'super-admin': 4,
     };
 
     const userRoleLevel = roleHierarchy[request.user.role as keyof typeof roleHierarchy] || 0;
@@ -373,7 +383,9 @@ export class SecurityMiddleware {
       // Check rate limit
       const rateLimitResult = this.checkRateLimit(context.request);
       if (!rateLimitResult.allowed) {
-        const resetTime = rateLimitResult.resetTime ? new Date(rateLimitResult.resetTime) : new Date();
+        const resetTime = rateLimitResult.resetTime
+          ? new Date(rateLimitResult.resetTime)
+          : new Date();
         return this.createErrorResponse(
           'Rate limit exceeded',
           'RATE_LIMIT_EXCEEDED',
@@ -381,7 +393,7 @@ export class SecurityMiddleware {
           context.request,
           {
             resetTime: resetTime.toISOString(),
-            remaining: rateLimitResult.remaining || 0
+            remaining: rateLimitResult.remaining || 0,
           }
         );
       }
@@ -405,5 +417,5 @@ export const defaultSecurityConfig: SecurityConfig = {
   rateLimitMaxRequests: 100, // 100 requests per 15 minutes
   allowedOrigins: ['http://localhost:3000', 'https://dashboard.fire22.com', 'https://*.fire22.com'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'X-Request-ID'],
-  allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH']
+  allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
 };

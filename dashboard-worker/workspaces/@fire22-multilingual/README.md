@@ -6,7 +6,8 @@
 [![Bun](https://img.shields.io/badge/bun-%3E%3D1.2.20-f472b6.svg)](https://bun.sh)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-Comprehensive multilingual system with 77 language codes supporting English, Spanish, Portuguese, and French for the Fire22 platform.
+Comprehensive multilingual system with 77 language codes supporting English,
+Spanish, Portuguese, and French for the Fire22 platform.
 
 ## 📦 Installation
 
@@ -36,7 +37,7 @@ await languageSystem.initialize();
 // Translate a message
 const welcome = await languageSystem.translate(
   'L-1500', // Welcome code
-  'es',     // Spanish
+  'es', // Spanish
   { name: 'Usuario' } // Variables
 );
 // Result: "¡Bienvenido, Usuario!"
@@ -51,6 +52,7 @@ await languageSystem.setUserLanguage('user123', 'fr');
 ## 🗂️ Language Codes
 
 ### Core System (L-1000 to L-1499)
+
 - **User Interface**: L-1000 to L-1099
 - **System Messages**: L-1100 to L-1199
 - **Business Operations**: L-1200 to L-1299
@@ -58,6 +60,7 @@ await languageSystem.setUserLanguage('user123', 'fr');
 - **Errors & Validation**: L-1400 to L-1499
 
 ### Telegram Integration (L-1500 to L-1520)
+
 ```typescript
 L-1500: "Welcome"                    // Bot welcome
 L-1501: "Account Linked"             // Account linking
@@ -84,12 +87,12 @@ L-1520: "Language Changed"          // Language switch
 
 ## 🌍 Supported Languages
 
-| Code | Language | Flag | Native Name |
-|------|----------|------|------------|
-| `en` | English | 🇺🇸 | English |
-| `es` | Spanish | 🇪🇸 | Español |
-| `pt` | Portuguese | 🇵🇹 | Português |
-| `fr` | French | 🇫🇷 | Français |
+| Code | Language   | Flag | Native Name |
+| ---- | ---------- | ---- | ----------- |
+| `en` | English    | 🇺🇸   | English     |
+| `es` | Spanish    | 🇪🇸   | Español     |
+| `pt` | Portuguese | 🇵🇹   | Português   |
+| `fr` | French     | 🇫🇷   | Français    |
 
 ## 🔧 Configuration
 
@@ -97,10 +100,10 @@ L-1520: "Language Changed"          // Language switch
 
 ```typescript
 const config = {
-  cacheSize: 1000,        // Maximum cached translations
-  cacheTTL: 3600000,      // 1 hour TTL
+  cacheSize: 1000, // Maximum cached translations
+  cacheTTL: 3600000, // 1 hour TTL
   fallbackLanguage: 'en', // Default language
-  preloadLanguages: ['en', 'es'] // Preload at startup
+  preloadLanguages: ['en', 'es'], // Preload at startup
 };
 ```
 
@@ -108,14 +111,13 @@ const config = {
 
 ```typescript
 // Template with variables
-const template = "Hello {{name}}, you have {{count}} messages";
+const template = 'Hello {{name}}, you have {{count}} messages';
 
 // Translate with variables
-const result = await languageSystem.translate(
-  'L-1001',
-  'en',
-  { name: 'John', count: 5 }
-);
+const result = await languageSystem.translate('L-1001', 'en', {
+  name: 'John',
+  count: 5,
+});
 // Result: "Hello John, you have 5 messages"
 ```
 
@@ -152,6 +154,7 @@ bun run validate
 ## 📊 Translation Coverage
 
 ### Current Status
+
 - **Total Codes**: 77
 - **Languages**: 4
 - **Total Translations**: 308 (77 × 4)
@@ -174,26 +177,33 @@ bun run scripts/validate-translations.ts
 ### Main Classes
 
 #### `Fire22LanguageSystem`
+
 Core language system managing translations and caching.
 
 ### Methods
 
 #### `initialize()`
+
 Initialize the language system and load translations.
 
 #### `translate(code, language, variables?)`
+
 Translate a language code with optional variables.
 
 #### `detectUserLanguage(userId)`
+
 Detect user's preferred language.
 
 #### `setUserLanguage(userId, language)`
+
 Set user's language preference.
 
 #### `getSupportedLanguages()`
+
 Get list of supported languages.
 
 #### `validateTranslations()`
+
 Validate translation completeness.
 
 ## 🔗 Dependencies
@@ -217,9 +227,12 @@ MIT © Fire22 Team
 
 ## 🔗 Related Packages
 
-- [@fire22/telegram-bot](../fire22-telegram-bot) - Telegram bot using translations
-- [@fire22/telegram-workflows](../fire22-telegram-workflows) - Multilingual workflows
-- [@fire22/telegram-dashboard](../fire22-telegram-dashboard) - Dashboard with language support
+- [@fire22/telegram-bot](../fire22-telegram-bot) - Telegram bot using
+  translations
+- [@fire22/telegram-workflows](../fire22-telegram-workflows) - Multilingual
+  workflows
+- [@fire22/telegram-dashboard](../fire22-telegram-dashboard) - Dashboard with
+  language support
 
 ## 📞 Support
 

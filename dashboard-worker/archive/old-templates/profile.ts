@@ -3,11 +3,7 @@
  */
 
 import type { EmployeeData } from '../types';
-import {
-  generateHtmlHead,
-  generateHeader,
-  generateFooter,
-} from '../components';
+import { generateHtmlHead, generateHeader, generateFooter } from '../components';
 
 export function generateProfilePage(employee: EmployeeData): string {
   // Use enhanced enterprise template
@@ -161,16 +157,19 @@ export function generateBasicProfilePage(employee: EmployeeData): string {
 }
 
 function generateExecutiveHero(employee: EmployeeData): string {
-  const credentials = employee.tier === 5 ? [
-    'MBA in Business Administration',
-    'Certified VIP Relationship Manager',
-    '15+ Years Premium Client Experience',
-    'Sports Betting Industry Expert'
-  ] : [
-    'MBA in Business Administration',
-    '10+ Years Client Management',
-    'Sports Industry Specialist'
-  ];
+  const credentials =
+    employee.tier === 5
+      ? [
+          'MBA in Business Administration',
+          'Certified VIP Relationship Manager',
+          '15+ Years Premium Client Experience',
+          'Sports Betting Industry Expert',
+        ]
+      : [
+          'MBA in Business Administration',
+          '10+ Years Client Management',
+          'Sports Industry Specialist',
+        ];
 
   return `
     <div class="executive-hero">
@@ -241,27 +240,29 @@ function generateAchievementsSection(employee: EmployeeData): string {
     {
       icon: '🏆',
       title: 'VIP Client Excellence Award 2024',
-      description: 'Recognized for outstanding performance in premium client management and retention',
-      year: '2024'
+      description:
+        'Recognized for outstanding performance in premium client management and retention',
+      year: '2024',
     },
     {
       icon: '💰',
       title: '$2.8M Monthly VIP Revenue',
       description: 'Generated through strategic client relationships and premium service offerings',
-      year: '2024'
+      year: '2024',
     },
     {
       icon: '⭐',
       title: '96.4% Client Retention Rate',
       description: 'Industry-leading retention through personalized VIP service excellence',
-      year: '2024'
+      year: '2024',
     },
     {
       icon: '🚀',
       title: '24 New VIP Clients',
-      description: 'Successfully onboarded high-value clients this month through strategic partnerships',
-      year: '2024'
-    }
+      description:
+        'Successfully onboarded high-value clients this month through strategic partnerships',
+      year: '2024',
+    },
   ];
 
   return `
@@ -272,7 +273,9 @@ function generateAchievementsSection(employee: EmployeeData): string {
       </div>
 
       <div class="achievements-grid">
-        ${achievements.map(achievement => `
+        ${achievements
+          .map(
+            achievement => `
           <div class="achievement-card">
             <div class="achievement-icon">${achievement.icon}</div>
             <div class="achievement-content">
@@ -281,7 +284,9 @@ function generateAchievementsSection(employee: EmployeeData): string {
               <div class="achievement-year">${achievement.year}</div>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     </div>
   `;
@@ -292,39 +297,45 @@ function generateServicesSection(employee: EmployeeData): string {
     {
       icon: '👑',
       title: 'High-Roller Client Management',
-      description: 'Specialized support for premium clients with dedicated concierge services, priority access, and personalized betting strategies.',
-      features: ['Dedicated Concierge', 'Priority Access', 'Custom Strategies']
+      description:
+        'Specialized support for premium clients with dedicated concierge services, priority access, and personalized betting strategies.',
+      features: ['Dedicated Concierge', 'Priority Access', 'Custom Strategies'],
     },
     {
       icon: '🚨',
       title: 'VIP Escalation Handling',
-      description: 'Priority incident resolution and emergency support for high-value client matters requiring immediate attention.',
-      features: ['24/7 Support', 'Priority Resolution', 'Emergency Protocols']
+      description:
+        'Priority incident resolution and emergency support for high-value client matters requiring immediate attention.',
+      features: ['24/7 Support', 'Priority Resolution', 'Emergency Protocols'],
     },
     {
       icon: '📊',
       title: 'Performance Analytics',
-      description: 'Advanced reporting and insights for client performance, betting patterns, and strategic optimization recommendations.',
-      features: ['Real-time Analytics', 'Performance Insights', 'Strategic Recommendations']
+      description:
+        'Advanced reporting and insights for client performance, betting patterns, and strategic optimization recommendations.',
+      features: ['Real-time Analytics', 'Performance Insights', 'Strategic Recommendations'],
     },
     {
       icon: '🤝',
       title: 'Client Relationship Management',
-      description: 'Comprehensive CRM services including client onboarding, retention strategies, and relationship development.',
-      features: ['Client Onboarding', 'Retention Strategies', 'Relationship Development']
+      description:
+        'Comprehensive CRM services including client onboarding, retention strategies, and relationship development.',
+      features: ['Client Onboarding', 'Retention Strategies', 'Relationship Development'],
     },
     {
       icon: '💼',
       title: 'Business Development',
-      description: 'Strategic partnership development and high-value client acquisition through exclusive networks and relationships.',
-      features: ['Partnership Development', 'Client Acquisition', 'Network Expansion']
+      description:
+        'Strategic partnership development and high-value client acquisition through exclusive networks and relationships.',
+      features: ['Partnership Development', 'Client Acquisition', 'Network Expansion'],
     },
     {
       icon: '🎯',
       title: 'Portfolio Optimization',
-      description: 'Investment portfolio analysis and betting strategy optimization for maximum returns and risk management.',
-      features: ['Portfolio Analysis', 'Risk Management', 'Return Optimization']
-    }
+      description:
+        'Investment portfolio analysis and betting strategy optimization for maximum returns and risk management.',
+      features: ['Portfolio Analysis', 'Risk Management', 'Return Optimization'],
+    },
   ];
 
   return `
@@ -335,7 +346,9 @@ function generateServicesSection(employee: EmployeeData): string {
       </div>
 
       <div class="services-grid">
-        ${services.map(service => `
+        ${services
+          .map(
+            service => `
           <div class="service-card">
             <div class="service-header">
               <div class="service-icon">${service.icon}</div>
@@ -346,7 +359,9 @@ function generateServicesSection(employee: EmployeeData): string {
               ${service.features.map(feature => `<span class="feature-tag">${feature}</span>`).join('')}
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     </div>
   `;
@@ -359,43 +374,43 @@ function generatePerformanceMetrics(employee: EmployeeData): string {
       value: '1,247',
       change: '+12.3%',
       trend: 'up',
-      icon: '👥'
+      icon: '👥',
     },
     {
       label: 'Monthly VIP Revenue',
       value: '$2.8M',
       change: '+18.7%',
       trend: 'up',
-      icon: '💰'
+      icon: '💰',
     },
     {
       label: 'Client Retention Rate',
       value: '96.4%',
       change: '+2.1%',
       trend: 'up',
-      icon: '📈'
+      icon: '📈',
     },
     {
       label: 'New VIPs This Month',
       value: '24',
       change: '+45.2%',
       trend: 'up',
-      icon: '🚀'
+      icon: '🚀',
     },
     {
       label: 'Average Response Time',
       value: '< 3 min',
       change: '-45s',
       trend: 'down',
-      icon: '⚡'
+      icon: '⚡',
     },
     {
       label: 'Client Satisfaction',
       value: '4.9/5',
       change: '+0.2',
       trend: 'up',
-      icon: '⭐'
-    }
+      icon: '⭐',
+    },
   ];
 
   return `
@@ -406,7 +421,9 @@ function generatePerformanceMetrics(employee: EmployeeData): string {
       </div>
 
       <div class="metrics-grid">
-        ${metrics.map(metric => `
+        ${metrics
+          .map(
+            metric => `
           <div class="metric-card">
             <div class="metric-header">
               <div class="metric-icon">${metric.icon}</div>
@@ -417,7 +434,9 @@ function generatePerformanceMetrics(employee: EmployeeData): string {
             <div class="metric-value">${metric.value}</div>
             <div class="metric-label">${metric.label}</div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     </div>
   `;
@@ -429,20 +448,23 @@ function generateClientSuccess(employee: EmployeeData): string {
       client: 'Diamond Club Member',
       achievement: '$500K Portfolio Growth',
       timeframe: '6 months',
-      description: 'Strategic betting portfolio optimization resulting in 500% ROI through personalized strategies and market insights.'
+      description:
+        'Strategic betting portfolio optimization resulting in 500% ROI through personalized strategies and market insights.',
     },
     {
       client: 'Premium Client',
       achievement: 'Consistent 15% Monthly Returns',
       timeframe: '12 months',
-      description: 'Maintained consistent monthly returns through risk management and diversified betting strategies.'
+      description:
+        'Maintained consistent monthly returns through risk management and diversified betting strategies.',
     },
     {
       client: 'High-Net-Worth Individual',
       achievement: 'Emergency Crisis Resolution',
       timeframe: '24 hours',
-      description: 'Successfully resolved critical account issues and restored full access within 24 hours of escalation.'
-    }
+      description:
+        'Successfully resolved critical account issues and restored full access within 24 hours of escalation.',
+    },
   ];
 
   return `
@@ -453,7 +475,9 @@ function generateClientSuccess(employee: EmployeeData): string {
       </div>
 
       <div class="success-grid">
-        ${successStories.map(story => `
+        ${successStories
+          .map(
+            story => `
           <div class="success-card">
             <div class="success-header">
               <h3>${story.client}</h3>
@@ -462,7 +486,9 @@ function generateClientSuccess(employee: EmployeeData): string {
             <div class="success-timeframe">${story.timeframe}</div>
             <p class="success-description">${story.description}</p>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     </div>
   `;
@@ -475,29 +501,45 @@ function generateProfessionalTimeline(employee: EmployeeData): string {
       title: 'Head of VIP Management',
       company: 'Fire22',
       description: 'Leading premium client relationship management and strategic VIP operations',
-      achievements: ['Generated $2.8M monthly VIP revenue', 'Achieved 96.4% client retention', 'Onboarded 24 new VIP clients']
+      achievements: [
+        'Generated $2.8M monthly VIP revenue',
+        'Achieved 96.4% client retention',
+        'Onboarded 24 new VIP clients',
+      ],
     },
     {
       year: '2022',
       title: 'Senior VIP Relationship Manager',
       company: 'Premium Sports Network',
       description: 'Managed high-value client portfolios and implemented retention strategies',
-      achievements: ['Increased client lifetime value by 150%', 'Developed VIP concierge services', 'Launched premium betting programs']
+      achievements: [
+        'Increased client lifetime value by 150%',
+        'Developed VIP concierge services',
+        'Launched premium betting programs',
+      ],
     },
     {
       year: '2019',
       title: 'VIP Client Specialist',
       company: 'Elite Betting Group',
       description: 'Specialized in premium client acquisition and relationship management',
-      achievements: ['Built $50M+ client asset portfolio', 'Achieved 95% client satisfaction', 'Implemented personalized betting strategies']
+      achievements: [
+        'Built $50M+ client asset portfolio',
+        'Achieved 95% client satisfaction',
+        'Implemented personalized betting strategies',
+      ],
     },
     {
       year: '2016',
       title: 'Client Relationship Manager',
       company: 'Sports Investment Partners',
       description: 'Managed client relationships and developed betting optimization strategies',
-      achievements: ['Managed 200+ high-value clients', 'Developed risk management protocols', 'Increased client retention by 40%']
-    }
+      achievements: [
+        'Managed 200+ high-value clients',
+        'Developed risk management protocols',
+        'Increased client retention by 40%',
+      ],
+    },
   ];
 
   return `
@@ -508,7 +550,9 @@ function generateProfessionalTimeline(employee: EmployeeData): string {
       </div>
 
       <div class="timeline-container">
-        ${timeline.map((item, index) => `
+        ${timeline
+          .map(
+            (item, index) => `
           <div class="timeline-item ${index % 2 === 0 ? 'left' : 'right'}">
             <div class="timeline-marker">
               <div class="timeline-year">${item.year}</div>
@@ -520,16 +564,22 @@ function generateProfessionalTimeline(employee: EmployeeData): string {
               </div>
               <p class="timeline-description">${item.description}</p>
               <div class="timeline-achievements">
-                ${item.achievements.map(achievement => `
+                ${item.achievements
+                  .map(
+                    achievement => `
                   <div class="achievement-item">
                     <span class="achievement-icon">✓</span>
                     <span class="achievement-text">${achievement}</span>
                   </div>
-                `).join('')}
+                `
+                  )
+                  .join('')}
               </div>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     </div>
   `;
@@ -540,31 +590,35 @@ function generateTestimonialsSection(employee: EmployeeData): string {
     {
       client: 'Diamond Club Member',
       rating: 5,
-      testimonial: '"Vinny transformed my betting portfolio completely. His strategic insights and personalized approach resulted in exceptional returns while maintaining perfect risk management."',
+      testimonial:
+        '"Vinny transformed my betting portfolio completely. His strategic insights and personalized approach resulted in exceptional returns while maintaining perfect risk management."',
       result: '$500K Portfolio Growth in 6 months',
-      avatar: '👑'
+      avatar: '👑',
     },
     {
       client: 'Premium Client',
       rating: 5,
-      testimonial: '"Outstanding VIP service and expertise. Vinny\'s guidance helped me achieve consistent monthly returns of 15% through his sophisticated risk management strategies."',
+      testimonial:
+        '"Outstanding VIP service and expertise. Vinny\'s guidance helped me achieve consistent monthly returns of 15% through his sophisticated risk management strategies."',
       result: 'Consistent 15% Monthly Returns for 12 months',
-      avatar: '💎'
+      avatar: '💎',
     },
     {
       client: 'High-Net-Worth Individual',
       rating: 5,
-      testimonial: '"When I needed emergency support, Vinny was there within minutes. His crisis management skills and dedication to client satisfaction are unmatched in the industry."',
+      testimonial:
+        '"When I needed emergency support, Vinny was there within minutes. His crisis management skills and dedication to client satisfaction are unmatched in the industry."',
       result: '24-Hour Crisis Resolution',
-      avatar: '🏆'
+      avatar: '🏆',
     },
     {
       client: 'VIP Portfolio Manager',
       rating: 5,
-      testimonial: '"Vinny\'s analytical approach and market insights have been invaluable. His ability to combine data-driven strategies with personal attention is remarkable."',
+      testimonial:
+        '"Vinny\'s analytical approach and market insights have been invaluable. His ability to combine data-driven strategies with personal attention is remarkable."',
       result: '200% ROI Improvement',
-      avatar: '📈'
-    }
+      avatar: '📈',
+    },
   ];
 
   return `
@@ -575,7 +629,9 @@ function generateTestimonialsSection(employee: EmployeeData): string {
       </div>
 
       <div class="testimonials-grid">
-        ${testimonials.map(testimonial => `
+        ${testimonials
+          .map(
+            testimonial => `
           <div class="testimonial-card">
             <div class="testimonial-header">
               <div class="testimonial-avatar">${testimonial.avatar}</div>
@@ -594,7 +650,9 @@ function generateTestimonialsSection(employee: EmployeeData): string {
               </div>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     </div>
   `;
@@ -607,43 +665,43 @@ function generateIndustryRecognition(employee: EmployeeData): string {
       issuer: 'Sports Betting Excellence Awards',
       year: '2024',
       description: 'Recognized for exceptional client service and relationship management',
-      icon: '🏆'
+      icon: '🏆',
     },
     {
       title: 'Client Satisfaction Excellence',
       issuer: 'Premium Client Services Association',
       year: '2023',
       description: 'Awarded for maintaining 98%+ client satisfaction scores',
-      icon: '⭐'
+      icon: '⭐',
     },
     {
       title: 'Innovation in VIP Services',
       issuer: 'Financial Services Innovation Forum',
       year: '2023',
       description: 'Recognized for pioneering personalized VIP management solutions',
-      icon: '🚀'
+      icon: '🚀',
     },
     {
       title: 'Risk Management Leadership',
       issuer: 'Sports Investment Risk Council',
       year: '2022',
       description: 'Acknowledged for advanced risk management strategies',
-      icon: '🛡️'
+      icon: '🛡️',
     },
     {
       title: 'Mentorship Excellence',
       issuer: 'VIP Services Professional Network',
       year: '2022',
       description: 'Recognized for mentoring emerging VIP relationship professionals',
-      icon: '👨‍🏫'
+      icon: '👨‍🏫',
     },
     {
       title: 'Client Retention Champion',
       issuer: 'Client Relationship Management Institute',
       year: '2021',
       description: 'Awarded for achieving industry-leading client retention rates',
-      icon: '💎'
-    }
+      icon: '💎',
+    },
   ];
 
   return `
@@ -654,7 +712,9 @@ function generateIndustryRecognition(employee: EmployeeData): string {
       </div>
 
       <div class="recognition-grid">
-        ${recognitions.map(recognition => `
+        ${recognitions
+          .map(
+            recognition => `
           <div class="recognition-card">
             <div class="recognition-icon">${recognition.icon}</div>
             <div class="recognition-content">
@@ -663,7 +723,9 @@ function generateIndustryRecognition(employee: EmployeeData): string {
               <p class="recognition-description">${recognition.description}</p>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     </div>
   `;
@@ -675,26 +737,26 @@ function generateCertifications(employee: EmployeeData): string {
       title: 'Certified VIP Relationship Manager',
       issuer: 'International Association of VIP Services',
       year: '2023',
-      status: 'Active'
+      status: 'Active',
     },
     {
       title: 'MBA Business Administration',
       issuer: 'Harvard Business School',
       year: '2018',
-      status: 'Completed'
+      status: 'Completed',
     },
     {
       title: 'Sports Betting Industry Certification',
       issuer: 'Professional Sports Bettors Association',
       year: '2022',
-      status: 'Active'
+      status: 'Active',
     },
     {
       title: 'Financial Risk Management',
       issuer: 'CFA Institute',
       year: '2021',
-      status: 'Active'
-    }
+      status: 'Active',
+    },
   ];
 
   return `
@@ -705,7 +767,9 @@ function generateCertifications(employee: EmployeeData): string {
       </div>
 
       <div class="certifications-grid">
-        ${certifications.map(cert => `
+        ${certifications
+          .map(
+            cert => `
           <div class="certification-card">
             <div class="certification-header">
               <h3>${cert.title}</h3>
@@ -714,7 +778,9 @@ function generateCertifications(employee: EmployeeData): string {
             <div class="certification-issuer">${cert.issuer}</div>
             <div class="certification-year">${cert.year}</div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     </div>
   `;

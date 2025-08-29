@@ -2,7 +2,7 @@
 
 /**
  * 🤖 Fire22 CI/CD Benchmarking
- * 
+ *
  * Automated benchmarking for continuous integration
  * Detects performance regressions and generates reports
  */
@@ -68,35 +68,35 @@ export class CIBenchmarks {
 
       // Load baseline
       const baseline = await this.loadBaseline();
-      
+
       // Run benchmarks
       console.log('🚀 Running benchmarks...\n');
-      
+
       // 1. Core benchmarks
       const coreResults = await this.runCoreBenchmarks();
-      
+
       // 2. Memory benchmarks
       const memoryResults = await this.runMemoryBenchmarks();
-      
+
       // 3. API benchmarks
       const apiResults = await this.runAPIBenchmarks();
-      
+
       // 4. Build performance
       const buildResults = await this.runBuildBenchmarks();
-      
+
       // Combine results
       const allResults = {
         ...coreResults,
         ...memoryResults,
         ...apiResults,
-        ...buildResults
+        ...buildResults,
       };
 
       // Compare with baseline
       if (baseline) {
         console.log('\n📊 Comparing with baseline...');
         const regression = this.compareWithBaseline(allResults, baseline);
-        
+
         if (!regression.passed) {
           console.error('\n❌ Performance regressions detected!');
           this.printRegressionReport(regression);
@@ -128,7 +128,6 @@ export class CIBenchmarks {
       console.log(`\n⏱️  Total time: ${duration}s`);
 
       return allPassed;
-
     } catch (error) {
       console.error('❌ CI Benchmarking failed:', error);
       return false;
@@ -146,7 +145,7 @@ export class CIBenchmarks {
     return {
       branch: branch.trim(),
       commit: commit.trim(),
-      author: author.trim()
+      author: author.trim(),
     };
   }
 
@@ -160,48 +159,45 @@ export class CIBenchmarks {
     const results: Record<string, number> = {};
 
     // JSON operations
-    const largeObject = { users: Array(1000).fill(null).map((_, i) => ({ id: i, data: `user${i}` })) };
-    results['json.stringify'] = await this.measureOperation(
-      'JSON.stringify (large)',
-      () => JSON.stringify(largeObject)
+    const largeObject = {
+      users: Array(1000)
+        .fill(null)
+        .map((_, i) => ({ id: i, data: `user${i}` })),
+    };
+    results['json.stringify'] = await this.measureOperation('JSON.stringify (large)', () =>
+      JSON.stringify(largeObject)
     );
 
     const jsonString = JSON.stringify(largeObject);
-    results['json.parse'] = await this.measureOperation(
-      'JSON.parse (large)',
-      () => JSON.parse(jsonString)
+    results['json.parse'] = await this.measureOperation('JSON.parse (large)', () =>
+      JSON.parse(jsonString)
     );
 
     // Crypto operations
-    results['crypto.sha256'] = await this.measureOperation(
-      'SHA-256 Hash',
-      () => {
-        const hasher = new Bun.CryptoHasher('sha256');
-        hasher.update('test data');
-        hasher.digest();
-      }
-    );
+    results['crypto.sha256'] = await this.measureOperation('SHA-256 Hash', () => {
+      const hasher = new Bun.CryptoHasher('sha256');
+      hasher.update('test data');
+      hasher.digest();
+    });
 
-    results['crypto.uuid'] = await this.measureOperation(
-      'UUID Generation',
-      () => crypto.randomUUID()
+    results['crypto.uuid'] = await this.measureOperation('UUID Generation', () =>
+      crypto.randomUUID()
     );
 
     // Array operations
-    const array = Array(10000).fill(null).map((_, i) => i);
-    results['array.map'] = await this.measureOperation(
-      'Array.map (10k)',
-      () => array.map(x => x * 2)
+    const array = Array(10000)
+      .fill(null)
+      .map((_, i) => i);
+    results['array.map'] = await this.measureOperation('Array.map (10k)', () =>
+      array.map(x => x * 2)
     );
 
-    results['array.filter'] = await this.measureOperation(
-      'Array.filter (10k)',
-      () => array.filter(x => x % 2 === 0)
+    results['array.filter'] = await this.measureOperation('Array.filter (10k)', () =>
+      array.filter(x => x % 2 === 0)
     );
 
-    results['array.reduce'] = await this.measureOperation(
-      'Array.reduce (10k)',
-      () => array.reduce((sum, x) => sum + x, 0)
+    results['array.reduce'] = await this.measureOperation('Array.reduce (10k)', () =>
+      array.reduce((sum, x) => sum + x, 0)
     );
 
     return results;
@@ -218,19 +214,17 @@ export class CIBenchmarks {
     const profiler = new MemoryProfiler('CI Memory Test');
 
     // Memory allocation test
-    const { memory } = await profiler.profileFunction(
-      'Large Array Allocation',
-      () => {
-        const arrays = [];
-        for (let i = 0; i < 100; i++) {
-          arrays.push(new Array(10000).fill(i));
-        }
-        return arrays;
+    const { memory } = await profiler.profileFunction('Large Array Allocation', () => {
+      const arrays = [];
+      for (let i = 0; i < 100; i++) {
+        arrays.push(new Array(10000).fill(i));
       }
-    );
+      return arrays;
+    });
 
     results['memory.heap_growth'] = memory.finalMemory.heapSize - memory.initialMemory.heapSize;
-    results['memory.object_growth'] = memory.finalMemory.objectCount - memory.initialMemory.objectCount;
+    results['memory.object_growth'] =
+      memory.finalMemory.objectCount - memory.initialMemory.objectCount;
     results['memory.gc_runs'] = memory.gcRuns;
 
     console.log(`   Heap Growth: ${(results['memory.heap_growth'] / 1024 / 1024).toFixed(2)} MB`);
@@ -252,13 +246,13 @@ export class CIBenchmarks {
     // Start test server
     const server = Bun.serve({
       port: 0,
-      fetch: (req) => {
+      fetch: req => {
         const url = new URL(req.url);
         if (url.pathname === '/api/test') {
           return new Response(JSON.stringify({ status: 'ok' }));
         }
         return new Response('Not Found', { status: 404 });
-      }
+      },
     });
 
     const serverUrl = `http://localhost:${server.port}`;
@@ -376,7 +370,7 @@ export class CIBenchmarks {
       commit: gitInfo.commit,
       branch: gitInfo.branch,
       timestamp: new Date().toISOString(),
-      results
+      results,
     };
 
     await Bun.write(this.baselineFile, JSON.stringify(baseline, null, 2));
@@ -392,12 +386,12 @@ export class CIBenchmarks {
     const report: RegressionReport = {
       passed: true,
       regressions: [],
-      improvements: []
+      improvements: [],
     };
 
     for (const [key, currentValue] of Object.entries(current)) {
       const baselineValue = baseline.results[key];
-      
+
       if (!baselineValue) continue; // Skip new benchmarks
 
       const change = currentValue - baselineValue;
@@ -410,7 +404,7 @@ export class CIBenchmarks {
           baseline: baselineValue,
           current: currentValue,
           change,
-          percentChange
+          percentChange,
         });
         report.passed = false;
       } else if (percentChange < -this.thresholds.improvement) {
@@ -420,7 +414,7 @@ export class CIBenchmarks {
           baseline: baselineValue,
           current: currentValue,
           change,
-          percentChange: Math.abs(percentChange)
+          percentChange: Math.abs(percentChange),
         });
       }
     }
@@ -458,8 +452,8 @@ export class CIBenchmarks {
       environment: {
         bun: process.versions.bun,
         platform: process.platform,
-        arch: process.arch
-      }
+        arch: process.arch,
+      },
     };
 
     await Bun.write('benchmark-ci-results.json', JSON.stringify(jsonReport, null, 2));
@@ -476,7 +470,7 @@ export class CIBenchmarks {
       '## Results',
       '',
       '| Benchmark | Time/Value |',
-      '|-----------|------------|'
+      '|-----------|------------|',
     ];
 
     for (const [key, value] of Object.entries(results)) {
@@ -516,7 +510,7 @@ export class CIBenchmarks {
     if (!baseline) return;
 
     const results: Record<string, number> = {};
-    
+
     // Run quick benchmarks
     const coreResults = await this.runCoreBenchmarks();
     Object.assign(results, coreResults);
@@ -527,15 +521,15 @@ export class CIBenchmarks {
     if (process.env.GITHUB_ACTIONS) {
       if (!report.passed) {
         console.log('::error::Performance regressions detected');
-        
+
         for (const reg of report.regressions) {
           console.log(`::warning::${reg.name} is ${reg.percentChange.toFixed(1)}% slower`);
         }
-        
+
         process.exit(1);
       } else {
         console.log('::notice::All benchmarks passed');
-        
+
         for (const imp of report.improvements) {
           console.log(`::notice::${imp.name} is ${imp.percentChange.toFixed(1)}% faster`);
         }
@@ -547,7 +541,7 @@ export class CIBenchmarks {
 // Run if executed directly
 if (import.meta.main) {
   const ci = new CIBenchmarks();
-  
+
   // Check if running in CI environment
   if (process.env.CI || process.env.GITHUB_ACTIONS) {
     await ci.githubActionsOutput();

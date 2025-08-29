@@ -4,7 +4,7 @@
   "description": "Production-ready version management using Bun.semver for Fire22 Dashboard Worker",
   "keywords": [
     "semver",
-    "version-management", 
+    "version-management",
     "bun",
     "fire22",
     "cli",
@@ -24,7 +24,7 @@
       "require": "./dist/index.js"
     },
     "./cli": {
-      "types": "./dist/cli.d.ts", 
+      "types": "./dist/cli.d.ts",
       "import": "./dist/cli.js"
     },
     "./workspace": {
@@ -83,8 +83,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/brendadeeznuts1111/fire22-dashboard-worker",
-    "directory": "packages/version-manager"
+    "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture.git",
+    "directory": "dashboard-worker/packages/version-manager"
   },
   "bugs": {
     "url": "https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues"
@@ -101,7 +101,9 @@
     "minify": true,
     "sourcemap": true,
     "splitting": true,
-    "external": ["bun:*"]
+    "external": [
+      "bun:*"
+    ]
   },
   "fire22": {
     "component": "Version Manager",
@@ -116,7 +118,7 @@
       "Native Bun.semver integration",
       "Version parsing and validation",
       "Semantic version comparison",
-      "Range satisfaction checking", 
+      "Range satisfaction checking",
       "Version history tracking",
       "Workspace synchronization",
       "Git integration and tagging",

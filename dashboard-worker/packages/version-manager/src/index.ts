@@ -1,8 +1,8 @@
 /**
  * @fire22/version-manager
- * 
+ *
  * Production-ready version management using Bun.semver for Fire22 Dashboard Worker
- * 
+ *
  * @version 3.1.0
  * @author Fire22 Development Team
  */
@@ -29,7 +29,7 @@ export interface VersionHistory {
 
 export interface ReleaseConfig {
   version: string;
-  type: "major" | "minor" | "patch" | "prerelease";
+  type: 'major' | 'minor' | 'patch' | 'prerelease';
   tag?: string;
   branch?: string;
   autoTag: boolean;
@@ -61,7 +61,7 @@ export const VersionUtils = {
       patch: parsed.patch,
       prerelease: parsed.prerelease,
       build: parsed.build,
-      format: () => parsed.format()
+      format: () => parsed.format(),
     };
   },
 
@@ -71,11 +71,11 @@ export const VersionUtils = {
   compare(v1: string, v2: string): number {
     const version1 = Bun.semver(v1);
     const version2 = Bun.semver(v2);
-    
+
     if (!version1 || !version2) {
-      throw new Error("Invalid version format for comparison");
+      throw new Error('Invalid version format for comparison');
     }
-    
+
     return Bun.semver.order(version1, version2);
   },
 
@@ -87,7 +87,7 @@ export const VersionUtils = {
     if (!v) {
       throw new Error(`Invalid version: ${version}`);
     }
-    
+
     return Bun.semver.satisfies(v, range);
   },
 
@@ -120,43 +120,43 @@ export const VersionUtils = {
       patch: Bun.semver({
         major: current.major,
         minor: current.minor,
-        patch: current.patch + 1
+        patch: current.patch + 1,
       }).format(),
-      
+
       minor: Bun.semver({
         major: current.major,
         minor: current.minor + 1,
-        patch: 0
+        patch: 0,
       }).format(),
-      
+
       major: Bun.semver({
         major: current.major + 1,
         minor: 0,
-        patch: 0
+        patch: 0,
       }).format(),
-      
+
       prerelease: {
         alpha: Bun.semver({
           major: current.major,
           minor: current.minor,
           patch: current.patch,
-          prerelease: ["alpha", 0]
+          prerelease: ['alpha', 0],
         }).format(),
-        
+
         beta: Bun.semver({
           major: current.major,
           minor: current.minor,
           patch: current.patch,
-          prerelease: ["beta", 0]
+          prerelease: ['beta', 0],
         }).format(),
-        
+
         rc: Bun.semver({
           major: current.major,
           minor: current.minor,
           patch: current.patch,
-          prerelease: ["rc", 0]
-        }).format()
-      }
+          prerelease: ['rc', 0],
+        }).format(),
+      },
     };
   },
 
@@ -167,12 +167,12 @@ export const VersionUtils = {
     const parsed = versions
       .map(v => ({ version: v, parsed: Bun.semver(v) }))
       .filter(v => v.parsed !== null);
-    
+
     parsed.sort((a, b) => {
       const order = Bun.semver.order(a.parsed!, b.parsed!);
       return descending ? -order : order;
     });
-    
+
     return parsed.map(v => v.version);
   },
 
@@ -187,7 +187,7 @@ export const VersionUtils = {
         return false;
       }
     });
-  }
+  },
 };
 
 // Export constants
@@ -195,22 +195,26 @@ export const VERSION_TYPES = {
   MAJOR: 'major' as const,
   MINOR: 'minor' as const,
   PATCH: 'patch' as const,
-  PRERELEASE: 'prerelease' as const
+  PRERELEASE: 'prerelease' as const,
 };
 
 export const PRERELEASE_TYPES = {
   ALPHA: 'alpha' as const,
   BETA: 'beta' as const,
-  RC: 'rc' as const
+  RC: 'rc' as const,
 };
 
 // Export default instances
-export const versionManager = new (await import('../../../src/utils/version-manager')).BunVersionManager({
-  current: "3.1.0",
-  minimum: "1.0.0"
+export const versionManager = new (
+  await import('../../../src/utils/version-manager')
+).BunVersionManager({
+  current: '3.1.0',
+  minimum: '1.0.0',
 });
 
-export const workspaceManager = new (await import('../../../src/utils/version-manager')).WorkspaceVersionManager("3.1.0");
+export const workspaceManager = new (
+  await import('../../../src/utils/version-manager')
+).WorkspaceVersionManager('3.1.0');
 
 // Package metadata
 export const PACKAGE_INFO = {
@@ -226,12 +230,12 @@ export const PACKAGE_INFO = {
     'Workspace synchronization',
     'Git integration and tagging',
     'CLI interface',
-    'Automated release workflows'
+    'Automated release workflows',
   ],
   performance: {
     parsing: '<1ms',
     comparison: '<0.1ms',
     rangeSatisfaction: '<0.5ms',
-    databaseOps: '<5ms'
-  }
+    databaseOps: '<5ms',
+  },
 };

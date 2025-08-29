@@ -4,7 +4,7 @@
     "last_updated": "2024-08-28",
     "classification": "Internal Use - Security Sensitive",
     "description": "Comprehensive permission matrix for all Fire22 system integrations",
-    
+
     "security_levels": {
       "level_1": {
         "name": "Public Integrations",
@@ -14,7 +14,7 @@
         "examples": ["Social media APIs", "Marketing tools", "Analytics platforms"]
       },
       "level_2": {
-        "name": "Internal Integrations", 
+        "name": "Internal Integrations",
         "description": "Fire22 internal systems and department connections",
         "risk_level": "Medium",
         "approval_process": "Department Head → Security Review → CTO Approval (5 days)",
@@ -145,7 +145,7 @@
             }
           },
           {
-            "name": "SIEM System", 
+            "name": "SIEM System",
             "type": "Security Information and Event Management",
             "security_level": "level_4",
             "permissions": {
@@ -194,7 +194,7 @@
       "finance": {
         "department_id": "fin",
         "head": "Michael Chen",
-        "email": "michael.chen@fire22.com", 
+        "email": "michael.chen@fire22.com",
         "integration_coordinator": "Sarah Johnson",
         "coordinator_email": "sarah.johnson@fire22.com",
         "integrations": [
@@ -270,7 +270,7 @@
         "department_id": "mkt",
         "head": "Sarah Johnson",
         "email": "sarah.johnson@fire22.com",
-        "integration_coordinator": "Kevin Thompson", 
+        "integration_coordinator": "Kevin Thompson",
         "coordinator_email": "kevin.thompson@fire22.com",
         "integrations": [
           {
@@ -345,7 +345,7 @@
         "head": "Marcus Rodriguez",
         "email": "marcus.rodriguez@fire22.com",
         "integration_coordinator": "James Mitchell",
-        "coordinator_email": "james.mitchell@fire22.com", 
+        "coordinator_email": "james.mitchell@fire22.com",
         "integrations": [
           {
             "name": "Live Odds Feed",
@@ -417,7 +417,7 @@
 
       "operations": {
         "department_id": "ops",
-        "head": "David Martinez", 
+        "head": "David Martinez",
         "email": "david.martinez@fire22.com",
         "integration_coordinator": "Jennifer Lee",
         "coordinator_email": "jennifer.lee@fire22.com",
@@ -681,7 +681,7 @@
           "reauth_interval": "never"
         },
         "level_2": {
-          "timeout": "8_hours", 
+          "timeout": "8_hours",
           "mfa_required": true,
           "reauth_interval": "24_hours"
         },

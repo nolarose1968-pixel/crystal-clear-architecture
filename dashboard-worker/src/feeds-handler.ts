@@ -1,6 +1,6 @@
 /**
  * RSS/Atom Feeds Handler for Cloudflare Workers
- * 
+ *
  * Serves RSS and Atom feeds for Fire22 Dashboard
  */
 
@@ -11,25 +11,22 @@ import { feedsContent, getFeedContent, getAvailableFeeds as getFeeds } from './f
  */
 export function handleFeedsRequest(path: string): Response {
   // Extract feed file name from path
-  const feedPath = path
-    .replace('/feeds/', '')
-    .replace('/src/feeds/', '')
-    .replace(/^\//, '');
-  
+  const feedPath = path.replace('/feeds/', '').replace('/src/feeds/', '').replace(/^\//, '');
+
   const feedFile = feedPath || 'index.html';
-  
+
   // Check if feed exists
   const feedContent = getFeedContent(feedFile);
   if (!feedContent) {
-    return new Response('Feed not found', { 
+    return new Response('Feed not found', {
       status: 404,
       headers: {
         'Content-Type': 'text/plain',
         'Access-Control-Allow-Origin': '*',
-      }
+      },
     });
   }
-  
+
   // Determine content type
   let contentType = 'text/html';
   if (feedFile.endsWith('.xml')) {
@@ -39,7 +36,7 @@ export function handleFeedsRequest(path: string): Response {
       contentType = 'application/rss+xml';
     }
   }
-  
+
   // Return feed content
   return new Response(feedContent, {
     status: 200,

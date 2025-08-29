@@ -5,11 +5,7 @@
 
 import type { Request, Response } from 'express';
 import { customerService } from '../../services/customer/customer-service';
-import type { 
-  ApiResponse, 
-  CustomerAdminRequest, 
-  CreateCustomerRequest 
-} from '../../types';
+import type { ApiResponse, CustomerAdminRequest, CreateCustomerRequest } from '../../types';
 import { validateApiKey, validateAgentId } from '../middleware/auth';
 import { validateRequest } from '../validators/customer-validator';
 
@@ -26,7 +22,7 @@ export class CustomerController {
         res.status(401).json({
           success: false,
           error: 'Unauthorized',
-          message: 'Invalid or missing API key'
+          message: 'Invalid or missing API key',
         } as ApiResponse);
         return;
       }
@@ -36,7 +32,7 @@ export class CustomerController {
         agentID: req.body.agentID || 'BLAKEPPH',
         includeBalances: req.body.includeBalances !== false,
         includeStats: req.body.includeStats !== false,
-        filters: req.body.filters
+        filters: req.body.filters,
       };
 
       // Validate agent ID
@@ -44,7 +40,7 @@ export class CustomerController {
         res.status(400).json({
           success: false,
           error: 'Invalid agent ID',
-          message: 'Agent ID is required and must be valid'
+          message: 'Agent ID is required and must be valid',
         } as ApiResponse);
         return;
       }
@@ -55,15 +51,14 @@ export class CustomerController {
       res.json({
         success: true,
         data: customerData,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       } as ApiResponse);
-
     } catch (error) {
       console.error('Customer admin controller error:', error);
       res.status(500).json({
         success: false,
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error occurred'
+        message: error instanceof Error ? error.message : 'Unknown error occurred',
       } as ApiResponse);
     }
   }
@@ -80,7 +75,7 @@ export class CustomerController {
         res.status(401).json({
           success: false,
           error: 'Unauthorized',
-          message: 'Invalid or missing API key'
+          message: 'Invalid or missing API key',
         } as ApiResponse);
         return;
       }
@@ -91,7 +86,7 @@ export class CustomerController {
         res.status(400).json({
           success: false,
           error: 'Validation failed',
-          message: validationResult.errors.join(', ')
+          message: validationResult.errors.join(', '),
         } as ApiResponse);
         return;
       }
@@ -104,18 +99,17 @@ export class CustomerController {
       res.status(201).json({
         success: true,
         data: result,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       } as ApiResponse);
-
     } catch (error) {
       console.error('Create customer controller error:', error);
-      
+
       // Handle specific business logic errors
       if (error instanceof Error && error.message.includes('already exists')) {
         res.status(409).json({
           success: false,
           error: 'Conflict',
-          message: error.message
+          message: error.message,
         } as ApiResponse);
         return;
       }
@@ -123,7 +117,7 @@ export class CustomerController {
       res.status(500).json({
         success: false,
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error occurred'
+        message: error instanceof Error ? error.message : 'Unknown error occurred',
       } as ApiResponse);
     }
   }
@@ -140,7 +134,7 @@ export class CustomerController {
         res.status(401).json({
           success: false,
           error: 'Unauthorized',
-          message: 'Invalid or missing API key'
+          message: 'Invalid or missing API key',
         } as ApiResponse);
         return;
       }
@@ -152,7 +146,7 @@ export class CustomerController {
         res.status(400).json({
           success: false,
           error: 'Invalid agent ID',
-          message: 'Agent ID is required and must be valid'
+          message: 'Agent ID is required and must be valid',
         } as ApiResponse);
         return;
       }
@@ -163,15 +157,14 @@ export class CustomerController {
       res.json({
         success: true,
         data: hierarchyData,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       } as ApiResponse);
-
     } catch (error) {
       console.error('Customer hierarchy controller error:', error);
       res.status(500).json({
         success: false,
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error occurred'
+        message: error instanceof Error ? error.message : 'Unknown error occurred',
       } as ApiResponse);
     }
   }
@@ -188,7 +181,7 @@ export class CustomerController {
         res.status(401).json({
           success: false,
           error: 'Unauthorized',
-          message: 'Invalid or missing API key'
+          message: 'Invalid or missing API key',
         } as ApiResponse);
         return;
       }
@@ -199,7 +192,7 @@ export class CustomerController {
         res.status(400).json({
           success: false,
           error: 'Invalid request',
-          message: 'Customers array is required and must not be empty'
+          message: 'Customers array is required and must not be empty',
         } as ApiResponse);
         return;
       }
@@ -211,7 +204,7 @@ export class CustomerController {
           res.status(400).json({
             success: false,
             error: 'Validation failed',
-            message: `Customer ${i + 1}: ${validationResult.errors.join(', ')}`
+            message: `Customer ${i + 1}: ${validationResult.errors.join(', ')}`,
           } as ApiResponse);
           return;
         }
@@ -225,15 +218,14 @@ export class CustomerController {
       res.status(statusCode).json({
         success: result.failed === 0,
         data: result,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       } as ApiResponse);
-
     } catch (error) {
       console.error('Import customers controller error:', error);
       res.status(500).json({
         success: false,
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error occurred'
+        message: error instanceof Error ? error.message : 'Unknown error occurred',
       } as ApiResponse);
     }
   }
@@ -250,7 +242,7 @@ export class CustomerController {
         res.status(401).json({
           success: false,
           error: 'Unauthorized',
-          message: 'Invalid or missing API key'
+          message: 'Invalid or missing API key',
         } as ApiResponse);
         return;
       }
@@ -261,7 +253,7 @@ export class CustomerController {
         res.status(400).json({
           success: false,
           error: 'Invalid request',
-          message: 'Customer ID is required'
+          message: 'Customer ID is required',
         } as ApiResponse);
         return;
       }
@@ -273,7 +265,7 @@ export class CustomerController {
         res.status(404).json({
           success: false,
           error: 'Not found',
-          message: 'Customer not found'
+          message: 'Customer not found',
         } as ApiResponse);
         return;
       }
@@ -281,15 +273,14 @@ export class CustomerController {
       res.json({
         success: true,
         data: customer,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       } as ApiResponse);
-
     } catch (error) {
       console.error('Get customer by ID controller error:', error);
       res.status(500).json({
         success: false,
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error occurred'
+        message: error instanceof Error ? error.message : 'Unknown error occurred',
       } as ApiResponse);
     }
   }
@@ -306,7 +297,7 @@ export class CustomerController {
         res.status(401).json({
           success: false,
           error: 'Unauthorized',
-          message: 'Invalid or missing API key'
+          message: 'Invalid or missing API key',
         } as ApiResponse);
         return;
       }
@@ -317,7 +308,7 @@ export class CustomerController {
         res.status(400).json({
           success: false,
           error: 'Invalid request',
-          message: 'Customer ID is required'
+          message: 'Customer ID is required',
         } as ApiResponse);
         return;
       }
@@ -328,15 +319,14 @@ export class CustomerController {
       res.json({
         success: true,
         data: balance,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       } as ApiResponse);
-
     } catch (error) {
       console.error('Get customer balance controller error:', error);
       res.status(500).json({
         success: false,
         error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error occurred'
+        message: error instanceof Error ? error.message : 'Unknown error occurred',
       } as ApiResponse);
     }
   }

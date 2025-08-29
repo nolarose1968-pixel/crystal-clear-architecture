@@ -327,5 +327,5 @@ export type {
   DashboardWidget,
   WidgetLayout,
   AuditLog,
-  ComplianceRule
+  ComplianceRule,
 };

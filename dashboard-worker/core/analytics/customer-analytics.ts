@@ -3,8 +3,15 @@
  * Advanced analytics for customer behavior, financial patterns, and betting performance
  */
 
-import { CustomerDatabaseManagement, CustomerProfile, CustomerRanking } from '../customers/customer-database-management';
-import { DepositWithdrawalSystem, FinancialTransaction } from '../finance/deposit-withdrawal-system';
+import {
+  CustomerDatabaseManagement,
+  CustomerProfile,
+  CustomerRanking,
+} from '../customers/customer-database-management';
+import {
+  DepositWithdrawalSystem,
+  FinancialTransaction,
+} from '../finance/deposit-withdrawal-system';
 import { P2PTransactionSystem, P2PTransaction } from '../finance/p2p-transaction-system';
 
 export interface CustomerAnalytics {
@@ -218,7 +225,10 @@ export class CustomerAnalyticsSystem {
   /**
    * Generate comprehensive customer analytics
    */
-  async generateCustomerAnalytics(customerId: string, forceRefresh: boolean = false): Promise<CustomerAnalytics> {
+  async generateCustomerAnalytics(
+    customerId: string,
+    forceRefresh: boolean = false
+  ): Promise<CustomerAnalytics> {
     // Check cache first
     if (!forceRefresh && this.analyticsCache.has(customerId)) {
       const cached = this.analyticsCache.get(customerId)!;
@@ -242,11 +252,19 @@ export class CustomerAnalyticsSystem {
     const p2pTransactions = this.p2pSystem.getCustomerTransactions(customerId);
 
     // Generate analytics components
-    const financialAnalytics = await this.generateFinancialAnalytics(customerId, financialTransactions);
+    const financialAnalytics = await this.generateFinancialAnalytics(
+      customerId,
+      financialTransactions
+    );
     const bettingAnalytics = await this.generateBettingAnalytics(customerId);
     const p2pAnalytics = await this.generateP2PAnalytics(customerId, p2pTransactions);
     const behavioralInsights = await this.generateBehavioralInsights(profile, ranking);
-    const recommendations = this.generateRecommendations(profile, ranking, financialAnalytics, bettingAnalytics);
+    const recommendations = this.generateRecommendations(
+      profile,
+      ranking,
+      financialAnalytics,
+      bettingAnalytics
+    );
 
     const analytics: CustomerAnalytics = {
       customerId,
@@ -261,8 +279,8 @@ export class CustomerAnalyticsSystem {
       dataFreshness: {
         financialDataAge: this.calculateDataAge(financialTransactions),
         bettingDataAge: this.calculateDataAge([]), // Would need betting data
-        profileDataAge: this.calculateDataAge([profile])
-      }
+        profileDataAge: this.calculateDataAge([profile]),
+      },
     };
 
     // Cache the results
@@ -274,26 +292,39 @@ export class CustomerAnalyticsSystem {
   /**
    * Generate financial analytics
    */
-  private async generateFinancialAnalytics(customerId: string, transactions: FinancialTransaction[]): Promise<CustomerAnalytics['financialAnalytics']> {
+  private async generateFinancialAnalytics(
+    customerId: string,
+    transactions: FinancialTransaction[]
+  ): Promise<CustomerAnalytics['financialAnalytics']> {
     const deposits = transactions.filter(t => t.type === 'deposit' && t.status === 'completed');
-    const withdrawals = transactions.filter(t => t.type === 'withdrawal' && t.status === 'completed');
+    const withdrawals = transactions.filter(
+      t => t.type === 'withdrawal' && t.status === 'completed'
+    );
 
     // Deposit patterns
     const depositPatterns = {
-      frequency: deposits.length > 0 ? deposits.length / this.calculateMonthsSinceFirstDeposit(deposits) : 0,
-      averageAmount: deposits.length > 0 ? deposits.reduce((sum, d) => sum + d.amount, 0) / deposits.length : 0,
+      frequency:
+        deposits.length > 0 ? deposits.length / this.calculateMonthsSinceFirstDeposit(deposits) : 0,
+      averageAmount:
+        deposits.length > 0 ? deposits.reduce((sum, d) => sum + d.amount, 0) / deposits.length : 0,
       preferredMethods: this.getPreferredMethods(deposits),
       seasonalTrends: this.calculateSeasonalTrends(deposits),
-      growthRate: this.calculateGrowthRate(deposits)
+      growthRate: this.calculateGrowthRate(deposits),
     };
 
     // Withdrawal patterns
     const withdrawalPatterns = {
-      frequency: withdrawals.length > 0 ? withdrawals.length / this.calculateMonthsSinceFirstWithdrawal(withdrawals) : 0,
-      averageAmount: withdrawals.length > 0 ? withdrawals.reduce((sum, w) => sum + w.amount, 0) / withdrawals.length : 0,
+      frequency:
+        withdrawals.length > 0
+          ? withdrawals.length / this.calculateMonthsSinceFirstWithdrawal(withdrawals)
+          : 0,
+      averageAmount:
+        withdrawals.length > 0
+          ? withdrawals.reduce((sum, w) => sum + w.amount, 0) / withdrawals.length
+          : 0,
       preferredMethods: this.getPreferredMethods(withdrawals),
       cashOutRate: deposits.length > 0 ? withdrawals.length / deposits.length : 0,
-      retentionRate: this.calculateRetentionRate(customerId, deposits, withdrawals)
+      retentionRate: this.calculateRetentionRate(customerId, deposits, withdrawals),
     };
 
     // Balance analytics
@@ -304,40 +335,42 @@ export class CustomerAnalyticsSystem {
       transactionVelocity: this.calculateTransactionVelocity(transactions),
       amountDeviation: this.calculateAmountDeviation(transactions),
       methodDiversity: this.calculateMethodDiversity(transactions),
-      geographicSpread: 0.5 // Placeholder - would need location data
+      geographicSpread: 0.5, // Placeholder - would need location data
     };
 
     return {
       depositPatterns,
       withdrawalPatterns,
       balanceAnalytics,
-      riskMetrics
+      riskMetrics,
     };
   }
 
   /**
    * Generate betting analytics
    */
-  private async generateBettingAnalytics(customerId: string): Promise<CustomerAnalytics['bettingAnalytics']> {
+  private async generateBettingAnalytics(
+    customerId: string
+  ): Promise<CustomerAnalytics['bettingAnalytics']> {
     // This would integrate with betting data - placeholder implementation
     const performanceMetrics = {
       winRate: 0.52, // Would calculate from actual betting data
       profitLossRatio: 1.15,
       averageBetSize: 50,
       betFrequency: 2.5, // bets per week
-      roi: 8.5
+      roi: 8.5,
     };
 
     const bettingPatterns = {
-      timePreferences: { 'evening': 0.6, 'night': 0.3, 'afternoon': 0.1 },
-      sportPreferences: { 'football': 0.4, 'basketball': 0.3, 'baseball': 0.2, 'soccer': 0.1 },
-      betTypePreferences: { 'straight': 0.7, 'parlay': 0.2, 'teaser': 0.1 },
-      stakeDistribution: { 'small': 0.5, 'medium': 0.3, 'large': 0.2 },
+      timePreferences: { evening: 0.6, night: 0.3, afternoon: 0.1 },
+      sportPreferences: { football: 0.4, basketball: 0.3, baseball: 0.2, soccer: 0.1 },
+      betTypePreferences: { straight: 0.7, parlay: 0.2, teaser: 0.1 },
+      stakeDistribution: { small: 0.5, medium: 0.3, large: 0.2 },
       sessionPatterns: {
         averageSessionLength: 45, // minutes
         betsPerSession: 3.2,
-        peakBettingTimes: ['8:00 PM', '9:00 PM', '7:00 PM']
-      }
+        peakBettingTimes: ['8:00 PM', '9:00 PM', '7:00 PM'],
+      },
     };
 
     const riskAssessment = {
@@ -347,47 +380,57 @@ export class CustomerAnalyticsSystem {
       responsibleGambling: {
         score: 85,
         flags: [],
-        recommendations: ['Continue current betting patterns']
-      }
+        recommendations: ['Continue current betting patterns'],
+      },
     };
 
     return {
       performanceMetrics,
       bettingPatterns,
-      riskAssessment
+      riskAssessment,
     };
   }
 
   /**
    * Generate P2P analytics
    */
-  private generateP2PAnalytics(customerId: string, transactions: P2PTransaction[]): CustomerAnalytics['p2pAnalytics'] {
+  private generateP2PAnalytics(
+    customerId: string,
+    transactions: P2PTransaction[]
+  ): CustomerAnalytics['p2pAnalytics'] {
     const completedTransactions = transactions.filter(t => t.status === 'completed');
     const disputedTransactions = transactions.filter(t => t.status === 'disputed');
 
     const transactionVolume = completedTransactions.reduce((sum, t) => sum + t.amount, 0);
-    const transactionFrequency = transactions.length > 0 ? transactions.length / this.calculateMonthsSinceFirstTransaction(transactions) : 0;
-    const successRate = transactions.length > 0 ? completedTransactions.length / transactions.length : 0;
-    const disputeRate = transactions.length > 0 ? disputedTransactions.length / transactions.length : 0;
+    const transactionFrequency =
+      transactions.length > 0
+        ? transactions.length / this.calculateMonthsSinceFirstTransaction(transactions)
+        : 0;
+    const successRate =
+      transactions.length > 0 ? completedTransactions.length / transactions.length : 0;
+    const disputeRate =
+      transactions.length > 0 ? disputedTransactions.length / transactions.length : 0;
 
     // Marketplace activity (placeholder - would need actual marketplace data)
     const marketplaceActivity = {
       itemsListed: 0,
       itemsSold: 0,
       averagePrice: 0,
-      categories: {}
+      categories: {},
     };
 
     // Escrow usage
     const escrowTransactions = transactions.filter(t => t.escrowDetails);
     const successfulReleases = escrowTransactions.filter(t => t.status === 'completed');
-    const disputesResolved = escrowTransactions.filter(t => t.disputeDetails?.status === 'resolved');
+    const disputesResolved = escrowTransactions.filter(
+      t => t.disputeDetails?.status === 'resolved'
+    );
 
     const escrowUsage = {
       totalEscrowed: escrowTransactions.reduce((sum, t) => sum + t.amount, 0),
       successfulReleases: successfulReleases.length,
       disputesResolved: disputesResolved.length,
-      averageHoldTime: 3.5 // days
+      averageHoldTime: 3.5, // days
     };
 
     return {
@@ -396,14 +439,17 @@ export class CustomerAnalyticsSystem {
       successRate,
       disputeRate,
       marketplaceActivity,
-      escrowUsage
+      escrowUsage,
     };
   }
 
   /**
    * Generate behavioral insights
    */
-  private async generateBehavioralInsights(profile: CustomerProfile, ranking: CustomerRanking): Promise<CustomerAnalytics['behavioralInsights']> {
+  private async generateBehavioralInsights(
+    profile: CustomerProfile,
+    ranking: CustomerRanking
+  ): Promise<CustomerAnalytics['behavioralInsights']> {
     const accountAgeMonths = this.calculateAccountAgeMonths(profile.accountInfo.registrationDate);
 
     const engagementScore = this.calculateEngagementScore(profile, ranking);
@@ -412,7 +458,7 @@ export class CustomerAnalyticsSystem {
       accountAge: accountAgeMonths,
       activityConsistency: this.calculateActivityConsistency(profile),
       featureAdoption: this.calculateFeatureAdoption(profile),
-      referralActivity: profile.accountInfo.referralCode ? 1 : 0
+      referralActivity: profile.accountInfo.referralCode ? 1 : 0,
     };
 
     const churnRisk = await this.calculateChurnRisk(profile, ranking);
@@ -423,7 +469,7 @@ export class CustomerAnalyticsSystem {
       engagementScore,
       loyaltyIndicators,
       churnRisk,
-      lifetimeValue
+      lifetimeValue,
     };
   }
 
@@ -472,7 +518,7 @@ export class CustomerAnalyticsSystem {
       betting: bettingRecs,
       riskManagement: riskRecs,
       engagement: engagementRecs,
-      vipUpgrade
+      vipUpgrade,
     };
   }
 
@@ -503,7 +549,10 @@ export class CustomerAnalyticsSystem {
   /**
    * Calculate churn risk
    */
-  private async calculateChurnRisk(profile: CustomerProfile, ranking: CustomerRanking): Promise<CustomerAnalytics['behavioralInsights']['churnRisk']> {
+  private async calculateChurnRisk(
+    profile: CustomerProfile,
+    ranking: CustomerRanking
+  ): Promise<CustomerAnalytics['behavioralInsights']['churnRisk']> {
     let score = 0;
     const indicators: string[] = [];
 
@@ -533,27 +582,30 @@ export class CustomerAnalyticsSystem {
       'Send re-engagement email with special offer',
       'Offer bonus on next deposit',
       'Provide personalized betting tips',
-      'Connect with VIP concierge if eligible'
+      'Connect with VIP concierge if eligible',
     ];
 
     return {
       score: Math.min(score, 100),
       indicators,
       predictedChurnDate: score > 50 ? this.predictChurnDate(daysSinceActivity) : undefined,
-      retentionStrategies
+      retentionStrategies,
     };
   }
 
   /**
    * Calculate lifetime value
    */
-  private calculateLifetimeValue(profile: CustomerProfile, ranking: CustomerRanking): CustomerAnalytics['behavioralInsights']['lifetimeValue'] {
+  private calculateLifetimeValue(
+    profile: CustomerProfile,
+    ranking: CustomerRanking
+  ): CustomerAnalytics['behavioralInsights']['lifetimeValue'] {
     const currentLTV = profile.financialProfile.lifetimeVolume;
     const ageMonths = this.calculateAccountAgeMonths(profile.accountInfo.registrationDate);
 
     // Simple LTV prediction based on current activity
     const monthlyValue = profile.financialProfile.lifetimeVolume / Math.max(ageMonths, 1);
-    const predictedLTV = currentLTV + (monthlyValue * 12); // Next 12 months
+    const predictedLTV = currentLTV + monthlyValue * 12; // Next 12 months
 
     const growthRate = ageMonths > 0 ? (predictedLTV - currentLTV) / currentLTV : 0;
 
@@ -561,21 +613,24 @@ export class CustomerAnalyticsSystem {
       deposits: profile.financialProfile.totalDeposits * 0.4,
       betting: profile.bettingProfile.totalWagered * 0.3,
       loyalty: ranking.loyaltyScore * 10,
-      referrals: profile.accountInfo.referralCode ? 1000 : 0
+      referrals: profile.accountInfo.referralCode ? 1000 : 0,
     };
 
     return {
       currentLTV,
       predictedLTV,
       ltvGrowthRate: growthRate,
-      valueDrivers
+      valueDrivers,
     };
   }
 
   /**
    * Generate VIP upgrade recommendation
    */
-  private generateVIPUpgradeRecommendation(profile: CustomerProfile, ranking: CustomerRanking): CustomerAnalytics['recommendations']['vipUpgrade'] {
+  private generateVIPUpgradeRecommendation(
+    profile: CustomerProfile,
+    ranking: CustomerRanking
+  ): CustomerAnalytics['recommendations']['vipUpgrade'] {
     const eligible = ranking.overallScore >= 70;
     const currentTier = ranking.tier;
 
@@ -597,7 +652,7 @@ export class CustomerAnalyticsSystem {
       eligible,
       recommendedTier,
       upgradeTriggers,
-      expectedBenefits
+      expectedBenefits,
     };
   }
 
@@ -620,12 +675,22 @@ export class CustomerAnalyticsSystem {
     const totalValue = customers.reduce((sum, c) => sum + c.financialProfile.lifetimeVolume, 0);
     const averageValue = totalValue / customers.length;
 
-    const averageDeposit = customers.reduce((sum, c) => sum + c.financialProfile.averageDepositAmount, 0) / customers.length;
-    const averageBetSize = customers.reduce((sum, c) => sum + c.bettingProfile.averageBetSize, 0) / customers.length;
-    const averageWinRate = customers.reduce((sum, c) => sum + c.bettingProfile.winRate, 0) / customers.length;
+    const averageDeposit =
+      customers.reduce((sum, c) => sum + c.financialProfile.averageDepositAmount, 0) /
+      customers.length;
+    const averageBetSize =
+      customers.reduce((sum, c) => sum + c.bettingProfile.averageBetSize, 0) / customers.length;
+    const averageWinRate =
+      customers.reduce((sum, c) => sum + c.bettingProfile.winRate, 0) / customers.length;
 
     // Calculate engagement and churn (simplified)
-    const engagementScore = customers.reduce((sum, c) => sum + this.calculateEngagementScore(c, this.customerManager.getCustomerRanking(c.customerId)!), 0) / customers.length;
+    const engagementScore =
+      customers.reduce(
+        (sum, c) =>
+          sum +
+          this.calculateEngagementScore(c, this.customerManager.getCustomerRanking(c.customerId)!),
+        0
+      ) / customers.length;
     const churnRate = 0.15; // Would calculate from actual data
 
     const metrics = {
@@ -633,7 +698,7 @@ export class CustomerAnalyticsSystem {
       averageBetSize,
       averageWinRate,
       churnRate,
-      engagementScore
+      engagementScore,
     };
 
     // Calculate trends (simplified)
@@ -641,7 +706,7 @@ export class CustomerAnalyticsSystem {
       growthRate: 0.05,
       depositTrend: 0.02,
       bettingTrend: 0.03,
-      valueTrend: 0.04
+      valueTrend: 0.04,
     };
 
     // Calculate characteristics
@@ -649,7 +714,7 @@ export class CustomerAnalyticsSystem {
       topSports: this.getTopSports(customers),
       preferredBetTypes: this.getPreferredBetTypes(customers),
       paymentMethods: this.getPreferredPaymentMethods(customers),
-      geographicDistribution: { 'US': 0.7, 'CA': 0.2, 'UK': 0.1 } // Placeholder
+      geographicDistribution: { US: 0.7, CA: 0.2, UK: 0.1 }, // Placeholder
     };
 
     const recommendations = this.generateSegmentRecommendations(metrics, trends);
@@ -664,7 +729,7 @@ export class CustomerAnalyticsSystem {
       trends,
       characteristics,
       recommendations,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.segmentAnalytics.set(segmentId, analytics);
@@ -688,7 +753,7 @@ export class CustomerAnalyticsSystem {
       probability: this.calculateNextDepositProbability(profile),
       expectedAmount: profile.financialProfile.averageDepositAmount,
       expectedDate: this.predictNextDepositDate(profile),
-      confidence: 0.75
+      confidence: 0.75,
     };
 
     // Churn prediction
@@ -696,14 +761,14 @@ export class CustomerAnalyticsSystem {
       score: analytics.behavioralInsights.churnRisk.score,
       timeframe: analytics.behavioralInsights.churnRisk.score > 70 ? '30 days' : '90 days',
       riskFactors: analytics.behavioralInsights.churnRisk.indicators,
-      mitigationStrategies: analytics.behavioralInsights.churnRisk.retentionStrategies
+      mitigationStrategies: analytics.behavioralInsights.churnRisk.retentionStrategies,
     };
 
     // Lifetime value prediction
     const lifetimeValue = {
       predictedValue: analytics.behavioralInsights.lifetimeValue.predictedLTV,
       confidence: 0.8,
-      growthDrivers: analytics.behavioralInsights.lifetimeValue.valueDrivers
+      growthDrivers: analytics.behavioralInsights.lifetimeValue.valueDrivers,
     };
 
     // Betting behavior prediction
@@ -711,20 +776,20 @@ export class CustomerAnalyticsSystem {
       nextBetProbability: this.calculateNextBetProbability(profile),
       expectedBetSize: profile.bettingProfile.averageBetSize,
       preferredSports: Object.keys(profile.bettingProfile.favoriteSports),
-      riskLevelChange: 0.1
+      riskLevelChange: 0.1,
     };
 
     const insights = {
       behavioralPatterns: this.identifyBehavioralPatterns(profile),
       financialHabits: this.identifyFinancialHabits(profile),
       riskIndicators: this.identifyRiskIndicators(profile),
-      opportunities: this.identifyOpportunities(profile, ranking)
+      opportunities: this.identifyOpportunities(profile, ranking),
     };
 
     const recommendations = {
       immediate: analytics.recommendations.financial.slice(0, 2),
       shortTerm: analytics.recommendations.betting.slice(0, 2),
-      longTerm: ['Increase account diversification', 'Explore premium features']
+      longTerm: ['Increase account diversification', 'Explore premium features'],
     };
 
     return {
@@ -733,30 +798,36 @@ export class CustomerAnalyticsSystem {
         nextDeposit,
         churnProbability,
         lifetimeValue,
-        bettingBehavior
+        bettingBehavior,
       },
       insights,
       recommendations,
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
   }
 
   // Helper methods
   private calculateMonthsSinceFirstDeposit(deposits: FinancialTransaction[]): number {
     if (deposits.length === 0) return 1;
-    const firstDeposit = deposits.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())[0];
+    const firstDeposit = deposits.sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    )[0];
     return this.calculateMonthsBetween(new Date(firstDeposit.createdAt), new Date());
   }
 
   private calculateMonthsSinceFirstWithdrawal(withdrawals: FinancialTransaction[]): number {
     if (withdrawals.length === 0) return 1;
-    const firstWithdrawal = withdrawals.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())[0];
+    const firstWithdrawal = withdrawals.sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    )[0];
     return this.calculateMonthsBetween(new Date(firstWithdrawal.createdAt), new Date());
   }
 
   private calculateMonthsSinceFirstTransaction(transactions: P2PTransaction[]): number {
     if (transactions.length === 0) return 1;
-    const firstTransaction = transactions.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())[0];
+    const firstTransaction = transactions.sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    )[0];
     return this.calculateMonthsBetween(new Date(firstTransaction.createdAt), new Date());
   }
 
@@ -774,7 +845,9 @@ export class CustomerAnalyticsSystem {
 
   private calculateDataAge(data: any[]): number {
     if (data.length === 0) return 24; // Default 24 hours if no data
-    const latestUpdate = Math.max(...data.map(item => new Date(item.updatedAt || item.createdAt).getTime()));
+    const latestUpdate = Math.max(
+      ...data.map(item => new Date(item.updatedAt || item.createdAt).getTime())
+    );
     return (Date.now() - latestUpdate) / (1000 * 60 * 60);
   }
 
@@ -786,7 +859,7 @@ export class CustomerAnalyticsSystem {
     });
 
     return Object.entries(methodCounts)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 3)
       .map(([method]) => method);
   }
@@ -810,7 +883,9 @@ export class CustomerAnalyticsSystem {
 
   private calculateGrowthRate(transactions: FinancialTransaction[]): number {
     if (transactions.length < 2) return 0;
-    const sorted = transactions.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    const sorted = transactions.sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
     const firstHalf = sorted.slice(0, Math.floor(sorted.length / 2));
     const secondHalf = sorted.slice(Math.floor(sorted.length / 2));
 
@@ -820,35 +895,47 @@ export class CustomerAnalyticsSystem {
     return firstAvg > 0 ? (secondAvg - firstAvg) / firstAvg : 0;
   }
 
-  private calculateRetentionRate(customerId: string, deposits: FinancialTransaction[], withdrawals: FinancialTransaction[]): number {
+  private calculateRetentionRate(
+    customerId: string,
+    deposits: FinancialTransaction[],
+    withdrawals: FinancialTransaction[]
+  ): number {
     if (deposits.length === 0) return 0;
-    const netFlow = deposits.reduce((sum, d) => sum + d.amount, 0) - withdrawals.reduce((sum, w) => sum + w.amount, 0);
+    const netFlow =
+      deposits.reduce((sum, d) => sum + d.amount, 0) -
+      withdrawals.reduce((sum, w) => sum + w.amount, 0);
     return netFlow > 0 ? 1 : 0; // Simplified - positive balance indicates retention
   }
 
-  private async generateBalanceAnalytics(customerId: string): Promise<CustomerAnalytics['financialAnalytics']['balanceAnalytics']> {
+  private async generateBalanceAnalytics(
+    customerId: string
+  ): Promise<CustomerAnalytics['financialAnalytics']['balanceAnalytics']> {
     const balance = await this.financialSystem.getCustomerBalance(customerId);
     const history = balance.balanceHistory;
 
-    const averageBalance = history.length > 0
-      ? history.reduce((sum, h) => sum + h.newBalance, 0) / history.length
-      : balance.availableBalance;
+    const averageBalance =
+      history.length > 0
+        ? history.reduce((sum, h) => sum + h.newBalance, 0) / history.length
+        : balance.availableBalance;
 
-    const volatility = history.length > 1
-      ? this.calculateVolatility(history.map(h => h.newBalance))
-      : 0;
+    const volatility =
+      history.length > 1 ? this.calculateVolatility(history.map(h => h.newBalance)) : 0;
 
-    const utilizationRate = balance.availableBalance / (balance.availableBalance + balance.pendingDeposits);
+    const utilizationRate =
+      balance.availableBalance / (balance.availableBalance + balance.pendingDeposits);
 
-    const balanceTrend = history.length > 1
-      ? history[history.length - 1].newBalance > history[0].newBalance ? 'increasing' : 'decreasing'
-      : 'stable';
+    const balanceTrend =
+      history.length > 1
+        ? history[history.length - 1].newBalance > history[0].newBalance
+          ? 'increasing'
+          : 'decreasing'
+        : 'stable';
 
     return {
       averageBalance,
       volatility,
       utilizationRate,
-      balanceTrend
+      balanceTrend,
     };
   }
 
@@ -869,7 +956,8 @@ export class CustomerAnalyticsSystem {
     if (transactions.length < 2) return 0;
     const amounts = transactions.map(t => t.amount);
     const mean = amounts.reduce((sum, amt) => sum + amt, 0) / amounts.length;
-    const variance = amounts.reduce((sum, amt) => sum + Math.pow(amt - mean, 2), 0) / amounts.length;
+    const variance =
+      amounts.reduce((sum, amt) => sum + Math.pow(amt - mean, 2), 0) / amounts.length;
     return Math.sqrt(variance) / mean;
   }
 
@@ -1001,7 +1089,7 @@ export class CustomerAnalyticsSystem {
     });
 
     return Object.entries(sportCounts)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
       .map(([sport]) => sport);
   }
@@ -1015,7 +1103,7 @@ export class CustomerAnalyticsSystem {
     });
 
     return Object.entries(typeCounts)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 3)
       .map(([type]) => type);
   }
@@ -1029,7 +1117,7 @@ export class CustomerAnalyticsSystem {
     });
 
     return Object.entries(methodCounts)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 3)
       .map(([method]) => method);
   }
@@ -1089,7 +1177,7 @@ export class CustomerAnalyticsSystem {
       totalCustomers,
       cachedAnalytics: this.analyticsCache.size,
       segmentAnalytics: this.segmentAnalytics.size,
-      averageCalculationTime: 0 // Would track actual calculation times
+      averageCalculationTime: 0, // Would track actual calculation times
     };
   }
 }

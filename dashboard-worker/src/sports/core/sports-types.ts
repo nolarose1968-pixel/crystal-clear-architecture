@@ -17,7 +17,7 @@ import type {
   EventStatus,
   BetStatus,
   RiskLevel,
-  VIPTier
+  VIPTier,
 } from '../../../core/types/sports';
 
 // Re-export all sports types for convenience
@@ -35,7 +35,7 @@ export type {
   EventStatus,
   BetStatus,
   RiskLevel,
-  VIPTier
+  VIPTier,
 } from '../../../core/types/sports';
 
 // Additional core types specific to the sports module
@@ -208,15 +208,39 @@ export type OddsUpdateRequest = {
 
 // Export default configuration
 export const DEFAULT_SPORTS_CONFIG: SportsConfig = {
-  supportedSports: ['football', 'basketball', 'baseball', 'soccer', 'tennis', 'golf', 'racing', 'esports'],
-  supportedLeagues: ['NFL', 'NBA', 'MLB', 'NHL', 'EPL', 'La Liga', 'Serie A', 'Bundesliga', 'Champions League', 'ATP', 'WTA', 'PGA', 'Formula 1', 'NASCAR'],
+  supportedSports: [
+    'football',
+    'basketball',
+    'baseball',
+    'soccer',
+    'tennis',
+    'golf',
+    'racing',
+    'esports',
+  ],
+  supportedLeagues: [
+    'NFL',
+    'NBA',
+    'MLB',
+    'NHL',
+    'EPL',
+    'La Liga',
+    'Serie A',
+    'Bundesliga',
+    'Champions League',
+    'ATP',
+    'WTA',
+    'PGA',
+    'Formula 1',
+    'NASCAR',
+  ],
   defaultRiskLevel: 'medium',
   maxBetLimits: {
     bronze: 1000,
     silver: 2500,
     gold: 5000,
     platinum: 10000,
-    diamond: 25000
+    diamond: 25000,
   },
   minBetAmounts: {
     football: 10,
@@ -227,18 +251,18 @@ export const DEFAULT_SPORTS_CONFIG: SportsConfig = {
     golf: 25,
     racing: 20,
     esports: 5,
-    other: 10
+    other: 10,
   },
   houseEdge: {
     moneyline: 0.05,
-    spread: 0.10,
-    over_under: 0.10,
+    spread: 0.1,
+    over_under: 0.1,
     parlay: 0.15,
     teaser: 0.12,
     futures: 0.08,
     live_bet: 0.12,
-    special: 0.20,
-    prop_bet: 0.25
+    special: 0.2,
+    prop_bet: 0.25,
   },
   liveBettingDelay: 15, // seconds
   oddsUpdateInterval: 30, // seconds
@@ -252,7 +276,7 @@ export const DEFAULT_SPORTS_CONFIG: SportsConfig = {
     golf: [2.5, 3, 3.5],
     racing: [1, 1.5, 2],
     esports: [1, 1.5, 2],
-    other: [1, 1.5, 2]
+    other: [1, 1.5, 2],
   },
-  settlementDelay: 24 // hours
+  settlementDelay: 24, // hours
 };

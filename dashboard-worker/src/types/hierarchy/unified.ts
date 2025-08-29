@@ -5,11 +5,11 @@
 
 // Universal 5-level hierarchy system
 export enum UniversalLevel {
-  EXECUTIVE = 1,     // C-Suite, Board, Top-level agents
-  DIRECTOR = 2,      // Department Heads, Regional Directors
-  MANAGER = 3,       // Team Leads, Supervisors
-  SENIOR_STAFF = 4,  // Senior Specialists, Coordinators
-  STAFF = 5          // Junior Staff, Support, Entry-level
+  EXECUTIVE = 1, // C-Suite, Board, Top-level agents
+  DIRECTOR = 2, // Department Heads, Regional Directors
+  MANAGER = 3, // Team Leads, Supervisors
+  SENIOR_STAFF = 4, // Senior Specialists, Coordinators
+  STAFF = 5, // Junior Staff, Support, Entry-level
 }
 
 // Level descriptors for UI display
@@ -18,7 +18,7 @@ export const LevelDescriptors: Record<UniversalLevel, string> = {
   [UniversalLevel.DIRECTOR]: 'Director',
   [UniversalLevel.MANAGER]: 'Manager',
   [UniversalLevel.SENIOR_STAFF]: 'Senior Staff',
-  [UniversalLevel.STAFF]: 'Staff'
+  [UniversalLevel.STAFF]: 'Staff',
 };
 
 // Unified hierarchy node interface
@@ -30,26 +30,26 @@ export interface UnifiedHierarchyNode {
   department: string;
   parentId: string | null;
   children: string[];
-  
+
   // Metadata
   email?: string;
   phone?: string;
   location?: string;
   startDate?: string;
-  
+
   // Permissions and access
   permissions: UnifiedPermission[];
   reportingTo: string[];
   directReports: string[];
-  
+
   // Cross-system mappings
   mappings: {
-    fire22AgentLevel?: number;      // 1-8 Fire22 agent levels
-    organizationalLevel?: string;    // Original org structure level
-    departmentRole?: string;         // Department-specific role
+    fire22AgentLevel?: number; // 1-8 Fire22 agent levels
+    organizationalLevel?: string; // Original org structure level
+    departmentRole?: string; // Department-specific role
     customAttributes?: Record<string, any>;
   };
-  
+
   // Performance and metrics
   metrics?: {
     teamSize?: number;
@@ -76,14 +76,14 @@ export enum PermissionAction {
   DELETE = 'delete',
   APPROVE = 'approve',
   ASSIGN = 'assign',
-  DELEGATE = 'delegate'
+  DELEGATE = 'delegate',
 }
 
 export enum PermissionScope {
-  GLOBAL = 'global',           // Entire organization
-  DEPARTMENT = 'department',   // Department-wide
-  TEAM = 'team',              // Team only
-  SELF = 'self'               // Self only
+  GLOBAL = 'global', // Entire organization
+  DEPARTMENT = 'department', // Department-wide
+  TEAM = 'team', // Team only
+  SELF = 'self', // Self only
 }
 
 // Department hierarchy configuration
@@ -101,30 +101,30 @@ export interface DepartmentHierarchyConfig {
 
 // Fire22 Agent level mapping to universal levels
 export const Fire22AgentMapping: Record<number, UniversalLevel> = {
-  1: UniversalLevel.EXECUTIVE,    // Master Agent
-  2: UniversalLevel.EXECUTIVE,    // Senior Master
-  3: UniversalLevel.DIRECTOR,     // Agent
-  4: UniversalLevel.DIRECTOR,     // Senior Agent  
-  5: UniversalLevel.MANAGER,      // Sub-Agent
-  6: UniversalLevel.MANAGER,      // Senior Sub-Agent
+  1: UniversalLevel.EXECUTIVE, // Master Agent
+  2: UniversalLevel.EXECUTIVE, // Senior Master
+  3: UniversalLevel.DIRECTOR, // Agent
+  4: UniversalLevel.DIRECTOR, // Senior Agent
+  5: UniversalLevel.MANAGER, // Sub-Agent
+  6: UniversalLevel.MANAGER, // Senior Sub-Agent
   7: UniversalLevel.SENIOR_STAFF, // Basic Agent
-  8: UniversalLevel.STAFF         // Clerk
+  8: UniversalLevel.STAFF, // Clerk
 };
 
 // Organizational structure mapping
 export const OrganizationalMapping: Record<string, UniversalLevel> = {
-  'CEO': UniversalLevel.EXECUTIVE,
-  'President': UniversalLevel.EXECUTIVE,
-  'VP': UniversalLevel.EXECUTIVE,
-  'Director': UniversalLevel.DIRECTOR,
-  'Manager': UniversalLevel.MANAGER,
-  'Lead': UniversalLevel.MANAGER,
-  'Senior': UniversalLevel.SENIOR_STAFF,
-  'Specialist': UniversalLevel.SENIOR_STAFF,
-  'Coordinator': UniversalLevel.SENIOR_STAFF,
-  'Associate': UniversalLevel.STAFF,
-  'Assistant': UniversalLevel.STAFF,
-  'Junior': UniversalLevel.STAFF
+  CEO: UniversalLevel.EXECUTIVE,
+  President: UniversalLevel.EXECUTIVE,
+  VP: UniversalLevel.EXECUTIVE,
+  Director: UniversalLevel.DIRECTOR,
+  Manager: UniversalLevel.MANAGER,
+  Lead: UniversalLevel.MANAGER,
+  Senior: UniversalLevel.SENIOR_STAFF,
+  Specialist: UniversalLevel.SENIOR_STAFF,
+  Coordinator: UniversalLevel.SENIOR_STAFF,
+  Associate: UniversalLevel.STAFF,
+  Assistant: UniversalLevel.STAFF,
+  Junior: UniversalLevel.STAFF,
 };
 
 // Hierarchy tree structure for visualization
@@ -219,9 +219,8 @@ export function isManager(node: UnifiedHierarchyNode): boolean {
 }
 
 export function canApprove(node: UnifiedHierarchyNode, resource: string): boolean {
-  return node.permissions.some(p => 
-    p.resource === resource && 
-    p.actions.includes(PermissionAction.APPROVE)
+  return node.permissions.some(
+    p => p.resource === resource && p.actions.includes(PermissionAction.APPROVE)
   );
 }
 
@@ -234,7 +233,7 @@ export function getEffectiveLevel(
   if (fire22Level && Fire22AgentMapping[fire22Level]) {
     return Fire22AgentMapping[fire22Level];
   }
-  
+
   if (orgRole) {
     for (const [key, level] of Object.entries(OrganizationalMapping)) {
       if (orgRole.includes(key)) {
@@ -242,7 +241,7 @@ export function getEffectiveLevel(
       }
     }
   }
-  
+
   // Default to staff level if no mapping found
   return UniversalLevel.STAFF;
 }
@@ -258,5 +257,5 @@ export type {
   HierarchyMigration,
   HierarchyValidation,
   ValidationResult,
-  HierarchyAnalytics
+  HierarchyAnalytics,
 };

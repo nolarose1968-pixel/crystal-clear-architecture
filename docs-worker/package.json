@@ -31,12 +31,16 @@
     "typescript": "^5.3.0",
     "wrangler": "^3.22.0"
   },
+  "optionalDependencies": {
+    "@cloudflare/workers-types": "^4.20240925.0"
+  },
   "engines": {
     "node": ">=18.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture.git"
+    "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture.git",
+    "directory": "docs-worker"
   },
   "bugs": {
     "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture/issues"

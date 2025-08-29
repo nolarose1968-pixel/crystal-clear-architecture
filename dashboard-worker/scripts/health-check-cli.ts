@@ -40,7 +40,7 @@ class HealthCheckCLI {
       components: ['database', 'api', 'authentication', 'cache', 'monitoring'],
       timeout: 10000,
       verbose: false,
-      ...options
+      ...options,
     };
 
     this.monitor = new HealthMonitor(this.options.components);
@@ -67,9 +67,11 @@ class HealthCheckCLI {
 
       // Display results
       this.displayHealthStatus(healthStatus, metrics, executionTime);
-
     } catch (error) {
-      console.error('❌ Health check failed:', error instanceof Error ? error.message : 'Unknown error');
+      console.error(
+        '❌ Health check failed:',
+        error instanceof Error ? error.message : 'Unknown error'
+      );
       process.exit(1);
     }
   }
@@ -80,22 +82,26 @@ class HealthCheckCLI {
   private async getPerformanceMetrics(): Promise<HealthMetrics> {
     // Simulate getting real metrics (in production, this would query actual monitoring data)
     const responseTime = Math.floor(Math.random() * 50) + 100; // 100-150ms
-    const successRate = 99.9 - (Math.random() * 0.1); // 99.8-99.9%
-    const uptime = 99.9 - (Math.random() * 0.1); // 99.8-99.9%
+    const successRate = 99.9 - Math.random() * 0.1; // 99.8-99.9%
+    const uptime = 99.9 - Math.random() * 0.1; // 99.8-99.9%
     const errorRate = Math.random() * 0.2; // 0-0.2%
 
     return {
       responseTime: Math.round(responseTime),
       successRate: Math.round(successRate * 10) / 10,
       uptime: Math.round(uptime * 10) / 10,
-      errorRate: Math.round(errorRate * 10) / 10
+      errorRate: Math.round(errorRate * 10) / 10,
     };
   }
 
   /**
    * 📋 Display health status in formatted output
    */
-  private displayHealthStatus(healthStatus: any, metrics: HealthMetrics, executionTime: number): void {
+  private displayHealthStatus(
+    healthStatus: any,
+    metrics: HealthMetrics,
+    executionTime: number
+  ): void {
     const { status, components } = healthStatus;
 
     if (this.options.format === 'json') {
@@ -105,25 +111,25 @@ class HealthCheckCLI {
         status: status,
         components: {
           'API Gateway': this.getComponentStatus(components, 'api'),
-          'Authentication': this.getComponentStatus(components, 'authentication'),
-          'Database': this.getComponentStatus(components, 'database'),
-          'Cache': this.getComponentStatus(components, 'cache'),
-          'Monitoring': this.getComponentStatus(components, 'monitoring')
+          Authentication: this.getComponentStatus(components, 'authentication'),
+          Database: this.getComponentStatus(components, 'database'),
+          Cache: this.getComponentStatus(components, 'cache'),
+          Monitoring: this.getComponentStatus(components, 'monitoring'),
         },
         performance: {
           responseTime: `${metrics.responseTime}ms`,
           successRate: `${metrics.successRate}%`,
           uptime: `${metrics.uptime}%`,
-          errorRate: `${metrics.errorRate}%`
+          errorRate: `${metrics.errorRate}%`,
         },
         security: {
           ssl: 'Active',
           firewall: 'Enabled',
           ddosProtection: 'Active',
-          encryption: 'AES-256'
+          encryption: 'AES-256',
         },
         timestamp: new Date().toISOString(),
-        executionTime: `${executionTime}ms`
+        executionTime: `${executionTime}ms`,
       };
       console.log(JSON.stringify(jsonOutput, null, 2));
       return;
@@ -133,18 +139,26 @@ class HealthCheckCLI {
     // Component status checks
     const checks = [
       { name: 'API Gateway', status: this.getComponentStatus(components, 'api'), icon: '✅' },
-      { name: 'Authentication', status: this.getComponentStatus(components, 'authentication'), icon: '✅' },
+      {
+        name: 'Authentication',
+        status: this.getComponentStatus(components, 'authentication'),
+        icon: '✅',
+      },
       { name: 'Database', status: this.getComponentStatus(components, 'database'), icon: '✅' },
       { name: 'Cache', status: this.getComponentStatus(components, 'cache'), icon: '✅' },
-      { name: 'Monitoring', status: this.getComponentStatus(components, 'monitoring'), icon: '✅' }
+      { name: 'Monitoring', status: this.getComponentStatus(components, 'monitoring'), icon: '✅' },
     ];
 
     // Display component status
     checks.forEach(check => {
       if (check.status === 'healthy') {
-        console.log(`${check.icon} ${check.name}: ${check.status.charAt(0).toUpperCase() + check.status.slice(1)}`);
+        console.log(
+          `${check.icon} ${check.name}: ${check.status.charAt(0).toUpperCase() + check.status.slice(1)}`
+        );
       } else {
-        console.log(`❌ ${check.name}: ${check.status.charAt(0).toUpperCase() + check.status.slice(1)}`);
+        console.log(
+          `❌ ${check.name}: ${check.status.charAt(0).toUpperCase() + check.status.slice(1)}`
+        );
       }
     });
 
@@ -206,7 +220,10 @@ class HealthCheckCLI {
         }
       }
     } catch (error) {
-      console.error(`❌ Failed to check component ${componentName}:`, error instanceof Error ? error.message : 'Unknown error');
+      console.error(
+        `❌ Failed to check component ${componentName}:`,
+        error instanceof Error ? error.message : 'Unknown error'
+      );
       process.exit(1);
     }
   }
@@ -226,8 +243,8 @@ class HealthCheckCLI {
       const response = await fetch(url, {
         signal: controller.signal,
         headers: {
-          'User-Agent': 'Fire22-Health-Check-CLI/1.0.0'
-        }
+          'User-Agent': 'Fire22-Health-Check-CLI/1.0.0',
+        },
       });
 
       clearTimeout(timeoutId);
@@ -249,7 +266,10 @@ class HealthCheckCLI {
       if (error instanceof Error && error.name === 'AbortError') {
         console.log(`⏰ Endpoint timeout after ${this.options.timeout}ms`);
       } else {
-        console.log(`❌ Endpoint test failed:`, error instanceof Error ? error.message : 'Unknown error');
+        console.log(
+          `❌ Endpoint test failed:`,
+          error instanceof Error ? error.message : 'Unknown error'
+        );
       }
     }
   }
@@ -259,7 +279,7 @@ class HealthCheckCLI {
    */
   async showStatistics(): Promise<void> {
     console.log('📈 Health Check Statistics');
-    console.log('========================');
+    console.log('!==!==!==!====');
 
     const health = await this.monitor.getSystemHealth();
     const score = HealthUtils.calculateHealthScore(health.components);
@@ -279,7 +299,11 @@ class HealthCheckCLI {
 }
 
 // CLI Interface
-function parseArgs(): { command: string; commandArg?: string; options: Partial<HealthCheckOptions> } {
+function parseArgs(): {
+  command: string;
+  commandArg?: string;
+  options: Partial<HealthCheckOptions>;
+} {
   const args = process.argv.slice(2);
   let command = 'check';
   let commandArg: string | undefined;
@@ -394,7 +418,10 @@ async function main(): Promise<void> {
         process.exit(1);
     }
   } catch (error) {
-    console.error('❌ CLI execution failed:', error instanceof Error ? error.message : 'Unknown error');
+    console.error(
+      '❌ CLI execution failed:',
+      error instanceof Error ? error.message : 'Unknown error'
+    );
     process.exit(1);
   }
 }

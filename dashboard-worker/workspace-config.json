@@ -2,7 +2,7 @@
   "name": "fire22-workspace-orchestrator",
   "version": "3.0.9",
   "description": "Advanced workspace management for Fire22 dashboard system",
-  
+
   "workspaces": {
     "@fire22-core-dashboard": {
       "name": "@fire22/core-dashboard",
@@ -18,7 +18,7 @@
       },
       "include": [
         "src/index.ts",
-        "src/dashboard.html", 
+        "src/dashboard.html",
         "src/config.ts",
         "src/types.ts",
         "src/utils.ts",
@@ -47,9 +47,9 @@
         }
       }
     },
-    
+
     "@fire22-pattern-system": {
-      "name": "@fire22/pattern-system", 
+      "name": "@fire22/pattern-system",
       "description": "Advanced pattern weaver system with streaming capabilities",
       "version": "3.0.9",
       "main": "src/patterns/index.ts",
@@ -57,12 +57,10 @@
       "target": "cloudflare-workers",
       "maxSize": "800KB",
       "dependencies": {},
-      "include": [
-        "src/patterns/"
-      ],
+      "include": ["src/patterns/"],
       "features": [
         "streaming-analysis",
-        "security-scanning", 
+        "security-scanning",
         "performance-monitoring",
         "multi-pattern-workflows"
       ],
@@ -75,11 +73,11 @@
         }
       }
     },
-    
+
     "@fire22-api-client": {
       "name": "@fire22/api-client",
       "description": "Fire22 API integration and data management",
-      "version": "3.0.9", 
+      "version": "3.0.9",
       "main": "src/fire22-api.ts",
       "type": "module",
       "target": "cloudflare-workers",
@@ -100,7 +98,7 @@
         "compatibility_flags": ["nodejs_compat"],
         "limits": {
           "cpu_time": 30000,
-          "memory": "128MB" 
+          "memory": "128MB"
         },
         "bindings": {
           "D1": ["fire22_db", "dashboard_db"],
@@ -109,12 +107,12 @@
         }
       }
     },
-    
+
     "@fire22-sports-betting": {
       "name": "@fire22/sports-betting",
       "description": "Sports betting and live casino management",
       "version": "3.0.9",
-      "main": "src/sports-betting-management.ts", 
+      "main": "src/sports-betting-management.ts",
       "type": "module",
       "target": "cloudflare-workers",
       "maxSize": "600KB",
@@ -128,7 +126,7 @@
         "src/business-management.ts"
       ],
       "cloudflare": {
-        "compatibility_date": "2024-08-27", 
+        "compatibility_date": "2024-08-27",
         "compatibility_flags": ["nodejs_compat"],
         "limits": {
           "cpu_time": 30000,
@@ -141,13 +139,13 @@
         }
       }
     },
-    
+
     "@fire22-telegram-integration": {
       "name": "@fire22/telegram-integration",
       "description": "Telegram bot and P2P queue system",
       "version": "3.0.9",
       "main": "src/telegram-bot.ts",
-      "type": "module", 
+      "type": "module",
       "target": "cloudflare-workers",
       "maxSize": "350KB",
       "dependencies": {
@@ -155,14 +153,14 @@
       },
       "include": [
         "src/telegram-bot.ts",
-        "src/p2p-queue-api.ts", 
+        "src/p2p-queue-api.ts",
         "src/queue-system.ts",
         "p2p-*.sql",
         "queue-*.sql"
       ],
       "cloudflare": {
         "compatibility_date": "2024-08-27",
-        "compatibility_flags": ["nodejs_compat"], 
+        "compatibility_flags": ["nodejs_compat"],
         "limits": {
           "cpu_time": 30000,
           "memory": "128MB"
@@ -175,7 +173,7 @@
         }
       }
     },
-    
+
     "@fire22-build-system": {
       "name": "@fire22/build-system",
       "description": "Build automation, benchmarking, and tooling",
@@ -190,18 +188,16 @@
       },
       "include": [
         "scripts/",
-        "bench/", 
+        "bench/",
         "build.ts",
         "build.config.ts",
         "tsconfig.json",
         "bunfig.toml"
       ],
-      "exclude": [
-        "scripts/workspace-cli.ts"
-      ]
+      "exclude": ["scripts/workspace-cli.ts"]
     }
   },
-  
+
   "orchestration": {
     "splitStrategy": "feature-based",
     "preserveHistory": true,
@@ -209,7 +205,7 @@
     "crossDependencies": "symlink",
     "buildOrder": [
       "@fire22-pattern-system",
-      "@fire22-api-client", 
+      "@fire22-api-client",
       "@fire22-core-dashboard",
       "@fire22-sports-betting",
       "@fire22-telegram-integration"
@@ -217,7 +213,7 @@
     "testingStrategy": "parallel-workspace",
     "deploymentStrategy": "progressive-regional"
   },
-  
+
   "benchmarking": {
     "suites": {
       "package": {
@@ -256,7 +252,7 @@
       "metrics": ["size", "performance", "maintainability"]
     }
   },
-  
+
   "publishing": {
     "registry": {
       "url": "https://fire22.workers.dev/registry",
@@ -271,7 +267,7 @@
       },
       "beta": {
         "prerelease": true,
-        "tags": ["beta", "next"], 
+        "tags": ["beta", "next"],
         "regions": ["us-west", "eu-west"]
       },
       "prerelease": {
@@ -287,7 +283,7 @@
       "deployment": "progressive"
     }
   },
-  
+
   "optimization": {
     "bundling": {
       "treeshaking": true,
@@ -306,7 +302,7 @@
       "memoryOptimization": true
     }
   },
-  
+
   "monitoring": {
     "metrics": {
       "buildTimes": true,

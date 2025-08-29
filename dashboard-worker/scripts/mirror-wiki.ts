@@ -5,9 +5,9 @@
  * Mirrors GitHub wiki content to static pages
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from "fs";
-import { join, extname, basename } from "path";
-import { marked } from "marked";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs';
+import { join, extname, basename } from 'path';
+import { marked } from 'marked';
 
 interface WikiPage {
   title: string;
@@ -34,7 +34,7 @@ class WikiMirrorSystem {
 
   public async mirror(): Promise<void> {
     console.log('📝 Wiki Mirror System');
-    console.log('====================');
+    console.log('!==!==!=====');
 
     try {
       // Scan for wiki pages
@@ -92,7 +92,7 @@ class WikiMirrorSystem {
           slug,
           content,
           lastModified: stat.mtime,
-          category
+          category,
         });
       }
     }
@@ -288,19 +288,28 @@ class WikiMirrorSystem {
             </ul>
         </div>
         
-        ${Array.from(categories.entries()).map(([category, pages]) => `
+        ${Array.from(categories.entries())
+          .map(
+            ([category, pages]) => `
         <div class="category-section">
             <h2 class="category-title">📁 ${category.charAt(0).toUpperCase() + category.slice(1)}</h2>
             <ul class="page-list">
-                ${pages.sort((a, b) => a.title.localeCompare(b.title)).map(page => `
+                ${pages
+                  .sort((a, b) => a.title.localeCompare(b.title))
+                  .map(
+                    page => `
                 <li class="page-item">
                     <a href="/wiki/${category}/${page.slug}.html">${page.title}</a>
                     <span class="page-date">${page.lastModified.toLocaleDateString()}</span>
                 </li>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </ul>
         </div>
-        `).join('')}
+        `
+          )
+          .join('')}
     </main>
     
     <footer>
@@ -321,14 +330,11 @@ class WikiMirrorSystem {
       category: page.category,
       slug: page.slug,
       url: `/wiki/${page.category}/${page.slug}.html`,
-      content: page.content.substring(0, 200) // First 200 chars for preview
+      content: page.content.substring(0, 200), // First 200 chars for preview
     }));
 
     // Write search index as JSON
-    writeFileSync(
-      join(this.distDir, 'search-index.json'),
-      JSON.stringify(searchData, null, 2)
-    );
+    writeFileSync(join(this.distDir, 'search-index.json'), JSON.stringify(searchData, null, 2));
 
     // Generate search page
     const searchHtml = `<!DOCTYPE html>
@@ -487,7 +493,7 @@ Welcome to the Fire22 Dashboard Wiki!
 
 This wiki contains comprehensive documentation for the Fire22 Dashboard system.
 
-Last updated: ${new Date().toISOString()}`
+Last updated: ${new Date().toISOString()}`,
       },
       {
         file: 'Getting-Started.md',
@@ -515,8 +521,8 @@ bun run build
 
 \`\`\`bash
 bun run deploy
-\`\`\``
-      }
+\`\`\``,
+      },
     ];
 
     for (const page of defaultPages) {

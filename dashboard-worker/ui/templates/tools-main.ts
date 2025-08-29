@@ -4,7 +4,11 @@
  */
 
 import type { EmployeeData } from '../../personal-subdomains/src/types';
-import { generateHtmlHead, generateHeader, generateFooter } from '../../personal-subdomains/src/components';
+import {
+  generateHtmlHead,
+  generateHeader,
+  generateFooter,
+} from '../../personal-subdomains/src/components';
 
 export function generateToolsPage(employee: EmployeeData, pathname?: string): string {
   const content = generateToolsContent(employee);
@@ -32,26 +36,26 @@ function generateToolsContent(employee: EmployeeData): string {
       icon: '🛠️',
       title: 'Development Tools',
       description: 'Code editors, debuggers, and development utilities',
-      status: 'available'
+      status: 'available',
     },
     {
       icon: '📊',
       title: 'Analytics Tools',
       description: 'Data analysis, reporting, and visualization tools',
-      status: 'available'
+      status: 'available',
     },
     {
       icon: '🔧',
       title: 'System Tools',
       description: 'System maintenance, monitoring, and management tools',
-      status: 'available'
+      status: 'available',
     },
     {
       icon: '📱',
       title: 'Mobile Tools',
       description: 'Mobile development and testing tools',
-      status: 'coming-soon'
-    }
+      status: 'coming-soon',
+    },
   ];
 
   return `
@@ -62,7 +66,9 @@ function generateToolsContent(employee: EmployeeData): string {
       </div>
 
       <div class="tools-grid">
-        ${tools.map(tool => `
+        ${tools
+          .map(
+            tool => `
           <div class="tool-card ${tool.status === 'available' ? 'active' : 'disabled'}">
             <div class="tool-icon">${tool.icon}</div>
             <div class="tool-content">
@@ -71,7 +77,9 @@ function generateToolsContent(employee: EmployeeData): string {
               <div class="tool-status ${tool.status}">${tool.status.replace('-', ' ').toUpperCase()}</div>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
 
       <div class="tools-actions">

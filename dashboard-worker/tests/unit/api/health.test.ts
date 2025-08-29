@@ -13,7 +13,7 @@ describe('Health API Endpoint', () => {
   beforeAll(async () => {
     // Setup test database
     await testUtils.setupTestDatabase();
-    
+
     // Note: In a real scenario, you'd start your test server here
     // testServer = await startTestServer();
   });
@@ -21,7 +21,7 @@ describe('Health API Endpoint', () => {
   afterAll(async () => {
     // Cleanup
     await testUtils.cleanupTestDatabase();
-    
+
     // Stop test server
     // if (testServer) {
     //   await testServer.stop();
@@ -41,7 +41,7 @@ describe('Health API Endpoint', () => {
         database: 'connected',
         fire22Schema: 'detected',
         tables: 'real',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       expect(mockResponse.status).toBe('ok');
@@ -57,7 +57,7 @@ describe('Health API Endpoint', () => {
         database: 'connected',
         fire22Schema: 'detected',
         tables: 'real',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       expect(mockHealthResponse).toHaveProperty('database');
@@ -70,7 +70,7 @@ describe('Health API Endpoint', () => {
         database: 'connected',
         fire22Schema: 'detected',
         tables: 'real',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       expect(mockHealthResponse).toHaveProperty('fire22Schema');
@@ -83,7 +83,7 @@ describe('Health API Endpoint', () => {
         database: 'connected',
         fire22Schema: 'detected',
         tables: 'real',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       expect(mockHealthResponse).toHaveProperty('timestamp');
@@ -96,7 +96,7 @@ describe('Health API Endpoint', () => {
         database: 'connected',
         fire22Schema: 'detected',
         tables: 'real',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       const expectedKeys = ['status', 'database', 'fire22Schema', 'tables', 'timestamp'];
@@ -111,7 +111,7 @@ describe('Health API Endpoint', () => {
       // Test database connection detection logic
       const db = testUtils.getTestDatabase();
       expect(db).toBeDefined();
-      
+
       // Test a simple query
       const result = db.query('SELECT 1 as test').get();
       expect(result).toEqual({ test: 1 });
@@ -119,15 +119,19 @@ describe('Health API Endpoint', () => {
 
     it('should validate Fire22 schema presence', () => {
       const db = testUtils.getTestDatabase();
-      
+
       // Check for required tables
-      const tables = db.query(`
+      const tables = db
+        .query(
+          `
         SELECT name FROM sqlite_master 
         WHERE type='table' AND name IN ('customers', 'transactions', 'bets')
-      `).all();
-      
+      `
+        )
+        .all();
+
       expect(tables).toHaveLength(3);
-      
+
       const tableNames = tables.map((t: any) => t.name);
       expect(tableNames).toContain('customers');
       expect(tableNames).toContain('transactions');
@@ -137,7 +141,7 @@ describe('Health API Endpoint', () => {
     it('should handle database errors gracefully', () => {
       // Test error handling when database is unavailable
       const mockError = new Error('Database connection failed');
-      
+
       // In real implementation, you'd test actual error handling
       expect(mockError.message).toBe('Database connection failed');
     });
@@ -147,28 +151,28 @@ describe('Health API Endpoint', () => {
     it('should have valid status values', () => {
       const validStatuses = ['ok', 'error', 'degraded'];
       const testStatus = 'ok';
-      
+
       expect(validStatuses).toContain(testStatus);
     });
 
     it('should have valid database status values', () => {
       const validDatabaseStatuses = ['connected', 'disconnected', 'simulated'];
       const testDatabaseStatus = 'connected';
-      
+
       expect(validDatabaseStatuses).toContain(testDatabaseStatus);
     });
 
     it('should have valid schema detection values', () => {
       const validSchemaStatuses = ['detected', 'not detected'];
       const testSchemaStatus = 'detected';
-      
+
       expect(validSchemaStatuses).toContain(testSchemaStatus);
     });
 
     it('should have valid table status values', () => {
       const validTableStatuses = ['real', 'simulated'];
       const testTableStatus = 'real';
-      
+
       expect(validTableStatuses).toContain(testTableStatus);
     });
   });

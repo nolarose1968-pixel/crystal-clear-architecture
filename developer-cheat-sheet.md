@@ -9,40 +9,44 @@ This guide solves the "where do I put this?" problem for new developers. Use thi
 ## 🎯 **COMMON DEVELOPMENT TASKS**
 
 ### **👥 Customer Management**
-| Task | Location | Files to Modify |
-|------|----------|-----------------|
-| Add customer field | `src/components/customer/core/` | `customer-interface-types.ts` |
-| Customer search logic | `src/components/customer/search/` | `customer-search.ts` |
-| Customer forms | `src/components/customer/forms/` | `customer-forms.ts` |
-| Customer API endpoints | `src/api/controllers/` | Domain-specific controller |
-| Customer language keys | `src/i18n/` | `fire22-language-keys.json` |
+
+| Task                   | Location                          | Files to Modify               |
+| ---------------------- | --------------------------------- | ----------------------------- |
+| Add customer field     | `src/components/customer/core/`   | `customer-interface-types.ts` |
+| Customer search logic  | `src/components/customer/search/` | `customer-search.ts`          |
+| Customer forms         | `src/components/customer/forms/`  | `customer-forms.ts`           |
+| Customer API endpoints | `src/api/controllers/`            | Domain-specific controller    |
+| Customer language keys | `src/i18n/`                       | `fire22-language-keys.json`   |
 
 ### **💰 Financial Operations**
-| Task | Location | Files to Modify |
-|------|----------|-----------------|
-| Balance validation | `src/finance/validation/` | `balance-validator.ts` |
-| Transaction logging | `src/finance/audit/` | `balance-audit-trail.ts` |
-| Payment processing | `src/finance/` | Domain-specific module |
-| Financial reports | `src/api/controllers/` | `settlement-controller.ts` |
-| Commission calculations | `src/hierarchy/commissions/` | `commission-manager.ts` |
+
+| Task                    | Location                     | Files to Modify            |
+| ----------------------- | ---------------------------- | -------------------------- |
+| Balance validation      | `src/finance/validation/`    | `balance-validator.ts`     |
+| Transaction logging     | `src/finance/audit/`         | `balance-audit-trail.ts`   |
+| Payment processing      | `src/finance/`               | Domain-specific module     |
+| Financial reports       | `src/api/controllers/`       | `settlement-controller.ts` |
+| Commission calculations | `src/hierarchy/commissions/` | `commission-manager.ts`    |
 
 ### **⚽ Sports & Betting**
-| Task | Location | Files to Modify |
-|------|----------|-----------------|
-| Event management | `src/sports/events/` | `event-management.ts` |
-| Odds calculation | `src/sports/betting/` | `odds-management.ts` |
-| Bet processing | `src/sports/betting/` | `bet-processing.ts` |
-| Risk assessment | `src/sports/risk/` | `risk-assessment.ts` |
+
+| Task                 | Location               | Files to Modify            |
+| -------------------- | ---------------------- | -------------------------- |
+| Event management     | `src/sports/events/`   | `event-management.ts`      |
+| Odds calculation     | `src/sports/betting/`  | `odds-management.ts`       |
+| Bet processing       | `src/sports/betting/`  | `bet-processing.ts`        |
+| Risk assessment      | `src/sports/risk/`     | `risk-assessment.ts`       |
 | Sports API endpoints | `src/api/controllers/` | `settlement-controller.ts` |
 
 ### **🤖 Telegram Integration**
-| Task | Location | Files to Modify |
-|------|----------|-----------------|
-| New bot command | `src/telegram/commands/` | `user-commands.ts` or `wager-commands.ts` |
-| Command language keys | `src/telegram/` | `telegram-constants.ts` |
-| Notification system | `src/telegram/` | `multilingual-telegram-bot.ts` |
-| Bot configuration | `src/config/` | `telegram-integration-config.ts` |
-| Bot testing | `src/telegram/` | Domain-specific test files |
+
+| Task                  | Location                 | Files to Modify                           |
+| --------------------- | ------------------------ | ----------------------------------------- |
+| New bot command       | `src/telegram/commands/` | `user-commands.ts` or `wager-commands.ts` |
+| Command language keys | `src/telegram/`          | `telegram-constants.ts`                   |
+| Notification system   | `src/telegram/`          | `multilingual-telegram-bot.ts`            |
+| Bot configuration     | `src/config/`            | `telegram-integration-config.ts`          |
+| Bot testing           | `src/telegram/`          | Domain-specific test files                |
 
 ---
 
@@ -101,6 +105,7 @@ src/
 ## 🔧 **HOW TO ADD NEW FEATURES**
 
 ### **Step 1: Identify the Domain**
+
 ```
 Customer Feature → src/components/customer/
 Financial Logic → src/finance/
@@ -110,6 +115,7 @@ Agent Management → src/hierarchy/
 ```
 
 ### **Step 2: Follow the Pattern**
+
 ```typescript
 // 1. Add types to appropriate module
 // Location: src/[domain]/core/types.ts or core/types/[domain]/
@@ -145,10 +151,11 @@ export async function handleNewFeature(request: ControllerRequest) {
 ```
 
 ### **Step 3: Update Exports**
+
 ```typescript
 // Add to appropriate index.ts files
-export * from './new-feature-manager';
-export { handleNewFeature } from './api-endpoint';
+export * from "./new-feature-manager";
+export { handleNewFeature } from "./api-endpoint";
 ```
 
 ---
@@ -157,39 +164,40 @@ export { handleNewFeature } from './api-endpoint';
 
 ### **"I need to add..."**
 
-| What to Add | Where to Go | Example |
-|-------------|-------------|---------|
-| Customer field | `src/components/customer/core/` | Add to `customer-interface-types.ts` |
-| API endpoint | `src/api/controllers/` | Add to domain-specific controller |
-| Language text | `src/i18n/` | Add L-XXXX key to language files |
-| Telegram command | `src/telegram/commands/` | Add to appropriate command file |
-| Balance logic | `src/finance/validation/` | Modify `balance-validator.ts` |
-| Agent permission | `src/hierarchy/permissions/` | Update permission logic |
-| Sports event | `src/sports/events/` | Modify `event-management.ts` |
-| Device tracking | `src/device/tracking/` | Add to tracking module |
-| Report generation | `src/api/controllers/` | Add to settlement controller |
-| Notification system | `src/finance/notifications/` | Modify `balance-notifications.ts` |
+| What to Add         | Where to Go                     | Example                              |
+| ------------------- | ------------------------------- | ------------------------------------ |
+| Customer field      | `src/components/customer/core/` | Add to `customer-interface-types.ts` |
+| API endpoint        | `src/api/controllers/`          | Add to domain-specific controller    |
+| Language text       | `src/i18n/`                     | Add L-XXXX key to language files     |
+| Telegram command    | `src/telegram/commands/`        | Add to appropriate command file      |
+| Balance logic       | `src/finance/validation/`       | Modify `balance-validator.ts`        |
+| Agent permission    | `src/hierarchy/permissions/`    | Update permission logic              |
+| Sports event        | `src/sports/events/`            | Modify `event-management.ts`         |
+| Device tracking     | `src/device/tracking/`          | Add to tracking module               |
+| Report generation   | `src/api/controllers/`          | Add to settlement controller         |
+| Notification system | `src/finance/notifications/`    | Modify `balance-notifications.ts`    |
 
 ### **"I need to modify..."**
 
-| What to Modify | Where to Look | Files |
-|---------------|---------------|-------|
-| Balance calculations | `src/finance/validation/` | `balance-validator.ts` |
-| Transaction logging | `src/finance/audit/` | `balance-audit-trail.ts` |
-| Customer search | `src/components/customer/search/` | `customer-search.ts` |
-| Agent hierarchy | `src/hierarchy/agents/` | `agent-profile-manager.ts` |
-| Sports odds | `src/sports/betting/` | `odds-management.ts` |
-| Telegram responses | `src/telegram/` | `multilingual-telegram-bot.ts` |
-| Language translations | `src/i18n/` | Language JSON files |
-| API responses | `src/api/controllers/` | Domain controllers |
-| Error handling | `core/types/shared/` | `validation.ts` |
-| Type definitions | `core/types/` | Domain-specific types |
+| What to Modify        | Where to Look                     | Files                          |
+| --------------------- | --------------------------------- | ------------------------------ |
+| Balance calculations  | `src/finance/validation/`         | `balance-validator.ts`         |
+| Transaction logging   | `src/finance/audit/`              | `balance-audit-trail.ts`       |
+| Customer search       | `src/components/customer/search/` | `customer-search.ts`           |
+| Agent hierarchy       | `src/hierarchy/agents/`           | `agent-profile-manager.ts`     |
+| Sports odds           | `src/sports/betting/`             | `odds-management.ts`           |
+| Telegram responses    | `src/telegram/`                   | `multilingual-telegram-bot.ts` |
+| Language translations | `src/i18n/`                       | Language JSON files            |
+| API responses         | `src/api/controllers/`            | Domain controllers             |
+| Error handling        | `core/types/shared/`              | `validation.ts`                |
+| Type definitions      | `core/types/`                     | Domain-specific types          |
 
 ---
 
 ## 🚨 **IMPORTANT PATTERNS TO FOLLOW**
 
 ### **1. Type Safety First**
+
 ```typescript
 // ✅ DO: Define types before implementation
 export interface NewFeature {
@@ -200,22 +208,31 @@ export interface NewFeature {
 
 // ❌ DON'T: Skip type definitions
 export class NewFeature {
-  constructor(public id: string, public name: string) {}
+  constructor(
+    public id: string,
+    public name: string,
+  ) {}
 }
 ```
 
 ### **2. Domain Separation**
+
 ```typescript
 // ✅ DO: Keep domains separate
 // src/finance/validation/balance-validator.ts
-export class BalanceValidator { /* finance logic */ }
+export class BalanceValidator {
+  /* finance logic */
+}
 
 // ❌ DON'T: Mix domains
 // src/utils/mixed-logic.ts
-export class MixedLogic { /* finance + customer + sports */ }
+export class MixedLogic {
+  /* finance + customer + sports */
+}
 ```
 
 ### **3. Language Key Convention**
+
 ```json
 // ✅ DO: Follow L-XXXX pattern
 {
@@ -231,16 +248,17 @@ export class MixedLogic { /* finance + customer + sports */ }
 ```
 
 ### **4. Error Handling**
+
 ```typescript
 // ✅ DO: Use proper error types
 try {
   // operation
 } catch (error) {
-  throw new ValidationError('Invalid data', error);
+  throw new ValidationError("Invalid data", error);
 }
 
 // ❌ DON'T: Generic errors
-throw new Error('Something went wrong');
+throw new Error("Something went wrong");
 ```
 
 ---
@@ -248,11 +266,13 @@ throw new Error('Something went wrong');
 ## 🎯 **DAILY DEVELOPMENT WORKFLOW**
 
 ### **Morning: Plan Your Day**
+
 1. Check `REFACTORING_STATUS_REPORT.md` for architecture overview
 2. Review `language-telegram-integration-map.html` for i18n reference
 3. Use this cheat sheet to identify target locations
 
 ### **Development: Implement Features**
+
 1. **Navigate**: Use directory structure above to find right location
 2. **Types First**: Define interfaces in appropriate type files
 3. **Implement**: Follow existing patterns in the module
@@ -260,12 +280,14 @@ throw new Error('Something went wrong');
 5. **Language**: Add L-XXXX keys for any user-facing text
 
 ### **Integration: Connect Components**
+
 1. **API**: Add endpoints to appropriate controllers
 2. **UI**: Connect to existing components or create new ones
 3. **Telegram**: Add bot commands if needed
 4. **Testing**: Ensure all integrations work together
 
 ### **Evening: Documentation & Review**
+
 1. Update any modified documentation
 2. Review code follows established patterns
 3. Test multilingual support if applicable
@@ -276,18 +298,21 @@ throw new Error('Something went wrong');
 ## 📞 **WHEN YOU NEED HELP**
 
 ### **Quick References:**
+
 - **Architecture Overview**: `REFACTORING_STATUS_REPORT.md`
 - **Language Integration**: `language-telegram-integration-map.html`
 - **Navigation Guide**: `navigational-developer-guide.html`
 - **This Cheat Sheet**: `developer-cheat-sheet.md`
 
 ### **Finding Specific Functionality:**
+
 1. **Search by feature**: Use `grep -r "featureName" src/`
 2. **Find by domain**: Check domain-specific directories
 3. **Language keys**: Search `grep "L-" src/i18n/`
 4. **API endpoints**: Check `src/api/controllers/`
 
 ### **Common Questions:**
+
 - **"Where do I put X?"** → Check the task matrix above
 - **"How does Y work?"** → Look at existing implementations
 - **"What's the pattern for Z?"** → Examine similar functionality
@@ -309,6 +334,6 @@ By using this guide, you should be able to:
 
 ---
 
-*Last Updated: December 2024*
-*Version: 1.0*
-*Target: New Developer Onboarding*
+_Last Updated: December 2024_
+_Version: 1.0_
+_Target: New Developer Onboarding_

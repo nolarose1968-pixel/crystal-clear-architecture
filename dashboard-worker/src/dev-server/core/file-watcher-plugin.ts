@@ -64,7 +64,7 @@ export class PluginManager {
       defaultAction: 'ignore',
       maxConcurrentPlugins: 3,
       pluginTimeout: 5000,
-      ...config
+      ...config,
     };
   }
 
@@ -97,19 +97,18 @@ export class PluginManager {
   async initialize(): Promise<void> {
     console.log('🚀 Initializing file watcher plugins...');
 
-    const initPromises = Array.from(this.plugins.values())
-      .map(async (plugin) => {
-        try {
-          if (plugin.isEnabled()) {
-            await plugin.initialize();
-            console.log(`✅ Plugin initialized: ${plugin.name}`);
-          } else {
-            console.log(`⏸️ Plugin disabled: ${plugin.name}`);
-          }
-        } catch (error) {
-          console.error(`❌ Failed to initialize plugin ${plugin.name}:`, error);
+    const initPromises = Array.from(this.plugins.values()).map(async plugin => {
+      try {
+        if (plugin.isEnabled()) {
+          await plugin.initialize();
+          console.log(`✅ Plugin initialized: ${plugin.name}`);
+        } else {
+          console.log(`⏸️ Plugin disabled: ${plugin.name}`);
         }
-      });
+      } catch (error) {
+        console.error(`❌ Failed to initialize plugin ${plugin.name}:`, error);
+      }
+    });
 
     await Promise.allSettled(initPromises);
     this.initialized = true;
@@ -137,7 +136,7 @@ export class PluginManager {
         success: true,
         action: this.config.defaultAction,
         processedBy: 'none',
-        data: { reason: 'no_capable_plugins' }
+        data: { reason: 'no_capable_plugins' },
       };
     }
 
@@ -157,9 +156,8 @@ export class PluginManager {
 
       return {
         ...result,
-        processedBy: primaryPlugin.name
+        processedBy: primaryPlugin.name,
       };
-
     } catch (error) {
       console.error(`❌ Plugin ${primaryPlugin.name} failed to process ${change.path}:`, error);
 
@@ -167,7 +165,7 @@ export class PluginManager {
         success: false,
         action: 'ignore',
         error: error instanceof Error ? error.message : 'Unknown error',
-        processedBy: primaryPlugin.name
+        processedBy: primaryPlugin.name,
       };
     }
   }
@@ -199,8 +197,8 @@ export class PluginManager {
         version: p.version,
         enabled: p.isEnabled(),
         priority: p.getPriority(),
-        extensions: p.getSupportedExtensions()
-      }))
+        extensions: p.getSupportedExtensions(),
+      })),
     };
   }
 
@@ -239,15 +237,14 @@ export class PluginManager {
   async cleanup(): Promise<void> {
     console.log('🧹 Cleaning up plugins...');
 
-    const cleanupPromises = Array.from(this.plugins.values())
-      .map(async (plugin) => {
-        try {
-          await plugin.cleanup();
-          console.log(`✅ Plugin cleaned up: ${plugin.name}`);
-        } catch (error) {
-          console.error(`❌ Failed to cleanup plugin ${plugin.name}:`, error);
-        }
-      });
+    const cleanupPromises = Array.from(this.plugins.values()).map(async plugin => {
+      try {
+        await plugin.cleanup();
+        console.log(`✅ Plugin cleaned up: ${plugin.name}`);
+      } catch (error) {
+        console.error(`❌ Failed to cleanup plugin ${plugin.name}:`, error);
+      }
+    });
 
     await Promise.allSettled(cleanupPromises);
     this.plugins.clear();
@@ -258,21 +255,18 @@ export class PluginManager {
   /**
    * Process with timeout to prevent hanging plugins
    */
-  private async processWithTimeout<T>(
-    promise: Promise<T>,
-    timeoutMs: number
-  ): Promise<T> {
+  private async processWithTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         reject(new Error(`Plugin processing timed out after ${timeoutMs}ms`));
       }, timeoutMs);
 
       promise
-        .then((result) => {
+        .then(result => {
           clearTimeout(timeout);
           resolve(result);
         })
-        .catch((error) => {
+        .catch(error => {
           clearTimeout(timeout);
           reject(error);
         });
@@ -280,9 +274,9 @@ export class PluginManager {
   }
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // PRE-BUILT PLUGINS
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 /**
  * JavaScript/TypeScript Plugin
@@ -296,7 +290,7 @@ export class JavaScriptPlugin implements FileWatcherPlugin {
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.mjs', '.cjs'],
     description: 'JavaScript/TypeScript files',
     priority: 100,
-    enabled: true
+    enabled: true,
   };
 
   async initialize(): Promise<void> {
@@ -322,8 +316,8 @@ export class JavaScriptPlugin implements FileWatcherPlugin {
       data: {
         fileType: 'javascript',
         changeType: change.type,
-        requiresReload: change.type === 'delete' || change.type === 'rename'
-      }
+        requiresReload: change.type === 'delete' || change.type === 'rename',
+      },
     };
   }
 
@@ -352,7 +346,7 @@ export class CSSPlugin implements FileWatcherPlugin {
     extensions: ['.css', '.scss', '.sass', '.less', '.styl'],
     description: 'CSS and preprocessor files',
     priority: 90,
-    enabled: true
+    enabled: true,
   };
 
   async initialize(): Promise<void> {
@@ -376,8 +370,8 @@ export class CSSPlugin implements FileWatcherPlugin {
       data: {
         fileType: 'css',
         changeType: change.type,
-        injectStyles: true
-      }
+        injectStyles: true,
+      },
     };
   }
 
@@ -406,7 +400,7 @@ export class HTMLPlugin implements FileWatcherPlugin {
     extensions: ['.html', '.htm', '.ejs', '.pug', '.hbs'],
     description: 'HTML template files',
     priority: 80,
-    enabled: true
+    enabled: true,
   };
 
   async initialize(): Promise<void> {
@@ -430,8 +424,8 @@ export class HTMLPlugin implements FileWatcherPlugin {
       data: {
         fileType: 'html',
         changeType: change.type,
-        reason: 'HTML templates require full reload'
-      }
+        reason: 'HTML templates require full reload',
+      },
     };
   }
 
@@ -460,7 +454,7 @@ export class GraphQLPlugin implements FileWatcherPlugin {
     extensions: ['.graphql', '.gql', '.graphqls'],
     description: 'GraphQL schema and query files',
     priority: 70,
-    enabled: true
+    enabled: true,
   };
 
   async initialize(): Promise<void> {
@@ -473,9 +467,11 @@ export class GraphQLPlugin implements FileWatcherPlugin {
 
   canHandle(filePath: string): boolean {
     const ext = filePath.substring(filePath.lastIndexOf('.'));
-    return this.config.extensions.includes(ext) ||
-           filePath.includes('.graphql') ||
-           filePath.includes('.gql');
+    return (
+      this.config.extensions.includes(ext) ||
+      filePath.includes('.graphql') ||
+      filePath.includes('.gql')
+    );
   }
 
   async processFileChange(change: FileChangeEvent): Promise<FileChangeResult> {
@@ -487,8 +483,8 @@ export class GraphQLPlugin implements FileWatcherPlugin {
         fileType: 'graphql',
         changeType: change.type,
         recompileSchema: change.type === 'modify',
-        requiresReload: change.path.includes('schema')
-      }
+        requiresReload: change.path.includes('schema'),
+      },
     };
   }
 
@@ -517,7 +513,7 @@ export class ConfigPlugin implements FileWatcherPlugin {
     extensions: ['.json', '.yaml', '.yml', '.toml', '.ini', '.env'],
     description: 'Configuration files',
     priority: 50,
-    enabled: true
+    enabled: true,
   };
 
   async initialize(): Promise<void> {
@@ -532,8 +528,9 @@ export class ConfigPlugin implements FileWatcherPlugin {
     const ext = filePath.substring(filePath.lastIndexOf('.'));
     const configFileNames = ['config', 'settings', 'env', 'environment'];
 
-    return this.config.extensions.includes(ext) ||
-           configFileNames.some(name => filePath.includes(name));
+    return (
+      this.config.extensions.includes(ext) || configFileNames.some(name => filePath.includes(name))
+    );
   }
 
   async processFileChange(change: FileChangeEvent): Promise<FileChangeResult> {
@@ -545,8 +542,8 @@ export class ConfigPlugin implements FileWatcherPlugin {
         fileType: 'config',
         changeType: change.type,
         reason: 'Configuration changes require server restart',
-        severity: 'high'
-      }
+        severity: 'high',
+      },
     };
   }
 
@@ -580,6 +577,6 @@ export function createDefaultPluginConfig(): PluginManagerConfig {
     plugins: pluginManager.getPlugins(),
     defaultAction: 'ignore',
     maxConcurrentPlugins: 3,
-    pluginTimeout: 5000
+    pluginTimeout: 5000,
   };
 }

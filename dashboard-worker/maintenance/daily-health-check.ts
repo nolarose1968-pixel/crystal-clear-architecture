@@ -3,14 +3,14 @@
 /**
  * Fire22 Dashboard Daily Health Check
  * Automated daily maintenance and health monitoring script
- * 
+ *
  * @version 1.0.0
  * @author Fire22 Maintenance Team
  * @schedule Daily at 9:00 AM
  */
 
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { join } from 'path';
 
 interface HealthCheckResult {
   component: string;
@@ -44,7 +44,7 @@ class DailyHealthChecker {
    */
   async runHealthCheck(): Promise<HealthReport> {
     console.log('🏥 Fire22 Dashboard Daily Health Check');
-    console.log('=====================================');
+    console.log('!==!==!==!==!==!==!==');
     console.log(`📅 Date: ${new Date().toISOString().split('T')[0]}`);
     console.log(`⏰ Time: ${new Date().toLocaleTimeString()}\n`);
 
@@ -71,14 +71,14 @@ class DailyHealthChecker {
    */
   private async checkDashboardAccessibility(): Promise<void> {
     console.log('🌐 Checking dashboard accessibility...');
-    
+
     try {
       const startTime = Date.now();
-      
+
       // Check if dashboard files exist
       const indexPath = join(process.cwd(), 'dist', 'index.html');
       const assetsExist = existsSync(join(process.cwd(), 'dist', 'assets'));
-      
+
       if (!existsSync(indexPath)) {
         this.addResult('Dashboard Files', 'critical', 'Dashboard index.html not found');
         return;
@@ -89,13 +89,15 @@ class DailyHealthChecker {
       }
 
       const loadTime = Date.now() - startTime;
-      
-      this.addResult('Dashboard Accessibility', 'healthy', 
-        `Dashboard files accessible (${loadTime}ms)`, { loadTime });
-      
+
+      this.addResult(
+        'Dashboard Accessibility',
+        'healthy',
+        `Dashboard files accessible (${loadTime}ms)`,
+        { loadTime }
+      );
     } catch (error) {
-      this.addResult('Dashboard Accessibility', 'critical', 
-        `Dashboard check failed: ${error}`);
+      this.addResult('Dashboard Accessibility', 'critical', `Dashboard check failed: ${error}`);
     }
   }
 
@@ -104,10 +106,18 @@ class DailyHealthChecker {
    */
   private async checkRSSFeeds(): Promise<void> {
     console.log('📡 Checking RSS feeds...');
-    
+
     const departments = [
-      'finance', 'support', 'compliance', 'operations', 'technology',
-      'marketing', 'management', 'communications', 'contributors', 'design'
+      'finance',
+      'support',
+      'compliance',
+      'operations',
+      'technology',
+      'marketing',
+      'management',
+      'communications',
+      'contributors',
+      'design',
     ];
 
     let healthyFeeds = 0;
@@ -117,42 +127,52 @@ class DailyHealthChecker {
       try {
         const rssPath = join(process.cwd(), 'dist', 'feeds', `${dept}-rss.xml`);
         const atomPath = join(process.cwd(), 'dist', 'feeds', `${dept}-atom.xml`);
-        
+
         const rssExists = existsSync(rssPath);
         const atomExists = existsSync(atomPath);
-        
+
         totalFeeds += 2;
-        
+
         if (rssExists && atomExists) {
           healthyFeeds += 2;
-          
+
           // Validate RSS content
           const rssContent = readFileSync(rssPath, 'utf-8');
           if (!rssContent.includes('<rss') || !rssContent.includes('</rss>')) {
             this.addResult(`RSS Feed - ${dept}`, 'warning', 'Invalid RSS format');
           }
         } else {
-          this.addResult(`RSS Feed - ${dept}`, 'critical', 
-            `Missing feeds: RSS=${rssExists}, Atom=${atomExists}`);
+          this.addResult(
+            `RSS Feed - ${dept}`,
+            'critical',
+            `Missing feeds: RSS=${rssExists}, Atom=${atomExists}`
+          );
         }
-        
       } catch (error) {
-        this.addResult(`RSS Feed - ${dept}`, 'critical', 
-          `Feed check failed: ${error}`);
+        this.addResult(`RSS Feed - ${dept}`, 'critical', `Feed check failed: ${error}`);
       }
     }
 
     const feedHealth = (healthyFeeds / totalFeeds) * 100;
-    
+
     if (feedHealth >= 95) {
-      this.addResult('RSS Feed System', 'healthy', 
-        `${healthyFeeds}/${totalFeeds} feeds operational (${feedHealth.toFixed(1)}%)`);
+      this.addResult(
+        'RSS Feed System',
+        'healthy',
+        `${healthyFeeds}/${totalFeeds} feeds operational (${feedHealth.toFixed(1)}%)`
+      );
     } else if (feedHealth >= 80) {
-      this.addResult('RSS Feed System', 'warning', 
-        `${healthyFeeds}/${totalFeeds} feeds operational (${feedHealth.toFixed(1)}%)`);
+      this.addResult(
+        'RSS Feed System',
+        'warning',
+        `${healthyFeeds}/${totalFeeds} feeds operational (${feedHealth.toFixed(1)}%)`
+      );
     } else {
-      this.addResult('RSS Feed System', 'critical', 
-        `${healthyFeeds}/${totalFeeds} feeds operational (${feedHealth.toFixed(1)}%)`);
+      this.addResult(
+        'RSS Feed System',
+        'critical',
+        `${healthyFeeds}/${totalFeeds} feeds operational (${feedHealth.toFixed(1)}%)`
+      );
     }
   }
 
@@ -161,26 +181,30 @@ class DailyHealthChecker {
    */
   private async checkDatabaseConnectivity(): Promise<void> {
     console.log('🗄️ Checking database connectivity...');
-    
+
     try {
       // Check if database files exist (SQLite)
       const dbPath = join(process.cwd(), 'data', 'dashboard.db');
-      
+
       if (existsSync(dbPath)) {
         const stats = await Bun.file(dbPath).stat();
         const dbSize = stats.size;
-        
-        this.addResult('Database Connectivity', 'healthy', 
-          `Database accessible (${(dbSize / 1024 / 1024).toFixed(2)} MB)`, 
-          { dbSize, dbPath });
+
+        this.addResult(
+          'Database Connectivity',
+          'healthy',
+          `Database accessible (${(dbSize / 1024 / 1024).toFixed(2)} MB)`,
+          { dbSize, dbPath }
+        );
       } else {
-        this.addResult('Database Connectivity', 'warning', 
-          'Database file not found - may be using in-memory DB');
+        this.addResult(
+          'Database Connectivity',
+          'warning',
+          'Database file not found - may be using in-memory DB'
+        );
       }
-      
     } catch (error) {
-      this.addResult('Database Connectivity', 'critical', 
-        `Database check failed: ${error}`);
+      this.addResult('Database Connectivity', 'critical', `Database check failed: ${error}`);
     }
   }
 
@@ -189,45 +213,48 @@ class DailyHealthChecker {
    */
   private async checkAPIEndpoints(): Promise<void> {
     console.log('🔌 Checking API endpoints...');
-    
-    const endpoints = [
-      '/api/tasks',
-      '/api/tasks/events',
-      '/api/departments',
-      '/feeds/index.html'
-    ];
+
+    const endpoints = ['/api/tasks', '/api/tasks/events', '/api/departments', '/feeds/index.html'];
 
     let healthyEndpoints = 0;
 
     for (const endpoint of endpoints) {
       try {
         // Check if endpoint files/handlers exist
-        const endpointPath = join(process.cwd(), 'src', 'api', 
-          endpoint.replace('/api/', '').replace('/', '') + '.ts');
-        
+        const endpointPath = join(
+          process.cwd(),
+          'src',
+          'api',
+          endpoint.replace('/api/', '').replace('/', '') + '.ts'
+        );
+
         if (existsSync(endpointPath) || endpoint.includes('/feeds/')) {
           healthyEndpoints++;
           this.addResult(`API Endpoint ${endpoint}`, 'healthy', 'Endpoint available');
         } else {
           this.addResult(`API Endpoint ${endpoint}`, 'warning', 'Endpoint file not found');
         }
-        
       } catch (error) {
-        this.addResult(`API Endpoint ${endpoint}`, 'critical', 
-          `Endpoint check failed: ${error}`);
+        this.addResult(`API Endpoint ${endpoint}`, 'critical', `Endpoint check failed: ${error}`);
       }
     }
 
     const endpointHealth = (healthyEndpoints / endpoints.length) * 100;
-    
+
     if (endpointHealth >= 100) {
       this.addResult('API System', 'healthy', 'All endpoints operational');
     } else if (endpointHealth >= 75) {
-      this.addResult('API System', 'warning', 
-        `${healthyEndpoints}/${endpoints.length} endpoints operational`);
+      this.addResult(
+        'API System',
+        'warning',
+        `${healthyEndpoints}/${endpoints.length} endpoints operational`
+      );
     } else {
-      this.addResult('API System', 'critical', 
-        `${healthyEndpoints}/${endpoints.length} endpoints operational`);
+      this.addResult(
+        'API System',
+        'critical',
+        `${healthyEndpoints}/${endpoints.length} endpoints operational`
+      );
     }
   }
 
@@ -236,7 +263,7 @@ class DailyHealthChecker {
    */
   private async checkCodebaseHealth(): Promise<void> {
     console.log('💻 Checking codebase health...');
-    
+
     try {
       // Check package.json and dependencies
       const packagePath = join(process.cwd(), 'package.json');
@@ -257,18 +284,20 @@ class DailyHealthChecker {
       const hasReadme = existsSync(join(process.cwd(), 'README.md'));
       const hasGitignore = existsSync(join(process.cwd(), '.gitignore'));
 
-      this.addResult('Codebase Health', 'healthy', 
-        `Codebase structure valid (${depCount} deps, ${devDepCount} devDeps)`, {
+      this.addResult(
+        'Codebase Health',
+        'healthy',
+        `Codebase structure valid (${depCount} deps, ${devDepCount} devDeps)`,
+        {
           dependencies: depCount,
           devDependencies: devDepCount,
           hasTypeScript,
           hasReadme,
-          hasGitignore
-        });
-      
+          hasGitignore,
+        }
+      );
     } catch (error) {
-      this.addResult('Codebase Health', 'critical', 
-        `Codebase check failed: ${error}`);
+      this.addResult('Codebase Health', 'critical', `Codebase check failed: ${error}`);
     }
   }
 
@@ -277,7 +306,7 @@ class DailyHealthChecker {
    */
   private async checkDocumentationStatus(): Promise<void> {
     console.log('📚 Checking documentation status...');
-    
+
     try {
       const docsPath = join(process.cwd(), 'docs');
       const maintenancePath = join(process.cwd(), 'maintenance');
@@ -296,7 +325,7 @@ class DailyHealthChecker {
       const keyDocs = [
         'docs/api/TASK-MANAGEMENT-API.md',
         'maintenance/fire22-maintenance-framework.md',
-        'projects/fire22-department-outreach-project.md'
+        'projects/fire22-department-outreach-project.md',
       ];
 
       let keyDocsFound = 0;
@@ -307,19 +336,26 @@ class DailyHealthChecker {
       }
 
       if (docScore >= 90 && keyDocsFound >= 2) {
-        this.addResult('Documentation Status', 'healthy', 
-          `Documentation complete (${keyDocsFound}/${keyDocs.length} key docs)`);
+        this.addResult(
+          'Documentation Status',
+          'healthy',
+          `Documentation complete (${keyDocsFound}/${keyDocs.length} key docs)`
+        );
       } else if (docScore >= 60) {
-        this.addResult('Documentation Status', 'warning', 
-          `Documentation partially complete (${keyDocsFound}/${keyDocs.length} key docs)`);
+        this.addResult(
+          'Documentation Status',
+          'warning',
+          `Documentation partially complete (${keyDocsFound}/${keyDocs.length} key docs)`
+        );
       } else {
-        this.addResult('Documentation Status', 'critical', 
-          `Documentation incomplete (${keyDocsFound}/${keyDocs.length} key docs)`);
+        this.addResult(
+          'Documentation Status',
+          'critical',
+          `Documentation incomplete (${keyDocsFound}/${keyDocs.length} key docs)`
+        );
       }
-      
     } catch (error) {
-      this.addResult('Documentation Status', 'critical', 
-        `Documentation check failed: ${error}`);
+      this.addResult('Documentation Status', 'critical', `Documentation check failed: ${error}`);
     }
   }
 
@@ -328,14 +364,10 @@ class DailyHealthChecker {
    */
   private async checkSecurityStatus(): Promise<void> {
     console.log('🔒 Checking security status...');
-    
+
     try {
       // Check for security-related files
-      const securityFiles = [
-        '.env.example',
-        '.gitignore',
-        'package-lock.json'
-      ];
+      const securityFiles = ['.env.example', '.gitignore', 'package-lock.json'];
 
       let securityScore = 0;
       for (const file of securityFiles) {
@@ -347,7 +379,7 @@ class DailyHealthChecker {
       // Check for sensitive files that shouldn't be committed
       const sensitiveFiles = ['.env', 'config/secrets.json', 'private.key'];
       let exposedFiles = 0;
-      
+
       for (const file of sensitiveFiles) {
         if (existsSync(join(process.cwd(), file))) {
           exposedFiles++;
@@ -357,15 +389,16 @@ class DailyHealthChecker {
       if (securityScore >= 90 && exposedFiles === 0) {
         this.addResult('Security Status', 'healthy', 'Security configuration good');
       } else if (exposedFiles > 0) {
-        this.addResult('Security Status', 'critical', 
-          `${exposedFiles} potentially sensitive files found`);
+        this.addResult(
+          'Security Status',
+          'critical',
+          `${exposedFiles} potentially sensitive files found`
+        );
       } else {
         this.addResult('Security Status', 'warning', 'Security configuration incomplete');
       }
-      
     } catch (error) {
-      this.addResult('Security Status', 'critical', 
-        `Security check failed: ${error}`);
+      this.addResult('Security Status', 'critical', `Security check failed: ${error}`);
     }
   }
 
@@ -374,44 +407,51 @@ class DailyHealthChecker {
    */
   private async checkPerformanceMetrics(): Promise<void> {
     console.log('⚡ Checking performance metrics...');
-    
+
     try {
       const totalCheckTime = Date.now() - this.startTime;
-      
+
       // Check file sizes
       const distPath = join(process.cwd(), 'dist');
       let totalSize = 0;
-      
+
       if (existsSync(distPath)) {
         // Simple size calculation (would need recursive function for full accuracy)
-        const indexSize = existsSync(join(distPath, 'index.html')) ? 
-          (await Bun.file(join(distPath, 'index.html')).stat()).size : 0;
+        const indexSize = existsSync(join(distPath, 'index.html'))
+          ? (await Bun.file(join(distPath, 'index.html')).stat()).size
+          : 0;
         totalSize += indexSize;
       }
 
-      this.addResult('Performance Metrics', 'healthy', 
-        `Health check completed in ${totalCheckTime}ms`, {
+      this.addResult(
+        'Performance Metrics',
+        'healthy',
+        `Health check completed in ${totalCheckTime}ms`,
+        {
           checkDuration: totalCheckTime,
-          distSize: totalSize
-        });
-      
+          distSize: totalSize,
+        }
+      );
     } catch (error) {
-      this.addResult('Performance Metrics', 'warning', 
-        `Performance check failed: ${error}`);
+      this.addResult('Performance Metrics', 'warning', `Performance check failed: ${error}`);
     }
   }
 
   /**
    * 📝 Add health check result
    */
-  private addResult(component: string, status: 'healthy' | 'warning' | 'critical', 
-                   message: string, metrics?: Record<string, any>): void {
+  private addResult(
+    component: string,
+    status: 'healthy' | 'warning' | 'critical',
+    message: string,
+    metrics?: Record<string, any>
+  ): void {
     this.results.push({
       component,
       status,
       message,
       timestamp: new Date().toISOString(),
-      metrics
+      metrics,
     });
 
     const emoji = status === 'healthy' ? '✅' : status === 'warning' ? '⚠️' : '❌';
@@ -422,19 +462,22 @@ class DailyHealthChecker {
    * 📊 Generate comprehensive health report
    */
   private generateHealthReport(): HealthReport {
-    const summary = this.results.reduce((acc, result) => {
-      acc[result.status]++;
-      return acc;
-    }, { healthy: 0, warning: 0, critical: 0 });
+    const summary = this.results.reduce(
+      (acc, result) => {
+        acc[result.status]++;
+        return acc;
+      },
+      { healthy: 0, warning: 0, critical: 0 }
+    );
 
-    const overallStatus = summary.critical > 0 ? 'critical' : 
-                         summary.warning > 0 ? 'warning' : 'healthy';
+    const overallStatus =
+      summary.critical > 0 ? 'critical' : summary.warning > 0 ? 'warning' : 'healthy';
 
     return {
       date: new Date().toISOString().split('T')[0],
       overallStatus,
       checks: this.results,
-      summary
+      summary,
     };
   }
 
@@ -443,14 +486,14 @@ class DailyHealthChecker {
    */
   private async saveHealthReport(report: HealthReport): Promise<void> {
     const reportsDir = join(process.cwd(), 'maintenance', 'reports');
-    
+
     try {
       // Create reports directory if it doesn't exist
       await Bun.write(join(reportsDir, '.gitkeep'), '');
-      
+
       const reportPath = join(reportsDir, `health-check-${report.date}.json`);
       await Bun.write(reportPath, JSON.stringify(report, null, 2));
-      
+
       console.log(`\n📊 Health report saved: ${reportPath}`);
     } catch (error) {
       console.error(`❌ Failed to save health report: ${error}`);
@@ -463,13 +506,13 @@ class DailyHealthChecker {
   private async sendAlerts(report: HealthReport): Promise<void> {
     if (report.overallStatus === 'critical') {
       console.log('\n🚨 CRITICAL ISSUES DETECTED - ALERTS SENT');
-      
+
       const criticalIssues = report.checks.filter(check => check.status === 'critical');
       console.log('Critical Issues:');
       criticalIssues.forEach(issue => {
         console.log(`  ❌ ${issue.component}: ${issue.message}`);
       });
-      
+
       // In a real implementation, this would send emails/Slack notifications
       console.log('📧 Alert notifications would be sent to:');
       console.log('  - Alex Rodriguez (alex.rodriguez@technology.fire22)');
@@ -484,15 +527,14 @@ async function main() {
   try {
     const checker = new DailyHealthChecker();
     const report = await checker.runHealthCheck();
-    
+
     console.log('\n📋 Health Check Summary:');
     console.log(`  Overall Status: ${report.overallStatus.toUpperCase()}`);
     console.log(`  ✅ Healthy: ${report.summary.healthy}`);
     console.log(`  ⚠️ Warnings: ${report.summary.warning}`);
     console.log(`  ❌ Critical: ${report.summary.critical}`);
-    
+
     process.exit(report.overallStatus === 'critical' ? 1 : 0);
-    
   } catch (error) {
     console.error('❌ Health check failed:', error);
     process.exit(1);

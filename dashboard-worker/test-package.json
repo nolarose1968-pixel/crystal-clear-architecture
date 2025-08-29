@@ -2,14 +2,7 @@
   "name": "fire22-dashboard-test",
   "version": "2.1.0-beta.3",
   "description": "Comprehensive test package for demonstrating bun pm pkg commands with rich metadata",
-  "keywords": [
-    "dashboard",
-    "fire22",
-    "betting",
-    "sportsbook",
-    "analytics",
-    "monitoring"
-  ],
+  "keywords": ["dashboard", "fire22", "betting", "sportsbook", "analytics", "monitoring"],
   "author": {
     "name": "Fire22 Team",
     "email": "dev@fire22.ag",
@@ -27,10 +20,7 @@
       "role": "Architect"
     }
   ],
-  "maintainers": [
-    "dev@fire22.ag",
-    "support@fire22.ag"
-  ],
+  "maintainers": ["dev@fire22.ag", "support@fire22.ag"],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -50,26 +40,14 @@
     "node": ">=18.0.0",
     "bun": ">=1.0.0"
   },
-  "os": [
-    "darwin",
-    "linux",
-    "win32"
-  ],
-  "cpu": [
-    "x64",
-    "arm64"
-  ],
+  "os": ["darwin", "linux", "win32"],
+  "cpu": ["x64", "arm64"],
   "private": false,
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "files": [
-    "dist/**/*",
-    "src/**/*",
-    "*.md",
-    "LICENSE"
-  ],
+  "files": ["dist/**/*", "src/**/*", "*.md", "LICENSE"],
   "directories": {
     "lib": "src",
     "bin": "bin",
@@ -164,10 +142,7 @@
   "resolutions": {
     "typescript": "^5.3.3"
   },
-  "bundledDependencies": [
-    "drizzle-orm",
-    "zod"
-  ],
+  "bundledDependencies": ["drizzle-orm", "zod"],
   "config": {
     "port": 3000,
     "environment": "development",
@@ -186,35 +161,22 @@
     "monitoring": {
       "enabled": true,
       "interval": 5000,
-      "endpoints": [
-        "/api/health",
-        "/api/health/system",
-        "/api/health/permissions"
-      ]
+      "endpoints": ["/api/health", "/api/health/system", "/api/health/permissions"]
     }
   },
   "bun": {
-    "entrypoints": [
-      "./src/index.ts",
-      "./src/dashboard.ts",
-      "./src/api.ts"
-    ],
+    "entrypoints": ["./src/index.ts", "./src/dashboard.ts", "./src/api.ts"],
     "output": "./dist",
     "target": "bun",
     "minify": false,
     "sourcemap": "external",
-    "external": [
-      "sqlite3",
-      "better-sqlite3"
-    ]
+    "external": ["sqlite3", "better-sqlite3"]
   },
   "wrangler": {
     "name": "fire22-dashboard",
     "main": "src/index.ts",
     "compatibility_date": "2024-01-15",
-    "compatibility_flags": [
-      "nodejs_compat"
-    ],
+    "compatibility_flags": ["nodejs_compat"],
     "env": {
       "staging": {
         "name": "fire22-dashboard-staging"
@@ -227,10 +189,7 @@
   "jest": {
     "preset": "bun",
     "testEnvironment": "node",
-    "collectCoverageFrom": [
-      "src/**/*.ts",
-      "!src/**/*.d.ts"
-    ],
+    "collectCoverageFrom": ["src/**/*.ts", "!src/**/*.d.ts"],
     "coverageThreshold": {
       "global": {
         "branches": 80,
@@ -241,14 +200,9 @@
     }
   },
   "eslintConfig": {
-    "extends": [
-      "@typescript-eslint/recommended",
-      "prettier"
-    ],
+    "extends": ["@typescript-eslint/recommended", "prettier"],
     "parser": "@typescript-eslint/parser",
-    "plugins": [
-      "@typescript-eslint"
-    ],
+    "plugins": ["@typescript-eslint"],
     "rules": {
       "@typescript-eslint/no-unused-vars": "error",
       "@typescript-eslint/explicit-function-return-type": "warn"
@@ -268,21 +222,13 @@
     }
   },
   "lint-staged": {
-    "*.ts": [
-      "eslint --fix",
-      "prettier --write"
-    ]
+    "*.ts": ["eslint --fix", "prettier --write"]
   },
   "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
+    "extends": ["@commitlint/config-conventional"]
   },
   "release": {
-    "branches": [
-      "main",
-      "develop"
-    ],
+    "branches": ["main", "develop"],
     "plugins": [
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
@@ -292,10 +238,7 @@
       "@semantic-release/github"
     ]
   },
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
+  "workspaces": ["packages/*", "apps/*"],
   "packageManager": "bun@1.0.35",
   "volta": {
     "node": "18.19.0",
@@ -305,20 +248,9 @@
     "node": ">=18.0.0",
     "bun": ">=1.0.0"
   },
-  "os": [
-    "darwin",
-    "linux",
-    "win32"
-  ],
-  "cpu": [
-    "x64",
-    "arm64"
-  ],
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ],
+  "os": ["darwin", "linux", "win32"],
+  "cpu": ["x64", "arm64"],
+  "browserslist": ["> 1%", "last 2 versions", "not dead"],
   "sideEffects": false,
   "type": "module",
   "exports": {
@@ -347,10 +279,7 @@
     "fire22-dashboard": "./dist/cli.js",
     "fire22-monitor": "./dist/monitor.js"
   },
-  "man": [
-    "./man/fire22-dashboard.1",
-    "./man/fire22-monitor.1"
-  ],
+  "man": ["./man/fire22-dashboard.1", "./man/fire22-monitor.1"],
   "keywords": [
     "dashboard",
     "fire22",
@@ -365,11 +294,7 @@
     "typescript",
     "bun"
   ],
-  "categories": [
-    "web-frameworks",
-    "monitoring",
-    "analytics"
-  ],
+  "categories": ["web-frameworks", "monitoring", "analytics"],
   "badges": [
     {
       "description": "Build Status",

@@ -2,7 +2,7 @@
 
 /**
  * 🚀 Fire22 User-Agent Enhanced Build System
- * 
+ *
  * Leverages Bun v1.2.18+ features:
  * - Programmatic Bun.build() API with compile support
  * - Custom user-agent configuration
@@ -53,7 +53,7 @@ export class UserAgentBuildSystem {
   private readonly srcDir = join(process.cwd(), 'src');
   private readonly distDir = join(process.cwd(), 'dist');
   private readonly packageJson = require(join(process.cwd(), 'package.json'));
-  
+
   /**
    * Get default cookie configuration based on environment
    */
@@ -65,7 +65,7 @@ export class UserAgentBuildSystem {
           httpOnly: true,
           sameSite: 'strict',
           path: '/',
-          maxAge: 86400 // 1 day in seconds
+          maxAge: 86400, // 1 day in seconds
         };
       case 'staging':
         return {
@@ -73,7 +73,7 @@ export class UserAgentBuildSystem {
           httpOnly: true,
           sameSite: 'lax',
           path: '/',
-          maxAge: 3600 // 1 hour in seconds
+          maxAge: 3600, // 1 hour in seconds
         };
       case 'development':
       case 'demo':
@@ -83,7 +83,7 @@ export class UserAgentBuildSystem {
           httpOnly: false,
           sameSite: 'lax',
           path: '/',
-          maxAge: 7200 // 2 hours in seconds
+          maxAge: 7200, // 2 hours in seconds
         };
     }
   }
@@ -94,45 +94,45 @@ export class UserAgentBuildSystem {
   private createSessionCookies(config: BuildConfig): CookieMap {
     const cookies = new CookieMap();
     const cookieConfig = config.cookieConfig || this.getDefaultCookieConfig(config.environment);
-    
+
     // Add Fire22 session cookie
     cookies.set({
       name: 'fire22_session',
       value: `${config.environment}_${Date.now()}`,
       ...cookieConfig,
-      httpOnly: true // Always httpOnly for session
+      httpOnly: true, // Always httpOnly for session
     });
-    
+
     // Add user agent tracking cookie
     cookies.set({
       name: 'fire22_ua',
       value: config.userAgent || this.getDefaultUserAgent(config.environment),
       ...cookieConfig,
-      httpOnly: false // Allow JS access for debugging
+      httpOnly: false, // Allow JS access for debugging
     });
-    
+
     // Add build info cookie
     cookies.set({
       name: 'fire22_build',
       value: JSON.stringify({
         version: this.packageJson.version,
         env: config.environment,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),
       }),
       ...cookieConfig,
-      httpOnly: false
+      httpOnly: false,
     });
-    
+
     return cookies;
   }
-  
+
   /**
    * Get default user agent based on environment
    */
   private getDefaultUserAgent(env: BuildConfig['environment']): string {
     const version = this.packageJson.version || '3.0.9';
     const baseAgent = `Fire22-Dashboard/${version}`;
-    
+
     switch (env) {
       case 'development':
         return `${baseAgent} (Development; Bun/${Bun.version})`;
@@ -153,28 +153,25 @@ export class UserAgentBuildSystem {
   async buildWithUserAgent(config: BuildConfig): Promise<void> {
     console.log('🎯 Building Fire22 Dashboard with Custom User-Agent & Cookies');
     console.log('='.repeat(60));
-    
+
     const userAgent = config.userAgent || this.getDefaultUserAgent(config.environment);
     console.log(`📱 User-Agent: ${userAgent}`);
     console.log(`🌍 Environment: ${config.environment}`);
-    
+
     // Create and display cookie configuration
     const cookies = this.createSessionCookies(config);
     console.log(`🍪 Cookies configured: ${cookies.size} cookies`);
     for (const [name, value] of cookies) {
       console.log(`   - ${name}: ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}`);
     }
-    
+
     // Ensure dist directory exists
     if (!existsSync(this.distDir)) {
       mkdirSync(this.distDir, { recursive: true });
     }
 
     // Prepare embedded runtime flags
-    const embedFlags: string[] = [
-      `--user-agent="${userAgent}"`,
-      ...(config.embedFlags || [])
-    ];
+    const embedFlags: string[] = [`--user-agent="${userAgent}"`, ...(config.embedFlags || [])];
 
     // Add environment-specific flags
     switch (config.environment) {
@@ -193,10 +190,12 @@ export class UserAgentBuildSystem {
     }
 
     // Prepare compile configuration
-    const compileConfig: any = config.target ? {
-      target: config.target,
-      outfile: join(this.distDir, this.getOutputFileName(config)),
-    } : true;
+    const compileConfig: any = config.target
+      ? {
+          target: config.target,
+          outfile: join(this.distDir, this.getOutputFileName(config)),
+        }
+      : true;
 
     // Add Windows metadata if provided
     if (config.windowsMetadata) {
@@ -206,13 +205,13 @@ export class UserAgentBuildSystem {
         version: config.windowsMetadata.version || this.packageJson.version,
         description: config.windowsMetadata.description || this.packageJson.description,
         copyright: config.windowsMetadata.copyright || '© 2024 Fire22 Development Team',
-        ...(config.windowsMetadata.icon && { icon: config.windowsMetadata.icon })
+        ...(config.windowsMetadata.icon && { icon: config.windowsMetadata.icon }),
       };
     }
 
     try {
       console.log('\n🔨 Building executable...');
-      
+
       // Use programmatic Bun.build() API
       const result = await Bun.build({
         entrypoints: [join(this.srcDir, 'index.ts')],
@@ -228,7 +227,9 @@ export class UserAgentBuildSystem {
           'process.env.VERSION': JSON.stringify(this.packageJson.version),
           'process.env.BUILD_TIME': JSON.stringify(new Date().toISOString()),
           'process.env.DEBUG_MODE': JSON.stringify(config.environment !== 'production'),
-          'process.env.COOKIE_CONFIG': JSON.stringify(config.cookieConfig || this.getDefaultCookieConfig(config.environment)),
+          'process.env.COOKIE_CONFIG': JSON.stringify(
+            config.cookieConfig || this.getDefaultCookieConfig(config.environment)
+          ),
           'process.env.DEFAULT_COOKIES': JSON.stringify(cookies.toJSON()),
         },
         // Enable bytecode compilation for production
@@ -237,7 +238,7 @@ export class UserAgentBuildSystem {
 
       if (result.success) {
         console.log('✅ Build successful!');
-        
+
         // Display build artifacts
         for (const output of result.outputs) {
           const size = (output.size / 1024 / 1024).toFixed(2);
@@ -247,7 +248,6 @@ export class UserAgentBuildSystem {
         console.error('❌ Build failed:', result.logs);
         process.exit(1);
       }
-      
     } catch (error) {
       console.error('❌ Build error:', error);
       process.exit(1);
@@ -260,18 +260,18 @@ export class UserAgentBuildSystem {
   private getOutputFileName(config: BuildConfig): string {
     const base = 'fire22-dashboard';
     const env = config.environment;
-    
+
     // Check for Windows target
     if (config.target?.includes('windows')) {
       return `${base}-${env}.exe`;
     }
-    
+
     // Check for specific platform targets
     if (config.target) {
       const platform = config.target.split('-')[1]; // Extract platform from bun-platform-arch
       return `${base}-${env}-${platform}`;
     }
-    
+
     // Default naming
     return `${base}-${env}`;
   }
@@ -290,12 +290,12 @@ export class UserAgentBuildSystem {
     ];
 
     console.log('🌍 Building for all platforms...\n');
-    
+
     for (const target of targets) {
       console.log(`\n📦 Building for ${target}...`);
       await this.buildWithUserAgent({ ...config, target });
     }
-    
+
     console.log('\n✅ All platform builds completed!');
   }
 
@@ -305,7 +305,7 @@ export class UserAgentBuildSystem {
   async testUserAgent(executable?: string): Promise<void> {
     console.log('\n🧪 Testing User-Agent & Cookie Configuration');
     console.log('='.repeat(60));
-    
+
     // Create test script
     const testScript = `
       import { Cookie, CookieMap } from 'bun';
@@ -358,10 +358,10 @@ export class UserAgentBuildSystem {
         console.log('\\nEmbedded runtime flags:', process.execArgv.join(' '));
       }
     `;
-    
+
     const testFile = join(this.distDir, 'test-user-agent.ts');
     await Bun.write(testFile, testScript);
-    
+
     if (executable && existsSync(executable)) {
       console.log(`\nTesting executable: ${executable}`);
       await $`${executable}`;
@@ -376,10 +376,10 @@ export class UserAgentBuildSystem {
 if (import.meta.main) {
   const args = process.argv.slice(2);
   const builder = new UserAgentBuildSystem();
-  
+
   const environment = (args[0] as BuildConfig['environment']) || 'development';
   const command = args[1] || 'build';
-  
+
   const config: BuildConfig = {
     environment,
     minify: args.includes('--minify'),
@@ -387,44 +387,44 @@ if (import.meta.main) {
     bytecode: args.includes('--bytecode'),
     stripAnsi: args.includes('--strip-ansi'),
   };
-  
+
   // Check for custom user agent
   const userAgentArg = args.find(arg => arg.startsWith('--user-agent='));
   if (userAgentArg) {
     config.userAgent = userAgentArg.split('=')[1];
   }
-  
+
   // Check for target platform
   const targetArg = args.find(arg => arg.startsWith('--target='));
   if (targetArg) {
     config.target = targetArg.split('=')[1];
   }
-  
+
   // Cookie configuration flags
   if (args.includes('--secure-cookies')) {
     config.cookieConfig = {
       secure: true,
       httpOnly: true,
-      sameSite: 'strict'
+      sameSite: 'strict',
     };
   }
-  
+
   const cookieDomainArg = args.find(arg => arg.startsWith('--cookie-domain='));
   if (cookieDomainArg) {
     config.cookieConfig = {
       ...config.cookieConfig,
-      domain: cookieDomainArg.split('=')[1]
+      domain: cookieDomainArg.split('=')[1],
     };
   }
-  
+
   // Windows-specific build
   if (args.includes('--windows')) {
     config.target = 'bun-windows-x64';
     config.windowsMetadata = {
-      icon: existsSync('./assets/icon.ico') ? './assets/icon.ico' : undefined
+      icon: existsSync('./assets/icon.ico') ? './assets/icon.ico' : undefined,
     };
   }
-  
+
   switch (command) {
     case 'all':
       await builder.buildAllPlatforms(config);
@@ -442,6 +442,6 @@ if (import.meta.main) {
       }
       break;
   }
-  
+
   console.log('\n🎉 User-Agent Build System Complete!');
 }

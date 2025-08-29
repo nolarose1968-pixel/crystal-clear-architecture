@@ -2,7 +2,7 @@
 
 /**
  * Queue System Demo
- * 
+ *
  * This script demonstrates the peer-to-peer matching queue system
  */
 
@@ -21,7 +21,7 @@ class QueueDemo {
 
   private setupDatabase() {
     console.log('🔧 Setting up demo database...');
-    
+
     // Create players table
     this.db.run(`
       CREATE TABLE players (
@@ -98,20 +98,29 @@ class QueueDemo {
     `);
 
     // Insert test customers
-    this.db.run(`
+    this.db.run(
+      `
       INSERT INTO players (customer_id, name, balance)
       VALUES (?, ?, ?)
-    `, ['CUSTOMER_001', 'John Doe', 1000.00]);
+    `,
+      ['CUSTOMER_001', 'John Doe', 1000.0]
+    );
 
-    this.db.run(`
+    this.db.run(
+      `
       INSERT INTO players (customer_id, name, balance)
       VALUES (?, ?, ?)
-    `, ['CUSTOMER_002', 'Jane Smith', 500.00]);
+    `,
+      ['CUSTOMER_002', 'Jane Smith', 500.0]
+    );
 
-    this.db.run(`
+    this.db.run(
+      `
       INSERT INTO players (customer_id, name, balance)
       VALUES (?, ?, ?)
-    `, ['CUSTOMER_003', 'Bob Johnson', 750.00]);
+    `,
+      ['CUSTOMER_003', 'Bob Johnson', 750.0]
+    );
 
     console.log('✅ Demo database setup complete\n');
   }
@@ -124,11 +133,11 @@ class QueueDemo {
     const withdrawalId = await this.queueSystem.addToQueue({
       type: 'withdrawal',
       customerId: 'CUSTOMER_001',
-      amount: 200.00,
+      amount: 200.0,
       paymentType: 'venmo',
       paymentDetails: '@johndoe',
       priority: 1,
-      notes: 'Need money for weekend'
+      notes: 'Need money for weekend',
     });
     console.log(`   ✅ Withdrawal added with ID: ${withdrawalId}`);
 
@@ -136,11 +145,11 @@ class QueueDemo {
     console.log('\n📥 Step 2: Adding deposit to queue...');
     const depositId = await this.queueSystem.addDepositToQueue({
       customerId: 'CUSTOMER_002',
-      amount: 250.00,
+      amount: 250.0,
       paymentType: 'venmo',
       paymentDetails: '@janesmith',
       priority: 1,
-      notes: 'Deposit from bank transfer'
+      notes: 'Deposit from bank transfer',
     });
     console.log(`   ✅ Deposit added with ID: ${depositId}`);
 
@@ -157,7 +166,9 @@ class QueueDemo {
     console.log('\n📋 Step 4: Queue items...');
     const allItems = this.queueSystem.getQueueItems();
     allItems.forEach(item => {
-      console.log(`   ${item.type.toUpperCase()}: $${item.amount} (${item.paymentType}) - Status: ${item.status}`);
+      console.log(
+        `   ${item.type.toUpperCase()}: $${item.amount} (${item.paymentType}) - Status: ${item.status}`
+      );
     });
 
     // Step 5: Show matches
@@ -166,7 +177,9 @@ class QueueDemo {
     if (matches.length > 0) {
       matches.forEach(match => {
         console.log(`   ✅ Match: Withdrawal ${match.withdrawalId} ↔ Deposit ${match.depositId}`);
-        console.log(`      Amount: $${match.amount}, Score: ${match.matchScore}, Status: ${match.status}`);
+        console.log(
+          `      Amount: $${match.amount}, Score: ${match.matchScore}, Status: ${match.status}`
+        );
       });
     } else {
       console.log('   ⏳ No matches found yet');
@@ -177,11 +190,11 @@ class QueueDemo {
     const paypalWithdrawalId = await this.queueSystem.addToQueue({
       type: 'withdrawal',
       customerId: 'CUSTOMER_003',
-      amount: 150.00,
+      amount: 150.0,
       paymentType: 'paypal',
       paymentDetails: 'bob@example.com',
       priority: 1,
-      notes: 'PayPal withdrawal'
+      notes: 'PayPal withdrawal',
     });
     console.log(`   ✅ PayPal withdrawal added with ID: ${paypalWithdrawalId}`);
 
@@ -189,11 +202,11 @@ class QueueDemo {
     console.log('\n📥 Step 7: Adding PayPal deposit...');
     const paypalDepositId = await this.queueSystem.addDepositToQueue({
       customerId: 'CUSTOMER_001',
-      amount: 180.00,
+      amount: 180.0,
       paymentType: 'paypal',
       paymentDetails: 'john@example.com',
       priority: 1,
-      notes: 'PayPal deposit'
+      notes: 'PayPal deposit',
     });
     console.log(`   ✅ PayPal deposit added with ID: ${paypalDepositId}`);
 
@@ -212,7 +225,9 @@ class QueueDemo {
     if (allMatches.length > 0) {
       allMatches.forEach(match => {
         console.log(`   ✅ Match: Withdrawal ${match.withdrawalId} ↔ Deposit ${match.depositId}`);
-        console.log(`      Amount: $${match.amount}, Score: ${match.matchScore}, Status: ${match.status}`);
+        console.log(
+          `      Amount: $${match.amount}, Score: ${match.matchScore}, Status: ${match.status}`
+        );
       });
     } else {
       console.log('   ⏳ No matches found');
@@ -220,7 +235,9 @@ class QueueDemo {
 
     // Step 10: Show matching opportunities
     console.log('\n🎯 Step 10: Matching opportunities...');
-    const opportunities = this.db.prepare(`
+    const opportunities = this.db
+      .prepare(
+        `
       SELECT 
         w.id as withdrawal_id,
         w.customer_id as withdrawal_customer,
@@ -253,13 +270,19 @@ class QueueDemo {
         AND w.amount <= d.amount
         AND w.payment_type = d.payment_type
       ORDER BY match_score DESC, w.created_at ASC
-    `).all();
+    `
+      )
+      .all();
 
     if (opportunities.length > 0) {
       console.log(`   🎯 Found ${opportunities.length} matching opportunities:`);
       opportunities.forEach((opp, index) => {
-        console.log(`      ${index + 1}. Withdrawal $${opp.withdrawal_amount} (${opp.withdrawal_payment_type}) ↔ Deposit $${opp.deposit_amount} (${opp.deposit_payment_type})`);
-        console.log(`         Score: ${opp.match_score}, Customer: ${opp.withdrawal_customer} ↔ ${opp.deposit_customer}`);
+        console.log(
+          `      ${index + 1}. Withdrawal $${opp.withdrawal_amount} (${opp.withdrawal_payment_type}) ↔ Deposit $${opp.deposit_amount} (${opp.deposit_payment_type})`
+        );
+        console.log(
+          `         Score: ${opp.match_score}, Customer: ${opp.withdrawal_customer} ↔ ${opp.deposit_customer}`
+        );
       });
     } else {
       console.log('   ⏳ No matching opportunities found');
@@ -282,7 +305,7 @@ class QueueDemo {
 // Run demo
 async function main() {
   const demo = new QueueDemo();
-  
+
   try {
     await demo.runDemo();
   } catch (error) {

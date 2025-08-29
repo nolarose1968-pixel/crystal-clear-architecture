@@ -51,7 +51,23 @@ export interface TelegramMessage {
 }
 
 export interface MessageEntity {
-  type: 'mention' | 'hashtag' | 'cashtag' | 'bot_command' | 'url' | 'email' | 'phone_number' | 'bold' | 'italic' | 'underline' | 'strikethrough' | 'spoiler' | 'code' | 'pre' | 'text_link' | 'text_mention';
+  type:
+    | 'mention'
+    | 'hashtag'
+    | 'cashtag'
+    | 'bot_command'
+    | 'url'
+    | 'email'
+    | 'phone_number'
+    | 'bold'
+    | 'italic'
+    | 'underline'
+    | 'strikethrough'
+    | 'spoiler'
+    | 'code'
+    | 'pre'
+    | 'text_link'
+    | 'text_mention';
   offset: number;
   length: number;
   url?: string;
@@ -112,7 +128,16 @@ export interface CommandResult {
 }
 
 export interface CommandAction {
-  type: 'reply' | 'edit' | 'delete' | 'forward' | 'send_photo' | 'send_document' | 'ban_user' | 'kick_user' | 'restrict_user';
+  type:
+    | 'reply'
+    | 'edit'
+    | 'delete'
+    | 'forward'
+    | 'send_photo'
+    | 'send_document'
+    | 'ban_user'
+    | 'kick_user'
+    | 'restrict_user';
   content?: string;
   targetChatId?: number;
   targetMessageId?: number;

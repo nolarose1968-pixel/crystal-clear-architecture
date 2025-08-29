@@ -11,7 +11,7 @@ export {
   EntityFactory,
   type ValidationRule,
   type ValidationResult,
-  type ValidationError
+  type ValidationError,
 } from './base';
 
 // Domain entity classes
@@ -74,7 +74,7 @@ export const EntityFactories = {
   customer: new CustomerFactory(),
   agent: new AgentFactory(),
   transaction: new TransactionFactory(),
-  wager: new WagerFactory()
+  wager: new WagerFactory(),
 } as const;
 
 export type EntityFactoryType = keyof typeof EntityFactories;
@@ -85,7 +85,7 @@ export type EntityFactoryType = keyof typeof EntityFactories;
 export function createEntity<T extends EntityFactoryType>(
   entityType: T,
   data: any
-): ReturnType<typeof EntityFactories[T]['create']> {
+): ReturnType<(typeof EntityFactories)[T]['create']> {
   const factory = EntityFactories[entityType];
   return factory.create(data);
 }
@@ -96,7 +96,7 @@ export function createEntity<T extends EntityFactoryType>(
 export function createEntities<T extends EntityFactoryType>(
   entityType: T,
   dataArray: any[]
-): ReturnType<typeof EntityFactories[T]['create']>[] {
+): ReturnType<(typeof EntityFactories)[T]['create']>[] {
   const factory = EntityFactories[entityType];
   return factory.createMany(dataArray);
 }
@@ -107,7 +107,7 @@ export function createEntities<T extends EntityFactoryType>(
 export function createEntityCollection<T extends EntityFactoryType>(
   entityType: T,
   dataArray: any[]
-): ReturnType<typeof EntityFactories[T]['createCollection']> {
+): ReturnType<(typeof EntityFactories)[T]['createCollection']> {
   const factory = EntityFactories[entityType];
   return factory.createCollection(dataArray);
 }
@@ -119,26 +119,26 @@ export default {
   AuditableEntityClass,
   EntityCollection,
   EntityFactory,
-  
+
   // Domain entities
   CustomerEntity,
   AgentEntity,
   TransactionEntity,
   WagerEntity,
-  
+
   // Factories
   CustomerFactory,
   AgentFactory,
   TransactionFactory,
   WagerFactory,
   EntityFactories,
-  
+
   // Utility functions
   createEntity,
   createEntities,
   createEntityCollection,
-  
+
   // Services
   CustomerProfileService,
-  AgentHierarchyService
+  AgentHierarchyService,
 };

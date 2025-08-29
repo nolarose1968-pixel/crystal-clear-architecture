@@ -1,21 +1,21 @@
 /// <reference types="jest" />
-import { 
-  EnhancedError, 
-  createEnhancedError, 
-  formatErrorResponse, 
-  handleApiError, 
+import {
+  EnhancedError,
+  createEnhancedError,
+  formatErrorResponse,
+  handleApiError,
   withErrorHandling,
   validateRequiredFields,
   validateDataTypes,
   ErrorCodes,
-  HttpStatusCodes
+  HttpStatusCodes,
 } from '../../src/error/enhanced-error-handler';
 
 describe('Enhanced Error Handler', () => {
   describe('EnhancedError', () => {
     it('should create an EnhancedError with correct properties', () => {
       const error = new EnhancedError('TEST_ERROR', 'Test error message', { detail: 'test' }, 400);
-      
+
       expect(error).toBeInstanceOf(Error);
       expect(error.code).toBe('TEST_ERROR');
       expect(error.message).toBe('Test error message');
@@ -28,13 +28,13 @@ describe('Enhanced Error Handler', () => {
 
     it('should use default HTTP status when not provided', () => {
       const error = new EnhancedError('TEST_ERROR', 'Test error message');
-      
+
       expect(error.httpStatus).toBe(500);
     });
 
     it('should have proper prototype chain', () => {
       const error = new EnhancedError('TEST_ERROR', 'Test error message');
-      
+
       expect(error).toBeInstanceOf(EnhancedError);
       expect(error).toBeInstanceOf(Error);
     });
@@ -42,8 +42,13 @@ describe('Enhanced Error Handler', () => {
 
   describe('createEnhancedError', () => {
     it('should create an EnhancedError with correct properties', () => {
-      const error = createEnhancedError('TEST_ERROR', 'Test error message', { detail: 'test' }, 400);
-      
+      const error = createEnhancedError(
+        'TEST_ERROR',
+        'Test error message',
+        { detail: 'test' },
+        400
+      );
+
       expect(error).toBeInstanceOf(EnhancedError);
       expect(error.code).toBe('TEST_ERROR');
       expect(error.message).toBe('Test error message');
@@ -53,14 +58,14 @@ describe('Enhanced Error Handler', () => {
 
     it('should use default HTTP status when not provided', () => {
       const error = createEnhancedError('TEST_ERROR', 'Test error message');
-      
+
       expect(error.httpStatus).toBe(500);
     });
 
     it('should generate unique request IDs', () => {
       const error1 = createEnhancedError('TEST_ERROR', 'Test error message');
       const error2 = createEnhancedError('TEST_ERROR', 'Test error message');
-      
+
       expect(error1.requestId).toBeDefined();
       expect(error2.requestId).toBeDefined();
       expect(error1.requestId).not.toBe(error2.requestId);
@@ -69,9 +74,14 @@ describe('Enhanced Error Handler', () => {
 
   describe('formatErrorResponse', () => {
     it('should format EnhancedError into ErrorResponse', () => {
-      const error = createEnhancedError('TEST_ERROR', 'Test error message', { detail: 'test' }, 400);
+      const error = createEnhancedError(
+        'TEST_ERROR',
+        'Test error message',
+        { detail: 'test' },
+        400
+      );
       const formatted = formatErrorResponse(error);
-      
+
       expect(formatted.success).toBe(false);
       expect(formatted.error.code).toBe('TEST_ERROR');
       expect(formatted.error.message).toBe('Test error message');
@@ -83,22 +93,27 @@ describe('Enhanced Error Handler', () => {
     it('should handle error without details', () => {
       const error = createEnhancedError('TEST_ERROR', 'Test error message');
       const formatted = formatErrorResponse(error);
-      
+
       expect(formatted.error.details).toBeUndefined();
     });
   });
 
   describe('handleApiError', () => {
     it('should handle EnhancedError correctly', () => {
-      const error = createEnhancedError('TEST_ERROR', 'Test error message', { detail: 'test' }, 400);
+      const error = createEnhancedError(
+        'TEST_ERROR',
+        'Test error message',
+        { detail: 'test' },
+        400
+      );
       const response = handleApiError(error);
-      
+
       expect(response.status).toBe(400);
       expect(response.headers.get('Content-Type')).toBe('application/json');
       expect(response.headers.get('X-Error-Code')).toBe('TEST_ERROR');
       expect(response.headers.get('X-Request-ID')).toBe(error.requestId);
       expect(response.headers.get('X-Timestamp')).toBe(error.timestamp);
-      
+
       const responseBody = await response.json();
       expect(responseBody.success).toBe(false);
       expect(responseBody.error.code).toBe('TEST_ERROR');
@@ -108,11 +123,11 @@ describe('Enhanced Error Handler', () => {
     it('should handle unknown errors', () => {
       const unknownError = new Error('Unknown error');
       const response = handleApiError(unknownError);
-      
+
       expect(response.status).toBe(500);
       expect(response.headers.get('Content-Type')).toBe('application/json');
       expect(response.headers.get('X-Error-Code')).toBe('INTERNAL_ERROR');
-      
+
       const responseBody = await response.json();
       expect(responseBody.success).toBe(false);
       expect(responseBody.error.code).toBe('INTERNAL_ERROR');
@@ -121,9 +136,9 @@ describe('Enhanced Error Handler', () => {
 
     it('should handle string errors', () => {
       const response = handleApiError('String error');
-      
+
       expect(response.status).toBe(500);
-      
+
       const responseBody = await response.json();
       expect(responseBody.error.details).toEqual({ originalError: 'String error' });
     });
@@ -133,7 +148,7 @@ describe('Enhanced Error Handler', () => {
     it('should wrap function and handle errors', async () => {
       const mockFn = jest.fn().mockRejectedValue(new Error('Test error'));
       const wrappedFn = withErrorHandling(mockFn, 'test context');
-      
+
       await expect(wrappedFn()).rejects.toThrow('Error in test context: Test error');
     });
 
@@ -141,7 +156,7 @@ describe('Enhanced Error Handler', () => {
       const originalError = createEnhancedError('TEST_ERROR', 'Test error message');
       const mockFn = jest.fn().mockRejectedValue(originalError);
       const wrappedFn = withErrorHandling(mockFn, 'test context');
-      
+
       await expect(wrappedFn()).rejects.toBe(originalError);
     });
 
@@ -150,7 +165,7 @@ describe('Enhanced Error Handler', () => {
       originalError.stack = 'Error stack trace';
       const mockFn = jest.fn().mockRejectedValue(originalError);
       const wrappedFn = withErrorHandling(mockFn, 'test context');
-      
+
       try {
         await wrappedFn();
       } catch (error) {
@@ -165,36 +180,41 @@ describe('Enhanced Error Handler', () => {
     it('should pass validation when all required fields are present', () => {
       const data = { name: 'John', age: 30, email: 'john@example.com' };
       const requiredFields = ['name', 'age', 'email'];
-      
+
       expect(() => validateRequiredFields(data, requiredFields)).not.toThrow();
     });
 
     it('should throw error when required fields are missing', () => {
       const data = { name: 'John', age: 30 };
       const requiredFields = ['name', 'age', 'email'];
-      
-      expect(() => validateRequiredFields(data, requiredFields)).toThrow('Missing required fields: email');
+
+      expect(() => validateRequiredFields(data, requiredFields)).toThrow(
+        'Missing required fields: email'
+      );
     });
 
     it('should throw error when required fields are null or empty', () => {
       const data = { name: 'John', age: null, email: '' };
       const requiredFields = ['name', 'age', 'email'];
-      
-      expect(() => validateRequiredFields(data, requiredFields)).toThrow('Missing required fields: age, email');
+
+      expect(() => validateRequiredFields(data, requiredFields)).toThrow(
+        'Missing required fields: age, email'
+      );
     });
 
     it('should include context in error message', () => {
       const data = { name: 'John' };
       const requiredFields = ['name', 'age'];
-      
-      expect(() => validateRequiredFields(data, requiredFields, 'User Registration'))
-        .toThrow('Missing required fields: age');
+
+      expect(() => validateRequiredFields(data, requiredFields, 'User Registration')).toThrow(
+        'Missing required fields: age'
+      );
     });
 
     it('should include missing and provided fields in error details', () => {
       const data = { name: 'John' };
       const requiredFields = ['name', 'age', 'email'];
-      
+
       try {
         validateRequiredFields(data, requiredFields);
       } catch (error) {
@@ -210,28 +230,34 @@ describe('Enhanced Error Handler', () => {
     it('should pass validation when all types match', () => {
       const data = { name: 'John', age: 30, active: true };
       const schema = { name: 'string', age: 'number', active: 'boolean' };
-      
+
       expect(() => validateDataTypes(data, schema)).not.toThrow();
     });
 
     it('should throw error when types do not match', () => {
       const data = { name: 'John', age: '30', active: true };
       const schema = { name: 'string', age: 'number', active: 'boolean' };
-      
+
       expect(() => validateDataTypes(data, schema)).toThrow('Type validation failed');
     });
 
     it('should include all type errors in error details', () => {
       const data = { name: 123, age: '30', active: 'yes' };
       const schema = { name: 'string', age: 'number', active: 'boolean' };
-      
+
       try {
         validateDataTypes(data, schema);
       } catch (error) {
         if (error instanceof EnhancedError) {
-          expect((error as any).errors).toContain("Field 'name' expected type 'string' but got 'number'");
-          expect((error as any).errors).toContain("Field 'age' expected type 'number' but got 'string'");
-          expect((error as any).errors).toContain("Field 'active' expected type 'boolean' but got 'string'");
+          expect((error as any).errors).toContain(
+            "Field 'name' expected type 'string' but got 'number'"
+          );
+          expect((error as any).errors).toContain(
+            "Field 'age' expected type 'number' but got 'string'"
+          );
+          expect((error as any).errors).toContain(
+            "Field 'active' expected type 'boolean' but got 'string'"
+          );
         }
       }
     });
@@ -239,16 +265,17 @@ describe('Enhanced Error Handler', () => {
     it('should skip validation for null or undefined values', () => {
       const data = { name: 'John', age: null, active: undefined };
       const schema = { name: 'string', age: 'number', active: 'boolean' };
-      
+
       expect(() => validateDataTypes(data, schema)).not.toThrow();
     });
 
     it('should include context in error message', () => {
       const data = { name: 123 };
       const schema = { name: 'string' };
-      
-      expect(() => validateDataTypes(data, schema, 'User Profile'))
-        .toThrow('Type validation failed in User Profile');
+
+      expect(() => validateDataTypes(data, schema, 'User Profile')).toThrow(
+        'Type validation failed in User Profile'
+      );
     });
   });
 
@@ -310,21 +337,21 @@ describe('Enhanced Error Handler', () => {
     it('should work together in a real scenario', async () => {
       // Simulate a request validation scenario
       const requestData = { username: '', password: '123' };
-      
+
       try {
         // Validate required fields
         validateRequiredFields(requestData, ['username', 'password'], 'Login Request');
-        
+
         // This should not reach here
         expect(true).toBe(false);
       } catch (error) {
         if (error instanceof EnhancedError) {
           // Format the error for API response
           const errorResponse = formatErrorResponse(error);
-          
+
           // Handle the API error
           const apiResponse = handleApiError(error);
-          
+
           expect(apiResponse.status).toBe(400);
           expect(errorResponse.success).toBe(false);
           expect(errorResponse.error.code).toBe('VALIDATION_ERROR');
@@ -338,9 +365,9 @@ describe('Enhanced Error Handler', () => {
         validateRequiredFields({ id: 1 }, ['id'], 'Database Operation');
         return { success: true };
       };
-      
+
       const wrappedOperation = withErrorHandling(asyncOperation, 'Database Service');
-      
+
       const result = await wrappedOperation();
       expect(result).toEqual({ success: true });
     });

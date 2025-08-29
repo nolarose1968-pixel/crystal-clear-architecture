@@ -9,7 +9,7 @@ export {
   updateCustomer,
   getCustomerActivity,
   getCustomerPreferences,
-  updateCustomerPreferences
+  updateCustomerPreferences,
 } from './customer-operations.controller';
 
 // Financial Operations
@@ -18,7 +18,7 @@ export {
   processTransfer,
   getTransactionHistory,
   getPaymentMethods,
-  updatePaymentMethod
+  updatePaymentMethod,
 } from './financial-operations.controller';
 
 // Re-export from original file (temporarily during migration)
@@ -29,7 +29,7 @@ export {
   telegramOperations,
   validationEndpoint,
   utilityFunctions,
-  maintenanceOperations
+  maintenanceOperations,
 } from '../other.controller';
 
 // Future modules to be created:

@@ -23,7 +23,7 @@ describe('Admin Controller Integration Tests', () => {
             resolve();
           },
           stderr: 'inherit',
-          stdout: 'inherit'
+          stdout: 'inherit',
         });
       });
       console.log(`Cleaned up any existing process on port ${PORT}`);

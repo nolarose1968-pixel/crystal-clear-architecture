@@ -14,7 +14,7 @@ async function main() {
   try {
     // Step 1: Check prerequisites
     console.log('1️⃣  Checking prerequisites...');
-    
+
     // Check if Bun is installed
     try {
       const bunVersion = execSync('bun --version', { encoding: 'utf8' }).trim();
@@ -24,15 +24,17 @@ async function main() {
       console.log('      curl -fsSL https://bun.sh/install | bash');
       process.exit(1);
     }
-    
+
     // Check if we're in the right directory
     if (!existsSync('package.json')) {
-      console.log('   ❌ Not in project root. Please run this from the dashboard-worker directory.');
+      console.log(
+        '   ❌ Not in project root. Please run this from the dashboard-worker directory.'
+      );
       process.exit(1);
     }
-    
+
     console.log('   ✅ Project structure looks good\n');
-    
+
     // Step 2: Install dependencies
     console.log('2️⃣  Installing dependencies...');
     try {
@@ -42,10 +44,10 @@ async function main() {
       console.log('   ❌ Failed to install dependencies');
       process.exit(1);
     }
-    
+
     // Step 3: Environment setup
     console.log('3️⃣  Setting up environment...');
-    
+
     if (!existsSync('.env') && existsSync('.env.example')) {
       copyFileSync('.env.example', '.env');
       console.log('   ✅ Created .env from .env.example');
@@ -94,7 +96,7 @@ BUN_CONFIG_MAX_HTTP_REQUESTS=256
       writeFileSync('.env', basicEnv);
       console.log('   ✅ Created basic .env file');
     }
-    
+
     // Step 4: Validate environment
     console.log('\n4️⃣  Validating environment...');
     try {
@@ -103,7 +105,7 @@ BUN_CONFIG_MAX_HTTP_REQUESTS=256
     } catch {
       console.log('   ⚠️  Environment validation failed. Please check your .env file\n');
     }
-    
+
     // Step 5: Run health check
     console.log('5️⃣  Running health check...');
     try {
@@ -112,7 +114,7 @@ BUN_CONFIG_MAX_HTTP_REQUESTS=256
     } catch {
       console.log('   ⚠️  Health check failed\n');
     }
-    
+
     // Step 6: Show next steps
     console.log('🎉 Quick start completed!\n');
     console.log('📋 Next steps:');
@@ -122,7 +124,6 @@ BUN_CONFIG_MAX_HTTP_REQUESTS=256
     console.log('4. Run: bun run env:integration (full test)');
     console.log('5. Run: bun run env:docs (open documentation)');
     console.log('\n🚀 Ready to develop!');
-    
   } catch (error) {
     console.error('❌ Quick start failed:', error);
     process.exit(1);

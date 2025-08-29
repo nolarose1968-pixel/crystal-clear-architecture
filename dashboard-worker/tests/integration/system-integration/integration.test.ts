@@ -21,10 +21,10 @@ const mockEnv = {
       bind: (...args: any[]) => ({
         first: async () => ({ balance: 1000, credit_limit: 5000 }),
         all: async () => ({ results: [] }),
-        run: async () => ({ meta: { last_row_id: 1 } })
-      })
-    })
-  }
+        run: async () => ({ meta: { last_row_id: 1 } }),
+      }),
+    }),
+  },
 } as any;
 
 class IntegrationTestSuite {
@@ -60,7 +60,6 @@ class IntegrationTestSuite {
 
       console.log('\n✅ All integration tests passed!');
       console.log('🎉 Fire22 system is fully integrated and functional');
-
     } catch (error) {
       console.error('\n❌ Integration tests failed:', error);
       process.exit(1);
@@ -72,25 +71,24 @@ class IntegrationTestSuite {
    */
   private async testSystemControllerInit(): Promise<void> {
     console.log('\n📋 Test 1: System Controller Initialization');
-    
+
     try {
       this.systemController = await createSystemController(mockEnv, {
         enableTelegram: true,
         enableRealTimeUpdates: true,
         enableNotifications: true,
         adminUsers: ['test_admin'],
-        environment: 'development'
+        environment: 'development',
       });
 
       const status = this.systemController.getSystemStatus();
-      
+
       console.log('   ✅ System controller initialized');
       console.log('   📊 Status:', JSON.stringify(status, null, 2));
-      
+
       if (status.dashboard !== 'online') {
         throw new Error('Dashboard not online');
       }
-
     } catch (error) {
       console.error('   ❌ System controller test failed:', error);
       throw error;
@@ -102,7 +100,7 @@ class IntegrationTestSuite {
    */
   private async testUnifiedAPIHandler(): Promise<void> {
     console.log('\n📋 Test 2: Unified API Handler');
-    
+
     try {
       this.apiHandler = createUnifiedAPIHandler(mockEnv);
 
@@ -111,7 +109,7 @@ class IntegrationTestSuite {
         method: 'POST',
         path: '/api/auth/login',
         body: { username: 'admin', password: 'Fire22Admin2025!' },
-        systemController: this.systemController
+        systemController: this.systemController,
       });
 
       console.log('   ✅ Login API test passed');
@@ -126,12 +124,11 @@ class IntegrationTestSuite {
         method: 'GET',
         path: '/api/user/balance',
         user: { id: 'admin', username: 'admin', isAdmin: true },
-        systemController: this.systemController
+        systemController: this.systemController,
       });
 
       console.log('   ✅ Balance API test passed');
       console.log('   📊 Response:', JSON.stringify(balanceResponse, null, 2));
-
     } catch (error) {
       console.error('   ❌ API handler test failed:', error);
       throw error;
@@ -143,7 +140,7 @@ class IntegrationTestSuite {
    */
   private async testRealTimeUpdates(): Promise<void> {
     console.log('\n📋 Test 3: Real-time Updates');
-    
+
     try {
       this.updateManager = createDashboardUpdateManager(mockEnv, this.systemController);
 
@@ -153,7 +150,7 @@ class IntegrationTestSuite {
         amount: 100,
         selection: 'Team A to win',
         odds: 2.5,
-        source: 'test'
+        source: 'test',
       });
 
       console.log('   ✅ Event broadcasting test passed');
@@ -165,7 +162,6 @@ class IntegrationTestSuite {
       // Test manual update
       this.updateManager.triggerTestUpdate();
       console.log('   ✅ Manual update test passed');
-
     } catch (error) {
       console.error('   ❌ Real-time updates test failed:', error);
       throw error;
@@ -177,21 +173,19 @@ class IntegrationTestSuite {
    */
   private async testTelegramBotIntegration(): Promise<void> {
     console.log('\n📋 Test 4: Telegram Bot Integration');
-    
+
     try {
       const telegramBot = this.systemController.getTelegramBot();
-      
+
       if (telegramBot) {
         console.log('   ✅ Telegram bot is available');
-        
+
         // Test bot status
         const botStatus = telegramBot.getStatus();
         console.log('   📊 Bot status:', JSON.stringify(botStatus, null, 2));
-        
       } else {
         console.log('   ⚠️ Telegram bot not initialized (BOT_TOKEN not provided)');
       }
-
     } catch (error) {
       console.error('   ❌ Telegram bot test failed:', error);
       throw error;
@@ -203,13 +197,13 @@ class IntegrationTestSuite {
    */
   private async testDashboardIntegration(): Promise<void> {
     console.log('\n📋 Test 5: Dashboard Integration');
-    
+
     try {
       // Test system status endpoint
       const statusResponse = await this.apiHandler.handleRequest({
         method: 'GET',
         path: '/api/system/status',
-        systemController: this.systemController
+        systemController: this.systemController,
       });
 
       console.log('   ✅ System status API test passed');
@@ -221,12 +215,11 @@ class IntegrationTestSuite {
         path: '/api/notifications/send',
         body: { message: 'Test notification', target: 'all' },
         user: { id: 'admin', username: 'admin', isAdmin: true },
-        systemController: this.systemController
+        systemController: this.systemController,
       });
 
       console.log('   ✅ Notification API test passed');
       console.log('   📊 Response:', JSON.stringify(notificationResponse, null, 2));
-
     } catch (error) {
       console.error('   ❌ Dashboard integration test failed:', error);
       throw error;
@@ -238,7 +231,7 @@ class IntegrationTestSuite {
    */
   private async testEndToEndWorkflow(): Promise<void> {
     console.log('\n📋 Test 6: End-to-End Workflow');
-    
+
     try {
       // Simulate user login
       console.log('   🔄 Simulating user login...');
@@ -246,7 +239,7 @@ class IntegrationTestSuite {
         username: 'test_user',
         isAdmin: false,
         telegramId: 123456789,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       // Simulate wager placement
@@ -257,10 +250,10 @@ class IntegrationTestSuite {
         body: {
           selection: 'Team A to win',
           stake: 50,
-          odds: 2.0
+          odds: 2.0,
         },
         user: { id: 'test_user', username: 'test_user', telegramId: 123456789, isAdmin: false },
-        systemController: this.systemController
+        systemController: this.systemController,
       });
 
       console.log('   ✅ Wager placement test passed');
@@ -274,11 +267,10 @@ class IntegrationTestSuite {
         oldBalance: 1000,
         newBalance: 950,
         change: -50,
-        source: 'wager'
+        source: 'wager',
       });
 
       console.log('   ✅ End-to-end workflow test passed');
-
     } catch (error) {
       console.error('   ❌ End-to-end workflow test failed:', error);
       throw error;
@@ -309,7 +301,7 @@ class IntegrationTestSuite {
 // CLI Interface
 async function main() {
   const testSuite = new IntegrationTestSuite();
-  
+
   try {
     await testSuite.runTests();
     testSuite.displayIntegrationSummary();

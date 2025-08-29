@@ -4,7 +4,7 @@
  * Enhanced error handling with exponential backoff and health monitoring
  */
 
-import { logger } from "../../scripts/enhanced-logging-system";
+import { logger } from '../../scripts/enhanced-logging-system';
 
 export interface CircuitBreakerConfig {
   failureThreshold: number;
@@ -53,7 +53,7 @@ export class CircuitBreaker {
       monitoringWindow: config.monitoringWindow || 60000, // 1 minute
       expectedErrors: config.expectedErrors || [],
       healthCheckInterval: config.healthCheckInterval || 5000, // 5 seconds
-      maxConcurrentRequests: config.maxConcurrentRequests || 100
+      maxConcurrentRequests: config.maxConcurrentRequests || 100,
     };
 
     this.state = {
@@ -63,35 +63,36 @@ export class CircuitBreaker {
       lastFailureTime: 0,
       nextAttempt: 0,
       totalRequests: 0,
-      windowStart: Date.now()
+      windowStart: Date.now(),
     };
 
     this.startHealthMonitoring();
-    logger.info("CIRCUIT_BREAKER", "1.0.0", `Circuit breaker '${name}' initialized`);
+    logger.info('CIRCUIT_BREAKER', '1.0.0', `Circuit breaker '${name}' initialized`);
   }
 
   /**
    * Execute a function with circuit breaker protection
    */
-  async execute<T>(
-    operation: () => Promise<T>,
-    fallback?: () => Promise<T>
-  ): Promise<T> {
+  async execute<T>(operation: () => Promise<T>, fallback?: () => Promise<T>): Promise<T> {
     // Check concurrent request limits
     if (this.concurrentRequests >= this.config.maxConcurrentRequests) {
-      const error = new Error(`Circuit breaker '${this.name}': Max concurrent requests exceeded (${this.config.maxConcurrentRequests})`);
-      logger.warning("CIRCUIT_BREAKER", "1.0.0", error.message, "CB001");
+      const error = new Error(
+        `Circuit breaker '${this.name}': Max concurrent requests exceeded (${this.config.maxConcurrentRequests})`
+      );
+      logger.warning('CIRCUIT_BREAKER', '1.0.0', error.message, 'CB001');
       throw error;
     }
 
     // Check if circuit is open
     if (this.state.state === 'OPEN') {
       if (Date.now() < this.state.nextAttempt) {
-        const error = new Error(`Circuit breaker '${this.name}' is OPEN. Next attempt in ${Math.ceil((this.state.nextAttempt - Date.now()) / 1000)}s`);
-        logger.warning("CIRCUIT_BREAKER", "1.0.0", error.message, "CB002");
-        
+        const error = new Error(
+          `Circuit breaker '${this.name}' is OPEN. Next attempt in ${Math.ceil((this.state.nextAttempt - Date.now()) / 1000)}s`
+        );
+        logger.warning('CIRCUIT_BREAKER', '1.0.0', error.message, 'CB002');
+
         if (fallback) {
-          logger.info("CIRCUIT_BREAKER", "1.0.0", `Using fallback for '${this.name}'`);
+          logger.info('CIRCUIT_BREAKER', '1.0.0', `Using fallback for '${this.name}'`);
           return await fallback();
         }
         throw error;
@@ -99,7 +100,11 @@ export class CircuitBreaker {
         // Transition to HALF_OPEN
         this.state.state = 'HALF_OPEN';
         this.notifyStateChange();
-        logger.info("CIRCUIT_BREAKER", "1.0.0", `Circuit breaker '${this.name}' transitioned to HALF_OPEN`);
+        logger.info(
+          'CIRCUIT_BREAKER',
+          '1.0.0',
+          `Circuit breaker '${this.name}' transitioned to HALF_OPEN`
+        );
       }
     }
 
@@ -113,12 +118,12 @@ export class CircuitBreaker {
       return result;
     } catch (error) {
       await this.onFailure(error as Error, Date.now() - startTime);
-      
+
       if (fallback && this.state.state === 'OPEN') {
-        logger.info("CIRCUIT_BREAKER", "1.0.0", `Using fallback for '${this.name}' after failure`);
+        logger.info('CIRCUIT_BREAKER', '1.0.0', `Using fallback for '${this.name}' after failure`);
         return await fallback();
       }
-      
+
       throw error;
     } finally {
       this.concurrentRequests--;
@@ -136,7 +141,7 @@ export class CircuitBreaker {
       operation(),
       new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error(`Operation timed out after ${timeout}ms`)), timeout)
-      )
+      ),
     ]);
   }
 
@@ -153,7 +158,7 @@ export class CircuitBreaker {
       this.state.failureCount = 0;
       this.state.successCount = 0;
       this.notifyStateChange();
-      logger.success("CIRCUIT_BREAKER", "1.0.0", `Circuit breaker '${this.name}' reset to CLOSED`);
+      logger.success('CIRCUIT_BREAKER', '1.0.0', `Circuit breaker '${this.name}' reset to CLOSED`);
     } else {
       this.state.successCount++;
     }
@@ -171,24 +176,33 @@ export class CircuitBreaker {
     this.state.lastFailureTime = Date.now();
 
     // Check if error is expected and should not trigger circuit breaker
-    const isExpectedError = this.config.expectedErrors.some(expectedError =>
-      error.message.includes(expectedError) || error.name.includes(expectedError)
+    const isExpectedError = this.config.expectedErrors.some(
+      expectedError => error.message.includes(expectedError) || error.name.includes(expectedError)
     );
 
     if (isExpectedError) {
-      logger.info("CIRCUIT_BREAKER", "1.0.0", `Expected error in '${this.name}': ${error.message}`);
+      logger.info('CIRCUIT_BREAKER', '1.0.0', `Expected error in '${this.name}': ${error.message}`);
       return;
     }
 
-    logger.error("CIRCUIT_BREAKER", "1.0.0", `Failure in '${this.name}': ${error.message}`, "CB003");
+    logger.error(
+      'CIRCUIT_BREAKER',
+      '1.0.0',
+      `Failure in '${this.name}': ${error.message}`,
+      'CB003'
+    );
 
     // Check if we should open the circuit
     if (this.state.failureCount >= this.config.failureThreshold) {
       this.state.state = 'OPEN';
       this.state.nextAttempt = Date.now() + this.config.resetTimeout;
       this.notifyStateChange();
-      logger.warning("CIRCUIT_BREAKER", "1.0.0", 
-        `Circuit breaker '${this.name}' opened after ${this.state.failureCount} failures`, "CB004");
+      logger.warning(
+        'CIRCUIT_BREAKER',
+        '1.0.0',
+        `Circuit breaker '${this.name}' opened after ${this.state.failureCount} failures`,
+        'CB004'
+      );
     }
 
     this.resetWindowIfNeeded();
@@ -198,13 +212,15 @@ export class CircuitBreaker {
    * Get current metrics
    */
   getMetrics(): CircuitBreakerMetrics {
-    const successRate = this.state.totalRequests > 0 
-      ? ((this.state.totalRequests - this.state.failureCount) / this.state.totalRequests) * 100 
-      : 100;
+    const successRate =
+      this.state.totalRequests > 0
+        ? ((this.state.totalRequests - this.state.failureCount) / this.state.totalRequests) * 100
+        : 100;
 
-    const averageResponseTime = this.responseTimes.length > 0
-      ? this.responseTimes.reduce((sum, time) => sum + time, 0) / this.responseTimes.length
-      : 0;
+    const averageResponseTime =
+      this.responseTimes.length > 0
+        ? this.responseTimes.reduce((sum, time) => sum + time, 0) / this.responseTimes.length
+        : 0;
 
     return {
       totalRequests: this.state.totalRequests,
@@ -213,7 +229,7 @@ export class CircuitBreaker {
       averageResponseTime: Math.round(averageResponseTime),
       currentState: this.state.state,
       lastStateChange: this.state.lastFailureTime,
-      concurrentRequests: this.concurrentRequests
+      concurrentRequests: this.concurrentRequests,
     };
   }
 
@@ -229,7 +245,7 @@ export class CircuitBreaker {
     this.state.windowStart = Date.now();
     this.responseTimes = [];
     this.notifyStateChange();
-    logger.info("CIRCUIT_BREAKER", "1.0.0", `Circuit breaker '${this.name}' manually reset`);
+    logger.info('CIRCUIT_BREAKER', '1.0.0', `Circuit breaker '${this.name}' manually reset`);
   }
 
   /**
@@ -264,7 +280,9 @@ export class CircuitBreaker {
     if (!healthy) {
       if (this.state.state === 'OPEN') {
         recommendations.push('Circuit is open - check downstream dependencies');
-        recommendations.push(`Will retry in ${Math.ceil((this.state.nextAttempt - Date.now()) / 1000)}s`);
+        recommendations.push(
+          `Will retry in ${Math.ceil((this.state.nextAttempt - Date.now()) / 1000)}s`
+        );
       }
       if (metrics.successRate < 50) {
         recommendations.push('Low success rate - investigate error patterns');
@@ -282,7 +300,7 @@ export class CircuitBreaker {
       healthy,
       state: this.state.state,
       metrics,
-      recommendations
+      recommendations,
     };
   }
 
@@ -309,7 +327,7 @@ export class CircuitBreaker {
       try {
         listener(this.state);
       } catch (error) {
-        logger.error("CIRCUIT_BREAKER", "1.0.0", `State change listener error: ${error}`, "CB005");
+        logger.error('CIRCUIT_BREAKER', '1.0.0', `State change listener error: ${error}`, 'CB005');
       }
     });
   }
@@ -318,8 +336,12 @@ export class CircuitBreaker {
     this.healthCheckTimer = setInterval(() => {
       const report = this.getHealthReport();
       if (!report.healthy) {
-        logger.warning("CIRCUIT_BREAKER", "1.0.0", 
-          `Circuit breaker '${this.name}' health check failed: ${report.recommendations.join(', ')}`, "CB006");
+        logger.warning(
+          'CIRCUIT_BREAKER',
+          '1.0.0',
+          `Circuit breaker '${this.name}' health check failed: ${report.recommendations.join(', ')}`,
+          'CB006'
+        );
       }
     }, this.config.healthCheckInterval);
   }
@@ -332,7 +354,7 @@ export class CircuitBreaker {
       clearInterval(this.healthCheckTimer);
     }
     this.stateChangeListeners = [];
-    logger.info("CIRCUIT_BREAKER", "1.0.0", `Circuit breaker '${this.name}' destroyed`);
+    logger.info('CIRCUIT_BREAKER', '1.0.0', `Circuit breaker '${this.name}' destroyed`);
   }
 }
 
@@ -345,11 +367,11 @@ export class CircuitBreakerManager {
     totalRequests: 0,
     totalFailures: 0,
     activeCircuitBreakers: 0,
-    openCircuitBreakers: 0
+    openCircuitBreakers: 0,
   };
 
   constructor() {
-    logger.info("CIRCUIT_BREAKER_MANAGER", "1.0.0", "Circuit Breaker Manager initialized");
+    logger.info('CIRCUIT_BREAKER_MANAGER', '1.0.0', 'Circuit Breaker Manager initialized');
   }
 
   /**
@@ -357,14 +379,17 @@ export class CircuitBreakerManager {
    */
   getCircuitBreaker(name: string, config?: CircuitBreakerConfig): CircuitBreaker {
     if (!this.circuitBreakers.has(name)) {
-      const circuitBreaker = new CircuitBreaker(name, config || {
-        failureThreshold: 5,
-        resetTimeout: 30000,
-        monitoringWindow: 60000
-      });
+      const circuitBreaker = new CircuitBreaker(
+        name,
+        config || {
+          failureThreshold: 5,
+          resetTimeout: 30000,
+          monitoringWindow: 60000,
+        }
+      );
 
       // Add state change listener for global metrics
-      circuitBreaker.onStateChange((state) => {
+      circuitBreaker.onStateChange(state => {
         this.updateGlobalMetrics();
       });
 
@@ -395,7 +420,7 @@ export class CircuitBreakerManager {
    */
   resetAll(): void {
     this.circuitBreakers.forEach(cb => cb.reset());
-    logger.info("CIRCUIT_BREAKER_MANAGER", "1.0.0", "All circuit breakers reset");
+    logger.info('CIRCUIT_BREAKER_MANAGER', '1.0.0', 'All circuit breakers reset');
   }
 
   /**
@@ -404,7 +429,7 @@ export class CircuitBreakerManager {
   destroyAll(): void {
     this.circuitBreakers.forEach(cb => cb.destroy());
     this.circuitBreakers.clear();
-    logger.info("CIRCUIT_BREAKER_MANAGER", "1.0.0", "All circuit breakers destroyed");
+    logger.info('CIRCUIT_BREAKER_MANAGER', '1.0.0', 'All circuit breakers destroyed');
   }
 
   private updateGlobalMetrics(): void {

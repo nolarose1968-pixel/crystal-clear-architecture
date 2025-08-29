@@ -41,7 +41,7 @@ export abstract class Fire22BaseRepository<T extends { id?: string | number }> {
     this.db = database || databaseService.getDatabase();
   }
 
-  // ===== CORE CRUD OPERATIONS =====
+  // !== CORE CRUD OPERATIONS !==
 
   /**
    * Find entity by ID
@@ -280,7 +280,7 @@ export abstract class Fire22BaseRepository<T extends { id?: string | number }> {
     }
   }
 
-  // ===== BATCH OPERATIONS =====
+  // !== BATCH OPERATIONS !==
 
   /**
    * Create multiple entities in a transaction
@@ -374,7 +374,7 @@ export abstract class Fire22BaseRepository<T extends { id?: string | number }> {
     }
   }
 
-  // ===== QUERY BUILDING HELPERS =====
+  // !== QUERY BUILDING HELPERS !==
 
   /**
    * Build SELECT query with options
@@ -439,7 +439,7 @@ export abstract class Fire22BaseRepository<T extends { id?: string | number }> {
     // Add filter conditions
     if (filters) {
       for (const [key, value] of Object.entries(filters)) {
-        if (value !== undefined && value !=== null) {
+        if (value !== undefined && value !== null) {
           if (Array.isArray(value)) {
             const placeholders = value.map(() => '?').join(', ');
             conditions.push(`${key} IN (${placeholders})`);
@@ -468,7 +468,7 @@ export abstract class Fire22BaseRepository<T extends { id?: string | number }> {
     };
   }
 
-  // ===== UTILITY METHODS =====
+  // !== UTILITY METHODS !==
 
   /**
    * Execute custom query

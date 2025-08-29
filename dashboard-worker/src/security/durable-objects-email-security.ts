@@ -1,19 +1,25 @@
 /**
  * 🔒 Fire22 Durable Objects Email Security Implementation
  * SPECIAL OPS TEAM - SECURE-COMM-22 OPERATION
- * 
+ *
  * @version 1.0.0
  * @classification CONFIDENTIAL - FIRE22 INTERNAL
  * @team Special Operations
  * @mission Cloudflare Durable Objects Email Security
  */
 
-import { DurableObjectNamespace, DurableObjectState } from "@cloudflare/workers-types";
+import { DurableObjectNamespace, DurableObjectState } from '@cloudflare/workers-types';
 
 // Security classification levels
-type SecurityLevel = 'TOP_SECRET' | 'CONFIDENTIAL_FINANCIAL' | 'CONFIDENTIAL_LEGAL' | 
-                    'CONFIDENTIAL_CUSTOMER' | 'CONFIDENTIAL_OPERATIONAL' | 'CONFIDENTIAL_CORPORATE' |
-                    'CONFIDENTIAL_TECHNICAL' | 'INTERNAL';
+type SecurityLevel =
+  | 'TOP_SECRET'
+  | 'CONFIDENTIAL_FINANCIAL'
+  | 'CONFIDENTIAL_LEGAL'
+  | 'CONFIDENTIAL_CUSTOMER'
+  | 'CONFIDENTIAL_OPERATIONAL'
+  | 'CONFIDENTIAL_CORPORATE'
+  | 'CONFIDENTIAL_TECHNICAL'
+  | 'INTERNAL';
 
 // Department security tiers
 type SecurityTier = 'TIER_1_MAXIMUM' | 'TIER_2_HIGH' | 'TIER_3_MEDIUM';
@@ -56,7 +62,11 @@ interface DepartmentConfig {
   email: string;
   securityTier: SecurityTier;
   securityLevel: SecurityLevel;
-  encryptionLevel: 'AES_256_GCM' | 'AES_256_GCM_HSM' | 'AES_256_GCM_FINANCIAL' | 'AES_256_GCM_LEGAL';
+  encryptionLevel:
+    | 'AES_256_GCM'
+    | 'AES_256_GCM_HSM'
+    | 'AES_256_GCM_FINANCIAL'
+    | 'AES_256_GCM_LEGAL';
   backupFrequency: 'REAL_TIME' | 'EVERY_5_MIN' | 'EVERY_10_MIN' | 'EVERY_15_MIN';
   retentionPeriod: '2_YEARS' | '3_YEARS' | '5_YEARS' | '7_YEARS' | '10_YEARS';
   accessControl: string[];
@@ -111,7 +121,6 @@ export class Fire22EmailSecurityDO {
         default:
           return new Response('Invalid operation', { status: 400 });
       }
-
     } catch (error) {
       console.error('🚨 Security operation failed:', error);
       await this.logSecurityError(error, request);
@@ -123,11 +132,10 @@ export class Fire22EmailSecurityDO {
    * 🔐 Secure email storage with department-specific encryption
    */
   private async secureStoreEmail(
-    request: Request, 
-    department: string, 
+    request: Request,
+    department: string,
     context: SecurityContext
   ): Promise<Response> {
-
     try {
       // Get department configuration
       const deptConfig = this.departmentConfigs.get(department);
@@ -142,7 +150,7 @@ export class Fire22EmailSecurityDO {
       }
 
       // Parse and validate email data
-      const emailData = await request.json() as Partial<Fire22EmailMessage>;
+      const emailData = (await request.json()) as Partial<Fire22EmailMessage>;
       const validatedEmail = await this.validateEmailData(emailData, deptConfig);
 
       // Apply department-specific encryption
@@ -152,7 +160,7 @@ export class Fire22EmailSecurityDO {
       const storageKey = `email:${department}:${Date.now()}:${this.generateSecureId()}`;
 
       // Store with atomic transaction and audit trail
-      await this.state.storage.transaction(async (txn) => {
+      await this.state.storage.transaction(async txn => {
         await txn.put(storageKey, encryptedEmail);
         await txn.put(`meta:${storageKey}`, {
           department,
@@ -160,36 +168,41 @@ export class Fire22EmailSecurityDO {
           storedBy: context.userId,
           storedAt: Date.now(),
           encryptionLevel: deptConfig.encryptionLevel,
-          retentionUntil: this.calculateRetentionDate(deptConfig.retentionPeriod)
+          retentionUntil: this.calculateRetentionDate(deptConfig.retentionPeriod),
         });
       });
 
       // Log security audit trail
-      await this.logAuditEvent({
-        action: 'CREATE',
-        userId: context.userId,
-        timestamp: Date.now(),
-        ipAddress: context.ipAddress,
-        userAgent: request.headers.get('User-Agent') || '',
-        details: `Email stored in ${department} with ${deptConfig.securityLevel} security`
-      }, storageKey);
+      await this.logAuditEvent(
+        {
+          action: 'CREATE',
+          userId: context.userId,
+          timestamp: Date.now(),
+          ipAddress: context.ipAddress,
+          userAgent: request.headers.get('User-Agent') || '',
+          details: `Email stored in ${department} with ${deptConfig.securityLevel} security`,
+        },
+        storageKey
+      );
 
       // Schedule backup based on department policy
       await this.scheduleSecureBackup(department, storageKey, deptConfig.backupFrequency);
 
-      return new Response(JSON.stringify({
-        success: true,
-        emailId: storageKey,
-        department,
-        securityLevel: deptConfig.securityLevel,
-        encryptionLevel: deptConfig.encryptionLevel,
-        backupScheduled: true,
-        auditLogged: true
-      }), {
-        status: 201,
-        headers: { 'Content-Type': 'application/json' }
-      });
-
+      return new Response(
+        JSON.stringify({
+          success: true,
+          emailId: storageKey,
+          department,
+          securityLevel: deptConfig.securityLevel,
+          encryptionLevel: deptConfig.encryptionLevel,
+          backupScheduled: true,
+          auditLogged: true,
+        }),
+        {
+          status: 201,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error(`🚨 Secure store failed for ${department}:`, error);
       await this.logSecurityError(error, request, context);
@@ -201,11 +214,10 @@ export class Fire22EmailSecurityDO {
    * 📧 Secure email retrieval with access control
    */
   private async secureRetrieveEmails(
-    request: Request, 
-    department: string, 
+    request: Request,
+    department: string,
     context: SecurityContext
   ): Promise<Response> {
-
     try {
       // Get department configuration
       const deptConfig = this.departmentConfigs.get(department);
@@ -227,9 +239,9 @@ export class Fire22EmailSecurityDO {
       const endDate = url.searchParams.get('endDate');
 
       // Retrieve encrypted emails with pagination
-      const emailKeys = await this.state.storage.list({ 
+      const emailKeys = await this.state.storage.list({
         prefix: `email:${department}:`,
-        limit: limit + offset
+        limit: limit + offset,
       });
 
       const emails = [];
@@ -246,7 +258,7 @@ export class Fire22EmailSecurityDO {
         try {
           // Decrypt email content
           const decryptedEmail = await this.decryptEmailContent(encryptedEmail, deptConfig);
-          
+
           // Apply date filtering if specified
           if (this.passesDateFilter(decryptedEmail, startDate, endDate)) {
             emails.push(this.sanitizeEmailForUser(decryptedEmail, context));
@@ -259,31 +271,36 @@ export class Fire22EmailSecurityDO {
       }
 
       // Log access audit trail
-      await this.logAuditEvent({
-        action: 'READ',
-        userId: context.userId,
-        timestamp: Date.now(),
-        ipAddress: context.ipAddress,
-        userAgent: request.headers.get('User-Agent') || '',
-        details: `Retrieved ${emails.length} emails from ${department}`
-      }, `retrieve:${department}`);
-
-      return new Response(JSON.stringify({
-        success: true,
-        emails,
-        count: emails.length,
-        department,
-        securityLevel: deptConfig.securityLevel,
-        pagination: {
-          limit,
-          offset,
-          hasMore: emailKeys.size > (offset + limit)
+      await this.logAuditEvent(
+        {
+          action: 'READ',
+          userId: context.userId,
+          timestamp: Date.now(),
+          ipAddress: context.ipAddress,
+          userAgent: request.headers.get('User-Agent') || '',
+          details: `Retrieved ${emails.length} emails from ${department}`,
         },
-        auditLogged: true
-      }), {
-        headers: { 'Content-Type': 'application/json' }
-      });
+        `retrieve:${department}`
+      );
 
+      return new Response(
+        JSON.stringify({
+          success: true,
+          emails,
+          count: emails.length,
+          department,
+          securityLevel: deptConfig.securityLevel,
+          pagination: {
+            limit,
+            offset,
+            hasMore: emailKeys.size > offset + limit,
+          },
+          auditLogged: true,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error(`🚨 Secure retrieve failed for ${department}:`, error);
       await this.logSecurityError(error, request, context);
@@ -295,11 +312,10 @@ export class Fire22EmailSecurityDO {
    * 🗑️ Secure email deletion with audit trail
    */
   private async secureDeleteEmail(
-    request: Request, 
-    department: string, 
+    request: Request,
+    department: string,
     context: SecurityContext
   ): Promise<Response> {
-
     try {
       const url = new URL(request.url);
       const emailId = url.searchParams.get('emailId');
@@ -329,10 +345,10 @@ export class Fire22EmailSecurityDO {
       }
 
       // Perform secure deletion with audit trail
-      await this.state.storage.transaction(async (txn) => {
+      await this.state.storage.transaction(async txn => {
         await txn.delete(emailKey);
         await txn.delete(`meta:${emailKey}`);
-        
+
         // Create deletion audit record (permanent)
         await txn.put(`deleted:${emailKey}:${Date.now()}`, {
           originalEmailId: emailId,
@@ -340,31 +356,36 @@ export class Fire22EmailSecurityDO {
           deletedBy: context.userId,
           deletedAt: Date.now(),
           reason: 'USER_REQUESTED',
-          securityLevel: deptConfig.securityLevel
+          securityLevel: deptConfig.securityLevel,
         });
       });
 
       // Log deletion audit trail
-      await this.logAuditEvent({
-        action: 'DELETE',
-        userId: context.userId,
-        timestamp: Date.now(),
-        ipAddress: context.ipAddress,
-        userAgent: request.headers.get('User-Agent') || '',
-        details: `Email ${emailId} securely deleted from ${department}`
-      }, emailKey);
+      await this.logAuditEvent(
+        {
+          action: 'DELETE',
+          userId: context.userId,
+          timestamp: Date.now(),
+          ipAddress: context.ipAddress,
+          userAgent: request.headers.get('User-Agent') || '',
+          details: `Email ${emailId} securely deleted from ${department}`,
+        },
+        emailKey
+      );
 
-      return new Response(JSON.stringify({
-        success: true,
-        emailId,
-        department,
-        deletedBy: context.userId,
-        deletedAt: Date.now(),
-        auditLogged: true
-      }), {
-        headers: { 'Content-Type': 'application/json' }
-      });
-
+      return new Response(
+        JSON.stringify({
+          success: true,
+          emailId,
+          department,
+          deletedBy: context.userId,
+          deletedAt: Date.now(),
+          auditLogged: true,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error(`🚨 Secure delete failed for ${department}:`, error);
       await this.logSecurityError(error, request, context);
@@ -376,11 +397,10 @@ export class Fire22EmailSecurityDO {
    * 📊 Generate security audit report
    */
   private async generateSecurityAudit(
-    request: Request, 
-    department: string, 
+    request: Request,
+    department: string,
     context: SecurityContext
   ): Promise<Response> {
-
     try {
       // Verify user has audit access
       if (!this.hasAuditAccess(context)) {
@@ -393,8 +413,8 @@ export class Fire22EmailSecurityDO {
       const endDate = url.searchParams.get('endDate');
 
       // Retrieve audit logs
-      const auditLogs = await this.state.storage.list({ 
-        prefix: `audit:${department}:`
+      const auditLogs = await this.state.storage.list({
+        prefix: `audit:${department}:`,
       });
 
       const auditEntries = [];
@@ -408,27 +428,32 @@ export class Fire22EmailSecurityDO {
       const auditSummary = this.generateAuditSummary(auditEntries, department);
 
       // Log audit access
-      await this.logAuditEvent({
-        action: 'AUDIT',
-        userId: context.userId,
-        timestamp: Date.now(),
-        ipAddress: context.ipAddress,
-        userAgent: request.headers.get('User-Agent') || '',
-        details: `Generated audit report for ${department} (${auditEntries.length} entries)`
-      }, `audit:${department}`);
+      await this.logAuditEvent(
+        {
+          action: 'AUDIT',
+          userId: context.userId,
+          timestamp: Date.now(),
+          ipAddress: context.ipAddress,
+          userAgent: request.headers.get('User-Agent') || '',
+          details: `Generated audit report for ${department} (${auditEntries.length} entries)`,
+        },
+        `audit:${department}`
+      );
 
-      return new Response(JSON.stringify({
-        success: true,
-        department,
-        auditPeriod: { startDate, endDate },
-        summary: auditSummary,
-        entries: auditEntries,
-        generatedBy: context.userId,
-        generatedAt: Date.now()
-      }), {
-        headers: { 'Content-Type': 'application/json' }
-      });
-
+      return new Response(
+        JSON.stringify({
+          success: true,
+          department,
+          auditPeriod: { startDate, endDate },
+          summary: auditSummary,
+          entries: auditEntries,
+          generatedBy: context.userId,
+          generatedAt: Date.now(),
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error(`🚨 Audit generation failed for ${department}:`, error);
       await this.logSecurityError(error, request, context);
@@ -440,11 +465,10 @@ export class Fire22EmailSecurityDO {
    * 💾 Perform secure backup operation
    */
   private async performSecureBackup(
-    request: Request, 
-    department: string, 
+    request: Request,
+    department: string,
     context: SecurityContext
   ): Promise<Response> {
-
     try {
       // Verify user has backup access
       if (!this.hasBackupAccess(context)) {
@@ -458,8 +482,8 @@ export class Fire22EmailSecurityDO {
       }
 
       // Get all emails for department
-      const emailKeys = await this.state.storage.list({ 
-        prefix: `email:${department}:`
+      const emailKeys = await this.state.storage.list({
+        prefix: `email:${department}:`,
       });
 
       const backupData = {
@@ -468,7 +492,7 @@ export class Fire22EmailSecurityDO {
         backupBy: context.userId,
         securityLevel: deptConfig.securityLevel,
         emailCount: emailKeys.size,
-        emails: []
+        emails: [],
       };
 
       // Create encrypted backup
@@ -476,7 +500,7 @@ export class Fire22EmailSecurityDO {
         backupData.emails.push({
           key,
           encryptedData: email,
-          metadata: await this.state.storage.get(`meta:${key}`)
+          metadata: await this.state.storage.get(`meta:${key}`),
         });
       }
 
@@ -485,27 +509,32 @@ export class Fire22EmailSecurityDO {
       await this.state.storage.put(backupKey, backupData);
 
       // Log backup operation
-      await this.logAuditEvent({
-        action: 'BACKUP',
-        userId: context.userId,
-        timestamp: Date.now(),
-        ipAddress: context.ipAddress,
-        userAgent: request.headers.get('User-Agent') || '',
-        details: `Secure backup created for ${department} (${emailKeys.size} emails)`
-      }, backupKey);
+      await this.logAuditEvent(
+        {
+          action: 'BACKUP',
+          userId: context.userId,
+          timestamp: Date.now(),
+          ipAddress: context.ipAddress,
+          userAgent: request.headers.get('User-Agent') || '',
+          details: `Secure backup created for ${department} (${emailKeys.size} emails)`,
+        },
+        backupKey
+      );
 
-      return new Response(JSON.stringify({
-        success: true,
-        backupId: backupKey,
-        department,
-        emailCount: emailKeys.size,
-        backupTimestamp: Date.now(),
-        securityLevel: deptConfig.securityLevel,
-        auditLogged: true
-      }), {
-        headers: { 'Content-Type': 'application/json' }
-      });
-
+      return new Response(
+        JSON.stringify({
+          success: true,
+          backupId: backupKey,
+          department,
+          emailCount: emailKeys.size,
+          backupTimestamp: Date.now(),
+          securityLevel: deptConfig.securityLevel,
+          auditLogged: true,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error(`🚨 Secure backup failed for ${department}:`, error);
       await this.logSecurityError(error, request, context);
@@ -526,38 +555,40 @@ export class Fire22EmailSecurityDO {
         security: {
           encryptionActive: true,
           auditLogging: true,
-          accessControlActive: true
-        }
+          accessControlActive: true,
+        },
       };
 
       // Check each department
       for (const [deptId, config] of this.departmentConfigs) {
-        const emailCount = await this.state.storage.list({ 
+        const emailCount = await this.state.storage.list({
           prefix: `email:${deptId}:`,
-          limit: 1
+          limit: 1,
         });
 
         healthStatus.departments[deptId] = {
           name: config.name,
           securityLevel: config.securityLevel,
           hasEmails: emailCount.size > 0,
-          lastBackup: await this.getLastBackupTime(deptId)
+          lastBackup: await this.getLastBackupTime(deptId),
         };
       }
 
       return new Response(JSON.stringify(healthStatus), {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
-
     } catch (error) {
-      return new Response(JSON.stringify({
-        status: 'unhealthy',
-        error: error.message,
-        timestamp: Date.now()
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          status: 'unhealthy',
+          error: error.message,
+          timestamp: Date.now(),
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
   }
 
@@ -565,130 +596,160 @@ export class Fire22EmailSecurityDO {
   private initializeDepartmentConfigs(): void {
     this.departmentConfigs = new Map([
       // TIER 1 - MAXIMUM SECURITY
-      ['exec', {
-        id: 'exec',
-        name: 'Executive Management',
-        email: 'exec@fire22.com',
-        securityTier: 'TIER_1_MAXIMUM',
-        securityLevel: 'TOP_SECRET',
-        encryptionLevel: 'AES_256_GCM_HSM',
-        backupFrequency: 'REAL_TIME',
-        retentionPeriod: '10_YEARS',
-        accessControl: ['william-harris', 'sarah-wilson'],
-        complianceRequirements: ['SOX', 'Executive_Records']
-      }],
-      ['finance', {
-        id: 'finance',
-        name: 'Finance Department',
-        email: 'finance@fire22.com',
-        securityTier: 'TIER_1_MAXIMUM',
-        securityLevel: 'CONFIDENTIAL_FINANCIAL',
-        encryptionLevel: 'AES_256_GCM_FINANCIAL',
-        backupFrequency: 'REAL_TIME',
-        retentionPeriod: '7_YEARS',
-        accessControl: ['john-smith', 'sarah-johnson', 'mike-chen', 'anna-lee'],
-        complianceRequirements: ['SOX', 'PCI_DSS', 'Financial_Regulations']
-      }],
-      ['compliance', {
-        id: 'compliance',
-        name: 'Compliance & Legal',
-        email: 'compliance@fire22.com',
-        securityTier: 'TIER_1_MAXIMUM',
-        securityLevel: 'CONFIDENTIAL_LEGAL',
-        encryptionLevel: 'AES_256_GCM_LEGAL',
-        backupFrequency: 'REAL_TIME',
-        retentionPeriod: '10_YEARS',
-        accessControl: ['robert-brown', 'lisa-davis'],
-        complianceRequirements: ['GDPR', 'SOC2', 'Legal_Requirements']
-      }],
-      
+      [
+        'exec',
+        {
+          id: 'exec',
+          name: 'Executive Management',
+          email: 'exec@fire22.com',
+          securityTier: 'TIER_1_MAXIMUM',
+          securityLevel: 'TOP_SECRET',
+          encryptionLevel: 'AES_256_GCM_HSM',
+          backupFrequency: 'REAL_TIME',
+          retentionPeriod: '10_YEARS',
+          accessControl: ['william-harris', 'sarah-wilson'],
+          complianceRequirements: ['SOX', 'Executive_Records'],
+        },
+      ],
+      [
+        'finance',
+        {
+          id: 'finance',
+          name: 'Finance Department',
+          email: 'finance@fire22.com',
+          securityTier: 'TIER_1_MAXIMUM',
+          securityLevel: 'CONFIDENTIAL_FINANCIAL',
+          encryptionLevel: 'AES_256_GCM_FINANCIAL',
+          backupFrequency: 'REAL_TIME',
+          retentionPeriod: '7_YEARS',
+          accessControl: ['john-smith', 'sarah-johnson', 'mike-chen', 'anna-lee'],
+          complianceRequirements: ['SOX', 'PCI_DSS', 'Financial_Regulations'],
+        },
+      ],
+      [
+        'compliance',
+        {
+          id: 'compliance',
+          name: 'Compliance & Legal',
+          email: 'compliance@fire22.com',
+          securityTier: 'TIER_1_MAXIMUM',
+          securityLevel: 'CONFIDENTIAL_LEGAL',
+          encryptionLevel: 'AES_256_GCM_LEGAL',
+          backupFrequency: 'REAL_TIME',
+          retentionPeriod: '10_YEARS',
+          accessControl: ['robert-brown', 'lisa-davis'],
+          complianceRequirements: ['GDPR', 'SOC2', 'Legal_Requirements'],
+        },
+      ],
+
       // TIER 2 - HIGH SECURITY
-      ['support', {
-        id: 'support',
-        name: 'Customer Support',
-        email: 'support@fire22.com',
-        securityTier: 'TIER_2_HIGH',
-        securityLevel: 'CONFIDENTIAL_CUSTOMER',
-        encryptionLevel: 'AES_256_GCM',
-        backupFrequency: 'EVERY_5_MIN',
-        retentionPeriod: '5_YEARS',
-        accessControl: ['jessica-martinez', 'david-wilson'],
-        complianceRequirements: ['Customer_Privacy', 'GDPR']
-      }],
-      ['operations', {
-        id: 'operations',
-        name: 'Operations Department',
-        email: 'operations@fire22.com',
-        securityTier: 'TIER_2_HIGH',
-        securityLevel: 'CONFIDENTIAL_OPERATIONAL',
-        encryptionLevel: 'AES_256_GCM',
-        backupFrequency: 'EVERY_5_MIN',
-        retentionPeriod: '5_YEARS',
-        accessControl: ['michael-johnson', 'jennifer-lee'],
-        complianceRequirements: ['Operational_Security']
-      }],
-      ['communications', {
-        id: 'communications',
-        name: 'Communications Department',
-        email: 'communications@fire22.com',
-        securityTier: 'TIER_2_HIGH',
-        securityLevel: 'CONFIDENTIAL_CORPORATE',
-        encryptionLevel: 'AES_256_GCM',
-        backupFrequency: 'EVERY_5_MIN',
-        retentionPeriod: '3_YEARS',
-        accessControl: ['sarah-martinez', 'alex-chen', 'jordan-taylor'],
-        complianceRequirements: ['Corporate_Communications']
-      }],
-      ['technology', {
-        id: 'technology',
-        name: 'Technology Department',
-        email: 'tech@fire22.com',
-        securityTier: 'TIER_2_HIGH',
-        securityLevel: 'CONFIDENTIAL_TECHNICAL',
-        encryptionLevel: 'AES_256_GCM',
-        backupFrequency: 'EVERY_10_MIN',
-        retentionPeriod: '3_YEARS',
-        accessControl: ['alex-rodriguez', 'maria-garcia'],
-        complianceRequirements: ['Technical_Security']
-      }],
-      
+      [
+        'support',
+        {
+          id: 'support',
+          name: 'Customer Support',
+          email: 'support@fire22.com',
+          securityTier: 'TIER_2_HIGH',
+          securityLevel: 'CONFIDENTIAL_CUSTOMER',
+          encryptionLevel: 'AES_256_GCM',
+          backupFrequency: 'EVERY_5_MIN',
+          retentionPeriod: '5_YEARS',
+          accessControl: ['jessica-martinez', 'david-wilson'],
+          complianceRequirements: ['Customer_Privacy', 'GDPR'],
+        },
+      ],
+      [
+        'operations',
+        {
+          id: 'operations',
+          name: 'Operations Department',
+          email: 'operations@fire22.com',
+          securityTier: 'TIER_2_HIGH',
+          securityLevel: 'CONFIDENTIAL_OPERATIONAL',
+          encryptionLevel: 'AES_256_GCM',
+          backupFrequency: 'EVERY_5_MIN',
+          retentionPeriod: '5_YEARS',
+          accessControl: ['michael-johnson', 'jennifer-lee'],
+          complianceRequirements: ['Operational_Security'],
+        },
+      ],
+      [
+        'communications',
+        {
+          id: 'communications',
+          name: 'Communications Department',
+          email: 'communications@fire22.com',
+          securityTier: 'TIER_2_HIGH',
+          securityLevel: 'CONFIDENTIAL_CORPORATE',
+          encryptionLevel: 'AES_256_GCM',
+          backupFrequency: 'EVERY_5_MIN',
+          retentionPeriod: '3_YEARS',
+          accessControl: ['sarah-martinez', 'alex-chen', 'jordan-taylor'],
+          complianceRequirements: ['Corporate_Communications'],
+        },
+      ],
+      [
+        'technology',
+        {
+          id: 'technology',
+          name: 'Technology Department',
+          email: 'tech@fire22.com',
+          securityTier: 'TIER_2_HIGH',
+          securityLevel: 'CONFIDENTIAL_TECHNICAL',
+          encryptionLevel: 'AES_256_GCM',
+          backupFrequency: 'EVERY_10_MIN',
+          retentionPeriod: '3_YEARS',
+          accessControl: ['alex-rodriguez', 'maria-garcia'],
+          complianceRequirements: ['Technical_Security'],
+        },
+      ],
+
       // TIER 3 - MEDIUM SECURITY
-      ['marketing', {
-        id: 'marketing',
-        name: 'Marketing Department',
-        email: 'marketing@fire22.com',
-        securityTier: 'TIER_3_MEDIUM',
-        securityLevel: 'INTERNAL',
-        encryptionLevel: 'AES_256_GCM',
-        backupFrequency: 'EVERY_15_MIN',
-        retentionPeriod: '2_YEARS',
-        accessControl: ['emily-davis', 'james-wilson'],
-        complianceRequirements: ['Marketing_Compliance']
-      }],
-      ['design', {
-        id: 'design',
-        name: 'Design Team',
-        email: 'design@fire22.com',
-        securityTier: 'TIER_3_MEDIUM',
-        securityLevel: 'INTERNAL',
-        encryptionLevel: 'AES_256_GCM',
-        backupFrequency: 'EVERY_15_MIN',
-        retentionPeriod: '2_YEARS',
-        accessControl: ['isabella-martinez', 'ethan-cooper'],
-        complianceRequirements: ['Design_IP_Protection']
-      }],
-      ['contributors', {
-        id: 'contributors',
-        name: 'Team Contributors',
-        email: 'team@fire22.com',
-        securityTier: 'TIER_3_MEDIUM',
-        securityLevel: 'INTERNAL',
-        encryptionLevel: 'AES_256_GCM',
-        backupFrequency: 'EVERY_15_MIN',
-        retentionPeriod: '2_YEARS',
-        accessControl: ['chris-anderson', 'taylor-johnson'],
-        complianceRequirements: ['Team_Coordination']
-      }]
+      [
+        'marketing',
+        {
+          id: 'marketing',
+          name: 'Marketing Department',
+          email: 'marketing@fire22.com',
+          securityTier: 'TIER_3_MEDIUM',
+          securityLevel: 'INTERNAL',
+          encryptionLevel: 'AES_256_GCM',
+          backupFrequency: 'EVERY_15_MIN',
+          retentionPeriod: '2_YEARS',
+          accessControl: ['emily-davis', 'james-wilson'],
+          complianceRequirements: ['Marketing_Compliance'],
+        },
+      ],
+      [
+        'design',
+        {
+          id: 'design',
+          name: 'Design Team',
+          email: 'design@fire22.com',
+          securityTier: 'TIER_3_MEDIUM',
+          securityLevel: 'INTERNAL',
+          encryptionLevel: 'AES_256_GCM',
+          backupFrequency: 'EVERY_15_MIN',
+          retentionPeriod: '2_YEARS',
+          accessControl: ['isabella-martinez', 'ethan-cooper'],
+          complianceRequirements: ['Design_IP_Protection'],
+        },
+      ],
+      [
+        'contributors',
+        {
+          id: 'contributors',
+          name: 'Team Contributors',
+          email: 'team@fire22.com',
+          securityTier: 'TIER_3_MEDIUM',
+          securityLevel: 'INTERNAL',
+          encryptionLevel: 'AES_256_GCM',
+          backupFrequency: 'EVERY_15_MIN',
+          retentionPeriod: '2_YEARS',
+          accessControl: ['chris-anderson', 'taylor-johnson'],
+          complianceRequirements: ['Team_Coordination'],
+        },
+      ],
     ]);
   }
 
@@ -703,23 +764,29 @@ export class Fire22EmailSecurityDO {
       permissions: ['read', 'write', 'delete', 'audit', 'backup'],
       sessionId: 'special-ops-session',
       ipAddress: request.headers.get('CF-Connecting-IP') || 'unknown',
-      authenticated: true
+      authenticated: true,
     };
   }
 
   private hasWriteAccess(context: SecurityContext, config: DepartmentConfig): boolean {
-    return context.permissions.includes('write') && 
-           (config.accessControl.includes(context.userId) || context.accessLevel === 'TOP_SECRET');
+    return (
+      context.permissions.includes('write') &&
+      (config.accessControl.includes(context.userId) || context.accessLevel === 'TOP_SECRET')
+    );
   }
 
   private hasReadAccess(context: SecurityContext, config: DepartmentConfig): boolean {
-    return context.permissions.includes('read') && 
-           (config.accessControl.includes(context.userId) || context.accessLevel === 'TOP_SECRET');
+    return (
+      context.permissions.includes('read') &&
+      (config.accessControl.includes(context.userId) || context.accessLevel === 'TOP_SECRET')
+    );
   }
 
   private hasDeleteAccess(context: SecurityContext, config: DepartmentConfig): boolean {
-    return context.permissions.includes('delete') && 
-           (config.accessControl.includes(context.userId) || context.accessLevel === 'TOP_SECRET');
+    return (
+      context.permissions.includes('delete') &&
+      (config.accessControl.includes(context.userId) || context.accessLevel === 'TOP_SECRET')
+    );
   }
 
   private hasAuditAccess(context: SecurityContext): boolean {
@@ -730,7 +797,10 @@ export class Fire22EmailSecurityDO {
     return context.permissions.includes('backup') || context.accessLevel === 'TOP_SECRET';
   }
 
-  private async validateEmailData(emailData: Partial<Fire22EmailMessage>, config: DepartmentConfig): Promise<Fire22EmailMessage> {
+  private async validateEmailData(
+    emailData: Partial<Fire22EmailMessage>,
+    config: DepartmentConfig
+  ): Promise<Fire22EmailMessage> {
     return {
       id: this.generateSecureId(),
       from: emailData.from || '',
@@ -740,22 +810,28 @@ export class Fire22EmailSecurityDO {
       timestamp: Date.now(),
       department: config.id,
       securityLevel: config.securityLevel,
-      auditTrail: []
+      auditTrail: [],
     };
   }
 
-  private async encryptEmailContent(email: Fire22EmailMessage, config: DepartmentConfig): Promise<any> {
+  private async encryptEmailContent(
+    email: Fire22EmailMessage,
+    config: DepartmentConfig
+  ): Promise<any> {
     // Implementation would use actual encryption based on config.encryptionLevel
     // For now, returning the email with encryption metadata
     return {
       ...email,
       encrypted: true,
       encryptionLevel: config.encryptionLevel,
-      encryptedAt: Date.now()
+      encryptedAt: Date.now(),
     };
   }
 
-  private async decryptEmailContent(encryptedEmail: any, config: DepartmentConfig): Promise<Fire22EmailMessage> {
+  private async decryptEmailContent(
+    encryptedEmail: any,
+    config: DepartmentConfig
+  ): Promise<Fire22EmailMessage> {
     // Implementation would decrypt based on config.encryptionLevel
     // For now, returning the email as-is
     return encryptedEmail;
@@ -777,18 +853,28 @@ export class Fire22EmailSecurityDO {
   private calculateRetentionDate(period: string): number {
     const now = Date.now();
     const yearMs = 365 * 24 * 60 * 60 * 1000;
-    
+
     switch (period) {
-      case '2_YEARS': return now + (2 * yearMs);
-      case '3_YEARS': return now + (3 * yearMs);
-      case '5_YEARS': return now + (5 * yearMs);
-      case '7_YEARS': return now + (7 * yearMs);
-      case '10_YEARS': return now + (10 * yearMs);
-      default: return now + (3 * yearMs);
+      case '2_YEARS':
+        return now + 2 * yearMs;
+      case '3_YEARS':
+        return now + 3 * yearMs;
+      case '5_YEARS':
+        return now + 5 * yearMs;
+      case '7_YEARS':
+        return now + 7 * yearMs;
+      case '10_YEARS':
+        return now + 10 * yearMs;
+      default:
+        return now + 3 * yearMs;
     }
   }
 
-  private async scheduleSecureBackup(department: string, emailKey: string, frequency: string): Promise<void> {
+  private async scheduleSecureBackup(
+    department: string,
+    emailKey: string,
+    frequency: string
+  ): Promise<void> {
     // Implementation would schedule backup based on frequency
   }
 
@@ -797,7 +883,11 @@ export class Fire22EmailSecurityDO {
     await this.state.storage.put(auditKey, event);
   }
 
-  private async logSecurityViolation(request: Request, violation: string, context?: SecurityContext): Promise<void> {
+  private async logSecurityViolation(
+    request: Request,
+    violation: string,
+    context?: SecurityContext
+  ): Promise<void> {
     const violationKey = `violation:${Date.now()}`;
     await this.state.storage.put(violationKey, {
       violation,
@@ -805,38 +895,46 @@ export class Fire22EmailSecurityDO {
       ipAddress: request.headers.get('CF-Connecting-IP'),
       userAgent: request.headers.get('User-Agent'),
       userId: context?.userId || 'unknown',
-      url: request.url
+      url: request.url,
     });
   }
 
-  private async logSecurityError(error: any, request: Request, context?: SecurityContext): Promise<void> {
+  private async logSecurityError(
+    error: any,
+    request: Request,
+    context?: SecurityContext
+  ): Promise<void> {
     const errorKey = `error:${Date.now()}`;
     await this.state.storage.put(errorKey, {
       error: error.message,
       stack: error.stack,
       timestamp: Date.now(),
       userId: context?.userId || 'unknown',
-      url: request.url
+      url: request.url,
     });
   }
 
-  private passesDateFilter(email: Fire22EmailMessage, startDate?: string, endDate?: string): boolean {
+  private passesDateFilter(
+    email: Fire22EmailMessage,
+    startDate?: string,
+    endDate?: string
+  ): boolean {
     if (!startDate && !endDate) return true;
-    
+
     const emailDate = email.timestamp;
     const start = startDate ? new Date(startDate).getTime() : 0;
     const end = endDate ? new Date(endDate).getTime() : Date.now();
-    
+
     return emailDate >= start && emailDate <= end;
   }
 
   private passesAuditDateFilter(logEntry: any, startDate?: string, endDate?: string): boolean {
     if (!startDate && !endDate) return true;
-    
+
     const logDate = logEntry.timestamp;
     const start = startDate ? new Date(startDate).getTime() : 0;
     const end = endDate ? new Date(endDate).getTime() : Date.now();
-    
+
     return logDate >= start && logDate <= end;
   }
 
@@ -849,17 +947,17 @@ export class Fire22EmailSecurityDO {
       securityViolations: 0,
       timeRange: {
         earliest: entries.length > 0 ? Math.min(...entries.map(e => e.timestamp)) : null,
-        latest: entries.length > 0 ? Math.max(...entries.map(e => e.timestamp)) : null
-      }
+        latest: entries.length > 0 ? Math.max(...entries.map(e => e.timestamp)) : null,
+      },
     };
 
     entries.forEach(entry => {
       // Count actions
       summary.actionCounts[entry.action] = (summary.actionCounts[entry.action] || 0) + 1;
-      
+
       // Count user activity
       summary.userActivity[entry.userId] = (summary.userActivity[entry.userId] || 0) + 1;
-      
+
       // Count security violations
       if (entry.action === 'ACCESS_DENIED') {
         summary.securityViolations++;
@@ -870,13 +968,13 @@ export class Fire22EmailSecurityDO {
   }
 
   private async getLastBackupTime(department: string): Promise<number | null> {
-    const backups = await this.state.storage.list({ 
+    const backups = await this.state.storage.list({
       prefix: `backup:${department}:`,
-      limit: 1
+      limit: 1,
     });
-    
+
     if (backups.size === 0) return null;
-    
+
     const [key] = Array.from(backups.keys());
     const timestamp = key.split(':')[2];
     return parseInt(timestamp);
@@ -888,9 +986,9 @@ export default {
   async fetch(request: Request, env: any): Promise<Response> {
     return new Response('Fire22 Email Security System - Use Durable Objects endpoints', {
       status: 200,
-      headers: { 'Content-Type': 'text/plain' }
+      headers: { 'Content-Type': 'text/plain' },
     });
-  }
+  },
 };
 
 // Durable Object binding

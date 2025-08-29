@@ -28,7 +28,7 @@ class DebugEndpointsTester {
       endpoint,
       status: 'FAIL',
       responseTime: 0,
-      details: description
+      details: description,
     };
 
     try {
@@ -40,18 +40,17 @@ class DebugEndpointsTester {
       }
 
       const data = await response.json();
-      
+
       if (!data.success) {
         throw new Error(`API returned success: false - ${data.error || 'Unknown error'}`);
       }
 
       // Validate response structure based on endpoint
       this.validateResponseStructure(endpoint, data);
-      
+
       result.status = 'PASS';
       result.data = data;
       result.details = `${description} - Response time: ${result.responseTime}ms`;
-
     } catch (error) {
       result.status = 'FAIL';
       result.error = error.message;
@@ -63,7 +62,7 @@ class DebugEndpointsTester {
 
   private validateResponseStructure(endpoint: string, data: any): void {
     const requiredFields = ['success', 'timestamp', 'endpoint'];
-    
+
     // Check required fields
     for (const field of requiredFields) {
       if (!(field in data)) {
@@ -111,42 +110,42 @@ class DebugEndpointsTester {
     const tests = [
       {
         endpoint: '/api/debug/permissions-matrix',
-        description: 'Matrix Structure Debug'
+        description: 'Matrix Structure Debug',
       },
       {
         endpoint: '/api/debug/permissions-matrix/validation',
-        description: 'Validation Details Debug'
+        description: 'Validation Details Debug',
       },
       {
         endpoint: '/api/debug/permissions-matrix/agents',
-        description: 'Agent Details Debug'
+        description: 'Agent Details Debug',
       },
       {
         endpoint: '/api/debug/permissions-matrix/performance',
-        description: 'Performance Metrics Debug'
+        description: 'Performance Metrics Debug',
       },
       {
         endpoint: '/api/debug/permissions-matrix/realtime',
-        description: 'Real-Time Status Debug'
-      }
+        description: 'Real-Time Status Debug',
+      },
     ];
 
     for (const test of tests) {
       const result = await this.testEndpoint(test.endpoint, test.description);
       this.results.push(result);
-      
+
       const statusIcon = result.status === 'PASS' ? '✅' : '❌';
       console.log(`${statusIcon} ${test.description}`);
       console.log(`   Endpoint: ${test.endpoint}`);
       console.log(`   Status: ${result.status}`);
       console.log(`   Response Time: ${result.responseTime}ms`);
-      
+
       if (result.status === 'FAIL') {
         console.log(`   Error: ${result.error}`);
       } else {
         console.log(`   Details: ${result.details}`);
       }
-      
+
       console.log('');
     }
 
@@ -169,9 +168,11 @@ class DebugEndpointsTester {
 
     if (failedTests > 0) {
       console.log('\n❌ Failed Tests:');
-      this.results.filter(r => r.status === 'FAIL').forEach(result => {
-        console.log(`   - ${result.endpoint}: ${result.error}`);
-      });
+      this.results
+        .filter(r => r.status === 'FAIL')
+        .forEach(result => {
+          console.log(`   - ${result.endpoint}: ${result.error}`);
+        });
     }
 
     // Performance summary
@@ -198,7 +199,7 @@ class DebugEndpointsTester {
 // Main execution
 async function main() {
   const tester = new DebugEndpointsTester();
-  
+
   try {
     await tester.runAllTests();
   } catch (error) {

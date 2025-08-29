@@ -2,7 +2,7 @@
 
 /**
  * Fire22 Dashboard Configuration Loader
- * 
+ *
  * This script efficiently loads all dashboard configurations using Bun.file()
  * and provides a unified configuration management interface.
  */
@@ -96,7 +96,7 @@ class ConfigLoader {
         package: packageConfig || this.getDefaultPackageConfig(),
         build: buildConfig || this.getDefaultBuildConfig(),
         environment: envConfig || this.getDefaultEnvironmentConfig(),
-        matrix: matrixConfig || this.getDefaultMatrixConfig()
+        matrix: matrixConfig || this.getDefaultMatrixConfig(),
       };
 
       const loadTime = performance.now() - startTime;
@@ -106,12 +106,11 @@ class ConfigLoader {
         errors,
         warnings,
         loadTime,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       this.loadResults.push(result);
       return result;
-
     } catch (error) {
       const loadTime = performance.now() - startTime;
       const result: ConfigLoadResult = {
@@ -119,7 +118,7 @@ class ConfigLoader {
         errors: [error instanceof Error ? error.message : 'Unknown error'],
         warnings,
         loadTime,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       this.loadResults.push(result);
@@ -148,7 +147,7 @@ class ConfigLoader {
   private async loadBuildConfig(): Promise<any> {
     try {
       console.log('🏗️  Loading build configuration...');
-      
+
       // Try bun.config.ts first
       const bunConfig = Bun.file('bun.config.ts');
       if (await bunConfig.exists()) {
@@ -179,7 +178,7 @@ class ConfigLoader {
   private async loadEnvironmentConfig(): Promise<any> {
     try {
       console.log('🌍 Loading environment configuration...');
-      
+
       const envFiles = ['.env', '.env.example', '.env.local'];
       const envVars: Record<string, string> = {};
       const configs: string[] = [];
@@ -189,14 +188,14 @@ class ConfigLoader {
         if (await file.exists()) {
           const content = await file.text();
           const lines = content.split('\n').filter(line => line.trim() && !line.startsWith('#'));
-          
+
           lines.forEach(line => {
             const [key, ...valueParts] = line.split('=');
             if (key && valueParts.length > 0) {
               envVars[key.trim()] = valueParts.join('=').trim();
             }
           });
-          
+
           configs.push(envFile);
           console.log(`   ✅ Loaded: ${envFile} (${lines.length} variables)`);
         }
@@ -220,7 +219,7 @@ class ConfigLoader {
   private async loadMatrixConfig(): Promise<any> {
     try {
       console.log('🔍 Loading matrix health configuration...');
-      
+
       // Try to load matrix config file
       const matrixConfig = Bun.file('matrix-config.json');
       if (await matrixConfig.exists()) {
@@ -231,8 +230,8 @@ class ConfigLoader {
 
       // Try to load from package.json scripts
       const packageJson = await Bun.file('package.json').json();
-      const matrixScripts = Object.keys(packageJson.scripts || {}).filter(script => 
-        script.includes('matrix') || script.includes('health')
+      const matrixScripts = Object.keys(packageJson.scripts || {}).filter(
+        script => script.includes('matrix') || script.includes('health')
       );
 
       if (matrixScripts.length > 0) {
@@ -241,12 +240,12 @@ class ConfigLoader {
           health: {
             enabled: true,
             interval: 300000, // 5 minutes
-            thresholds: { warning: 70, critical: 50 }
+            thresholds: { warning: 70, critical: 50 },
           },
           permissions: {
             validation: true,
-            autoRepair: false
-          }
+            autoRepair: false,
+          },
         };
       }
 
@@ -267,7 +266,7 @@ class ConfigLoader {
       target: 'bun',
       entry: 'src/index.ts',
       output: 'dist',
-      plugins: []
+      plugins: [],
     };
 
     // Extract entry point
@@ -289,7 +288,7 @@ class ConfigLoader {
       target: 'bun',
       entry: content.compilerOptions?.rootDir || 'src',
       output: content.compilerOptions?.outDir || 'dist',
-      plugins: []
+      plugins: [],
     };
   }
 
@@ -303,7 +302,7 @@ class ConfigLoader {
       description: 'Fire22 Dashboard with Cloudflare Workers',
       scripts: {},
       dependencies: {},
-      devDependencies: {}
+      devDependencies: {},
     };
   }
 
@@ -315,7 +314,7 @@ class ConfigLoader {
       target: 'bun',
       entry: 'src/index.ts',
       output: 'dist',
-      plugins: []
+      plugins: [],
     };
   }
 
@@ -325,7 +324,7 @@ class ConfigLoader {
   private getDefaultEnvironmentConfig(): any {
     return {
       variables: {},
-      configs: []
+      configs: [],
     };
   }
 
@@ -337,12 +336,12 @@ class ConfigLoader {
       health: {
         enabled: true,
         interval: 300000,
-        thresholds: { warning: 70, critical: 50 }
+        thresholds: { warning: 70, critical: 50 },
       },
       permissions: {
         validation: true,
-        autoRepair: false
-      }
+        autoRepair: false,
+      },
     };
   }
 
@@ -364,21 +363,21 @@ class ConfigLoader {
         name: this.config.package.name,
         version: this.config.package.version,
         scriptsCount: Object.keys(this.config.package.scripts).length,
-        dependenciesCount: Object.keys(this.config.package.dependencies).length
+        dependenciesCount: Object.keys(this.config.package.dependencies).length,
       },
       build: {
         target: this.config.build.target,
         entry: this.config.build.entry,
-        output: this.config.build.output
+        output: this.config.build.output,
       },
       environment: {
         variablesCount: Object.keys(this.config.environment.variables).length,
-        configsCount: this.config.environment.configs.length
+        configsCount: this.config.environment.configs.length,
       },
       matrix: {
         healthEnabled: this.config.matrix.health.enabled,
-        validationEnabled: this.config.matrix.permissions.validation
-      }
+        validationEnabled: this.config.matrix.permissions.validation,
+      },
     };
   }
 
@@ -394,12 +393,12 @@ class ConfigLoader {
       timestamp: new Date().toISOString(),
       config: this.config,
       summary: this.getConfigurationSummary(),
-      loadResults: this.loadResults
+      loadResults: this.loadResults,
     };
 
     const exportPath = 'dashboard-config-export.json';
     await Bun.write(exportPath, JSON.stringify(exportData, null, 2));
-    
+
     console.log(`📤 Configuration exported to: ${exportPath}`);
   }
 
@@ -428,7 +427,7 @@ class ConfigLoader {
 
     return {
       valid: issues.length === 0,
-      issues
+      issues,
     };
   }
 }
@@ -436,16 +435,16 @@ class ConfigLoader {
 // CLI interface
 if (import.meta.main) {
   const loader = new ConfigLoader();
-  
+
   try {
     console.log('🚀 Fire22 Dashboard Configuration Loader');
-    console.log('========================================\n');
-    
+    console.log('!==!==!==!==!==!==!====\n');
+
     const result = await loader.loadAllConfigurations();
-    
+
     if (result.success) {
       console.log('\n✅ Configuration loaded successfully!');
-      
+
       // Display summary
       const summary = loader.getConfigurationSummary();
       if (summary) {
@@ -455,7 +454,7 @@ if (import.meta.main) {
         console.log(`   Environment Variables: ${summary.environment.variablesCount}`);
         console.log(`   Matrix Health: ${summary.matrix.healthEnabled ? 'Enabled' : 'Disabled'}`);
       }
-      
+
       // Validate configuration
       const validation = loader.validateConfiguration();
       if (validation.valid) {
@@ -464,10 +463,9 @@ if (import.meta.main) {
         console.log('\n⚠️  Configuration validation issues:');
         validation.issues.forEach(issue => console.log(`   • ${issue}`));
       }
-      
+
       // Export configuration
       await loader.exportConfiguration();
-      
     } else {
       console.log('\n❌ Configuration loading failed:');
       result.errors.forEach(error => console.log(`   • ${error}`));
@@ -476,9 +474,8 @@ if (import.meta.main) {
         result.warnings.forEach(warning => console.log(`   • ${warning}`));
       }
     }
-    
+
     console.log(`\n⏱️  Total load time: ${result.loadTime.toFixed(2)}ms`);
-    
   } catch (error) {
     console.error('❌ Configuration loader failed:', error);
     process.exit(1);
