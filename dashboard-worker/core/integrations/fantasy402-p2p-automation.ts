@@ -10,6 +10,7 @@ import { Fantasy42AgentClient } from '../../src/api/fantasy42-agent-client';
 import { EnhancedCashierSystem } from '../cashier/enhanced-cashier-system';
 
 export interface P2PAutomationConfig {
+  // Core Configuration
   passwordFieldXPath: string;
   agentSelectXPath: string;
   thirdPartyIdXPath: string;
@@ -18,6 +19,210 @@ export interface P2PAutomationConfig {
   maxTransferAmount: number;
   supportedPaymentMethods: string[];
   riskThreshold: number;
+
+  // 🔧 Advanced Automation Settings
+  automationMode: 'conservative' | 'balanced' | 'aggressive';
+  batchProcessingEnabled: boolean;
+  maxConcurrentTransfers: number;
+  transferTimeoutSeconds: number;
+  retryAttempts: number;
+  retryDelaySeconds: number;
+
+  // 📊 Risk Management
+  fraudDetectionEnabled: boolean;
+  velocityChecksEnabled: boolean;
+  maxTransfersPerHour: number;
+  maxTransfersPerDay: number;
+  suspiciousPatterns: string[];
+  riskScoringEnabled: boolean;
+  riskThresholdHigh: number;
+  riskThresholdMedium: number;
+
+  // 🔔 Notification & Alerting
+  emailNotificationsEnabled: boolean;
+  smsNotificationsEnabled: boolean;
+  webhookNotificationsEnabled: boolean;
+  notificationRecipients: string[];
+  alertOnHighRisk: boolean;
+  alertOnFailedTransfers: boolean;
+  alertOnSystemErrors: boolean;
+  webhookUrl: string;
+  webhookSecret: string;
+
+  // 🌍 Geographic & Regulatory
+  geoRestrictionsEnabled: boolean;
+  allowedCountries: string[];
+  blockedCountries: string[];
+  kycRequired: boolean;
+  complianceChecksEnabled: boolean;
+  regulatoryReportingEnabled: boolean;
+
+  // 💰 Fee & Commission Management
+  feeCalculationEnabled: boolean;
+  feeStructure: {
+    percentage: number;
+    fixedAmount: number;
+    minFee: number;
+    maxFee: number;
+  };
+  agentCommissionEnabled: boolean;
+  agentCommissionRate: number;
+
+  // 📈 Analytics & Reporting
+  analyticsEnabled: boolean;
+  metricsCollectionEnabled: boolean;
+  performanceTrackingEnabled: boolean;
+  reportingIntervalHours: number;
+  exportFormats: string[];
+  dashboardIntegrationEnabled: boolean;
+
+  // 🔄 Recovery & Error Handling
+  autoRecoveryEnabled: boolean;
+  manualApprovalRequired: boolean;
+  approvalWorkflowEnabled: boolean;
+  escalationEnabled: boolean;
+  escalationThreshold: number;
+  backupSystemsEnabled: boolean;
+
+  // 🚀 Performance Optimization
+  cachingEnabled: boolean;
+  connectionPoolingEnabled: boolean;
+  loadBalancingEnabled: boolean;
+  circuitBreakerEnabled: boolean;
+  circuitBreakerThreshold: number;
+  rateLimitingEnabled: boolean;
+
+  // 🔐 Security Enhancements
+  encryptionEnabled: boolean;
+  auditLoggingEnabled: boolean;
+  sessionManagementEnabled: boolean;
+  ipWhitelistEnabled: boolean;
+  allowedIPs: string[];
+  twoFactorAuthRequired: boolean;
+
+  // 📱 Multi-Channel Support
+  multiAgentSupportEnabled: boolean;
+  agentLoadBalancingEnabled: boolean;
+  agentHealthChecksEnabled: boolean;
+  agentFailoverEnabled: boolean;
+  agentPriorityList: string[];
+
+  // ⏰ Scheduling & Automation
+  scheduledTransfersEnabled: boolean;
+  businessHoursOnly: boolean;
+  maintenanceWindows: string[];
+  autoScalingEnabled: boolean;
+  predictiveScalingEnabled: boolean;
+
+  // 🔗 Integration Settings
+  externalApiIntegrations: {
+    enabled: boolean;
+    endpoints: string[];
+    authentication: {
+      type: 'api_key' | 'oauth' | 'basic_auth';
+      credentials: Record<string, string>;
+    };
+  };
+  webhookIntegrations: {
+    enabled: boolean;
+    endpoints: string[];
+    retryPolicy: {
+      maxRetries: number;
+      backoffMultiplier: number;
+    };
+  };
+
+  // 📊 Monitoring & Observability
+  monitoringEnabled: boolean;
+  metricsEndpoint: string;
+  healthCheckEndpoint: string;
+  loggingLevel: 'debug' | 'info' | 'warn' | 'error';
+  logRetentionDays: number;
+  distributedTracingEnabled: boolean;
+
+  // 💾 Data Management
+  dataRetentionEnabled: boolean;
+  retentionPeriodDays: number;
+  dataArchivingEnabled: boolean;
+  backupFrequency: string;
+  encryptionAtRest: boolean;
+
+  // 🎯 Advanced Validation
+  customValidationRules: {
+    enabled: boolean;
+    rules: Array<{
+      name: string;
+      condition: string;
+      action: 'allow' | 'deny' | 'review';
+    }>;
+  };
+  duplicateDetectionEnabled: boolean;
+  transactionDeduplicationWindow: number;
+
+  // 🚦 Rate Limiting & Throttling
+  rateLimitEnabled: boolean;
+  rateLimitRequestsPerMinute: number;
+  rateLimitRequestsPerHour: number;
+  burstLimitEnabled: boolean;
+  burstLimitRequests: number;
+  throttlingEnabled: boolean;
+
+  // 🎨 User Experience
+  uiFeedbackEnabled: boolean;
+  realTimeUpdatesEnabled: boolean;
+  progressIndicatorsEnabled: boolean;
+  confirmationMessagesEnabled: boolean;
+  errorMessagesEnabled: boolean;
+  accessibilityFeaturesEnabled: boolean;
+
+  // 📋 Compliance & Audit
+  auditTrailEnabled: boolean;
+  regulatoryComplianceEnabled: boolean;
+  dataPrivacyEnabled: boolean;
+  consentManagementEnabled: boolean;
+  gdprComplianceEnabled: boolean;
+  ccpaComplianceEnabled: boolean;
+
+  // 🔧 Maintenance & Operations
+  maintenanceModeEnabled: boolean;
+  systemHealthChecksEnabled: boolean;
+  automaticUpdatesEnabled: boolean;
+  rollbackEnabled: boolean;
+  disasterRecoveryEnabled: boolean;
+
+  // 🌐 Internationalization
+  internationalizationEnabled: boolean;
+  supportedLanguages: string[];
+  defaultLanguage: string;
+  currencySupport: string[];
+  timezoneSupport: string[];
+
+  // 📈 Business Intelligence
+  biIntegrationEnabled: boolean;
+  dataWarehouseEnabled: boolean;
+  realTimeReportingEnabled: boolean;
+  predictiveAnalyticsEnabled: boolean;
+  machineLearningEnabled: boolean;
+
+  // 🔗 API Management
+  apiRateLimitingEnabled: boolean;
+  apiVersioningEnabled: boolean;
+  apiDocumentationEnabled: boolean;
+  apiTestingEnabled: boolean;
+  apiMonitoringEnabled: boolean;
+
+  // 💳 Payment Processing
+  paymentGatewayIntegration: {
+    enabled: boolean;
+    providers: string[];
+    failoverEnabled: boolean;
+    loadBalancingEnabled: boolean;
+  };
+  cryptoCurrencySupport: {
+    enabled: boolean;
+    supportedCurrencies: string[];
+    walletIntegrationEnabled: boolean;
+  };
 }
 
 export interface P2PTransferRequest {
@@ -40,6 +245,28 @@ export class Fantasy42P2PAutomation {
   private config: P2PAutomationConfig;
   private activeTransfers: Map<string, P2PTransferRequest> = new Map();
   private automationActive: boolean = false;
+
+  // 🆕 New Properties for Enhanced Features
+  private riskScores: Map<string, number> = new Map();
+  private transferHistory: Map<string, P2PTransferRequest[]> = new Map();
+  private notificationQueue: Array<{ type: string; data: any; priority: 'low' | 'medium' | 'high' }> = [];
+  private rateLimitCounters: Map<string, { count: number; resetTime: number }> = new Map();
+  private geoCache: Map<string, { country: string; allowed: boolean }> = new Map();
+  private circuitBreakerState: 'closed' | 'open' | 'half-open' = 'closed';
+  private circuitBreakerFailures: number = 0;
+  private performanceMetrics: {
+    totalTransfers: number;
+    successfulTransfers: number;
+    failedTransfers: number;
+    averageProcessingTime: number;
+    lastHealthCheck: Date;
+  } = {
+    totalTransfers: 0,
+    successfulTransfers: 0,
+    failedTransfers: 0,
+    averageProcessingTime: 0,
+    lastHealthCheck: new Date()
+  };
 
   constructor(
     p2pMatching: P2PPaymentMatching,
@@ -741,20 +968,409 @@ export class Fantasy42P2PAutomation {
   }
 
   /**
-   * Get automation status
+   * Get comprehensive automation status
    */
   getStatus(): {
+    // Core Status
     automationActive: boolean;
     activeTransfers: number;
     config: P2PAutomationConfig;
     lastActivity: string;
+
+    // 🆕 Enhanced Status Information
+    performance: {
+      totalTransfers: number;
+      successfulTransfers: number;
+      failedTransfers: number;
+      successRate: number;
+      averageProcessingTime: number;
+      lastHealthCheck: string;
+    };
+
+    risk: {
+      highRiskTransfers: number;
+      mediumRiskTransfers: number;
+      lowRiskTransfers: number;
+      blockedTransfers: number;
+    };
+
+    notifications: {
+      queued: number;
+      sent: number;
+      failed: number;
+    };
+
+    limits: {
+      rateLimited: boolean;
+      circuitBreakerState: string;
+      currentLoad: number;
+      maxCapacity: number;
+    };
+
+    features: {
+      riskScoringEnabled: boolean;
+      fraudDetectionEnabled: boolean;
+      geoRestrictionsEnabled: boolean;
+      feeCalculationEnabled: boolean;
+      analyticsEnabled: boolean;
+      notificationsEnabled: boolean;
+      backupSystemsEnabled: boolean;
+    };
   } {
+    const totalRiskTransfers = Array.from(this.riskScores.values());
+    const highRisk = totalRiskTransfers.filter(score => score >= this.config.riskThresholdHigh || 0).length;
+    const mediumRisk = totalRiskTransfers.filter(score =>
+      score >= (this.config.riskThresholdMedium || 0) && score < (this.config.riskThresholdHigh || 100)
+    ).length;
+    const lowRisk = totalRiskTransfers.filter(score => score < (this.config.riskThresholdMedium || 50)).length;
+
     return {
+      // Core Status
       automationActive: this.automationActive,
       activeTransfers: this.activeTransfers.size,
       config: this.config,
       lastActivity: new Date().toISOString(),
+
+      // Performance Metrics
+      performance: {
+        totalTransfers: this.performanceMetrics.totalTransfers,
+        successfulTransfers: this.performanceMetrics.successfulTransfers,
+        failedTransfers: this.performanceMetrics.failedTransfers,
+        successRate: this.performanceMetrics.totalTransfers > 0
+          ? (this.performanceMetrics.successfulTransfers / this.performanceMetrics.totalTransfers) * 100
+          : 0,
+        averageProcessingTime: this.performanceMetrics.averageProcessingTime,
+        lastHealthCheck: this.performanceMetrics.lastHealthCheck.toISOString(),
+      },
+
+      // Risk Assessment
+      risk: {
+        highRiskTransfers: highRisk,
+        mediumRiskTransfers: mediumRisk,
+        lowRiskTransfers: lowRisk,
+        blockedTransfers: totalRiskTransfers.filter(score => score >= this.config.riskThreshold).length,
+      },
+
+      // Notification Status
+      notifications: {
+        queued: this.notificationQueue.length,
+        sent: 0, // Would track in real implementation
+        failed: 0, // Would track in real implementation
+      },
+
+      // System Limits
+      limits: {
+        rateLimited: Array.from(this.rateLimitCounters.values()).some(counter =>
+          counter.count >= this.config.rateLimitRequestsPerMinute
+        ),
+        circuitBreakerState: this.circuitBreakerState,
+        currentLoad: this.activeTransfers.size,
+        maxCapacity: this.config.maxConcurrentTransfers,
+      },
+
+      // Feature Status
+      features: {
+        riskScoringEnabled: this.config.riskScoringEnabled,
+        fraudDetectionEnabled: this.config.fraudDetectionEnabled,
+        geoRestrictionsEnabled: this.config.geoRestrictionsEnabled,
+        feeCalculationEnabled: this.config.feeCalculationEnabled,
+        analyticsEnabled: this.config.analyticsEnabled,
+        notificationsEnabled: this.config.emailNotificationsEnabled ||
+                            this.config.smsNotificationsEnabled ||
+                            this.config.webhookNotificationsEnabled,
+        backupSystemsEnabled: this.config.backupSystemsEnabled,
+      },
     };
+  }
+
+  // 🆕 Enhanced Methods for New Features
+
+  /**
+   * Calculate risk score for a transfer request
+   */
+  private async calculateRiskScore(request: P2PTransferRequest): Promise<number> {
+    if (!this.config.riskScoringEnabled) return 0;
+
+    let riskScore = 0;
+
+    // Amount-based risk
+    if (request.amount > this.config.maxTransferAmount * 0.8) riskScore += 20;
+    if (request.amount > this.config.maxTransferAmount * 0.9) riskScore += 30;
+
+    // Velocity checks
+    if (this.config.velocityChecksEnabled) {
+      const recentTransfers = this.getRecentTransfers(request.senderCustomerId, 60); // Last hour
+      if (recentTransfers.length > this.config.maxTransfersPerHour) riskScore += 40;
+    }
+
+    // Geographic risk
+    if (this.config.geoRestrictionsEnabled) {
+      const geoAllowed = await this.checkGeographicRestrictions(request);
+      if (!geoAllowed) riskScore += 50;
+    }
+
+    // Suspicious patterns
+    if (this.checkSuspiciousPatterns(request)) riskScore += 35;
+
+    // Store risk score
+    this.riskScores.set(request.transactionId, riskScore);
+
+    return riskScore;
+  }
+
+  /**
+   * Check geographic restrictions
+   */
+  private async checkGeographicRestrictions(request: P2PTransferRequest): Promise<boolean> {
+    if (!this.config.geoRestrictionsEnabled) return true;
+
+    // This would integrate with a geo-IP service
+    // For now, return true as placeholder
+    return true;
+  }
+
+  /**
+   * Check for suspicious patterns
+   */
+  private checkSuspiciousPatterns(request: P2PTransferRequest): boolean {
+    if (!this.config.fraudDetectionEnabled) return false;
+
+    const suspiciousPatterns = this.config.suspiciousPatterns || [];
+
+    for (const pattern of suspiciousPatterns) {
+      if (request.senderAddress.includes(pattern) ||
+          request.recipientAddress.includes(pattern)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Send notifications based on configuration
+   */
+  private async sendNotification(
+    type: string,
+    data: any,
+    priority: 'low' | 'medium' | 'high' = 'medium'
+  ): Promise<void> {
+    if (!this.config.emailNotificationsEnabled &&
+        !this.config.smsNotificationsEnabled &&
+        !this.config.webhookNotificationsEnabled) {
+      return;
+    }
+
+    const notification = { type, data, priority, timestamp: new Date() };
+    this.notificationQueue.push(notification);
+
+    // Process notification based on type and priority
+    await this.processNotification(notification);
+  }
+
+  /**
+   * Process queued notifications
+   */
+  private async processNotification(notification: any): Promise<void> {
+    const { type, data, priority } = notification;
+
+    // Email notifications
+    if (this.config.emailNotificationsEnabled && this.config.notificationRecipients.length > 0) {
+      await this.sendEmailNotification(type, data, priority);
+    }
+
+    // SMS notifications for high priority
+    if (this.config.smsNotificationsEnabled && priority === 'high') {
+      await this.sendSMSNotification(type, data);
+    }
+
+    // Webhook notifications
+    if (this.config.webhookNotificationsEnabled && this.config.webhookUrl) {
+      await this.sendWebhookNotification(type, data);
+    }
+  }
+
+  /**
+   * Calculate fees for transfer
+   */
+  private calculateTransferFee(amount: number): number {
+    if (!this.config.feeCalculationEnabled) return 0;
+
+    const { feeStructure } = this.config;
+    let fee = 0;
+
+    // Percentage-based fee
+    if (feeStructure.percentage > 0) {
+      fee += (amount * feeStructure.percentage) / 100;
+    }
+
+    // Fixed amount fee
+    fee += feeStructure.fixedAmount;
+
+    // Apply min/max constraints
+    fee = Math.max(fee, feeStructure.minFee);
+    fee = Math.min(fee, feeStructure.maxFee);
+
+    return fee;
+  }
+
+  /**
+   * Check rate limits
+   */
+  private checkRateLimit(identifier: string): boolean {
+    if (!this.config.rateLimitEnabled) return true;
+
+    const now = Date.now();
+    const counter = this.rateLimitCounters.get(identifier);
+
+    if (!counter || now > counter.resetTime) {
+      // Reset counter
+      this.rateLimitCounters.set(identifier, {
+        count: 1,
+        resetTime: now + 60000 // 1 minute
+      });
+      return true;
+    }
+
+    if (counter.count >= this.config.rateLimitRequestsPerMinute) {
+      return false;
+    }
+
+    counter.count++;
+    return true;
+  }
+
+  /**
+   * Circuit breaker pattern implementation
+   */
+  private async executeWithCircuitBreaker<T>(
+    operation: () => Promise<T>,
+    operationName: string
+  ): Promise<T> {
+    if (!this.config.circuitBreakerEnabled) {
+      return await operation();
+    }
+
+    if (this.circuitBreakerState === 'open') {
+      throw new Error(`Circuit breaker is OPEN for ${operationName}`);
+    }
+
+    try {
+      const result = await operation();
+      this.circuitBreakerFailures = 0;
+      this.circuitBreakerState = 'closed';
+      return result;
+    } catch (error) {
+      this.circuitBreakerFailures++;
+      if (this.circuitBreakerFailures >= this.config.circuitBreakerThreshold) {
+        this.circuitBreakerState = 'open';
+        console.warn(`🔌 Circuit breaker OPENED for ${operationName}`);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Collect performance metrics
+   */
+  private updatePerformanceMetrics(
+    operation: string,
+    duration: number,
+    success: boolean
+  ): void {
+    if (!this.config.performanceTrackingEnabled) return;
+
+    this.performanceMetrics.totalTransfers++;
+    if (success) {
+      this.performanceMetrics.successfulTransfers++;
+    } else {
+      this.performanceMetrics.failedTransfers++;
+    }
+
+    // Update average processing time
+    const totalTime = this.performanceMetrics.averageProcessingTime * (this.performanceMetrics.totalTransfers - 1);
+    this.performanceMetrics.averageProcessingTime = (totalTime + duration) / this.performanceMetrics.totalTransfers;
+  }
+
+  /**
+   * Get recent transfers for velocity checks
+   */
+  private getRecentTransfers(customerId: string, minutes: number): P2PTransferRequest[] {
+    const history = this.transferHistory.get(customerId) || [];
+    const cutoff = new Date(Date.now() - minutes * 60 * 1000);
+
+    return history.filter(transfer => {
+      // This would need proper timestamp handling in real implementation
+      return true; // Placeholder
+    });
+  }
+
+  /**
+   * Validate with custom rules
+   */
+  private async validateWithCustomRules(request: P2PTransferRequest): Promise<{ valid: boolean; reason?: string }> {
+    if (!this.config.customValidationRules.enabled) {
+      return { valid: true };
+    }
+
+    for (const rule of this.config.customValidationRules.rules) {
+      const conditionMet = await this.evaluateRuleCondition(rule.condition, request);
+
+      if (conditionMet) {
+        switch (rule.action) {
+          case 'deny':
+            return { valid: false, reason: rule.name };
+          case 'review':
+            // Flag for manual review
+            await this.flagForManualReview(request, rule.name);
+            break;
+          case 'allow':
+            // Continue processing
+            break;
+        }
+      }
+    }
+
+    return { valid: true };
+  }
+
+  /**
+   * Check for duplicate transactions
+   */
+  private async checkForDuplicates(request: P2PTransferRequest): Promise<boolean> {
+    if (!this.config.duplicateDetectionEnabled) return false;
+
+    const history = this.transferHistory.get(request.senderCustomerId) || [];
+    const windowMs = this.config.transactionDeduplicationWindow * 60 * 1000;
+    const cutoff = new Date(Date.now() - windowMs);
+
+    return history.some(transfer =>
+      transfer.recipientCustomerId === request.recipientCustomerId &&
+      transfer.amount === request.amount &&
+      transfer.paymentMethod === request.paymentMethod
+    );
+  }
+
+  // Placeholder methods for new features (would be implemented with actual services)
+  private async sendEmailNotification(type: string, data: any, priority: 'low' | 'medium' | 'high'): Promise<void> {
+    console.log(`📧 Email notification: ${type} (${priority})`, data);
+  }
+
+  private async sendSMSNotification(type: string, data: any): Promise<void> {
+    console.log(`📱 SMS notification: ${type}`, data);
+  }
+
+  private async sendWebhookNotification(type: string, data: any): Promise<void> {
+    console.log(`🔗 Webhook notification: ${type}`, data);
+  }
+
+  private async evaluateRuleCondition(condition: string, request: P2PTransferRequest): Promise<boolean> {
+    // Placeholder for rule evaluation logic
+    return false;
+  }
+
+  private async flagForManualReview(request: P2PTransferRequest, ruleName: string): Promise<void> {
+    console.log(`🏷️ Flagged for review: ${request.transactionId} (${ruleName})`);
   }
 
   /**
@@ -763,6 +1379,8 @@ export class Fantasy42P2PAutomation {
   stop(): void {
     this.automationActive = false;
     this.activeTransfers.clear();
+    this.notificationQueue = [];
+    this.rateLimitCounters.clear();
     console.log('🛑 Fantasy42 P2P Automation stopped');
   }
 }

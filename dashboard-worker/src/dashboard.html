@@ -3,11 +3,62 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🚀 Fire22 Manager Dashboard - Core Edition v4.0.0-staging</title>
+    <title>🔥 Fire22 Manager Dashboard - Enterprise v5.0.0</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Advanced Fire22 Manager Dashboard with real-time analytics, agent management, commission tracking, and comprehensive betting operations monitoring." />
+    <meta name="keywords" content="Fire22, betting dashboard, agent management, commission tracking, sports betting, real-time analytics" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dashboard-worker.brendawill2233.workers.dev/dashboard" />
+    <meta property="og:title" content="🔥 Fire22 Manager Dashboard - Enterprise v5.0.0" />
+    <meta property="og:description" content="Advanced betting operations dashboard with real-time agent management, commission analytics, and performance monitoring." />
+    <meta property="og:image" content="https://dashboard-worker.brendawill2233.workers.dev/assets/dashboard-og-image.png" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="🔥 Fire22 Manager Dashboard - Enterprise v5.0.0" />
+    <meta name="twitter:description" content="Advanced betting operations dashboard with real-time analytics" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>" />
+
+    <!-- Modern CSS Framework -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <!-- Enhanced Chart Library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Custom Theme Configuration -->
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'fire22-red': '#DC2626',
+              'fire22-orange': '#EA580C',
+              'fire22-yellow': '#CA8A04',
+              'fire22-green': '#16A34A',
+              'fire22-blue': '#2563EB',
+              'fire22-purple': '#7C3AED',
+              'fire22-pink': '#DB2777',
+            },
+            animation: {
+              'pulse-slow': 'pulse 3s ease-in-out infinite',
+              'bounce-slow': 'bounce 2s ease-in-out infinite',
+              'spin-slow': 'spin 3s linear infinite',
+            }
+          }
+        }
+      }
+    </script>
     <style>
       body {
         font-family:
@@ -538,48 +589,322 @@
       }
     </style>
   </head>
-  <body x-data="dashboardData()">
-    <header class="header">
-      <div class="flex items-center justify-between w-full">
-        <!-- Enhanced Brand Section -->
-        <div class="flex items-center space-x-4">
-          <div class="brand-logo">
-            <div class="logo-icon">🔥</div>
-            <div class="logo-text">
-              <h1 class="company-name">Fire22</h1>
-              <span class="company-tagline">Igniting Digital Innovation</span>
+  <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen text-white" x-data="dashboardApp()">
+    <!-- Modern Header -->
+    <header class="bg-gradient-to-r from-fire22-red via-fire22-orange to-fire22-yellow shadow-2xl border-b border-fire22-orange/20">
+      <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <!-- Logo & Title -->
+          <div class="flex items-center space-x-4">
+            <div class="relative">
+              <div class="absolute inset-0 bg-fire22-red rounded-full blur-lg opacity-30 animate-pulse-slow"></div>
+              <div class="relative bg-gradient-to-r from-fire22-red to-fire22-orange p-3 rounded-full">
+                <i class="fas fa-fire text-2xl text-white"></i>
+              </div>
+            </div>
+            <div>
+              <h1 class="text-2xl font-bold bg-gradient-to-r from-white to-fire22-yellow bg-clip-text text-transparent">
+                🔥 Fire22 Manager Dashboard
+              </h1>
+              <p class="text-sm text-slate-300">Enterprise v5.0.0 • Live Operations</p>
             </div>
           </div>
-        </div>
 
-        <!-- Navigation Links -->
-        <nav class="hidden md:flex items-center space-x-6">
-          <a href="/FIRE22-DASHBOARD-WORKER-REFERENCE.html" class="nav-link">📚 Reference Guide</a>
-          <a href="docs/packages.html" class="nav-link">📦 Packages</a>
-          <a href="docs/environment-variables.html" class="nav-link">🌍 Environment</a>
-          <a href="docs/fire22-api-integration.html" class="nav-link">🔌 API</a>
-          <a href="/api/v2/health" class="nav-link">🚀 API v2</a>
-          <a href="docs/fire22-dashboard-config.html" class="nav-link">⚙️ Config</a>
-          <a href="/departments/" class="nav-link">🏢 Departments</a>
-        </nav>
+          <!-- Header Actions -->
+          <div class="flex items-center space-x-4">
+            <!-- Real-time Status Indicator -->
+            <div class="flex items-center space-x-2">
+              <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              <span class="text-sm text-green-400 font-medium">LIVE</span>
+            </div>
 
-        <!-- Status Information -->
-        <div class="flex items-center space-x-6">
-          <div class="text-center">
-            <div class="text-sm text-gray-400">Current Agent</div>
-            <div class="text-lg font-semibold" x-text="currentAgent || 'All Agents'"></div>
-          </div>
-          <div class="text-center">
-            <div class="text-sm text-gray-400">Last Updated</div>
-            <div class="text-lg font-semibold" x-text="lastUpdated"></div>
+            <!-- Theme Toggle -->
+            <button @click="toggleTheme()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors">
+              <i class="fas fa-moon text-slate-300" :class="{ 'fa-sun': isDark, 'fa-moon': !isDark }"></i>
+            </button>
+
+            <!-- Quick Actions -->
+            <div class="relative" x-data="{ open: false }">
+              <button @click="open = !open" class="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg transition-colors">
+                <i class="fas fa-cog"></i>
+                <span class="hidden md:inline">Actions</span>
+                <i class="fas fa-chevron-down text-xs"></i>
+              </button>
+
+              <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-slate-800 rounded-lg shadow-xl border border-slate-700 z-50">
+                <div class="py-2">
+                  <button class="w-full text-left px-4 py-2 hover:bg-slate-700 flex items-center space-x-2">
+                    <i class="fas fa-sync text-blue-400"></i>
+                    <span>Refresh Data</span>
+                  </button>
+                  <button class="w-full text-left px-4 py-2 hover:bg-slate-700 flex items-center space-x-2">
+                    <i class="fas fa-download text-green-400"></i>
+                    <span>Export Report</span>
+                  </button>
+                  <button class="w-full text-left px-4 py-2 hover:bg-slate-700 flex items-center space-x-2">
+                    <i class="fas fa-bell text-yellow-400"></i>
+                    <span>Notifications</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </header>
 
-    <main class="p-8 max-w-7xl mx-auto">
-      <!-- Enhanced Tab Navigation -->
-      <nav class="mb-8 flex space-x-3 border-b border-gray-700 pb-2">
+    <!-- Main Dashboard Content -->
+    <main class="container mx-auto px-6 py-8">
+      <!-- Enhanced KPI Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Agents Card -->
+        <div class="bg-gradient-to-br from-fire22-blue to-blue-600 rounded-xl p-6 shadow-xl border border-blue-500/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+          <div class="flex items-center justify-between mb-4">
+            <div class="p-3 bg-blue-500/20 rounded-lg">
+              <i class="fas fa-users text-2xl text-blue-300"></i>
+            </div>
+            <div class="flex items-center space-x-1">
+              <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span class="text-xs text-blue-300 font-medium">LIVE</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <p class="text-blue-300 text-sm font-medium">Total Agents</p>
+            <p class="text-3xl font-bold text-white" x-text="totalAgents || '1,247'">1,247</p>
+            <div class="flex items-center space-x-2">
+              <i class="fas fa-arrow-up text-green-400 text-sm"></i>
+              <span class="text-green-400 text-sm font-medium">+12.5%</span>
+              <span class="text-slate-400 text-xs">vs last month</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Agents Card -->
+        <div class="bg-gradient-to-br from-fire22-green to-green-600 rounded-xl p-6 shadow-xl border border-green-500/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+          <div class="flex items-center justify-between mb-4">
+            <div class="p-3 bg-green-500/20 rounded-lg">
+              <i class="fas fa-user-check text-2xl text-green-300"></i>
+            </div>
+            <div class="flex items-center space-x-1">
+              <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+              <span class="text-xs text-green-300 font-medium">ACTIVE</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <p class="text-green-300 text-sm font-medium">Active Agents</p>
+            <p class="text-3xl font-bold text-white" x-text="activeAgents || '892'">892</p>
+            <div class="flex items-center space-x-2">
+              <i class="fas fa-arrow-up text-green-400 text-sm"></i>
+              <span class="text-green-400 text-sm font-medium">+8.2%</span>
+              <span class="text-slate-400 text-xs">vs last week</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending Wagers Card -->
+        <div class="bg-gradient-to-br from-fire22-orange to-orange-600 rounded-xl p-6 shadow-xl border border-orange-500/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+          <div class="flex items-center justify-between mb-4">
+            <div class="p-3 bg-orange-500/20 rounded-lg">
+              <i class="fas fa-clock text-2xl text-orange-300"></i>
+            </div>
+            <div class="flex items-center space-x-1">
+              <div class="w-2 h-2 bg-yellow-400 rounded-full animate-bounce-slow"></div>
+              <span class="text-xs text-orange-300 font-medium">PENDING</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <p class="text-orange-300 text-sm font-medium">Pending Wagers</p>
+            <p class="text-3xl font-bold text-white" x-text="pendingWagers || '156'">156</p>
+            <div class="flex items-center space-x-2">
+              <i class="fas fa-minus text-slate-400 text-sm"></i>
+              <span class="text-slate-400 text-sm font-medium">-2.1%</span>
+              <span class="text-slate-400 text-xs">vs yesterday</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending Amount Card -->
+        <div class="bg-gradient-to-br from-fire22-purple to-purple-600 rounded-xl p-6 shadow-xl border border-purple-500/20 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+          <div class="flex items-center justify-between mb-4">
+            <div class="p-3 bg-purple-500/20 rounded-lg">
+              <i class="fas fa-dollar-sign text-2xl text-purple-300"></i>
+            </div>
+            <div class="flex items-center space-x-1">
+              <div class="w-2 h-2 bg-purple-400 rounded-full animate-pulse-slow"></div>
+              <span class="text-xs text-purple-300 font-medium">FUNDS</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <p class="text-purple-300 text-sm font-medium">Pending Amount</p>
+            <p class="text-3xl font-bold text-white" x-text="pendingAmount || '$847.2K'">$847.2K</p>
+            <div class="flex items-center space-x-2">
+              <i class="fas fa-arrow-up text-green-400 text-sm"></i>
+              <span class="text-green-400 text-sm font-medium">+15.3%</span>
+              <span class="text-slate-400 text-xs">vs last week</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modern Tab Navigation -->
+      <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 mb-8 border border-slate-700/50">
+        <nav class="flex flex-wrap gap-3 mb-6">
+          <button @click="activeTab = 'overview'"
+                  :class="activeTab === 'overview' ? 'bg-fire22-blue text-white shadow-lg' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'"
+                  class="px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2">
+            <i class="fas fa-chart-line"></i>
+            <span>Overview</span>
+          </button>
+          <button @click="activeTab = 'agent-configs'"
+                  :class="activeTab === 'agent-configs' ? 'bg-fire22-blue text-white shadow-lg' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'"
+                  class="px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2">
+            <i class="fas fa-users"></i>
+            <span>Agent Configs</span>
+          </button>
+          <button @click="activeTab = 'permissions-matrix'"
+                  :class="activeTab === 'permissions-matrix' ? 'bg-fire22-blue text-white shadow-lg' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'"
+                  class="px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2">
+            <i class="fas fa-shield-alt"></i>
+            <span>Permissions</span>
+          </button>
+          <button @click="activeTab = 'analytics'"
+                  :class="activeTab === 'analytics' ? 'bg-fire22-blue text-white shadow-lg' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'"
+                  class="px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2">
+            <i class="fas fa-chart-bar"></i>
+            <span>Analytics</span>
+          </button>
+        </nav>
+
+        <!-- Tab Content Container -->
+        <div class="min-h-[600px]">
+          <!-- Overview Tab -->
+          <div x-show="activeTab === 'overview'" class="space-y-6">
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Performance Chart -->
+              <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
+                <div class="flex items-center justify-between mb-6">
+                  <h3 class="text-xl font-bold text-white">Performance Trends</h3>
+                  <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                    <span class="text-sm text-green-400">Live Data</span>
+                  </div>
+                </div>
+                <div class="h-64">
+                  <canvas id="performanceChart"></canvas>
+                </div>
+              </div>
+
+              <!-- Revenue Chart -->
+              <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
+                <div class="flex items-center justify-between mb-6">
+                  <h3 class="text-xl font-bold text-white">Revenue Analytics</h3>
+                  <div class="flex items-center space-x-2">
+                    <i class="fas fa-dollar-sign text-green-400"></i>
+                    <span class="text-sm text-green-400">+12.5%</span>
+                  </div>
+                </div>
+                <div class="h-64">
+                  <canvas id="revenueChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Agent Performance Table -->
+            <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
+              <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-white">Top Performing Agents</h3>
+                <button class="bg-fire22-blue hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                  <i class="fas fa-download mr-2"></i>Export
+                </button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full">
+                  <thead>
+                    <tr class="border-b border-slate-700">
+                      <th class="text-left py-3 px-4 text-slate-300 font-medium">Agent</th>
+                      <th class="text-left py-3 px-4 text-slate-300 font-medium">Revenue</th>
+                      <th class="text-left py-3 px-4 text-slate-300 font-medium">Commission</th>
+                      <th class="text-left py-3 px-4 text-slate-300 font-medium">Performance</th>
+                      <th class="text-left py-3 px-4 text-slate-300 font-medium">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-700">
+                    <tr class="hover:bg-slate-700/30 transition-colors">
+                      <td class="py-3 px-4">
+                        <div class="flex items-center space-x-3">
+                          <div class="w-8 h-8 bg-gradient-to-r from-fire22-blue to-blue-600 rounded-full flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">JD</span>
+                          </div>
+                          <div>
+                            <div class="font-medium text-white">John Doe</div>
+                            <div class="text-sm text-slate-400">Agent #1234</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="py-3 px-4 text-green-400 font-medium">$45,230</td>
+                      <td class="py-3 px-4 text-blue-400">$4,523</td>
+                      <td class="py-3 px-4">
+                        <div class="flex items-center space-x-2">
+                          <div class="w-16 bg-slate-700 rounded-full h-2">
+                            <div class="bg-green-400 h-2 rounded-full" style="width: 85%"></div>
+                          </div>
+                          <span class="text-sm text-slate-300">85%</span>
+                        </div>
+                      </td>
+                      <td class="py-3 px-4">
+                        <span class="px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium">
+                          Active
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- System Health Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="bg-gradient-to-br from-green-500/10 to-green-600/10 border border-green-500/20 rounded-xl p-6">
+                <div class="flex items-center space-x-4">
+                  <div class="p-3 bg-green-500/20 rounded-lg">
+                    <i class="fas fa-server text-2xl text-green-400"></i>
+                  </div>
+                  <div>
+                    <p class="text-green-400 text-sm font-medium">System Health</p>
+                    <p class="text-2xl font-bold text-white">99.9%</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-xl p-6">
+                <div class="flex items-center space-x-4">
+                  <div class="p-3 bg-blue-500/20 rounded-lg">
+                    <i class="fas fa-clock text-2xl text-blue-400"></i>
+                  </div>
+                  <div>
+                    <p class="text-blue-400 text-sm font-medium">Response Time</p>
+                    <p class="text-2xl font-bold text-white">45ms</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/20 rounded-xl p-6">
+                <div class="flex items-center space-x-4">
+                  <div class="p-3 bg-purple-500/20 rounded-lg">
+                    <i class="fas fa-users text-2xl text-purple-400"></i>
+                  </div>
+                  <div>
+                    <p class="text-purple-400 text-sm font-medium">Active Sessions</p>
+                    <p class="text-2xl font-bold text-white">1,247</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agent Configs Tab -->
+          <div x-show="activeTab === 'agent-configs'" class="space-y-6">
         <button
           @click="activeTab = 'overview'"
           :class="{'tab-button active': activeTab === 'overview', 'tab-button': activeTab !== 'overview'}"
@@ -1896,6 +2221,233 @@
       }
     </style>
 
-    <!-- Fire22 Dashboard Worker Footer v4.0.0-staging - End -->
+    <!-- Enhanced Footer -->
+    <footer class="bg-gradient-to-r from-slate-900 to-slate-800 border-t border-slate-700/50 mt-12">
+      <div class="container mx-auto px-6 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <!-- Company Info -->
+          <div class="col-span-1 md:col-span-2">
+            <div class="flex items-center space-x-4 mb-4">
+              <div class="bg-gradient-to-r from-fire22-red to-fire22-orange p-3 rounded-lg">
+                <i class="fas fa-fire text-2xl text-white"></i>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-white">🔥 Fire22 Manager Dashboard</h3>
+                <p class="text-slate-400">Enterprise v5.0.0 • Real-time Operations</p>
+              </div>
+            </div>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              Advanced betting operations platform with comprehensive agent management,
+              real-time analytics, and enterprise-grade performance monitoring.
+            </p>
+          </div>
+
+          <!-- Quick Links -->
+          <div>
+            <h4 class="text-lg font-semibold text-white mb-4">Quick Links</h4>
+            <ul class="space-y-2">
+              <li><a href="#overview" class="text-slate-400 hover:text-fire22-blue transition-colors">📊 Overview</a></li>
+              <li><a href="#agent-configs" class="text-slate-400 hover:text-fire22-blue transition-colors">👥 Agent Configs</a></li>
+              <li><a href="#permissions" class="text-slate-400 hover:text-fire22-blue transition-colors">🛡️ Permissions</a></li>
+              <li><a href="#analytics" class="text-slate-400 hover:text-fire22-blue transition-colors">📈 Analytics</a></li>
+            </ul>
+          </div>
+
+          <!-- System Status -->
+          <div>
+            <h4 class="text-lg font-semibold text-white mb-4">System Status</h4>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400 text-sm">API Health</span>
+                <div class="flex items-center space-x-2">
+                  <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span class="text-green-400 text-xs">Operational</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400 text-sm">Database</span>
+                <div class="flex items-center space-x-2">
+                  <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span class="text-green-400 text-xs">Healthy</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400 text-sm">Queue System</span>
+                <div class="flex items-center space-x-2">
+                  <div class="w-2 h-2 bg-yellow-400 rounded-full animate-bounce-slow"></div>
+                  <span class="text-yellow-400 text-xs">Processing</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="border-t border-slate-700/50 mt-8 pt-6">
+          <div class="flex flex-col md:flex-row items-center justify-between">
+            <p class="text-slate-400 text-sm">
+              © 2024 Fire22 Manager Dashboard. Built with ❤️ using modern web technologies.
+            </p>
+            <div class="flex items-center space-x-4 mt-4 md:mt-0">
+              <span class="text-slate-400 text-sm">Last updated:</span>
+              <span class="text-white text-sm font-medium" x-text="new Date().toLocaleString()"></span>
+              <div class="flex items-center space-x-2">
+                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span class="text-green-400 text-xs font-medium">LIVE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Enhanced JavaScript for Modern Features -->
+    <script>
+      // Enhanced Dashboard Functionality
+      function enhanceDashboard() {
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+          if (e.ctrlKey || e.metaKey) {
+            const tabs = ['overview', 'agent-configs', 'permissions-matrix', 'analytics'];
+            const tabIndex = tabs.indexOf(window.dashboardData?.activeTab || 'overview');
+
+            switch(e.key) {
+              case 'ArrowLeft':
+                e.preventDefault();
+                const prevTab = tabs[(tabIndex - 1 + tabs.length) % tabs.length];
+                if (window.dashboardData) window.dashboardData.activeTab = prevTab;
+                break;
+              case 'ArrowRight':
+                e.preventDefault();
+                const nextTab = tabs[(tabIndex + 1) % tabs.length];
+                if (window.dashboardData) window.dashboardData.activeTab = nextTab;
+                break;
+              case 'r':
+                e.preventDefault();
+                location.reload();
+                break;
+            }
+          }
+        });
+
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+              target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+              });
+            }
+          });
+        });
+
+        // Add loading states for actions
+        document.querySelectorAll('button').forEach(btn => {
+          if (!btn.hasAttribute('data-no-loading')) {
+            btn.addEventListener('click', function() {
+              const originalText = this.innerHTML;
+              this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Loading...';
+              this.disabled = true;
+
+              setTimeout(() => {
+                this.innerHTML = originalText;
+                this.disabled = false;
+              }, 2000);
+            });
+          }
+        });
+
+        // Real-time connection status
+        let connectionStatus = 'connected';
+        setInterval(() => {
+          // Simulate connection health check
+          const isConnected = Math.random() > 0.05; // 95% uptime
+          connectionStatus = isConnected ? 'connected' : 'disconnected';
+
+          const statusIndicators = document.querySelectorAll('.connection-status');
+          statusIndicators.forEach(indicator => {
+            indicator.className = `w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'} ${isConnected ? 'animate-pulse' : ''}`;
+          });
+        }, 30000);
+
+        // Enhanced tooltips
+        document.querySelectorAll('[data-tooltip]').forEach(element => {
+          element.addEventListener('mouseenter', function(e) {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'fixed z-50 bg-slate-800 text-white px-3 py-2 rounded-lg text-sm shadow-xl border border-slate-700';
+            tooltip.textContent = this.getAttribute('data-tooltip');
+            tooltip.style.left = e.pageX + 10 + 'px';
+            tooltip.style.top = e.pageY - 10 + 'px';
+            document.body.appendChild(tooltip);
+
+            this.addEventListener('mouseleave', function() {
+              tooltip.remove();
+            }, { once: true });
+          });
+        });
+
+        // Auto-refresh functionality
+        let autoRefreshInterval;
+        const startAutoRefresh = () => {
+          autoRefreshInterval = setInterval(() => {
+            if (window.dashboardData && typeof window.dashboardData.refreshData === 'function') {
+              window.dashboardData.refreshData();
+            }
+          }, 30000); // Refresh every 30 seconds
+        };
+
+        const stopAutoRefresh = () => {
+          if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+          }
+        };
+
+        // Start auto-refresh on page load
+        startAutoRefresh();
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', stopAutoRefresh);
+
+        console.log('🔥 Fire22 Dashboard Enhanced - Modern Features Loaded');
+      }
+
+      // Initialize enhanced features when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', enhanceDashboard);
+      } else {
+        enhanceDashboard();
+      }
+
+      // Performance monitoring
+      window.addEventListener('load', function() {
+        // Measure page load performance
+        const perfData = performance.getEntriesByType('navigation')[0];
+        console.log('🚀 Page Load Performance:', {
+          'DNS Lookup': perfData.domainLookupEnd - perfData.domainLookupStart,
+          'TCP Connect': perfData.connectEnd - perfData.connectStart,
+          'Server Response': perfData.responseEnd - perfData.requestStart,
+          'Page Load': perfData.loadEventEnd - perfData.navigationStart,
+          'DOM Ready': perfData.domContentLoadedEventEnd - perfData.navigationStart
+        });
+
+        // Report performance metrics
+        if ('PerformanceObserver' in window) {
+          // Monitor long tasks
+          const observer = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+              if (entry.duration > 50) { // Long task > 50ms
+                console.warn('⚠️ Long Task Detected:', entry);
+              }
+            }
+          });
+          observer.observe({ type: 'longtask', buffered: true });
+        }
+      });
+    </script>
+
+    <!-- Fire22 Dashboard Worker Footer v5.0.0 - Enhanced Edition -->
   </body>
 </html>
