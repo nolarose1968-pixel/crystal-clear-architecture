@@ -4,80 +4,82 @@
  * Progressive Web App features for offline access and caching
  */
 
-const CACHE_NAME = 'fire22-analytics-v1.0.0';
-const API_CACHE_NAME = 'fire22-api-cache-v1.0.0';
+const CACHE_NAME = "fire22-analytics-v1.0.0";
+const API_CACHE_NAME = "fire22-api-cache-v1.0.0";
 
 // Files to cache immediately
 const STATIC_CACHE_URLS = [
-  '/analytics/',
-  '/analytics/index.html',
-  '/analytics/analytics.css',
-  '/analytics/analytics.js',
-  '/analytics/config.js',
-  '/analytics/manifest.json',
-  '/terminal-framework.css',
-  '/performance-dashboard.html'
+  "/analytics/",
+  "/analytics/index.html",
+  "/analytics/analytics.css",
+  "/analytics/analytics.js",
+  "/analytics/config.js",
+  "/analytics/manifest.json",
+  "/terminal-framework.css",
+  "/performance-dashboard.html",
 ];
 
 // API endpoints to cache
 const API_ENDPOINTS = [
-  '/api/dashboard/metrics',
-  '/api/dashboard/analytics',
-  '/api/dashboard/health',
-  '/api/dashboard/performance'
+  "/api/dashboard/metrics",
+  "/api/dashboard/analytics",
+  "/api/dashboard/health",
+  "/api/dashboard/performance",
 ];
 
 /**
  * Install Event - Cache static assets
  */
-self.addEventListener('install', (event) => {
-  console.log('🔧 Installing Fire22 Analytics Service Worker...');
+self.addEventListener("install", (event) => {
+  console.log("🔧 Installing Fire22 Analytics Service Worker...");
 
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches
+      .open(CACHE_NAME)
       .then((cache) => {
-        console.log('📦 Caching static assets...');
+        console.log("📦 Caching static assets...");
         return cache.addAll(STATIC_CACHE_URLS);
       })
       .then(() => {
-        console.log('✅ Static assets cached successfully');
+        console.log("✅ Static assets cached successfully");
         return self.skipWaiting();
       })
       .catch((error) => {
-        console.error('❌ Failed to cache static assets:', error);
-      })
+        console.error("❌ Failed to cache static assets:", error);
+      }),
   );
 });
 
 /**
  * Activate Event - Clean up old caches
  */
-self.addEventListener('activate', (event) => {
-  console.log('🚀 Activating Fire22 Analytics Service Worker...');
+self.addEventListener("activate", (event) => {
+  console.log("🚀 Activating Fire22 Analytics Service Worker...");
 
   event.waitUntil(
-    caches.keys()
+    caches
+      .keys()
       .then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
             if (cacheName !== CACHE_NAME && cacheName !== API_CACHE_NAME) {
-              console.log('🗑️ Deleting old cache:', cacheName);
+              console.log("🗑️ Deleting old cache:", cacheName);
               return caches.delete(cacheName);
             }
-          })
+          }),
         );
       })
       .then(() => {
-        console.log('✅ Service Worker activated successfully');
+        console.log("✅ Service Worker activated successfully");
         return self.clients.claim();
-      })
+      }),
   );
 });
 
 /**
  * Fetch Event - Handle requests with caching strategy
  */
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
@@ -101,15 +103,28 @@ self.addEventListener('fetch', (event) => {
  * Check if request is for API endpoints
  */
 function isApiRequest(url) {
-  return API_ENDPOINTS.some(endpoint => url.pathname.includes(endpoint));
+  return API_ENDPOINTS.some((endpoint) => url.pathname.includes(endpoint));
 }
 
 /**
  * Check if request is for static assets
  */
 function isStaticAsset(url) {
-  const staticExtensions = ['.css', '.js', '.png', '.jpg', '.jpeg', '.svg', '.ico', '.woff', '.woff2'];
-  return staticExtensions.some(ext => url.includes(ext)) || STATIC_CACHE_URLS.includes(url);
+  const staticExtensions = [
+    ".css",
+    ".js",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".svg",
+    ".ico",
+    ".woff",
+    ".woff2",
+  ];
+  return (
+    staticExtensions.some((ext) => url.includes(ext)) ||
+    STATIC_CACHE_URLS.includes(url)
+  );
 }
 
 /**
@@ -128,28 +143,29 @@ async function handleApiRequest(request) {
       return networkResponse;
     }
   } catch (error) {
-    console.log('🌐 Network failed for API request, trying cache:', error);
+    console.log("🌐 Network failed for API request, trying cache:", error);
   }
 
   // Fallback to cache
   const cachedResponse = await caches.match(request);
   if (cachedResponse) {
-    console.log('📦 Serving API response from cache');
+    console.log("📦 Serving API response from cache");
     return cachedResponse;
   }
 
   // Return offline fallback for API
   return new Response(
     JSON.stringify({
-      error: 'Offline',
-      message: 'You are currently offline. Please check your internet connection.',
+      error: "Offline",
+      message:
+        "You are currently offline. Please check your internet connection.",
       offline: true,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }),
     {
       status: 503,
-      headers: { 'Content-Type': 'application/json' }
-    }
+      headers: { "Content-Type": "application/json" },
+    },
   );
 }
 
@@ -171,20 +187,20 @@ async function handleStaticRequest(request) {
     }
     return networkResponse;
   } catch (error) {
-    console.error('Failed to fetch static asset:', error);
+    console.error("Failed to fetch static asset:", error);
 
     // Return offline fallback for HTML pages
-    if (request.headers.get('accept').includes('text/html')) {
+    if (request.headers.get("accept").includes("text/html")) {
       const cache = await caches.open(CACHE_NAME);
-      const fallbackResponse = await cache.match('/analytics/index.html');
+      const fallbackResponse = await cache.match("/analytics/index.html");
       if (fallbackResponse) {
         return fallbackResponse;
       }
     }
 
-    return new Response('Offline - Asset not available', {
+    return new Response("Offline - Asset not available", {
       status: 503,
-      headers: { 'Content-Type': 'text/plain' }
+      headers: { "Content-Type": "text/plain" },
     });
   }
 }
@@ -197,7 +213,7 @@ async function handleNetworkFirst(request) {
     const networkResponse = await fetch(request);
     return networkResponse;
   } catch (error) {
-    console.log('🌐 Network failed, trying cache:', error);
+    console.log("🌐 Network failed, trying cache:", error);
 
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
@@ -205,17 +221,17 @@ async function handleNetworkFirst(request) {
     }
 
     // Return offline page for navigation requests
-    if (request.mode === 'navigate') {
+    if (request.mode === "navigate") {
       const cache = await caches.open(CACHE_NAME);
-      const offlineResponse = await cache.match('/analytics/index.html');
+      const offlineResponse = await cache.match("/analytics/index.html");
       if (offlineResponse) {
         return offlineResponse;
       }
     }
 
-    return new Response('Offline - Content not available', {
+    return new Response("Offline - Content not available", {
       status: 503,
-      headers: { 'Content-Type': 'text/plain' }
+      headers: { "Content-Type": "text/plain" },
     });
   }
 }
@@ -223,10 +239,10 @@ async function handleNetworkFirst(request) {
 /**
  * Background Sync for offline actions
  */
-self.addEventListener('sync', (event) => {
-  console.log('🔄 Background sync triggered:', event.tag);
+self.addEventListener("sync", (event) => {
+  console.log("🔄 Background sync triggered:", event.tag);
 
-  if (event.tag === 'background-sync') {
+  if (event.tag === "background-sync") {
     event.waitUntil(syncOfflineData());
   }
 });
@@ -235,7 +251,7 @@ self.addEventListener('sync', (event) => {
  * Sync offline data when connection is restored
  */
 async function syncOfflineData() {
-  console.log('📤 Syncing offline data...');
+  console.log("📤 Syncing offline data...");
 
   try {
     // Get stored offline actions
@@ -246,11 +262,11 @@ async function syncOfflineData() {
         await fetch(action.url, {
           method: action.method,
           headers: action.headers,
-          body: action.body
+          body: action.body,
         });
-        console.log('✅ Synced offline action:', action.id);
+        console.log("✅ Synced offline action:", action.id);
       } catch (error) {
-        console.error('❌ Failed to sync offline action:', action.id, error);
+        console.error("❌ Failed to sync offline action:", action.id, error);
       }
     }
 
@@ -259,23 +275,22 @@ async function syncOfflineData() {
 
     // Notify clients
     const clients = await self.clients.matchAll();
-    clients.forEach(client => {
+    clients.forEach((client) => {
       client.postMessage({
-        type: 'SYNC_COMPLETE',
-        message: 'Offline data synced successfully'
+        type: "SYNC_COMPLETE",
+        message: "Offline data synced successfully",
       });
     });
-
   } catch (error) {
-    console.error('❌ Background sync failed:', error);
+    console.error("❌ Background sync failed:", error);
   }
 }
 
 /**
  * Push Notifications
  */
-self.addEventListener('push', (event) => {
-  console.log('🔔 Push notification received:', event);
+self.addEventListener("push", (event) => {
+  console.log("🔔 Push notification received:", event);
 
   if (!event.data) return;
 
@@ -283,59 +298,60 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body,
-    icon: '/analytics/icons/icon-192x192.png',
-    badge: '/analytics/icons/icon-72x72.png',
+    icon: "/analytics/icons/icon-192x192.png",
+    badge: "/analytics/icons/icon-72x72.png",
     vibrate: [100, 50, 100],
     data: data.data || {},
     actions: [
       {
-        action: 'view',
-        title: 'View Dashboard'
+        action: "view",
+        title: "View Dashboard",
       },
       {
-        action: 'dismiss',
-        title: 'Dismiss'
-      }
-    ]
+        action: "dismiss",
+        title: "Dismiss",
+      },
+    ],
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Fire22 Analytics', options)
+    self.registration.showNotification(
+      data.title || "Fire22 Analytics",
+      options,
+    ),
   );
 });
 
 /**
  * Notification Click Handler
  */
-self.addEventListener('notificationclick', (event) => {
-  console.log('🔔 Notification clicked:', event);
+self.addEventListener("notificationclick", (event) => {
+  console.log("🔔 Notification clicked:", event);
 
   event.notification.close();
 
-  if (event.action === 'dismiss') {
+  if (event.action === "dismiss") {
     return;
   }
 
   // Open dashboard
-  event.waitUntil(
-    clients.openWindow('/analytics/index.html')
-  );
+  event.waitUntil(clients.openWindow("/analytics/index.html"));
 });
 
 /**
  * Message Handler for client communication
  */
-self.addEventListener('message', (event) => {
-  console.log('💬 Message received from client:', event.data);
+self.addEventListener("message", (event) => {
+  console.log("💬 Message received from client:", event.data);
 
-  if (event.data && event.data.type === 'SKIP_WAITING') {
+  if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
 
-  if (event.data && event.data.type === 'GET_VERSION') {
+  if (event.data && event.data.type === "GET_VERSION") {
     event.ports[0].postMessage({
-      version: '1.0.0',
-      cacheName: CACHE_NAME
+      version: "1.0.0",
+      cacheName: CACHE_NAME,
     });
   }
 });
@@ -351,20 +367,23 @@ async function getOfflineActions() {
 
 async function clearOfflineActions() {
   // Clear offline actions from storage
-  console.log('🧹 Cleared offline actions');
+  console.log("🧹 Cleared offline actions");
 }
 
 /**
  * Periodic Background Sync (if supported)
  */
-if ('periodicSync' in self.registration) {
-  self.registration.periodicSync.register('analytics-sync', {
-    minInterval: 24 * 60 * 60 * 1000 // 24 hours
-  }).then(() => {
-    console.log('⏰ Periodic sync registered');
-  }).catch((error) => {
-    console.log('❌ Periodic sync not supported:', error);
-  });
+if ("periodicSync" in self.registration) {
+  self.registration.periodicSync
+    .register("analytics-sync", {
+      minInterval: 24 * 60 * 60 * 1000, // 24 hours
+    })
+    .then(() => {
+      console.log("⏰ Periodic sync registered");
+    })
+    .catch((error) => {
+      console.log("❌ Periodic sync not supported:", error);
+    });
 }
 
-console.log('🔥 Fire22 Analytics Service Worker loaded successfully');
+console.log("🔥 Fire22 Analytics Service Worker loaded successfully");

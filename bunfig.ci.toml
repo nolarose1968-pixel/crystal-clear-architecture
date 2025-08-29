@@ -1,0 +1,63 @@
+# Fire22 CI/CD Environment Configuration
+# Optimized for continuous integration and deployment
+
+[install]
+# CI/CD specific settings
+production = false                   # Include dev dependencies for testing
+frozenLockfile = true                # Prevent lockfile changes in CI
+optional = false                     # Consistent dependencies across runs
+target = "bun-linux-x64"             # Force Linux binaries for CI
+lockfile = "bun.lockb"               # Use binary lockfile for speed
+global = false                       # Disable global installs
+
+# Trusted dependencies for CI environment
+[install.trustedDependencies]
+esbuild = "*"                        # Bundling for builds
+vite = "^5.0.0"                      # Development server for testing
+playwright-core = "*"                # E2E testing
+typescript = "^5.0.0"                # Type checking
+tailwindcss = "^3.0.0"               # CSS processing
+
+# CI registries with authentication
+[install.scopes]
+"@fire22" = "https://npm.fire22.com/"
+"@enterprise" = { token = "$FIRE22_CI_TOKEN", url = "https://npm.enterprise.com" }
+
+# CI cache settings for faster builds
+[install.cache]
+disable = false
+disableManifest = false
+
+# CI security scanning
+[install.security]
+scanner = "packages/fire22-security-scanner/src/index.ts"
+level = "fatal"
+enable = true
+
+[install.security.options]
+license_check = true
+malware_scan = true
+vulnerability_check = true
+
+# CI runtime settings
+[run]
+shell = "bun"
+silent = false                       # Show output for debugging
+
+# CI logging
+logLevel = "info"
+
+# CI test settings
+[test]
+root = "./src"
+preload = ["./test-setup.ts"]
+coverage = true
+coverageThreshold = { line = 0.8, function = 0.85, statement = 0.8 }
+coverageSkipTestFiles = true
+coverageReporter = ["text", "lcov"]
+coverageDir = "./coverage/ci"
+smol = false
+
+# CI console settings
+[console]
+depth = 4

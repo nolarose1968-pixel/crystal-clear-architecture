@@ -1,10 +1,190 @@
 # Fire22 Enterprise System - Bun Configuration
 # Following Bun semver conventions with enterprise-grade versioning
 
+# Runtime configuration for enterprise development
+preload = ["./scripts/preload.ts"]
+smol = false
+logLevel = "warn"
+
+# JSX configuration for React development
+jsx = "react"
+jsxFactory = "React.createElement"
+jsxFragment = "React.Fragment"
+jsxImportSource = "react"
+
+# Define environment-specific constants
+[define]
+"process.env.NODE_ENV" = "'development'"
+"process.env.FIRE22_ENV" = "'enterprise'"
+"__DEV__" = "true"
+
+# Custom file loaders for enterprise assets
+[loader]
+".fire22" = "ts"
+".enterprise" = "tsx"
+".config" = "json"
+
+# Console output configuration
+[console]
+depth = 4
+
+# Telemetry configuration (disabled for enterprise privacy)
+telemetry = false
+
+# Test runner configuration for enterprise testing
+[test]
+root = "./src"
+preload = ["./test/setup.ts"]
+smol = false
+coverage = true
+
+# Coverage thresholds for enterprise quality standards
+coverageThreshold = { line = 0.8, function = 0.85, statement = 0.8 }
+
+# Skip test files from coverage (avoid double-counting)
+coverageSkipTestFiles = true
+
+# Exclude configuration and build files from coverage
+coveragePathIgnorePatterns = [
+  "**/*.config.*",
+  "**/*.d.ts",
+  "**/build/**",
+  "**/dist/**",
+  "**/node_modules/**",
+  "**/scripts/**",
+  "**/test/**"
+]
+
+# Coverage reporters for different outputs
+coverageReporter = ["text", "lcov", "html"]
+
+# Custom coverage directory
+coverageDir = "./coverage/fire22"
+
 [install]
-registry = "https://registry.npmjs.org/"
-cache = true
+# Core registry configuration with authentication
+registry = { url = "https://registry.npmjs.org", token = "$FIRE22_REGISTRY_TOKEN" }
+
+# Installation behavior - enterprise defaults
 dev = true
+optional = true
+peer = true
+production = false
+
+# Dependency version management
+exact = false                    # Use caret ranges (^) for flexibility
+frozenLockfile = false          # Allow lockfile updates in development
+dryRun = false                  # Perform actual installations
+
+# Lockfile and workspace configuration
+saveTextLockfile = true         # Human-readable lockfiles for collaboration
+linkWorkspacePackages = true    # Enable monorepo workspace linking
+linker = "isolated"             # Strict dependency isolation for security
+
+# Auto-install behavior
+auto = "auto"                   # Smart auto-install for development
+
+# Global package management
+globalDir = "~/.bun/install/global"
+globalBinDir = "~/.bun/bin"
+
+# Enterprise scope configurations with authentication
+[install.scopes]
+"@fire22" = "https://npm.fire22.com/"
+"@enterprise" = { token = "$FIRE22_ENTERPRISE_TOKEN", url = "https://npm.enterprise.com" }
+"@private" = { username = "$FIRE22_PRIVATE_USER", password = "$FIRE22_PRIVATE_PASS", url = "https://npm.private.com" }
+
+# Security: Only trust essential build tools and testing frameworks
+[install.trustedDependencies]
+esbuild = "*"           # Our bundler - trust all versions
+vite = "^5.0.0"         # Development server - trust v5.x.x
+playwright-core = "*"   # Testing framework - trust all versions
+typescript = "^5.0.0"   # TypeScript compiler - trust v5.x.x
+
+# Installation behavior - enterprise defaults
+optional = false                    # Skip optional dependencies for lean installs
+target = "bun-darwin-arm64"         # Force Apple Silicon binaries for consistency
+lockfile = "bun.lockb"              # Use binary lockfile for performance
+global = false                      # Disable global installs for security
+
+# Enterprise installation flags
+dryRun = false                      # Perform actual installations
+force = false                       # Respect existing lockfile
+frozenLockfile = false              # Allow lockfile updates in development
+production = false                  # Include dev dependencies for development
+
+# Exclude problematic packages (if any)
+exclude = []                        # No packages excluded by default
+
+# CA certificate configuration for enterprise proxies
+cafile = "~/.bun/certs/ca-bundle.crt"
+
+# Cache configuration for enterprise performance
+[install.cache]
+dir = "~/.bun/install/cache"
+disable = false
+disableManifest = false
+
+# Lockfile configuration for enterprise reproducibility
+[install.lockfile]
+save = true
+print = "yarn"                  # Generate yarn.lock for compatibility
+
+# Security scanning configuration for enterprise-grade protection
+[install.security]
+# Enable comprehensive security scanning for all packages
+# This protects against supply chain attacks and known vulnerabilities
+scanner = "packages/fire22-security-scanner/src/index.ts"
+
+# Security scanning behavior
+# - "fatal": Stop installation on critical vulnerabilities
+# - "warn": Show warnings but allow installation
+level = "fatal"
+
+# Enable security scanning for all package operations
+# This includes bun install, bun add, bun remove, etc.
+enable = true
+
+# Additional security configuration
+[install.security.options]
+# Scan for license compliance issues
+license_check = true
+
+# Scan for known malicious packages
+malware_scan = true
+
+# Check for outdated dependencies with security fixes
+vulnerability_check = true
+
+# Enterprise security settings
+enterprise_mode = true
+
+# Custom security rules for Fire22
+[install.security.fire22]
+# Block packages from untrusted registries
+trusted_registries_only = true
+
+# Require security audits for new packages
+require_audit = true
+
+# Custom security policies
+policies = [
+    "no-typosquatting",
+    "no-malicious-code",
+    "license-compliance",
+    "supply-chain-security"
+]
+
+# Run configuration for enterprise script execution
+[run]
+# Use Bun's shell for consistent behavior across platforms
+shell = "bun"
+
+# Auto-alias node to bun for seamless migration
+bun = true
+
+# Suppress command reporting for cleaner CI/CD output
+silent = false
 
 # Version Management Configuration
 [version]
@@ -64,12 +244,36 @@ require-tests = true
 require-documentation = true
 enforce-semantic-commits = true
 
+# Test configuration for consistent timezone behavior
+[test]
+# Setup file for timezone and test environment configuration
+preload = "./test-setup.ts"
+
+# Bun test sets TZ to UTC by default for deterministic behavior
+# This ensures consistent timezone handling across all tests
+timezone = "UTC"
+
+# Test environment settings
+env.NODE_ENV = "test"
+env.BUN_TEST_TIMEZONE = "UTC"
+
 # Version automation
 [version.automation]
 auto-tag = true
 auto-changelog = true
 auto-release-notes = true
 github-releases = true
+
+# Path aliases for module resolution
+[resolve.aliases]
+"@ff" = "./"
+"@ff/*" = "./*"
+"@/*" = "./src/*"
+"@/domains/*" = "./src/domains/*"
+"@/shared/*" = "./src/shared/*"
+"@/collections/*" = "./src/collections/*"
+"@/interfaces/*" = "./src/interfaces/*"
+"@/application/*" = "./src/application/*"
 
 # Version metadata
 [version.metadata]

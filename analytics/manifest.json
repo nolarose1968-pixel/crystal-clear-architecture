@@ -66,14 +66,18 @@
       "short_name": "Performance",
       "description": "View system performance metrics",
       "url": "/performance-dashboard.html",
-      "icons": [{ "src": "/analytics/icons/performance-96x96.png", "sizes": "96x96" }]
+      "icons": [
+        { "src": "/analytics/icons/performance-96x96.png", "sizes": "96x96" }
+      ]
     },
     {
       "name": "ROI Calculator",
       "short_name": "ROI",
       "description": "Calculate return on investment",
       "url": "/analytics/index.html#roi-calculator",
-      "icons": [{ "src": "/analytics/icons/calculator-96x96.png", "sizes": "96x96" }]
+      "icons": [
+        { "src": "/analytics/icons/calculator-96x96.png", "sizes": "96x96" }
+      ]
     }
   ],
   "screenshots": [

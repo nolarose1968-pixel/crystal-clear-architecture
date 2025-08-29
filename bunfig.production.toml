@@ -1,0 +1,50 @@
+# Fire22 Production Environment Configuration
+# Optimized for production deployments
+
+[install]
+# Production-specific settings
+production = true                    # Skip dev dependencies
+frozenLockfile = true                # Prevent lockfile changes
+optional = false                     # Skip optional dependencies
+target = "bun-linux-x64"             # Force Linux binaries for production
+lockfile = "bun.lockb"               # Use binary lockfile for performance
+global = false                       # Disable global installs
+
+# Minimal trusted dependencies for production
+[install.trustedDependencies]
+esbuild = "*"                        # Required for production builds
+typescript = "^5.0.0"                # Type checking in production
+
+# Production registries
+[install.scopes]
+"@fire22" = "https://npm.fire22.com/"
+"@enterprise" = { token = "$FIRE22_PROD_TOKEN", url = "https://npm.enterprise.com" }
+
+# Production cache settings
+[install.cache]
+disable = false
+disableManifest = false
+
+# Production security (minimal)
+[install.security]
+scanner = "packages/fire22-security-scanner/src/index.ts"
+level = "fatal"
+enable = true
+
+[install.security.options]
+license_check = true
+malware_scan = true
+vulnerability_check = true
+
+# Production runtime settings
+[run]
+shell = "bun"
+silent = true                        # Reduce CI/CD output
+
+# Production logging
+logLevel = "warn"
+
+# Production test settings (minimal)
+[test]
+coverage = false                     # Skip coverage in production
+smol = true                         # Minimize test output

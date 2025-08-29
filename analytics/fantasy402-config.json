@@ -152,21 +152,9 @@
     "Racing"
   ],
 
-  "currencies": [
-    "USD",
-    "EUR",
-    "GBP",
-    "CAD",
-    "AUD"
-  ],
+  "currencies": ["USD", "EUR", "GBP", "CAD", "AUD"],
 
-  "timezones": [
-    "UTC",
-    "EST",
-    "PST",
-    "GMT",
-    "CET"
-  ],
+  "timezones": ["UTC", "EST", "PST", "GMT", "CET"],
 
   "debug": {
     "enabled": false,

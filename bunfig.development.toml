@@ -1,0 +1,82 @@
+# Fire22 Development Environment Configuration
+# Optimized for local development workflow
+
+[install]
+# Development-specific settings
+production = false                   # Include all dependencies
+frozenLockfile = false               # Allow lockfile updates during development
+optional = true                      # Include optional dependencies for testing
+target = "bun-darwin-arm64"          # Apple Silicon binaries for Mac development
+lockfile = "bun.lockb"               # Binary lockfile for performance
+global = false                       # Disable global installs for consistency
+
+# Comprehensive trusted dependencies for development
+[install.trustedDependencies]
+esbuild = "*"                        # Fast bundling
+vite = "^5.0.0"                      # Development server with HMR
+playwright-core = "*"                # E2E testing
+typescript = "^5.0.0"                # TypeScript compilation
+tailwindcss = "^3.0.0"               # CSS framework
+"@types/bun" = "*"                   # Bun type definitions
+prettier = "*"                       # Code formatting
+
+# Development registries
+[install.scopes]
+"@fire22" = "https://npm.fire22.com/"
+"@enterprise" = { token = "$FIRE22_DEV_TOKEN", url = "https://npm.enterprise.com" }
+"@private" = { username = "$FIRE22_DEV_USER", password = "$FIRE22_DEV_PASS", url = "https://npm.private.com" }
+
+# Development cache settings
+[install.cache]
+disable = false
+disableManifest = false
+
+# Development security (comprehensive scanning)
+[install.security]
+scanner = "packages/fire22-security-scanner/src/index.ts"
+level = "warn"                       # Show warnings instead of failing
+enable = true
+
+[install.security.options]
+license_check = true
+malware_scan = true
+vulnerability_check = true
+
+# Development runtime settings
+[run]
+shell = "bun"
+bun = true                          # Enable node.js compatibility
+silent = false                      # Show all output for debugging
+
+# Development logging
+logLevel = "debug"
+
+# Development test settings
+[test]
+root = "./src"
+preload = ["./test-setup.ts"]
+coverage = true
+coverageThreshold = { line = 0.7, function = 0.7, statement = 0.7 }  # More lenient for dev
+coverageSkipTestFiles = true
+coverageReporter = ["text", "html"]
+coverageDir = "./coverage/dev"
+smol = false
+
+# Development console settings
+[console]
+depth = 6                          # Deeper object inspection for debugging
+
+# Development JSX settings
+jsx = "react"
+jsxFactory = "React.createElement"
+jsxFragment = "React.Fragment"
+jsxImportSource = "react"
+
+# Development telemetry
+telemetry = false                  # Privacy in development
+
+# Development version settings
+[version]
+major = ["BREAKING CHANGES", "major"]
+minor = ["feat", "minor"]
+patch = ["fix", "perf", "docs", "style", "refactor", "test", "build", "ci", "chore", "revert"]
