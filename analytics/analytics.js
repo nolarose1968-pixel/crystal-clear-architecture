@@ -1582,15 +1582,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Add keyboard shortcut for health check (Ctrl+Shift+H)
+  // Add keyboard shortcuts for debugging
   document.addEventListener('keydown', (e) => {
+    // Ctrl+Shift+H: Health check
     if (e.ctrlKey && e.shiftKey && e.key === 'H') {
       e.preventDefault();
       window.checkAnalyticsHealth();
     }
+
+    // Ctrl+Shift+D: Toggle debug panel
+    if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+      e.preventDefault();
+      const debugPanel = document.getElementById('debug-panel');
+      if (debugPanel) {
+        debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+
+    // Ctrl+Shift+R: Force refresh data
+    if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+      e.preventDefault();
+      if (window.analyticsDashboard) {
+        window.analyticsDashboard.refreshData();
+      }
+    }
   });
 
-  console.log('💡 Tip: Press Ctrl+Shift+H or run checkAnalyticsHealth() in console for diagnostics');
+  console.log('💡 Debug Shortcuts:');
+  console.log('   Ctrl+Shift+H: Health check');
+  console.log('   Ctrl+Shift+D: Toggle debug panel');
+  console.log('   Ctrl+Shift+R: Force refresh data');
+  console.log('   Or run checkAnalyticsHealth() in console');
 });
 
 // Cleanup on page unload

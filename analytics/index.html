@@ -453,6 +453,26 @@
     <!-- Toast Notifications -->
     <div class="mobile-toast" id="mobile-toast"></div>
 
+    <!-- Debug Panel (hidden by default) -->
+    <div class="debug-panel" id="debug-panel" style="display: none;">
+        <div class="debug-header">
+            <h3>🔧 Debug Panel</h3>
+            <button onclick="document.getElementById('debug-panel').style.display='none'">×</button>
+        </div>
+        <div class="debug-content">
+            <button onclick="checkAnalyticsHealth()">Run Health Check</button>
+            <button onclick="window.analyticsDashboard?.runHealthCheck()">Force Re-initialize</button>
+            <button onclick="console.clear()">Clear Console</button>
+            <div class="debug-info" id="debug-info"></div>
+        </div>
+    </div>
+
+    <!-- Debug Toggle Button -->
+    <button class="debug-toggle" onclick="document.getElementById('debug-panel').style.display='block'"
+            title="Open Debug Panel (Ctrl+Shift+D)">
+        🐛
+    </button>
+
     <!-- Scripts -->
     <script src="config.js"></script>
     <script src="analytics.js"></script>
