@@ -20,6 +20,14 @@ class AdvancedAnalyticsDashboard {
     console.log('📊 Initializing Advanced Analytics Dashboard...');
 
     try {
+      // Check if Chart.js is loaded
+      if (typeof Chart === 'undefined') {
+        throw new Error('Chart.js library is not loaded. Please check your internet connection and try again.');
+      }
+
+      // Check if required DOM elements exist
+      this.checkRequiredElements();
+
       // Initialize UI components
       this.initializeUI();
 
@@ -49,7 +57,194 @@ class AdvancedAnalyticsDashboard {
       console.log('✅ Analytics Dashboard initialized successfully');
     } catch (error) {
       console.error('❌ Failed to initialize analytics dashboard:', error);
-      this.showError('Failed to initialize analytics dashboard');
+      this.showError('Failed to initialize analytics dashboard: ' + error.message);
+      // Show error in the UI
+      this.showInitializationError(error.message);
+    }
+  }
+
+  // Health check method for diagnostics
+  runHealthCheck() {
+    console.log('🔍 Running Analytics Dashboard Health Check...');
+
+    const health = {
+      chartjs: typeof Chart !== 'undefined',
+      websocket: typeof ReconnectingWebSocket !== 'undefined',
+      domElements: this.checkRequiredElementsHealth(),
+      timestamp: new Date().toISOString()
+    };
+
+    console.table(health);
+    return health;
+  }
+
+  checkRequiredElementsHealth() {
+    const requiredElements = [
+      'mobile-menu-toggle',
+      'mobile-menu-overlay',
+      'mobile-menu',
+      'mobile-menu-close',
+      'time-range',
+      'data-source',
+      'refresh-data',
+      'export-data',
+      'total-revenue',
+      'active-users',
+      'roi-percentage',
+      'performance-score',
+      'sync-status',
+      'realtime-status',
+      'data-freshness',
+      'revenue-chart',
+      'engagement-chart',
+      'roi-chart',
+      'performance-chart',
+      'mobile-toast'
+    ];
+
+    const missingElements = [];
+    const foundElements = [];
+
+    requiredElements.forEach(elementId => {
+      if (document.getElementById(elementId)) {
+        foundElements.push(elementId);
+      } else {
+        missingElements.push(elementId);
+      }
+    });
+
+    return {
+      total: requiredElements.length,
+      found: foundElements.length,
+      missing: missingElements.length,
+      missingElements: missingElements
+    };
+  }
+
+  // Check if required DOM elements exist
+  checkRequiredElements() {
+    const requiredElements = [
+      'mobile-menu-toggle',
+      'mobile-menu-overlay',
+      'mobile-menu',
+      'mobile-menu-close',
+      'time-range',
+      'data-source',
+      'refresh-data',
+      'export-data',
+      'total-revenue',
+      'active-users',
+      'roi-percentage',
+      'performance-score',
+      'sync-status',
+      'realtime-status',
+      'data-freshness',
+      'sync-indicator',
+      'realtime-indicator',
+      'freshness-indicator',
+      'revenue-chart',
+      'engagement-chart',
+      'roi-chart',
+      'performance-chart',
+      'mobile-toast'
+    ];
+
+    const missingElements = [];
+    requiredElements.forEach(elementId => {
+      if (!document.getElementById(elementId)) {
+        missingElements.push(elementId);
+      }
+    });
+
+    if (missingElements.length > 0) {
+      throw new Error(`Missing required DOM elements: ${missingElements.join(', ')}`);
+    }
+
+    console.log('✅ All required DOM elements found');
+  }
+
+  // Show initialization error in the UI
+  showInitializationError(message) {
+    // Create error display container
+    const errorContainer = document.createElement('div');
+    errorContainer.id = 'analytics-init-error';
+    errorContainer.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(239, 68, 68, 0.95);
+      backdrop-filter: blur(20px);
+      color: white;
+      padding: 30px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      text-align: center;
+      z-index: 10000;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    `;
+
+    errorContainer.innerHTML = `
+      <h2 style="margin-bottom: 15px; font-size: 1.5rem;">❌ Analytics Dashboard Error</h2>
+      <p style="margin-bottom: 20px; line-height: 1.6;">${message}</p>
+      <button onclick="location.reload()" style="
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+      " onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+        🔄 Reload Page
+      </button>
+    `;
+
+    document.body.appendChild(errorContainer);
+
+    // Also log to console for debugging
+    console.error('Analytics Dashboard Initialization Error:', message);
+  }
+
+  // Show chart initialization error
+  showChartError(chartId, message) {
+    const chartContainer = document.querySelector(`[id="${chartId}"]`)?.closest('.chart-container');
+    if (chartContainer) {
+      const errorDiv = document.createElement('div');
+      errorDiv.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(239, 68, 68, 0.9);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 0.9rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        z-index: 10;
+      `;
+      errorDiv.innerHTML = `
+        <div style="margin-bottom: 10px;">⚠️ Chart Error</div>
+        <div style="font-size: 0.8rem; opacity: 0.9;">${message}</div>
+        <button onclick="this.parentElement.remove()" style="
+          margin-top: 10px;
+          background: rgba(255, 255, 255, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          color: white;
+          padding: 5px 10px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.8rem;
+        ">Dismiss</button>
+      `;
+      chartContainer.style.position = 'relative';
+      chartContainer.appendChild(errorDiv);
     }
   }
 
@@ -213,9 +408,13 @@ class AdvancedAnalyticsDashboard {
 
   initializeRevenueChart() {
     const ctx = document.getElementById('revenue-chart');
-    if (!ctx) return;
+    if (!ctx) {
+      console.warn('Revenue chart canvas not found');
+      return;
+    }
 
-    this.charts.revenue = new Chart(ctx.getContext('2d'), {
+    try {
+      this.charts.revenue = new Chart(ctx.getContext('2d'), {
       type: 'line',
       data: {
         labels: [],
@@ -258,13 +457,21 @@ class AdvancedAnalyticsDashboard {
         }
       }
     });
+    } catch (error) {
+      console.error('Failed to initialize revenue chart:', error);
+      this.showChartError('revenue-chart', 'Failed to load revenue chart');
+    }
   }
 
   initializeEngagementChart() {
     const ctx = document.getElementById('engagement-chart');
-    if (!ctx) return;
+    if (!ctx) {
+      console.warn('Engagement chart canvas not found');
+      return;
+    }
 
-    this.charts.engagement = new Chart(ctx.getContext('2d'), {
+    try {
+      this.charts.engagement = new Chart(ctx.getContext('2d'), {
       type: 'doughnut',
       data: {
         labels: ['Active Users', 'New Users', 'Returning Users', 'Inactive Users'],
@@ -292,13 +499,21 @@ class AdvancedAnalyticsDashboard {
         }
       }
     });
+    } catch (error) {
+      console.error('Failed to initialize engagement chart:', error);
+      this.showChartError('engagement-chart', 'Failed to load engagement chart');
+    }
   }
 
   initializeROIChart() {
     const ctx = document.getElementById('roi-chart');
-    if (!ctx) return;
+    if (!ctx) {
+      console.warn('ROI chart canvas not found');
+      return;
+    }
 
-    this.charts.roi = new Chart(ctx.getContext('2d'), {
+    try {
+      this.charts.roi = new Chart(ctx.getContext('2d'), {
       type: 'bar',
       data: {
         labels: [],
@@ -340,13 +555,21 @@ class AdvancedAnalyticsDashboard {
         }
       }
     });
+    } catch (error) {
+      console.error('Failed to initialize ROI chart:', error);
+      this.showChartError('roi-chart', 'Failed to load ROI chart');
+    }
   }
 
   initializePerformanceChart() {
     const ctx = document.getElementById('performance-chart');
-    if (!ctx) return;
+    if (!ctx) {
+      console.warn('Performance chart canvas not found');
+      return;
+    }
 
-    this.charts.performance = new Chart(ctx.getContext('2d'), {
+    try {
+      this.charts.performance = new Chart(ctx.getContext('2d'), {
       type: 'radar',
       data: {
         labels: ['Speed', 'Reliability', 'Security', 'Scalability', 'User Experience', 'Cost Efficiency'],
@@ -378,6 +601,10 @@ class AdvancedAnalyticsDashboard {
         }
       }
     });
+    } catch (error) {
+      console.error('Failed to initialize performance chart:', error);
+      this.showChartError('performance-chart', 'Failed to load performance chart');
+    }
   }
 
   // Real-time Updates
@@ -1344,6 +1571,26 @@ AdvancedAnalyticsDashboard.prototype.formatRevenueBreakdown = function(data) {
 // Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   window.analyticsDashboard = new AdvancedAnalyticsDashboard();
+
+  // Make health check available globally for debugging
+  window.checkAnalyticsHealth = () => {
+    if (window.analyticsDashboard) {
+      return window.analyticsDashboard.runHealthCheck();
+    } else {
+      console.error('Analytics dashboard not initialized');
+      return { error: 'Dashboard not initialized' };
+    }
+  };
+
+  // Add keyboard shortcut for health check (Ctrl+Shift+H)
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'H') {
+      e.preventDefault();
+      window.checkAnalyticsHealth();
+    }
+  });
+
+  console.log('💡 Tip: Press Ctrl+Shift+H or run checkAnalyticsHealth() in console for diagnostics');
 });
 
 // Cleanup on page unload

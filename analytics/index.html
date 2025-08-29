@@ -13,11 +13,71 @@
     <link rel="stylesheet" href="analytics.css">
 
     <!-- Chart.js for Data Visualization -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script>
+      // Fallback Chart.js loading with error handling
+      (function() {
+        function loadChartJS() {
+          if (typeof Chart === 'undefined') {
+            console.warn('Chart.js CDN failed, loading from fallback...');
+            // Fallback to local Chart.js if available, or show error
+            setTimeout(() => {
+              if (typeof Chart === 'undefined') {
+                console.error('Chart.js could not be loaded from any source');
+                // Show error message in UI
+                document.addEventListener('DOMContentLoaded', function() {
+                  const errorDiv = document.createElement('div');
+                  errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#ef4444;color:white;padding:15px;border-radius:8px;z-index:10000;max-width:300px;';
+                  errorDiv.innerHTML = '<strong>⚠️ Chart Library Error</strong><br>Unable to load Chart.js. Please check your internet connection and refresh the page.';
+                  document.body.appendChild(errorDiv);
+                });
+              }
+            }, 5000);
+          } else {
+            console.log('✅ Chart.js loaded successfully');
+          }
+        }
+
+        // Load Chart.js
+        const script1 = document.createElement('script');
+        script1.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        script1.onload = loadChartJS;
+        script1.onerror = loadChartJS;
+        document.head.appendChild(script1);
+
+        // Load date adapter
+        const script2 = document.createElement('script');
+        script2.src = 'https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns';
+        script2.onerror = function() {
+          console.warn('Chart.js date adapter failed to load, some date features may not work');
+        };
+        document.head.appendChild(script2);
+      })();
+    </script>
 
     <!-- Real-time Updates -->
-    <script src="https://cdn.jsdelivr.net/npm/reconnecting-websocket@4.4.0/dist/reconnecting-websocket.min.js"></script>
+    <script>
+      // Fallback WebSocket loading
+      (function() {
+        function loadWebSocket() {
+          if (typeof ReconnectingWebSocket === 'undefined') {
+            console.warn('ReconnectingWebSocket CDN failed, using native WebSocket');
+            // Define a simple fallback
+            window.ReconnectingWebSocket = window.WebSocket;
+          } else {
+            console.log('✅ ReconnectingWebSocket loaded successfully');
+          }
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/reconnecting-websocket@4.4.0/dist/reconnecting-websocket.min.js';
+        script.onload = loadWebSocket;
+        script.onerror = function() {
+          console.warn('ReconnectingWebSocket CDN failed, falling back to native WebSocket');
+          window.ReconnectingWebSocket = window.WebSocket;
+        };
+        document.head.appendChild(script);
+      })();
+    </script>
 </head>
 <body>
     <!-- Mobile Navigation -->
