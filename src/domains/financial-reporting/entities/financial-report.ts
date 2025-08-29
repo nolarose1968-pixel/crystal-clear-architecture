@@ -5,7 +5,8 @@
  * Represents a comprehensive financial report with regulatory compliance
  */
 
-import { DomainEntity } from '../../shared/domain-entity';
+import { DomainEntity, DomainError } from '../../shared/domain-entity';
+import { BaseDomainEvent } from '../../shared/events/domain-events';
 
 export enum ReportType {
   DAILY = 'daily',
@@ -52,7 +53,7 @@ export class FinancialReport extends DomainEntity {
   private readonly _compliance: ComplianceMetrics;
 
   constructor(params: FinancialReportParams) {
-    super();
+    super(params.id, new Date(), new Date()); // DomainEntity requires id, createdAt, updatedAt
     this._id = params.id;
     this._reportType = params.reportType;
     this._periodStart = new Date(params.periodStart);
@@ -101,16 +102,16 @@ export class FinancialReport extends DomainEntity {
     this._approvedAt = new Date();
     this._status = ReportStatus.APPROVED;
 
-    this.addDomainEvent({
-      eventType: 'FinancialReportApproved',
-      aggregateId: this._id,
-      eventData: {
+    this.addDomainEvent(new BaseDomainEvent(
+      'FinancialReportApproved',
+      this._id,
+      'FinancialReport',
+      {
         reportId: this._id,
         approvedBy,
         approvedAt: this._approvedAt
-      },
-      occurredAt: new Date()
-    });
+      }
+    ));
   }
 
   publish(): void {
@@ -121,54 +122,54 @@ export class FinancialReport extends DomainEntity {
     this._publishedAt = new Date();
     this._status = ReportStatus.PUBLISHED;
 
-    this.addDomainEvent({
-      eventType: 'FinancialReportPublished',
-      aggregateId: this._id,
-      eventData: {
+    this.addDomainEvent(new BaseDomainEvent(
+      'FinancialReportPublished',
+      this._id,
+      'FinancialReport',
+      {
         reportId: this._id,
         publishedAt: this._publishedAt
-      },
-      occurredAt: new Date()
-    });
+      }
+    ));
   }
 
   markForReview(): void {
     this._status = ReportStatus.PENDING_REVIEW;
 
-    this.addDomainEvent({
-      eventType: 'FinancialReportMarkedForReview',
-      aggregateId: this._id,
-      eventData: { reportId: this._id },
-      occurredAt: new Date()
-    });
+    this.addDomainEvent(new BaseDomainEvent(
+      'FinancialReportMarkedForReview',
+      this._id,
+      'FinancialReport',
+      { reportId: this._id }
+    ));
   }
 
   archive(): void {
     if (this._status === ReportStatus.PUBLISHED) {
       this._status = ReportStatus.ARCHIVED;
 
-      this.addDomainEvent({
-        eventType: 'FinancialReportArchived',
-        aggregateId: this._id,
-        eventData: { reportId: this._id },
-        occurredAt: new Date()
-      });
+      this.addDomainEvent(new BaseDomainEvent(
+        'FinancialReportArchived',
+        this._id,
+        'FinancialReport',
+        { reportId: this._id }
+      ));
     }
   }
 
   updateComplianceStatus(status: ComplianceStatus, notes?: string): void {
     this._complianceStatus = status;
 
-    this.addDomainEvent({
-      eventType: 'FinancialReportComplianceUpdated',
-      aggregateId: this._id,
-      eventData: {
+    this.addDomainEvent(new BaseDomainEvent(
+      'FinancialReportComplianceUpdated',
+      this._id,
+      'FinancialReport',
+      {
         reportId: this._id,
         complianceStatus: status,
         notes
-      },
-      occurredAt: new Date()
-    });
+      }
+    ));
   }
 
   // Utility Methods

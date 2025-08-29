@@ -127,6 +127,21 @@ export class SQLiteFinancialReportingRepository extends FinancialReportingReposi
       ]);
     }
 
+    // Publish domain events after successful save
+    const domainEvents = report.getDomainEvents();
+    if (domainEvents.length > 0) {
+      // Import DomainEvents here to avoid circular dependency
+      const { DomainEvents } = await import('../../shared/events/domain-events');
+      const events = DomainEvents.getInstance();
+
+      for (const event of domainEvents) {
+        await events.publish(event.eventType, event);
+      }
+
+      // Clear events after publishing
+      report.clearDomainEvents();
+    }
+
     return report;
   }
 
