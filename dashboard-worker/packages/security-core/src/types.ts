@@ -1,13 +1,13 @@
 /**
  * @fire22/security-core/types - Security type definitions
- * 
+ *
  * Comprehensive type system for Fire22 security features
  */
 
 import { z } from 'zod';
 import type { Fire22Config } from '@fire22/core';
 
-// ===== Credential Management Types =====
+// !== Credential Management Types !==
 
 export interface CredentialConfig {
   service: string;
@@ -32,7 +32,7 @@ export interface CredentialValidationRule {
   required: boolean;
 }
 
-// ===== Security Scanner Types =====
+// !== Security Scanner Types !==
 
 export type SecuritySeverity = 'fatal' | 'warn';
 export type SecurityIssueType = 'vulnerability' | 'malicious' | 'license' | 'policy';
@@ -74,7 +74,7 @@ export interface SecurityPolicy {
   enabled: boolean;
 }
 
-// ===== Environment Management Types =====
+// !== Environment Management Types !==
 
 export interface EnvironmentCredential {
   name: string;
@@ -103,39 +103,51 @@ export interface EnvironmentAuditResult {
   };
 }
 
-// ===== Configuration Schemas =====
+// !== Configuration Schemas !==
 
 export const SecurityConfigSchema = z.object({
   service: z.string().default('fire22-dashboard'),
   environments: z.array(z.string()).default(['development', 'staging', 'production']),
-  scanner: z.object({
-    enabled: z.boolean().default(true),
-    policies: z.array(z.object({
-      name: z.string(),
-      pattern: z.string(),
-      severity: z.enum(['fatal', 'warn']),
-      description: z.string(),
-      enabled: z.boolean().default(true)
-    })).optional(),
-    excludePackages: z.array(z.string()).optional()
-  }).optional(),
-  credentials: z.object({
-    validation: z.boolean().default(true),
-    rotation: z.object({
-      enabled: z.boolean().default(false),
-      interval: z.string().default('30d')
-    }).optional()
-  }).optional(),
-  audit: z.object({
-    enabled: z.boolean().default(true),
-    schedule: z.string().optional(),
-    reportPath: z.string().optional()
-  }).optional()
+  scanner: z
+    .object({
+      enabled: z.boolean().default(true),
+      policies: z
+        .array(
+          z.object({
+            name: z.string(),
+            pattern: z.string(),
+            severity: z.enum(['fatal', 'warn']),
+            description: z.string(),
+            enabled: z.boolean().default(true),
+          })
+        )
+        .optional(),
+      excludePackages: z.array(z.string()).optional(),
+    })
+    .optional(),
+  credentials: z
+    .object({
+      validation: z.boolean().default(true),
+      rotation: z
+        .object({
+          enabled: z.boolean().default(false),
+          interval: z.string().default('30d'),
+        })
+        .optional(),
+    })
+    .optional(),
+  audit: z
+    .object({
+      enabled: z.boolean().default(true),
+      schedule: z.string().optional(),
+      reportPath: z.string().optional(),
+    })
+    .optional(),
 });
 
 export type SecurityConfig = z.infer<typeof SecurityConfigSchema>;
 
-// ===== Error Types =====
+// !== Error Types !==
 
 export class SecurityError extends Error {
   constructor(
@@ -163,7 +175,7 @@ export class ScannerError extends SecurityError {
   }
 }
 
-// ===== Integration Types =====
+// !== Integration Types !==
 
 export interface Fire22SecurityIntegration {
   core: Fire22Config;
@@ -182,7 +194,7 @@ export interface SecurityAuditResult {
   nextAuditDue?: Date;
 }
 
-// ===== CLI Types =====
+// !== CLI Types !==
 
 export interface CLICommand {
   name: string;
@@ -203,19 +215,22 @@ export interface CLIContext {
   environment: string;
 }
 
-// ===== Workspace Integration Types =====
+// !== Workspace Integration Types !==
 
 export interface WorkspaceSecurityConfig {
-  workspaces: Record<string, {
-    securityLevel: 'strict' | 'standard' | 'permissive';
-    customPolicies?: SecurityPolicy[];
-    credentialScope: 'workspace' | 'shared';
-  }>;
+  workspaces: Record<
+    string,
+    {
+      securityLevel: 'strict' | 'standard' | 'permissive';
+      customPolicies?: SecurityPolicy[];
+      credentialScope: 'workspace' | 'shared';
+    }
+  >;
   sharedCredentials: string[];
   centralizedAudit: boolean;
 }
 
-// ===== Performance Types =====
+// !== Performance Types !==
 
 export interface SecurityPerformanceMetrics {
   credentialRetrievalTime: number;
@@ -234,9 +249,5 @@ export interface SecurityBenchmark {
   standardDeviation: number;
 }
 
-// ===== Export all types =====
-export type {
-  Fire22Config,
-  DatabaseConfig,
-  ApiConfig
-} from '@fire22/core';
+// !== Export all types !==
+export type { Fire22Config, DatabaseConfig, ApiConfig } from '@fire22/core';

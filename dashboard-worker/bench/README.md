@@ -41,36 +41,43 @@ bun run bench:format     # Format output beautifully
 ## 📊 Available Tools
 
 ### 1. **BenchmarkSuite** - Core benchmarking
+
 - Nanosecond precision with `Bun.nanoseconds()`
 - Statistical analysis (P50, P90, P95, P99)
 - JSON/Markdown export
 
 ### 2. **MemoryProfiler** - Memory analysis
+
 - Heap statistics via `bun:jsc`
 - Memory leak detection
 - Heap snapshot generation
 
 ### 3. **MicroBenchmarks** - Precision testing
+
 - API handler benchmarks
 - Database operation testing
 - Crypto and validation benchmarks
 
 ### 4. **LoadTester** - Stress testing
+
 - HTTP endpoint load testing
 - WebSocket performance
 - Concurrent connection testing
 
 ### 5. **CIBenchmarks** - Continuous integration
+
 - Regression detection
 - Baseline comparison
 - GitHub Actions integration
 
 ### 6. **BenchmarkFormatter** - Beautiful output
+
 - Uses `Bun.stringWidth()` for alignment
 - `Bun.inspect()` for serialization
 - `Bun.inspect.table()` for tables
 
 ### 7. **BenchmarkReporter** - Report generation
+
 - Multiple formats (JSON, HTML, Markdown, CSV)
 - Trend analysis
 - Performance recommendations
@@ -104,7 +111,9 @@ const { result, memory } = await profiler.profileFunction(
   () => new Array(10000).fill(0)
 );
 
-console.log(`Heap growth: ${memory.finalMemory.heapSize - memory.initialMemory.heapSize}`);
+console.log(
+  `Heap growth: ${memory.finalMemory.heapSize - memory.initialMemory.heapSize}`
+);
 ```
 
 ### Load Testing
@@ -172,12 +181,12 @@ packages/
 {
   "bun": {
     "install": {
-      "frozen-lockfile": false,     // Use exact versions
-      "production": false,          // Production mode
-      "optional": true,             // Install optional deps
-      "dev": true,                  // Install dev deps
-      "peer": true,                 // Install peer deps
-      "concurrent-scripts": 4       // Parallel script execution
+      "frozen-lockfile": false, // Use exact versions
+      "production": false, // Production mode
+      "optional": true, // Install optional deps
+      "dev": true, // Install dev deps
+      "peer": true, // Install peer deps
+      "concurrent-scripts": 4 // Parallel script execution
     }
   }
 }
@@ -187,10 +196,7 @@ packages/
 
 ```json
 {
-  "trustedDependencies": [
-    "@fire22/benchmark-suite",
-    "mitata"
-  ]
+  "trustedDependencies": ["@fire22/benchmark-suite", "mitata"]
 }
 ```
 
@@ -198,10 +204,7 @@ packages/
 
 ```json
 {
-  "workspaces": [
-    "packages/*",
-    "bench"
-  ]
+  "workspaces": ["packages/*", "bench"]
 }
 ```
 

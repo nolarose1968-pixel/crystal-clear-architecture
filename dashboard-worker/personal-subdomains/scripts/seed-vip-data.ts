@@ -26,17 +26,17 @@ const vipEmployeeData: EmployeeData = {
     'customer-management',
     'performance-analytics',
     'premium-scheduling',
-    'advanced-tools'
+    'advanced-tools',
   ],
   manager: 'CEO',
   directReports: ['VIP Support Team'],
   hireDate: '2023-01-15',
-  lastUpdated: new Date().toISOString()
+  lastUpdated: new Date().toISOString(),
 };
 
 async function seedVIPData(): Promise<void> {
   console.log('🔥 Seeding VIP Employee Data for Fire22');
-  console.log('=====================================');
+  console.log('!==!==!==!==!==!==!==');
 
   try {
     // This would normally connect to Cloudflare KV
@@ -67,7 +67,6 @@ async function seedVIPData(): Promise<void> {
     console.log(`   ✅ Agent: billy666`);
     console.log(`   ✅ Domain: apexodds.net`);
     console.log(`   ✅ Live betting data ready`);
-
   } catch (error) {
     console.error('❌ Error seeding VIP data:', error);
     process.exit(1);

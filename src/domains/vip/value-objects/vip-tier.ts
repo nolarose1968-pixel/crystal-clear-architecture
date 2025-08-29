@@ -5,9 +5,14 @@
  * Defines VIP membership tiers with associated benefits and requirements
  */
 
-import { ValueObject } from '../../shared/value-object';
+import { ValueObject } from "../../shared/value-object";
 
-export type VipTierLevel = 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
+export type VipTierLevel =
+  | "bronze"
+  | "silver"
+  | "gold"
+  | "platinum"
+  | "diamond";
 
 export interface VipTierBenefits {
   // Financial Benefits
@@ -56,7 +61,7 @@ export class VipTier extends ValueObject {
     private readonly requirements: VipTierRequirements,
     private readonly monthlyFee: number,
     private readonly upgradeBonus: number,
-    private readonly isActive: boolean = true
+    private readonly isActive: boolean = true,
   ) {
     super();
     this.validateTier();
@@ -78,15 +83,15 @@ export class VipTier extends ValueObject {
       params.requirements,
       params.monthlyFee,
       params.upgradeBonus,
-      params.isActive ?? true
+      params.isActive ?? true,
     );
   }
 
   // Predefined VIP Tiers
   static bronze(): VipTier {
     return new VipTier(
-      'bronze',
-      'Bronze VIP',
+      "bronze",
+      "Bronze VIP",
       {
         balanceLimitMultiplier: 1.5,
         withdrawalFeeDiscount: 0.1,
@@ -103,7 +108,7 @@ export class VipTier extends ValueObject {
         personalizedNewsletters: false,
         exclusivePromotions: true,
         directPhoneSupport: false,
-        customBirthdayOffers: false
+        customBirthdayOffers: false,
       },
       {
         minDepositAmount: 500,
@@ -112,17 +117,17 @@ export class VipTier extends ValueObject {
         minLoyaltyPoints: 100,
         monthlyDepositRequirement: 200,
         monthlyBettingVolume: 500,
-        accountActivityScore: 50
+        accountActivityScore: 50,
       },
       0, // No monthly fee
-      50  // Upgrade bonus
+      50, // Upgrade bonus
     );
   }
 
   static silver(): VipTier {
     return new VipTier(
-      'silver',
-      'Silver VIP',
+      "silver",
+      "Silver VIP",
       {
         balanceLimitMultiplier: 2.0,
         withdrawalFeeDiscount: 0.25,
@@ -139,7 +144,7 @@ export class VipTier extends ValueObject {
         personalizedNewsletters: true,
         exclusivePromotions: true,
         directPhoneSupport: false,
-        customBirthdayOffers: false
+        customBirthdayOffers: false,
       },
       {
         minDepositAmount: 2500,
@@ -148,17 +153,17 @@ export class VipTier extends ValueObject {
         minLoyaltyPoints: 500,
         monthlyDepositRequirement: 500,
         monthlyBettingVolume: 1500,
-        accountActivityScore: 70
+        accountActivityScore: 70,
       },
       0,
-      150
+      150,
     );
   }
 
   static gold(): VipTier {
     return new VipTier(
-      'gold',
-      'Gold VIP',
+      "gold",
+      "Gold VIP",
       {
         balanceLimitMultiplier: 3.0,
         withdrawalFeeDiscount: 0.5,
@@ -175,7 +180,7 @@ export class VipTier extends ValueObject {
         personalizedNewsletters: true,
         exclusivePromotions: true,
         directPhoneSupport: true,
-        customBirthdayOffers: true
+        customBirthdayOffers: true,
       },
       {
         minDepositAmount: 10000,
@@ -184,17 +189,17 @@ export class VipTier extends ValueObject {
         minLoyaltyPoints: 2500,
         monthlyDepositRequirement: 2000,
         monthlyBettingVolume: 5000,
-        accountActivityScore: 85
+        accountActivityScore: 85,
       },
       0,
-      500
+      500,
     );
   }
 
   static platinum(): VipTier {
     return new VipTier(
-      'platinum',
-      'Platinum VIP',
+      "platinum",
+      "Platinum VIP",
       {
         balanceLimitMultiplier: 5.0,
         withdrawalFeeDiscount: 0.75,
@@ -211,7 +216,7 @@ export class VipTier extends ValueObject {
         personalizedNewsletters: true,
         exclusivePromotions: true,
         directPhoneSupport: true,
-        customBirthdayOffers: true
+        customBirthdayOffers: true,
       },
       {
         minDepositAmount: 50000,
@@ -220,17 +225,17 @@ export class VipTier extends ValueObject {
         minLoyaltyPoints: 10000,
         monthlyDepositRequirement: 10000,
         monthlyBettingVolume: 25000,
-        accountActivityScore: 95
+        accountActivityScore: 95,
       },
       0,
-      2000
+      2000,
     );
   }
 
   static diamond(): VipTier {
     return new VipTier(
-      'diamond',
-      'Diamond VIP',
+      "diamond",
+      "Diamond VIP",
       {
         balanceLimitMultiplier: 10.0,
         withdrawalFeeDiscount: 1.0, // 100% discount
@@ -247,7 +252,7 @@ export class VipTier extends ValueObject {
         personalizedNewsletters: true,
         exclusivePromotions: true,
         directPhoneSupport: true,
-        customBirthdayOffers: true
+        customBirthdayOffers: true,
       },
       {
         minDepositAmount: 250000,
@@ -256,33 +261,36 @@ export class VipTier extends ValueObject {
         minLoyaltyPoints: 50000,
         monthlyDepositRequirement: 50000,
         monthlyBettingVolume: 100000,
-        accountActivityScore: 99
+        accountActivityScore: 99,
       },
       0,
-      10000
+      10000,
     );
   }
 
   private validateTier(): void {
     if (!this.name || this.name.trim().length === 0) {
-      throw new Error('VIP tier name cannot be empty');
+      throw new Error("VIP tier name cannot be empty");
     }
 
     if (this.monthlyFee < 0) {
-      throw new Error('Monthly fee cannot be negative');
+      throw new Error("Monthly fee cannot be negative");
     }
 
     if (this.upgradeBonus < 0) {
-      throw new Error('Upgrade bonus cannot be negative');
+      throw new Error("Upgrade bonus cannot be negative");
     }
 
     // Validate benefits ranges
     if (this.benefits.balanceLimitMultiplier <= 0) {
-      throw new Error('Balance limit multiplier must be positive');
+      throw new Error("Balance limit multiplier must be positive");
     }
 
-    if (this.benefits.withdrawalFeeDiscount < 0 || this.benefits.withdrawalFeeDiscount > 1) {
-      throw new Error('Withdrawal fee discount must be between 0 and 1');
+    if (
+      this.benefits.withdrawalFeeDiscount < 0 ||
+      this.benefits.withdrawalFeeDiscount > 1
+    ) {
+      throw new Error("Withdrawal fee discount must be between 0 and 1");
     }
   }
 
@@ -292,7 +300,9 @@ export class VipTier extends ValueObject {
   }
 
   canDowngradeTo(previousTier: VipTier): boolean {
-    return this.getTierOrder(this.level) > this.getTierOrder(previousTier.level);
+    return (
+      this.getTierOrder(this.level) > this.getTierOrder(previousTier.level)
+    );
   }
 
   getUpgradeBonus(): number {
@@ -321,12 +331,24 @@ export class VipTier extends ValueObject {
   }
 
   // Getters
-  getLevel(): VipTierLevel { return this.level; }
-  getName(): string { return this.name; }
-  getBenefits(): VipTierBenefits { return { ...this.benefits }; }
-  getRequirements(): VipTierRequirements { return { ...this.requirements }; }
-  getMonthlyFee(): number { return this.monthlyFee; }
-  getIsActive(): boolean { return this.isActive; }
+  getLevel(): VipTierLevel {
+    return this.level;
+  }
+  getName(): string {
+    return this.name;
+  }
+  getBenefits(): VipTierBenefits {
+    return { ...this.benefits };
+  }
+  getRequirements(): VipTierRequirements {
+    return { ...this.requirements };
+  }
+  getMonthlyFee(): number {
+    return this.monthlyFee;
+  }
+  getIsActive(): boolean {
+    return this.isActive;
+  }
 
   // Business rules
   isEligibleForUpgrade(customerStats: {

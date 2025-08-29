@@ -2,7 +2,10 @@
 
 ## 🚀 **Overview**
 
-The Fire22 Dashboard now includes comprehensive editor integration using Bun's native `Bun.openInEditor()` functionality. This system provides seamless access to all project files and directories directly from the command line, with support for line and column positioning.
+The Fire22 Dashboard now includes comprehensive editor integration using Bun's
+native `Bun.openInEditor()` functionality. This system provides seamless access
+to all project files and directories directly from the command line, with
+support for line and column positioning.
 
 ## ✨ **Features**
 
@@ -17,9 +20,12 @@ The Fire22 Dashboard now includes comprehensive editor integration using Bun's n
 ## 🛠️ **Installation & Setup**
 
 ### **1. Automatic Setup**
-The editor integration is automatically available with your Fire22 Dashboard installation. No additional setup required.
+
+The editor integration is automatically available with your Fire22 Dashboard
+installation. No additional setup required.
 
 ### **2. Editor Configuration**
+
 Set your preferred editor in `bunfig.toml`:
 
 ```toml
@@ -31,6 +37,7 @@ editor = "code"  # VSCode
 ```
 
 ### **3. Environment Variables**
+
 Set your default editor via environment variables:
 
 ```bash
@@ -42,23 +49,23 @@ export EDITOR="code"      # Fallback editor
 
 ### **Core Commands**
 
-| Command | Description | Example |
-|---------|-------------|---------|
-| `bun run editor:open` | Open current working directory | `bun run editor:open` |
-| `bun run editor:config` | Open all configuration files | `bun run editor:config` |
-| `bun run editor:src` | Open source code directory | `bun run editor:src` |
-| `bun run editor:docs` | Open documentation directory | `bun run editor:docs` |
-| `bun run editor:scripts` | Open scripts directory | `bun run editor:scripts` |
-| `bun run editor:help` | Show help and usage | `bun run editor:help` |
-| `bun run editor:structure` | Show project structure | `bun run editor:structure` |
+| Command                    | Description                    | Example                    |
+| -------------------------- | ------------------------------ | -------------------------- |
+| `bun run editor:open`      | Open current working directory | `bun run editor:open`      |
+| `bun run editor:config`    | Open all configuration files   | `bun run editor:config`    |
+| `bun run editor:src`       | Open source code directory     | `bun run editor:src`       |
+| `bun run editor:docs`      | Open documentation directory   | `bun run editor:docs`      |
+| `bun run editor:scripts`   | Open scripts directory         | `bun run editor:scripts`   |
+| `bun run editor:help`      | Show help and usage            | `bun run editor:help`      |
+| `bun run editor:structure` | Show project structure         | `bun run editor:structure` |
 
 ### **File-Specific Commands**
 
-| Command | Description | Example |
-|---------|-------------|---------|
-| `bun run editor:open <file>` | Open specific file | `bun run editor:open src/index.ts` |
-| `bun run editor:open <file>:<line>` | Open file at line | `bun run editor:open src/index.ts:100` |
-| `bun run editor:open <file>:<line>,<column>` | Open at position | `bun run editor:open src/index.ts:100:5` |
+| Command                                      | Description        | Example                                  |
+| -------------------------------------------- | ------------------ | ---------------------------------------- |
+| `bun run editor:open <file>`                 | Open specific file | `bun run editor:open src/index.ts`       |
+| `bun run editor:open <file>:<line>`          | Open file at line  | `bun run editor:open src/index.ts:100`   |
+| `bun run editor:open <file>:<line>,<column>` | Open at position   | `bun run editor:open src/index.ts:100:5` |
 
 ## 🔍 **Usage Examples**
 
@@ -252,6 +259,7 @@ grep -l "error" src/**/*.ts | xargs -I {} bun run editor:open {}
 ### **Common Issues**
 
 #### **1. Editor Not Found**
+
 ```bash
 ❌ Failed to open file: Editor not found
 
@@ -261,6 +269,7 @@ editor = "code"  # or "subl", "vim", "nano"
 ```
 
 #### **2. Permission Denied**
+
 ```bash
 ❌ Failed to open file: Permission denied
 
@@ -269,6 +278,7 @@ chmod 644 src/index.ts
 ```
 
 #### **3. Editor Already Running**
+
 ```bash
 ❌ Failed to open file: Editor already running
 
@@ -334,6 +344,7 @@ bun run editor:open docs/api-integrations-index.html
 ## 🔗 **Related Commands**
 
 ### **Version Management**
+
 ```bash
 bun run version:status      # Check version
 bun run version:patch       # Bump patch version
@@ -342,6 +353,7 @@ bun run version:major       # Bump major version
 ```
 
 ### **Build System**
+
 ```bash
 bun run build:quick         # Quick build
 bun run build:standard      # Standard build
@@ -350,6 +362,7 @@ bun run build:packages      # Package build
 ```
 
 ### **Testing & Health**
+
 ```bash
 bun run test:quick          # Quick tests
 bun run test:checklist      # Full test suite
@@ -360,6 +373,7 @@ bun run env:validate        # Environment validation
 ## 🎯 **Best Practices**
 
 ### **1. Use Descriptive Commands**
+
 ```bash
 # Good
 bun run editor:src
@@ -371,6 +385,7 @@ bun run editor:open config
 ```
 
 ### **2. Leverage Line Positioning**
+
 ```bash
 # Jump to specific errors
 bun run editor:open src/index.ts:150:10
@@ -380,6 +395,7 @@ bun run editor:open src/types.ts:25
 ```
 
 ### **3. Combine with Other Tools**
+
 ```bash
 # Open files with errors
 grep -n "error" src/**/*.ts | cut -d: -f1,2 | xargs -I {} bun run editor:open {}
@@ -389,6 +405,7 @@ git diff --name-only | xargs -I {} bun run editor:open {}
 ```
 
 ### **4. Use Project Structure**
+
 ```bash
 # Get overview first
 bun run editor:structure
@@ -453,9 +470,13 @@ To request new features or improvements:
 
 ## 🎉 **Conclusion**
 
-The Fire22 Dashboard Editor Integration provides a powerful, seamless way to navigate and edit your project files. With support for multiple editors, line positioning, and comprehensive project navigation, it enhances your development workflow and productivity.
+The Fire22 Dashboard Editor Integration provides a powerful, seamless way to
+navigate and edit your project files. With support for multiple editors, line
+positioning, and comprehensive project navigation, it enhances your development
+workflow and productivity.
 
 **Key Benefits:**
+
 - ⚡ **Fast Navigation**: Quick access to any file or directory
 - 🎯 **Precise Positioning**: Jump to exact line and column positions
 - 🔧 **Smart Integration**: Works with your preferred editor
@@ -463,6 +484,7 @@ The Fire22 Dashboard Editor Integration provides a powerful, seamless way to nav
 - 🚀 **Workflow Enhancement**: Seamless integration with development tools
 
 **Get Started:**
+
 ```bash
 # Show available commands
 bun run editor:help
@@ -479,5 +501,5 @@ bun run editor:config
 
 ---
 
-*Built with ❤️ for the Fire22 Development Team*
-*Editor Integration v1.0.0 | Bun Runtime v1.2.21*
+_Built with ❤️ for the Fire22 Development Team_ _Editor Integration v1.0.0 | Bun
+Runtime v1.2.21_

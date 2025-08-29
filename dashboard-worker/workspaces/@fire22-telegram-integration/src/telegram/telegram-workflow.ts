@@ -2,7 +2,7 @@
 
 /**
  * 🔄 Fire22 Telegram Workflow Integration
- * 
+ *
  * Complete workflow system connecting bot commands, queue system,
  * multilingual support, and dashboard integration
  */
@@ -22,9 +22,9 @@ import {
   API_ENDPOINTS,
 } from './telegram-constants';
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🎯 WORKFLOW TYPES
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 export interface WorkflowContext {
   userId: string;
@@ -51,9 +51,9 @@ export interface DepartmentWorkflow {
   escalationPath?: string[];
 }
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🔄 MAIN WORKFLOW ORCHESTRATOR
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 export class TelegramWorkflowOrchestrator {
   private bot: Bot;
@@ -68,14 +68,14 @@ export class TelegramWorkflowOrchestrator {
     this.bot = new Bot(this.environment.botToken);
     this.queueSystem = new WithdrawalQueueSystem(env);
     this.languageSystem = new Fire22LanguageSystem();
-    
+
     this.initializeDepartmentWorkflows();
     this.setupBotHandlers();
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🏢 DEPARTMENT WORKFLOW INITIALIZATION
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   private initializeDepartmentWorkflows(): void {
     // Customer Service Workflow
@@ -88,77 +88,85 @@ export class TelegramWorkflowOrchestrator {
           name: 'Customer Service Welcome',
           description: 'Welcome customer service agent',
           handler: this.handleCustomerServiceWelcome.bind(this),
-          nextSteps: ['cs_ticket_management', 'cs_escalation']
+          nextSteps: ['cs_ticket_management', 'cs_escalation'],
         },
         {
           id: 'cs_ticket_management',
           name: 'Ticket Management',
           description: 'Handle support tickets',
           handler: this.handleTicketManagement.bind(this),
-          permissions: [ACCESS_LEVELS.CS_AGENT]
-        }
+          permissions: [ACCESS_LEVELS.CS_AGENT],
+        },
       ],
-      escalationPath: ['cs_senior', 'cs_manager', 'director']
+      escalationPath: ['cs_senior', 'cs_manager', 'director'],
     });
 
     // Finance Workflow
     this.departmentWorkflows.set('finance', {
       department: 'finance',
-      permissions: [ACCESS_LEVELS.CASHIER, ACCESS_LEVELS.SENIOR_CASHIER, ACCESS_LEVELS.CASHIER_MANAGER],
+      permissions: [
+        ACCESS_LEVELS.CASHIER,
+        ACCESS_LEVELS.SENIOR_CASHIER,
+        ACCESS_LEVELS.CASHIER_MANAGER,
+      ],
       steps: [
         {
           id: 'finance_welcome',
           name: 'Finance Welcome',
           description: 'Welcome finance team member',
           handler: this.handleFinanceWelcome.bind(this),
-          nextSteps: ['transaction_approval', 'balance_management']
+          nextSteps: ['transaction_approval', 'balance_management'],
         },
         {
           id: 'transaction_approval',
           name: 'Transaction Approval',
           description: 'Approve withdrawal/deposit transactions',
           handler: this.handleTransactionApproval.bind(this),
-          permissions: [ACCESS_LEVELS.CASHIER]
-        }
-      ]
+          permissions: [ACCESS_LEVELS.CASHIER],
+        },
+      ],
     });
 
     // Operations Workflow
     this.departmentWorkflows.set('operations', {
       department: 'operations',
-      permissions: [ACCESS_LEVELS.OPS_ANALYST, ACCESS_LEVELS.QUEUE_MANAGER, ACCESS_LEVELS.OPS_DIRECTOR],
+      permissions: [
+        ACCESS_LEVELS.OPS_ANALYST,
+        ACCESS_LEVELS.QUEUE_MANAGER,
+        ACCESS_LEVELS.OPS_DIRECTOR,
+      ],
       steps: [
         {
           id: 'ops_welcome',
           name: 'Operations Welcome',
           description: 'Welcome operations team member',
           handler: this.handleOperationsWelcome.bind(this),
-          nextSteps: ['queue_management', 'p2p_monitoring']
+          nextSteps: ['queue_management', 'p2p_monitoring'],
         },
         {
           id: 'queue_management',
           name: 'Queue Management',
           description: 'Manage P2P queue and matching',
           handler: this.handleQueueManagement.bind(this),
-          permissions: [ACCESS_LEVELS.QUEUE_MANAGER]
-        }
-      ]
+          permissions: [ACCESS_LEVELS.QUEUE_MANAGER],
+        },
+      ],
     });
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🤖 BOT COMMAND HANDLERS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   private setupBotHandlers(): void {
     // Start command with department detection
-    this.bot.command('start', async (ctx) => {
+    this.bot.command('start', async ctx => {
       const workflow = await this.initializeWorkflow(ctx);
       await this.handleStartCommand(ctx, workflow);
     });
 
     // Language switching
-    this.bot.command('language', async (ctx) => {
+    this.bot.command('language', async ctx => {
       const workflow = this.getWorkflowContext(ctx.from?.id.toString() || '');
       if (workflow) {
         await this.handleLanguageSelection(ctx, workflow);
@@ -166,7 +174,7 @@ export class TelegramWorkflowOrchestrator {
     });
 
     // Dashboard access
-    this.bot.command('dashboard', async (ctx) => {
+    this.bot.command('dashboard', async ctx => {
       const workflow = this.getWorkflowContext(ctx.from?.id.toString() || '');
       if (workflow) {
         await this.handleDashboardAccess(ctx, workflow);
@@ -174,7 +182,7 @@ export class TelegramWorkflowOrchestrator {
     });
 
     // Queue status (Operations)
-    this.bot.command('queue', async (ctx) => {
+    this.bot.command('queue', async ctx => {
       const workflow = this.getWorkflowContext(ctx.from?.id.toString() || '');
       if (workflow && this.hasPermission(workflow, 'queue_access')) {
         await this.handleQueueStatus(ctx, workflow);
@@ -182,7 +190,7 @@ export class TelegramWorkflowOrchestrator {
     });
 
     // Balance check (Finance)
-    this.bot.command('balance', async (ctx) => {
+    this.bot.command('balance', async ctx => {
       const workflow = this.getWorkflowContext(ctx.from?.id.toString() || '');
       if (workflow && this.hasPermission(workflow, 'finance_access')) {
         await this.handleBalanceCheck(ctx, workflow);
@@ -190,7 +198,7 @@ export class TelegramWorkflowOrchestrator {
     });
 
     // Support ticket (Customer Service)
-    this.bot.command('support', async (ctx) => {
+    this.bot.command('support', async ctx => {
       const workflow = this.getWorkflowContext(ctx.from?.id.toString() || '');
       if (workflow) {
         await this.handleSupportRequest(ctx, workflow);
@@ -198,7 +206,7 @@ export class TelegramWorkflowOrchestrator {
     });
 
     // Callback query handler for interactive buttons
-    this.bot.on('callback_query', async (ctx) => {
+    this.bot.on('callback_query', async ctx => {
       const workflow = this.getWorkflowContext(ctx.from?.id.toString() || '');
       if (workflow) {
         await this.handleCallbackQuery(ctx, workflow);
@@ -206,16 +214,16 @@ export class TelegramWorkflowOrchestrator {
     });
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🔄 WORKFLOW MANAGEMENT
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   private async initializeWorkflow(ctx: Context): Promise<WorkflowContext> {
     const userId = ctx.from?.id.toString() || '';
     const chatId = ctx.chat?.id || 0;
 
     // Detect user language
-    const detectedLanguage = await this.languageSystem.detectUserLanguage(userId) || 'en';
+    const detectedLanguage = (await this.languageSystem.detectUserLanguage(userId)) || 'en';
 
     // Determine department and access level (mock implementation)
     const { department, accessLevel } = await this.determineDepartmentAccess(userId);
@@ -226,7 +234,7 @@ export class TelegramWorkflowOrchestrator {
       language: detectedLanguage as 'en' | 'es' | 'pt' | 'fr',
       department,
       accessLevel,
-      sessionData: {}
+      sessionData: {},
     };
 
     this.activeWorkflows.set(userId, workflow);
@@ -237,7 +245,9 @@ export class TelegramWorkflowOrchestrator {
     return this.activeWorkflows.get(userId);
   }
 
-  private async determineDepartmentAccess(userId: string): Promise<{ department?: string; accessLevel?: string }> {
+  private async determineDepartmentAccess(
+    userId: string
+  ): Promise<{ department?: string; accessLevel?: string }> {
     // This would integrate with your user management system
     // For demo purposes, returning mock data
     const userMockData = {
@@ -251,17 +261,18 @@ export class TelegramWorkflowOrchestrator {
 
   private hasPermission(workflow: WorkflowContext, permission: string): boolean {
     if (!workflow.accessLevel) return false;
-    
-    const permissions = DEPARTMENT_PERMISSIONS[workflow.accessLevel as keyof typeof DEPARTMENT_PERMISSIONS];
+
+    const permissions =
+      DEPARTMENT_PERMISSIONS[workflow.accessLevel as keyof typeof DEPARTMENT_PERMISSIONS];
     if (!permissions) return false;
 
     // Check if user has required permission based on access level
     return true; // Simplified for demo
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📱 COMMAND HANDLERS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   private async handleStartCommand(ctx: Context, workflow: WorkflowContext): Promise<void> {
     const welcomeMessage = await this.languageSystem.translate(
@@ -271,13 +282,16 @@ export class TelegramWorkflowOrchestrator {
     );
 
     const keyboard = new InlineKeyboard();
-    
+
     if (workflow.department) {
       // Department-specific menu
       const departmentWorkflow = this.departmentWorkflows.get(workflow.department);
       if (departmentWorkflow) {
         keyboard
-          .text(`${UI_ELEMENTS.DEPARTMENT_ICONS[workflow.department.toUpperCase() as keyof typeof UI_ELEMENTS.DEPARTMENT_ICONS]} ${workflow.department}`, `dept_${workflow.department}`)
+          .text(
+            `${UI_ELEMENTS.DEPARTMENT_ICONS[workflow.department.toUpperCase() as keyof typeof UI_ELEMENTS.DEPARTMENT_ICONS]} ${workflow.department}`,
+            `dept_${workflow.department}`
+          )
           .row()
           .text(`${UI_ELEMENTS.EMOJIS.CHART} Dashboard`, 'dashboard')
           .text(`${UI_ELEMENTS.EMOJIS.TARGET} Stats`, 'stats')
@@ -314,7 +328,7 @@ export class TelegramWorkflowOrchestrator {
 
   private async handleDashboardAccess(ctx: Context, workflow: WorkflowContext): Promise<void> {
     const dashboardUrl = `${this.environment.fire22ApiUrl}/dashboard?user=${workflow.userId}&lang=${workflow.language}`;
-    
+
     const keyboard = new InlineKeyboard()
       .url(`${UI_ELEMENTS.EMOJIS.CHART} Open Dashboard`, dashboardUrl)
       .row()
@@ -330,7 +344,7 @@ export class TelegramWorkflowOrchestrator {
 
   private async handleQueueStatus(ctx: Context, workflow: WorkflowContext): Promise<void> {
     const queueStats = this.queueSystem.getQueueStats();
-    
+
     const statusMessage = `
 ${UI_ELEMENTS.EMOJIS.TARGET} **Queue Status**
 
@@ -349,9 +363,9 @@ Last Updated: ${queueStats.lastUpdated.toLocaleTimeString()}
       .row()
       .text(`${UI_ELEMENTS.EMOJIS.CHART} Details`, 'queue_details');
 
-    await ctx.reply(statusMessage, { 
+    await ctx.reply(statusMessage, {
       reply_markup: keyboard,
-      parse_mode: 'Markdown'
+      parse_mode: 'Markdown',
     });
   }
 
@@ -359,8 +373,8 @@ Last Updated: ${queueStats.lastUpdated.toLocaleTimeString()}
     // This would integrate with your balance system
     const mockBalance = {
       available: 15420.75,
-      pending: 2340.50,
-      total: 17761.25
+      pending: 2340.5,
+      total: 17761.25,
     };
 
     const balanceMessage = `
@@ -380,9 +394,9 @@ ${UI_ELEMENTS.EMOJIS.CLOCK} Last Updated: ${new Date().toLocaleTimeString()}
       .text(`${UI_ELEMENTS.EMOJIS.TARGET} Deposit`, 'new_deposit')
       .text(`${UI_ELEMENTS.EMOJIS.MONEY} Withdraw`, 'new_withdrawal');
 
-    await ctx.reply(balanceMessage, { 
+    await ctx.reply(balanceMessage, {
       reply_markup: keyboard,
-      parse_mode: 'Markdown'
+      parse_mode: 'Markdown',
     });
   }
 
@@ -402,11 +416,14 @@ ${UI_ELEMENTS.EMOJIS.CLOCK} Last Updated: ${new Date().toLocaleTimeString()}
     await ctx.reply(supportMessage, { reply_markup: keyboard });
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🏢 DEPARTMENT-SPECIFIC HANDLERS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
-  private async handleCustomerServiceWelcome(ctx: Context, workflow: WorkflowContext): Promise<void> {
+  private async handleCustomerServiceWelcome(
+    ctx: Context,
+    workflow: WorkflowContext
+  ): Promise<void> {
     const welcomeMessage = `
 ${UI_ELEMENTS.DEPARTMENT_ICONS.CUSTOMER_SERVICE} **Customer Service Dashboard**
 
@@ -425,9 +442,9 @@ Access Level: ${workflow.accessLevel}
       .text(`${UI_ELEMENTS.EMOJIS.CHART} My Stats`, 'cs_stats')
       .text(`${UI_ELEMENTS.EMOJIS.SHIELD} Escalate`, 'cs_escalate');
 
-    await ctx.reply(welcomeMessage, { 
+    await ctx.reply(welcomeMessage, {
       reply_markup: keyboard,
-      parse_mode: 'Markdown'
+      parse_mode: 'Markdown',
     });
   }
 
@@ -451,15 +468,15 @@ Transaction Limit: $${DEPARTMENT_PERMISSIONS[workflow.accessLevel as keyof typeo
       .text(`${UI_ELEMENTS.EMOJIS.TARGET} Daily Summary`, 'finance_summary')
       .text(`${UI_ELEMENTS.EMOJIS.SHIELD} Risk Review`, 'finance_risk');
 
-    await ctx.reply(welcomeMessage, { 
+    await ctx.reply(welcomeMessage, {
       reply_markup: keyboard,
-      parse_mode: 'Markdown'
+      parse_mode: 'Markdown',
     });
   }
 
   private async handleOperationsWelcome(ctx: Context, workflow: WorkflowContext): Promise<void> {
     const queueStats = this.queueSystem.getQueueStats();
-    
+
     const welcomeMessage = `
 ${UI_ELEMENTS.DEPARTMENT_ICONS.OPERATIONS} **Operations Dashboard**
 
@@ -478,15 +495,15 @@ Access Level: ${workflow.accessLevel}
       .text(`${UI_ELEMENTS.EMOJIS.CHART} Performance`, 'ops_performance')
       .text(`${UI_ELEMENTS.EMOJIS.SHIELD} Alerts`, 'ops_alerts');
 
-    await ctx.reply(welcomeMessage, { 
+    await ctx.reply(welcomeMessage, {
       reply_markup: keyboard,
-      parse_mode: 'Markdown'
+      parse_mode: 'Markdown',
     });
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🎯 CALLBACK QUERY HANDLERS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   private async handleCallbackQuery(ctx: Context, workflow: WorkflowContext): Promise<void> {
     const callbackData = (ctx as any).callbackQuery?.data;
@@ -498,40 +515,44 @@ Access Level: ${workflow.accessLevel}
       case callbackData.startsWith('lang_'):
         await this.handleLanguageChange(ctx, workflow, callbackData.replace('lang_', ''));
         break;
-        
+
       case callbackData.startsWith('dept_'):
         const department = callbackData.replace('dept_', '');
         await this.executeDepartmentWorkflow(ctx, workflow, department);
         break;
-        
+
       case callbackData === 'dashboard':
         await this.handleDashboardAccess(ctx, workflow);
         break;
-        
+
       case callbackData === 'refresh_queue':
         await this.handleQueueStatus(ctx, workflow);
         break;
-        
+
       case callbackData === 'process_queue':
         await this.handleQueueProcessing(ctx, workflow);
         break;
-        
+
       case callbackData.startsWith('support_'):
         const supportType = callbackData.replace('support_', '');
         await this.handleSupportType(ctx, workflow, supportType);
         break;
-        
+
       default:
         await ctx.reply('Command not recognized. Use /help for available commands.');
     }
   }
 
-  private async handleLanguageChange(ctx: Context, workflow: WorkflowContext, newLanguage: string): Promise<void> {
+  private async handleLanguageChange(
+    ctx: Context,
+    workflow: WorkflowContext,
+    newLanguage: string
+  ): Promise<void> {
     workflow.language = newLanguage as 'en' | 'es' | 'pt' | 'fr';
     this.activeWorkflows.set(workflow.userId, workflow);
-    
+
     await this.languageSystem.setUserLanguage(workflow.userId, workflow.language);
-    
+
     const confirmMessage = await this.languageSystem.translate(
       LANGUAGE_CODES.LANGUAGE_CHANGED,
       workflow.language
@@ -540,7 +561,11 @@ Access Level: ${workflow.accessLevel}
     await ctx.editMessageText(confirmMessage);
   }
 
-  private async executeDepartmentWorkflow(ctx: Context, workflow: WorkflowContext, department: string): Promise<void> {
+  private async executeDepartmentWorkflow(
+    ctx: Context,
+    workflow: WorkflowContext,
+    department: string
+  ): Promise<void> {
     const departmentWorkflow = this.departmentWorkflows.get(department);
     if (!departmentWorkflow) {
       await ctx.reply('Department workflow not found.');
@@ -555,7 +580,7 @@ Access Level: ${workflow.accessLevel}
 
   private async handleQueueProcessing(ctx: Context, workflow: WorkflowContext): Promise<void> {
     await this.queueSystem.processMatchedItems();
-    
+
     const processMessage = `
 ${UI_ELEMENTS.STATUS_ICONS.PROCESSING} **Queue Processing Started**
 
@@ -568,25 +593,29 @@ Use /queue to check updated status.
     await ctx.reply(processMessage, { parse_mode: 'Markdown' });
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🚀 WORKFLOW ORCHESTRATOR METHODS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   private async handleTicketManagement(ctx: Context, workflow: WorkflowContext): Promise<void> {
     // Implementation for ticket management workflow
   }
 
   private async handleTransactionApproval(ctx: Context, workflow: WorkflowContext): Promise<void> {
-    // Implementation for transaction approval workflow  
+    // Implementation for transaction approval workflow
   }
 
   private async handleQueueManagement(ctx: Context, workflow: WorkflowContext): Promise<void> {
     // Implementation for queue management workflow
   }
 
-  private async handleSupportType(ctx: Context, workflow: WorkflowContext, supportType: string): Promise<void> {
+  private async handleSupportType(
+    ctx: Context,
+    workflow: WorkflowContext,
+    supportType: string
+  ): Promise<void> {
     const ticketId = `TKT-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
-    
+
     const ticketMessage = `
 ${UI_ELEMENTS.EMOJIS.TARGET} **Support Ticket Created**
 
@@ -602,19 +631,19 @@ ${UI_ELEMENTS.EMOJIS.CLOCK} Expected response: 15-30 minutes
       .text(`${UI_ELEMENTS.EMOJIS.LOADING} Check Status`, `ticket_${ticketId}`)
       .text(`${UI_ELEMENTS.EMOJIS.SHIELD} Escalate`, `escalate_${ticketId}`);
 
-    await ctx.reply(ticketMessage, { 
+    await ctx.reply(ticketMessage, {
       reply_markup: keyboard,
-      parse_mode: 'Markdown'
+      parse_mode: 'Markdown',
     });
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🎯 PUBLIC METHODS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   public async start(): Promise<void> {
     console.log('🔥📱 Fire22 Telegram Workflow Orchestrator starting...');
-    
+
     const validation = this.environment.validateRequiredSecrets();
     if (!validation.valid) {
       throw new Error(`Missing required environment variables: ${validation.missing.join(', ')}`);

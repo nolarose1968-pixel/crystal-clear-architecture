@@ -17,7 +17,7 @@ import type {
   RiskAssessment,
   SportsRate,
   SportsValidationResult,
-  SettlementRequest
+  SettlementRequest,
 } from '../core/sports-types';
 
 export class BetProcessing {
@@ -31,7 +31,10 @@ export class BetProcessing {
   /**
    * Create a new bet
    */
-  async createBet(betData: SportsBetCreate, event: SportsEvent): Promise<{
+  async createBet(
+    betData: SportsBetCreate,
+    event: SportsEvent
+  ): Promise<{
     bet: SportsBet | null;
     validation: SportsValidationResult;
   }> {
@@ -50,7 +53,7 @@ export class BetProcessing {
       updatedAt: new Date(),
       isActive: true,
       createdBy: betData.playerId,
-      updatedBy: betData.playerId
+      updatedBy: betData.playerId,
     };
 
     // Calculate potential win
@@ -80,7 +83,7 @@ export class BetProcessing {
       ...bet,
       ...updates,
       updatedAt: new Date(),
-      updatedBy: 'system'
+      updatedBy: 'system',
     };
 
     this.bets.set(betId, updatedBet);
@@ -97,7 +100,7 @@ export class BetProcessing {
     return this.updateBet(betId, {
       status: 'cancelled',
       notes: reason,
-      settledAt: new Date()
+      settledAt: new Date(),
     });
   }
 
@@ -150,16 +153,14 @@ export class BetProcessing {
     }
 
     if (filter.dateRange) {
-      bets = bets.filter(b =>
-        b.placedAt >= filter.dateRange!.start &&
-        b.placedAt <= filter.dateRange!.end
+      bets = bets.filter(
+        b => b.placedAt >= filter.dateRange!.start && b.placedAt <= filter.dateRange!.end
       );
     }
 
     if (filter.amountRange) {
-      bets = bets.filter(b =>
-        b.stake >= filter.amountRange!.min &&
-        b.stake <= filter.amountRange!.max
+      bets = bets.filter(
+        b => b.stake >= filter.amountRange!.min && b.stake <= filter.amountRange!.max
       );
     }
 
@@ -238,19 +239,22 @@ export class BetProcessing {
       actualWin,
       settledAt: new Date(),
       settledBy: settlement.reviewedBy,
-      notes: settlement.notes
+      notes: settlement.notes,
     });
 
     return {
       bet: updatedBet,
-      success: !!updatedBet
+      success: !!updatedBet,
     };
   }
 
   /**
    * Bulk settle bets for an event
    */
-  bulkSettleBets(eventId: string, settlements: SettlementRequest[]): {
+  bulkSettleBets(
+    eventId: string,
+    settlements: SettlementRequest[]
+  ): {
     settled: number;
     failed: number;
     results: Array<{ betId: string; success: boolean; error?: string }>;
@@ -260,21 +264,24 @@ export class BetProcessing {
       return {
         betId: settlement.betId,
         success: result.success,
-        error: result.error
+        error: result.error,
       };
     });
 
     return {
       settled: results.filter(r => r.success).length,
       failed: results.filter(r => !r.success).length,
-      results
+      results,
     };
   }
 
   /**
    * Validate bet before creation
    */
-  private async validateBet(betData: SportsBetCreate, event: SportsEvent): Promise<SportsValidationResult> {
+  private async validateBet(
+    betData: SportsBetCreate,
+    event: SportsEvent
+  ): Promise<SportsValidationResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -315,7 +322,7 @@ export class BetProcessing {
     return {
       isValid: errors.length === 0,
       errors,
-      warnings
+      warnings,
     };
   }
 
@@ -340,7 +347,7 @@ export class BetProcessing {
       tennis: 10,
       golf: 25,
       racing: 20,
-      esports: 5
+      esports: 5,
     };
     return minStakes[sport] || 10;
   }
@@ -358,7 +365,7 @@ export class BetProcessing {
       futures: 100,
       live_bet: 15,
       special: 20,
-      prop_bet: 30
+      prop_bet: 30,
     };
     return maxOdds[betType] || 10;
   }
@@ -386,7 +393,7 @@ export class BetProcessing {
       totalVolume: 0,
       averageStake: 0,
       pendingCount: 0,
-      settledCount: 0
+      settledCount: 0,
     };
 
     bets.forEach(bet => {
@@ -419,8 +426,26 @@ export class BetProcessing {
   }
 
   private initializeBetIndex(): void {
-    const betTypes: BetType[] = ['moneyline', 'spread', 'over_under', 'parlay', 'teaser', 'futures', 'live_bet', 'special', 'prop_bet'];
-    const statuses: BetStatus[] = ['pending', 'active', 'won', 'lost', 'cancelled', 'void', 'pushed'];
+    const betTypes: BetType[] = [
+      'moneyline',
+      'spread',
+      'over_under',
+      'parlay',
+      'teaser',
+      'futures',
+      'live_bet',
+      'special',
+      'prop_bet',
+    ];
+    const statuses: BetStatus[] = [
+      'pending',
+      'active',
+      'won',
+      'lost',
+      'cancelled',
+      'void',
+      'pushed',
+    ];
 
     betTypes.forEach(type => this.betIndex.set(`type_${type}`, new Set()));
     statuses.forEach(status => this.betIndex.set(`status_${status}`, new Set()));

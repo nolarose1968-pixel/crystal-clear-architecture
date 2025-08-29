@@ -5,10 +5,10 @@
  * Orchestrates comprehensive edge case testing with detailed reporting
  */
 
-import { spawn } from "bun";
-import { EdgeCaseHelpers } from "../test/utils/edge-case-helpers";
-import { existsSync, writeFileSync, mkdirSync } from "fs";
-import { join } from "path";
+import { spawn } from 'bun';
+import { EdgeCaseHelpers } from '../test/utils/edge-case-helpers';
+import { existsSync, writeFileSync, mkdirSync } from 'fs';
+import { join } from 'path';
 
 interface EdgeCaseTestSuite {
   name: string;
@@ -33,39 +33,39 @@ interface EdgeCaseResult {
 export class EdgeCaseTestRunner {
   private rootPath: string;
   private resultsDir: string;
-  
+
   // 🛡️ Edge case test suites
   private testSuites: EdgeCaseTestSuite[] = [
     {
-      name: "Runtime Environment",
-      emoji: "⚡",
-      description: "Bun version compatibility, memory pressure, and concurrency",
-      testFile: "test/edge-cases/runtime-environment.test.ts",
+      name: 'Runtime Environment',
+      emoji: '⚡',
+      description: 'Bun version compatibility, memory pressure, and concurrency',
+      testFile: 'test/edge-cases/runtime-environment.test.ts',
       timeout: 60000, // 1 minute
-      memoryLimit: 256 // 256MB
+      memoryLimit: 256, // 256MB
     },
     {
-      name: "Workspace Edge Cases",
-      emoji: "🏗️",
-      description: "Package corruption, dependency resolution, and workspace validation",
-      testFile: "test/edge-cases/workspace-edge-cases.test.ts",
+      name: 'Workspace Edge Cases',
+      emoji: '🏗️',
+      description: 'Package corruption, dependency resolution, and workspace validation',
+      testFile: 'test/edge-cases/workspace-edge-cases.test.ts',
       timeout: 45000, // 45 seconds
-      memoryLimit: 128 // 128MB
+      memoryLimit: 128, // 128MB
     },
     {
-      name: "Pattern System",
-      emoji: "🕸️",
-      description: "Pattern connections, timeouts, and memory management",
-      testFile: "test/edge-cases/pattern-edge-cases.test.ts",
+      name: 'Pattern System',
+      emoji: '🕸️',
+      description: 'Pattern connections, timeouts, and memory management',
+      testFile: 'test/edge-cases/pattern-edge-cases.test.ts',
       timeout: 90000, // 1.5 minutes
-      memoryLimit: 256 // 256MB
-    }
+      memoryLimit: 256, // 256MB
+    },
   ];
 
   constructor(rootPath: string = process.cwd()) {
     this.rootPath = rootPath;
     this.resultsDir = join(rootPath, 'edge-case-results');
-    
+
     // Ensure results directory exists
     if (!existsSync(this.resultsDir)) {
       mkdirSync(this.resultsDir, { recursive: true });
@@ -75,12 +75,14 @@ export class EdgeCaseTestRunner {
   /**
    * 🛡️ Run comprehensive edge case test suite
    */
-  async runAllEdgeCases(options: {
-    verbose?: boolean;
-    failFast?: boolean;
-    generateReport?: boolean;
-    smol?: boolean;
-  } = {}): Promise<{
+  async runAllEdgeCases(
+    options: {
+      verbose?: boolean;
+      failFast?: boolean;
+      generateReport?: boolean;
+      smol?: boolean;
+    } = {}
+  ): Promise<{
     success: boolean;
     results: EdgeCaseResult[];
     summary: {
@@ -95,9 +97,9 @@ export class EdgeCaseTestRunner {
     };
   }> {
     const startTime = Bun.nanoseconds();
-    
-    console.log("🛡️ Fire22 Edge Case Test Suite");
-    console.log("=".repeat(50));
+
+    console.log('🛡️ Fire22 Edge Case Test Suite');
+    console.log('='.repeat(50));
     console.log(`📊 Running ${this.testSuites.length} edge case test suites\n`);
 
     const results: EdgeCaseResult[] = [];
@@ -111,7 +113,7 @@ export class EdgeCaseTestRunner {
 
       console.log(`${suite.emoji} Running ${suite.name} edge cases...`);
       console.log(`   📝 ${suite.description}`);
-      
+
       if (options.verbose) {
         console.log(`   📁 Test file: ${suite.testFile}`);
         console.log(`   ⏱️ Timeout: ${suite.timeout}ms`);
@@ -122,9 +124,11 @@ export class EdgeCaseTestRunner {
       results.push(suiteResult);
 
       // Display suite results
-      const statusIcon = suiteResult.success ? "✅" : "❌";
-      console.log(`   ${statusIcon} ${suiteResult.passed} passed, ${suiteResult.failed} failed, ${suiteResult.skipped} skipped (${suiteResult.duration})`);
-      
+      const statusIcon = suiteResult.success ? '✅' : '❌';
+      console.log(
+        `   ${statusIcon} ${suiteResult.passed} passed, ${suiteResult.failed} failed, ${suiteResult.skipped} skipped (${suiteResult.duration})`
+      );
+
       if (!suiteResult.success) {
         shouldStop = true;
         console.log(`   ⚠️  Issues found: ${suiteResult.issues.length}`);
@@ -132,7 +136,7 @@ export class EdgeCaseTestRunner {
           suiteResult.issues.forEach(issue => console.log(`      • ${issue}`));
         }
       }
-      
+
       console.log(); // Empty line for readability
     }
 
@@ -141,7 +145,7 @@ export class EdgeCaseTestRunner {
 
     // Calculate summary
     const summary = this.calculateSummary(results, totalDuration);
-    
+
     // Display summary
     this.displaySummary(summary, results);
 
@@ -153,7 +157,7 @@ export class EdgeCaseTestRunner {
     return {
       success: summary.failedSuites === 0,
       results,
-      summary
+      summary,
     };
   }
 
@@ -161,11 +165,11 @@ export class EdgeCaseTestRunner {
    * 🧪 Run specific edge case suite
    */
   private async runEdgeCaseSuite(
-    suite: EdgeCaseTestSuite, 
+    suite: EdgeCaseTestSuite,
     options: { verbose?: boolean; smol?: boolean }
   ): Promise<EdgeCaseResult> {
     const startTime = Date.now();
-    
+
     // Check if test file exists
     const testFilePath = join(this.rootPath, suite.testFile);
     if (!existsSync(testFilePath)) {
@@ -174,43 +178,40 @@ export class EdgeCaseTestRunner {
         passed: 0,
         failed: 1,
         skipped: 0,
-        duration: "0ms",
+        duration: '0ms',
         success: false,
         issues: [`Test file not found: ${suite.testFile}`],
-        recommendations: [`Create the test file: ${suite.testFile}`]
+        recommendations: [`Create the test file: ${suite.testFile}`],
       };
     }
 
     try {
       // Build Bun test command
       const args = ['test', testFilePath];
-      
+
       if (options.smol) {
         args.push('--smol');
       }
-      
+
       args.push('--timeout', suite.timeout.toString());
 
       // Run the test suite with memory constraints
-      const result = await EdgeCaseHelpers.runWithMemoryConstraints(
-        async () => {
-          const proc = spawn({
-            cmd: ['bun', ...args],
-            cwd: this.rootPath,
-            stdout: 'pipe',
-            stderr: 'pipe',
-            env: {
-              ...process.env,
-              BUN_ENV: 'test',
-              NODE_ENV: 'test',
-              EDGE_CASE_TESTING: 'true'
-            }
-          });
+      const result = await EdgeCaseHelpers.runWithMemoryConstraints(async () => {
+        const proc = spawn({
+          cmd: ['bun', ...args],
+          cwd: this.rootPath,
+          stdout: 'pipe',
+          stderr: 'pipe',
+          env: {
+            ...process.env,
+            BUN_ENV: 'test',
+            NODE_ENV: 'test',
+            EDGE_CASE_TESTING: 'true',
+          },
+        });
 
-          return await this.processTestOutput(proc, suite);
-        },
-        suite.memoryLimit
-      );
+        return await this.processTestOutput(proc, suite);
+      }, suite.memoryLimit);
 
       const duration = Date.now() - startTime;
 
@@ -220,9 +221,13 @@ export class EdgeCaseTestRunner {
           duration: `${duration}ms`,
           success: result.result.failed === 0,
           issues: result.result.failed > 0 ? [`${result.result.failed} tests failed`] : [],
-          recommendations: result.result.failed > 0 ? 
-            ["Review test output for specific failure details", "Check edge case handling in implementation"] : 
-            []
+          recommendations:
+            result.result.failed > 0
+              ? [
+                  'Review test output for specific failure details',
+                  'Check edge case handling in implementation',
+                ]
+              : [],
         };
       } else {
         return {
@@ -232,18 +237,17 @@ export class EdgeCaseTestRunner {
           skipped: 0,
           duration: `${duration}ms`,
           success: false,
-          issues: [result.message || "Test execution failed under memory constraints"],
+          issues: [result.message || 'Test execution failed under memory constraints'],
           recommendations: [
-            "Reduce memory usage in test implementation",
-            "Optimize test data structures",
-            "Consider using --smol flag"
-          ]
+            'Reduce memory usage in test implementation',
+            'Optimize test data structures',
+            'Consider using --smol flag',
+          ],
         };
       }
-
     } catch (error) {
       const duration = Date.now() - startTime;
-      
+
       return {
         suite: suite.name,
         passed: 0,
@@ -253,10 +257,10 @@ export class EdgeCaseTestRunner {
         success: false,
         issues: [`Test suite execution failed: ${error.message}`],
         recommendations: [
-          "Check test file syntax and imports",
-          "Verify test environment setup",
-          "Review error logs for specific issues"
-        ]
+          'Check test file syntax and imports',
+          'Verify test environment setup',
+          'Review error logs for specific issues',
+        ],
       };
     }
   }
@@ -264,7 +268,10 @@ export class EdgeCaseTestRunner {
   /**
    * 📊 Process test output and extract results
    */
-  private async processTestOutput(proc: any, suite: EdgeCaseTestSuite): Promise<{
+  private async processTestOutput(
+    proc: any,
+    suite: EdgeCaseTestSuite
+  ): Promise<{
     suite: string;
     passed: number;
     failed: number;
@@ -280,7 +287,7 @@ export class EdgeCaseTestRunner {
       for await (const chunk of proc.stdout) {
         const text = new TextDecoder().decode(chunk);
         output += text;
-        
+
         // Count test results in real-time
         const lines = text.split('\n');
         for (const line of lines) {
@@ -306,7 +313,7 @@ export class EdgeCaseTestRunner {
       }
 
       const exitCode = await proc.exited;
-      
+
       // If no explicit counts found, infer from exit code
       if (passed === 0 && failed === 0 && skipped === 0) {
         if (exitCode === 0) {
@@ -318,7 +325,10 @@ export class EdgeCaseTestRunner {
 
       // Save test output for debugging
       if (output.trim()) {
-        const outputFile = join(this.resultsDir, `${suite.name.toLowerCase().replace(/\s+/g, '-')}-output.log`);
+        const outputFile = join(
+          this.resultsDir,
+          `${suite.name.toLowerCase().replace(/\s+/g, '-')}-output.log`
+        );
         writeFileSync(outputFile, output);
       }
 
@@ -326,16 +336,15 @@ export class EdgeCaseTestRunner {
         suite: suite.name,
         passed,
         failed,
-        skipped
+        skipped,
       };
-
     } catch (error) {
       console.warn(`   ⚠️ Error processing ${suite.name} output:`, error);
       return {
         suite: suite.name,
         passed: 0,
         failed: 1,
-        skipped: 0
+        skipped: 0,
       };
     }
   }
@@ -347,7 +356,7 @@ export class EdgeCaseTestRunner {
     const totalSuites = results.length;
     const passedSuites = results.filter(r => r.success).length;
     const failedSuites = results.filter(r => !r.success).length;
-    
+
     const totalTests = results.reduce((sum, r) => sum + r.passed + r.failed + r.skipped, 0);
     const totalPassed = results.reduce((sum, r) => sum + r.passed, 0);
     const totalFailed = results.reduce((sum, r) => sum + r.failed, 0);
@@ -361,7 +370,7 @@ export class EdgeCaseTestRunner {
       totalPassed,
       totalFailed,
       totalSkipped,
-      duration: `${totalDuration.toFixed(2)}ms`
+      duration: `${totalDuration.toFixed(2)}ms`,
     };
   }
 
@@ -369,38 +378,40 @@ export class EdgeCaseTestRunner {
    * 📊 Display test summary
    */
   private displaySummary(summary: any, results: EdgeCaseResult[]) {
-    console.log("🛡️ Edge Case Test Summary");
-    console.log("=".repeat(40));
-    
+    console.log('🛡️ Edge Case Test Summary');
+    console.log('='.repeat(40));
+
     // Overall status
-    const overallStatus = summary.failedSuites === 0 ? "✅ ALL PASSED" : "❌ SOME FAILED";
+    const overallStatus = summary.failedSuites === 0 ? '✅ ALL PASSED' : '❌ SOME FAILED';
     console.log(`📊 Overall Status: ${overallStatus}`);
     console.log();
-    
+
     // Suite-level results
-    console.log("📋 Suite Results:");
+    console.log('📋 Suite Results:');
     for (const result of results) {
-      const icon = result.success ? "✅" : "❌";
+      const icon = result.success ? '✅' : '❌';
       const suite = this.testSuites.find(s => s.name === result.suite);
-      console.log(`   ${icon} ${suite?.emoji || "🧪"} ${result.suite}: ${result.passed}/${result.passed + result.failed + result.skipped}`);
+      console.log(
+        `   ${icon} ${suite?.emoji || '🧪'} ${result.suite}: ${result.passed}/${result.passed + result.failed + result.skipped}`
+      );
     }
     console.log();
-    
+
     // Summary statistics
-    console.log("📊 Statistics:");
+    console.log('📊 Statistics:');
     console.log(`   Test Suites: ${summary.passedSuites}/${summary.totalSuites} passed`);
     console.log(`   Total Tests: ${summary.totalPassed}/${summary.totalTests} passed`);
     console.log(`   Failed: ${summary.totalFailed}`);
     console.log(`   Skipped: ${summary.totalSkipped}`);
     console.log(`   Duration: ${summary.duration}`);
-    
+
     // Issues and recommendations
     const allIssues = results.flatMap(r => r.issues);
     if (allIssues.length > 0) {
-      console.log("\n⚠️ Issues Found:");
+      console.log('\n⚠️ Issues Found:');
       allIssues.forEach(issue => console.log(`   • ${issue}`));
-      
-      console.log("\n💡 Recommendations:");
+
+      console.log('\n💡 Recommendations:');
       const allRecommendations = [...new Set(results.flatMap(r => r.recommendations))];
       allRecommendations.forEach(rec => console.log(`   • ${rec}`));
     }
@@ -411,7 +422,7 @@ export class EdgeCaseTestRunner {
    */
   private async generateDetailedReport(results: EdgeCaseResult[], summary: any): Promise<void> {
     const reportPath = join(this.resultsDir, `edge-case-report-${Date.now()}.html`);
-    
+
     const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -471,46 +482,60 @@ export class EdgeCaseTestRunner {
         </div>
         
         <h2>📋 Suite Details</h2>
-        ${results.map(result => {
-          const suite = this.testSuites.find(s => s.name === result.suite);
-          return `
+        ${results
+          .map(result => {
+            const suite = this.testSuites.find(s => s.name === result.suite);
+            return `
             <div class="suite ${result.success ? '' : 'failed'}">
                 <h3>${suite?.emoji || '🧪'} ${result.suite}</h3>
                 <p><strong>Description:</strong> ${suite?.description || 'No description available'}</p>
                 <p><strong>Results:</strong> ${result.passed} passed, ${result.failed} failed, ${result.skipped} skipped (${result.duration})</p>
                 
-                ${result.issues.length > 0 ? `
+                ${
+                  result.issues.length > 0
+                    ? `
                     <div class="issues">
                         <strong>⚠️ Issues:</strong>
                         <ul>${result.issues.map(issue => `<li>${issue}</li>`).join('')}</ul>
                     </div>
-                ` : ''}
+                `
+                    : ''
+                }
                 
-                ${result.recommendations.length > 0 ? `
+                ${
+                  result.recommendations.length > 0
+                    ? `
                     <div class="recommendations">
                         <strong>💡 Recommendations:</strong>
                         <ul>${result.recommendations.map(rec => `<li>${rec}</li>`).join('')}</ul>
                     </div>
-                ` : ''}
+                `
+                    : ''
+                }
             </div>
           `;
-        }).join('')}
+          })
+          .join('')}
         
         <h2>🔧 Test Configuration</h2>
         <div class="suite">
             <h3>Test Suites Configuration</h3>
-            ${this.testSuites.map(suite => `
+            ${this.testSuites
+              .map(
+                suite => `
                 <p><strong>${suite.emoji} ${suite.name}:</strong><br>
                    File: <code>${suite.testFile}</code><br>
                    Timeout: ${suite.timeout}ms<br>
                    Memory Limit: ${suite.memoryLimit}MB</p>
-            `).join('')}
+            `
+              )
+              .join('')}
         </div>
     </div>
 </body>
 </html>
     `;
-    
+
     writeFileSync(reportPath, html);
     console.log(`\n📝 Detailed report generated: ${reportPath}`);
   }
@@ -518,14 +543,20 @@ export class EdgeCaseTestRunner {
   /**
    * 🧪 Run specific edge case suite by name
    */
-  async runSpecificSuite(suiteName: string, options: { verbose?: boolean; smol?: boolean } = {}): Promise<EdgeCaseResult> {
-    const suite = this.testSuites.find(s => 
-      s.name.toLowerCase().includes(suiteName.toLowerCase()) ||
-      suiteName.toLowerCase().includes(s.name.toLowerCase())
+  async runSpecificSuite(
+    suiteName: string,
+    options: { verbose?: boolean; smol?: boolean } = {}
+  ): Promise<EdgeCaseResult> {
+    const suite = this.testSuites.find(
+      s =>
+        s.name.toLowerCase().includes(suiteName.toLowerCase()) ||
+        suiteName.toLowerCase().includes(s.name.toLowerCase())
     );
 
     if (!suite) {
-      throw new Error(`Edge case suite not found: ${suiteName}. Available: ${this.testSuites.map(s => s.name).join(', ')}`);
+      throw new Error(
+        `Edge case suite not found: ${suiteName}. Available: ${this.testSuites.map(s => s.name).join(', ')}`
+      );
     }
 
     console.log(`🛡️ Running ${suite.name} edge cases...`);
@@ -542,7 +573,7 @@ if (import.meta.main) {
     verbose: args.includes('--verbose') || args.includes('-v'),
     failFast: args.includes('--fail-fast'),
     generateReport: args.includes('--report'),
-    smol: args.includes('--smol')
+    smol: args.includes('--smol'),
   };
 
   const suiteFilter = args.find(arg => !arg.startsWith('--'));
@@ -552,13 +583,15 @@ if (import.meta.main) {
       // Run specific suite
       const result = await runner.runSpecificSuite(suiteFilter, options);
       const success = result.success;
-      
-      console.log(`\n🛡️ ${result.suite} Results: ${result.passed} passed, ${result.failed} failed (${result.duration})`);
-      
+
+      console.log(
+        `\n🛡️ ${result.suite} Results: ${result.passed} passed, ${result.failed} failed (${result.duration})`
+      );
+
       if (!success && result.issues.length > 0) {
         console.log(`⚠️ Issues: ${result.issues.join(', ')}`);
       }
-      
+
       process.exit(success ? 0 : 1);
     } else {
       // Run all edge case suites

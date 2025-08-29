@@ -7,7 +7,7 @@ import type {
   CustomerSearchOptions,
   CustomerSearchFilters,
   CustomerProfile,
-  CustomerPaginationOptions
+  CustomerPaginationOptions,
 } from '../core/customer-interface-types';
 import { CustomerInformationService } from '../../../services/customer-information-service';
 
@@ -42,14 +42,14 @@ export class CustomerSearch {
         console.log('✅ Using cached search results');
         return {
           ...cached,
-          searchTime: Date.now() - startTime
+          searchTime: Date.now() - startTime,
         };
       }
 
       // Perform search
       const searchFilters: CustomerSearchFilters = {
         ...options.filters,
-        query: options.query
+        query: options.query,
       };
 
       const customers = await this.customerService.searchCustomers(searchFilters);
@@ -58,25 +58,28 @@ export class CustomerSearch {
       const sortedCustomers = this.applySorting(customers, options.sortBy, options.sortOrder);
 
       // Apply pagination
-      const { results, pagination } = this.applyPagination(sortedCustomers, options.page, options.limit);
+      const { results, pagination } = this.applyPagination(
+        sortedCustomers,
+        options.page,
+        options.limit
+      );
 
       const searchResult = {
         results,
         pagination,
         totalFound: customers.length,
-        searchTime: Date.now() - startTime
+        searchTime: Date.now() - startTime,
       };
 
       // Cache results
       this.cacheResults(cacheKey, {
         results,
         pagination,
-        totalFound: customers.length
+        totalFound: customers.length,
       });
 
       console.log(`✅ Search completed: ${results.length} results in ${searchResult.searchTime}ms`);
       return searchResult;
-
     } catch (error) {
       console.error('❌ Search failed:', error);
       throw error;
@@ -126,16 +129,14 @@ export class CustomerSearch {
     console.log(`🏷️ Searching by tags: ${tags.join(', ')}`);
 
     const filters: CustomerSearchFilters = {
-      tags: matchAll ? tags : undefined
+      tags: matchAll ? tags : undefined,
     };
 
     const customers = await this.customerService.searchCustomers(filters);
 
     if (!matchAll) {
       // Match any tag
-      return customers.filter(customer =>
-        customer.tags?.some(tag => tags.includes(tag))
-      );
+      return customers.filter(customer => customer.tags?.some(tag => tags.includes(tag)));
     }
 
     return customers;
@@ -148,7 +149,7 @@ export class CustomerSearch {
     console.log(`👑 Searching by VIP tiers: ${tiers.join(', ')}`);
 
     const filters: CustomerSearchFilters = {
-      vipTier: tiers
+      vipTier: tiers,
     };
 
     return await this.customerService.searchCustomers(filters);
@@ -161,7 +162,7 @@ export class CustomerSearch {
     console.log(`⚠️ Searching by risk levels: ${riskLevels.join(', ')}`);
 
     const filters: CustomerSearchFilters = {
-      riskLevel: riskLevels
+      riskLevel: riskLevels,
     };
 
     return await this.customerService.searchCustomers(filters);
@@ -174,7 +175,7 @@ export class CustomerSearch {
     console.log(`💰 Searching by balance range: $${min} - $${max}`);
 
     const filters: CustomerSearchFilters = {
-      balance: { min, max }
+      balance: { min, max },
     };
 
     return await this.customerService.searchCustomers(filters);
@@ -183,8 +184,14 @@ export class CustomerSearch {
   /**
    * Search customers by activity date range
    */
-  async searchByActivityDate(startDate: Date, endDate: Date, activityType: 'created' | 'login' | 'transaction' = 'login'): Promise<CustomerProfile[]> {
-    console.log(`📅 Searching by ${activityType} date range: ${startDate.toISOString()} - ${endDate.toISOString()}`);
+  async searchByActivityDate(
+    startDate: Date,
+    endDate: Date,
+    activityType: 'created' | 'login' | 'transaction' = 'login'
+  ): Promise<CustomerProfile[]> {
+    console.log(
+      `📅 Searching by ${activityType} date range: ${startDate.toISOString()} - ${endDate.toISOString()}`
+    );
 
     const filters: CustomerSearchFilters = {};
 
@@ -249,7 +256,7 @@ export class CustomerSearch {
       { term: 'smith', count: 32 },
       { term: 'gmail.com', count: 28 },
       { term: 'active', count: 25 },
-      { term: 'gold', count: 22 }
+      { term: 'gold', count: 22 },
     ].slice(0, limit);
   }
 
@@ -271,10 +278,10 @@ export class CustomerSearch {
         { filter: 'status', count: 450 },
         { filter: 'vipTier', count: 380 },
         { filter: 'email', count: 320 },
-        { filter: 'name', count: 280 }
+        { filter: 'name', count: 280 },
       ],
       cacheHitRate: 0.65,
-      averageSearchTime: 125
+      averageSearchTime: 125,
     };
   }
 
@@ -318,7 +325,7 @@ export class CustomerSearch {
   private cacheResults(cacheKey: string, results: any): void {
     this.searchCache.set(cacheKey, {
       ...results,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
 
     // Clean up old cache entries if too many
@@ -397,7 +404,7 @@ export class CustomerSearch {
       totalItems,
       itemsPerPage: limit,
       hasNext: currentPage < totalPages,
-      hasPrev: currentPage > 1
+      hasPrev: currentPage > 1,
     };
 
     return { results, pagination };

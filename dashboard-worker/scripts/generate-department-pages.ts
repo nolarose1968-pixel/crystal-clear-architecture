@@ -5,8 +5,8 @@
  * Creates static HTML pages for all Fire22 departments
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
-import { join } from "path";
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
 
 interface Department {
   id: string;
@@ -64,7 +64,7 @@ class DepartmentPagesGenerator {
 
   private mergeDepartmentData(base: Department[], additional: any[]): Department[] {
     const merged = [...base];
-    
+
     additional.forEach(dept => {
       const existing = merged.find(d => d.id === dept.id);
       if (existing) {
@@ -79,7 +79,7 @@ class DepartmentPagesGenerator {
 
   public async generate(): Promise<void> {
     console.log('📊 Generating Department Pages');
-    console.log('================================');
+    console.log('!==!==!==!==!==!==');
 
     // Create output directory
     if (!existsSync(this.distDir)) {
@@ -140,13 +140,17 @@ class DepartmentPagesGenerator {
     
     <main>
         <div class="department-grid">
-            ${this.departments.map(dept => `
+            ${this.departments
+              .map(
+                dept => `
             <div class="department-card" style="border-color: ${dept.color}">
                 <h2>${dept.icon || '🏢'} ${dept.name}</h2>
                 <p>${dept.description || 'Fire22 Department'}</p>
                 <a href="/departments/${dept.id}.html" class="btn">View Department</a>
             </div>
-            `).join('')}
+            `
+              )
+              .join('')}
         </div>
     </main>
     
@@ -218,13 +222,17 @@ class DepartmentPagesGenerator {
         <section>
             <h2>Team Contacts</h2>
             <div class="contact-list">
-                ${(department.contacts || []).map(contact => `
+                ${(department.contacts || [])
+                  .map(
+                    contact => `
                 <div class="contact-card">
                     <h3>${contact.name}</h3>
                     <p><strong>${contact.role}</strong></p>
                     <p>📧 <a href="mailto:${contact.email}">${contact.email}</a></p>
                 </div>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </div>
         </section>
         
@@ -297,7 +305,9 @@ class DepartmentPagesGenerator {
                 </tr>
             </thead>
             <tbody>
-                ${this.departments.map(dept => `
+                ${this.departments
+                  .map(
+                    dept => `
                 <tr>
                     <td>${dept.icon || '🏢'} ${dept.name}</td>
                     <td><a href="mailto:${dept.email}">${dept.email}</a></td>
@@ -310,7 +320,9 @@ class DepartmentPagesGenerator {
                         <a href="/api/departments/${dept.id}">API</a>
                     </td>
                 </tr>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </tbody>
         </table>
         

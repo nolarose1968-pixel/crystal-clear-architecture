@@ -1,6 +1,7 @@
 # 📱🏢 Fire22 Telegram Department System
 
-Complete documentation for Fire22's departmental Telegram customer support system with multilingual capabilities and intelligent routing.
+Complete documentation for Fire22's departmental Telegram customer support
+system with multilingual capabilities and intelligent routing.
 
 ## Table of Contents
 
@@ -15,7 +16,9 @@ Complete documentation for Fire22's departmental Telegram customer support syste
 
 ## Overview
 
-The Fire22 Telegram Department System provides intelligent customer support routing across specialized department channels with multilingual support (English, Spanish, Portuguese, French) and automated escalation workflows.
+The Fire22 Telegram Department System provides intelligent customer support
+routing across specialized department channels with multilingual support
+(English, Spanish, Portuguese, French) and automated escalation workflows.
 
 ### Key Features
 
@@ -31,31 +34,31 @@ The Fire22 Telegram Department System provides intelligent customer support rout
 
 ### Primary Support Departments
 
-| Department | Channel | Keywords | Priority | Hours |
-|------------|---------|----------|----------|-------|
-| **Finance** | `@fire22_finance_support` | payment, deposit, withdrawal, balance, transaction, money, refund | High | 09:00-18:00 EST |
-| **Customer Support** | `@fire22_customer_support` | help, problem, issue, support, question, account, login | Normal | 24/7 |
-| **Compliance** | `@fire22_compliance` | kyc, verification, document, identity, compliance, regulation | High | 09:00-17:00 EST |
-| **Technology** | `@fire22_tech_support` | bug, error, technical, app, website, crash, loading | Urgent | 24/7 |
-| **Operations** | `@fire22_operations` | betting, odds, game, casino, sports, live, wager | Normal | 24/7 |
+| Department           | Channel                    | Keywords                                                          | Priority | Hours           |
+| -------------------- | -------------------------- | ----------------------------------------------------------------- | -------- | --------------- |
+| **Finance**          | `@fire22_finance_support`  | payment, deposit, withdrawal, balance, transaction, money, refund | High     | 09:00-18:00 EST |
+| **Customer Support** | `@fire22_customer_support` | help, problem, issue, support, question, account, login           | Normal   | 24/7            |
+| **Compliance**       | `@fire22_compliance`       | kyc, verification, document, identity, compliance, regulation     | High     | 09:00-17:00 EST |
+| **Technology**       | `@fire22_tech_support`     | bug, error, technical, app, website, crash, loading               | Urgent   | 24/7            |
+| **Operations**       | `@fire22_operations`       | betting, odds, game, casino, sports, live, wager                  | Normal   | 24/7            |
 
 ### Secondary Departments
 
-| Department | Channel | Purpose | Hours |
-|------------|---------|---------|-------|
-| **Marketing** | `@fire22_marketing` | Campaigns, promotions, partnerships | 09:00-18:00 EST |
-| **Management** | `@fire22_executive` | Executive escalations, VIP support | 09:00-17:00 EST |
-| **Communications** | `@fire22_communications` | Company updates, announcements | 09:00-18:00 EST |
-| **Design** | `@fire22_design` | UI/UX feedback, visual issues | 09:00-18:00 EST |
-| **Team Contributors** | `@fire22_team` | Internal coordination, team updates | 24/7 |
+| Department            | Channel                  | Purpose                             | Hours           |
+| --------------------- | ------------------------ | ----------------------------------- | --------------- |
+| **Marketing**         | `@fire22_marketing`      | Campaigns, promotions, partnerships | 09:00-18:00 EST |
+| **Management**        | `@fire22_executive`      | Executive escalations, VIP support  | 09:00-17:00 EST |
+| **Communications**    | `@fire22_communications` | Company updates, announcements      | 09:00-18:00 EST |
+| **Design**            | `@fire22_design`         | UI/UX feedback, visual issues       | 09:00-18:00 EST |
+| **Team Contributors** | `@fire22_team`           | Internal coordination, team updates | 24/7            |
 
 ### Special Purpose Channels
 
-| Channel | Purpose | Access Level |
-|---------|---------|--------------|
-| `@fire22_emergency` | Critical system issues, security incidents | All departments |
+| Channel              | Purpose                                        | Access Level               |
+| -------------------- | ---------------------------------------------- | -------------------------- |
+| `@fire22_emergency`  | Critical system issues, security incidents     | All departments            |
 | `@fire22_escalation` | Escalated inquiries requiring urgent attention | Management + Senior agents |
-| `@fire22_help` | General help desk, routing assistance | Public |
+| `@fire22_help`       | General help desk, routing assistance          | Public                     |
 
 ### Bot Accounts
 
@@ -76,10 +79,10 @@ graph TD
     H --> I[Agent Assignment]
     I --> J[Resolution Tracking]
     J --> K[Customer Notification]
-    
+
     L[Escalation Timer] --> M[Auto-Escalate]
     M --> N[Management Review]
-    
+
     O[Performance Analytics] --> P[Department Stats]
     P --> Q[Reporting Dashboard]
 ```
@@ -87,16 +90,19 @@ graph TD
 ### Core Components
 
 #### 1. DepartmentalTelegramBot Class
+
 - **File**: `src/telegram/departmental-telegram-bot.ts`
 - **Purpose**: Main routing and management system
 - **Features**: Keyword classification, queue management, escalation handling
 
 #### 2. API Routes
+
 - **File**: `src/api/routes/telegram-department.routes.ts`
 - **Purpose**: RESTful endpoints for system interaction
 - **Features**: Inquiry submission, stats retrieval, resolution tracking
 
 #### 3. Team Directory Integration
+
 - **File**: `src/communications/team-directory.json`
 - **Purpose**: Channel configuration and contact information
 - **Features**: Quick actions, channel mappings, department details
@@ -107,7 +113,8 @@ graph TD
 
 1. **Initial Contact**: Customer messages any Fire22 channel or bot
 2. **Language Detection**: System detects user's preferred language
-3. **Department Routing**: AI classifies inquiry and routes to appropriate department
+3. **Department Routing**: AI classifies inquiry and routes to appropriate
+   department
 4. **Auto-Response**: Immediate acknowledgment with queue position and wait time
 5. **Agent Assignment**: Available agent claims the inquiry
 6. **Resolution**: Agent resolves issue and marks as complete
@@ -132,6 +139,7 @@ We'll respond as soon as possible!
 ### Multilingual Support
 
 #### Supported Languages
+
 - **English (en)**: Primary language, full feature support
 - **Spanish (es)**: Complete translation, regional banking terms
 - **Portuguese (pt)**: Brazilian Portuguese, local payment methods
@@ -139,7 +147,9 @@ We'll respond as soon as possible!
 
 #### Auto-Response Templates
 
-All departments provide immediate responses in the customer's preferred language with:
+All departments provide immediate responses in the customer's preferred language
+with:
+
 - Department-specific greeting
 - Current queue position
 - Estimated wait time
@@ -153,17 +163,18 @@ All departments provide immediate responses in the customer's preferred language
 
 Each department tracks:
 
-| Metric | Description | Target |
-|--------|-------------|---------|
-| **Total Inquiries** | All inquiries received | N/A |
-| **Pending Inquiries** | Currently waiting for response | <10 |
-| **Average Response Time** | Time to first agent response | <15 min |
-| **Satisfaction Score** | Customer rating (1-5) | >4.0 |
-| **Active Agents** | Currently online agents | 2-8 |
+| Metric                    | Description                    | Target  |
+| ------------------------- | ------------------------------ | ------- |
+| **Total Inquiries**       | All inquiries received         | N/A     |
+| **Pending Inquiries**     | Currently waiting for response | <10     |
+| **Average Response Time** | Time to first agent response   | <15 min |
+| **Satisfaction Score**    | Customer rating (1-5)          | >4.0    |
+| **Active Agents**         | Currently online agents        | 2-8     |
 
 ### Escalation Workflow
 
 #### Automatic Escalation
+
 - **Finance**: 15 minutes without response
 - **Customer Support**: 30 minutes without response
 - **Compliance**: 20 minutes without response
@@ -171,7 +182,9 @@ Each department tracks:
 - **Operations**: 25 minutes without response
 
 #### Manual Escalation
+
 Agents can escalate inquiries immediately with reasons:
+
 - Customer VIP status
 - Regulatory compliance issue
 - Technical system failure
@@ -189,6 +202,7 @@ Agents can escalate inquiries immediately with reasons:
 ## API Reference
 
 ### Base URL
+
 ```
 https://api.fire22.ag/api/telegram
 ```
@@ -196,6 +210,7 @@ https://api.fire22.ag/api/telegram
 ### Endpoints
 
 #### Submit Customer Inquiry
+
 ```http
 POST /api/telegram/inquiry
 Content-Type: application/json
@@ -214,6 +229,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -228,12 +244,14 @@ Content-Type: application/json
 ```
 
 #### Get Department Statistics
+
 ```http
 GET /api/telegram/departments/stats
 GET /api/telegram/departments/finance/stats
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -249,21 +267,25 @@ GET /api/telegram/departments/finance/stats
 ```
 
 #### Get Available Departments
+
 ```http
 GET /api/telegram/departments
 ```
 
 #### Get Pending Inquiries
+
 ```http
 GET /api/telegram/departments/finance/pending
 ```
 
 #### Get Inquiry Details
+
 ```http
 GET /api/telegram/inquiry/F22-1A2B3C4D-XYZ89
 ```
 
 #### Escalate Inquiry
+
 ```http
 POST /api/telegram/inquiry/F22-1A2B3C4D-XYZ89/escalate
 Content-Type: application/json
@@ -274,6 +296,7 @@ Content-Type: application/json
 ```
 
 #### Resolve Inquiry
+
 ```http
 POST /api/telegram/inquiry/F22-1A2B3C4D-XYZ89/resolve
 Content-Type: application/json
@@ -285,11 +308,13 @@ Content-Type: application/json
 ```
 
 #### Get Performance Report
+
 ```http
 GET /api/telegram/reports/performance
 ```
 
 #### Test System (Development)
+
 ```http
 POST /api/telegram/test-inquiry
 ```
@@ -299,6 +324,7 @@ POST /api/telegram/test-inquiry
 ### For Department Administrators
 
 #### 1. Channel Setup
+
 ```bash
 # Create your department channel
 # Example: @fire22_finance_support
@@ -318,12 +344,14 @@ POST /api/telegram/test-inquiry
 ```
 
 #### 2. Agent Training
+
 - **Response Templates**: Use consistent, professional language
 - **Escalation Guidelines**: Know when and how to escalate
 - **System Commands**: Learn bot commands for inquiry management
 - **Language Support**: Basic phrases in supported languages
 
 #### 3. Performance Monitoring
+
 - Daily stats review via `/stats` command
 - Weekly performance reports
 - Customer satisfaction tracking
@@ -332,6 +360,7 @@ POST /api/telegram/test-inquiry
 ### For System Administrators
 
 #### 1. Bot Configuration
+
 ```javascript
 // Add new department
 const newDepartment = {
@@ -342,16 +371,17 @@ const newDepartment = {
     en: 'Risk management and fraud prevention',
     es: 'Gestión de riesgos y prevención de fraude',
     pt: 'Gestão de riscos e prevenção de fraude',
-    fr: 'Gestion des risques et prévention de la fraude'
+    fr: 'Gestion des risques et prévention de la fraude',
   },
   priority: 'urgent',
   autoResponder: true,
   escalationTime: 5,
-  supportHours: { start: '24/7', end: '24/7', timezone: 'UTC' }
+  supportHours: { start: '24/7', end: '24/7', timezone: 'UTC' },
 };
 ```
 
 #### 2. Monitoring Setup
+
 ```bash
 # Enable performance monitoring
 bun run monitor:telegram-departments
@@ -364,11 +394,12 @@ bun run reports:daily-telegram-stats
 ```
 
 #### 3. Integration Testing
+
 ```bash
 # Test all department routing
 bun run test:telegram-routing
 
-# Test multilingual responses  
+# Test multilingual responses
 bun run test:telegram-languages
 
 # Test escalation workflows
@@ -380,24 +411,28 @@ bun run test:telegram-escalation
 ### Common Issues
 
 #### Bot Not Responding
+
 1. Check bot token validity
 2. Verify channel permissions
 3. Review API rate limits
 4. Check error logs
 
 #### Incorrect Routing
+
 1. Review keyword configuration
 2. Test classification algorithm
 3. Update department mappings
 4. Verify message preprocessing
 
 #### Missing Languages
+
 1. Confirm language code support
 2. Update translation files
 3. Test language detection
 4. Verify template completeness
 
 #### High Response Times
+
 1. Check agent availability
 2. Review queue management
 3. Optimize escalation times
@@ -406,16 +441,19 @@ bun run test:telegram-escalation
 ### Performance Optimization
 
 #### Queue Management
+
 - Monitor peak hours and adjust staffing
 - Implement priority queuing for VIP customers
 - Use predictive analytics for demand forecasting
 
 #### Response Templates
+
 - Create context-specific auto-responses
 - Implement dynamic wait time calculations
 - Add proactive status updates for long waits
 
 #### Agent Efficiency
+
 - Provide real-time dashboard for agents
 - Implement inquiry categorization shortcuts
 - Create knowledge base integration
@@ -436,6 +474,7 @@ curl -X POST https://api.fire22.ag/api/telegram/test-inquiry
 ## Best Practices
 
 ### For Agents
+
 - ✅ Respond within department SLA times
 - ✅ Use professional, friendly tone
 - ✅ Provide clear, actionable solutions
@@ -443,6 +482,7 @@ curl -X POST https://api.fire22.ag/api/telegram/test-inquiry
 - ✅ Escalate proactively when needed
 
 ### For Customers
+
 - 🔍 Use specific keywords for faster routing
 - 📱 Include account details when relevant
 - 🕐 Check department support hours
@@ -450,6 +490,7 @@ curl -X POST https://api.fire22.ag/api/telegram/test-inquiry
 - ⭐ Provide feedback after resolution
 
 ### For Managers
+
 - 📊 Review daily performance metrics
 - 👥 Ensure adequate agent coverage
 - 🎯 Set realistic SLA targets
@@ -459,12 +500,14 @@ curl -X POST https://api.fire22.ag/api/telegram/test-inquiry
 ## Integration Points
 
 ### Fire22 Platform Integration
+
 - Customer account lookup via customer ID
 - Real-time balance and transaction data
 - KYC status and document verification
 - VIP status and service tier identification
 
 ### Internal Systems
+
 - CRM system for inquiry tracking
 - Knowledge base for quick responses
 - Escalation workflows to management

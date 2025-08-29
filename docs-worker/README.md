@@ -32,7 +32,7 @@ graph TB
 
 - Cloudflare account with Workers enabled
 - GitHub repository with documentation
-- Node.js 18+ and npm
+- Node.js 18+ and Bun
 
 ## 🚀 Quick Start
 
@@ -93,6 +93,7 @@ zone_name = "yourdomain.com"
 ## 📖 API Endpoints
 
 ### Documentation Pages
+
 - `GET /` - Main documentation index
 - `GET /communication.html` - Communication hub
 - `GET /domains.html` - Domain documentation
@@ -100,9 +101,12 @@ zone_name = "yourdomain.com"
 - `GET /favicon.ico` - Site favicon
 
 ### Health & Monitoring
+
 - `GET /api/health` - Service health check
 - `GET /api/docs` - Documentation service info
 - `POST /api/clear-cache` - Clear cache (admin only)
+- `GET /api/pages-integration` - Cloudflare Pages integration status
+- `GET /api/performance-metrics` - Performance metrics and optimization status
 
 ### Examples
 
@@ -112,6 +116,12 @@ curl https://crystal-clear-docs.nolarose1968.workers.dev/api/health
 
 # Documentation info
 curl https://crystal-clear-docs.nolarose1968.workers.dev/api/docs
+
+# Pages integration status
+curl https://crystal-clear-docs.nolarose1968.workers.dev/api/pages-integration
+
+# Performance metrics
+curl https://crystal-clear-docs.nolarose1968.workers.dev/api/performance-metrics
 
 # Clear cache (requires auth)
 curl -X POST \
@@ -134,7 +144,7 @@ bun run dev
 
 ```bash
 # Run tests
-npm test
+bun test
 
 # Type checking
 bun run typecheck
@@ -188,10 +198,10 @@ The worker automatically deploys when you push changes to the `docs/` directory:
 # .github/workflows/deploy-docs-worker.yml
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'docs/**'
-      - 'docs-worker/**'
+      - "docs/**"
+      - "docs-worker/**"
 ```
 
 ### Manual Deployment
@@ -235,16 +245,19 @@ curl -X POST \
 ### Common Issues
 
 #### 404 Errors
+
 - Check that files exist in GitHub repository
 - Verify `GITHUB_REPO` and `GITHUB_BRANCH` are correct
 - Ensure files are in the `docs/` directory
 
 #### Caching Issues
+
 - Clear cache: `POST /api/clear-cache`
 - Check cache status: `GET /api/docs`
 - Adjust `CACHE_TTL` in configuration
 
 #### Rate Limiting
+
 - Add GitHub token for higher limits
 - Check GitHub API rate limit status
 - Implement exponential backoff
@@ -255,7 +268,7 @@ Enable debug logging:
 
 ```javascript
 // In docs-worker.ts
-console.log('Debug info:', data);
+console.log("Debug info:", data);
 ```
 
 ## 📈 Performance Optimization

@@ -1,6 +1,7 @@
 # Fire22 Terminal UI - Performance Optimization & Accessibility Guide
 
-Complete guide for optimizing the Fire22 Terminal UI system for maximum performance and accessibility compliance.
+Complete guide for optimizing the Fire22 Terminal UI system for maximum
+performance and accessibility compliance.
 
 ## Table of Contents
 
@@ -17,11 +18,13 @@ Complete guide for optimizing the Fire22 Terminal UI system for maximum performa
 #### Largest Contentful Paint (LCP) - Target: `&lt; 2.5s
 
 **Current Issues:**
+
 - Box drawing character rendering delays
 - CSS custom property fallback calculations
 - Large font file loading
 
 **Optimizations:**
+
 ```css
 /* Preload critical fonts */
 <link rel="preload" href="fonts/sf-mono.woff2" as="font" type="font/woff2" crossorigin&gt;`
@@ -44,7 +47,8 @@ Complete guide for optimizing the Fire22 Terminal UI system for maximum performa
 #### First Input Delay (FID) - Target: `&lt; 100ms
 
 **Optimizations:**
-```javascript
+
+````javascript
 // Optimize JavaScript initialization
 ```javascript
 function initializeTerminalComponents() {
@@ -61,11 +65,12 @@ function initializeTerminalComponents() {
         }, 0);
     }
 }
-```
+````
 
-// Use passive event listeners where possible
-element.addEventListener('scroll', handler, { passive: true });
-```
+// Use passive event listeners where possible element.addEventListener('scroll',
+handler, { passive: true });
+
+````
 
 #### Cumulative Layout Shift (CLS) - Target: `&lt; 0.1
 
@@ -92,7 +97,7 @@ element.addEventListener('scroll', handler, { passive: true });
     min-width: 100px; /* Prevent text length shifts */
     text-align: center;
 }
-```
+````
 
 ### 2. Rendering Performance
 
@@ -101,42 +106,42 @@ element.addEventListener('scroll', handler, { passive: true });
 ```css
 /* Use CSS containment for better rendering performance */
 .terminal-card {
-    contain: layout style paint;
+  contain: layout style paint;
 }
 
 /* Optimize animations with transform and opacity only */
 @keyframes terminal-fade-in {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Use will-change sparingly and remove after animation */
 .terminal-animation-element {
-    will-change: transform;
+  will-change: transform;
 }
 
 .terminal-animation-element.animation-complete {
-    will-change: auto; /* Reset after animation */
+  will-change: auto; /* Reset after animation */
 }
 
 /* Optimize pseudo-elements */
 .terminal-card::before {
-    /* Use transform instead of positioning when possible */
-    transform: translate(-1px, -1px);
-    /* Enable GPU acceleration */
-    transform: translateZ(0);
+  /* Use transform instead of positioning when possible */
+  transform: translate(-1px, -1px);
+  /* Enable GPU acceleration */
+  transform: translateZ(0);
 }
 ```
 
 #### JavaScript Optimization
 
-```javascript
+````javascript
 // Optimize DOM queries with caching
 const terminalElements = {
     cards: document.querySelectorAll('.terminal-card'),
@@ -160,29 +165,22 @@ function updateMultipleMetrics(updates) {
         parent.appendChild(fragment);
     });
 }
-```
+````
 
-// Debounce expensive operations
-const debouncedResize = debounce(() => {
-    recalculateLayout();
-}, 250);
+// Debounce expensive operations const debouncedResize = debounce(() => {
+recalculateLayout(); }, 250);
 
 window.addEventListener('resize', debouncedResize);
 
-// Use Intersection Observer for lazy loading
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            initializeComponent(entry.target);
-            observer.unobserve(entry.target);
-        }
-    });
-});
+// Use Intersection Observer for lazy loading const observer = new
+IntersectionObserver((entries) => { entries.forEach(entry => { if
+(entry.isIntersecting) { initializeComponent(entry.target);
+observer.unobserve(entry.target); } }); });
 
 document.querySelectorAll('.terminal-card').forEach(card => {
-    observer.observe(card);
-});
-```
+observer.observe(card); });
+
+````
 
 ### 3. Memory Management
 
@@ -217,13 +215,13 @@ class TerminalComponent {
         this.listeners.forEach(({ handler, options }, event) => {
             this.element.removeEventListener(event, handler, options);
         });
-        
+
         // Clear intervals
         this.intervals.forEach(id => clearInterval(id));
-        
+
         // Disconnect observers
         this.observers.forEach(observer => observer.disconnect());
-        
+
         // Clear references
         this.listeners.clear();
         this.intervals.clear();
@@ -238,42 +236,54 @@ window.addEventListener('beforeunload', () => {
         window.terminalComponents.destroy();
     }
 });
-```
+````
 
 ### 4. Resource Loading Optimization
 
 #### Critical Resource Hints
+
 ```html
 <!-- DNS prefetching for external resources -->
-<link rel="dns-prefetch" href="//fonts.googleapis.com">
+<link rel="dns-prefetch" href="//fonts.googleapis.com" />
 `&lt;link rel="dns-prefetch" href="//api.fire22.com"&gt;`
 
 <!-- Preconnect for critical third-party origins -->
-<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
 
 <!-- Preload critical resources -->
-<link rel="preload" href="terminal-framework.css" as="style">
-<link rel="preload" href="terminal-components.js" as="script">
+<link rel="preload" href="terminal-framework.css" as="style" />
+<link rel="preload" href="terminal-components.js" as="script" />
 
 <!-- Module preloading for modern browsers -->
-<link rel="modulepreload" href="terminal-components.mjs">
+<link rel="modulepreload" href="terminal-components.mjs" />
 ```
 
 #### Optimize CSS Delivery
+
 ```html
 <!-- Load critical CSS inline -->
 <style>
-    /* Critical above-the-fold terminal styles */
-    .terminal-header { /* ... */ }
-    .terminal-card { /* ... */ }
+  /* Critical above-the-fold terminal styles */
+  .terminal-header {
+    /* ... */
+  }
+  .terminal-card {
+    /* ... */
+  }
 </style>
 
 <!-- Load non-critical CSS asynchronously -->
-<link rel="preload" href="terminal-animations.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="terminal-animations.css"></noscript>
+<link
+  rel="preload"
+  href="terminal-animations.css"
+  as="style"
+  onload="this.onload=null;this.rel='stylesheet'"
+/>
+<noscript><link rel="stylesheet" href="terminal-animations.css" /></noscript>
 ```
 
 #### Bundle Optimization
+
 ```javascript
 // Code splitting for terminal components
 const TerminalAnimations = () => import('./terminal-animations.js');
@@ -281,13 +291,13 @@ const TerminalCharts = () => import('./terminal-charts.js');
 
 // Load components on demand
 async function loadComponent(componentName) {
-    const module = await import(`./components/${componentName}.js`);
-    return module.default;
+  const module = await import(`./components/${componentName}.js`);
+  return module.default;
 }
 
 // Service worker for caching
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/terminal-sw.js');
+  navigator.serviceWorker.register('/terminal-sw.js');
 }
 ```
 
@@ -300,30 +310,30 @@ if ('serviceWorker' in navigator) {
 ```css
 /* Ensure minimum contrast ratios */
 :root {
-    /* 4.5:1 for normal text, 3:1 for large text */
-    --text-on-dark: #f0f6fc;      /* 13.64:1 on #0d1117 */
-    --accent-color: #58a6ff;       /* 8.52:1 on #0d1117 */
-    --fire-color: #ff6b35;         /* 4.52:1 on #0d1117 */
-    --success-color: #39ff14;      /* 12.03:1 on #0d1117 */
-    --warning-color: #ffd700;      /* 10.89:1 on #0d1117 */
-    --danger-color: #ff4444;       /* 5.24:1 on #0d1117 */
+  /* 4.5:1 for normal text, 3:1 for large text */
+  --text-on-dark: #f0f6fc; /* 13.64:1 on #0d1117 */
+  --accent-color: #58a6ff; /* 8.52:1 on #0d1117 */
+  --fire-color: #ff6b35; /* 4.52:1 on #0d1117 */
+  --success-color: #39ff14; /* 12.03:1 on #0d1117 */
+  --warning-color: #ffd700; /* 10.89:1 on #0d1117 */
+  --danger-color: #ff4444; /* 5.24:1 on #0d1117 */
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-    :root {
-        --border-width: 2px;
-        --text-on-dark: #ffffff;
-        --accent-color: #7cb7ff;
-    }
-    
-    .terminal-btn {
-        border-width: 2px;
-    }
-    
-    .terminal-card {
-        border-width: 2px;
-    }
+  :root {
+    --border-width: 2px;
+    --text-on-dark: #ffffff;
+    --accent-color: #7cb7ff;
+  }
+
+  .terminal-btn {
+    border-width: 2px;
+  }
+
+  .terminal-card {
+    border-width: 2px;
+  }
 }
 ```
 
@@ -347,77 +357,77 @@ if ('serviceWorker' in navigator) {
 .terminal-btn:focus,
 .terminal-card:focus,
 .terminal-form__input:focus {
-    outline: 2px solid var(--accent-color);
-    outline-offset: 2px;
-    /* Custom focus ring */
-    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+  /* Custom focus ring */
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
 }
 
 /* Skip navigation links */
 .skip-nav {
-    position: absolute;
-    top: -40px;
-    left: 6px;
-    background: var(--accent-color);
-    color: var(--primary);
-    padding: 8px;
-    text-decoration: none;
-    border-radius: 4px;
-    opacity: 0;
-    transform: translateY(-100%);
-    transition: all 0.3s;
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--accent-color);
+  color: var(--primary);
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  opacity: 0;
+  transform: translateY(-100%);
+  transition: all 0.3s;
 }
 
 .skip-nav:focus {
-    top: 6px;
-    opacity: 1;
-    transform: translateY(0);
+  top: 6px;
+  opacity: 1;
+  transform: translateY(0);
 }
 ```
 
 ```javascript
 // Focus management for modals and interactive elements
 class FocusManager {
-    constructor() {
-        this.focusableSelectors = [
-            'button',
-            '[href]',
-            'input',
-            'select',
-            'textarea',
-            '[tabindex]:not([tabindex="-1"])'
-        ].join(', ');
-    }
+  constructor() {
+    this.focusableSelectors = [
+      'button',
+      '[href]',
+      'input',
+      'select',
+      'textarea',
+      '[tabindex]:not([tabindex="-1"])',
+    ].join(', ');
+  }
 
-    trapFocus(container) {
-        const focusable = container.querySelectorAll(this.focusableSelectors);
-        const firstFocusable = focusable[0];
-        const lastFocusable = focusable[focusable.length - 1];
+  trapFocus(container) {
+    const focusable = container.querySelectorAll(this.focusableSelectors);
+    const firstFocusable = focusable[0];
+    const lastFocusable = focusable[focusable.length - 1];
 
-        container.addEventListener('keydown', (e) => {
-            if (e.key === 'Tab') {
-                if (e.shiftKey) {
-                    if (document.activeElement === firstFocusable) {
-                        e.preventDefault();
-                        lastFocusable.focus();
-                    }
-                } else {
-                    if (document.activeElement === lastFocusable) {
-                        e.preventDefault();
-                        firstFocusable.focus();
-                    }
-                }
-            }
-        });
-
-        firstFocusable?.focus();
-    }
-
-    restoreFocus(previousElement) {
-        if (previousElement && previousElement.focus) {
-            previousElement.focus();
+    container.addEventListener('keydown', e => {
+      if (e.key === 'Tab') {
+        if (e.shiftKey) {
+          if (document.activeElement === firstFocusable) {
+            e.preventDefault();
+            lastFocusable.focus();
+          }
+        } else {
+          if (document.activeElement === lastFocusable) {
+            e.preventDefault();
+            firstFocusable.focus();
+          }
         }
+      }
+    });
+
+    firstFocusable?.focus();
+  }
+
+  restoreFocus(previousElement) {
+    if (previousElement && previousElement.focus) {
+      previousElement.focus();
     }
+  }
 }
 ```
 
@@ -461,16 +471,16 @@ class FocusManager {
 </div>
 
 <!-- Progress indicators -->
-`&lt;div role="progressbar" 
-     aria-valuemin="0" 
-     aria-valuemax="100" 
-     aria-valuenow="67" 
+`&lt;div role="progressbar"
+     aria-valuemin="0"
+     aria-valuemax="100"
+     aria-valuenow="67"
      aria-label="CPU Usage"&gt;`
     `&lt;div class="terminal-progress__fill" style="width: 67%"&gt;`</div>
 </div>
 ```
 
-```javascript
+````javascript
 // Screen reader announcements
 ```javascript
 function announceToScreenReader(message, priority = 'polite') {
@@ -483,24 +493,26 @@ function announceToScreenReader(message, priority = 'polite') {
         }, 1000);
     }
 }
-```
+````
 
 // Update progress bar accessibility
+
 ```javascript
 function updateProgress(elementId, value, label) {
-    const progressBar = document.getElementById(elementId);
-    if (progressBar) {
-        progressBar.setAttribute('aria-valuenow', value);
-        progressBar.setAttribute('aria-label', `${label}: ${value}%`);
-        
-        // Announce significant changes
-        if (value >= 90) {
-            announceToScreenReader(`${label} is high at ${value}%`, 'assertive');
-        }
+  const progressBar = document.getElementById(elementId);
+  if (progressBar) {
+    progressBar.setAttribute('aria-valuenow', value);
+    progressBar.setAttribute('aria-label', `${label}: ${value}%`);
+
+    // Announce significant changes
+    if (value >= 90) {
+      announceToScreenReader(`${label} is high at ${value}%`, 'assertive');
     }
+  }
 }
 ```
-```
+
+````
 
 #### Form Accessibility
 
@@ -509,13 +521,13 @@ function updateProgress(elementId, value, label) {
 <form class="terminal-form" novalidate>
     <fieldset>
         <legend>Agent Configuration</legend>
-        
+
         <div class="terminal-form__group">
             <label for="agent-id" class="terminal-form__label">
                 Agent ID *
             </label>
-            <input type="text" 
-                   id="agent-id" 
+            <input type="text"
+                   id="agent-id"
                    class="terminal-form__input"
                    required
                    aria-describedby="agent-id-help agent-id-error"
@@ -527,7 +539,7 @@ function updateProgress(elementId, value, label) {
                 <!-- Error message will appear here -->
             </div>
         </div>
-        
+
         <div class="terminal-form__group">
             <fieldset>
                 <legend>Notification Preferences</legend>
@@ -542,72 +554,78 @@ function updateProgress(elementId, value, label) {
             </fieldset>
         </div>
     </fieldset>
-    
+
     <button type="submit" class="terminal-btn terminal-btn--primary">
         Save Configuration
     </button>
 </form>
-```
+````
 
 ```javascript
 // Form validation with accessibility
 class AccessibleFormValidator {
-    constructor(form) {
-        this.form = form;
-        this.setupValidation();
+  constructor(form) {
+    this.form = form;
+    this.setupValidation();
+  }
+
+  setupValidation() {
+    this.form.addEventListener('submit', this.handleSubmit.bind(this));
+
+    // Real-time validation
+    const inputs = this.form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+      input.addEventListener('blur', () => this.validateField(input));
+      input.addEventListener('input', () => this.clearError(input));
+    });
+  }
+
+  validateField(field) {
+    const isValid = field.checkValidity();
+    const errorElement = document.getElementById(`${field.id}-error`);
+
+    field.setAttribute('aria-invalid', !isValid);
+
+    if (!isValid && errorElement) {
+      errorElement.textContent = field.validationMessage;
+      announceToScreenReader(
+        `Error in ${field.labels[0]?.textContent}: ${field.validationMessage}`,
+        'assertive'
+      );
     }
 
-    setupValidation() {
-        this.form.addEventListener('submit', this.handleSubmit.bind(this));
-        
-        // Real-time validation
-        const inputs = this.form.querySelectorAll('input, select, textarea');
-        inputs.forEach(input => {
-            input.addEventListener('blur', () => this.validateField(input));
-            input.addEventListener('input', () => this.clearError(input));
-        });
-    }
+    return isValid;
+  }
 
-    validateField(field) {
-        const isValid = field.checkValidity();
-        const errorElement = document.getElementById(`${field.id}-error`);
-        
-        field.setAttribute('aria-invalid', !isValid);
-        
-        if (!isValid && errorElement) {
-            errorElement.textContent = field.validationMessage;
-            announceToScreenReader(`Error in ${field.labels[0]?.textContent}: ${field.validationMessage}`, 'assertive');
-        }
-        
-        return isValid;
+  clearError(field) {
+    const errorElement = document.getElementById(`${field.id}-error`);
+    if (errorElement) {
+      errorElement.textContent = '';
+      field.setAttribute('aria-invalid', 'false');
     }
+  }
 
-    clearError(field) {
-        const errorElement = document.getElementById(`${field.id}-error`);
-        if (errorElement) {
-            errorElement.textContent = '';
-            field.setAttribute('aria-invalid', 'false');
-        }
-    }
+  handleSubmit(e) {
+    e.preventDefault();
 
-    handleSubmit(e) {
-        e.preventDefault();
-        
-        const isFormValid = Array.from(this.form.elements)
-            .filter(el => el.tagName !== 'BUTTON')
-            .every(field => this.validateField(field));
-        
-        if (isFormValid) {
-            this.submitForm();
-        } else {
-            // Focus first invalid field
-            const firstInvalid = this.form.querySelector('[aria-invalid="true"]');
-            if (firstInvalid) {
-                firstInvalid.focus();
-                announceToScreenReader('Please correct the errors in the form', 'assertive');
-            }
-        }
+    const isFormValid = Array.from(this.form.elements)
+      .filter(el => el.tagName !== 'BUTTON')
+      .every(field => this.validateField(field));
+
+    if (isFormValid) {
+      this.submitForm();
+    } else {
+      // Focus first invalid field
+      const firstInvalid = this.form.querySelector('[aria-invalid="true"]');
+      if (firstInvalid) {
+        firstInvalid.focus();
+        announceToScreenReader(
+          'Please correct the errors in the form',
+          'assertive'
+        );
+      }
     }
+  }
 }
 ```
 
@@ -624,6 +642,7 @@ class AccessibleFormValidator {
 #### Testing Commands
 
 **VoiceOver (macOS):**
+
 ```
 VO + Right Arrow    - Navigate to next item
 VO + U             - Open rotor
@@ -632,6 +651,7 @@ VO + A             - Read all
 ```
 
 **NVDA (Windows):**
+
 ```
 Insert + Down      - Say all
 Insert + T         - Read title
@@ -643,30 +663,31 @@ Tab                - Next focusable element
 
 ### 1. Progressive Enhancement
 
-```javascript
+````javascript
 // Build features progressively
 ```javascript
 function enhanceTerminalComponents() {
     // Base functionality works without JavaScript
     if (!window.requestAnimationFrame) return;
-    
+
     // Add animations only if supported
     if (CSS.supports('animation', 'fade-in 1s')) {
         document.documentElement.classList.add('animations-supported');
     }
-    
+
     // Add advanced features for modern browsers
     if ('IntersectionObserver' in window) {
         setupLazyLoading();
     }
-    
+
     // Respect user preferences
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         document.documentElement.classList.add('reduced-motion');
     }
 }
-```
-```
+````
+
+````
 
 ### 2. Performance Budgets
 
@@ -685,23 +706,24 @@ const performanceBudgets = {
 function checkPerformanceBudgets() {
     const navigation = performance.getEntriesByType('navigation')[0];
     const paint = performance.getEntriesByType('paint');
-    
+
     // Check FCP
     const fcp = paint.find(entry => entry.name === 'first-contentful-paint');
     if (fcp && fcp.startTime > performanceBudgets.firstContentfulPaint) {
         console.warn(`FCP budget exceeded: ${fcp.startTime}ms > ${performanceBudgets.firstContentfulPaint}ms`);
     }
-    
+
     // Check resource sizes
     const resources = performance.getEntriesByType('resource');
     const totalSize = resources.reduce((sum, resource) => sum + (resource.transferSize || 0), 0) / 1024;
-    
+
     if (totalSize > performanceBudgets.totalPageWeight) {
         console.warn(`Page weight budget exceeded: ${totalSize}KB > ${performanceBudgets.totalPageWeight}KB`);
     }
 }
-```
-```
+````
+
+````
 
 ### 3. Accessibility Testing Automation
 
@@ -715,7 +737,7 @@ async function runA11yTests() {
         semanticHTML: await testSemanticStructure(),
         focusManagement: await testFocusManagement()
     };
-    
+
     console.table(results);
     return results;
 }
@@ -723,12 +745,12 @@ async function runA11yTests() {
 async function testColorContrast() {
     const elements = document.querySelectorAll('[style*="color"], .terminal-btn, .terminal-text');
     const failures = [];
-    
+
     elements.forEach(element => {
         const styles = getComputedStyle(element);
         const bgColor = styles.backgroundColor;
         const textColor = styles.color;
-        
+
         const contrast = calculateContrastRatio(textColor, bgColor);
         if (contrast `&lt; 4.5) {
             failures.push({
@@ -738,13 +760,13 @@ async function testColorContrast() {
             });
         }
     });
-    
+
     return {
         passed: failures.length === 0,
         failures
     };
 }
-```
+````
 
 ## Monitoring & Maintenance
 
@@ -773,7 +795,7 @@ class PerformanceMonitor {
                     }
                 });
             });
-            
+
             longTaskObserver.observe({ entryTypes: ['longtask'] });
             this.observers.push(longTaskObserver);
         }
@@ -787,14 +809,14 @@ class PerformanceMonitor {
                         clsScore += entry.value;
                     }
                 });
-                
+
                 if (clsScore > 0.1) {
                     this.reportPerformanceIssue('layout-shift', {
                         score: clsScore
                     });
                 }
             });
-            
+
             clsObserver.observe({ entryTypes: ['layout-shift'] });
             this.observers.push(clsObserver);
         }
@@ -803,7 +825,7 @@ class PerformanceMonitor {
     reportPerformanceIssue(type, data) {
         // Send to analytics or logging service
         console.warn(`Performance issue: ${type}`, data);
-        
+
         // Auto-fix common issues
         if (type === 'long-task') {
             // Reduce animation complexity
@@ -818,70 +840,73 @@ class PerformanceMonitor {
 ```javascript
 // Continuous accessibility monitoring
 class AccessibilityMonitor {
-    constructor() {
-        this.setupMutationObserver();
-        this.setupFocusTracking();
+  constructor() {
+    this.setupMutationObserver();
+    this.setupFocusTracking();
+  }
+
+  setupMutationObserver() {
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            this.checkNewElement(node);
+          }
+        });
+      });
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  checkNewElement(element) {
+    // Check for missing alt text
+    if (element.tagName === 'IMG' && !element.hasAttribute('alt')) {
+      console.warn('Image added without alt text:', element);
     }
 
-    setupMutationObserver() {
-        const observer = new MutationObserver(mutations => {
-            mutations.forEach(mutation => {
-                mutation.addedNodes.forEach(node => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        this.checkNewElement(node);
-                    }
-                });
-            });
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
+    // Check for missing form labels
+    if (['INPUT', 'SELECT', 'TEXTAREA'].includes(element.tagName)) {
+      if (!element.labels?.length && !element.getAttribute('aria-label')) {
+        console.warn('Form control added without label:', element);
+      }
     }
 
-    checkNewElement(element) {
-        // Check for missing alt text
-        if (element.tagName === 'IMG' && !element.hasAttribute('alt')) {
-            console.warn('Image added without alt text:', element);
+    // Check for interactive elements without keyboard support
+    if (element.onclick && !element.tabIndex && element.tagName !== 'BUTTON') {
+      console.warn('Interactive element without keyboard support:', element);
+    }
+  }
+
+  setupFocusTracking() {
+    let focusPath = [];
+
+    document.addEventListener('focusin', e => {
+      focusPath.push(e.target);
+
+      // Check for focus traps
+      if (focusPath.length > 50) {
+        console.warn('Potential focus trap detected');
+        focusPath = []; // Reset
+      }
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Tab') {
+        // Track tab order issues
+        const currentFocus = document.activeElement;
+        if (currentFocus && currentFocus.tabIndex < 0) {
+          console.warn(
+            'Tabbing to element with negative tabindex:',
+            currentFocus
+          );
         }
-
-        // Check for missing form labels
-        if (['INPUT', 'SELECT', 'TEXTAREA'].includes(element.tagName)) {
-            if (!element.labels?.length && !element.getAttribute('aria-label')) {
-                console.warn('Form control added without label:', element);
-            }
-        }
-
-        // Check for interactive elements without keyboard support
-        if (element.onclick && !element.tabIndex && element.tagName !== 'BUTTON') {
-            console.warn('Interactive element without keyboard support:', element);
-        }
-    }
-
-    setupFocusTracking() {
-        let focusPath = [];
-        
-        document.addEventListener('focusin', (e) => {
-            focusPath.push(e.target);
-            
-            // Check for focus traps
-            if (focusPath.length > 50) {
-                console.warn('Potential focus trap detected');
-                focusPath = []; // Reset
-            }
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Tab') {
-                // Track tab order issues
-                const currentFocus = document.activeElement;
-                if (currentFocus && currentFocus.tabIndex < 0) {
-                    console.warn('Tabbing to element with negative tabindex:', currentFocus);
-                }
-            }
-        });
-    }
+      }
+    });
+  }
 }
 ```
 
@@ -890,12 +915,14 @@ class AccessibilityMonitor {
 ### Performance Checklist
 
 #### Core Web Vitals
+
 - [ ] First Contentful Paint < 2.5s
 - [ ] Largest Contentful Paint < 2.5s
 - [ ] First Input Delay < 100ms
 - [ ] Cumulative Layout Shift < 0.1
 
 #### Resource Optimization
+
 - [ ] Critical CSS inlined
 - [ ] Non-critical CSS loaded asynchronously
 - [ ] JavaScript code split and lazy loaded
@@ -903,6 +930,7 @@ class AccessibilityMonitor {
 - [ ] Fonts preloaded with font-display: swap
 
 #### Rendering Performance
+
 - [ ] CSS containment implemented
 - [ ] Animations use transform/opacity only
 - [ ] Long tasks avoided (< 50ms)
@@ -911,6 +939,7 @@ class AccessibilityMonitor {
 ### Accessibility Checklist
 
 #### WCAG 2.1 AA Compliance
+
 - [ ] Color contrast ratio ≥ 4.5:1 (normal text) / 3:1 (large text)
 - [ ] All functionality available via keyboard
 - [ ] Focus indicators visible and clear
@@ -918,6 +947,7 @@ class AccessibilityMonitor {
 - [ ] Form labels and error handling accessible
 
 #### Semantic HTML
+
 - [ ] Proper heading hierarchy (h1-h6)
 - [ ] Landmark roles implemented
 - [ ] Alt text for all informative images
@@ -925,6 +955,7 @@ class AccessibilityMonitor {
 - [ ] Tables have headers and captions
 
 #### Interactive Elements
+
 - [ ] Touch targets ≥ 44x44px
 - [ ] Focus management in modals/dialogs
 - [ ] Skip navigation links provided
@@ -934,6 +965,7 @@ class AccessibilityMonitor {
 ### Testing Checklist
 
 #### Browser Testing
+
 - [ ] Chrome (latest 2 versions)
 - [ ] Firefox (latest 2 versions)
 - [ ] Safari (latest 2 versions)
@@ -942,6 +974,7 @@ class AccessibilityMonitor {
 - [ ] Chrome Mobile (Android)
 
 #### Accessibility Testing
+
 - [ ] Screen reader testing (NVDA, JAWS, VoiceOver)
 - [ ] Keyboard-only navigation
 - [ ] High contrast mode
@@ -949,6 +982,7 @@ class AccessibilityMonitor {
 - [ ] Voice control software
 
 #### Performance Testing
+
 - [ ] Lighthouse audits (Performance, Accessibility, Best Practices)
 - [ ] WebPageTest on various devices
 - [ ] Real User Monitoring (RUM) data
@@ -957,12 +991,14 @@ class AccessibilityMonitor {
 ### Maintenance Checklist
 
 #### Regular Reviews (Monthly)
+
 - [ ] Performance metrics trending
 - [ ] Accessibility compliance maintained
 - [ ] Browser compatibility verified
 - [ ] User feedback reviewed
 
 #### Updates & Improvements
+
 - [ ] Third-party dependencies updated
 - [ ] Performance optimizations applied
 - [ ] Accessibility improvements implemented
@@ -973,18 +1009,21 @@ class AccessibilityMonitor {
 ## Tools and Resources
 
 ### Performance Tools
+
 - **Lighthouse** - Comprehensive auditing
 - **WebPageTest** - Real-world testing
 - **Chrome DevTools** - Development debugging
 - **Performance API** - Runtime monitoring
 
 ### Accessibility Tools
+
 - **axe-core** - Automated accessibility testing
 - **WAVE** - Web accessibility evaluation
 - **Colour Contrast Analyser** - Color contrast testing
 - **Screen readers** - Manual testing
 
 ### Monitoring Services
+
 - **Real User Monitoring (RUM)** - SpeedCurve, New Relic
 - **Synthetic Monitoring** - Pingdom, GTmetrix
 - **Error Tracking** - Sentry, Bugsnag
@@ -992,4 +1031,4 @@ class AccessibilityMonitor {
 
 ---
 
-*Built with ╭─🔥─╮ for optimal performance and accessibility*
+_Built with ╭─🔥─╮ for optimal performance and accessibility_

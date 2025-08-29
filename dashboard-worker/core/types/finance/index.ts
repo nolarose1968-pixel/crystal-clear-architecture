@@ -285,7 +285,13 @@ export interface AffiliateNotificationSettings {
 export interface FreePlayBonus extends BaseEntity {
   customerId: string;
   agentId: string;
-  bonusType: 'free_bet' | 'free_play' | 'cashback' | 'match_bonus' | 'reload_bonus' | 'loyalty_bonus';
+  bonusType:
+    | 'free_bet'
+    | 'free_play'
+    | 'cashback'
+    | 'match_bonus'
+    | 'reload_bonus'
+    | 'loyalty_bonus';
   amount: number;
   currency: Currency;
   wagerRequirement: number;

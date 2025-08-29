@@ -14,7 +14,7 @@ import type {
   BotType,
   BROWSER_FINGERPRINTS,
   BOT_PATTERNS,
-  SUSPICIOUS_PATTERNS
+  SUSPICIOUS_PATTERNS,
 } from '../../../core/types/device';
 
 export class DeviceDetector {
@@ -71,7 +71,7 @@ export class DeviceDetector {
       cookieEnabled: capabilities.cookies,
       language: navigator?.language || 'en-US',
       timezone: Intl?.DateTimeFormat()?.resolvedOptions()?.timeZone || 'UTC',
-      screenResolution: this.getScreenResolution()
+      screenResolution: this.getScreenResolution(),
     };
   }
 
@@ -109,7 +109,7 @@ export class DeviceDetector {
       doNotTrack: navigator?.doNotTrack || 'unspecified',
       adBlock: this.detectAdBlock(),
       touchSupport: this.getTouchSupport(),
-      ...additionalData
+      ...additionalData,
     };
 
     // Generate fingerprint hash
@@ -129,7 +129,7 @@ export class DeviceDetector {
       seenCount: 1,
       riskScore,
       isTrusted: confidence > 80 && riskScore < 30,
-      blocklisted: riskScore > 80
+      blocklisted: riskScore > 80,
     };
   }
 
@@ -144,14 +144,17 @@ export class DeviceDetector {
       ...fingerprint,
       lastSeen: now,
       seenCount: fingerprint.seenCount + 1,
-      riskScore: this.recalculateRiskScore(fingerprint, timeSinceLastSeen)
+      riskScore: this.recalculateRiskScore(fingerprint, timeSinceLastSeen),
     };
   }
 
   /**
    * Compare fingerprints for similarity
    */
-  compareFingerprints(fp1: DeviceFingerprint, fp2: DeviceFingerprint): {
+  compareFingerprints(
+    fp1: DeviceFingerprint,
+    fp2: DeviceFingerprint
+  ): {
     similarity: number; // 0-100
     differences: string[];
     confidence: number;
@@ -233,12 +236,12 @@ export class DeviceDetector {
     const similarity = (similarityScore / maxScore) * 100;
 
     // Calculate confidence based on number of matching points
-    const confidence = Math.min(similarityScore / maxScore * 100, 95);
+    const confidence = Math.min((similarityScore / maxScore) * 100, 95);
 
     return {
       similarity,
       differences,
-      confidence
+      confidence,
     };
   }
 
@@ -311,7 +314,7 @@ export class DeviceDetector {
       suspiciousDevices: suspiciousCount,
       botDevices: botCount,
       topPlatforms,
-      riskDistribution: riskLevels
+      riskDistribution: riskLevels,
     };
   }
 
@@ -349,7 +352,7 @@ export class DeviceDetector {
           name: browserName as BrowserType,
           version,
           major: major || 0,
-          minor: minor || 0
+          minor: minor || 0,
         };
       }
     }
@@ -358,7 +361,7 @@ export class DeviceDetector {
       name: 'other',
       version: '',
       major: 0,
-      minor: 0
+      minor: 0,
     };
   }
 
@@ -369,7 +372,7 @@ export class DeviceDetector {
         return {
           name: osName as OSType,
           version: match[1] || '',
-          platform: osName
+          platform: osName,
         };
       }
     }
@@ -377,7 +380,7 @@ export class DeviceDetector {
     return {
       name: 'other',
       version: '',
-      platform: 'unknown'
+      platform: 'unknown',
     };
   }
 
@@ -387,18 +390,26 @@ export class DeviceDetector {
         return {
           type: deviceName as DeviceType,
           vendor: this.extractVendor(userAgent),
-          model: this.extractModel(userAgent)
+          model: this.extractModel(userAgent),
         };
       }
     }
 
     return {
-      type: 'other'
+      type: 'other',
     };
   }
 
-  private detectEngine(userAgent: string, browser: ParsedUserAgent['browser']): ParsedUserAgent['engine'] {
-    if (browser.name === 'chrome' || browser.name === 'edge' || browser.name === 'opera' || browser.name === 'brave') {
+  private detectEngine(
+    userAgent: string,
+    browser: ParsedUserAgent['browser']
+  ): ParsedUserAgent['engine'] {
+    if (
+      browser.name === 'chrome' ||
+      browser.name === 'edge' ||
+      browser.name === 'opera' ||
+      browser.name === 'brave'
+    ) {
       return { name: 'Blink', version: '' };
     } else if (browser.name === 'firefox') {
       return { name: 'Gecko', version: '' };
@@ -430,20 +441,16 @@ export class DeviceDetector {
       webRTC: !/mobile|android|iphone/i.test(userAgent.toLowerCase()),
       webGL: true, // Most modern browsers support WebGL
       touch: /mobile|android|iphone|ipad|touch/i.test(userAgent.toLowerCase()),
-      cookies: true // Assume cookies are enabled
+      cookies: true, // Assume cookies are enabled
     };
   }
 
   private detectBotPatterns(userAgent: string): boolean {
-    return BOT_PATTERNS.some(pattern =>
-      new RegExp(pattern, 'i').test(userAgent)
-    );
+    return BOT_PATTERNS.some(pattern => new RegExp(pattern, 'i').test(userAgent));
   }
 
   private detectSuspiciousPatterns(userAgent: string): boolean {
-    return SUSPICIOUS_PATTERNS.some(pattern =>
-      new RegExp(pattern, 'i').test(userAgent)
-    );
+    return SUSPICIOUS_PATTERNS.some(pattern => new RegExp(pattern, 'i').test(userAgent));
   }
 
   private extractVendor(userAgent: string): string | undefined {
@@ -457,11 +464,7 @@ export class DeviceDetector {
   }
 
   private extractModel(userAgent: string): string | undefined {
-    const modelPatterns = [
-      /iPhone\s*([^;\s]+)/i,
-      /iPad\s*([^;\s]+)/i,
-      /Android[^;]*;\s*([^)]+)/i
-    ];
+    const modelPatterns = [/iPhone\s*([^;\s]+)/i, /iPad\s*([^;\s]+)/i, /Android[^;]*;\s*([^)]+)/i];
 
     for (const pattern of modelPatterns) {
       const match = userAgent.match(pattern);
@@ -479,7 +482,7 @@ export class DeviceDetector {
         width: window.screen.width,
         height: window.screen.height,
         colorDepth: window.screen.colorDepth,
-        pixelRatio: window.devicePixelRatio || 1
+        pixelRatio: window.devicePixelRatio || 1,
       };
     }
     return undefined;
@@ -501,8 +504,14 @@ export class DeviceDetector {
     // This would require canvas fingerprinting for actual font detection
     // For now, return common fonts
     return [
-      'Arial', 'Helvetica', 'Times New Roman', 'Courier New',
-      'Verdana', 'Georgia', 'Comic Sans MS', 'Impact'
+      'Arial',
+      'Helvetica',
+      'Times New Roman',
+      'Courier New',
+      'Verdana',
+      'Georgia',
+      'Comic Sans MS',
+      'Impact',
     ];
   }
 
@@ -564,7 +573,7 @@ export class DeviceDetector {
     return {
       maxTouchPoints: navigator?.maxTouchPoints || 0,
       touchEvent: 'ontouchstart' in window,
-      touchStart: typeof TouchEvent !== 'undefined'
+      touchStart: typeof TouchEvent !== 'undefined',
     };
   }
 
@@ -574,7 +583,7 @@ export class DeviceDetector {
     let hash = 0;
     for (let i = 0; i < dataString.length; i++) {
       const char = dataString.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return Math.abs(hash).toString(16);
@@ -598,7 +607,10 @@ export class DeviceDetector {
     return Math.max(0, Math.min(100, confidence));
   }
 
-  private calculateFingerprintRisk(components: FingerprintComponents, parsedUA: ParsedUserAgent): number {
+  private calculateFingerprintRisk(
+    components: FingerprintComponents,
+    parsedUA: ParsedUserAgent
+  ): number {
     let riskScore = 0;
 
     // Bot detection
@@ -636,7 +648,8 @@ export class DeviceDetector {
     }
 
     // Increase risk for devices not seen in a while
-    if (timeSinceLastSeen > 30 * 24 * 60 * 60 * 1000) { // 30 days
+    if (timeSinceLastSeen > 30 * 24 * 60 * 60 * 1000) {
+      // 30 days
       newRiskScore = Math.min(100, newRiskScore + 10);
     }
 

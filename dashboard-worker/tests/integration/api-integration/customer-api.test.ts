@@ -31,7 +31,9 @@ describe('Customer API Integration', () => {
       await testUtils.seedTestDatabase(db);
 
       // Query real customer data from database
-      const customers = db.query(`
+      const customers = db
+        .query(
+          `
         SELECT
           customer_id as CustomerID,
           first_name as FirstName,
@@ -44,18 +46,24 @@ describe('Customer API Integration', () => {
           created_at as LastVerDateTime
         FROM customers
         ORDER BY customer_id
-      `).all();
+      `
+        )
+        .all();
 
       expect(customers).toHaveLength(3);
 
       // Calculate balances from transactions
-      const balances = db.query(`
+      const balances = db
+        .query(
+          `
         SELECT
           customer_id,
           COALESCE(SUM(amount), 0) as balance
         FROM transactions
         GROUP BY customer_id
-      `).all();
+      `
+        )
+        .all();
 
       // Mock API response with real data
       const mockResponse = {
@@ -70,12 +78,12 @@ describe('Customer API Integration', () => {
               TotalBalance: balance ? balance.balance : 0,
               AgentType: null,
               ParentAgent: null,
-              PlayerNotes: ''
+              PlayerNotes: '',
             };
           }),
           totalCustomers: customers.length,
-          totalBalance: balances.reduce((sum: number, b: any) => sum + b.balance, 0)
-        }
+          totalBalance: balances.reduce((sum: number, b: any) => sum + b.balance, 0),
+        },
       };
 
       // Validate response structure with real data
@@ -95,7 +103,7 @@ describe('Customer API Integration', () => {
       const mockErrorResponse = {
         success: false,
         error: 'Invalid agent ID',
-        message: 'Agent not found or unauthorized'
+        message: 'Agent not found or unauthorized',
       };
 
       expect(mockErrorResponse.success).toBe(false);
@@ -107,7 +115,7 @@ describe('Customer API Integration', () => {
       const mockUnauthorizedResponse = {
         success: false,
         error: 'Unauthorized',
-        message: 'Invalid or missing API key'
+        message: 'Invalid or missing API key',
       };
 
       expect(mockUnauthorizedResponse.success).toBe(false);
@@ -122,15 +130,15 @@ describe('Customer API Integration', () => {
         username: 'newuser',
         firstName: 'New',
         lastName: 'Customer',
-        agentID: 'BLAKEPPH'
+        agentID: 'BLAKEPPH',
       };
 
       const mockResponse = {
         success: true,
         data: {
           customerID: customerData.customerID,
-          message: 'Customer created successfully'
-        }
+          message: 'Customer created successfully',
+        },
       };
 
       expect(mockResponse.success).toBe(true);
@@ -143,13 +151,13 @@ describe('Customer API Integration', () => {
         customerID: 'TEST001', // This already exists in test data
         username: 'duplicate',
         firstName: 'Duplicate',
-        lastName: 'Customer'
+        lastName: 'Customer',
       };
 
       const mockErrorResponse = {
         success: false,
         error: 'Customer already exists',
-        message: 'Customer ID TEST001 already exists'
+        message: 'Customer ID TEST001 already exists',
       };
 
       expect(mockErrorResponse.success).toBe(false);
@@ -158,14 +166,14 @@ describe('Customer API Integration', () => {
 
     it('should validate required fields', async () => {
       const incompleteCustomerData = {
-        customerID: 'INCOMPLETE001'
+        customerID: 'INCOMPLETE001',
         // Missing required fields
       };
 
       const mockValidationError = {
         success: false,
         error: 'Validation failed',
-        message: 'Missing required fields: username, firstName, lastName'
+        message: 'Missing required fields: username, firstName, lastName',
       };
 
       expect(mockValidationError.success).toBe(false);
@@ -177,7 +185,7 @@ describe('Customer API Integration', () => {
   describe('Database Integration', () => {
     it('should maintain data consistency between API and database', async () => {
       const db = testUtils.getTestDatabase();
-      
+
       // Check that seeded data exists in database
       const customers = db.query('SELECT * FROM customers ORDER BY customer_id').all();
       expect(customers).toHaveLength(3);
@@ -191,28 +199,31 @@ describe('Customer API Integration', () => {
 
     it('should handle database transactions properly', async () => {
       const db = testUtils.getTestDatabase();
-      
+
       // Start a transaction
       db.exec('BEGIN TRANSACTION');
-      
+
       try {
         // Insert a customer
-        db.query(`
+        db.query(
+          `
           INSERT INTO customers (customer_id, username, first_name, last_name)
           VALUES (?, ?, ?, ?)
-        `).run('TRANS001', 'transuser', 'Trans', 'User');
-        
+        `
+        ).run('TRANS001', 'transuser', 'Trans', 'User');
+
         // Verify it exists within transaction
         const customer = db.query('SELECT * FROM customers WHERE customer_id = ?').get('TRANS001');
         expect(customer).toBeDefined();
-        
+
         // Rollback transaction
         db.exec('ROLLBACK');
-        
+
         // Verify it no longer exists
-        const rolledBackCustomer = db.query('SELECT * FROM customers WHERE customer_id = ?').get('TRANS001');
+        const rolledBackCustomer = db
+          .query('SELECT * FROM customers WHERE customer_id = ?')
+          .get('TRANS001');
         expect(rolledBackCustomer).toBeNull();
-        
       } catch (error) {
         db.exec('ROLLBACK');
         throw error;
@@ -221,17 +232,19 @@ describe('Customer API Integration', () => {
 
     it('should handle concurrent operations safely', async () => {
       const db = testUtils.getTestDatabase();
-      
+
       // Simulate concurrent customer creation
       const promises = [];
       for (let i = 1; i <= 10; i++) {
         promises.push(
-          new Promise((resolve) => {
+          new Promise(resolve => {
             try {
-              db.query(`
+              db.query(
+                `
                 INSERT INTO customers (customer_id, username, first_name, last_name)
                 VALUES (?, ?, ?, ?)
-              `).run(`CONCURRENT${i}`, `user${i}`, `First${i}`, `Last${i}`);
+              `
+              ).run(`CONCURRENT${i}`, `user${i}`, `First${i}`, `Last${i}`);
               resolve(true);
             } catch (error) {
               resolve(false);
@@ -239,16 +252,20 @@ describe('Customer API Integration', () => {
           })
         );
       }
-      
+
       const results = await Promise.all(promises);
-      
+
       // All operations should succeed
       expect(results.every(result => result === true)).toBe(true);
-      
+
       // Verify all customers were created
-      const concurrentCustomers = db.query(`
+      const concurrentCustomers = db
+        .query(
+          `
         SELECT * FROM customers WHERE customer_id LIKE 'CONCURRENT%'
-      `).all();
+      `
+        )
+        .all();
       expect(concurrentCustomers).toHaveLength(10);
     });
   });
@@ -259,7 +276,7 @@ describe('Customer API Integration', () => {
       const mockDatabaseError = {
         success: false,
         error: 'Database connection failed',
-        message: 'Unable to connect to database'
+        message: 'Unable to connect to database',
       };
 
       expect(mockDatabaseError.success).toBe(false);
@@ -270,7 +287,7 @@ describe('Customer API Integration', () => {
       const mockMalformedRequest = {
         success: false,
         error: 'Invalid request format',
-        message: 'Request body must be valid JSON'
+        message: 'Request body must be valid JSON',
       };
 
       expect(mockMalformedRequest.success).toBe(false);
@@ -281,7 +298,7 @@ describe('Customer API Integration', () => {
       const mockServerError = {
         success: false,
         error: 'Internal server error',
-        message: 'An unexpected error occurred'
+        message: 'An unexpected error occurred',
       };
 
       expect(mockServerError.success).toBe(false);

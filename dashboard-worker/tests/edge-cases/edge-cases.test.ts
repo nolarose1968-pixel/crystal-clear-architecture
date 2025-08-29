@@ -25,11 +25,11 @@ async function runEdgeCaseTests() {
     const response = await fetch(`${BASE_URL}/Manager/getAgentPerformance`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: 'agentID=BLAKEPPH&start=2024-01-01&end=2025-12-31&type=CP'
+      body: 'agentID=BLAKEPPH&start=2024-01-01&end=2025-12-31&type=CP',
     });
-    
+
     const data = await response.json();
     console.log('Status:', response.status);
     console.log('Success:', data.success);
@@ -44,11 +44,11 @@ async function runEdgeCaseTests() {
     const response = await fetch(`${BASE_URL}/Manager/getAgentPerformance`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: 'agentID=BLAKEPPH&start=invalid-date&end=also-invalid&type=CP'
+      body: 'agentID=BLAKEPPH&start=invalid-date&end=also-invalid&type=CP',
     });
-    
+
     const data = await response.json();
     console.log('Status:', response.status);
     console.log('Response:', JSON.stringify(data).substring(0, 100));
@@ -59,11 +59,11 @@ async function runEdgeCaseTests() {
     const response = await fetch(`${BASE_URL}/api/manager/getWeeklyFigureByAgentLite`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: 'agentID=BLAKEPPH&week=52&type=A&layout=byDay'
+      body: 'agentID=BLAKEPPH&week=52&type=A&layout=byDay',
     });
-    
+
     const data = await response.json();
     console.log('Status:', response.status);
     console.log('Week:', data.data?.week);
@@ -75,11 +75,11 @@ async function runEdgeCaseTests() {
     const response = await fetch(`${BASE_URL}/api/manager/getWeeklyFigureByAgentLite`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: 'agentID=BLAKEPPH&week=-1&type=A&layout=byDay'
+      body: 'agentID=BLAKEPPH&week=-1&type=A&layout=byDay',
     });
-    
+
     const data = await response.json();
     console.log('Status:', response.status);
     console.log('Response:', JSON.stringify(data).substring(0, 100));
@@ -90,11 +90,11 @@ async function runEdgeCaseTests() {
     const response = await fetch(`${BASE_URL}/api/manager/getWeeklyFigureByAgentLite`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: 'week=0&type=A'
+      body: 'week=0&type=A',
     });
-    
+
     const data = await response.json();
     console.log('Status:', response.status);
     console.log('AgentID in response:', data.data?.agentID);
@@ -105,11 +105,11 @@ async function runEdgeCaseTests() {
     const response = await fetch(`${BASE_URL}/api/manager/getWeeklyFigureByAgentLite`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: "agentID='; DROP TABLE bets; --&week=0"
+      body: "agentID='; DROP TABLE bets; --&week=0",
     });
-    
+
     const data = await response.json();
     console.log('Status:', response.status);
     console.log('Response success:', data.success);
@@ -120,14 +120,14 @@ async function runEdgeCaseTests() {
     const response = await fetch(`${BASE_URL}/api/fire22/player-info`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         playerId: '<script>alert("XSS")</script>',
-        agentId: 'BLAKEPPH'
-      })
+        agentId: 'BLAKEPPH',
+      }),
     });
-    
+
     const data = await response.json();
     console.log('Status:', response.status);
     console.log('Error message:', data.error);
@@ -139,15 +139,15 @@ async function runEdgeCaseTests() {
     const response = await fetch(`${BASE_URL}/api/fire22/transactions`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         playerId: largeString,
         agentId: 'BLAKEPPH',
-        limit: 1000
-      })
+        limit: 1000,
+      }),
     });
-    
+
     console.log('Status:', response.status);
     if (!response.ok) {
       const text = await response.text();
@@ -160,11 +160,11 @@ async function runEdgeCaseTests() {
     const response = await fetch(`${BASE_URL}/api/manager/getWeeklyFigureByAgentLite`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: encodeURI('agentID=BLAKE!@#$%^&*()PPH&week=0&type=A&layout=byDay')
+      body: encodeURI('agentID=BLAKE!@#$%^&*()PPH&week=0&type=A&layout=byDay'),
     });
-    
+
     const data = await response.json();
     console.log('Status:', response.status);
     console.log('Success:', data.success);
@@ -172,23 +172,28 @@ async function runEdgeCaseTests() {
 
   // Test 10: Concurrent requests
   await testEdgeCase('Concurrent Requests (10 simultaneous)', async () => {
-    const requests = Array(10).fill(null).map(() =>
-      fetch(`${BASE_URL}/api/manager/getWeeklyFigureByAgentLite`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: 'agentID=BLAKEPPH&week=0&type=A'
-      })
-    );
-    
+    const requests = Array(10)
+      .fill(null)
+      .map(() =>
+        fetch(`${BASE_URL}/api/manager/getWeeklyFigureByAgentLite`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'agentID=BLAKEPPH&week=0&type=A',
+        })
+      );
+
     const startTime = performance.now();
     const responses = await Promise.all(requests);
     const endTime = performance.now();
-    
+
     const statuses = responses.map(r => r.status);
     console.log('All status codes:', statuses);
-    console.log('All successful:', statuses.every(s => s === 200));
+    console.log(
+      'All successful:',
+      statuses.every(s => s === 200)
+    );
     console.log(`Total time for 10 requests: ${(endTime - startTime).toFixed(2)}ms`);
     console.log(`Average time per request: ${((endTime - startTime) / 10).toFixed(2)}ms`);
   });
@@ -198,12 +203,12 @@ async function runEdgeCaseTests() {
     const response = await fetch(`${BASE_URL}/api/manager/getWeeklyFigureByAgentLite`, {
       method: 'OPTIONS',
       headers: {
-        'Origin': 'https://example.com',
+        Origin: 'https://example.com',
         'Access-Control-Request-Method': 'POST',
-        'Access-Control-Request-Headers': 'Content-Type, Authorization'
-      }
+        'Access-Control-Request-Headers': 'Content-Type, Authorization',
+      },
     });
-    
+
     console.log('Status:', response.status);
     console.log('CORS Headers:');
     console.log('  Allow-Origin:', response.headers.get('Access-Control-Allow-Origin'));
@@ -214,16 +219,16 @@ async function runEdgeCaseTests() {
   // Test 12: Different agent IDs
   await testEdgeCase('Different Agent IDs', async () => {
     const agents = ['AGENT001', 'AGENT002', 'TESTUSER', '123456', ''];
-    
+
     for (const agentID of agents) {
       const response = await fetch(`${BASE_URL}/api/manager/getWeeklyFigureByAgentLite`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `agentID=${agentID}&week=0`
+        body: `agentID=${agentID}&week=0`,
       });
-      
+
       const data = await response.json();
       console.log(`  Agent "${agentID}": Status ${response.status}, Success: ${data.success}`);
     }

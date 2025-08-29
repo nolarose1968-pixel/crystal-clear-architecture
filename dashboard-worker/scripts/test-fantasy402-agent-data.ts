@@ -5,13 +5,16 @@
  * Verify what endpoints the agent can access through the unified client
  */
 
-import { createFantasy402Client, initializeDefaultClient } from '../src/api/fantasy402-unified-client';
+import {
+  createFantasy402Client,
+  initializeDefaultClient,
+} from '../src/api/fantasy402-unified-client';
 
 const USERNAME = process.env.FIRE22_USERNAME || 'billy666';
 const PASSWORD = process.env.FIRE22_PASSWORD || 'backdoor69';
 
 console.log('🎰 Fantasy402 Agent Data Access Test (Unified Client)');
-console.log('====================================================');
+console.log('!==!==!==!==!==!==!==!==!=====');
 console.log(`Agent: ${USERNAME}`);
 console.log('');
 
@@ -24,7 +27,7 @@ async function testUnifiedClient() {
     username: USERNAME,
     password: PASSWORD,
     enableCache: true,
-    enableRealtime: false
+    enableRealtime: false,
   });
 
   if (!initResult.success) {
@@ -39,7 +42,7 @@ async function testUnifiedClient() {
   console.log('-------------------------------');
   const dashboardResult = await createFantasy402Client({
     username: USERNAME,
-    password: PASSWORD
+    password: PASSWORD,
   }).getAgentDashboard();
 
   if (dashboardResult.success && dashboardResult.data) {
@@ -65,7 +68,7 @@ async function testUnifiedClient() {
 
   const client = createFantasy402Client({
     username: USERNAME,
-    password: PASSWORD
+    password: PASSWORD,
   });
 
   // Initialize the client
@@ -140,9 +143,11 @@ async function testUnifiedClient() {
   console.log('• Single point of maintenance');
 }
 
-testUnifiedClient().then(() => {
-  console.log('\n🎉 All tests completed successfully!');
-}).catch(error => {
-  console.error('❌ Test failed:', error);
-  process.exit(1);
-});
+testUnifiedClient()
+  .then(() => {
+    console.log('\n🎉 All tests completed successfully!');
+  })
+  .catch(error => {
+    console.error('❌ Test failed:', error);
+    process.exit(1);
+  });

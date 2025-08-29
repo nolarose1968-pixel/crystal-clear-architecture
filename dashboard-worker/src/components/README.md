@@ -1,10 +1,13 @@
 # 🔥 Fire22 KPI Component System
 
-A comprehensive, reusable KPI (Key Performance Indicator) component system designed for the Fire22 Dashboard Worker. This system provides enhanced styling, multiple variants, and easy integration capabilities.
+A comprehensive, reusable KPI (Key Performance Indicator) component system
+designed for the Fire22 Dashboard Worker. This system provides enhanced styling,
+multiple variants, and easy integration capabilities.
 
 ## 🚀 Features
 
 ### ✨ Core Features
+
 - **Multiple Color Themes**: Primary, secondary, success, warning, danger, info
 - **Size Variants**: Small, medium, large
 - **Value Formatting**: Number, currency, percentage, text
@@ -14,6 +17,7 @@ A comprehensive, reusable KPI (Key Performance Indicator) component system desig
 - **TypeScript Support**: Full type safety and IntelliSense
 
 ### 🎨 Visual Enhancements
+
 - **Gradient Backgrounds**: Modern gradient designs
 - **Hover Effects**: Smooth animations and transformations
 - **Icon Support**: Emoji and custom icon integration
@@ -22,7 +26,8 @@ A comprehensive, reusable KPI (Key Performance Indicator) component system desig
 
 ## 📦 Installation
 
-The KPI component is part of the Fire22 Dashboard Worker system. No additional installation is required.
+The KPI component is part of the Fire22 Dashboard Worker system. No additional
+installation is required.
 
 ## 🔧 Usage
 
@@ -32,10 +37,10 @@ The KPI component is part of the Fire22 Dashboard Worker system. No additional i
 import { createKPICard } from './kpi-component.ts';
 
 const kpi = createKPICard({
-    label: 'Pending Amount',
-    value: 125000,
-    format: 'currency',
-    color: 'warning'
+  label: 'Pending Amount',
+  value: 125000,
+  format: 'currency',
+  color: 'warning',
 });
 
 document.body.appendChild(kpi);
@@ -44,11 +49,11 @@ document.body.appendChild(kpi);
 ### Pre-built KPI Components
 
 ```typescript
-import { 
-    createPendingAmountKPI, 
-    createTotalAgentsKPI,
-    createActiveAgentsKPI,
-    createPendingWagersKPI 
+import {
+  createPendingAmountKPI,
+  createTotalAgentsKPI,
+  createActiveAgentsKPI,
+  createPendingWagersKPI,
 } from './kpi-component.ts';
 
 // Create specific KPIs
@@ -70,19 +75,19 @@ document.body.appendChild(pendingWagers);
 import { KPIComponent } from './kpi-component.ts';
 
 const kpi = new KPIComponent({
-    label: 'Revenue Growth',
-    value: 23.5,
-    format: 'percentage',
-    color: 'success',
-    size: 'large',
-    icon: '📈',
-    trend: 'up',
-    trendValue: '+5.2%',
-    clickable: true,
-    onClick: () => {
-        console.log('KPI clicked!');
-        // Open detailed view or modal
-    }
+  label: 'Revenue Growth',
+  value: 23.5,
+  format: 'percentage',
+  color: 'success',
+  size: 'large',
+  icon: '📈',
+  trend: 'up',
+  trendValue: '+5.2%',
+  clickable: true,
+  onClick: () => {
+    console.log('KPI clicked!');
+    // Open detailed view or modal
+  },
 });
 
 document.body.appendChild(kpi.render());
@@ -92,14 +97,14 @@ document.body.appendChild(kpi.render());
 
 ```typescript
 const clickableKPI = new KPIComponent({
-    label: 'Click Me!',
-    value: 'Interactive',
-    color: 'secondary',
-    icon: '🖱️',
-    clickable: true,
-    onClick: () => {
-        alert('KPI clicked! This could open a detailed view or modal.');
-    }
+  label: 'Click Me!',
+  value: 'Interactive',
+  color: 'secondary',
+  icon: '🖱️',
+  clickable: true,
+  onClick: () => {
+    alert('KPI clicked! This could open a detailed view or modal.');
+  },
 });
 
 document.body.appendChild(clickableKPI.render());
@@ -111,48 +116,48 @@ document.body.appendChild(clickableKPI.render());
 
 ```typescript
 interface KPIConfig {
-    label: string;                    // Display label
-    value: string | number;           // KPI value
-    prefix?: string;                  // Value prefix
-    suffix?: string;                  // Value suffix
-    format?: 'number' | 'currency' | 'percentage' | 'text';
-    color?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
-    size?: 'small' | 'medium' | 'large';
-    icon?: string;                    // Emoji or icon
-    trend?: 'up' | 'down' | 'neutral';
-    trendValue?: string | number;     // Trend value display
-    clickable?: boolean;              // Make KPI clickable
-    onClick?: () => void;             // Click event handler
+  label: string; // Display label
+  value: string | number; // KPI value
+  prefix?: string; // Value prefix
+  suffix?: string; // Value suffix
+  format?: 'number' | 'currency' | 'percentage' | 'text';
+  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
+  size?: 'small' | 'medium' | 'large';
+  icon?: string; // Emoji or icon
+  trend?: 'up' | 'down' | 'neutral';
+  trendValue?: string | number; // Trend value display
+  clickable?: boolean; // Make KPI clickable
+  onClick?: () => void; // Click event handler
 }
 ```
 
 ### Color Themes
 
-| Color | Description | Use Case |
-|-------|-------------|----------|
-| `primary` | Blue gradient | General metrics |
-| `secondary` | Purple gradient | Secondary metrics |
-| `success` | Green gradient | Positive indicators |
-| `warning` | Orange gradient | Caution indicators |
-| `danger` | Red gradient | Critical indicators |
-| `info` | Cyan gradient | Informational metrics |
+| Color       | Description     | Use Case              |
+| ----------- | --------------- | --------------------- |
+| `primary`   | Blue gradient   | General metrics       |
+| `secondary` | Purple gradient | Secondary metrics     |
+| `success`   | Green gradient  | Positive indicators   |
+| `warning`   | Orange gradient | Caution indicators    |
+| `danger`    | Red gradient    | Critical indicators   |
+| `info`      | Cyan gradient   | Informational metrics |
 
 ### Size Variants
 
-| Size | Padding | Value Font | Label Font |
-|------|---------|------------|------------|
-| `small` | 1rem | 1.5rem | 0.8rem |
-| `medium` | 1.5rem | 2.5rem | 0.9rem |
-| `large` | 2rem | 3.5rem | 1.1rem |
+| Size     | Padding | Value Font | Label Font |
+| -------- | ------- | ---------- | ---------- |
+| `small`  | 1rem    | 1.5rem     | 0.8rem     |
+| `medium` | 1.5rem  | 2.5rem     | 0.9rem     |
+| `large`  | 2rem    | 3.5rem     | 1.1rem     |
 
 ### Value Formats
 
-| Format | Description | Example |
-|--------|-------------|---------|
-| `number` | Locale-formatted number | 1,234,567 |
-| `currency` | USD currency format | $1,234.56 |
-| `percentage` | Percentage with decimals | 23.45% |
-| `text` | Plain text | "Online" |
+| Format       | Description              | Example   |
+| ------------ | ------------------------ | --------- |
+| `number`     | Locale-formatted number  | 1,234,567 |
+| `currency`   | USD currency format      | $1,234.56 |
+| `percentage` | Percentage with decimals | 23.45%    |
+| `text`       | Plain text               | "Online"  |
 
 ## 🎨 Styling
 
@@ -176,14 +181,14 @@ You can override the default styles by targeting these classes in your CSS:
 
 ```css
 .kpi-card {
-    /* Custom background */
-    background: linear-gradient(135deg, #your-color-1, #your-color-2);
+  /* Custom background */
+  background: linear-gradient(135deg, #your-color-1, #your-color-2);
 }
 
 .kpi-value {
-    /* Custom value styling */
-    font-family: 'Your Font', sans-serif;
-    color: #your-color;
+  /* Custom value styling */
+  font-family: 'Your Font', sans-serif;
+  color: #your-color;
 }
 ```
 
@@ -193,8 +198,8 @@ You can override the default styles by targeting these classes in your CSS:
 
 ```typescript
 const kpi = new KPIComponent({
-    label: 'Live Counter',
-    value: 0
+  label: 'Live Counter',
+  value: 0,
 });
 
 // Update value
@@ -202,9 +207,9 @@ kpi.setValue(42);
 
 // Update multiple properties
 kpi.update({
-    value: 100,
-    color: 'success',
-    trend: 'up'
+  value: 100,
+  color: 'success',
+  trend: 'up',
 });
 ```
 
@@ -213,17 +218,18 @@ kpi.update({
 ```typescript
 // Example: Update KPI every second
 setInterval(() => {
-    const newValue = Math.floor(Math.random() * 1000);
-    kpi.update({
-        value: newValue,
-        trend: newValue > 500 ? 'up' : 'down'
-    });
+  const newValue = Math.floor(Math.random() * 1000);
+  kpi.update({
+    value: newValue,
+    trend: newValue > 500 ? 'up' : 'down',
+  });
 }, 1000);
 ```
 
 ## 📱 Responsive Design
 
-The KPI components are designed to be responsive and work across different screen sizes:
+The KPI components are designed to be responsive and work across different
+screen sizes:
 
 - **Grid Layout**: Auto-fitting grid with minimum width constraints
 - **Flexible Sizing**: Responsive padding and font sizes
@@ -249,9 +255,9 @@ open kpi-demo.html
 ```typescript
 // Test KPI creation
 const testKPI = createKPICard({
-    label: 'Test KPI',
-    value: 100,
-    format: 'number'
+  label: 'Test KPI',
+  value: 100,
+  format: 'number',
 });
 
 // Verify element creation
@@ -269,14 +275,14 @@ const existingKPIs = document.querySelectorAll('.kpi-card');
 
 // Replace with new component
 existingKPIs.forEach((element, index) => {
-    const newKPI = createKPICard({
-        label: `KPI ${index + 1}`,
-        value: Math.floor(Math.random() * 1000),
-        format: 'number',
-        color: 'primary'
-    });
-    
-    element.parentNode.replaceChild(newKPI, element);
+  const newKPI = createKPICard({
+    label: `KPI ${index + 1}`,
+    value: Math.floor(Math.random() * 1000),
+    format: 'number',
+    color: 'primary',
+  });
+
+  element.parentNode.replaceChild(newKPI, element);
 });
 ```
 
@@ -310,51 +316,51 @@ dashboard.appendChild(newKPI);
 ### Complete Dashboard Integration
 
 ```typescript
-import { 
-    createPendingAmountKPI, 
-    createTotalAgentsKPI,
-    createActiveAgentsKPI,
-    createPendingWagersKPI 
+import {
+  createPendingAmountKPI,
+  createTotalAgentsKPI,
+  createActiveAgentsKPI,
+  createPendingWagersKPI,
 } from './kpi-component.ts';
 
 class Dashboard {
-    constructor() {
-        this.initializeKPIs();
-        this.startDataUpdates();
-    }
-    
-    initializeKPIs() {
-        const container = document.getElementById('kpi-overview');
-        
-        this.pendingAmount = createPendingAmountKPI(0);
-        this.totalAgents = createTotalAgentsKPI(0);
-        this.activeAgents = createActiveAgentsKPI(0);
-        this.pendingWagers = createPendingWagersKPI(0);
-        
-        container.appendChild(this.pendingAmount);
-        container.appendChild(this.totalAgents);
-        container.appendChild(this.activeAgents);
-        container.appendChild(this.pendingWagers);
-    }
-    
-    startDataUpdates() {
-        setInterval(() => {
-            this.updateKPIData();
-        }, 5000);
-    }
-    
-    updateKPIData() {
-        // Fetch real-time data and update KPIs
-        fetch('/api/dashboard-stats')
-            .then(response => response.json())
-            .then(data => {
-                // Update KPI values
-                this.pendingAmount.setValue(data.pendingAmount);
-                this.totalAgents.setValue(data.totalAgents);
-                this.activeAgents.setValue(data.activeAgents);
-                this.pendingWagers.setValue(data.pendingWagers);
-            });
-    }
+  constructor() {
+    this.initializeKPIs();
+    this.startDataUpdates();
+  }
+
+  initializeKPIs() {
+    const container = document.getElementById('kpi-overview');
+
+    this.pendingAmount = createPendingAmountKPI(0);
+    this.totalAgents = createTotalAgentsKPI(0);
+    this.activeAgents = createActiveAgentsKPI(0);
+    this.pendingWagers = createPendingWagersKPI(0);
+
+    container.appendChild(this.pendingAmount);
+    container.appendChild(this.totalAgents);
+    container.appendChild(this.activeAgents);
+    container.appendChild(this.pendingWagers);
+  }
+
+  startDataUpdates() {
+    setInterval(() => {
+      this.updateKPIData();
+    }, 5000);
+  }
+
+  updateKPIData() {
+    // Fetch real-time data and update KPIs
+    fetch('/api/dashboard-stats')
+      .then(response => response.json())
+      .then(data => {
+        // Update KPI values
+        this.pendingAmount.setValue(data.pendingAmount);
+        this.totalAgents.setValue(data.totalAgents);
+        this.activeAgents.setValue(data.activeAgents);
+        this.pendingWagers.setValue(data.pendingWagers);
+      });
+  }
 }
 
 // Initialize dashboard
@@ -373,7 +379,8 @@ When contributing to the KPI component system:
 
 ## 📄 License
 
-This component is part of the Fire22 Dashboard Worker system and follows the same licensing terms.
+This component is part of the Fire22 Dashboard Worker system and follows the
+same licensing terms.
 
 ## 🆘 Support
 

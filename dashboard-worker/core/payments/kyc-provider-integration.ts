@@ -159,14 +159,14 @@ export class KYCProviderIntegration {
           sanctionsScreening: true,
           pepScreening: true,
           livenessDetection: true,
-          addressVerification: true
+          addressVerification: true,
         },
         supportedDocuments: ['passport', 'drivers_license', 'national_id'],
         supportedCountries: ['US', 'CA', 'GB', 'DE', 'FR', 'AU'],
         processingTime: '1-5 minutes',
-        costPerVerification: 2.50,
+        costPerVerification: 2.5,
         accuracy: 98,
-        compliance: ['GDPR', 'CCPA', 'PCI DSS']
+        compliance: ['GDPR', 'CCPA', 'PCI DSS'],
       });
     }
 
@@ -181,14 +181,14 @@ export class KYCProviderIntegration {
           sanctionsScreening: true,
           pepScreening: true,
           livenessDetection: true,
-          addressVerification: true
+          addressVerification: true,
         },
         supportedDocuments: ['passport', 'drivers_license', 'national_id'],
         supportedCountries: ['US', 'CA', 'GB', 'DE', 'FR', 'AU', 'BR'],
         processingTime: '2-10 minutes',
         costPerVerification: 2.75,
         accuracy: 97,
-        compliance: ['GDPR', 'CCPA', 'PCI DSS']
+        compliance: ['GDPR', 'CCPA', 'PCI DSS'],
       });
     }
 
@@ -203,14 +203,14 @@ export class KYCProviderIntegration {
           sanctionsScreening: false,
           pepScreening: false,
           livenessDetection: true,
-          addressVerification: false
+          addressVerification: false,
         },
         supportedDocuments: ['passport', 'drivers_license', 'national_id'],
         supportedCountries: ['US', 'CA', 'GB', 'DE', 'FR', 'EE'],
         processingTime: '30 seconds - 2 minutes',
-        costPerVerification: 1.50,
+        costPerVerification: 1.5,
         accuracy: 95,
-        compliance: ['GDPR', 'CCPA']
+        compliance: ['GDPR', 'CCPA'],
       });
     }
 
@@ -225,14 +225,14 @@ export class KYCProviderIntegration {
           sanctionsScreening: true,
           pepScreening: true,
           livenessDetection: false,
-          addressVerification: true
+          addressVerification: true,
         },
         supportedDocuments: [],
         supportedCountries: ['US'],
         processingTime: 'Instant',
-        costPerVerification: 0.50,
+        costPerVerification: 0.5,
         accuracy: 92,
-        compliance: ['GLBA', 'FCRA']
+        compliance: ['GLBA', 'FCRA'],
       });
     }
 
@@ -247,14 +247,14 @@ export class KYCProviderIntegration {
           sanctionsScreening: true,
           pepScreening: true,
           livenessDetection: false,
-          addressVerification: true
+          addressVerification: true,
         },
         supportedDocuments: ['passport', 'drivers_license', 'national_id'],
         supportedCountries: ['US', 'CA', 'GB', 'AU', 'NZ'],
         processingTime: '1-3 minutes',
         costPerVerification: 1.25,
         accuracy: 94,
-        compliance: ['GDPR', 'CCPA']
+        compliance: ['GDPR', 'CCPA'],
       });
     }
   }
@@ -274,7 +274,11 @@ export class KYCProviderIntegration {
     }
 
     // Create provider session
-    const sessionToken = await this.createProviderSession(selectedProvider, customerId, verificationType);
+    const sessionToken = await this.createProviderSession(
+      selectedProvider,
+      customerId,
+      verificationType
+    );
 
     const session: KYCSession = {
       id: this.generateSessionId(),
@@ -287,7 +291,7 @@ export class KYCProviderIntegration {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours
-      metadata: {}
+      metadata: {},
     };
 
     this.kycSessions.set(session.id, session);
@@ -314,7 +318,12 @@ export class KYCProviderIntegration {
     }
 
     // Upload to provider
-    const uploadResult = await this.uploadToProvider(session.provider, fileData, fileName, documentType);
+    const uploadResult = await this.uploadToProvider(
+      session.provider,
+      fileData,
+      fileName,
+      documentType
+    );
 
     const document: KYCDocument = {
       id: this.generateDocumentId(),
@@ -322,7 +331,7 @@ export class KYCProviderIntegration {
       side,
       status: 'uploaded',
       fileUrl: uploadResult.fileUrl,
-      uploadedAt: new Date().toISOString()
+      uploadedAt: new Date().toISOString(),
     };
 
     session.documents.push(document);
@@ -385,10 +394,11 @@ export class KYCProviderIntegration {
         suitableProviders = availableProviders.filter(p => p.capabilities.databaseVerification);
         break;
       case 'enhanced':
-        suitableProviders = availableProviders.filter(p =>
-          p.capabilities.documentVerification &&
-          p.capabilities.biometricVerification &&
-          p.capabilities.databaseVerification
+        suitableProviders = availableProviders.filter(
+          p =>
+            p.capabilities.documentVerification &&
+            p.capabilities.biometricVerification &&
+            p.capabilities.databaseVerification
         );
         break;
     }
@@ -400,10 +410,11 @@ export class KYCProviderIntegration {
     // Prioritize by accuracy and cost
     return suitableProviders
       .sort((a, b) => {
-        const scoreA = a.accuracy - (a.costPerVerification * 20);
-        const scoreB = b.accuracy - (b.costPerVerification * 20);
+        const scoreA = a.accuracy - a.costPerVerification * 20;
+        const scoreB = b.accuracy - b.costPerVerification * 20;
         return scoreB - scoreA;
-      })[0].name.toLowerCase();
+      })[0]
+      .name.toLowerCase();
   }
 
   /**
@@ -476,8 +487,8 @@ export class KYCProviderIntegration {
       document.processedAt = new Date().toISOString();
 
       // Check if all documents are processed
-      const allProcessed = session.documents.every(d =>
-        d.status === 'verified' || d.status === 'rejected'
+      const allProcessed = session.documents.every(
+        d => d.status === 'verified' || d.status === 'rejected'
       );
 
       if (allProcessed) {
@@ -492,7 +503,6 @@ export class KYCProviderIntegration {
       }
 
       session.updatedAt = new Date().toISOString();
-
     } catch (error) {
       console.error(`KYC processing failed for document ${documentId}:`, error);
       document.status = 'rejected';
@@ -508,7 +518,8 @@ export class KYCProviderIntegration {
     const verifiedDocuments = session.documents.filter(d => d.status === 'verified');
     const totalDocuments = session.documents.length;
 
-    const verificationScore = totalDocuments > 0 ? (verifiedDocuments.length / totalDocuments) * 100 : 0;
+    const verificationScore =
+      totalDocuments > 0 ? (verifiedDocuments.length / totalDocuments) * 100 : 0;
 
     let overallStatus: KYCResult['overallStatus'] = 'failed';
     let riskLevel: KYCResult['riskLevel'] = 'high';
@@ -534,16 +545,16 @@ export class KYCProviderIntegration {
           confidence: verificationScore,
           issues: session.documents
             .filter(d => d.status === 'rejected')
-            .map(d => d.rejectionReason || 'Unknown issue')
+            .map(d => d.rejectionReason || 'Unknown issue'),
         },
         biometricVerification: { status: 'not_performed', confidence: 0 },
         databaseVerification: { status: 'not_performed', confidence: 0, matches: 0 },
         sanctionsCheck: { status: 'not_performed', confidence: 0, matches: [] },
-        pepCheck: { status: 'not_performed', confidence: 0, matches: [] }
+        pepCheck: { status: 'not_performed', confidence: 0, matches: [] },
       },
       recommendations: this.generateKYCRecommendations(overallStatus, verificationScore),
       reviewRequired: overallStatus === 'review_required',
-      verifiedAt: new Date().toISOString()
+      verifiedAt: new Date().toISOString(),
     };
 
     // Run additional checks based on provider capabilities
@@ -564,47 +575,78 @@ export class KYCProviderIntegration {
   }
 
   // Provider-specific implementations (simplified)
-  private async createJumioSession(customerId: string, type: KYCSession['verificationType']): Promise<string> {
+  private async createJumioSession(
+    customerId: string,
+    type: KYCSession['verificationType']
+  ): Promise<string> {
     console.log(`Creating Jumio session for ${customerId}`);
     return `jumio_${Date.now()}`;
   }
 
-  private async createOnfidoSession(customerId: string, type: KYCSession['verificationType']): Promise<string> {
+  private async createOnfidoSession(
+    customerId: string,
+    type: KYCSession['verificationType']
+  ): Promise<string> {
     console.log(`Creating Onfido session for ${customerId}`);
     return `onfido_${Date.now()}`;
   }
 
-  private async createVeriffSession(customerId: string, type: KYCSession['verificationType']): Promise<string> {
+  private async createVeriffSession(
+    customerId: string,
+    type: KYCSession['verificationType']
+  ): Promise<string> {
     console.log(`Creating Veriff session for ${customerId}`);
     return `veriff_${Date.now()}`;
   }
 
-  private async createIdologySession(customerId: string, type: KYCSession['verificationType']): Promise<string> {
+  private async createIdologySession(
+    customerId: string,
+    type: KYCSession['verificationType']
+  ): Promise<string> {
     console.log(`Creating Idology session for ${customerId}`);
     return `idology_${Date.now()}`;
   }
 
-  private async createTruliooSession(customerId: string, type: KYCSession['verificationType']): Promise<string> {
+  private async createTruliooSession(
+    customerId: string,
+    type: KYCSession['verificationType']
+  ): Promise<string> {
     console.log(`Creating Trulioo session for ${customerId}`);
     return `trulioo_${Date.now()}`;
   }
 
-  private async uploadToJumio(fileData: ArrayBuffer, fileName: string, documentType: KYCDocument['type']): Promise<{ fileUrl: string }> {
+  private async uploadToJumio(
+    fileData: ArrayBuffer,
+    fileName: string,
+    documentType: KYCDocument['type']
+  ): Promise<{ fileUrl: string }> {
     console.log(`Uploading to Jumio: ${fileName}`);
     return { fileUrl: `jumio://docs/${Date.now()}` };
   }
 
-  private async uploadToOnfido(fileData: ArrayBuffer, fileName: string, documentType: KYCDocument['type']): Promise<{ fileUrl: string }> {
+  private async uploadToOnfido(
+    fileData: ArrayBuffer,
+    fileName: string,
+    documentType: KYCDocument['type']
+  ): Promise<{ fileUrl: string }> {
     console.log(`Uploading to Onfido: ${fileName}`);
     return { fileUrl: `onfido://docs/${Date.now()}` };
   }
 
-  private async uploadToVeriff(fileData: ArrayBuffer, fileName: string, documentType: KYCDocument['type']): Promise<{ fileUrl: string }> {
+  private async uploadToVeriff(
+    fileData: ArrayBuffer,
+    fileName: string,
+    documentType: KYCDocument['type']
+  ): Promise<{ fileUrl: string }> {
     console.log(`Uploading to Veriff: ${fileName}`);
     return { fileUrl: `veriff://docs/${Date.now()}` };
   }
 
-  private async uploadToTrulioo(fileData: ArrayBuffer, fileName: string, documentType: KYCDocument['type']): Promise<{ fileUrl: string }> {
+  private async uploadToTrulioo(
+    fileData: ArrayBuffer,
+    fileName: string,
+    documentType: KYCDocument['type']
+  ): Promise<{ fileUrl: string }> {
     console.log(`Uploading to Trulioo: ${fileName}`);
     return { fileUrl: `trulioo://docs/${Date.now()}` };
   }
@@ -615,15 +657,17 @@ export class KYCProviderIntegration {
 
     return {
       verified: isVerified,
-      extractedData: isVerified ? {
-        documentNumber: '123456789',
-        expiryDate: '2025-12-31',
-        issuingCountry: 'US',
-        firstName: 'John',
-        lastName: 'Doe',
-        dateOfBirth: '1990-01-01'
-      } : undefined,
-      rejectionReason: isVerified ? undefined : 'Document unclear or invalid'
+      extractedData: isVerified
+        ? {
+            documentNumber: '123456789',
+            expiryDate: '2025-12-31',
+            issuingCountry: 'US',
+            firstName: 'John',
+            lastName: 'Doe',
+            dateOfBirth: '1990-01-01',
+          }
+        : undefined,
+      rejectionReason: isVerified ? undefined : 'Document unclear or invalid',
     };
   }
 
@@ -650,7 +694,7 @@ export class KYCProviderIntegration {
       status: Math.random() > 0.05 ? 'passed' : 'failed',
       confidence: 95,
       matches: Math.random() > 0.95 ? 1 : 0,
-      issues: []
+      issues: [],
     };
   }
 
@@ -660,7 +704,7 @@ export class KYCProviderIntegration {
       status: Math.random() > 0.02 ? 'passed' : 'failed',
       confidence: 98,
       matches: [],
-      issues: []
+      issues: [],
     };
   }
 
@@ -670,7 +714,7 @@ export class KYCProviderIntegration {
       status: Math.random() > 0.01 ? 'passed' : 'failed',
       confidence: 97,
       matches: [],
-      issues: []
+      issues: [],
     };
   }
 
@@ -706,7 +750,7 @@ export class KYCProviderIntegration {
       failedSessions,
       averageProcessingTime: 5, // minutes
       passRate,
-      activeProviders
+      activeProviders,
     };
   }
 }

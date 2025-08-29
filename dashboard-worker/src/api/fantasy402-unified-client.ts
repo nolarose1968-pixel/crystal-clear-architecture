@@ -43,7 +43,7 @@ export class Fantasy402UnifiedClient {
       enableCache: true,
       enableRealtime: false,
       requestTimeout: 30000,
-      ...config
+      ...config,
     };
   }
 
@@ -55,16 +55,10 @@ export class Fantasy402UnifiedClient {
       console.log('🚀 Initializing Fantasy402 Unified Client...');
 
       // Initialize auth client
-      this.auth = new Fantasy402Auth(
-        this.config.username,
-        this.config.password
-      );
+      this.auth = new Fantasy402Auth(this.config.username, this.config.password);
 
       // Initialize agent client
-      this.agentClient = new Fantasy402AgentClient(
-        this.config.username,
-        this.config.password
-      );
+      this.agentClient = new Fantasy402AgentClient(this.config.username, this.config.password);
 
       // Initialize the agent client
       const initResult = await this.agentClient.initialize();
@@ -85,7 +79,6 @@ export class Fantasy402UnifiedClient {
         timestamp: new Date(),
         requestId: this.generateRequestId(),
       };
-
     } catch (error) {
       console.error('❌ Failed to initialize unified client:', error);
       return {
@@ -131,7 +124,6 @@ export class Fantasy402UnifiedClient {
         timestamp: new Date(),
         requestId: this.generateRequestId(),
       };
-
     } catch (error) {
       return this.handleError('getAgentDashboard', error);
     }
@@ -154,14 +146,14 @@ export class Fantasy402UnifiedClient {
       const transactions = await this.agentClient!.getTransactions({
         start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days ago
         end: new Date().toISOString().split('T')[0],
-        limit: 50
+        limit: 50,
       });
 
       // Get customer wagers (recent)
       const wagers = await this.agentClient!.getWagers({
         start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         end: new Date().toISOString().split('T')[0],
-        limit: 50
+        limit: 50,
       });
 
       return {
@@ -177,7 +169,6 @@ export class Fantasy402UnifiedClient {
         timestamp: new Date(),
         requestId: this.generateRequestId(),
       };
-
     } catch (error) {
       return this.handleError('getCustomerDetails', error);
     }
@@ -207,7 +198,6 @@ export class Fantasy402UnifiedClient {
         timestamp: new Date(),
         requestId: this.generateRequestId(),
       };
-
     } catch (error) {
       return this.handleError('getCustomerSummary', error);
     }
@@ -216,11 +206,14 @@ export class Fantasy402UnifiedClient {
   /**
    * Get customer transactions
    */
-  async getCustomerTransactions(customerID: string, options?: {
-    start?: string;
-    end?: string;
-    limit?: number;
-  }): Promise<ApiResponse> {
+  async getCustomerTransactions(
+    customerID: string,
+    options?: {
+      start?: string;
+      end?: string;
+      limit?: number;
+    }
+  ): Promise<ApiResponse> {
     if (!this.ensureInitialized()) return this.notInitializedResponse();
 
     try {
@@ -232,7 +225,6 @@ export class Fantasy402UnifiedClient {
         timestamp: new Date(),
         requestId: this.generateRequestId(),
       };
-
     } catch (error) {
       return this.handleError('getCustomerTransactions', error);
     }
@@ -241,12 +233,15 @@ export class Fantasy402UnifiedClient {
   /**
    * Get customer wagers/bets
    */
-  async getCustomerWagers(customerID: string, options?: {
-    start?: string;
-    end?: string;
-    limit?: number;
-    status?: string;
-  }): Promise<ApiResponse> {
+  async getCustomerWagers(
+    customerID: string,
+    options?: {
+      start?: string;
+      end?: string;
+      limit?: number;
+      status?: string;
+    }
+  ): Promise<ApiResponse> {
     if (!this.ensureInitialized()) return this.notInitializedResponse();
 
     try {
@@ -258,7 +253,6 @@ export class Fantasy402UnifiedClient {
         timestamp: new Date(),
         requestId: this.generateRequestId(),
       };
-
     } catch (error) {
       return this.handleError('getCustomerWagers', error);
     }
@@ -285,7 +279,6 @@ export class Fantasy402UnifiedClient {
         timestamp: new Date(),
         requestId: this.generateRequestId(),
       };
-
     } catch (error) {
       return this.handleError('getPending', error);
     }
@@ -311,7 +304,6 @@ export class Fantasy402UnifiedClient {
         timestamp: new Date(),
         requestId: this.generateRequestId(),
       };
-
     } catch (error) {
       return this.handleError('getTransactionHistory', error);
     }
@@ -332,7 +324,6 @@ export class Fantasy402UnifiedClient {
         timestamp: new Date(),
         requestId: this.generateRequestId(),
       };
-
     } catch (error) {
       return this.handleError('clearCache', error);
     }
@@ -353,7 +344,6 @@ export class Fantasy402UnifiedClient {
         timestamp: new Date(),
         requestId: this.generateRequestId(),
       };
-
     } catch (error) {
       return this.handleError('getWeeklyFigureByAgent', error);
     }
@@ -374,7 +364,6 @@ export class Fantasy402UnifiedClient {
         timestamp: new Date(),
         requestId: this.generateRequestId(),
       };
-
     } catch (error) {
       return this.handleError('rawRequest', error);
     }

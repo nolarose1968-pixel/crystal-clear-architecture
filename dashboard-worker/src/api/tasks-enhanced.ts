@@ -1,7 +1,7 @@
 // Fire22 Dashboard Worker - Enhanced Task API with Bun.SQL
 // Full CRUD operations with advanced filtering, pagination, and real-time updates
 
-import { SQL } from "bun";
+import { SQL } from 'bun';
 import { Env } from '../types/env';
 import { getDatabase } from '../database/connection';
 import { generateTaskUUID, getTeamMemberId, getDepartmentId } from '../utils/uuid-generator';
@@ -67,11 +67,11 @@ export interface TaskListQuery {
   search?: string;
   dueBefore?: string;
   dueAfter?: string;
-  
+
   // Sorting
   sortBy?: 'title' | 'priority' | 'status' | 'progress' | 'dueDate' | 'createdAt' | 'updatedAt';
   sortOrder?: 'asc' | 'desc';
-  
+
   // Pagination
   page?: number;
   limit?: number;
@@ -111,7 +111,7 @@ export class TaskService {
    */
   async createTask(taskData: TaskCreate, userId?: string): Promise<TaskResponse> {
     const taskUuid = generateTaskUUID();
-    
+
     try {
       // Insert the task
       await this.db`
@@ -143,7 +143,6 @@ export class TaskService {
       await this.logActivity(taskUuid, userId || null, 'comment', null, null, 'Task created');
 
       return await this.getTaskByUuid(taskUuid);
-
     } catch (error) {
       console.error('Error creating task:', error);
       throw new Error(`Failed to create task: ${error}`);
@@ -178,7 +177,10 @@ export class TaskService {
       SELECT tag FROM task_tags WHERE task_uuid = ${uuid} ORDER BY tag
     `;
 
-    return this.formatTaskResponse(task, tags.map((t: any) => t.tag));
+    return this.formatTaskResponse(
+      task,
+      tags.map((t: any) => t.tag)
+    );
   }
 
   /**
@@ -186,18 +188,18 @@ export class TaskService {
    */
   async updateTask(taskData: TaskUpdate, userId?: string): Promise<TaskResponse> {
     const { uuid, ...updateData } = taskData;
-    
+
     // Get current task for change tracking
     const currentTask = await this.getTaskByUuid(uuid);
-    
+
     try {
       // Update fields individually using tagged template literals
-      const updates: Array<{field: string, value: any}> = [];
-      
+      const updates: Array<{ field: string; value: any }> = [];
+
       Object.entries(updateData).forEach(([key, value]) => {
         if (value !== undefined && key !== 'tags') {
           const dbField = this.camelToSnake(key);
-          updates.push({field: dbField, value});
+          updates.push({ field: dbField, value });
         }
       });
 
@@ -208,14 +210,14 @@ export class TaskService {
         updates.forEach(update => {
           updateFields[update.field] = update.value;
         });
-        
+
         // Generate SET clause dynamically
         const setClause = Object.keys(updateFields)
           .map((field, index) => `${field} = $${index + 2}`)
           .join(', ');
-        
+
         const values = [uuid, ...Object.values(updateFields)];
-        
+
         // Use raw query for dynamic field updates
         await this.db.query(
           `UPDATE tasks SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE uuid = $1`,
@@ -226,7 +228,7 @@ export class TaskService {
       // Update tags if provided
       if (taskData.tags !== undefined) {
         await this.db`DELETE FROM task_tags WHERE task_uuid = ${uuid}`;
-        
+
         if (taskData.tags.length > 0) {
           for (const tag of taskData.tags) {
             await this.db`
@@ -241,7 +243,6 @@ export class TaskService {
       await this.logTaskChanges(uuid, currentTask, updateData, userId);
 
       return await this.getTaskByUuid(uuid);
-
     } catch (error) {
       console.error('Error updating task:', error);
       throw new Error(`Failed to update task: ${error}`);
@@ -255,10 +256,10 @@ export class TaskService {
     try {
       // Log deletion
       await this.logActivity(uuid, userId || null, 'comment', null, null, 'Task deleted');
-      
+
       // Delete task (cascading will handle related records)
       const result = await this.db`DELETE FROM tasks WHERE uuid = ${uuid}`;
-      
+
       return true;
     } catch (error) {
       console.error('Error deleting task:', error);
@@ -271,10 +272,18 @@ export class TaskService {
    */
   async getTasks(query: TaskListQuery = {}): Promise<TaskListResponse> {
     const {
-      department, assignee, status, priority, tags, search,
-      dueBefore, dueAfter,
-      sortBy = 'createdAt', sortOrder = 'desc',
-      page = 1, limit = 20
+      department,
+      assignee,
+      status,
+      priority,
+      tags,
+      search,
+      dueBefore,
+      dueAfter,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      page = 1,
+      limit = 20,
     } = query;
 
     // Build WHERE conditions
@@ -331,13 +340,13 @@ export class TaskService {
 
     // Build ORDER BY
     const validSortFields = {
-      'title': 't.title',
-      'priority': 't.priority',
-      'status': 't.status', 
-      'progress': 't.progress',
-      'dueDate': 't.due_date',
-      'createdAt': 't.created_at',
-      'updatedAt': 't.updated_at'
+      title: 't.title',
+      priority: 't.priority',
+      status: 't.status',
+      progress: 't.progress',
+      dueDate: 't.due_date',
+      createdAt: 't.created_at',
+      updatedAt: 't.updated_at',
     };
 
     const orderBy = validSortFields[sortBy as keyof typeof validSortFields] || 't.created_at';
@@ -352,7 +361,7 @@ export class TaskService {
       WHERE ${conditions.join(' AND ')}
     `;
 
-    const countResult = await this.db.query(countQuery, params) as any[];
+    const countResult = (await this.db.query(countQuery, params)) as any[];
     const total = countResult[0]?.total || 0;
 
     // Get paginated results
@@ -372,19 +381,20 @@ export class TaskService {
       LIMIT ? OFFSET ?
     `;
 
-    const tasksResult = await this.db.query(tasksQuery, [...params, limit, offset]) as any[];
+    const tasksResult = (await this.db.query(tasksQuery, [...params, limit, offset])) as any[];
 
     // Get tags for all tasks
     const taskUuids = tasksResult.map((t: any) => t.uuid);
-    const tagsResult = taskUuids.length > 0 
-      ? await this.db.query(
-          `SELECT task_uuid, tag 
+    const tagsResult =
+      taskUuids.length > 0
+        ? await this.db.query(
+            `SELECT task_uuid, tag 
            FROM task_tags 
            WHERE task_uuid IN (${taskUuids.map((_, i) => `$${i + 1}`).join(', ')})
            ORDER BY tag`,
-          taskUuids
-        )
-      : [];
+            taskUuids
+          )
+        : [];
 
     const tagsByTask = tagsResult.reduce((acc: any, tag: any) => {
       if (!acc[tag.task_uuid]) acc[tag.task_uuid] = [];
@@ -393,7 +403,7 @@ export class TaskService {
     }, {});
 
     // Format tasks
-    const tasks = tasksResult.map((task: any) => 
+    const tasks = tasksResult.map((task: any) =>
       this.formatTaskResponse(task, tagsByTask[task.uuid] || [])
     );
 
@@ -408,7 +418,7 @@ export class TaskService {
       total,
       totalPages,
       hasNext: page < totalPages,
-      hasPrev: page > 1
+      hasPrev: page > 1,
     };
 
     return {
@@ -417,7 +427,7 @@ export class TaskService {
       pagination,
       filters: query,
       aggregates,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }
 
@@ -436,7 +446,7 @@ export class TaskService {
       GROUP BY status, priority
     `;
 
-    const result = await this.db.query(aggregateQuery, params) as any[];
+    const result = (await this.db.query(aggregateQuery, params)) as any[];
 
     const byStatus: Record<string, number> = {};
     const byPriority: Record<string, number> = {};
@@ -459,7 +469,7 @@ export class TaskService {
       byPriority,
       avgProgress: totalTasks > 0 ? Math.round(totalProgress / totalTasks) : 0,
       totalEstimatedHours,
-      totalActualHours
+      totalActualHours,
     };
   }
 
@@ -482,35 +492,39 @@ export class TaskService {
       actualHours: task.actual_hours,
       completedDate: task.completed_date,
       tags,
-      assignee: task.assignee_name ? {
-        id: task.assignee_id,
-        name: task.assignee_name,
-        email: task.assignee_email,
-        role: task.assignee_role
-      } : undefined,
-      reporter: task.reporter_name ? {
-        id: task.reporter_id,
-        name: task.reporter_name,
-        email: task.reporter_email,
-        role: task.reporter_role
-      } : undefined,
+      assignee: task.assignee_name
+        ? {
+            id: task.assignee_id,
+            name: task.assignee_name,
+            email: task.assignee_email,
+            role: task.assignee_role,
+          }
+        : undefined,
+      reporter: task.reporter_name
+        ? {
+            id: task.reporter_id,
+            name: task.reporter_name,
+            email: task.reporter_email,
+            role: task.reporter_role,
+          }
+        : undefined,
       department: {
         id: task.department_id,
         name: task.dept_name,
         displayName: task.dept_display_name,
-        icon: task.dept_icon
+        icon: task.dept_icon,
       },
       createdAt: task.created_at,
-      updatedAt: task.updated_at
+      updatedAt: task.updated_at,
     };
   }
 
   private async logActivity(
-    taskUuid: string, 
-    userId: string | null, 
-    activityType: string, 
-    oldValue: string | null, 
-    newValue: string | null, 
+    taskUuid: string,
+    userId: string | null,
+    activityType: string,
+    oldValue: string | null,
+    newValue: string | null,
     comment: string | null
   ): Promise<void> {
     await this.db`
@@ -520,24 +534,24 @@ export class TaskService {
   }
 
   private async logTaskChanges(
-    uuid: string, 
-    currentTask: TaskResponse, 
-    updates: Partial<TaskBase>, 
+    uuid: string,
+    currentTask: TaskResponse,
+    updates: Partial<TaskBase>,
     userId?: string
   ): Promise<void> {
-    const changes: Array<{type: string, field: string, oldValue: any, newValue: any}> = [];
+    const changes: Array<{ type: string; field: string; oldValue: any; newValue: any }> = [];
 
     // Check for field changes
     Object.entries(updates).forEach(([key, newValue]) => {
       if (key === 'tags') return; // Handle tags separately
-      
+
       const oldValue = (currentTask as any)[key];
       if (oldValue !== newValue) {
         changes.push({
           type: this.getActivityType(key),
           field: key,
           oldValue,
-          newValue
+          newValue,
         });
       }
     });
@@ -557,13 +571,13 @@ export class TaskService {
 
   private getActivityType(field: string): string {
     const mapping: Record<string, string> = {
-      'status': 'status_change',
-      'assigneeId': 'assignment',
-      'progress': 'progress_update',
-      'dueDate': 'due_date_change',
-      'priority': 'priority_change'
+      status: 'status_change',
+      assigneeId: 'assignment',
+      progress: 'progress_update',
+      dueDate: 'due_date_change',
+      priority: 'priority_change',
     };
-    
+
     return mapping[field] || 'comment';
   }
 
@@ -578,16 +592,16 @@ export async function handleTasksAPI(request: Request, env: Env): Promise<Respon
     const db = getDatabase(env);
     const sql = await db.getClient();
     const taskService = new TaskService(sql);
-    
+
     const url = new URL(request.url);
     const method = request.method;
-    
+
     // CORS headers
     const corsHeaders = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-User-ID',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     };
 
     if (method === 'OPTIONS') {
@@ -601,7 +615,7 @@ export async function handleTasksAPI(request: Request, env: Env): Promise<Respon
     if (method === 'GET' && url.pathname === '/api/tasks') {
       // List tasks with filtering/pagination
       const query: TaskListQuery = {};
-      
+
       // Parse query parameters
       url.searchParams.forEach((value, key) => {
         if (key === 'tags') {
@@ -621,69 +635,86 @@ export async function handleTasksAPI(request: Request, env: Env): Promise<Respon
       // Create new task
       const taskData: TaskCreate = await request.json();
       const result = await taskService.createTask(taskData, userId || undefined);
-      
-      return new Response(JSON.stringify({
-        success: true,
-        task: result
-      }), { status: 201, headers: corsHeaders });
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          task: result,
+        }),
+        { status: 201, headers: corsHeaders }
+      );
     }
 
     if (method === 'GET' && url.pathname.startsWith('/api/tasks/')) {
       // Get specific task
       const uuid = url.pathname.split('/').pop();
       if (!uuid) throw new Error('Task UUID required');
-      
+
       const result = await taskService.getTaskByUuid(uuid);
-      return new Response(JSON.stringify({
-        success: true,
-        task: result
-      }), { headers: corsHeaders });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          task: result,
+        }),
+        { headers: corsHeaders }
+      );
     }
 
     if (method === 'PUT' && url.pathname.startsWith('/api/tasks/')) {
       // Update task
       const uuid = url.pathname.split('/').pop();
       if (!uuid) throw new Error('Task UUID required');
-      
+
       const updates = await request.json();
       const result = await taskService.updateTask({ ...updates, uuid }, userId || undefined);
-      
-      return new Response(JSON.stringify({
-        success: true,
-        task: result
-      }), { headers: corsHeaders });
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          task: result,
+        }),
+        { headers: corsHeaders }
+      );
     }
 
     if (method === 'DELETE' && url.pathname.startsWith('/api/tasks/')) {
       // Delete task
       const uuid = url.pathname.split('/').pop();
       if (!uuid) throw new Error('Task UUID required');
-      
+
       await taskService.deleteTask(uuid, userId || undefined);
-      
-      return new Response(JSON.stringify({
-        success: true,
-        message: 'Task deleted successfully'
-      }), { headers: corsHeaders });
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: 'Task deleted successfully',
+        }),
+        { headers: corsHeaders }
+      );
     }
 
-    return new Response(JSON.stringify({
-      success: false,
-      error: 'Not found'
-    }), { status: 404, headers: corsHeaders });
-
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'Not found',
+      }),
+      { status: 404, headers: corsHeaders }
+    );
   } catch (error) {
     console.error('Task API Error:', error);
-    
-    return new Response(JSON.stringify({
-      success: false,
-      error: error instanceof Error ? error.message : 'Internal server error'
-    }), { 
-      status: 500, 
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : 'Internal server error',
+      }),
+      {
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
+        },
       }
-    });
+    );
   }
 }

@@ -2,15 +2,15 @@
 
 /**
  * 🎯 Queue Matching Performance Benchmarks
- * 
+ *
  * Tests the performance of the P2P transaction matching system
  */
 
 import BenchmarkRunner from './index';
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🎯 QUEUE BENCHMARKS
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 interface MockQueueItem {
   id: string;
@@ -28,7 +28,7 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
   const generateQueueItems = (count: number): MockQueueItem[] => {
     const items: MockQueueItem[] = [];
     const paymentTypes = ['bank_transfer', 'credit_card', 'crypto', 'paypal'];
-    
+
     for (let i = 0; i < count; i++) {
       items.push({
         id: `item_${i}`,
@@ -42,29 +42,29 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
     return items;
   };
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 BENCHMARK: Match Scoring Algorithm
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   const calculateMatchScore = (withdrawal: MockQueueItem, deposit: MockQueueItem): number => {
     let score = 100;
-    
+
     // Amount match (closer amounts get higher scores)
     const amountDiff = Math.abs(withdrawal.amount - deposit.amount);
     const amountScore = Math.max(0, 100 - (amountDiff / withdrawal.amount) * 100);
     score = (score + amountScore) / 2;
-    
+
     // Payment type match
     if (withdrawal.paymentType === deposit.paymentType) {
       score += 20;
     }
-    
+
     // Wait time priority
     const withdrawalWait = Date.now() - withdrawal.createdAt.getTime();
     const depositWait = Date.now() - deposit.createdAt.getTime();
     const waitScore = Math.min(20, (withdrawalWait + depositWait) / 60000);
     score += waitScore;
-    
+
     return Math.round(score);
   };
 
@@ -82,11 +82,14 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
     100000
   );
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 BENCHMARK: Find Best Match
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
-  const findBestMatch = (withdrawal: MockQueueItem, deposits: MockQueueItem[]): MockQueueItem | null => {
+  const findBestMatch = (
+    withdrawal: MockQueueItem,
+    deposits: MockQueueItem[]
+  ): MockQueueItem | null => {
     let bestMatch: MockQueueItem | null = null;
     let bestScore = 0;
 
@@ -113,9 +116,9 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
     1000
   );
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 BENCHMARK: Queue Sorting
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   await runner.benchmark(
     'Queue Priority Sorting (1000 items)',
@@ -133,9 +136,9 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
     100
   );
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 BENCHMARK: Batch Matching
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   const batchMatch = (withdrawals: MockQueueItem[], deposits: MockQueueItem[]) => {
     const matches: Array<{ withdrawal: MockQueueItem; deposit: MockQueueItem; score: number }> = [];
@@ -176,22 +179,25 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
     100
   );
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 BENCHMARK: Queue Statistics
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   const calculateQueueStats = (items: MockQueueItem[]) => {
     const now = new Date();
     const pendingWithdrawals = items.filter(i => i.type === 'withdrawal').length;
     const pendingDeposits = items.filter(i => i.type === 'deposit').length;
-    
+
     const waitTimes = items.map(i => now.getTime() - i.createdAt.getTime());
     const averageWaitTime = waitTimes.reduce((a, b) => a + b, 0) / waitTimes.length;
-    
-    const priorityGroups = items.reduce((acc, item) => {
-      acc[item.priority] = (acc[item.priority] || 0) + 1;
-      return acc;
-    }, {} as Record<number, number>);
+
+    const priorityGroups = items.reduce(
+      (acc, item) => {
+        acc[item.priority] = (acc[item.priority] || 0) + 1;
+        return acc;
+      },
+      {} as Record<number, number>
+    );
 
     return {
       total: items.length,
@@ -212,9 +218,9 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
     1000
   );
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 BENCHMARK: Queue Filtering
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   await runner.benchmark(
     'Queue Filtering (Payment Type)',
@@ -228,20 +234,20 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
     1000
   );
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 BENCHMARK: Match Validation
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   const validateMatch = (withdrawal: MockQueueItem, deposit: MockQueueItem): boolean => {
     // Validation rules
     if (deposit.amount < withdrawal.amount) return false;
     if (deposit.paymentType !== withdrawal.paymentType) return false;
     if (withdrawal.priority === 5 && deposit.priority < 3) return false;
-    
+
     // Check time constraints
     const timeDiff = Math.abs(withdrawal.createdAt.getTime() - deposit.createdAt.getTime());
     if (timeDiff > 7200000) return false; // 2 hour max difference
-    
+
     return true;
   };
 

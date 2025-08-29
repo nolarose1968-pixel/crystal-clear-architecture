@@ -15,42 +15,42 @@ export { BunxRegistry } from './bunx/BunxRegistry';
 export { CLI } from './cli/CLI';
 export { SecurityCLI } from './cli/SecurityCLI';
 export interface SecurityReport {
-    timestamp: string;
-    packageName: string;
-    version: string;
-    vulnerabilities: Vulnerability[];
-    riskLevel: 'low' | 'medium' | 'high' | 'critical';
-    score: number;
-    recommendations: string[];
+  timestamp: string;
+  packageName: string;
+  version: string;
+  vulnerabilities: Vulnerability[];
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  score: number;
+  recommendations: string[];
 }
 export interface Vulnerability {
-    id: string;
-    title: string;
-    description: string;
-    severity: 'low' | 'medium' | 'high' | 'critical';
-    cve?: string;
-    cwe?: string;
-    cvss?: number;
-    affectedVersions: string[];
-    patchedVersions: string[];
-    references: string[];
+  id: string;
+  title: string;
+  description: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  cve?: string;
+  cwe?: string;
+  cvss?: number;
+  affectedVersions: string[];
+  patchedVersions: string[];
+  references: string[];
 }
 export interface RegistryConfig {
-    url: string;
-    token?: string;
-    scopes: string[];
-    security: {
-        scanning: boolean;
-        audit: boolean;
-        strict: boolean;
-    };
+  url: string;
+  token?: string;
+  scopes: string[];
+  security: {
+    scanning: boolean;
+    audit: boolean;
+    strict: boolean;
+  };
 }
 export interface BunxConfig {
-    enabled: boolean;
-    globalPackages: string[];
-    securityChecks: boolean;
-    autoUpdate: boolean;
-    registry: RegistryConfig;
+  enabled: boolean;
+  globalPackages: string[];
+  securityChecks: boolean;
+  autoUpdate: boolean;
+  registry: RegistryConfig;
 }
 export * from './schemas/security.schema';
 export * from './schemas/registry.schema';

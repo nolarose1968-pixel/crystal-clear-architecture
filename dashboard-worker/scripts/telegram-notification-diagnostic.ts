@@ -69,9 +69,9 @@ class TelegramNotificationDiagnostic {
     return report;
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🧪 INDIVIDUAL DIAGNOSTIC TESTS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   /**
    * Test 1: Bot Token Validity
@@ -92,15 +92,15 @@ class TelegramNotificationDiagnostic {
             botId: botInfo.id,
             username: botInfo.username,
             canJoinGroups: botInfo.can_join_groups,
-            canReadAllGroupMessages: botInfo.can_read_all_group_messages
-          }
+            canReadAllGroupMessages: botInfo.can_read_all_group_messages,
+          },
         };
       } else {
         return {
           test: 'Bot Token Validity',
           status: 'FAIL',
           message: '❌ Invalid bot token or bot not found',
-          recommendation: 'Check your BOT_TOKEN environment variable and ensure the bot exists'
+          recommendation: 'Check your BOT_TOKEN environment variable and ensure the bot exists',
         };
       }
     } catch (error) {
@@ -108,7 +108,7 @@ class TelegramNotificationDiagnostic {
         test: 'Bot Token Validity',
         status: 'FAIL',
         message: `❌ Bot token test failed: ${error.message}`,
-        recommendation: 'Verify your BOT_TOKEN is correct and the bot has proper permissions'
+        recommendation: 'Verify your BOT_TOKEN is correct and the bot has proper permissions',
       };
     }
   }
@@ -126,7 +126,7 @@ class TelegramNotificationDiagnostic {
       const permissions = {
         canJoinGroups: botInfo.can_join_groups,
         canReadAllGroupMessages: botInfo.can_read_all_group_messages,
-        supportsInlineQueries: botInfo.supports_inline_queries
+        supportsInlineQueries: botInfo.supports_inline_queries,
       };
 
       const hasRequiredPermissions = permissions.canJoinGroups;
@@ -136,7 +136,7 @@ class TelegramNotificationDiagnostic {
           test: 'Bot Permissions',
           status: 'PASS',
           message: '✅ Bot has required permissions',
-          details: permissions
+          details: permissions,
         };
       } else {
         return {
@@ -144,7 +144,7 @@ class TelegramNotificationDiagnostic {
           status: 'WARN',
           message: '⚠️ Bot may have limited permissions',
           details: permissions,
-          recommendation: 'Ensure bot has permission to join groups and read messages'
+          recommendation: 'Ensure bot has permission to join groups and read messages',
         };
       }
     } catch (error) {
@@ -152,7 +152,7 @@ class TelegramNotificationDiagnostic {
         test: 'Bot Permissions',
         status: 'FAIL',
         message: `❌ Permission test failed: ${error.message}`,
-        recommendation: 'Check bot permissions in BotFather settings'
+        recommendation: 'Check bot permissions in BotFather settings',
       };
     }
   }
@@ -177,15 +177,15 @@ class TelegramNotificationDiagnostic {
             hasCustomCertificate: webhookInfo.has_custom_certificate,
             pendingUpdateCount: webhookInfo.pending_update_count,
             lastErrorDate: webhookInfo.last_error_date,
-            lastErrorMessage: webhookInfo.last_error_message
-          }
+            lastErrorMessage: webhookInfo.last_error_message,
+          },
         };
       } else {
         return {
           test: 'Webhook Configuration',
           status: 'WARN',
           message: '⚠️ No webhook configured (using polling mode)',
-          recommendation: 'Consider configuring webhook for better performance'
+          recommendation: 'Consider configuring webhook for better performance',
         };
       }
     } catch (error) {
@@ -193,7 +193,7 @@ class TelegramNotificationDiagnostic {
         test: 'Webhook Configuration',
         status: 'FAIL',
         message: `❌ Webhook test failed: ${error.message}`,
-        recommendation: 'Check webhook URL and SSL certificate configuration'
+        recommendation: 'Check webhook URL and SSL certificate configuration',
       };
     }
   }
@@ -217,14 +217,14 @@ class TelegramNotificationDiagnostic {
             test: 'Database Connectivity',
             status: 'PASS',
             message: '✅ Database connected and tables exist',
-            details: { tablesExist: true }
+            details: { tablesExist: true },
           };
         } else {
           return {
             test: 'Database Connectivity',
             status: 'WARN',
             message: '⚠️ Database connected but missing required tables',
-            recommendation: 'Run database migrations to create required tables'
+            recommendation: 'Run database migrations to create required tables',
           };
         }
       } else {
@@ -232,7 +232,7 @@ class TelegramNotificationDiagnostic {
           test: 'Database Connectivity',
           status: 'FAIL',
           message: '❌ Database connection failed',
-          recommendation: 'Check database configuration and connectivity'
+          recommendation: 'Check database configuration and connectivity',
         };
       }
     } catch (error) {
@@ -240,7 +240,7 @@ class TelegramNotificationDiagnostic {
         test: 'Database Connectivity',
         status: 'FAIL',
         message: `❌ Database test failed: ${error.message}`,
-        recommendation: 'Verify database credentials and network connectivity'
+        recommendation: 'Verify database credentials and network connectivity',
       };
     }
   }
@@ -256,7 +256,7 @@ class TelegramNotificationDiagnostic {
         test: 'User Mapping',
         status: 'WARN',
         message: '⚠️ No test user provided for mapping test',
-        recommendation: 'Provide test username or user ID to test user mapping'
+        recommendation: 'Provide test username or user ID to test user mapping',
       };
     }
 
@@ -271,15 +271,15 @@ class TelegramNotificationDiagnostic {
           details: {
             telegramId: userMapping.telegramId,
             username: userMapping.username,
-            customerId: userMapping.customerId
-          }
+            customerId: userMapping.customerId,
+          },
         };
       } else {
         return {
           test: 'User Mapping',
           status: 'WARN',
           message: '⚠️ User mapping not found',
-          recommendation: 'User needs to register or link their Telegram account'
+          recommendation: 'User needs to register or link their Telegram account',
         };
       }
     } catch (error) {
@@ -287,7 +287,7 @@ class TelegramNotificationDiagnostic {
         test: 'User Mapping',
         status: 'FAIL',
         message: `❌ User mapping test failed: ${error.message}`,
-        recommendation: 'Check user registration process and database schema'
+        recommendation: 'Check user registration process and database schema',
       };
     }
   }
@@ -303,7 +303,7 @@ class TelegramNotificationDiagnostic {
         test: 'Message Sending',
         status: 'WARN',
         message: '⚠️ No test user ID provided for message test',
-        recommendation: 'Provide test user ID to test message sending'
+        recommendation: 'Provide test user ID to test message sending',
       };
     }
 
@@ -314,7 +314,7 @@ class TelegramNotificationDiagnostic {
       const result = await bot.sendMessage({
         chat_id: this.testUserId,
         text: testMessage,
-        parse_mode: 'Markdown'
+        parse_mode: 'Markdown',
       });
 
       if (result && result.message_id) {
@@ -324,15 +324,15 @@ class TelegramNotificationDiagnostic {
           message: '✅ Test message sent successfully',
           details: {
             messageId: result.message_id,
-            chatId: result.chat.id
-          }
+            chatId: result.chat.id,
+          },
         };
       } else {
         return {
           test: 'Message Sending',
           status: 'FAIL',
           message: '❌ Failed to send test message',
-          recommendation: 'Check bot permissions and user access'
+          recommendation: 'Check bot permissions and user access',
         };
       }
     } catch (error) {
@@ -340,7 +340,7 @@ class TelegramNotificationDiagnostic {
         test: 'Message Sending',
         status: 'FAIL',
         message: `❌ Message sending test failed: ${error.message}`,
-        recommendation: 'Verify bot token and user permissions'
+        recommendation: 'Verify bot token and user permissions',
       };
     }
   }
@@ -359,7 +359,7 @@ class TelegramNotificationDiagnostic {
           test: 'Rate Limits',
           status: 'PASS',
           message: '✅ Within rate limits',
-          details: rateLimitStatus.details
+          details: rateLimitStatus.details,
         };
       } else {
         return {
@@ -367,7 +367,7 @@ class TelegramNotificationDiagnostic {
           status: 'WARN',
           message: '⚠️ Approaching or exceeding rate limits',
           details: rateLimitStatus.details,
-          recommendation: 'Implement rate limiting or reduce message frequency'
+          recommendation: 'Implement rate limiting or reduce message frequency',
         };
       }
     } catch (error) {
@@ -375,7 +375,7 @@ class TelegramNotificationDiagnostic {
         test: 'Rate Limits',
         status: 'FAIL',
         message: `❌ Rate limit test failed: ${error.message}`,
-        recommendation: 'Check Telegram API rate limits and implement proper handling'
+        recommendation: 'Check Telegram API rate limits and implement proper handling',
       };
     }
   }
@@ -394,7 +394,7 @@ class TelegramNotificationDiagnostic {
           test: 'Queue System',
           status: 'PASS',
           message: '✅ Queue system is healthy',
-          details: queueStatus.details
+          details: queueStatus.details,
         };
       } else {
         return {
@@ -402,7 +402,7 @@ class TelegramNotificationDiagnostic {
           status: 'WARN',
           message: '⚠️ Queue system has issues',
           details: queueStatus.details,
-          recommendation: 'Check queue configuration and processing'
+          recommendation: 'Check queue configuration and processing',
         };
       }
     } catch (error) {
@@ -410,7 +410,7 @@ class TelegramNotificationDiagnostic {
         test: 'Queue System',
         status: 'FAIL',
         message: `❌ Queue system test failed: ${error.message}`,
-        recommendation: 'Review queue implementation and configuration'
+        recommendation: 'Review queue implementation and configuration',
       };
     }
   }
@@ -429,7 +429,7 @@ class TelegramNotificationDiagnostic {
           test: 'Error Handling',
           status: 'PASS',
           message: '✅ Error handling is working correctly',
-          details: errorHandling.details
+          details: errorHandling.details,
         };
       } else {
         return {
@@ -437,7 +437,7 @@ class TelegramNotificationDiagnostic {
           status: 'WARN',
           message: '⚠️ Some error scenarios not handled properly',
           details: errorHandling.details,
-          recommendation: 'Improve error handling for edge cases'
+          recommendation: 'Improve error handling for edge cases',
         };
       }
     } catch (error) {
@@ -445,14 +445,14 @@ class TelegramNotificationDiagnostic {
         test: 'Error Handling',
         status: 'FAIL',
         message: `❌ Error handling test failed: ${error.message}`,
-        recommendation: 'Implement comprehensive error handling'
+        recommendation: 'Implement comprehensive error handling',
       };
     }
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🔧 HELPER METHODS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   private async checkDatabaseConnection(): Promise<boolean> {
     // Mock implementation - replace with actual database check
@@ -466,7 +466,12 @@ class TelegramNotificationDiagnostic {
 
   private async checkUserMapping(): Promise<any> {
     // Mock implementation - replace with actual user mapping check
-    return { exists: true, telegramId: this.testUserId, username: this.testUsername, customerId: 'test_customer' };
+    return {
+      exists: true,
+      telegramId: this.testUserId,
+      username: this.testUsername,
+      customerId: 'test_customer',
+    };
   }
 
   private async checkRateLimits(): Promise<any> {
@@ -484,16 +489,16 @@ class TelegramNotificationDiagnostic {
     return { allHandled: true, details: { scenariosTested: 5, passed: 5 } };
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 REPORT GENERATION
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   private generateReport(results: DiagnosticResult[]): DiagnosticReport {
     const summary = {
       total: results.length,
       passed: results.filter(r => r.status === 'PASS').length,
       warnings: results.filter(r => r.status === 'WARN').length,
-      failed: results.filter(r => r.status === 'FAIL').length
+      failed: results.filter(r => r.status === 'FAIL').length,
     };
 
     let overallStatus: DiagnosticReport['overallStatus'] = 'HEALTHY';
@@ -514,7 +519,7 @@ class TelegramNotificationDiagnostic {
       overallStatus,
       results,
       summary,
-      recommendations
+      recommendations,
     };
   }
 
@@ -561,15 +566,17 @@ class TelegramNotificationDiagnostic {
   }
 }
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🚀 CLI INTERFACE
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 async function main() {
   const args = process.argv.slice(2);
 
   if (args.length < 1) {
-    console.log('Usage: bun run scripts/telegram-notification-diagnostic.ts <BOT_TOKEN> [TEST_USER_ID] [TEST_USERNAME]');
+    console.log(
+      'Usage: bun run scripts/telegram-notification-diagnostic.ts <BOT_TOKEN> [TEST_USER_ID] [TEST_USERNAME]'
+    );
     console.log('');
     console.log('Arguments:');
     console.log('  BOT_TOKEN      - Your Telegram bot token');
@@ -577,7 +584,9 @@ async function main() {
     console.log('  TEST_USERNAME  - Telegram username for testing (optional)');
     console.log('');
     console.log('Example:');
-    console.log('  bun run scripts/telegram-notification-diagnostic.ts 1234567890:ABCDEF... 123456789 @testuser');
+    console.log(
+      '  bun run scripts/telegram-notification-diagnostic.ts 1234567890:ABCDEF... 123456789 @testuser'
+    );
     process.exit(1);
   }
 
@@ -591,7 +600,6 @@ async function main() {
     );
 
     await diagnostic.runFullDiagnostic();
-
   } catch (error) {
     console.error('❌ Diagnostic failed:', error);
     process.exit(1);

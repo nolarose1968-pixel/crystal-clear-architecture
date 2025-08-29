@@ -47,7 +47,7 @@ export class CrystalClearApiClient {
       baseURL: config.baseURL || 'https://api.crystal-clear-architecture.com',
       apiKey: config.apiKey || '',
       timeout: config.timeout || 30000,
-      retries: config.retries || 3
+      retries: config.retries || 3,
     };
   }
 
@@ -55,14 +55,14 @@ export class CrystalClearApiClient {
     const url = `${this.config.baseURL}${endpoint}`;
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${this.config.apiKey}`,
+      Authorization: `Bearer ${this.config.apiKey}`,
       'X-API-Key': this.config.apiKey,
-      ...options.headers
+      ...options.headers,
     };
 
     const requestOptions: RequestInit = {
       ...options,
-      headers
+      headers,
     };
 
     for (let attempt = 0; attempt < this.config.retries; attempt++) {
@@ -72,7 +72,7 @@ export class CrystalClearApiClient {
 
         const response = await fetch(url, {
           ...requestOptions,
-          signal: controller.signal
+          signal: controller.signal,
         });
 
         clearTimeout(timeoutId);
@@ -115,7 +115,7 @@ export class CrystalClearApiClient {
     try {
       await this.makeRequest(`/api/vip/clients/${clientId}/commission`, {
         method: 'PUT',
-        body: JSON.stringify({ commissionRate: rate })
+        body: JSON.stringify({ commissionRate: rate }),
       });
       return true;
     } catch (error) {
@@ -147,7 +147,7 @@ export class CrystalClearApiClient {
     try {
       await this.makeRequest(`/api/employees/${id}`, {
         method: 'PUT',
-        body: JSON.stringify(updates)
+        body: JSON.stringify(updates),
       });
       return true;
     } catch (error) {
@@ -179,7 +179,7 @@ export class CrystalClearApiClient {
     try {
       return await this.makeRequest('/api/fantasy402/bets', {
         method: 'POST',
-        body: JSON.stringify(betData)
+        body: JSON.stringify(betData),
       });
     } catch (error) {
       console.error('Failed to place bet:', error);
@@ -211,7 +211,7 @@ export class CrystalClearApiClient {
     try {
       return await this.makeRequest('/api/auth/login', {
         method: 'POST',
-        body: JSON.stringify(credentials)
+        body: JSON.stringify(credentials),
       });
     } catch (error) {
       console.error('Authentication failed:', error);
@@ -223,7 +223,7 @@ export class CrystalClearApiClient {
     try {
       await this.makeRequest('/api/auth/validate', {
         method: 'POST',
-        body: JSON.stringify({ token })
+        body: JSON.stringify({ token }),
       });
       return true;
     } catch (error) {
@@ -279,7 +279,7 @@ export function getApiClient(env?: any): CrystalClearApiClient {
       baseURL: env?.CRYSTAL_CLEAR_API_URL || 'https://api.crystal-clear-architecture.com',
       apiKey: env?.CRYSTAL_CLEAR_API_KEY || '',
       timeout: 30000,
-      retries: 3
+      retries: 3,
     };
     apiClient = new CrystalClearApiClient(config);
   }

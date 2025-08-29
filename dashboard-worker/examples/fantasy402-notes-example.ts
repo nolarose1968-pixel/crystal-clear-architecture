@@ -31,7 +31,9 @@ export async function basicFantasy402NotesExample() {
   if (integrationReady) {
     console.log('✅ Fantasy402 Notes Integration Ready');
   } else {
-    console.log('⚠️ Fantasy402 element not found, integration will initialize when element appears');
+    console.log(
+      '⚠️ Fantasy402 element not found, integration will initialize when element appears'
+    );
   }
 
   return notesManager;
@@ -45,7 +47,7 @@ export async function directXPathInteractionExample() {
 
   // Wait for element to be available
   const waitForElement = () => {
-    return new Promise<Element | null>((resolve) => {
+    return new Promise<Element | null>(resolve => {
       const checkElement = () => {
         const element = findFantasy402Element();
         if (element) {
@@ -98,7 +100,7 @@ Last Updated: ${new Date().toLocaleString()}`;
   const validateResult = await handleFantasy402Element('validate', {
     required: true,
     minLength: 10,
-    maxLength: 5000
+    maxLength: 5000,
   });
 
   console.log('🔍 Validation result:', validateResult);
@@ -156,7 +158,7 @@ Next Follow-up: Review lottery performance after next draw`;
   console.log('🔍 Step 3: Searching notes...');
   const searchResult = await client.searchPlayerNotes('lottery', {
     customerID: customerId,
-    limit: 5
+    limit: 5,
   });
 
   if (searchResult.success) {
@@ -170,7 +172,7 @@ Next Follow-up: Review lottery performance after next draw`;
   console.log('📊 Step 4: Getting notes by category...');
   const categoryResult = await client.getNotesByCategory('lottery', {
     customerID: customerId,
-    limit: 10
+    limit: 10,
   });
 
   if (categoryResult.success) {
@@ -192,7 +194,7 @@ export async function realTimeFantasy402MonitoringExample() {
 
     if (element) {
       // Add event listeners for real-time monitoring
-      element.addEventListener('input', (e) => {
+      element.addEventListener('input', e => {
         const target = e.target as HTMLTextAreaElement;
         console.log('📝 Real-time input:', target.value.length, 'characters');
 
@@ -259,7 +261,7 @@ export async function fantasy402DashboardIntegrationExample() {
       autoSync: true,
       realTimeUpdates: true,
       validation: true,
-      auditTrail: true
+      auditTrail: true,
     },
     callbacks: {
       onChange: async (newValue: string) => {
@@ -293,8 +295,8 @@ export async function fantasy402DashboardIntegrationExample() {
         } else {
           console.error('❌ Failed to save notes');
         }
-      }
-    }
+      },
+    },
   };
 
   // Setup the integration
@@ -304,7 +306,7 @@ export async function fantasy402DashboardIntegrationExample() {
     if (element) {
       // Add event listeners based on config
       if (integrationConfig.features.autoSync) {
-        element.addEventListener('input', async (e) => {
+        element.addEventListener('input', async e => {
           const target = e.target as HTMLTextAreaElement;
           const success = await integrationConfig.callbacks.onChange(target.value);
           if (!success) {
@@ -376,7 +378,6 @@ export async function completeFantasy402WorkflowExample() {
     await fantasy402DashboardIntegrationExample();
 
     console.log('✅ Complete Fantasy402 workflow finished successfully!');
-
   } catch (error) {
     console.error('❌ Complete workflow failed:', error);
   }
@@ -389,5 +390,5 @@ export {
   fantasy402AgentWorkflowExample,
   realTimeFantasy402MonitoringExample,
   fantasy402DashboardIntegrationExample,
-  completeFantasy402WorkflowExample
+  completeFantasy402WorkflowExample,
 };

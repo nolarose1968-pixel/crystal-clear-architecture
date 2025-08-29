@@ -209,13 +209,15 @@ export class MobileAppIntegration {
   /**
    * Register mobile device
    */
-  async registerDevice(deviceData: Omit<MobileDevice, 'id' | 'isActive' | 'registeredAt'>): Promise<MobileDevice> {
+  async registerDevice(
+    deviceData: Omit<MobileDevice, 'id' | 'isActive' | 'registeredAt'>
+  ): Promise<MobileDevice> {
     const deviceId = this.generateDeviceId();
     const device: MobileDevice = {
       ...deviceData,
       id: deviceId,
       isActive: true,
-      registeredAt: new Date().toISOString()
+      registeredAt: new Date().toISOString(),
     };
 
     // Store device
@@ -248,7 +250,7 @@ export class MobileAppIntegration {
       mobilePaymentData,
       riskScore: await this.calculateMobileRiskScore(customerId, deviceId, amount),
       createdAt: new Date().toISOString(),
-      metadata: {}
+      metadata: {},
     };
 
     this.paymentIntents.set(intent.id, intent);
@@ -279,7 +281,7 @@ export class MobileAppIntegration {
       intent.status = 'processing';
       intent.mobilePaymentData = {
         token: paymentData.token,
-        network: 'apple_pay'
+        network: 'apple_pay',
       };
 
       // Process with Apple Pay
@@ -296,7 +298,6 @@ export class MobileAppIntegration {
 
       intent.processedAt = new Date().toISOString();
       return result.success;
-
     } catch (error) {
       intent.status = 'failed';
       intent.failureReason = error instanceof Error ? error.message : 'Unknown error';
@@ -329,7 +330,7 @@ export class MobileAppIntegration {
       intent.status = 'processing';
       intent.mobilePaymentData = {
         token: paymentData.paymentMethodData.tokenizationData.token,
-        network: 'google_pay'
+        network: 'google_pay',
       };
 
       // Process with Google Pay
@@ -346,7 +347,6 @@ export class MobileAppIntegration {
 
       intent.processedAt = new Date().toISOString();
       return result.success;
-
     } catch (error) {
       intent.status = 'failed';
       intent.failureReason = error instanceof Error ? error.message : 'Unknown error';
@@ -369,7 +369,7 @@ export class MobileAppIntegration {
       deviceId,
       customerId,
       sentAt: new Date().toISOString(),
-      status: 'pending'
+      status: 'pending',
     };
 
     // Store notification
@@ -393,7 +393,6 @@ export class MobileAppIntegration {
 
       pushNotification.status = 'sent';
       return true;
-
     } catch (error) {
       pushNotification.status = 'failed';
       pushNotification.failureReason = error instanceof Error ? error.message : 'Unknown error';
@@ -419,7 +418,7 @@ export class MobileAppIntegration {
       events: [],
       deviceInfo,
       locationData,
-      metadata: {}
+      metadata: {},
     };
 
     this.sessions.set(session.id, session);
@@ -435,25 +434,22 @@ export class MobileAppIntegration {
 
     session.endTime = new Date().toISOString();
     if (session.startTime) {
-      session.duration = new Date(session.endTime).getTime() - new Date(session.startTime).getTime();
+      session.duration =
+        new Date(session.endTime).getTime() - new Date(session.startTime).getTime();
     }
   }
 
   /**
    * Track mobile app event
    */
-  async trackEvent(
-    sessionId: string,
-    eventType: string,
-    data: Record<string, any>
-  ): Promise<void> {
+  async trackEvent(sessionId: string, eventType: string, data: Record<string, any>): Promise<void> {
     const session = this.sessions.get(sessionId);
     if (!session) return;
 
     session.events.push({
       eventType,
       timestamp: new Date().toISOString(),
-      data
+      data,
     });
   }
 
@@ -474,7 +470,7 @@ export class MobileAppIntegration {
       payments: await this.gatherPaymentAnalytics(customerId, deviceId, period),
       notifications: await this.gatherNotificationAnalytics(deviceId, period),
       performance: await this.gatherPerformanceAnalytics(deviceId, period),
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
 
     this.analytics.set(`${customerId}_${deviceId}`, analytics);
@@ -506,7 +502,11 @@ export class MobileAppIntegration {
   }
 
   // Private helper methods
-  private async calculateMobileRiskScore(customerId: string, deviceId: string, amount: number): Promise<number> {
+  private async calculateMobileRiskScore(
+    customerId: string,
+    deviceId: string,
+    amount: number
+  ): Promise<number> {
     let score = 0;
 
     // Device-based risk
@@ -525,36 +525,41 @@ export class MobileAppIntegration {
     if (amount > 5000) score += 25;
 
     // Historical risk
-    const recentIntents = this.getCustomerPaymentIntents(customerId)
-      .filter(intent => {
-        const intentAge = Date.now() - new Date(intent.createdAt).getTime();
-        return intentAge < 24 * 60 * 60 * 1000; // Last 24 hours
-      });
+    const recentIntents = this.getCustomerPaymentIntents(customerId).filter(intent => {
+      const intentAge = Date.now() - new Date(intent.createdAt).getTime();
+      return intentAge < 24 * 60 * 60 * 1000; // Last 24 hours
+    });
 
     if (recentIntents.length > 5) score += 10; // Many recent transactions
 
     return Math.min(score, 100);
   }
 
-  private async processWithApplePay(intent: MobilePaymentIntent, paymentData: any): Promise<{ success: boolean; error?: string }> {
+  private async processWithApplePay(
+    intent: MobilePaymentIntent,
+    paymentData: any
+  ): Promise<{ success: boolean; error?: string }> {
     // Simulate Apple Pay processing
     console.log(`Processing Apple Pay payment: ${intent.amount} ${intent.currency}`);
 
     // In real implementation, would decrypt token and process with Apple Pay servers
     return {
       success: Math.random() > 0.05, // 95% success rate
-      error: Math.random() > 0.05 ? undefined : 'Payment declined'
+      error: Math.random() > 0.05 ? undefined : 'Payment declined',
     };
   }
 
-  private async processWithGooglePay(intent: MobilePaymentIntent, paymentData: any): Promise<{ success: boolean; error?: string }> {
+  private async processWithGooglePay(
+    intent: MobilePaymentIntent,
+    paymentData: any
+  ): Promise<{ success: boolean; error?: string }> {
     // Simulate Google Pay processing
     console.log(`Processing Google Pay payment: ${intent.amount} ${intent.currency}`);
 
     // In real implementation, would validate token and process with Google Pay
     return {
       success: Math.random() > 0.03, // 97% success rate
-      error: Math.random() > 0.03 ? undefined : 'Payment failed'
+      error: Math.random() > 0.03 ? undefined : 'Payment failed',
     };
   }
 
@@ -582,11 +587,19 @@ export class MobileAppIntegration {
     notification.deliveredAt = new Date().toISOString();
   }
 
-  private async gatherUsageAnalytics(customerId: string, deviceId: string, period: any): Promise<MobileAnalytics['usage']> {
+  private async gatherUsageAnalytics(
+    customerId: string,
+    deviceId: string,
+    period: any
+  ): Promise<MobileAnalytics['usage']> {
     // Gather usage analytics from sessions
-    const sessions = Array.from(this.sessions.values())
-      .filter(s => s.customerId === customerId && s.deviceId === deviceId &&
-                   s.startTime >= period.startDate && (s.endTime || s.startTime) <= period.endDate);
+    const sessions = Array.from(this.sessions.values()).filter(
+      s =>
+        s.customerId === customerId &&
+        s.deviceId === deviceId &&
+        s.startTime >= period.startDate &&
+        (s.endTime || s.startTime) <= period.endDate
+    );
 
     const appOpens = sessions.length;
     const totalDuration = sessions.reduce((sum, s) => sum + (s.duration || 0), 0);
@@ -613,13 +626,18 @@ export class MobileAppIntegration {
       sessionDuration: totalDuration,
       averageSessionLength,
       screenViews,
-      featureUsage
+      featureUsage,
     };
   }
 
-  private async gatherPaymentAnalytics(customerId: string, deviceId: string, period: any): Promise<MobileAnalytics['payments']> {
-    const intents = this.getCustomerPaymentIntents(customerId)
-      .filter(intent => intent.createdAt >= period.startDate && intent.createdAt <= period.endDate);
+  private async gatherPaymentAnalytics(
+    customerId: string,
+    deviceId: string,
+    period: any
+  ): Promise<MobileAnalytics['payments']> {
+    const intents = this.getCustomerPaymentIntents(customerId).filter(
+      intent => intent.createdAt >= period.startDate && intent.createdAt <= period.endDate
+    );
 
     const totalPayments = intents.length;
     const successfulPayments = intents.filter(i => i.status === 'completed').length;
@@ -638,13 +656,17 @@ export class MobileAppIntegration {
       failedPayments,
       totalAmount,
       averagePaymentAmount,
-      paymentMethods
+      paymentMethods,
     };
   }
 
-  private async gatherNotificationAnalytics(deviceId: string, period: any): Promise<MobileAnalytics['notifications']> {
-    const notifications = this.getDeviceNotifications(deviceId)
-      .filter(n => n.sentAt && n.sentAt >= period.startDate && n.sentAt <= period.endDate);
+  private async gatherNotificationAnalytics(
+    deviceId: string,
+    period: any
+  ): Promise<MobileAnalytics['notifications']> {
+    const notifications = this.getDeviceNotifications(deviceId).filter(
+      n => n.sentAt && n.sentAt >= period.startDate && n.sentAt <= period.endDate
+    );
 
     const sent = notifications.length;
     const delivered = notifications.filter(n => n.status === 'delivered').length;
@@ -657,21 +679,27 @@ export class MobileAppIntegration {
       delivered,
       opened,
       deliveryRate,
-      openRate
+      openRate,
     };
   }
 
-  private async gatherPerformanceAnalytics(deviceId: string, period: any): Promise<MobileAnalytics['performance']> {
+  private async gatherPerformanceAnalytics(
+    deviceId: string,
+    period: any
+  ): Promise<MobileAnalytics['performance']> {
     // Gather performance metrics from sessions
-    const sessions = Array.from(this.sessions.values())
-      .filter(s => s.deviceId === deviceId &&
-                   s.startTime >= period.startDate && (s.endTime || s.startTime) <= period.endDate);
+    const sessions = Array.from(this.sessions.values()).filter(
+      s =>
+        s.deviceId === deviceId &&
+        s.startTime >= period.startDate &&
+        (s.endTime || s.startTime) <= period.endDate
+    );
 
     // Simulate performance metrics
     return {
       crashRate: 0.02, // 2% crash rate
       loadTime: 1200, // 1.2 seconds
-      apiResponseTime: 800 // 800ms
+      apiResponseTime: 800, // 800ms
     };
   }
 
@@ -713,11 +741,12 @@ export class MobileAppIntegration {
     const totalPaymentIntents = paymentIntents.length;
     const successfulPayments = paymentIntents.filter(i => i.status === 'completed').length;
 
-    const pushNotificationsSent = Array.from(this.pushNotifications.values())
-      .reduce((sum, notifications) => sum + notifications.length, 0);
+    const pushNotificationsSent = Array.from(this.pushNotifications.values()).reduce(
+      (sum, notifications) => sum + notifications.length,
+      0
+    );
 
-    const activeSessions = Array.from(this.sessions.values())
-      .filter(s => !s.endTime).length;
+    const activeSessions = Array.from(this.sessions.values()).filter(s => !s.endTime).length;
 
     return {
       totalDevices,
@@ -725,7 +754,7 @@ export class MobileAppIntegration {
       totalPaymentIntents,
       successfulPayments,
       pushNotificationsSent,
-      activeSessions
+      activeSessions,
     };
   }
 }

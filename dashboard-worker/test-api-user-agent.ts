@@ -7,7 +7,7 @@
 import { Fire22Config } from './src/config/fire22-config';
 
 console.log('🧪 Testing API User-Agent Configuration\n');
-console.log('=' .repeat(60));
+console.log('='.repeat(60));
 
 // Display configuration
 Fire22Config.logConfiguration();
@@ -21,8 +21,8 @@ const testEndpoints = [
     body: {
       agentID: 'BLAKEPPH',
       week: 0,
-      operation: 'getWeeklyFigureByAgentLite'
-    }
+      operation: 'getWeeklyFigureByAgentLite',
+    },
   },
   {
     name: 'Fire22 Proxy',
@@ -30,39 +30,39 @@ const testEndpoints = [
     method: 'POST',
     body: {
       customerID: 'TEST001',
-      agentID: 'BLAKEPPH'
-    }
-  }
+      agentID: 'BLAKEPPH',
+    },
+  },
 ];
 
 async function testEndpoint(endpoint: any) {
   console.log(`\n📡 Testing: ${endpoint.name}`);
   console.log(`   URL: ${endpoint.url}`);
-  
+
   try {
     // Test with our configured headers
     const headers = Fire22Config.getDefaultHeaders();
-    
+
     const response = await fetch(endpoint.url, {
       method: endpoint.method,
       headers: {
         ...headers,
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer test-token'
+        Authorization: 'Bearer test-token',
       },
-      body: JSON.stringify(endpoint.body)
+      body: JSON.stringify(endpoint.body),
     });
-    
+
     console.log(`   Status: ${response.status} ${response.statusText}`);
     console.log(`   User-Agent sent: ${headers['User-Agent']}`);
-    
+
     // Check if server echoes back headers (if available)
     const responseHeaders = response.headers;
     const serverUA = responseHeaders.get('x-received-user-agent');
     if (serverUA) {
       console.log(`   Server received: ${serverUA}`);
     }
-    
+
     return true;
   } catch (error: any) {
     console.log(`   ❌ Error: ${error.message}`);
@@ -72,7 +72,7 @@ async function testEndpoint(endpoint: any) {
 
 // Run tests
 console.log('\n🚀 Running API Tests...');
-console.log('=' .repeat(60));
+console.log('='.repeat(60));
 
 let allPassed = true;
 
@@ -83,7 +83,7 @@ for (const endpoint of testEndpoints) {
 
 // Test with different environments
 console.log('\n🌍 Testing Different Environments...');
-console.log('=' .repeat(60));
+console.log('='.repeat(60));
 
 const environments = ['development', 'staging', 'production'];
 
@@ -95,10 +95,12 @@ for (const env of environments) {
 
 // Summary
 console.log('\n📊 Test Summary');
-console.log('=' .repeat(60));
+console.log('='.repeat(60));
 console.log(`✅ Configuration: Working`);
 console.log(`✅ Headers: Properly set`);
 console.log(`✅ Environment detection: Working`);
-console.log(`${allPassed ? '✅' : '❌'} API endpoints: ${allPassed ? 'All using proper user-agent' : 'Some tests failed'}`);
+console.log(
+  `${allPassed ? '✅' : '❌'} API endpoints: ${allPassed ? 'All using proper user-agent' : 'Some tests failed'}`
+);
 
 console.log('\n✅ Test Complete!');

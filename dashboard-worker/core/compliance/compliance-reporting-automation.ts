@@ -82,7 +82,12 @@ export interface RegulatoryFiling {
 
 export interface ComplianceAlert {
   id: string;
-  alertType: 'suspicious_transaction' | 'pep_match' | 'sanctions_match' | 'threshold_breach' | 'compliance_violation';
+  alertType:
+    | 'suspicious_transaction'
+    | 'pep_match'
+    | 'sanctions_match'
+    | 'threshold_breach'
+    | 'compliance_violation';
   severity: 'low' | 'medium' | 'high' | 'critical';
   customerId?: string;
   transactionId?: string;
@@ -151,7 +156,7 @@ export class ComplianceReportingAutomation {
       data: reportData,
       generatedAt: new Date().toISOString(),
       createdBy,
-      metadata: {}
+      metadata: {},
     };
 
     this.reports.set(report.id, report);
@@ -181,7 +186,7 @@ export class ComplianceReportingAutomation {
       data,
       attachments: [],
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     // Prepare filing data
@@ -215,7 +220,7 @@ export class ComplianceReportingAutomation {
       details,
       status: 'active',
       createdAt: new Date().toISOString(),
-      followUpActions: this.generateFollowUpActions(alertType, severity)
+      followUpActions: this.generateFollowUpActions(alertType, severity),
     };
 
     this.alerts.set(alert.id, alert);
@@ -255,17 +260,24 @@ export class ComplianceReportingAutomation {
 
     // Check for suspicious patterns
     if (this.config.transactionMonitoring.enabled) {
-      const suspiciousPatterns = await this.detectSuspiciousPatterns(customerId, amount, transactionType, metadata);
+      const suspiciousPatterns = await this.detectSuspiciousPatterns(
+        customerId,
+        amount,
+        transactionType,
+        metadata
+      );
       if (suspiciousPatterns.length > 0) {
         flags.push(...suspiciousPatterns);
-        alerts.push(await this.createAlert(
-          'suspicious_transaction',
-          'medium',
-          `Suspicious transaction pattern detected: ${suspiciousPatterns.join(', ')}`,
-          { customerId, transactionId, amount, patterns: suspiciousPatterns },
-          customerId,
-          transactionId
-        ));
+        alerts.push(
+          await this.createAlert(
+            'suspicious_transaction',
+            'medium',
+            `Suspicious transaction pattern detected: ${suspiciousPatterns.join(', ')}`,
+            { customerId, transactionId, amount, patterns: suspiciousPatterns },
+            customerId,
+            transactionId
+          )
+        );
       }
     }
 
@@ -274,14 +286,16 @@ export class ComplianceReportingAutomation {
       const pepMatch = await this.checkPEPStatus(customerId);
       if (pepMatch) {
         flags.push('pep_match');
-        alerts.push(await this.createAlert(
-          'pep_match',
-          'high',
-          'Politically Exposed Person transaction detected',
-          { customerId, transactionId, pepDetails: pepMatch },
-          customerId,
-          transactionId
-        ));
+        alerts.push(
+          await this.createAlert(
+            'pep_match',
+            'high',
+            'Politically Exposed Person transaction detected',
+            { customerId, transactionId, pepDetails: pepMatch },
+            customerId,
+            transactionId
+          )
+        );
       }
     }
 
@@ -289,35 +303,46 @@ export class ComplianceReportingAutomation {
       const sanctionsMatch = await this.checkSanctionsStatus(customerId);
       if (sanctionsMatch) {
         flags.push('sanctions_match');
-        alerts.push(await this.createAlert(
-          'sanctions_match',
-          'critical',
-          'Sanctions list match detected',
-          { customerId, transactionId, sanctionsDetails: sanctionsMatch },
-          customerId,
-          transactionId
-        ));
+        alerts.push(
+          await this.createAlert(
+            'sanctions_match',
+            'critical',
+            'Sanctions list match detected',
+            { customerId, transactionId, sanctionsDetails: sanctionsMatch },
+            customerId,
+            transactionId
+          )
+        );
       }
     }
 
     return {
       compliant: flags.length === 0,
       alerts,
-      flags
+      flags,
     };
   }
 
   /**
    * Schedule compliance report
    */
-  createSchedule(scheduleData: Omit<ComplianceSchedule, 'id' | 'lastGenerated' | 'nextDue' | 'createdAt' | 'updatedAt'>): ComplianceSchedule {
+  createSchedule(
+    scheduleData: Omit<
+      ComplianceSchedule,
+      'id' | 'lastGenerated' | 'nextDue' | 'createdAt' | 'updatedAt'
+    >
+  ): ComplianceSchedule {
     const schedule: ComplianceSchedule = {
       ...scheduleData,
       id: this.generateScheduleId(),
       lastGenerated: undefined,
-      nextDue: this.calculateNextDueDate(scheduleData.frequency, scheduleData.dueDay, scheduleData.dueTime),
+      nextDue: this.calculateNextDueDate(
+        scheduleData.frequency,
+        scheduleData.dueDay,
+        scheduleData.dueTime
+      ),
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.schedules.set(schedule.id, schedule);
@@ -354,7 +379,9 @@ export class ComplianceReportingAutomation {
       }
     }
 
-    return reports.sort((a, b) => new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime());
+    return reports.sort(
+      (a, b) => new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime()
+    );
   }
 
   /**
@@ -383,7 +410,9 @@ export class ComplianceReportingAutomation {
       }
     }
 
-    return filings.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return filings.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
   }
 
   /**
@@ -439,7 +468,7 @@ export class ComplianceReportingAutomation {
       suspiciousActivities: [],
       totalAmount: 0,
       affectedCustomers: 0,
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
   }
 
@@ -451,7 +480,7 @@ export class ComplianceReportingAutomation {
       transactionsOver10k: [],
       totalAmount: 0,
       transactionCount: 0,
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
   }
 
@@ -462,7 +491,7 @@ export class ComplianceReportingAutomation {
       period,
       suspiciousTransactions: [],
       riskCategories: {},
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
   }
 
@@ -474,7 +503,7 @@ export class ComplianceReportingAutomation {
       leiCode: this.config.euMifir.leiCode,
       transactions: [],
       totalVolume: 0,
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
   }
 
@@ -486,7 +515,7 @@ export class ComplianceReportingAutomation {
       monitoredTransactions: [],
       alertsTriggered: 0,
       complianceActions: [],
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
   }
 
@@ -498,11 +527,14 @@ export class ComplianceReportingAutomation {
       auditEvents: [],
       complianceViolations: [],
       correctiveActions: [],
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
   }
 
-  private async gatherTransactionMonitoringData(jurisdiction: string, period: any): Promise<Record<string, any>> {
+  private async gatherTransactionMonitoringData(
+    jurisdiction: string,
+    period: any
+  ): Promise<Record<string, any>> {
     // Gather transaction monitoring data
     return {
       jurisdiction,
@@ -510,7 +542,7 @@ export class ComplianceReportingAutomation {
       monitoredTransactions: [],
       riskAssessments: [],
       flaggedActivities: [],
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
   }
 
@@ -579,7 +611,10 @@ export class ComplianceReportingAutomation {
     return null; // Mock - no match
   }
 
-  private generateFollowUpActions(alertType: ComplianceAlert['alertType'], severity: ComplianceAlert['severity']): string[] {
+  private generateFollowUpActions(
+    alertType: ComplianceAlert['alertType'],
+    severity: ComplianceAlert['severity']
+  ): string[] {
     const actions: string[] = [];
 
     if (severity === 'critical') {
@@ -623,7 +658,7 @@ export class ComplianceReportingAutomation {
         dueTime: '09:00',
         autoGenerate: true,
         autoSubmit: false,
-        notificationDays: [7, 3, 1]
+        notificationDays: [7, 3, 1],
       },
       {
         reportType: 'ctr' as const,
@@ -633,7 +668,7 @@ export class ComplianceReportingAutomation {
         dueTime: '09:00',
         autoGenerate: true,
         autoSubmit: false,
-        notificationDays: [7, 3, 1]
+        notificationDays: [7, 3, 1],
       },
       {
         reportType: 'transaction_monitoring' as const,
@@ -643,8 +678,8 @@ export class ComplianceReportingAutomation {
         dueTime: '09:00',
         autoGenerate: true,
         autoSubmit: false,
-        notificationDays: [2, 1]
-      }
+        notificationDays: [2, 1],
+      },
     ];
 
     defaultSchedules.forEach(schedule => {
@@ -654,9 +689,12 @@ export class ComplianceReportingAutomation {
 
   private startScheduler(): void {
     // Check schedules every hour
-    setInterval(() => {
-      this.checkSchedules();
-    }, 60 * 60 * 1000);
+    setInterval(
+      () => {
+        this.checkSchedules();
+      },
+      60 * 60 * 1000
+    );
   }
 
   private async checkSchedules(): Promise<void> {
@@ -691,15 +729,27 @@ export class ComplianceReportingAutomation {
     const period = this.calculateReportingPeriod(schedule.frequency, schedule.dueDay);
 
     // Generate report
-    const report = await this.generateReport(schedule.reportType, schedule.jurisdiction, period, 'system');
+    const report = await this.generateReport(
+      schedule.reportType,
+      schedule.jurisdiction,
+      period,
+      'system'
+    );
 
     // Update schedule
     schedule.lastGenerated = new Date().toISOString();
-    schedule.nextDue = this.calculateNextDueDate(schedule.frequency, schedule.dueDay, schedule.dueTime);
+    schedule.nextDue = this.calculateNextDueDate(
+      schedule.frequency,
+      schedule.dueDay,
+      schedule.dueTime
+    );
     schedule.updatedAt = new Date().toISOString();
   }
 
-  private calculateReportingPeriod(frequency: ComplianceSchedule['frequency'], dueDay: number): { startDate: string; endDate: string } {
+  private calculateReportingPeriod(
+    frequency: ComplianceSchedule['frequency'],
+    dueDay: number
+  ): { startDate: string; endDate: string } {
     const now = new Date();
     let startDate: Date;
     let endDate: Date;
@@ -728,11 +778,15 @@ export class ComplianceReportingAutomation {
 
     return {
       startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0]
+      endDate: endDate.toISOString().split('T')[0],
     };
   }
 
-  private calculateNextDueDate(frequency: ComplianceSchedule['frequency'], dueDay: number, dueTime: string): string {
+  private calculateNextDueDate(
+    frequency: ComplianceSchedule['frequency'],
+    dueDay: number,
+    dueTime: string
+  ): string {
     const now = new Date();
     let nextDue: Date;
 
@@ -766,7 +820,10 @@ export class ComplianceReportingAutomation {
     return nextDue.toISOString();
   }
 
-  private async sendScheduleNotification(schedule: ComplianceSchedule, daysBefore: number): Promise<void> {
+  private async sendScheduleNotification(
+    schedule: ComplianceSchedule,
+    daysBefore: number
+  ): Promise<void> {
     console.log(`Sending ${daysBefore}-day notification for ${schedule.reportType} report`);
   }
 
@@ -810,7 +867,9 @@ export class ComplianceReportingAutomation {
     // Count upcoming deadlines (next 30 days)
     const thirtyDaysFromNow = new Date();
     thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-    const upcomingDeadlines = schedules.filter(s => new Date(s.nextDue) <= thirtyDaysFromNow).length;
+    const upcomingDeadlines = schedules.filter(
+      s => new Date(s.nextDue) <= thirtyDaysFromNow
+    ).length;
 
     const complianceRate = totalReports > 0 ? (submittedReports / totalReports) * 100 : 100;
 
@@ -820,7 +879,7 @@ export class ComplianceReportingAutomation {
       activeAlerts,
       scheduledReports,
       upcomingDeadlines,
-      complianceRate
+      complianceRate,
     };
   }
 }

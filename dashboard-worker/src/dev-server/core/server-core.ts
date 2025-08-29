@@ -10,7 +10,7 @@ import type {
   RouteHandler,
   ServerStats,
   ServerError,
-  ServerMode
+  ServerMode,
 } from '../../../core/types/dev-server';
 
 export class ServerCore {
@@ -35,7 +35,7 @@ export class ServerCore {
       logLevel: 'info',
       maxConnections: 100,
       timeout: 30000,
-      ...config
+      ...config,
     };
 
     this.startTime = new Date();
@@ -59,17 +59,18 @@ export class ServerCore {
       this.server = {
         port: this.config.port,
         host: this.config.host,
-        started: true
+        started: true,
       };
 
       this.log('info', 'Server started successfully', {
         port: this.config.port,
         host: this.config.host,
-        mode: this.config.mode
+        mode: this.config.mode,
       });
-
     } catch (error) {
-      this.log('error', 'Failed to start server', { error: error instanceof Error ? error.message : 'Unknown error' });
+      this.log('error', 'Failed to start server', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
       throw error;
     }
   }
@@ -88,7 +89,9 @@ export class ServerCore {
         this.log('info', 'Server stopped successfully');
       }
     } catch (error) {
-      this.log('error', 'Failed to stop server', { error: error instanceof Error ? error.message : 'Unknown error' });
+      this.log('error', 'Failed to stop server', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
       throw error;
     }
   }
@@ -100,7 +103,7 @@ export class ServerCore {
     const pattern = this.pathToRegex(route.path);
     const routeHandler: RouteHandler = {
       ...route,
-      pattern
+      pattern,
     };
 
     const key = `${route.method}:${route.path}`;
@@ -128,7 +131,7 @@ export class ServerCore {
         ...request,
         clientId: this.generateClientId(),
         sessionId: this.generateSessionId(),
-        startTime: new Date(startTime)
+        startTime: new Date(startTime),
       };
 
       // Apply middleware
@@ -147,7 +150,6 @@ export class ServerCore {
       this.updateRequestStats(processingTime, response.status === 200);
 
       return response;
-
     } catch (error) {
       const processingTime = Date.now() - startTime;
       this.updateRequestStats(processingTime, false);
@@ -167,7 +169,7 @@ export class ServerCore {
 
     return {
       ...this.stats,
-      uptime
+      uptime,
     };
   }
 
@@ -199,13 +201,13 @@ export class ServerCore {
       config: {
         mode: this.config.mode,
         hmrEnabled: this.config.hmrEnabled,
-        liveReloadEnabled: this.config.liveReloadEnabled
-      }
+        liveReloadEnabled: this.config.liveReloadEnabled,
+      },
     };
 
     return new Response(JSON.stringify(health), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
@@ -220,12 +222,12 @@ export class ServerCore {
       memoryUsage: {
         used: 0,
         total: 100 * 1024 * 1024, // 100MB
-        percentage: 0
+        percentage: 0,
       },
       fileChanges: 0,
       hmrMessages: 0,
       errors: 0,
-      averageResponseTime: 0
+      averageResponseTime: 0,
     };
   }
 
@@ -234,7 +236,7 @@ export class ServerCore {
     this.registerRoute({
       method: 'GET',
       path: '/health',
-      handler: this.healthCheck.bind(this)
+      handler: this.healthCheck.bind(this),
     });
 
     // Status route
@@ -245,9 +247,9 @@ export class ServerCore {
         const stats = this.getStats();
         return new Response(JSON.stringify(stats), {
           status: 200,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
         });
-      }
+      },
     });
 
     this.log('info', 'Default routes registered');
@@ -317,7 +319,8 @@ export class ServerCore {
 
     // Update average response time
     const currentAvg = this.stats.averageResponseTime;
-    const newAvg = (currentAvg * (this.stats.totalRequests - 1) + processingTime) / this.stats.totalRequests;
+    const newAvg =
+      (currentAvg * (this.stats.totalRequests - 1) + processingTime) / this.stats.totalRequests;
     this.stats.averageResponseTime = Math.round(newAvg);
   }
 
@@ -326,14 +329,17 @@ export class ServerCore {
     error.code = 'SERVER_ERROR';
     error.statusCode = statusCode;
 
-    return new Response(JSON.stringify({
-      error: message,
-      code: error.code,
-      timestamp: new Date().toISOString()
-    }), {
-      status: statusCode,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: message,
+        code: error.code,
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        status: statusCode,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 
   private log(level: string, message: string, data?: any): void {

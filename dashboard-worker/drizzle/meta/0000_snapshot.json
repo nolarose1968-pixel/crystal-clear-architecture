@@ -79,12 +79,8 @@
           "name": "bets_customer_id_customers_id_fk",
           "tableFrom": "bets",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -149,9 +145,7 @@
       "indexes": {
         "customers_customer_id_unique": {
           "name": "customers_customer_id_unique",
-          "columns": [
-            "customer_id"
-          ],
+          "columns": ["customer_id"],
           "isUnique": true
         }
       },

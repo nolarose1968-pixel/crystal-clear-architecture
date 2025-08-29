@@ -15,7 +15,8 @@ serve({
         headers: {
           "Access-Control-Allow-Origin": "*", // Allow all origins for development
           "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Agent-ID, X-Agent-Owner, X-Agent-Site",
+          "Access-Control-Allow-Headers":
+            "Content-Type, Authorization, X-Agent-ID, X-Agent-Owner, X-Agent-Site",
           "Access-Control-Max-Age": "86400", // Cache preflight response for 24 hours
         },
       });
@@ -32,40 +33,62 @@ serve({
         // Copy relevant headers from the incoming request
         for (const [key, value] of req.headers.entries()) {
           // Filter out hop-by-hop headers and problematic headers
-          if (!['connection', 'keep-alive', 'proxy-authenticate', 'proxy-authorization', 'te', 'trailers', 'transfer-encoding', 'upgrade', 'host'].includes(key.toLowerCase())) {
+          if (
+            ![
+              "connection",
+              "keep-alive",
+              "proxy-authenticate",
+              "proxy-authorization",
+              "te",
+              "trailers",
+              "transfer-encoding",
+              "upgrade",
+              "host",
+            ].includes(key.toLowerCase())
+          ) {
             requestHeaders[key] = value;
           }
         }
-        requestHeaders['Host'] = 'fire22.ag'; // Set the correct Host header for the target
-        requestHeaders['Accept-Encoding'] = 'identity'; // Prevent gzip encoding issues
+        requestHeaders["Host"] = "fire22.ag"; // Set the correct Host header for the target
+        requestHeaders["Accept-Encoding"] = "identity"; // Prevent gzip encoding issues
 
         const response = await axios({
           method: req.method,
           url: targetUrl,
           headers: requestHeaders,
-          data: req.method === 'POST' || req.method === 'PUT' ? await req.arrayBuffer() : undefined,
-          responseType: 'stream',
+          data:
+            req.method === "POST" || req.method === "PUT"
+              ? await req.arrayBuffer()
+              : undefined,
+          responseType: "stream",
         });
 
         const proxyResponseHeaders = new Headers(response.headers);
         proxyResponseHeaders.set("Access-Control-Allow-Origin", "*"); // Allow all origins for development
-        proxyResponseHeaders.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        proxyResponseHeaders.set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Agent-ID, X-Agent-Owner, X-Agent-Site");
+        proxyResponseHeaders.set(
+          "Access-Control-Allow-Methods",
+          "GET, POST, PUT, DELETE, OPTIONS",
+        );
+        proxyResponseHeaders.set(
+          "Access-Control-Allow-Headers",
+          "Content-Type, Authorization, X-Agent-ID, X-Agent-Owner, X-Agent-Site",
+        );
 
         return new Response(response.data, {
           status: response.status,
           statusText: response.statusText,
           headers: proxyResponseHeaders,
         });
-
       } catch (error) {
-        console.error('Proxy error:', error.message);
+        console.error("Proxy error:", error.message);
         if (error.response) {
-          console.error('Response data:', error.response.data);
-          console.error('Response status:', error.response.status);
-          return new Response(error.response.data, { status: error.response.status });
+          console.error("Response data:", error.response.data);
+          console.error("Response status:", error.response.status);
+          return new Response(error.response.data, {
+            status: error.response.status,
+          });
         } else {
-          return new Response('Proxy error', { status: 500 });
+          return new Response("Proxy error", { status: 500 });
         }
       }
     }

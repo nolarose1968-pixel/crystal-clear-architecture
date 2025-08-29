@@ -3,7 +3,7 @@
 /**
  * 📅 Fire22 Security Briefing Scheduler
  * OPERATION: SECURE-COMM-22 - Briefing Coordination
- * 
+ *
  * @version 1.0.0
  * @classification CONFIDENTIAL - FIRE22 INTERNAL
  * @team Special Operations
@@ -18,7 +18,7 @@ interface TeamLeadAvailability {
   department: string;
   departmentId: string;
   securityTier: string;
-  responseStatus: 'ACKNOWLEDGED' | 'PENDING';
+  responseStatus: "ACKNOWLEDGED" | "PENDING";
   availability: {
     preferredDays: string[];
     preferredTimes: string[];
@@ -51,7 +51,11 @@ class SecurityBriefingScheduler {
   private briefings: SecurityBriefing[];
 
   constructor() {
-    this.schedulingDir = join(process.cwd(), 'communications', 'security-briefings');
+    this.schedulingDir = join(
+      process.cwd(),
+      "communications",
+      "security-briefings",
+    );
     this.initializeTeamLeadAvailability();
     this.ensureSchedulingDirectory();
     this.briefings = [];
@@ -61,15 +65,19 @@ class SecurityBriefingScheduler {
    * 📅 Schedule security briefings for all departments
    */
   async scheduleSecurityBriefings(): Promise<void> {
-    console.log('📅 FIRE22 SECURITY BRIEFING SCHEDULER');
-    console.log('====================================');
-    console.log(`📅 Date: ${new Date().toISOString().split('T')[0]}`);
+    console.log("📅 FIRE22 SECURITY BRIEFING SCHEDULER");
+    console.log("!==!==!==!==!==!=====");
+    console.log(`📅 Date: ${new Date().toISOString().split("T")[0]}`);
     console.log(`⏰ Time: ${new Date().toLocaleTimeString()}`);
     console.log(`🎯 Operation: SECURE-COMM-22\n`);
 
     // Process acknowledged team leads
-    const acknowledgedLeads = this.teamLeads.filter(tl => tl.responseStatus === 'ACKNOWLEDGED');
-    console.log(`📋 Processing ${acknowledgedLeads.length} acknowledged team leads for briefing scheduling`);
+    const acknowledgedLeads = this.teamLeads.filter(
+      (tl) => tl.responseStatus === "ACKNOWLEDGED",
+    );
+    console.log(
+      `📋 Processing ${acknowledgedLeads.length} acknowledged team leads for briefing scheduling`,
+    );
 
     // Schedule briefings by security tier
     await this.scheduleTier1Briefings();
@@ -94,25 +102,27 @@ class SecurityBriefingScheduler {
    * 🔒 Schedule Tier 1 (Maximum Security) briefings
    */
   private async scheduleTier1Briefings(): Promise<void> {
-    console.log('🔒 Scheduling Tier 1 (Maximum Security) briefings...');
+    console.log("🔒 Scheduling Tier 1 (Maximum Security) briefings...");
 
-    const tier1Leads = this.teamLeads.filter(tl => 
-      tl.securityTier === 'TIER_1_MAXIMUM' && tl.responseStatus === 'ACKNOWLEDGED'
+    const tier1Leads = this.teamLeads.filter(
+      (tl) =>
+        tl.securityTier === "TIER_1_MAXIMUM" &&
+        tl.responseStatus === "ACKNOWLEDGED",
     );
 
     // Executive briefing (individual)
-    const execLead = tier1Leads.find(tl => tl.departmentId === 'exec');
+    const execLead = tier1Leads.find((tl) => tl.departmentId === "exec");
     if (execLead) {
       const briefing = this.createBriefing({
-        id: 'exec-security-briefing',
-        title: 'Executive Security Briefing - Cloudflare Durable Objects',
-        date: '2024-09-02',
-        time: '09:00',
+        id: "exec-security-briefing",
+        title: "Executive Security Briefing - Cloudflare Durable Objects",
+        date: "2024-09-02",
+        time: "09:00",
         duration: 90,
-        location: 'Executive Conference Room / Virtual',
-        attendees: [execLead.name, 'Alex Rodriguez', 'Robert Brown'],
-        presenter: 'Alex Rodriguez (CTO)',
-        securityLevel: 'TOP_SECRET'
+        location: "Executive Conference Room / Virtual",
+        attendees: [execLead.name, "Alex Rodriguez", "Robert Brown"],
+        presenter: "Alex Rodriguez (CTO)",
+        securityLevel: "TOP_SECRET",
       });
       this.briefings.push(briefing);
       execLead.briefingScheduled = true;
@@ -121,25 +131,27 @@ class SecurityBriefingScheduler {
     }
 
     // Finance & Compliance joint briefing
-    const financeLead = tier1Leads.find(tl => tl.departmentId === 'finance');
-    const complianceLead = tier1Leads.find(tl => tl.departmentId === 'compliance');
-    
+    const financeLead = tier1Leads.find((tl) => tl.departmentId === "finance");
+    const complianceLead = tier1Leads.find(
+      (tl) => tl.departmentId === "compliance",
+    );
+
     if (financeLead || complianceLead) {
       const attendees = [];
       if (financeLead) attendees.push(financeLead.name);
       if (complianceLead) attendees.push(complianceLead.name);
-      attendees.push('Alex Rodriguez', 'Robert Brown', 'Maria Garcia');
+      attendees.push("Alex Rodriguez", "Robert Brown", "Maria Garcia");
 
       const briefing = this.createBriefing({
-        id: 'finance-compliance-briefing',
-        title: 'Finance & Compliance Security Briefing',
-        date: '2024-09-02',
-        time: '14:00',
+        id: "finance-compliance-briefing",
+        title: "Finance & Compliance Security Briefing",
+        date: "2024-09-02",
+        time: "14:00",
         duration: 120,
-        location: 'Secure Conference Room A / Virtual',
+        location: "Secure Conference Room A / Virtual",
         attendees,
-        presenter: 'Robert Brown (CCO)',
-        securityLevel: 'CONFIDENTIAL_FINANCIAL'
+        presenter: "Robert Brown (CCO)",
+        securityLevel: "CONFIDENTIAL_FINANCIAL",
       });
       this.briefings.push(briefing);
 
@@ -162,32 +174,34 @@ class SecurityBriefingScheduler {
    * 🛡️ Schedule Tier 2 (High Security) briefings
    */
   private async scheduleTier2Briefings(): Promise<void> {
-    console.log('🛡️ Scheduling Tier 2 (High Security) briefings...');
+    console.log("🛡️ Scheduling Tier 2 (High Security) briefings...");
 
-    const tier2Leads = this.teamLeads.filter(tl => 
-      tl.securityTier === 'TIER_2_HIGH' && tl.responseStatus === 'ACKNOWLEDGED'
+    const tier2Leads = this.teamLeads.filter(
+      (tl) =>
+        tl.securityTier === "TIER_2_HIGH" &&
+        tl.responseStatus === "ACKNOWLEDGED",
     );
 
     // Operations & Support joint briefing
-    const opsLead = tier2Leads.find(tl => tl.departmentId === 'operations');
-    const supportLead = tier2Leads.find(tl => tl.departmentId === 'support');
-    
+    const opsLead = tier2Leads.find((tl) => tl.departmentId === "operations");
+    const supportLead = tier2Leads.find((tl) => tl.departmentId === "support");
+
     if (opsLead || supportLead) {
       const attendees = [];
       if (opsLead) attendees.push(opsLead.name);
       if (supportLead) attendees.push(supportLead.name);
-      attendees.push('Alex Rodriguez', 'Maria Garcia', 'Sarah Martinez');
+      attendees.push("Alex Rodriguez", "Maria Garcia", "Sarah Martinez");
 
       const briefing = this.createBriefing({
-        id: 'operations-support-briefing',
-        title: 'Operations & Support Security Briefing',
-        date: '2024-09-03',
-        time: '10:00',
+        id: "operations-support-briefing",
+        title: "Operations & Support Security Briefing",
+        date: "2024-09-03",
+        time: "10:00",
         duration: 90,
-        location: 'Conference Room B / Virtual',
+        location: "Conference Room B / Virtual",
         attendees,
-        presenter: 'Maria Garcia (DevOps Lead)',
-        securityLevel: 'CONFIDENTIAL_OPERATIONAL'
+        presenter: "Maria Garcia (DevOps Lead)",
+        securityLevel: "CONFIDENTIAL_OPERATIONAL",
       });
       this.briefings.push(briefing);
 
@@ -204,25 +218,27 @@ class SecurityBriefingScheduler {
     }
 
     // Communications & Technology joint briefing
-    const commLead = tier2Leads.find(tl => tl.departmentId === 'communications');
-    const techLead = tier2Leads.find(tl => tl.departmentId === 'technology');
-    
+    const commLead = tier2Leads.find(
+      (tl) => tl.departmentId === "communications",
+    );
+    const techLead = tier2Leads.find((tl) => tl.departmentId === "technology");
+
     if (commLead || techLead) {
       const attendees = [];
       if (commLead) attendees.push(commLead.name);
       if (techLead) attendees.push(techLead.name);
-      attendees.push('Alex Rodriguez', 'Maria Garcia', 'Sarah Martinez');
+      attendees.push("Alex Rodriguez", "Maria Garcia", "Sarah Martinez");
 
       const briefing = this.createBriefing({
-        id: 'communications-technology-briefing',
-        title: 'Communications & Technology Security Briefing',
-        date: '2024-09-03',
-        time: '14:00',
+        id: "communications-technology-briefing",
+        title: "Communications & Technology Security Briefing",
+        date: "2024-09-03",
+        time: "14:00",
         duration: 90,
-        location: 'Technology Lab / Virtual',
+        location: "Technology Lab / Virtual",
         attendees,
-        presenter: 'Alex Rodriguez (CTO)',
-        securityLevel: 'CONFIDENTIAL_TECHNICAL'
+        presenter: "Alex Rodriguez (CTO)",
+        securityLevel: "CONFIDENTIAL_TECHNICAL",
       });
       this.briefings.push(briefing);
 
@@ -245,32 +261,34 @@ class SecurityBriefingScheduler {
    * 🔓 Schedule Tier 3 (Medium Security) briefings
    */
   private async scheduleTier3Briefings(): Promise<void> {
-    console.log('🔓 Scheduling Tier 3 (Medium Security) briefings...');
+    console.log("🔓 Scheduling Tier 3 (Medium Security) briefings...");
 
-    const tier3Leads = this.teamLeads.filter(tl => 
-      tl.securityTier === 'TIER_3_MEDIUM' && tl.responseStatus === 'ACKNOWLEDGED'
+    const tier3Leads = this.teamLeads.filter(
+      (tl) =>
+        tl.securityTier === "TIER_3_MEDIUM" &&
+        tl.responseStatus === "ACKNOWLEDGED",
     );
 
     // Combined Tier 3 briefing
     if (tier3Leads.length > 0) {
-      const attendees = tier3Leads.map(tl => tl.name);
-      attendees.push('Sarah Martinez', 'Maria Garcia');
+      const attendees = tier3Leads.map((tl) => tl.name);
+      attendees.push("Sarah Martinez", "Maria Garcia");
 
       const briefing = this.createBriefing({
-        id: 'tier3-combined-briefing',
-        title: 'Marketing, Design & Contributors Security Briefing',
-        date: '2024-09-04',
-        time: '10:00',
+        id: "tier3-combined-briefing",
+        title: "Marketing, Design & Contributors Security Briefing",
+        date: "2024-09-04",
+        time: "10:00",
         duration: 75,
-        location: 'Main Conference Room / Virtual',
+        location: "Main Conference Room / Virtual",
         attendees,
-        presenter: 'Sarah Martinez (Communications Director)',
-        securityLevel: 'INTERNAL'
+        presenter: "Sarah Martinez (Communications Director)",
+        securityLevel: "INTERNAL",
       });
       this.briefings.push(briefing);
 
       // Update all Tier 3 leads
-      tier3Leads.forEach(lead => {
+      tier3Leads.forEach((lead) => {
         lead.briefingScheduled = true;
         lead.briefingDate = briefing.date;
         lead.briefingTime = briefing.time;
@@ -285,7 +303,7 @@ class SecurityBriefingScheduler {
    * 📋 Generate master briefing schedule
    */
   private async generateMasterSchedule(): Promise<void> {
-    console.log('📋 Generating master briefing schedule...');
+    console.log("📋 Generating master briefing schedule...");
 
     const schedule = `# 📅 Fire22 Security Briefing Master Schedule
 **OPERATION: SECURE-COMM-22 - Security Briefings**
@@ -301,16 +319,20 @@ class SecurityBriefingScheduler {
 
 ## 📅 **BRIEFING SCHEDULE**
 
-${this.briefings.map(briefing => `
+${this.briefings
+  .map(
+    (briefing) => `
 ### **${briefing.title}**
 - **Date**: ${briefing.date}
 - **Time**: ${briefing.time} (${briefing.duration} minutes)
 - **Location**: ${briefing.location}
 - **Presenter**: ${briefing.presenter}
 - **Security Level**: ${briefing.securityLevel}
-- **Attendees**: ${briefing.attendees.join(', ')}
+- **Attendees**: ${briefing.attendees.join(", ")}
 - **Briefing ID**: ${briefing.id}
-`).join('\n')}
+`,
+  )
+  .join("\n")}
 
 ---
 
@@ -393,21 +415,27 @@ ${this.briefings.map(briefing => `
 **Coordination**: Sarah Martinez  
 **Next Update**: Daily until completion`;
 
-    const schedulePath = join(this.schedulingDir, 'master-briefing-schedule.md');
+    const schedulePath = join(
+      this.schedulingDir,
+      "master-briefing-schedule.md",
+    );
     writeFileSync(schedulePath, schedule);
 
-    console.log('  ✅ Master briefing schedule generated');
+    console.log("  ✅ Master briefing schedule generated");
   }
 
   /**
    * 📧 Create briefing invitations
    */
   private async createBriefingInvitations(): Promise<void> {
-    console.log('📧 Creating briefing invitations...');
+    console.log("📧 Creating briefing invitations...");
 
     for (const briefing of this.briefings) {
       const invitation = this.generateBriefingInvitation(briefing);
-      const invitationPath = join(this.schedulingDir, `invitation-${briefing.id}.md`);
+      const invitationPath = join(
+        this.schedulingDir,
+        `invitation-${briefing.id}.md`,
+      );
       writeFileSync(invitationPath, invitation);
     }
 
@@ -434,7 +462,7 @@ ${this.briefings.map(briefing => `
 
 ## 👥 **INVITED ATTENDEES**
 
-${briefing.attendees.map(attendee => `- ${attendee}`).join('\n')}
+${briefing.attendees.map((attendee) => `- ${attendee}`).join("\n")}
 
 ---
 
@@ -561,82 +589,88 @@ ${briefing.attendees.map(attendee => `- ${attendee}`).join('\n')}
   private initializeTeamLeadAvailability(): void {
     this.teamLeads = [
       {
-        name: 'William Harris',
-        email: 'william.harris@exec.fire22',
-        department: 'Executive Management',
-        departmentId: 'exec',
-        securityTier: 'TIER_1_MAXIMUM',
-        responseStatus: 'ACKNOWLEDGED',
+        name: "William Harris",
+        email: "william.harris@exec.fire22",
+        department: "Executive Management",
+        departmentId: "exec",
+        securityTier: "TIER_1_MAXIMUM",
+        responseStatus: "ACKNOWLEDGED",
         availability: {
-          preferredDays: ['Monday', 'Tuesday', 'Wednesday'],
-          preferredTimes: ['09:00', '14:00'],
-          timeZone: 'EST',
-          restrictions: ['No Fridays after 15:00']
+          preferredDays: ["Monday", "Tuesday", "Wednesday"],
+          preferredTimes: ["09:00", "14:00"],
+          timeZone: "EST",
+          restrictions: ["No Fridays after 15:00"],
         },
-        briefingScheduled: false
+        briefingScheduled: false,
       },
       {
-        name: 'John Smith',
-        email: 'john.smith@finance.fire22',
-        department: 'Finance Department',
-        departmentId: 'finance',
-        securityTier: 'TIER_1_MAXIMUM',
-        responseStatus: 'ACKNOWLEDGED',
+        name: "John Smith",
+        email: "john.smith@finance.fire22",
+        department: "Finance Department",
+        departmentId: "finance",
+        securityTier: "TIER_1_MAXIMUM",
+        responseStatus: "ACKNOWLEDGED",
         availability: {
-          preferredDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],
-          preferredTimes: ['10:00', '14:00', '16:00'],
-          timeZone: 'EST',
-          restrictions: ['Month-end busy periods']
+          preferredDays: ["Monday", "Tuesday", "Wednesday", "Thursday"],
+          preferredTimes: ["10:00", "14:00", "16:00"],
+          timeZone: "EST",
+          restrictions: ["Month-end busy periods"],
         },
-        briefingScheduled: false
+        briefingScheduled: false,
       },
       {
-        name: 'Robert Brown',
-        email: 'robert.brown@compliance.fire22',
-        department: 'Compliance & Legal',
-        departmentId: 'compliance',
-        securityTier: 'TIER_1_MAXIMUM',
-        responseStatus: 'ACKNOWLEDGED',
+        name: "Robert Brown",
+        email: "robert.brown@compliance.fire22",
+        department: "Compliance & Legal",
+        departmentId: "compliance",
+        securityTier: "TIER_1_MAXIMUM",
+        responseStatus: "ACKNOWLEDGED",
         availability: {
-          preferredDays: ['Tuesday', 'Wednesday', 'Thursday'],
-          preferredTimes: ['09:00', '11:00', '14:00'],
-          timeZone: 'EST',
-          restrictions: ['Legal review meetings Mondays']
+          preferredDays: ["Tuesday", "Wednesday", "Thursday"],
+          preferredTimes: ["09:00", "11:00", "14:00"],
+          timeZone: "EST",
+          restrictions: ["Legal review meetings Mondays"],
         },
-        briefingScheduled: false
+        briefingScheduled: false,
       },
       {
-        name: 'Alex Rodriguez',
-        email: 'alex.rodriguez@technology.fire22',
-        department: 'Technology Department',
-        departmentId: 'technology',
-        securityTier: 'TIER_2_HIGH',
-        responseStatus: 'ACKNOWLEDGED',
+        name: "Alex Rodriguez",
+        email: "alex.rodriguez@technology.fire22",
+        department: "Technology Department",
+        departmentId: "technology",
+        securityTier: "TIER_2_HIGH",
+        responseStatus: "ACKNOWLEDGED",
         availability: {
-          preferredDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-          preferredTimes: ['09:00', '11:00', '14:00', '16:00'],
-          timeZone: 'EST',
-          restrictions: ['Sprint planning Mondays 10:00-12:00']
+          preferredDays: [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+          ],
+          preferredTimes: ["09:00", "11:00", "14:00", "16:00"],
+          timeZone: "EST",
+          restrictions: ["Sprint planning Mondays 10:00-12:00"],
         },
-        briefingScheduled: false
-      }
+        briefingScheduled: false,
+      },
       // Additional team leads would be added here based on responses
     ];
   }
 
   private createBriefing(params: Partial<SecurityBriefing>): SecurityBriefing {
     return {
-      id: params.id || '',
-      title: params.title || '',
-      date: params.date || '',
-      time: params.time || '',
+      id: params.id || "",
+      title: params.title || "",
+      date: params.date || "",
+      time: params.time || "",
       duration: params.duration || 60,
-      location: params.location || '',
+      location: params.location || "",
       attendees: params.attendees || [],
       agenda: params.agenda || [],
       materials: params.materials || [],
-      presenter: params.presenter || '',
-      securityLevel: params.securityLevel || 'INTERNAL'
+      presenter: params.presenter || "",
+      securityLevel: params.securityLevel || "INTERNAL",
     };
   }
 
@@ -648,8 +682,8 @@ ${briefing.attendees.map(attendee => `- ${attendee}`).join('\n')}
 
   private getTotalAttendees(): number {
     const allAttendees = new Set();
-    this.briefings.forEach(briefing => {
-      briefing.attendees.forEach(attendee => allAttendees.add(attendee));
+    this.briefings.forEach((briefing) => {
+      briefing.attendees.forEach((attendee) => allAttendees.add(attendee));
     });
     return allAttendees.size;
   }
@@ -661,14 +695,14 @@ ${briefing.attendees.map(attendee => `- ${attendee}`).join('\n')}
 ---
 
 **Total Briefings Scheduled**: ${this.briefings.length}  
-**Total Departments**: ${this.teamLeads.filter(tl => tl.briefingScheduled).length}  
+**Total Departments**: ${this.teamLeads.filter((tl) => tl.briefingScheduled).length}  
 **Coordination Status**: ACTIVE  
 
 ---
 
 ## 📅 **BRIEFING SUMMARY**
 
-${this.briefings.map(b => `- **${b.date} ${b.time}**: ${b.title} (${b.attendees.length} attendees)`).join('\n')}
+${this.briefings.map((b) => `- **${b.date} ${b.time}**: ${b.title} (${b.attendees.length} attendees)`).join("\n")}
 
 ---
 
@@ -685,7 +719,7 @@ ${this.briefings.map(b => `- **${b.date} ${b.time}**: ${b.title} (${b.attendees.
 **Coordination Owner**: Sarah Martinez  
 **Status**: Ready for execution`;
 
-    const summaryPath = join(this.schedulingDir, 'coordination-summary.md');
+    const summaryPath = join(this.schedulingDir, "coordination-summary.md");
     writeFileSync(summaryPath, summary);
   }
 }
@@ -695,16 +729,15 @@ async function main() {
   try {
     const scheduler = new SecurityBriefingScheduler();
     await scheduler.scheduleSecurityBriefings();
-    
-    console.log('\n📅 SECURITY BRIEFING SCHEDULING COMPLETE!');
-    console.log('=========================================');
-    console.log('✅ All security briefings scheduled');
-    console.log('✅ Invitations generated and ready to send');
-    console.log('✅ Master schedule created');
-    console.log('✅ Coordination summary prepared');
-    
+
+    console.log("\n📅 SECURITY BRIEFING SCHEDULING COMPLETE!");
+    console.log("!==!==!==!==!==!==!=====");
+    console.log("✅ All security briefings scheduled");
+    console.log("✅ Invitations generated and ready to send");
+    console.log("✅ Master schedule created");
+    console.log("✅ Coordination summary prepared");
   } catch (error) {
-    console.error('❌ Security briefing scheduling failed:', error);
+    console.error("❌ Security briefing scheduling failed:", error);
     process.exit(1);
   }
 }

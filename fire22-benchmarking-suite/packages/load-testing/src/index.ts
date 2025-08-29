@@ -9,8 +9,8 @@ export interface LoadTestResult {
   successfulRequests: number;
   failedRequests: number;
   averageResponseTime: number; // in milliseconds
-  minResponseTime: number;     // in milliseconds
-  maxResponseTime: number;     // in milliseconds
+  minResponseTime: number; // in milliseconds
+  maxResponseTime: number; // in milliseconds
   requestsPerSecond: number;
   errors: { [key: string]: number };
 }
@@ -21,7 +21,7 @@ export interface LoadTestResult {
 export interface LoadTestScenario {
   name: string;
   url: string;
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method: "GET" | "POST" | "PUT" | "DELETE";
   headers?: { [key: string]: string };
   body?: string | object;
   concurrency: number;
@@ -44,25 +44,31 @@ export default class LoadTester {
    * @returns A promise that resolves with the load test result.
    */
   public async start(): Promise<LoadTestResult> {
-    console.log(`Starting load test for ${this.scenario.url} with ${this.scenario.concurrency} concurrent users for ${this.scenario.duration} seconds.`);
+    console.log(
+      `Starting load test for ${this.scenario.url} with ${this.scenario.concurrency} concurrent users for ${this.scenario.duration} seconds.`,
+    );
     // In a real implementation, this would involve making HTTP requests
     // and collecting metrics. For now, return a mock result.
-    await new Promise(resolve => setTimeout(resolve, this.scenario.duration * 1000)); // Simulate duration
+    await new Promise((resolve) =>
+      setTimeout(resolve, this.scenario.duration * 1000),
+    ); // Simulate duration
 
     const mockResult: LoadTestResult = {
       totalRequests: this.scenario.concurrency * this.scenario.duration * 10, // Arbitrary number
-      successfulRequests: this.scenario.concurrency * this.scenario.duration * 10 * 0.95,
-      failedRequests: this.scenario.concurrency * this.scenario.duration * 10 * 0.05,
+      successfulRequests:
+        this.scenario.concurrency * this.scenario.duration * 10 * 0.95,
+      failedRequests:
+        this.scenario.concurrency * this.scenario.duration * 10 * 0.05,
       averageResponseTime: 150,
       minResponseTime: 50,
       maxResponseTime: 500,
       requestsPerSecond: 10,
       errors: {
-        '500 Internal Server Error': 5,
-        '404 Not Found': 2
-      }
+        "500 Internal Server Error": 5,
+        "404 Not Found": 2,
+      },
     };
-    console.log('Load test finished.');
+    console.log("Load test finished.");
     return mockResult;
   }
 
@@ -70,7 +76,7 @@ export default class LoadTester {
    * Stops the load test prematurely.
    */
   public stop(): void {
-    console.log('Load test stopped prematurely.');
+    console.log("Load test stopped prematurely.");
     // In a real implementation, this would stop ongoing requests.
   }
 }

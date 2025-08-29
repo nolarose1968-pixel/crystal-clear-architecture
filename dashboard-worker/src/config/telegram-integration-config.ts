@@ -2,7 +2,7 @@
 
 /**
  * 🔥📱 Fire22 Telegram Integration Configuration
- * 
+ *
  * Centralized configuration for Telegram bot integration
  * Connects to hub endpoints, environment management, and main config
  */
@@ -16,34 +16,34 @@ export interface TelegramIntegrationConfig {
   botToken: string;
   webhookUrl?: string;
   webhookSecret?: string;
-  
+
   // Feature Flags
   enableMultilingual: boolean;
   enableNotifications: boolean;
   enableP2PMatching: boolean;
   enableDepartmentWorkflows: boolean;
   enableMetrics: boolean;
-  
+
   // Performance Settings
   rateLimitCommands: number;
   rateLimitMessages: number;
   translationCacheSize: number;
   translationCacheTTL: number;
-  
+
   // Security Settings
   jwtSecret?: string;
   encryptionKey?: string;
   sessionTimeout: number;
-  
+
   // Database Integration
   databaseUrl?: string;
   enableDatabaseSync: boolean;
-  
+
   // API Integration
   fire22ApiUrl: string;
   fire22ApiKey?: string;
   fire22AgentToken?: string;
-  
+
   // Monitoring & Analytics
   enableHealthChecks: boolean;
   healthCheckInterval: number;
@@ -79,40 +79,40 @@ export class TelegramIntegrationConfigManager {
    */
   private buildConfig(): TelegramIntegrationConfig {
     const env = this.telegramEnv;
-    
+
     return {
       // Core Bot Configuration
       botToken: env.botToken,
       webhookUrl: env.webhookUrl,
       webhookSecret: env.webhookSecret,
-      
+
       // Feature Flags
       enableMultilingual: env.featureFlags.enableMultilingual,
       enableNotifications: env.featureFlags.enableNotifications,
       enableP2PMatching: env.featureFlags.enableP2pMatching,
       enableDepartmentWorkflows: env.featureFlags.enableDepartmentWorkflows,
       enableMetrics: env.featureFlags.enableMetrics,
-      
+
       // Performance Settings
       rateLimitCommands: env.performanceConfig.rateLimitCommands,
       rateLimitMessages: env.performanceConfig.rateLimitMessages,
       translationCacheSize: env.performanceConfig.translationCacheSize,
       translationCacheTTL: env.performanceConfig.translationCacheTtl,
-      
+
       // Security Settings
       jwtSecret: env.securityConfig.jwtSecret,
       encryptionKey: env.securityConfig.encryptionKey,
       sessionTimeout: env.securityConfig.sessionTimeout,
-      
+
       // Database Integration
       databaseUrl: env.databaseUrl,
       enableDatabaseSync: true, // Always enabled for hub integration
-      
+
       // API Integration
       fire22ApiUrl: env.fire22ApiUrl,
       fire22ApiKey: env.fire22ApiKey,
       fire22AgentToken: env.fire22AgentToken,
-      
+
       // Monitoring & Analytics
       enableHealthChecks: true,
       healthCheckInterval: env.monitoringConfig.healthCheckInterval,
@@ -123,7 +123,7 @@ export class TelegramIntegrationConfigManager {
       cashierGroupId: env.cashierGroupId,
       p2pQueueGroupId: env.p2pQueueGroupId,
       transactionChannelId: env.transactionChannelId,
-      supportGroupId: env.supportGroupId
+      supportGroupId: env.supportGroupId,
     };
   }
 
@@ -181,7 +181,7 @@ export class TelegramIntegrationConfigManager {
     return {
       valid: missing.length === 0,
       missing,
-      warnings
+      warnings,
     };
   }
 
@@ -199,10 +199,10 @@ export class TelegramIntegrationConfigManager {
       // Test bot token
       const botResponse = await fetch(`https://api.telegram.org/bot${this.config.botToken}/getMe`);
       const botStatus = botResponse.ok;
-      
+
       // Test hub connection
       const hubStatus = await hubConnection.getTelegramStatus();
-      
+
       // Test database access (if available)
       let databaseAccess = false;
       try {
@@ -227,8 +227,8 @@ export class TelegramIntegrationConfigManager {
           hub: hubStatus.connected ? 'Connected' : 'Failed',
           database: databaseAccess ? 'Accessible' : 'Failed',
           config: this.config,
-          hubDetails: hubStatus
-        }
+          hubDetails: hubStatus,
+        },
       };
     } catch (error) {
       return {
@@ -238,8 +238,8 @@ export class TelegramIntegrationConfigManager {
         databaseAccess: false,
         details: {
           error: error instanceof Error ? error.message : 'Unknown error',
-          config: this.config
-        }
+          config: this.config,
+        },
       };
     }
   }
@@ -255,18 +255,18 @@ export class TelegramIntegrationConfigManager {
   }> {
     const connectivity = await this.testConnectivity();
     const validation = this.validateConfig();
-    
+
     const checks = {
       configuration: validation.valid,
       botConnectivity: connectivity.botStatus,
       hubConnection: connectivity.hubConnection,
       databaseAccess: connectivity.databaseAccess,
-      environment: this.telegramEnv.environment === 'production' ? true : true // Always true for now
+      environment: this.telegramEnv.environment === 'production' ? true : true, // Always true for now
     };
 
     const healthyChecks = Object.values(checks).filter(Boolean).length;
     const totalChecks = Object.keys(checks).length;
-    
+
     let status: 'healthy' | 'degraded' | 'unhealthy';
     if (healthyChecks === totalChecks) {
       status = 'healthy';
@@ -284,9 +284,9 @@ export class TelegramIntegrationConfigManager {
         healthyChecks,
         healthPercentage: (healthyChecks / totalChecks) * 100,
         connectivity: connectivity.details,
-        validation: validation
+        validation: validation,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -301,7 +301,7 @@ export class TelegramIntegrationConfigManager {
     integrations: Record<string, boolean>;
   } {
     const validation = this.validateConfig();
-    
+
     return {
       status: validation.valid ? 'Configured' : 'Incomplete',
       features: {
@@ -309,26 +309,26 @@ export class TelegramIntegrationConfigManager {
         notifications: this.config.enableNotifications,
         p2pMatching: this.config.enableP2PMatching,
         departmentWorkflows: this.config.enableDepartmentWorkflows,
-        metrics: this.config.enableMetrics
+        metrics: this.config.enableMetrics,
       },
       performance: {
         rateLimitCommands: this.config.rateLimitCommands,
         rateLimitMessages: this.config.rateLimitMessages,
         cacheSize: this.config.translationCacheSize,
-        cacheTTL: this.config.translationCacheTTL / 1000 + 's'
+        cacheTTL: this.config.translationCacheTTL / 1000 + 's',
       },
       security: {
         jwtEnabled: !!this.config.jwtSecret,
         encryptionEnabled: !!this.config.encryptionKey,
         webhookSecured: !!this.config.webhookSecret,
-        sessionTimeout: this.config.sessionTimeout / 1000 + 's'
+        sessionTimeout: this.config.sessionTimeout / 1000 + 's',
       },
       integrations: {
         fire22: !!this.config.fire22ApiKey,
         database: !!this.config.databaseUrl,
         webhook: !!this.config.webhookUrl,
-        monitoring: !!this.config.sentryDsn
-      }
+        monitoring: !!this.config.sentryDsn,
+      },
     };
   }
 
@@ -338,13 +338,13 @@ export class TelegramIntegrationConfigManager {
   updateConfig(updates: Partial<TelegramIntegrationConfig>): boolean {
     try {
       this.config = { ...this.config, ...updates };
-      
+
       // Update environment if possible
       if (updates.enableMultilingual !== undefined) {
         // This would need to be implemented in TelegramEnvironment
         console.log('Feature flag updated:', updates.enableMultilingual);
       }
-      
+
       return true;
     } catch (error) {
       console.error('Failed to update Telegram config:', error);
@@ -358,13 +358,17 @@ export class TelegramIntegrationConfigManager {
   exportConfig(): string {
     const config = this.getConfig();
     const summary = this.getDashboardSummary();
-    
-    return JSON.stringify({
-      config,
-      summary,
-      validation: this.validateConfig(),
-      timestamp: new Date().toISOString()
-    }, null, 2);
+
+    return JSON.stringify(
+      {
+        config,
+        summary,
+        validation: this.validateConfig(),
+        timestamp: new Date().toISOString(),
+      },
+      null,
+      2
+    );
   }
 }
 
@@ -376,7 +380,11 @@ export function getTelegramConfig(): TelegramIntegrationConfig {
   return telegramIntegrationConfig.getConfig();
 }
 
-export function validateTelegramConfig(): { valid: boolean; missing: string[]; warnings: string[] } {
+export function validateTelegramConfig(): {
+  valid: boolean;
+  missing: string[];
+  warnings: string[];
+} {
   return telegramIntegrationConfig.validateConfig();
 }
 

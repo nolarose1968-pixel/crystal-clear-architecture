@@ -10,12 +10,12 @@ import {
   CollectionService,
   SettlementProcessor,
   MetricsCalculator,
-  Logger
+  Logger,
 } from '../../../domain/services';
 import {
   CollectionFilters,
   SettlementFilters,
-  MetricCalculationParams
+  MetricCalculationParams,
 } from '../../../domain/models';
 
 const logger = Logger.configure('CollectionsController');
@@ -55,7 +55,7 @@ export async function getCollectionsDashboard(request: ValidatedRequest): Promis
     // Get collections data
     const collectionFilters: CollectionFilters = {
       dateFrom,
-      dateTo
+      dateTo,
     };
 
     const collections = await CollectionService.getAll(collectionFilters);
@@ -64,7 +64,7 @@ export async function getCollectionsDashboard(request: ValidatedRequest): Promis
     // Get settlement data
     const settlementFilters: SettlementFilters = {
       dateFrom,
-      dateTo
+      dateTo,
     };
 
     const settlementSummary = await SettlementProcessor.getSummary(settlementFilters);
@@ -74,7 +74,7 @@ export async function getCollectionsDashboard(request: ValidatedRequest): Promis
     const metricsParams: MetricCalculationParams = {
       dateFrom,
       dateTo,
-      includeInactive
+      includeInactive,
     };
 
     const revenueMetrics = await MetricsCalculator.calculateRevenue(metricsParams);
@@ -97,7 +97,7 @@ export async function getCollectionsDashboard(request: ValidatedRequest): Promis
         completedSettlements: settlementSummary.completedSettlements,
         failedSettlements: settlementSummary.failedSettlements,
         successRate: collectionSummary.successRate,
-        averageProcessingTime: collectionSummary.averageProcessingTime
+        averageProcessingTime: collectionSummary.averageProcessingTime,
       },
       financials: {
         totalRevenue: revenueMetrics.totalRevenue,
@@ -108,7 +108,7 @@ export async function getCollectionsDashboard(request: ValidatedRequest): Promis
         monthlyVolume: revenueMetrics.monthlyVolume,
         revenueGrowthRate: revenueMetrics.revenueGrowthRate,
         volumeGrowthRate: revenueMetrics.volumeGrowthRate,
-        averageTransactionValue: revenueMetrics.averageTransactionValue
+        averageTransactionValue: revenueMetrics.averageTransactionValue,
       },
       settlementMetrics: {
         pendingAmount: settlementMetrics.totalAmount,
@@ -116,7 +116,7 @@ export async function getCollectionsDashboard(request: ValidatedRequest): Promis
         processingResults: settlementMetrics.processingResults.length,
         feePercentage: settlementSummary.feePercentage,
         settlementSuccessRate: settlementSummary.successRate,
-        averageSettlementTime: settlementSummary.averageProcessingTime
+        averageSettlementTime: settlementSummary.averageProcessingTime,
       },
       performance: {
         overallSuccessRate: revenueMetrics.successRate,
@@ -126,7 +126,7 @@ export async function getCollectionsDashboard(request: ValidatedRequest): Promis
         topAgentRevenue: revenueMetrics.topAgentRevenue,
         topAgentName: revenueMetrics.topAgentName,
         activeAgents: revenueMetrics.activeAgents,
-        activeMerchants: revenueMetrics.activeMerchants
+        activeMerchants: revenueMetrics.activeMerchants,
       },
       charts: {
         dailyBreakdown: dailyBreakdown.slice(-7), // Last 7 days
@@ -135,14 +135,14 @@ export async function getCollectionsDashboard(request: ValidatedRequest): Promis
         statusDistribution: {
           pending: collectionSummary.pendingCollections,
           processed: collectionSummary.processedCollections,
-          failed: collectionSummary.failedCollections
+          failed: collectionSummary.failedCollections,
         },
         settlementStatusDistribution: {
           pending: settlementSummary.pendingSettlements,
           processing: settlementSummary.processingSettlements,
           completed: settlementSummary.completedSettlements,
-          failed: settlementSummary.failedSettlements
-        }
+          failed: settlementSummary.failedSettlements,
+        },
       },
       recentCollections: collections
         .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
@@ -153,14 +153,14 @@ export async function getCollectionsDashboard(request: ValidatedRequest): Promis
           amount: collection.amount,
           status: collection.status,
           createdAt: collection.createdAt.toISOString(),
-          processedAt: collection.processedAt?.toISOString()
+          processedAt: collection.processedAt?.toISOString(),
         })),
       filters: {
         period,
         dateFrom: dateFrom.toISOString(),
         dateTo: dateTo.toISOString(),
-        includeInactive
-      }
+        includeInactive,
+      },
     };
 
     const response = {
@@ -172,14 +172,14 @@ export async function getCollectionsDashboard(request: ValidatedRequest): Promis
         totalCollections: collections.length,
         dataSource: 'Domain-Driven Collections Management System',
         apiVersion: '2.0',
-        processingTime: Date.now()
-      }
+        processingTime: Date.now(),
+      },
     };
 
     logger.info('Collections dashboard data generated successfully', {
       collectionsCount: collections.length,
       period,
-      processingTime: Date.now()
+      processingTime: Date.now(),
     });
 
     return new Response(JSON.stringify(response), {
@@ -188,8 +188,8 @@ export async function getCollectionsDashboard(request: ValidatedRequest): Promis
         'Content-Type': 'application/json',
         'X-API-Version': '2.0',
         'X-Request-ID': crypto.randomUUID(),
-        'Cache-Control': 'private, max-age=300' // Cache for 5 minutes
-      }
+        'Cache-Control': 'private, max-age=300', // Cache for 5 minutes
+      },
     });
   } catch (error: any) {
     logger.error('Failed to fetch collection metrics', error);
@@ -197,14 +197,14 @@ export async function getCollectionsDashboard(request: ValidatedRequest): Promis
       JSON.stringify({
         error: 'Failed to fetch collection metrics',
         details: error.message,
-        code: 'COLLECTIONS_DASHBOARD_ERROR'
+        code: 'COLLECTIONS_DASHBOARD_ERROR',
       }),
       {
         status: 500,
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Version': '2.0'
-        }
+          'X-API-Version': '2.0',
+        },
       }
     );
   }
@@ -253,9 +253,10 @@ export async function getPendingSettlements(request: ValidatedRequest): Promise<
     let filteredSettlements = allSettlements;
     if (customerId) {
       // This is a simplified filter - in production, the service would handle this
-      filteredSettlements = allSettlements.filter(s =>
-        s.collectionId.includes(customerId) ||
-        s.notes?.toLowerCase().includes(customerId.toLowerCase())
+      filteredSettlements = allSettlements.filter(
+        s =>
+          s.collectionId.includes(customerId) ||
+          s.notes?.toLowerCase().includes(customerId.toLowerCase())
       );
     }
 
@@ -318,7 +319,9 @@ export async function getPendingSettlements(request: ValidatedRequest): Promise<
       netAmount: filteredSettlements.reduce((sum, s) => sum + s.netAmount, 0),
       readyForSettlement: filteredSettlements.filter(s => s.status === 'pending').length,
       awaitingVerification: filteredSettlements.filter(s => s.status === 'processing').length,
-      awaitingResult: filteredSettlements.filter(s => s.status === 'pending' && s.notes?.includes('awaiting')).length
+      awaitingResult: filteredSettlements.filter(
+        s => s.status === 'pending' && s.notes?.includes('awaiting')
+      ).length,
     };
 
     // Enhanced settlement data with additional computed fields
@@ -340,11 +343,17 @@ export async function getPendingSettlements(request: ValidatedRequest): Promise<
       processedAt: settlement.processedAt?.toISOString(),
       completedAt: settlement.completedAt?.toISOString(),
       dueDate: new Date(settlement.createdAt.getTime() + 48 * 60 * 60 * 1000).toISOString(),
-      daysOverdue: Math.max(0, Math.floor((Date.now() - (settlement.createdAt.getTime() + 48 * 60 * 60 * 1000)) / (24 * 60 * 60 * 1000))),
+      daysOverdue: Math.max(
+        0,
+        Math.floor(
+          (Date.now() - (settlement.createdAt.getTime() + 48 * 60 * 60 * 1000)) /
+            (24 * 60 * 60 * 1000)
+        )
+      ),
       paymentMethod: settlement.paymentMethod || 'bank_transfer',
       notes: settlement.notes || '',
       transactionId: settlement.transactionId,
-      failureReason: settlement.failureReason
+      failureReason: settlement.failureReason,
     }));
 
     const response = {
@@ -361,7 +370,7 @@ export async function getPendingSettlements(request: ValidatedRequest): Promise<
           sortBy,
           sortOrder,
           page,
-          limit
+          limit,
         },
         pagination: {
           page,
@@ -369,7 +378,7 @@ export async function getPendingSettlements(request: ValidatedRequest): Promise<
           totalSettlements,
           totalPages,
           hasNextPage: page < totalPages,
-          hasPrevPage: page > 1
+          hasPrevPage: page > 1,
         },
         metadata: {
           lastUpdated: new Date().toISOString(),
@@ -377,16 +386,17 @@ export async function getPendingSettlements(request: ValidatedRequest): Promise<
           apiVersion: '2.0',
           processingTime: Date.now(),
           totalAmount: summary.totalAmount,
-          averageSettlementAmount: totalSettlements > 0 ? summary.totalAmount / totalSettlements : 0
-        }
-      }
+          averageSettlementAmount:
+            totalSettlements > 0 ? summary.totalAmount / totalSettlements : 0,
+        },
+      },
     };
 
     logger.info('Pending settlements data retrieved successfully', {
       totalSettlements,
       page,
       status,
-      priority
+      priority,
     });
 
     return new Response(JSON.stringify(response), {
@@ -395,19 +405,22 @@ export async function getPendingSettlements(request: ValidatedRequest): Promise<
         'Content-Type': 'application/json',
         'X-API-Version': '2.0',
         'X-Request-ID': crypto.randomUUID(),
-        'Cache-Control': 'private, max-age=60' // Cache for 1 minute
-      }
+        'Cache-Control': 'private, max-age=60', // Cache for 1 minute
+      },
     });
   } catch (error: any) {
     logger.error('Failed to get pending settlements', error);
-    return new Response(JSON.stringify({
-      error: 'Failed to get pending settlements',
-      details: error.message,
-      code: 'PENDING_SETTLEMENTS_ERROR'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get pending settlements',
+        details: error.message,
+        code: 'PENDING_SETTLEMENTS_ERROR',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -418,7 +431,7 @@ export async function processSettlement(request: ValidatedRequest): Promise<Resp
   try {
     logger.info('Processing settlement request');
 
-    const settlementData = request.validatedBody || await request.json();
+    const settlementData = request.validatedBody || (await request.json());
 
     const {
       settlementId,
@@ -427,7 +440,7 @@ export async function processSettlement(request: ValidatedRequest): Promise<Resp
       notes,
       processedBy,
       paymentMethod = 'bank_transfer',
-      expediteProcessing = false
+      expediteProcessing = false,
     } = settlementData;
 
     // Enhanced validation with domain-specific business rules
@@ -460,24 +473,29 @@ export async function processSettlement(request: ValidatedRequest): Promise<Resp
 
     const validPaymentMethods = ['bank_transfer', 'wire_transfer', 'check', 'ach', 'paypal'];
     if (paymentMethod && !validPaymentMethods.includes(paymentMethod)) {
-      validationErrors.push(`Invalid payment method. Must be one of: ${validPaymentMethods.join(', ')}`);
+      validationErrors.push(
+        `Invalid payment method. Must be one of: ${validPaymentMethods.join(', ')}`
+      );
     }
 
     if (validationErrors.length > 0) {
       logger.warn('Settlement validation failed', { validationErrors, settlementId });
 
-      return new Response(JSON.stringify({
-        error: 'Validation Error',
-        message: 'Settlement data validation failed',
-        details: validationErrors,
-        code: 'SETTLEMENT_VALIDATION_ERROR'
-      }), {
-        status: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Version': '2.0'
+      return new Response(
+        JSON.stringify({
+          error: 'Validation Error',
+          message: 'Settlement data validation failed',
+          details: validationErrors,
+          code: 'SETTLEMENT_VALIDATION_ERROR',
+        }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Version': '2.0',
+          },
         }
-      });
+      );
     }
 
     // Verify settlement exists and is in correct state
@@ -487,36 +505,42 @@ export async function processSettlement(request: ValidatedRequest): Promise<Resp
     if (!settlement) {
       logger.warn('Settlement not found', { settlementId });
 
-      return new Response(JSON.stringify({
-        error: 'Settlement Not Found',
-        message: `Settlement with ID ${settlementId} not found`,
-        code: 'SETTLEMENT_NOT_FOUND'
-      }), {
-        status: 404,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Version': '2.0'
+      return new Response(
+        JSON.stringify({
+          error: 'Settlement Not Found',
+          message: `Settlement with ID ${settlementId} not found`,
+          code: 'SETTLEMENT_NOT_FOUND',
+        }),
+        {
+          status: 404,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Version': '2.0',
+          },
         }
-      });
+      );
     }
 
     if (settlement.status !== 'pending') {
       logger.warn('Settlement not in pending state', {
         settlementId,
-        currentStatus: settlement.status
+        currentStatus: settlement.status,
       });
 
-      return new Response(JSON.stringify({
-        error: 'Invalid Settlement State',
-        message: `Settlement is not in pending state. Current status: ${settlement.status}`,
-        code: 'INVALID_SETTLEMENT_STATE'
-      }), {
-        status: 409,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Version': '2.0'
+      return new Response(
+        JSON.stringify({
+          error: 'Invalid Settlement State',
+          message: `Settlement is not in pending state. Current status: ${settlement.status}`,
+          code: 'INVALID_SETTLEMENT_STATE',
+        }),
+        {
+          status: 409,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Version': '2.0',
+          },
         }
-      });
+      );
     }
 
     // Verify amount matches settlement amount (business rule)
@@ -524,27 +548,30 @@ export async function processSettlement(request: ValidatedRequest): Promise<Resp
       logger.warn('Settlement amount mismatch', {
         settlementId,
         requestedAmount: amount,
-        settlementAmount: settlement.amount
+        settlementAmount: settlement.amount,
       });
 
-      return new Response(JSON.stringify({
-        error: 'Amount Mismatch',
-        message: `Requested amount (${amount}) does not match settlement amount (${settlement.amount})`,
-        code: 'AMOUNT_MISMATCH_ERROR'
-      }), {
-        status: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Version': '2.0'
+      return new Response(
+        JSON.stringify({
+          error: 'Amount Mismatch',
+          message: `Requested amount (${amount}) does not match settlement amount (${settlement.amount})`,
+          code: 'AMOUNT_MISMATCH_ERROR',
+        }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Version': '2.0',
+          },
         }
-      });
+      );
     }
 
     // Process the settlement using domain service
     const processingResult = await SettlementProcessor.processSettlement({
       ...settlement,
       paymentMethod,
-      notes: notes || settlement.notes
+      notes: notes || settlement.notes,
     });
 
     // Build enhanced response with business context
@@ -574,8 +601,8 @@ export async function processSettlement(request: ValidatedRequest): Promise<Resp
         processingTime: Date.now() - processingResult.processedAt.getTime(),
         feePercentage: (processingResult.fee / amount) * 100,
         expediteProcessing,
-        riskAssessment: amount > 5000 ? 'high' : amount > 1000 ? 'medium' : 'low'
-      }
+        riskAssessment: amount > 5000 ? 'high' : amount > 1000 ? 'medium' : 'low',
+      },
     };
 
     const response = {
@@ -589,15 +616,15 @@ export async function processSettlement(request: ValidatedRequest): Promise<Resp
         apiVersion: '2.0',
         settlementProcessed: processingResult.success,
         feeApplied: processingResult.fee,
-        netAmount: processingResult.netAmount
-      }
+        netAmount: processingResult.netAmount,
+      },
     };
 
     logger.info('Settlement processing completed', {
       settlementId,
       success: processingResult.success,
       amount: processingResult.netAmount,
-      paymentMethod
+      paymentMethod,
     });
 
     return new Response(JSON.stringify(response), {
@@ -606,23 +633,26 @@ export async function processSettlement(request: ValidatedRequest): Promise<Resp
         'Content-Type': 'application/json',
         'X-API-Version': '2.0',
         'X-Request-ID': crypto.randomUUID(),
-        'X-Settlement-Status': processingResult.success ? 'completed' : 'failed'
-      }
+        'X-Settlement-Status': processingResult.success ? 'completed' : 'failed',
+      },
     });
   } catch (error: any) {
     logger.error('Failed to process settlement', error);
 
-    return new Response(JSON.stringify({
-      error: 'Failed to process settlement',
-      details: error.message,
-      code: 'SETTLEMENT_PROCESSING_ERROR'
-    }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Version': '2.0'
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to process settlement',
+        details: error.message,
+        code: 'SETTLEMENT_PROCESSING_ERROR',
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Version': '2.0',
+        },
       }
-    });
+    );
   }
 }
 
@@ -635,14 +665,17 @@ export async function getCollectionDetail(request: ValidatedRequest): Promise<Re
     const collectionId = url.pathname.split('/').pop();
 
     if (!collectionId) {
-      return new Response(JSON.stringify({
-        error: 'Collection ID Required',
-        message: 'Collection ID must be provided in the URL path',
-        code: 'MISSING_COLLECTION_ID'
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Collection ID Required',
+          message: 'Collection ID must be provided in the URL path',
+          code: 'MISSING_COLLECTION_ID',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     logger.info(`Fetching collection detail for ID: ${collectionId}`);
@@ -652,19 +685,22 @@ export async function getCollectionDetail(request: ValidatedRequest): Promise<Re
     if (!collection) {
       logger.warn(`Collection not found: ${collectionId}`);
 
-      return new Response(JSON.stringify({
-        error: 'Collection Not Found',
-        message: `Collection with ID ${collectionId} not found`,
-        code: 'COLLECTION_NOT_FOUND'
-      }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Collection Not Found',
+          message: `Collection with ID ${collectionId} not found`,
+          code: 'COLLECTION_NOT_FOUND',
+        }),
+        {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     // Get related settlement information
     const settlements = await SettlementProcessor.getAll({
-      collectionId: collectionId
+      collectionId: collectionId,
     } as SettlementFilters);
 
     const enhancedCollection = {
@@ -677,7 +713,7 @@ export async function getCollectionDetail(request: ValidatedRequest): Promise<Re
         status: settlement.status,
         processedAt: settlement.processedAt?.toISOString(),
         agentId: settlement.agentId,
-        agentName: settlement.agentName
+        agentName: settlement.agentName,
       })),
       settlementCount: settlements.data.length,
       totalSettledAmount: settlements.data
@@ -685,7 +721,7 @@ export async function getCollectionDetail(request: ValidatedRequest): Promise<Re
         .reduce((sum, s) => sum + s.amount, 0),
       pendingSettlementAmount: settlements.data
         .filter(s => s.status === 'pending')
-        .reduce((sum, s) => sum + s.amount, 0)
+        .reduce((sum, s) => sum + s.amount, 0),
     };
 
     const response = {
@@ -694,8 +730,8 @@ export async function getCollectionDetail(request: ValidatedRequest): Promise<Re
       metadata: {
         generatedAt: new Date().toISOString(),
         apiVersion: '2.0',
-        settlementCount: settlements.data.length
-      }
+        settlementCount: settlements.data.length,
+      },
     };
 
     logger.info(`Collection detail retrieved successfully: ${collectionId}`);
@@ -706,20 +742,23 @@ export async function getCollectionDetail(request: ValidatedRequest): Promise<Re
         'Content-Type': 'application/json',
         'X-API-Version': '2.0',
         'X-Request-ID': crypto.randomUUID(),
-        'Cache-Control': 'private, max-age=300'
-      }
+        'Cache-Control': 'private, max-age=300',
+      },
     });
   } catch (error: any) {
     logger.error(`Failed to fetch collection ${request.url}`, error);
 
-    return new Response(JSON.stringify({
-      error: 'Failed to fetch collection details',
-      details: error.message,
-      code: 'COLLECTION_DETAIL_ERROR'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to fetch collection details',
+        details: error.message,
+        code: 'COLLECTION_DETAIL_ERROR',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -740,7 +779,7 @@ export async function getSettlementHistory(request: ValidatedRequest): Promise<R
 
     // Build filters
     const filters: SettlementFilters = {
-      dateFrom: new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+      dateFrom: new Date(Date.now() - days * 24 * 60 * 60 * 1000),
     };
 
     if (agentId) filters.agentId = agentId;
@@ -761,11 +800,13 @@ export async function getSettlementHistory(request: ValidatedRequest): Promise<R
       createdAt: settlement.createdAt.toISOString(),
       processedAt: settlement.processedAt?.toISOString(),
       completedAt: settlement.completedAt?.toISOString(),
-      processingDuration: settlement.processedAt && settlement.completedAt
-        ? settlement.completedAt.getTime() - settlement.createdAt.getTime()
-        : null,
-      isOverdue: settlement.status === 'pending' &&
-        (Date.now() - settlement.createdAt.getTime()) > (48 * 60 * 60 * 1000)
+      processingDuration:
+        settlement.processedAt && settlement.completedAt
+          ? settlement.completedAt.getTime() - settlement.createdAt.getTime()
+          : null,
+      isOverdue:
+        settlement.status === 'pending' &&
+        Date.now() - settlement.createdAt.getTime() > 48 * 60 * 60 * 1000,
     }));
 
     const response = {
@@ -777,7 +818,7 @@ export async function getSettlementHistory(request: ValidatedRequest): Promise<R
           averageProcessingTime: settlementSummary.averageProcessingTime,
           successRate: settlementSummary.successRate,
           totalVolume: settlementSummary.totalAmount,
-          feePercentage: settlementSummary.feePercentage
+          feePercentage: settlementSummary.feePercentage,
         },
         filters: {
           days,
@@ -785,7 +826,7 @@ export async function getSettlementHistory(request: ValidatedRequest): Promise<R
           merchantId,
           status,
           page,
-          limit
+          limit,
         },
         pagination: {
           page,
@@ -793,22 +834,22 @@ export async function getSettlementHistory(request: ValidatedRequest): Promise<R
           totalSettlements,
           totalPages,
           hasNextPage: page < totalPages,
-          hasPrevPage: page > 1
-        }
+          hasPrevPage: page > 1,
+        },
       },
       metadata: {
         generatedAt: new Date().toISOString(),
         period: `${days} days`,
         apiVersion: '2.0',
         totalAmount: settlementSummary.totalAmount,
-        totalFees: settlementSummary.totalFees
-      }
+        totalFees: settlementSummary.totalFees,
+      },
     };
 
     logger.info('Settlement history retrieved successfully', {
       days,
       totalSettlements,
-      page
+      page,
     });
 
     return new Response(JSON.stringify(response), {
@@ -817,19 +858,22 @@ export async function getSettlementHistory(request: ValidatedRequest): Promise<R
         'Content-Type': 'application/json',
         'X-API-Version': '2.0',
         'X-Request-ID': crypto.randomUUID(),
-        'Cache-Control': 'private, max-age=300'
-      }
+        'Cache-Control': 'private, max-age=300',
+      },
     });
   } catch (error: any) {
     logger.error('Failed to fetch settlement history', error);
 
-    return new Response(JSON.stringify({
-      error: 'Failed to fetch settlement history',
-      details: error.message,
-      code: 'SETTLEMENT_HISTORY_ERROR'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to fetch settlement history',
+        details: error.message,
+        code: 'SETTLEMENT_HISTORY_ERROR',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }

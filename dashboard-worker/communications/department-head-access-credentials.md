@@ -11,7 +11,9 @@
 
 ## 🚨 **CRITICAL SECURITY NOTICE**
 
-This document contains sensitive access credentials. Handle according to Fire22 security protocols:
+This document contains sensitive access credentials. Handle according to Fire22
+security protocols:
+
 - **Store securely** in password manager or hardware security module
 - **Never share** credentials via email or unsecured channels
 - **Report immediately** any suspected credential compromise
@@ -21,9 +23,11 @@ This document contains sensitive access credentials. Handle according to Fire22 
 
 ## 🔑 **Git Commit Signing Keys (GPG)**
 
-All department heads are required to sign commits with GPG keys for code integrity and audit compliance.
+All department heads are required to sign commits with GPG keys for code
+integrity and audit compliance.
 
 ### **🏢 Management Department**
+
 **Department Head**: William Harris (CEO)  
 **Email**: william.harris@fire22.com
 
@@ -49,6 +53,7 @@ git config --global commit.gpgsign true
 ```
 
 ### **💻 Technology Department**
+
 **Department Head**: Chris Brown (CTO)  
 **Email**: chris.brown@fire22.com
 
@@ -74,6 +79,7 @@ git config --global commit.gpgsign true
 ```
 
 ### **🛡️ Security Department**
+
 **Department Head**: Sarah Mitchell (CSO)  
 **Email**: sarah.mitchell@fire22.com
 
@@ -99,6 +105,7 @@ git config --global commit.gpgsign true
 ```
 
 ### **💰 Finance Department**
+
 **Department Head**: Michael Chen (CFO)  
 **Email**: michael.chen@fire22.com
 
@@ -124,6 +131,7 @@ git config --global commit.gpgsign true
 ```
 
 ### **📈 Marketing Department**
+
 **Department Head**: Sarah Johnson (CMO)  
 **Email**: sarah.johnson@fire22.com
 
@@ -149,6 +157,7 @@ git config --global commit.gpgsign true
 ```
 
 ### **⚙️ Operations Department**
+
 **Department Head**: David Martinez (Operations Director)  
 **Email**: david.martinez@fire22.com
 
@@ -174,6 +183,7 @@ git config --global commit.gpgsign true
 ```
 
 ### **⚖️ Compliance Department**
+
 **Department Head**: Lisa Anderson (CCO)  
 **Email**: lisa.anderson@fire22.com
 
@@ -199,6 +209,7 @@ git config --global commit.gpgsign true
 ```
 
 ### **🎧 Customer Support Department**
+
 **Department Head**: Jessica Martinez (Head of Customer Support)  
 **Email**: jessica.martinez@fire22.com
 
@@ -224,6 +235,7 @@ git config --global commit.gpgsign true
 ```
 
 ### **🎲 Sportsbook Operations Department**
+
 **Department Head**: Marcus Rodriguez (Head of Sportsbook Operations)  
 **Email**: marcus.rodriguez@fire22.com
 
@@ -249,6 +261,7 @@ git config --global commit.gpgsign true
 ```
 
 ### **🤝 Team Contributors Department**
+
 **Department Head**: Brenda Williams (Chief Technology Officer)  
 **Email**: brenda.williams@fire22.com
 
@@ -294,18 +307,18 @@ cat ~/.ssh/fire22_dept_head.pub
 
 ### **📊 Department-Specific SSH Keys**
 
-| Department | SSH Key Fingerprint | Repository Access | Expiration |
-|------------|---------------------|-------------------|------------|
-| **Management** | `SHA256:1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P` | All repositories | 2025-08-28 |
-| **Technology** | `SHA256:A9B8C7D6E5F4G3H2I1J0K9L8M7N6O5P4` | All repositories | 2025-08-28 |
-| **Security** | `SHA256:S3C4R1T7Y8K3Y9I0J1K2L3M4N5O6P7Q8` | Security repos | 2025-08-28 |
-| **Finance** | `SHA256:F1N4NC3M0N3Y4567890ABCDEF123456` | Finance repos | 2025-08-28 |
-| **Marketing** | `SHA256:M4RK3T1NGK3Y789ABCDEF0123456789` | Marketing repos | 2025-08-28 |
-| **Operations** | `SHA256:0P3R4T10NSK3Y123456789ABCDEF012` | Operations repos | 2025-08-28 |
-| **Compliance** | `SHA256:C0MPL14NC3K3Y3456789ABCDEF01234` | Compliance repos | 2025-08-28 |
-| **Customer Support** | `SHA256:SUPP0RTK3Y567890ABCDEF0123456789` | Support repos | 2025-08-28 |
-| **Sportsbook** | `SHA256:SP0RT5B00KK3Y78901234567890ABCD` | Sportsbook repos | 2025-08-28 |
-| **Team Contributors** | `SHA256:T34MC0NTR1BUT0R901234567890ABC` | Collaboration repos | 2025-08-28 |
+| Department            | SSH Key Fingerprint                       | Repository Access   | Expiration |
+| --------------------- | ----------------------------------------- | ------------------- | ---------- |
+| **Management**        | `SHA256:1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P` | All repositories    | 2025-08-28 |
+| **Technology**        | `SHA256:A9B8C7D6E5F4G3H2I1J0K9L8M7N6O5P4` | All repositories    | 2025-08-28 |
+| **Security**          | `SHA256:S3C4R1T7Y8K3Y9I0J1K2L3M4N5O6P7Q8` | Security repos      | 2025-08-28 |
+| **Finance**           | `SHA256:F1N4NC3M0N3Y4567890ABCDEF123456`  | Finance repos       | 2025-08-28 |
+| **Marketing**         | `SHA256:M4RK3T1NGK3Y789ABCDEF0123456789`  | Marketing repos     | 2025-08-28 |
+| **Operations**        | `SHA256:0P3R4T10NSK3Y123456789ABCDEF012`  | Operations repos    | 2025-08-28 |
+| **Compliance**        | `SHA256:C0MPL14NC3K3Y3456789ABCDEF01234`  | Compliance repos    | 2025-08-28 |
+| **Customer Support**  | `SHA256:SUPP0RTK3Y567890ABCDEF0123456789` | Support repos       | 2025-08-28 |
+| **Sportsbook**        | `SHA256:SP0RT5B00KK3Y78901234567890ABCD`  | Sportsbook repos    | 2025-08-28 |
+| **Team Contributors** | `SHA256:T34MC0NTR1BUT0R901234567890ABC`   | Collaboration repos | 2025-08-28 |
 
 ---
 
@@ -325,18 +338,18 @@ export FIRE22_API_SECRET_DEV="fire22_dev_secret_$(openssl rand -hex 16)"
 
 ### **📊 Department API Access Matrix**
 
-| Department | Production Access | Development Access | Admin Access | Rate Limit |
-|------------|------------------|-------------------|--------------|------------|
-| **Management** | ✅ Full | ✅ Full | ✅ Yes | Unlimited |
-| **Technology** | ✅ Full | ✅ Full | ✅ Yes | Unlimited |
-| **Security** | ✅ Full | ✅ Full | ✅ Yes | Unlimited |
-| **Finance** | ✅ Limited | ✅ Full | ❌ No | 10,000/hour |
-| **Marketing** | ✅ Limited | ✅ Full | ❌ No | 5,000/hour |
-| **Operations** | ✅ Limited | ✅ Full | ❌ No | 5,000/hour |
-| **Compliance** | ✅ Limited | ✅ Full | ❌ No | 3,000/hour |
-| **Customer Support** | ✅ Limited | ✅ Full | ❌ No | 10,000/hour |
-| **Sportsbook** | ✅ Full | ✅ Full | ✅ Yes | 50,000/hour |
-| **Team Contributors** | ✅ Limited | ✅ Full | ❌ No | 5,000/hour |
+| Department            | Production Access | Development Access | Admin Access | Rate Limit  |
+| --------------------- | ----------------- | ------------------ | ------------ | ----------- |
+| **Management**        | ✅ Full           | ✅ Full            | ✅ Yes       | Unlimited   |
+| **Technology**        | ✅ Full           | ✅ Full            | ✅ Yes       | Unlimited   |
+| **Security**          | ✅ Full           | ✅ Full            | ✅ Yes       | Unlimited   |
+| **Finance**           | ✅ Limited        | ✅ Full            | ❌ No        | 10,000/hour |
+| **Marketing**         | ✅ Limited        | ✅ Full            | ❌ No        | 5,000/hour  |
+| **Operations**        | ✅ Limited        | ✅ Full            | ❌ No        | 5,000/hour  |
+| **Compliance**        | ✅ Limited        | ✅ Full            | ❌ No        | 3,000/hour  |
+| **Customer Support**  | ✅ Limited        | ✅ Full            | ❌ No        | 10,000/hour |
+| **Sportsbook**        | ✅ Full           | ✅ Full            | ✅ Yes       | 50,000/hour |
+| **Team Contributors** | ✅ Limited        | ✅ Full            | ❌ No        | 5,000/hour  |
 
 ---
 
@@ -357,18 +370,18 @@ export PGPASSWORD="$(bun secrets get fire22-db-${DEPARTMENT,,})"
 
 ### **📊 Database Permission Matrix**
 
-| Department | Read Access | Write Access | Schema Access | Backup Access |
-|------------|-------------|--------------|---------------|---------------|
-| **Management** | All schemas | Reports only | All | ❌ No |
-| **Technology** | All schemas | Dev/staging | All | ✅ Yes |
-| **Security** | All schemas | Audit tables | All | ✅ Yes |
-| **Finance** | Financial data | Financial tables | Finance | ❌ No |
-| **Marketing** | Customer data | Marketing tables | Marketing | ❌ No |
-| **Operations** | Operational data | Ops tables | Operations | ❌ No |
-| **Compliance** | Audit logs | Compliance tables | Compliance | ❌ No |
-| **Customer Support** | Customer data | Support tables | Support | ❌ No |
-| **Sportsbook** | Betting data | Betting tables | Sportsbook | ❌ No |
-| **Team Contributors** | Public data | Collab tables | Public | ❌ No |
+| Department            | Read Access      | Write Access      | Schema Access | Backup Access |
+| --------------------- | ---------------- | ----------------- | ------------- | ------------- |
+| **Management**        | All schemas      | Reports only      | All           | ❌ No         |
+| **Technology**        | All schemas      | Dev/staging       | All           | ✅ Yes        |
+| **Security**          | All schemas      | Audit tables      | All           | ✅ Yes        |
+| **Finance**           | Financial data   | Financial tables  | Finance       | ❌ No         |
+| **Marketing**         | Customer data    | Marketing tables  | Marketing     | ❌ No         |
+| **Operations**        | Operational data | Ops tables        | Operations    | ❌ No         |
+| **Compliance**        | Audit logs       | Compliance tables | Compliance    | ❌ No         |
+| **Customer Support**  | Customer data    | Support tables    | Support       | ❌ No         |
+| **Sportsbook**        | Betting data     | Betting tables    | Sportsbook    | ❌ No         |
+| **Team Contributors** | Public data      | Collab tables     | Public        | ❌ No         |
 
 ---
 
@@ -416,12 +429,13 @@ Team Contributors (Brenda Williams): TNZGC4TJPJWGK5DBNF2GS3THEB2GQ4DP
 
 ### **🔑 Hardware Security Key Backup**
 
-Each department head receives a hardware security key (YubiKey) for backup authentication:
+Each department head receives a hardware security key (YubiKey) for backup
+authentication:
 
 ```bash
 # YubiKey Serial Numbers (for reference only)
 Management:      5428472
-Technology:      5428473  
+Technology:      5428473
 Security:        5428474
 Finance:         5428475
 Marketing:       5428476
@@ -438,14 +452,14 @@ Team Contributors: 5428481
 
 ### **🔄 Mandatory Rotation Intervals**
 
-| Credential Type | Rotation Frequency | Next Rotation | Auto-Rotation |
-|-----------------|-------------------|---------------|---------------|
-| **GPG Keys** | Annual | 2025-08-28 | ❌ Manual |
-| **SSH Keys** | Annual | 2025-08-28 | ❌ Manual |
-| **API Keys** | Quarterly | 2024-11-28 | ✅ Automatic |
-| **Database Passwords** | Monthly | 2024-09-28 | ✅ Automatic |
-| **MFA Secrets** | Annual | 2025-08-28 | ❌ Manual |
-| **Hardware Keys** | 3 Years | 2027-08-28 | ❌ Manual |
+| Credential Type        | Rotation Frequency | Next Rotation | Auto-Rotation |
+| ---------------------- | ------------------ | ------------- | ------------- |
+| **GPG Keys**           | Annual             | 2025-08-28    | ❌ Manual     |
+| **SSH Keys**           | Annual             | 2025-08-28    | ❌ Manual     |
+| **API Keys**           | Quarterly          | 2024-11-28    | ✅ Automatic  |
+| **Database Passwords** | Monthly            | 2024-09-28    | ✅ Automatic  |
+| **MFA Secrets**        | Annual             | 2025-08-28    | ❌ Manual     |
+| **Hardware Keys**      | 3 Years            | 2027-08-28    | ❌ Manual     |
 
 ### **📅 Rotation Notifications**
 
@@ -461,11 +475,13 @@ Team Contributors: 5428481
 ### **🔓 Key Compromise Protocol**
 
 1. **Immediate Actions** (Within 15 minutes):
+
    - Report to Security Team (sarah.mitchell@fire22.com)
    - Disable compromised credentials immediately
    - Change all related passwords/keys
 
 2. **Security Assessment** (Within 1 hour):
+
    - Forensic analysis of compromise scope
    - Review access logs for unauthorized usage
    - Identify potential data exposure
@@ -478,11 +494,13 @@ Team Contributors: 5428481
 ### **📞 Emergency Contacts**
 
 - **Primary Security Contact**: Sarah Mitchell (CSO)
+
   - Email: sarah.mitchell@fire22.com
   - Phone: +1-555-FIRE-SEC
   - Signal: +1-555-SEC-FIRE
 
 - **Secondary Contact**: Chris Brown (CTO)
+
   - Email: chris.brown@fire22.com
   - Phone: +1-555-FIRE-CTO
   - Signal: +1-555-CTO-FIRE
@@ -497,7 +515,8 @@ Team Contributors: 5428481
 
 Please confirm receipt and proper setup of all credentials:
 
-- [ ] **GPG Key Import**: Successfully imported and configured for commit signing
+- [ ] **GPG Key Import**: Successfully imported and configured for commit
+      signing
 - [ ] **SSH Key Setup**: Added to local SSH agent and tested repository access
 - [ ] **API Key Storage**: Securely stored in password manager or Bun.secrets
 - [ ] **Database Access**: Tested connection to department-specific schemas
@@ -515,6 +534,7 @@ Please confirm receipt and proper setup of all credentials:
 4. ✅ Any issues or questions requiring immediate attention
 
 **Confirmation Email Template:**
+
 ```
 Subject: CONFIRMED - Department Head Credentials Setup - [DEPARTMENT_NAME]
 
@@ -522,7 +542,7 @@ Dear Fire22 Security Team,
 
 I confirm receipt and successful setup of all departmental access credentials:
 - GPG Key: ✅ Configured and tested
-- SSH Access: ✅ Repository access verified  
+- SSH Access: ✅ Repository access verified
 - API Keys: ✅ Stored securely and tested
 - Database Access: ✅ Connection verified
 - MFA Setup: ✅ TOTP configured with backup

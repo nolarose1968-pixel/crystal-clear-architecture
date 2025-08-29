@@ -2,13 +2,13 @@
 
 /**
  * 🎯 Fire22 Enhanced Scripts Demo
- * 
+ *
  * Demonstrates all the enhanced features working together:
  * - Performance monitoring with ScriptRunner
  * - Enhanced error handling
  * - Configuration validation
  * - Comprehensive logging
- * 
+ *
  * @version 1.0.0
  * @author Fire22 Development Team
  */
@@ -23,23 +23,23 @@ const demoConfigSchema = {
     type: 'string',
     required: true,
     min: 2,
-    max: 50
+    max: 50,
   },
   port: {
     type: 'number',
     required: true,
     min: 1024,
-    max: 65535
+    max: 65535,
   },
   features: {
     type: 'array',
     required: true,
-    min: 1
+    min: 1,
   },
   enabled: {
     type: 'boolean',
-    required: true
-  }
+    required: true,
+  },
 };
 
 // Demo configuration
@@ -47,7 +47,7 @@ const demoConfig = {
   name: 'Fire22 Enhanced Demo',
   port: 3000,
   features: ['performance', 'error-handling', 'validation'],
-  enabled: true
+  enabled: true,
 };
 
 // Demo operations
@@ -73,8 +73,8 @@ async function performComplexOperation(): Promise<{ result: string; metadata: an
     metadata: {
       steps: 5,
       complexity: 'high',
-      timestamp: new Date().toISOString()
-    }
+      timestamp: new Date().toISOString(),
+    },
   };
 }
 
@@ -96,51 +96,60 @@ async function performConditionalOperation(shouldSucceed: boolean): Promise<stri
   }
 }
 
-async function performDatabaseOperation(): Promise<{ customers: number; transactions: number; bets: number }> {
+async function performDatabaseOperation(): Promise<{
+  customers: number;
+  transactions: number;
+  bets: number;
+}> {
   await Bun.sleep(150); // Simulate database query time
-  
+
   // Simulate database results
   return {
     customers: 2,
     transactions: 3,
-    bets: 3
+    bets: 3,
   };
 }
 
-async function performTransactionSimulation(): Promise<{ success: boolean; transactionId: string; amount: number }> {
+async function performTransactionSimulation(): Promise<{
+  success: boolean;
+  transactionId: string;
+  amount: number;
+}> {
   await Bun.sleep(250); // Simulate transaction processing
-  
+
   // Simulate successful transaction
   return {
     success: true,
     transactionId: `TXN_${Date.now()}`,
-    amount: 500.00
+    amount: 500.0,
   };
 }
 
-async function performDataValidation(): Promise<{ valid: number; invalid: number; errors: string[] }> {
+async function performDataValidation(): Promise<{
+  valid: number;
+  invalid: number;
+  errors: string[];
+}> {
   await Bun.sleep(100); // Simulate validation time
-  
+
   // Simulate data validation results
   return {
     valid: 8,
     invalid: 2,
-    errors: [
-      'Customer AL500: Invalid email format',
-      'Transaction TXN002: Amount exceeds limit'
-    ]
+    errors: ['Customer AL500: Invalid email format', 'Transaction TXN002: Amount exceeds limit'],
   };
 }
 
 async function main() {
   console.log('🚀 Fire22 Enhanced Scripts Demo');
-  console.log('================================\n');
+  console.log('!==!==!==!==!==!==\n');
 
   try {
     // 1. Configuration Validation Demo
     console.log('✅ Step 1: Configuration Validation');
     console.log('-----------------------------------');
-    
+
     const validation = validateConfig(demoConfig, demoConfigSchema);
     if (validation.isValid) {
       console.log('✅ Configuration is valid!');
@@ -159,83 +168,94 @@ async function main() {
     // 2. Performance Monitoring Demo
     console.log('📊 Step 2: Performance Monitoring');
     console.log('----------------------------------');
-    
+
     const fastResult = await runScript('fast-operation', performFastOperation, {
       tags: ['demo', 'fast'],
-      logLevel: 'info'
+      logLevel: 'info',
     });
-    
+
     console.log(`✅ Fast operation result: ${fastResult.data}`);
     console.log(`   Duration: ${fastResult.performance.duration.toFixed(2)}ms`);
-    console.log(`   Memory delta: ${(fastResult.performance.memoryDelta.heapUsed / 1024).toFixed(2)}KB\n`);
+    console.log(
+      `   Memory delta: ${(fastResult.performance.memoryDelta.heapUsed / 1024).toFixed(2)}KB\n`
+    );
 
     const slowResult = await runScript('slow-operation', performSlowOperation, {
       tags: ['demo', 'slow'],
-      logLevel: 'info'
+      logLevel: 'info',
     });
-    
+
     console.log(`✅ Slow operation result: ${slowResult.data}`);
     console.log(`   Duration: ${slowResult.performance.duration.toFixed(2)}ms`);
-    console.log(`   Memory delta: ${(slowResult.performance.memoryDelta.heapUsed / 1024).toFixed(2)}KB\n`);
+    console.log(
+      `   Memory delta: ${(slowResult.performance.memoryDelta.heapUsed / 1024).toFixed(2)}KB\n`
+    );
 
     // 3. Error Handling Demo
     console.log('🛡️ Step 3: Error Handling Demo');
     console.log('--------------------------------');
-    
+
     try {
       await runScript('failing-operation', performFailingOperation, {
         tags: ['demo', 'error'],
-        logLevel: 'info'
+        logLevel: 'info',
       });
     } catch (error) {
       console.log('❌ Operation failed as expected');
-      
+
       // Handle the error with enhanced error handler
       await handleError(error, {
         scriptName: 'enhanced-demo',
         operation: 'failing-operation',
-        environment: 'demo'
+        environment: 'demo',
       });
     }
 
     // 4. Custom Error Creation Demo
     console.log('\n🎭 Step 4: Custom Error Creation');
     console.log('----------------------------------');
-    
+
     try {
-      throw createError('This is a custom demo error', {
-        scriptName: 'enhanced-demo',
-        operation: 'custom-error-demo'
-      }, {
-        type: 'runtime',
-        severity: 'medium',
-        recoverable: true,
-        suggestedActions: [
-          'This is just a demo - no action needed',
-          'Check the error context for debugging info'
-        ]
-      });
+      throw createError(
+        'This is a custom demo error',
+        {
+          scriptName: 'enhanced-demo',
+          operation: 'custom-error-demo',
+        },
+        {
+          type: 'runtime',
+          severity: 'medium',
+          recoverable: true,
+          suggestedActions: [
+            'This is just a demo - no action needed',
+            'Check the error context for debugging info',
+          ],
+        }
+      );
     } catch (error) {
       console.log('✅ Custom error created and handled');
       await handleError(error, {
         scriptName: 'enhanced-demo',
-        operation: 'custom-error-demo'
+        operation: 'custom-error-demo',
       });
     }
 
     // 5. Validation Rules Demo
     console.log('\n🔍 Step 5: Validation Rules Demo');
     console.log('----------------------------------');
-    
+
     const rules = getCommonRules();
-    const emailValidation = validateConfig({ email: 'test@example.com' }, {
-      email: {
-        type: 'string',
-        required: true,
-        custom: rules.validEmail.validator
+    const emailValidation = validateConfig(
+      { email: 'test@example.com' },
+      {
+        email: {
+          type: 'string',
+          required: true,
+          custom: rules.validEmail.validator,
+        },
       }
-    });
-    
+    );
+
     if (emailValidation.isValid) {
       console.log('✅ Email validation passed');
     } else {
@@ -245,14 +265,14 @@ async function main() {
     // 6. Advanced Operations Demo
     console.log('\n🚀 Step 6: Advanced Operations Demo');
     console.log('------------------------------------');
-    
+
     // Complex operation with metadata
     const complexResult = await runScript('complex-operation', performComplexOperation, {
       tags: ['demo', 'complex', 'metadata'],
       logLevel: 'info',
-      timeout: 5000
+      timeout: 5000,
     });
-    
+
     if (complexResult.data) {
       console.log(`✅ Complex operation result: ${complexResult.data.result}`);
       console.log(`   Metadata: ${JSON.stringify(complexResult.data.metadata)}`);
@@ -262,9 +282,9 @@ async function main() {
     // Batch operations
     const batchResult = await runScript('batch-operation', performBatchOperation, {
       tags: ['demo', 'batch', 'parallel'],
-      logLevel: 'info'
+      logLevel: 'info',
     });
-    
+
     if (batchResult.data) {
       console.log(`✅ Batch operation completed: ${batchResult.data.length} items`);
       batchResult.data.forEach((item, index) => {
@@ -274,39 +294,43 @@ async function main() {
     console.log(`   Total duration: ${batchResult.performance.duration.toFixed(2)}ms\n`);
 
     // Conditional operations
-    const successResult = await runScript('conditional-success', () => performConditionalOperation(true), {
-      tags: ['demo', 'conditional', 'success'],
-      logLevel: 'info'
-    });
-    
+    const successResult = await runScript(
+      'conditional-success',
+      () => performConditionalOperation(true),
+      {
+        tags: ['demo', 'conditional', 'success'],
+        logLevel: 'info',
+      }
+    );
+
     console.log(`✅ Conditional success: ${successResult.data}`);
     console.log(`   Duration: ${successResult.performance.duration.toFixed(2)}ms\n`);
 
     try {
       await runScript('conditional-failure', () => performConditionalOperation(false), {
         tags: ['demo', 'conditional', 'failure'],
-        logLevel: 'info'
+        logLevel: 'info',
       });
     } catch (error) {
       console.log('❌ Conditional failure handled as expected');
       await handleError(error, {
         scriptName: 'enhanced-demo',
         operation: 'conditional-failure',
-        environment: 'demo'
+        environment: 'demo',
       });
     }
 
     // 7. Advanced Validation Demo
     console.log('\n🔍 Step 7: Advanced Validation Demo');
     console.log('------------------------------------');
-    
+
     // Complex configuration validation
     const complexConfig = {
       userName: 'John Doe',
       userEmail: 'john@example.com',
       userAge: 30,
       userPreferences: ['dark-mode', 'notifications'],
-      systemVersion: '2.1.0'
+      systemVersion: '2.1.0',
     };
 
     const complexSchema = {
@@ -314,29 +338,29 @@ async function main() {
         type: 'string',
         required: true,
         min: 2,
-        max: 50
+        max: 50,
       },
       userEmail: {
         type: 'string',
         required: true,
-        custom: (value: string) => value.includes('@') && value.includes('.')
+        custom: (value: string) => value.includes('@') && value.includes('.'),
       },
       userAge: {
         type: 'number',
         required: true,
         min: 18,
-        max: 120
+        max: 120,
       },
       userPreferences: {
         type: 'array',
         required: true,
-        min: 1
+        min: 1,
       },
       systemVersion: {
         type: 'string',
         required: true,
-        pattern: /^\d+\.\d+\.\d+$/
-      }
+        pattern: /^\d+\.\d+\.\d+$/,
+      },
     };
 
     const complexValidation = validateConfig(complexConfig, complexSchema);
@@ -354,14 +378,14 @@ async function main() {
     // 8. Database Operations Demo
     console.log('\n🗄️ Step 8: Database Operations Demo');
     console.log('------------------------------------');
-    
+
     // Database query simulation
     const dbResult = await runScript('database-query', performDatabaseOperation, {
       tags: ['demo', 'database', 'query'],
       logLevel: 'info',
-      timeout: 10000
+      timeout: 10000,
     });
-    
+
     if (dbResult.data) {
       console.log(`✅ Database query completed successfully`);
       console.log(`   Customers: ${dbResult.data.customers}`);
@@ -373,9 +397,9 @@ async function main() {
     // Transaction simulation
     const transactionResult = await runScript('transaction-sim', performTransactionSimulation, {
       tags: ['demo', 'database', 'transaction'],
-      logLevel: 'info'
+      logLevel: 'info',
     });
-    
+
     if (transactionResult.data) {
       console.log(`✅ Transaction processed successfully`);
       console.log(`   Transaction ID: ${transactionResult.data.transactionId}`);
@@ -386,9 +410,9 @@ async function main() {
     // Data validation simulation
     const validationResult = await runScript('data-validation', performDataValidation, {
       tags: ['demo', 'database', 'validation'],
-      logLevel: 'info'
+      logLevel: 'info',
     });
-    
+
     if (validationResult.data) {
       console.log(`✅ Data validation completed`);
       console.log(`   Valid records: ${validationResult.data.valid}`);
@@ -405,24 +429,23 @@ async function main() {
     // 9. Performance Report
     console.log('\n📈 Step 9: Performance Summary');
     console.log('-------------------------------');
-    
+
     const runner = (await import('./script-runner')).default.getInstance();
     const report = runner.generatePerformanceReport();
     console.log(report);
 
     console.log('\n🎉 Demo completed successfully!');
     console.log('Your enhanced scripts are working perfectly! 🚀');
-
   } catch (error) {
     console.error('\n💥 Demo failed with unexpected error:');
     console.error(error);
-    
+
     await handleError(error, {
       scriptName: 'enhanced-demo',
       operation: 'main',
-      environment: 'demo'
+      environment: 'demo',
     });
-    
+
     process.exit(1);
   }
 }
@@ -430,7 +453,7 @@ async function main() {
 // CLI interface
 if (import.meta.main) {
   const args = process.argv.slice(2);
-  
+
   if (args.includes('--help') || args.includes('-h')) {
     console.log(`
 🚀 Fire22 Enhanced Scripts Demo
@@ -466,28 +489,27 @@ This demo showcases:
   }
 
   // Run the demo
-  main().catch(async (error) => {
+  main().catch(async error => {
     await handleError(error, {
       scriptName: 'enhanced-demo',
       operation: 'cli-main',
-      environment: 'demo'
+      environment: 'demo',
     });
     process.exit(1);
   });
 }
 
-export { 
-  main, 
-  demoConfig, 
-  demoConfigSchema, 
-  performFastOperation, 
-  performSlowOperation, 
+export {
+  main,
+  demoConfig,
+  demoConfigSchema,
+  performFastOperation,
+  performSlowOperation,
   performFailingOperation,
   performComplexOperation,
   performBatchOperation,
   performConditionalOperation,
   performDatabaseOperation,
   performTransactionSimulation,
-  performDataValidation
+  performDataValidation,
 };
-

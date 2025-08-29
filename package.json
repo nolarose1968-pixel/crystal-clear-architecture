@@ -1,24 +1,4 @@
 {
-  "name": "@fire22/enterprise-system",
-  "version": "2.3.0-architecture+20241219",
-  "description": "Fire22 Enterprise System - Domain-Driven Architecture",
-  "author": "Fire22 Team",
-  "license": "MIT",
-  "engines": {
-    "bun": ">=1.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture.git"
-  },
-  "keywords": [
-    "fire22",
-    "enterprise",
-    "domain-driven-design",
-    "bun",
-    "typescript",
-    "architecture"
-  ],
   "dependencies": {
     "@iarna/toml": "^2.2.5",
     "@types/bun": "^1.2.21",
@@ -33,46 +13,36 @@
     "yaml": "^2.8.1"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240925.0",
     "autoprefixer": "^10.4.21",
-    "clean-css": "^5.3.3",
     "drizzle-kit": "^0.31.4",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.0",
-    "terser": "^5.36.0",
-    "webpack": "^5.97.1",
-    "webpack-bundle-analyzer": "^4.10.2",
-    "webpack-cli": "^5.1.4",
-    "workbox-webpack-plugin": "^7.1.0"
+    "wrangler": "^3.22.0"
   },
   "scripts": {
-    "build": "node build/build.js",
-    "build:analyze": "node build/build.js && bunx webpack-bundle-analyzer build/stats.json",
-    "build:dev": "NODE_ENV=development node build/build.js",
-    "build:prod": "NODE_ENV=production node build/build.js",
-    "optimize": "bun run build:prod && bun run build:analyze",
-    "serve": "bunx serve build -p 3000",
-    "dashboard:dev": "node dashboard-server.js",
-    "lighthouse": "bunx lighthouse http://localhost:3000/analytics/ --output=json --output-path=./build/lighthouse-report.json",
-    "version:major": "bun run scripts/version-manager.ts --bump major",
-    "version:minor": "bun run scripts/version-manager.ts --bump minor",
-    "version:patch": "bun run scripts/version-manager.ts --bump patch",
-    "version:prerelease": "bun run scripts/version-manager.ts --prerelease",
-    "version:release": "bun run scripts/version-manager.ts --release",
-    "version:status": "bun run scripts/version-manager.ts --status",
-    "version:validate": "bun run scripts/version-manager.ts --validate",
-    "version:current": "bun pm pkg get version",
-    "version:info": "bun pm pkg get name description version engines.repository",
-    "version:scripts": "bun pm pkg get scripts",
-    "version:deps": "bun pm pkg get dependencies devDependencies",
-
-    "pkg:get": "bun pm pkg get",
-    "pkg:set": "bun pm pkg set",
-    "pkg:delete": "bun pm pkg delete",
-    "pkg:fix": "bun pm pkg fix",
-
-    "release:prepare": "bun run version:validate && bun run build:prod",
-    "release:tag": "bun run scripts/version-manager.ts --tag",
-    "release:notes": "bun run scripts/version-manager.ts --changelog",
-    "release:verify": "bun run version:current && echo '✅ Version verified'"
+    "dev": "wrangler pages dev --compatibility-date=2024-09-23",
+    "build": "bun run build:docs && bun run build:pages",
+    "build:docs": "mkdir -p dist/docs && cp -r docs/* dist/docs/ && cp index.html dist/ && cp -r build/* dist/",
+    "build:pages": "wrangler pages deploy dist --project-name=crystal-clear-architecture",
+    "deploy": "bun run build && wrangler pages deploy dist",
+    "deploy:preview": "bun run build && wrangler pages deploy dist --branch=main",
+    "preview": "wrangler pages dev dist",
+    "functions:dev": "wrangler pages dev --functions=functions",
+    "lint": "echo 'Linting...'",
+    "format": "echo 'Formatting...'",
+    "test": "echo 'Testing...'",
+    "health": "curl -s https://crystal-clear-architecture.pages.dev/api/health | jq .",
+    "health:custom": "curl -s https://docs.apexodds.net/api/health | jq .",
+    "domain:setup": "bun run scripts/setup-custom-domain.bun.ts",
+    "domain:validate": "bun run scripts/validate-domain-setup.bun.ts",
+    "demo:cross-platform": "bun run scripts/demo-cross-platform.bun.ts",
+    "domain:test": "curl -I https://docs.apexodds.net/api/health",
+    "monitor": "wrangler tail --format=pretty"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture.git",
+    "directory": ""
   }
 }

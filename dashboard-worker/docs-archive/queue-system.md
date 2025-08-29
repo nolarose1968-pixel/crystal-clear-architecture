@@ -2,14 +2,17 @@
 
 ## Overview
 
-The Queue System is a peer-to-peer matching engine that automatically pairs withdrawal requests with available deposits, creating an efficient financial ecosystem that reduces processing times and improves customer experience.
+The Queue System is a peer-to-peer matching engine that automatically pairs
+withdrawal requests with available deposits, creating an efficient financial
+ecosystem that reduces processing times and improves customer experience.
 
 ## System Architecture
 
 ### Core Components
 
 1. **Queue Manager**: Manages items in the queue and handles matching logic
-2. **Matching Engine**: Automatically pairs withdrawals with deposits based on criteria
+2. **Matching Engine**: Automatically pairs withdrawals with deposits based on
+   criteria
 3. **Processing Pipeline**: Handles the execution of matched transactions
 4. **Database Layer**: Persistent storage for queue items, matches, and history
 
@@ -49,45 +52,55 @@ CREATE TABLE queue_matches (
 ## API Endpoints
 
 ### 1. Initialize Queue System
+
 - **Endpoint**: `POST /api/queue/init`
 - **Auth**: Required (manager)
 - **Action**: Creates necessary database tables
 - **Use Case**: First-time setup or system reset
 
 ### 2. Add Withdrawal to Queue
+
 - **Endpoint**: `POST /api/queue/withdrawal`
 - **Auth**: Required
-- **Body**: `{ customerId, amount, paymentType, paymentDetails, priority, notes }`
+- **Body**:
+  `{ customerId, amount, paymentType, paymentDetails, priority, notes }`
 - **Action**: Adds withdrawal request to queue for matching
 
 ### 3. Add Deposit to Queue
+
 - **Endpoint**: `POST /api/queue/deposit`
 - **Auth**: Required
-- **Body**: `{ customerId, amount, paymentType, paymentDetails, priority, notes }`
+- **Body**:
+  `{ customerId, amount, paymentType, paymentDetails, priority, notes }`
 - **Action**: Adds deposit to queue for matching with withdrawals
 
 ### 4. Get Queue Statistics
+
 - **Endpoint**: `GET /api/queue/stats`
 - **Auth**: Required
 - **Action**: Returns queue performance metrics and counts
 
 ### 5. Get Queue Items
+
 - **Endpoint**: `GET /api/queue/items`
 - **Auth**: Required
 - **Query**: `?status=pending&type=withdrawal`
 - **Action**: Returns filtered queue items
 
 ### 6. Get Matching Opportunities
+
 - **Endpoint**: `GET /api/queue/opportunities`
 - **Auth**: Required (manager)
 - **Action**: Shows potential matches with scoring
 
 ### 7. Process Matched Items
+
 - **Endpoint**: `POST /api/queue/process`
 - **Auth**: Required (manager)
 - **Action**: Executes processing for matched items
 
 ### 8. Complete Match
+
 - **Endpoint**: `POST /api/queue/complete`
 - **Auth**: Required (manager)
 - **Body**: `{ matchId, notes }`
@@ -133,21 +146,25 @@ score += Math.min(20, waitTime / 60000); // 1 point per minute, max 20
 ## Workflow
 
 ### 1. Item Addition
+
 ```
 Customer Request → Validation → Add to Queue → Attempt Match
 ```
 
 ### 2. Matching Process
+
 ```
 Queue Items → Scoring Algorithm → Best Match → Create Match Record
 ```
 
 ### 3. Processing Pipeline
+
 ```
 Matched Items → Status Update → Transaction Processing → Completion
 ```
 
 ### 4. Completion Flow
+
 ```
 Processing → Database Updates → Transaction Records → Cleanup
 ```
@@ -155,17 +172,20 @@ Processing → Database Updates → Transaction Records → Cleanup
 ## Business Rules
 
 ### Withdrawal Requirements
+
 - Customer must have sufficient balance
 - Amount must be positive
 - Payment type must be valid
 - Customer must be verified
 
 ### Deposit Requirements
+
 - Amount must be positive
 - Payment type must be valid
 - Customer must be verified
 
 ### Matching Constraints
+
 - Payment types must match exactly
 - Withdrawal amount ≤ deposit amount
 - Both items must be in 'pending' status
@@ -174,6 +194,7 @@ Processing → Database Updates → Transaction Records → Cleanup
 ## Payment Type Support
 
 ### Supported Methods
+
 - **Venmo**: `@username` in paymentDetails
 - **PayPal**: `email@address.com` in paymentDetails
 - **CashApp**: `$cashtag` in paymentDetails
@@ -182,6 +203,7 @@ Processing → Database Updates → Transaction Records → Cleanup
 - **Bank Transfer**: Traditional method (default)
 
 ### Payment Type Matching
+
 - Perfect matches get +20 points
 - Different types cannot be matched
 - Ensures payment method compatibility
@@ -189,6 +211,7 @@ Processing → Database Updates → Transaction Records → Cleanup
 ## Queue Management
 
 ### Status Transitions
+
 ```
 pending → matched → processing → completed
    ↓         ↓         ↓          ↓
@@ -197,6 +220,7 @@ pending → matched → processing → completed
 ```
 
 ### Queue Statistics
+
 - Total items in queue
 - Pending withdrawals count
 - Pending deposits count
@@ -206,6 +230,7 @@ pending → matched → processing → completed
 - Success rate
 
 ### Performance Metrics
+
 - **Response Time**: <Component100ms for queue operations
 - **Matching Speed**: Real-time matching on item addition
 - **Processing Rate**: Configurable batch processing
@@ -214,17 +239,20 @@ pending → matched → processing → completed
 ## Security Features
 
 ### Authentication
+
 - All endpoints require valid authentication
 - Role-based access control for management functions
 - Manager-level access for system operations
 
 ### Validation
+
 - Input validation for all parameters
 - Amount validation and balance checks
 - Payment type validation
 - Customer verification checks
 
 ### Audit Trail
+
 - Complete history of all queue operations
 - Match creation and completion tracking
 - Transaction logging for all operations
@@ -233,6 +261,7 @@ pending → matched → processing → completed
 ## Error Handling
 
 ### Common Error Scenarios
+
 1. **Insufficient Balance**: Customer balance < withdrawal amount
 2. **Invalid Payment Type**: Unsupported payment method
 3. **Customer Not Found**: Invalid customer ID
@@ -240,6 +269,7 @@ pending → matched → processing → completed
 5. **Database Errors**: Connection or constraint violations
 
 ### Error Responses
+
 ```json
 {
   "success": false,
@@ -251,6 +281,7 @@ pending → matched → processing → completed
 ## Monitoring & Analytics
 
 ### Key Metrics
+
 - Queue length and wait times
 - Matching success rates
 - Processing performance
@@ -258,6 +289,7 @@ pending → matched → processing → completed
 - Payment type distribution
 
 ### Dashboard Integration
+
 - Real-time queue status
 - Matching opportunities display
 - Performance analytics
@@ -266,6 +298,7 @@ pending → matched → processing → completed
 ## Testing
 
 ### Test Commands
+
 ```bash
 # Test queue system
 bun run test:queue
@@ -275,6 +308,7 @@ bun run test:withdrawals
 ```
 
 ### Test Coverage
+
 - ✅ Queue initialization
 - ✅ Item addition (withdrawal/deposit)
 - ✅ Matching algorithm
@@ -288,6 +322,7 @@ bun run test:withdrawals
 ## Usage Examples
 
 ### Add Withdrawal to Queue
+
 ```bash
 curl -X POST "http://localhost:8787/api/queue/withdrawal" \
   -H "Content-Type: application/json" \
@@ -303,6 +338,7 @@ curl -X POST "http://localhost:8787/api/queue/withdrawal" \
 ```
 
 ### Add Deposit to Queue
+
 ```bash
 curl -X POST "http://localhost:8787/api/queue/deposit" \
   -H "Content-Type: application/json" \
@@ -318,12 +354,14 @@ curl -X POST "http://localhost:8787/api/queue/deposit" \
 ```
 
 ### Get Matching Opportunities
+
 ```bash
 curl -X GET "http://localhost:8787/api/queue/opportunities" \
   -H "Authorization: Bearer MANAGER_TOKEN"
 ```
 
 ### Process Queue
+
 ```bash
 curl -X POST "http://localhost:8787/api/queue/process" \
   -H "Authorization: Bearer MANAGER_TOKEN"
@@ -332,18 +370,21 @@ curl -X POST "http://localhost:8787/api/queue/process" \
 ## Best Practices
 
 ### For Developers
+
 1. **Always validate input** before adding to queue
 2. **Handle errors gracefully** with proper logging
 3. **Monitor queue performance** regularly
 4. **Test matching algorithms** with various scenarios
 
 ### For Managers
+
 1. **Review matching opportunities** regularly
 2. **Monitor queue statistics** for bottlenecks
 3. **Process matches promptly** to maintain efficiency
 4. **Review failed matches** for system improvements
 
 ### For Customers
+
 1. **Provide accurate payment details** for faster matching
 2. **Use supported payment types** for better compatibility
 3. **Check queue position** for estimated wait times
@@ -354,24 +395,28 @@ curl -X POST "http://localhost:8787/api/queue/process" \
 ### Common Issues
 
 #### Queue Not Processing
+
 - Check if items are in 'pending' status
 - Verify payment type compatibility
 - Review matching algorithm logs
 - Check database connectivity
 
 #### Slow Matching
+
 - Review queue size and wait times
 - Check payment type distribution
 - Analyze matching algorithm performance
 - Consider adjusting scoring weights
 
 #### Failed Matches
+
 - Review error logs for specific failures
 - Check customer verification status
 - Verify payment method compatibility
 - Review amount constraints
 
 ### Debug Commands
+
 ```bash
 # Check queue status
 curl -X GET "http://localhost:8787/api/queue/stats"
@@ -386,6 +431,7 @@ curl -X GET "http://localhost:8787/api/queue/opportunities"
 ## Future Enhancements
 
 ### Planned Features
+
 - **AI-powered matching**: Machine learning for better matches
 - **Batch processing**: Process multiple matches simultaneously
 - **Priority queuing**: VIP customer priority system
@@ -393,6 +439,7 @@ curl -X GET "http://localhost:8787/api/queue/opportunities"
 - **Advanced analytics**: Predictive queue modeling
 
 ### Scalability Considerations
+
 - **Horizontal scaling**: Multiple queue instances
 - **Load balancing**: Distribute queue load
 - **Caching strategies**: Redis for high-performance matching
@@ -401,5 +448,4 @@ curl -X GET "http://localhost:8787/api/queue/opportunities"
 
 ---
 
-*Last Updated: December 2024*
-*Version: 1.0*
+_Last Updated: December 2024_ _Version: 1.0_

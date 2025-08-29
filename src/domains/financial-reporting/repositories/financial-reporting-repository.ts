@@ -5,7 +5,12 @@
  * Handles data persistence for financial reports with enterprise-grade patterns
  */
 
-import { FinancialReport, ReportType, ReportStatus, ComplianceStatus } from '../entities/financial-report';
+import {
+  FinancialReport,
+  ReportType,
+  ReportStatus,
+  ComplianceStatus,
+} from "../entities/financial-report";
 
 export interface FinancialReportQuery {
   reportType?: ReportType;
@@ -48,7 +53,10 @@ export abstract class FinancialReportingRepository {
   /**
    * Find reports by period
    */
-  abstract findByPeriod(startDate: Date, endDate: Date): Promise<FinancialReport[]>;
+  abstract findByPeriod(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<FinancialReport[]>;
 
   /**
    * Find reports requiring attention
@@ -85,53 +93,61 @@ export class SQLiteFinancialReportingRepository extends FinancialReportingReposi
 
     if (existing) {
       // Update existing report
-      await this.db.run(`
+      await this.db.run(
+        `
         UPDATE financial_reports
         SET status = ?, compliance_status = ?, approved_by = ?,
             approved_at = ?, published_at = ?, updated_at = datetime('now')
         WHERE id = ?
-      `, [
-        data.status,
-        data.complianceStatus,
-        data.approvedBy,
-        data.approvedAt,
-        data.publishedAt,
-        data.id
-      ]);
+      `,
+        [
+          data.status,
+          data.complianceStatus,
+          data.approvedBy,
+          data.approvedAt,
+          data.publishedAt,
+          data.id,
+        ],
+      );
     } else {
       // Insert new report
-      await this.db.run(`
+      await this.db.run(
+        `
         INSERT INTO financial_reports (
           id, report_type, period_start, period_end, generated_at,
           status, compliance_status, approved_by, approved_at, published_at,
           summary_data, collections_data, settlements_data, balance_data,
           revenue_data, compliance_data, created_at, updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
-      `, [
-        data.id,
-        data.reportType,
-        data.periodStart,
-        data.periodEnd,
-        data.generatedAt,
-        data.status,
-        data.complianceStatus,
-        data.approvedBy,
-        data.approvedAt,
-        data.publishedAt,
-        JSON.stringify(data.summary),
-        JSON.stringify(data.collections),
-        JSON.stringify(data.settlements),
-        JSON.stringify(data.balance),
-        JSON.stringify(data.revenue),
-        JSON.stringify(data.compliance)
-      ]);
+      `,
+        [
+          data.id,
+          data.reportType,
+          data.periodStart,
+          data.periodEnd,
+          data.generatedAt,
+          data.status,
+          data.complianceStatus,
+          data.approvedBy,
+          data.approvedAt,
+          data.publishedAt,
+          JSON.stringify(data.summary),
+          JSON.stringify(data.collections),
+          JSON.stringify(data.settlements),
+          JSON.stringify(data.balance),
+          JSON.stringify(data.revenue),
+          JSON.stringify(data.compliance),
+        ],
+      );
     }
 
     // Publish domain events after successful save
     const domainEvents = report.getDomainEvents();
     if (domainEvents.length > 0) {
       // Import DomainEvents here to avoid circular dependency
-      const { DomainEvents } = await import('../../shared/events/domain-events');
+      const { DomainEvents } = await import(
+        "../../shared/events/domain-events"
+      );
       const events = DomainEvents.getInstance();
 
       for (const event of domainEvents) {
@@ -146,9 +162,14 @@ export class SQLiteFinancialReportingRepository extends FinancialReportingReposi
   }
 
   async findById(id: string): Promise<FinancialReport | null> {
-    const row = await this.db.query(`
+    const row = await this.db
+      .query(
+        `
       SELECT * FROM financial_reports WHERE id = ? AND deleted_at IS NULL
-    `, [id]).get();
+    `,
+        [id],
+      )
+      .get();
 
     if (!row) return null;
 
@@ -163,54 +184,54 @@ export class SQLiteFinancialReportingRepository extends FinancialReportingReposi
     const params: any[] = [];
 
     if (query.reportType) {
-      sql += ' AND report_type = ?';
+      sql += " AND report_type = ?";
       params.push(query.reportType);
     }
 
     if (query.status) {
-      sql += ' AND status = ?';
+      sql += " AND status = ?";
       params.push(query.status);
     }
 
     if (query.complianceStatus) {
-      sql += ' AND compliance_status = ?';
+      sql += " AND compliance_status = ?";
       params.push(query.complianceStatus);
     }
 
     if (query.periodStart) {
-      sql += ' AND period_end >= ?';
+      sql += " AND period_end >= ?";
       params.push(query.periodStart.toISOString());
     }
 
     if (query.periodEnd) {
-      sql += ' AND period_start <= ?';
+      sql += " AND period_start <= ?";
       params.push(query.periodEnd.toISOString());
     }
 
     if (query.approvedBy) {
-      sql += ' AND approved_by = ?';
+      sql += " AND approved_by = ?";
       params.push(query.approvedBy);
     }
 
     if (query.generatedAfter) {
-      sql += ' AND generated_at >= ?';
+      sql += " AND generated_at >= ?";
       params.push(query.generatedAfter.toISOString());
     }
 
     if (query.generatedBefore) {
-      sql += ' AND generated_at <= ?';
+      sql += " AND generated_at <= ?";
       params.push(query.generatedBefore.toISOString());
     }
 
-    sql += ' ORDER BY generated_at DESC';
+    sql += " ORDER BY generated_at DESC";
 
     if (query.limit) {
-      sql += ' LIMIT ?';
+      sql += " LIMIT ?";
       params.push(query.limit);
     }
 
     if (query.offset) {
-      sql += ' OFFSET ?';
+      sql += " OFFSET ?";
       params.push(query.offset);
     }
 
@@ -218,14 +239,22 @@ export class SQLiteFinancialReportingRepository extends FinancialReportingReposi
     return rows.map((row: any) => this.mapRowToEntity(row));
   }
 
-  async findByPeriod(startDate: Date, endDate: Date): Promise<FinancialReport[]> {
-    const rows = await this.db.query(`
+  async findByPeriod(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<FinancialReport[]> {
+    const rows = await this.db
+      .query(
+        `
       SELECT * FROM financial_reports
       WHERE deleted_at IS NULL
         AND period_start <= ?
         AND period_end >= ?
       ORDER BY period_start ASC
-    `, [endDate.toISOString(), startDate.toISOString()]).all();
+    `,
+        [endDate.toISOString(), startDate.toISOString()],
+      )
+      .all();
 
     return rows.map((row: any) => this.mapRowToEntity(row));
   }
@@ -233,7 +262,9 @@ export class SQLiteFinancialReportingRepository extends FinancialReportingReposi
   async findReportsRequiringAttention(): Promise<FinancialReport[]> {
     const now = new Date().toISOString();
 
-    const rows = await this.db.query(`
+    const rows = await this.db
+      .query(
+        `
       SELECT * FROM financial_reports
       WHERE deleted_at IS NULL
         AND (
@@ -250,7 +281,10 @@ export class SQLiteFinancialReportingRepository extends FinancialReportingReposi
           ELSE 5
         END,
         period_end ASC
-    `, [now, now]).all();
+    `,
+        [now, now],
+      )
+      .all();
 
     return rows.map((row: any) => this.mapRowToEntity(row));
   }
@@ -258,7 +292,9 @@ export class SQLiteFinancialReportingRepository extends FinancialReportingReposi
   async getSummary(): Promise<FinancialReportSummary> {
     const now = new Date().toISOString();
 
-    const stats = await this.db.query(`
+    const stats = await this.db
+      .query(
+        `
       SELECT
         COUNT(*) as total_reports,
         SUM(CASE WHEN status = 'draft' THEN 1 ELSE 0 END) as draft_count,
@@ -279,7 +315,10 @@ export class SQLiteFinancialReportingRepository extends FinancialReportingReposi
         SUM(CASE WHEN status = 'draft' AND period_end < ? THEN 1 ELSE 0 END) as overdue_count
       FROM financial_reports
       WHERE deleted_at IS NULL
-    `, [now]).get();
+    `,
+        [now],
+      )
+      .get();
 
     return {
       totalReports: stats.total_reports || 0,
@@ -288,7 +327,7 @@ export class SQLiteFinancialReportingRepository extends FinancialReportingReposi
         [ReportStatus.PENDING_REVIEW]: stats.pending_review_count || 0,
         [ReportStatus.APPROVED]: stats.approved_count || 0,
         [ReportStatus.PUBLISHED]: stats.published_count || 0,
-        [ReportStatus.ARCHIVED]: stats.archived_count || 0
+        [ReportStatus.ARCHIVED]: stats.archived_count || 0,
       },
       reportsByType: {
         [ReportType.DAILY]: stats.daily_count || 0,
@@ -296,33 +335,42 @@ export class SQLiteFinancialReportingRepository extends FinancialReportingReposi
         [ReportType.MONTHLY]: stats.monthly_count || 0,
         [ReportType.QUARTERLY]: stats.quarterly_count || 0,
         [ReportType.ANNUAL]: stats.annual_count || 0,
-        [ReportType.CUSTOM]: stats.custom_count || 0
+        [ReportType.CUSTOM]: stats.custom_count || 0,
       },
       reportsByCompliance: {
         [ComplianceStatus.COMPLIANT]: stats.compliant_count || 0,
         [ComplianceStatus.PENDING_REVIEW]: stats.compliance_pending_count || 0,
-        [ComplianceStatus.REQUIRES_ATTENTION]: stats.requires_attention_count || 0,
-        [ComplianceStatus.NON_COMPLIANT]: stats.non_compliant_count || 0
+        [ComplianceStatus.REQUIRES_ATTENTION]:
+          stats.requires_attention_count || 0,
+        [ComplianceStatus.NON_COMPLIANT]: stats.non_compliant_count || 0,
       },
       overdueReports: stats.overdue_count || 0,
-      pendingReviews: stats.pending_review_count || 0
+      pendingReviews: stats.pending_review_count || 0,
     };
   }
 
   async delete(id: string): Promise<void> {
-    await this.db.run(`
+    await this.db.run(
+      `
       UPDATE financial_reports
       SET deleted_at = datetime('now')
       WHERE id = ?
-    `, [id]);
+    `,
+      [id],
+    );
   }
 
   async exists(id: string): Promise<boolean> {
-    const result = await this.db.query(`
+    const result = await this.db
+      .query(
+        `
       SELECT 1 FROM financial_reports
       WHERE id = ? AND deleted_at IS NULL
       LIMIT 1
-    `, [id]).get();
+    `,
+        [id],
+      )
+      .get();
 
     return !!result;
   }
@@ -344,7 +392,7 @@ export class SQLiteFinancialReportingRepository extends FinancialReportingReposi
       settlements: JSON.parse(row.settlements_data),
       balance: JSON.parse(row.balance_data),
       revenue: JSON.parse(row.revenue_data),
-      compliance: JSON.parse(row.compliance_data)
+      compliance: JSON.parse(row.compliance_data),
     });
   }
 }
@@ -352,13 +400,13 @@ export class SQLiteFinancialReportingRepository extends FinancialReportingReposi
 // Factory for creating repositories
 export class FinancialReportingRepositoryFactory {
   static createSQLiteRepository(dbPath?: string): FinancialReportingRepository {
-    const db = new (require('bun:sqlite').Database)(dbPath || ':memory:');
+    const db = new (require("bun:sqlite").Database)(dbPath || ":memory:");
     this.initializeSchema(db);
     return new SQLiteFinancialReportingRepository(db);
   }
 
   static createInMemoryRepository(): FinancialReportingRepository {
-    return this.createSQLiteRepository(':memory:');
+    return this.createSQLiteRepository(":memory:");
   }
 
   static createWithMockDatabase(mockDb: any): FinancialReportingRepository {
@@ -367,7 +415,7 @@ export class FinancialReportingRepositoryFactory {
 
   private static initializeSchema(db: any): void {
     // Skip schema initialization for mock databases
-    if (db.constructor.name !== 'Database') {
+    if (db.constructor.name !== "Database") {
       return;
     }
 
@@ -396,10 +444,20 @@ export class FinancialReportingRepositoryFactory {
     `);
 
     // Create indexes for better query performance
-    db.run(`CREATE INDEX IF NOT EXISTS idx_reports_status ON financial_reports(status)`);
-    db.run(`CREATE INDEX IF NOT EXISTS idx_reports_type ON financial_reports(report_type)`);
-    db.run(`CREATE INDEX IF NOT EXISTS idx_reports_period ON financial_reports(period_start, period_end)`);
-    db.run(`CREATE INDEX IF NOT EXISTS idx_reports_compliance ON financial_reports(compliance_status)`);
-    db.run(`CREATE INDEX IF NOT EXISTS idx_reports_generated ON financial_reports(generated_at)`);
+    db.run(
+      `CREATE INDEX IF NOT EXISTS idx_reports_status ON financial_reports(status)`,
+    );
+    db.run(
+      `CREATE INDEX IF NOT EXISTS idx_reports_type ON financial_reports(report_type)`,
+    );
+    db.run(
+      `CREATE INDEX IF NOT EXISTS idx_reports_period ON financial_reports(period_start, period_end)`,
+    );
+    db.run(
+      `CREATE INDEX IF NOT EXISTS idx_reports_compliance ON financial_reports(compliance_status)`,
+    );
+    db.run(
+      `CREATE INDEX IF NOT EXISTS idx_reports_generated ON financial_reports(generated_at)`,
+    );
   }
 }

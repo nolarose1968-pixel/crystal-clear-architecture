@@ -1,6 +1,8 @@
 # 🔐 JWT Authentication with Cloudflare Workers
 
-A complete implementation of JWT (JSON Web Token) authentication system using Cloudflare Workers, featuring both HTTP Basic Authentication and JWT token management.
+A complete implementation of JWT (JSON Web Token) authentication system using
+Cloudflare Workers, featuring both HTTP Basic Authentication and JWT token
+management.
 
 ## 🚀 Features
 
@@ -33,12 +35,14 @@ dashboard-worker/src/
 ### Setup
 
 1. **Clone or download the files**
+
    ```bash
    # Navigate to the dashboard-worker directory
    cd dashboard-worker/src
    ```
 
 2. **Install dependencies**
+
    ```bash
    bun install
    # or
@@ -56,21 +60,22 @@ dashboard-worker/src/
 
 ### Environment Variables
 
-| Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `JWT_SECRET` | Secret key for JWT signing | `your-secret-key-change-in-production` | Yes |
-| `AUTH_BASE_URL` | Base URL for the auth service | `http://localhost:8787` | No |
+| Variable        | Description                   | Default                                | Required |
+| --------------- | ----------------------------- | -------------------------------------- | -------- |
+| `JWT_SECRET`    | Secret key for JWT signing    | `your-secret-key-change-in-production` | Yes      |
+| `AUTH_BASE_URL` | Base URL for the auth service | `http://localhost:8787`                | No       |
 
 ### Worker Configuration
 
-The JWT authentication service can be configured by modifying the `AuthConfig` interface in `jwt-auth-worker.ts`:
+The JWT authentication service can be configured by modifying the `AuthConfig`
+interface in `jwt-auth-worker.ts`:
 
 ```typescript
 interface AuthConfig {
-  jwtSecret: string;        // Secret key for JWT signing
-  issuer: string;          // JWT issuer
-  audience: string;        // JWT audience
-  tokenExpiry: number;     // Token expiration in seconds
+  jwtSecret: string; // Secret key for JWT signing
+  issuer: string; // JWT issuer
+  audience: string; // JWT audience
+  tokenExpiry: number; // Token expiration in seconds
 }
 ```
 
@@ -95,12 +100,15 @@ bun run deploy
 ### API Endpoints
 
 #### 1. Service Information
+
 ```
 GET /
 ```
+
 Returns service information and available endpoints.
 
 **Response:**
+
 ```json
 {
   "message": "Fire22 JWT Authentication Service",
@@ -115,17 +123,21 @@ Returns service information and available endpoints.
 ```
 
 #### 2. HTTP Basic Authentication
+
 ```
 POST /auth/basic
 ```
+
 Authenticate using HTTP Basic Auth and receive a JWT token.
 
 **Headers:**
+
 ```
 Authorization: Basic base64(username:password)
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Authentication successful",
@@ -139,17 +151,21 @@ Authorization: Basic base64(username:password)
 ```
 
 #### 3. Token Verification
+
 ```
 POST /auth/verify
 ```
+
 Verify a JWT token and return user information.
 
 **Headers:**
+
 ```
 Authorization: Bearer <jwt-token>
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Token is valid",
@@ -169,17 +185,21 @@ Authorization: Bearer <jwt-token>
 ```
 
 #### 4. Token Refresh
+
 ```
 POST /auth/refresh
 ```
+
 Refresh an existing JWT token.
 
 **Headers:**
+
 ```
 Authorization: Bearer <jwt-token>
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Token refreshed successfully",
@@ -188,17 +208,21 @@ Authorization: Bearer <jwt-token>
 ```
 
 #### 5. Protected Route
+
 ```
 GET /protected
 ```
+
 Access a protected resource that requires valid JWT authentication.
 
 **Headers:**
+
 ```
 Authorization: Bearer <jwt-token>
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Access granted to protected resource",
@@ -218,10 +242,10 @@ Authorization: Bearer <jwt-token>
 
 The implementation includes two default users for testing:
 
-| Username | Password | Role |
-|----------|----------|------|
-| `admin` | `admin123` | `admin` |
-| `user` | `user123` | `user` |
+| Username | Password   | Role    |
+| -------- | ---------- | ------- |
+| `admin`  | `admin123` | `admin` |
+| `user`   | `user123`  | `user`  |
 
 ## 🧪 Testing
 
@@ -244,7 +268,8 @@ AUTH_BASE_URL=https://your-worker.your-subdomain.workers.dev bun run jwt-auth-te
 
 - **Complete Test Suite**: Tests all authentication flows and security scenarios
 - **Quick Test**: Basic functionality verification
-- **Error Handling**: Tests invalid credentials, tokens, and missing authentication
+- **Error Handling**: Tests invalid credentials, tokens, and missing
+  authentication
 - **Multiple Users**: Tests both admin and regular user flows
 - **Security Validation**: Ensures proper rejection of invalid requests
 
@@ -343,7 +368,8 @@ const corsHeaders = {
 };
 ```
 
-**Note**: In production, you should restrict `Access-Control-Allow-Origin` to specific domains.
+**Note**: In production, you should restrict `Access-Control-Allow-Origin` to
+specific domains.
 
 ## 📝 Code Examples
 
@@ -354,8 +380,8 @@ const corsHeaders = {
 const response = await fetch('/auth/basic', {
   method: 'POST',
   headers: {
-    'Authorization': 'Basic ' + btoa('admin:admin123')
-  }
+    Authorization: 'Basic ' + btoa('admin:admin123'),
+  },
 });
 
 const { token } = await response.json();
@@ -364,8 +390,8 @@ const { token } = await response.json();
 const protectedResponse = await fetch('/protected', {
   method: 'GET',
   headers: {
-    'Authorization': `Bearer ${token}`
-  }
+    Authorization: `Bearer ${token}`,
+  },
 });
 
 const data = await protectedResponse.json();
@@ -378,8 +404,8 @@ async function verifyToken(token: string) {
   const response = await fetch('/auth/verify', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   });
 
   if (response.ok) {
@@ -401,8 +427,8 @@ async function refreshToken(currentToken: string) {
   const response = await fetch('/auth/refresh', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${currentToken}`
-    }
+      Authorization: `Bearer ${currentToken}`,
+    },
   });
 
   if (response.ok) {
@@ -419,17 +445,19 @@ async function refreshToken(currentToken: string) {
 ### Cloudflare Workers Deployment
 
 1. **Install Wrangler CLI**
+
    ```bash
    npm install -g wrangler
    ```
 
 2. **Login to Cloudflare**
+
    ```bash
    wrangler login
    ```
 
-3. **Configure Wrangler**
-   Update `wrangler.toml`:
+3. **Configure Wrangler** Update `wrangler.toml`:
+
    ```toml
    name = "jwt-auth-worker"
    main = "src/jwt-auth-worker.ts"
@@ -477,7 +505,7 @@ interface JWTPayload {
   sub: string;
   username: string;
   role: string;
-  email?: string;        // Add custom fields
+  email?: string; // Add custom fields
   permissions?: string[]; // Add custom fields
   iat: number;
   exp: number;
@@ -493,7 +521,7 @@ const config: AuthConfig = {
   jwtSecret: 'your-secret-key',
   issuer: 'your-app',
   audience: 'your-api',
-  tokenExpiry: 7200 // 2 hours instead of 1 hour
+  tokenExpiry: 7200, // 2 hours instead of 1 hour
 };
 ```
 
@@ -502,11 +530,13 @@ const config: AuthConfig = {
 ### Common Issues
 
 1. **Token Verification Fails**
+
    - Check if the JWT secret matches between generation and verification
    - Verify the token hasn't expired
    - Ensure the token is properly formatted
 
 2. **CORS Errors**
+
    - Check that the `Access-Control-Allow-Origin` header is properly set
    - Verify the request includes the `Authorization` header in CORS preflight
 
@@ -548,25 +578,25 @@ export DEBUG_AUTH=true
 
 ```typescript
 interface JWTPayload {
-  sub: string;        // Subject (user ID)
-  username: string;   // Username
-  role: string;       // User role
-  iat: number;        // Issued at timestamp
-  exp: number;        // Expiration timestamp
+  sub: string; // Subject (user ID)
+  username: string; // Username
+  role: string; // User role
+  iat: number; // Issued at timestamp
+  exp: number; // Expiration timestamp
 }
 
 interface User {
-  id: string;         // User ID
-  username: string;   // Username
-  password: string;   // Password (hashed in production)
-  role: string;       // User role
+  id: string; // User ID
+  username: string; // Username
+  password: string; // Password (hashed in production)
+  role: string; // User role
 }
 
 interface AuthConfig {
-  jwtSecret: string;     // JWT signing secret
-  issuer: string;        // JWT issuer
-  audience: string;      // JWT audience
-  tokenExpiry: number;   // Token expiration in seconds
+  jwtSecret: string; // JWT signing secret
+  issuer: string; // JWT issuer
+  audience: string; // JWT audience
+  tokenExpiry: number; // Token expiration in seconds
 }
 ```
 
@@ -591,7 +621,9 @@ This project is licensed under the MIT License.
 
 ---
 
-**Note**: This implementation is designed for demonstration purposes. In production, you should:
+**Note**: This implementation is designed for demonstration purposes. In
+production, you should:
+
 - Use a proper database for user storage
 - Implement password hashing with bcrypt
 - Use environment variables for sensitive configuration

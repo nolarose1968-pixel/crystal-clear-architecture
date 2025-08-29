@@ -5,8 +5,8 @@
  * Creates comprehensive deployment reports for all environments
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
-import { join } from "path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
 interface DeploymentInfo {
   environment: string;
@@ -37,7 +37,7 @@ class DeploymentReportGenerator {
 
   async generate(): Promise<void> {
     console.log('📊 Generating Deployment Report');
-    console.log('================================');
+    console.log('!==!==!==!==!==!==');
 
     try {
       // Gather deployment information
@@ -68,7 +68,7 @@ class DeploymentReportGenerator {
       url: 'https://brendadeeznuts1111.github.io/fire22-dashboard-worker',
       status: 'active',
       lastDeployed: new Date().toISOString(),
-      version: await this.getVersion()
+      version: await this.getVersion(),
     });
 
     // Cloudflare Pages
@@ -77,7 +77,7 @@ class DeploymentReportGenerator {
       url: 'https://fire22-dashboard.pages.dev',
       status: 'active',
       lastDeployed: new Date().toISOString(),
-      version: await this.getVersion()
+      version: await this.getVersion(),
     });
 
     // Custom Domain
@@ -86,7 +86,7 @@ class DeploymentReportGenerator {
       url: 'https://dashboard.fire22.ag',
       status: 'active',
       lastDeployed: new Date().toISOString(),
-      version: await this.getVersion()
+      version: await this.getVersion(),
     });
 
     // Development
@@ -94,7 +94,7 @@ class DeploymentReportGenerator {
       environment: 'Development',
       url: 'http://localhost:3001',
       status: 'inactive',
-      version: await this.getVersion()
+      version: await this.getVersion(),
     });
 
     console.log(`✅ Gathered info for ${this.deployments.length} environments`);
@@ -126,21 +126,21 @@ class DeploymentReportGenerator {
 
     // Check main URL
     try {
-      const response = await fetch(deployment.url, { 
+      const response = await fetch(deployment.url, {
         method: 'HEAD',
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(5000),
       });
-      
+
       checks.push({
         name: 'Main URL',
         status: response.ok ? 'pass' : 'fail',
-        message: `HTTP ${response.status}`
+        message: `HTTP ${response.status}`,
       });
     } catch (error) {
       checks.push({
         name: 'Main URL',
         status: 'fail',
-        message: 'Connection failed'
+        message: 'Connection failed',
       });
     }
 
@@ -149,7 +149,7 @@ class DeploymentReportGenerator {
       checks.push({
         name: 'SSL Certificate',
         status: 'pass',
-        message: 'Valid HTTPS'
+        message: 'Valid HTTPS',
       });
     }
 
@@ -157,20 +157,20 @@ class DeploymentReportGenerator {
     const startTime = Date.now();
     try {
       await fetch(deployment.url, {
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(5000),
       });
       const responseTime = Date.now() - startTime;
-      
+
       checks.push({
         name: 'Response Time',
         status: responseTime < 1000 ? 'pass' : responseTime < 3000 ? 'warning' : 'fail',
-        message: `${responseTime}ms`
+        message: `${responseTime}ms`,
       });
     } catch {
       checks.push({
         name: 'Response Time',
         status: 'fail',
-        message: 'Timeout'
+        message: 'Timeout',
       });
     }
 
@@ -187,23 +187,22 @@ class DeploymentReportGenerator {
         total: this.deployments.length,
         active: this.deployments.filter(d => d.status === 'active').length,
         inactive: this.deployments.filter(d => d.status === 'inactive').length,
-        pending: this.deployments.filter(d => d.status === 'pending').length
+        pending: this.deployments.filter(d => d.status === 'pending').length,
       },
-      healthStatus: this.calculateHealthStatus()
+      healthStatus: this.calculateHealthStatus(),
     };
 
-    writeFileSync(
-      join(this.reportsDir, 'deployment-report.json'),
-      JSON.stringify(report, null, 2)
-    );
+    writeFileSync(join(this.reportsDir, 'deployment-report.json'), JSON.stringify(report, null, 2));
 
     console.log('✅ JSON report generated');
   }
 
   private calculateHealthStatus(): string {
     const activeDeployments = this.deployments.filter(d => d.status === 'active');
-    const failedChecks = activeDeployments.flatMap(d => d.checks || []).filter(c => c.status === 'fail');
-    
+    const failedChecks = activeDeployments
+      .flatMap(d => d.checks || [])
+      .filter(c => c.status === 'fail');
+
     if (failedChecks.length === 0) {
       return 'healthy';
     } else if (failedChecks.length < 3) {
@@ -406,7 +405,9 @@ class DeploymentReportGenerator {
     
     <h2>Deployment Environments</h2>
     
-    ${this.deployments.map(deployment => `
+    ${this.deployments
+      .map(
+        deployment => `
     <div class="deployment">
         <div class="deployment-header">
             <div>
@@ -416,10 +417,14 @@ class DeploymentReportGenerator {
             <span class="status ${deployment.status}">${deployment.status}</span>
         </div>
         
-        ${deployment.checks ? `
+        ${
+          deployment.checks
+            ? `
         <div class="checks">
             <h4>Health Checks</h4>
-            ${deployment.checks.map(check => `
+            ${deployment.checks
+              .map(
+                check => `
             <div class="check">
                 <div>
                     <span class="check-status ${check.status}"></span>
@@ -427,17 +432,27 @@ class DeploymentReportGenerator {
                 </div>
                 <div>${check.message || ''}</div>
             </div>
-            `).join('')}
+            `
+              )
+              .join('')}
         </div>
-        ` : ''}
+        `
+            : ''
+        }
         
-        ${deployment.lastDeployed ? `
+        ${
+          deployment.lastDeployed
+            ? `
         <div class="timestamp">
             Last deployed: ${new Date(deployment.lastDeployed).toLocaleString()}
         </div>
-        ` : ''}
+        `
+            : ''
+        }
     </div>
-    `).join('')}
+    `
+      )
+      .join('')}
     
     <div class="footer">
         <p>&copy; 2024 Fire22. All rights reserved.</p>
@@ -446,10 +461,7 @@ class DeploymentReportGenerator {
 </body>
 </html>`;
 
-    writeFileSync(
-      join(this.reportsDir, 'deployment-report.html'),
-      html
-    );
+    writeFileSync(join(this.reportsDir, 'deployment-report.html'), html);
 
     console.log('✅ HTML report generated');
   }
@@ -458,7 +470,8 @@ class DeploymentReportGenerator {
     console.log('\n📝 Generating Markdown report...');
 
     const healthStatus = this.calculateHealthStatus();
-    const healthEmoji = healthStatus === 'healthy' ? '✅' : healthStatus === 'degraded' ? '⚠️' : '❌';
+    const healthEmoji =
+      healthStatus === 'healthy' ? '✅' : healthStatus === 'degraded' ? '⚠️' : '❌';
 
     const markdown = `# 🚀 Fire22 Deployment Report
 
@@ -474,7 +487,9 @@ Generated: ${new Date().toLocaleString()}
 
 ## 🌐 Deployment Environments
 
-${this.deployments.map(deployment => `
+${this.deployments
+  .map(
+    deployment => `
 ### ${deployment.environment}
 
 - **URL**: [${deployment.url}](${deployment.url})
@@ -482,16 +497,25 @@ ${this.deployments.map(deployment => `
 - **Version**: ${deployment.version || 'N/A'}
 - **Last Deployed**: ${deployment.lastDeployed ? new Date(deployment.lastDeployed).toLocaleString() : 'N/A'}
 
-${deployment.checks ? `
+${
+  deployment.checks
+    ? `
 #### Health Checks
 
 | Check | Status | Details |
 |-------|--------|---------|
-${deployment.checks.map(check => 
-`| ${check.name} | ${check.status === 'pass' ? '✅' : check.status === 'fail' ? '❌' : '⚠️'} ${check.status.toUpperCase()} | ${check.message || '-'} |`
-).join('\n')}
-` : ''}
-`).join('\n')}
+${deployment.checks
+  .map(
+    check =>
+      `| ${check.name} | ${check.status === 'pass' ? '✅' : check.status === 'fail' ? '❌' : '⚠️'} ${check.status.toUpperCase()} | ${check.message || '-'} |`
+  )
+  .join('\n')}
+`
+    : ''
+}
+`
+  )
+  .join('\n')}
 
 ## 📈 Deployment Metrics
 
@@ -516,10 +540,7 @@ ${deployment.checks.map(check =>
 *Report generated by Fire22 Deployment System*
 *© 2024 Fire22. All rights reserved.*`;
 
-    writeFileSync(
-      join(this.reportsDir, 'deployment-report.md'),
-      markdown
-    );
+    writeFileSync(join(this.reportsDir, 'deployment-report.md'), markdown);
 
     console.log('✅ Markdown report generated');
   }

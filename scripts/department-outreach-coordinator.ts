@@ -27,7 +27,7 @@ interface DepartmentOutreachRequest {
   departmentName: string;
   currentEmail: string;
   currentMembers: any[];
-  requestType: 'point_of_contact' | 'blog_setup' | 'rss_feed';
+  requestType: "point_of_contact" | "blog_setup" | "rss_feed";
 }
 
 class DepartmentOutreachCoordinator {
@@ -36,8 +36,13 @@ class DepartmentOutreachCoordinator {
 
   constructor() {
     // Load team directory
-    const teamDirectoryPath = join(process.cwd(), 'src', 'communications', 'team-directory.json');
-    this.teamDirectory = JSON.parse(readFileSync(teamDirectoryPath, 'utf-8'));
+    const teamDirectoryPath = join(
+      process.cwd(),
+      "src",
+      "communications",
+      "team-directory.json",
+    );
+    this.teamDirectory = JSON.parse(readFileSync(teamDirectoryPath, "utf-8"));
   }
 
   async initialize() {
@@ -49,10 +54,10 @@ class DepartmentOutreachCoordinator {
    * 📞 Create outreach tasks for all departments
    */
   async createDepartmentOutreachTasks(): Promise<void> {
-    console.log('📞 Creating department outreach coordination tasks...');
-    
+    console.log("📞 Creating department outreach coordination tasks...");
+
     if (!this.taskService) {
-      throw new Error('Task service not initialized');
+      throw new Error("Task service not initialized");
     }
 
     const departments = this.getDepartments();
@@ -83,8 +88,10 @@ class DepartmentOutreachCoordinator {
       }
     }
 
-    console.log(`\n🎯 Summary: Created ${createdTasks.length} outreach tasks across ${departments.length} departments`);
-    
+    console.log(
+      `\n🎯 Summary: Created ${createdTasks.length} outreach tasks across ${departments.length} departments`,
+    );
+
     // Create master coordination task
     await this.createMasterCoordinationTask(createdTasks);
   }
@@ -94,7 +101,7 @@ class DepartmentOutreachCoordinator {
    */
   private async createPointOfContactTask(dept: Department) {
     const departmentHead = this.getDepartmentHead(dept);
-    const assigneeId = departmentHead?.id || 'system';
+    const assigneeId = departmentHead?.id || "system";
 
     const taskData = {
       title: `Designate Primary Point of Contact - ${dept.name}`,
@@ -128,7 +135,7 @@ class DepartmentOutreachCoordinator {
    - Budget approval limits (if applicable)
 
 **Current Team Members:**
-${dept.members.map(member => `- ${member.name} (${member.role}) - ${member.email}`).join('\n')}
+${dept.members.map((member) => `- ${member.name} (${member.role}) - ${member.email}`).join("\n")}
 
 **Next Steps:**
 1. Review current team structure
@@ -143,7 +150,7 @@ ${dept.members.map(member => `- ${member.name} (${member.role}) - ${member.email
       departmentId: dept.id,
       assigneeId,
       estimatedHours: 2,
-      tags: ["outreach", "point-of-contact", "coordination", "urgent"]
+      tags: ["outreach", "point-of-contact", "coordination", "urgent"],
     };
 
     try {
@@ -160,7 +167,7 @@ ${dept.members.map(member => `- ${member.name} (${member.role}) - ${member.email
    */
   private async createBlogInformationTask(dept: Department) {
     const departmentHead = this.getDepartmentHead(dept);
-    const assigneeId = departmentHead?.id || 'system';
+    const assigneeId = departmentHead?.id || "system";
 
     const taskData = {
       title: `Department Blog Information Request - ${dept.name}`,
@@ -211,7 +218,7 @@ ${dept.members.map(member => `- ${member.name} (${member.role}) - ${member.email
       departmentId: dept.id,
       assigneeId,
       estimatedHours: 3,
-      tags: ["outreach", "blog", "content-strategy", "integration"]
+      tags: ["outreach", "blog", "content-strategy", "integration"],
     };
 
     try {
@@ -228,7 +235,7 @@ ${dept.members.map(member => `- ${member.name} (${member.role}) - ${member.email
    */
   private async createRSSFeedTask(dept: Department) {
     const departmentHead = this.getDepartmentHead(dept);
-    const assigneeId = departmentHead?.id || 'system';
+    const assigneeId = departmentHead?.id || "system";
 
     const taskData = {
       title: `RSS Feed Setup and Configuration - ${dept.name}`,
@@ -291,7 +298,7 @@ ${dept.members.map(member => `- ${member.name} (${member.role}) - ${member.email
       departmentId: dept.id,
       assigneeId,
       estimatedHours: 4,
-      tags: ["outreach", "rss-feed", "technical-setup", "integration"]
+      tags: ["outreach", "rss-feed", "technical-setup", "integration"],
     };
 
     try {
@@ -317,7 +324,9 @@ ${dept.members.map(member => `- ${member.name} (${member.role}) - ${member.email
 - 3 categories: Point of Contact, Blog Information, RSS Feeds
 
 **Department Coverage:**
-${this.getDepartments().map(dept => `- ${dept.name} (${dept.id})`).join('\n')}
+${this.getDepartments()
+  .map((dept) => `- ${dept.name} (${dept.id})`)
+  .join("\n")}
 
 **Task Categories:**
 1. **Point of Contact Designation** - Establish primary contacts
@@ -337,7 +346,7 @@ ${this.getDepartments().map(dept => `- ${dept.name} (${dept.id})`).join('\n')}
 - Week 4: Testing and documentation
 
 **Related Tasks:**
-${createdTasks.map(task => `- ${task.title} (${task.uuid})`).join('\n')}
+${createdTasks.map((task) => `- ${task.title} (${task.uuid})`).join("\n")}
 
 **Coordination Notes:**
 - Monitor response rates and follow up as needed
@@ -350,16 +359,18 @@ ${createdTasks.map(task => `- ${task.title} (${task.uuid})`).join('\n')}
       departmentId: "communications",
       assigneeId: "sarah-martinez",
       estimatedHours: 8,
-      tags: ["coordination", "outreach", "master-task", "departments"]
+      tags: ["coordination", "outreach", "master-task", "departments"],
     };
 
     try {
       const result = await this.taskService!.createTask(taskData);
       if (result.success) {
-        console.log(`\n📋 Master coordination task created: ${result.data!.uuid}`);
+        console.log(
+          `\n📋 Master coordination task created: ${result.data!.uuid}`,
+        );
       }
     } catch (error) {
-      console.error('❌ Error creating master coordination task:', error);
+      console.error("❌ Error creating master coordination task:", error);
     }
   }
 
@@ -368,20 +379,20 @@ ${createdTasks.map(task => `- ${task.title} (${task.uuid})`).join('\n')}
    */
   private getDepartments(): Department[] {
     const departments: Department[] = [];
-    
+
     for (const [key, dept] of Object.entries(this.teamDirectory.departments)) {
-      if (dept && typeof dept === 'object' && 'name' in dept) {
+      if (dept && typeof dept === "object" && "name" in dept) {
         departments.push({
           id: key,
           name: dept.name,
           email: dept.email,
           domain: dept.domain,
           color: dept.color,
-          members: dept.members || []
+          members: dept.members || [],
         });
       }
     }
-    
+
     return departments;
   }
 
@@ -389,35 +400,39 @@ ${createdTasks.map(task => `- ${task.title} (${task.uuid})`).join('\n')}
    * 👤 Get department head (first member with leadership role)
    */
   private getDepartmentHead(dept: Department) {
-    return dept.members.find(member => 
-      member.role.toLowerCase().includes('director') ||
-      member.role.toLowerCase().includes('head') ||
-      member.role.toLowerCase().includes('lead') ||
-      member.role.toLowerCase().includes('manager')
-    ) || dept.members[0]; // Fallback to first member
+    return (
+      dept.members.find(
+        (member) =>
+          member.role.toLowerCase().includes("director") ||
+          member.role.toLowerCase().includes("head") ||
+          member.role.toLowerCase().includes("lead") ||
+          member.role.toLowerCase().includes("manager"),
+      ) || dept.members[0]
+    ); // Fallback to first member
   }
 }
 
 // CLI execution
 async function main() {
-  console.log('🚀 Fire22 Department Outreach Coordinator');
-  console.log('==========================================');
-  
+  console.log("🚀 Fire22 Department Outreach Coordinator");
+  console.log("!==!==!==!==!==!==!==!==");
+
   try {
     const coordinator = new DepartmentOutreachCoordinator();
     await coordinator.initialize();
     await coordinator.createDepartmentOutreachTasks();
-    
-    console.log('\n✅ Department outreach coordination completed successfully!');
-    console.log('\n📧 Next Steps:');
-    console.log('1. Monitor task responses from each department');
-    console.log('2. Follow up with non-responsive departments');
-    console.log('3. Compile contact information and blog details');
-    console.log('4. Implement RSS feed infrastructure');
-    console.log('5. Update dashboard with new contact information');
-    
+
+    console.log(
+      "\n✅ Department outreach coordination completed successfully!",
+    );
+    console.log("\n📧 Next Steps:");
+    console.log("1. Monitor task responses from each department");
+    console.log("2. Follow up with non-responsive departments");
+    console.log("3. Compile contact information and blog details");
+    console.log("4. Implement RSS feed infrastructure");
+    console.log("5. Update dashboard with new contact information");
   } catch (error) {
-    console.error('❌ Error during department outreach coordination:', error);
+    console.error("❌ Error during department outreach coordination:", error);
     process.exit(1);
   }
 }

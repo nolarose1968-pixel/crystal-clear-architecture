@@ -5,13 +5,13 @@
  * Sets up all necessary directories and initial content
  */
 
-import { existsSync, mkdirSync, writeFileSync } from "fs";
-import { join } from "path";
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
 class PagesInitializer {
   async initialize(): Promise<void> {
     console.log('🚀 Initializing GitHub Pages & Wiki System');
-    console.log('==========================================\n');
+    console.log('!==!==!==!==!==!==!==!==\n');
 
     // Create necessary directories
     await this.createDirectories();
@@ -45,7 +45,7 @@ class PagesInitializer {
       'dist/pages',
       'dist/pages/wiki',
       'dist/pages/departments',
-      'reports'
+      'reports',
     ];
 
     for (const dir of directories) {
@@ -185,7 +185,7 @@ See [Configuration Guide](configuration.md) for detailed setup instructions.
           domain: 'finance.fire22.ag',
           color: '#28a745',
           icon: '💰',
-          description: 'Manages financial operations, transactions, and reporting.'
+          description: 'Manages financial operations, transactions, and reporting.',
         },
         {
           id: 'support',
@@ -194,7 +194,7 @@ See [Configuration Guide](configuration.md) for detailed setup instructions.
           domain: 'support.fire22.ag',
           color: '#17a2b8',
           icon: '🎧',
-          description: 'Provides 24/7 customer assistance and issue resolution.'
+          description: 'Provides 24/7 customer assistance and issue resolution.',
         },
         {
           id: 'compliance',
@@ -203,7 +203,7 @@ See [Configuration Guide](configuration.md) for detailed setup instructions.
           domain: 'compliance.fire22.ag',
           color: '#6610f2',
           icon: '⚖️',
-          description: 'Ensures regulatory compliance and legal requirements.'
+          description: 'Ensures regulatory compliance and legal requirements.',
         },
         {
           id: 'operations',
@@ -212,7 +212,7 @@ See [Configuration Guide](configuration.md) for detailed setup instructions.
           domain: 'operations.fire22.ag',
           color: '#fd7e14',
           icon: '⚙️',
-          description: 'Manages day-to-day operations and process optimization.'
+          description: 'Manages day-to-day operations and process optimization.',
         },
         {
           id: 'technology',
@@ -221,7 +221,7 @@ See [Configuration Guide](configuration.md) for detailed setup instructions.
           domain: 'tech.fire22.ag',
           color: '#6f42c1',
           icon: '💻',
-          description: 'Develops and maintains technical infrastructure.'
+          description: 'Develops and maintains technical infrastructure.',
         },
         {
           id: 'marketing',
@@ -230,7 +230,7 @@ See [Configuration Guide](configuration.md) for detailed setup instructions.
           domain: 'marketing.fire22.ag',
           color: '#e83e8c',
           icon: '📢',
-          description: 'Handles marketing campaigns and brand management.'
+          description: 'Handles marketing campaigns and brand management.',
         },
         {
           id: 'management',
@@ -239,7 +239,7 @@ See [Configuration Guide](configuration.md) for detailed setup instructions.
           domain: 'management.fire22.ag',
           color: '#dc3545',
           icon: '👔',
-          description: 'Executive leadership and strategic planning.'
+          description: 'Executive leadership and strategic planning.',
         },
         {
           id: 'hr',
@@ -248,7 +248,7 @@ See [Configuration Guide](configuration.md) for detailed setup instructions.
           domain: 'hr.fire22.ag',
           color: '#20c997',
           icon: '👥',
-          description: 'Manages recruitment, training, and employee relations.'
+          description: 'Manages recruitment, training, and employee relations.',
         },
         {
           id: 'qa',
@@ -257,7 +257,7 @@ See [Configuration Guide](configuration.md) for detailed setup instructions.
           domain: 'qa.fire22.ag',
           color: '#ffc107',
           icon: '✅',
-          description: 'Ensures quality standards and testing processes.'
+          description: 'Ensures quality standards and testing processes.',
         },
         {
           id: 'contributors',
@@ -266,9 +266,9 @@ See [Configuration Guide](configuration.md) for detailed setup instructions.
           domain: 'team.fire22.ag',
           color: '#795548',
           icon: '🤝',
-          description: 'Community contributors and external partners.'
-        }
-      ]
+          description: 'Community contributors and external partners.',
+        },
+      ],
     };
 
     const configPath = 'src/departments/config.json';

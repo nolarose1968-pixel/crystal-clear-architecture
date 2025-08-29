@@ -2,15 +2,18 @@
 
 ## 🚀 **Current Version: 3.0.8** - Enhanced Withdrawal System
 
-The withdrawal system handles customer fund withdrawal requests through a complete workflow from request to completion. The system ensures proper balance validation, approval workflows, and transaction logging.
+The withdrawal system handles customer fund withdrawal requests through a
+complete workflow from request to completion. The system ensures proper balance
+validation, approval workflows, and transaction logging.
 
-**📊 System Status**: Fully integrated with Fire22 Dashboard version 3.0.8
-**⚡ Runtime**: Enhanced with Bun runtime capabilities
-**🔧 Build Profile**: Production-ready with quality gates
+**📊 System Status**: Fully integrated with Fire22 Dashboard version 3.0.8 **⚡
+Runtime**: Enhanced with Bun runtime capabilities **🔧 Build Profile**:
+Production-ready with quality gates
 
 ## 📊 **Version Information**
 
 ### **Current System Status**
+
 - **Version**: 3.0.8
 - **Build Number**: 1756255952096
 - **Last Updated**: 2025-08-27T00:52:32.096Z
@@ -18,7 +21,9 @@ The withdrawal system handles customer fund withdrawal requests through a comple
 - **Build Profiles**: 5 available configurations
 
 ### **Enhanced Features**
-- **Bun Runtime Integration**: Full runtime capabilities and performance monitoring
+
+- **Bun Runtime Integration**: Full runtime capabilities and performance
+  monitoring
 - **Advanced Versioning**: Semantic versioning with build automation
 - **Quality Gates**: Integrated testing, linting, and coverage validation
 - **Enhanced Documentation**: Advanced search and cross-referencing
@@ -60,23 +65,23 @@ ALTER TABLE players ADD COLUMN telegram_chat_id TEXT;
 
 ### **Enhanced Withdrawal Processing with Bun Runtime**
 
-```typescript
+````typescript
 // Enhanced withdrawal processor with Bun runtime integration
 ```javascript
 import { randomUUIDv7 } from "bun";
-```
+````
 
-class EnhancedWithdrawalProcessor {
-  async processWithdrawalRequest(request: WithdrawalRequest): Promise<WithdrawalResult> {
-    const startTime = performance.now();
-    
+class EnhancedWithdrawalProcessor { async processWithdrawalRequest(request:
+WithdrawalRequest): Promise<WithdrawalResult> { const startTime =
+performance.now();
+
     try {
       // Generate unique withdrawal ID with Bun UUID
       const withdrawalId = randomUUIDv7();
-      
+
       // Validate customer balance with enhanced performance
       const balanceCheck = await this.validateCustomerBalance(request.customerId, request.amount);
-      
+
       if (!balanceCheck.valid) {
         return {
           success: false,
@@ -84,7 +89,7 @@ class EnhancedWithdrawalProcessor {
           details: balanceCheck.details
         };
       }
-      
+
       // Process withdrawal with performance monitoring
       const result = await this.createWithdrawalRecord({
         id: withdrawalId,
@@ -92,45 +97,43 @@ class EnhancedWithdrawalProcessor {
         status: 'pending',
         createdAt: new Date().toISOString()
       });
-      
+
       const duration = performance.now() - startTime;
       console.log(`Withdrawal request processed in ${duration.toFixed(2)}ms`);
-      
+
       return {
         success: true,
         withdrawalId,
         status: 'pending',
         processingTime: duration
       };
-      
+
     } catch (error) {
       const duration = performance.now() - startTime;
       console.error(`Withdrawal processing failed after ${duration.toFixed(2)}ms:`, error);
-      
+
       return {
         success: false,
         error: error.message,
         processingTime: duration
       };
     }
-  }
-  
-  async sleep(ms: number) {
-    // Use Bun's optimized sleep function for rate limiting
-    await Bun.sleep(ms);
-  }
+
 }
+
+async sleep(ms: number) { // Use Bun's optimized sleep function for rate
+limiting await Bun.sleep(ms); } }
+
 ```
 
 ### **Status Flow**
 
 ```
-Request → Pending → [Approve/Reject]
-  ↓
-Approved → Complete (after payment processing)
-  ↓
-Rejected (with reason)
-```
+
+Request → Pending → [Approve/Reject] ↓ Approved → Complete (after payment
+processing) ↓ Rejected (with reason)
+
+````
 
 ## 🚀 **Enhanced API Endpoints**
 
@@ -148,7 +151,7 @@ Rejected (with reason)
 - **Endpoint**: `POST /api/withdrawals/approve`
 - **Auth**: Required (manager)
 - **Body**: `{ id, notes }`
-- **Action**: 
+- **Action**:
   - Updates status to 'approved'
   - Deducts amount from customer balance
   - Logs transaction
@@ -213,9 +216,10 @@ bun run version:major
 # View version history
 bun run version:history
 bun run version:changelog
-```
+````
 
 ### **Build System**
+
 ```bash
 # Quick build for development
 bun run build:quick
@@ -231,6 +235,7 @@ bun run build:full
 ```
 
 ### **Testing & Validation**
+
 ```bash
 # Quick health check
 bun run test:quick
@@ -250,6 +255,7 @@ bun run health:comprehensive
 ```
 
 ### **Package Management**
+
 ```bash
 # View package information
 bun run package:info
@@ -265,26 +271,30 @@ bun run deps:check
 ## 🔧 **Business Rules**
 
 ### **Payment Types**
+
 - **Venmo**: Requires username in paymentDetails
-- **PayPal**: Requires email address in paymentDetails  
+- **PayPal**: Requires email address in paymentDetails
 - **CashApp**: Requires $cashtag in paymentDetails
 - **Cash**: Physical cash pickup, no payment details required
 - **Transfer**: Bank transfer, requires account details in paymentDetails
 - **Bank Transfer**: Traditional bank transfer (default)
 
 ### **Balance Validation**
+
 - Withdrawal amount must not exceed available balance
 - Balance is checked at request time
 - Balance is deducted at approval time (not at completion)
 - Enhanced with Bun runtime performance monitoring
 
 ### **Approval Workflow**
+
 - Only managers can approve/reject withdrawals
 - All actions are logged with audit trail
 - Rejected withdrawals don't affect balance
 - Enhanced with performance metrics and timing
 
 ### **Completion Process**
+
 - Withdrawals must be approved before completion
 - Completion requires payment reference
 - Updates total withdrawal tracking
@@ -293,17 +303,20 @@ bun run deps:check
 ## 🔒 **Security Features**
 
 ### **Authentication**
+
 - All endpoints require valid authentication
 - Role-based access control (manager for approvals)
 - Enhanced with JWT token validation
 
 ### **Validation**
+
 - Input validation for all parameters
 - SQL injection prevention with prepared statements
 - Foreign key constraints for data integrity
 - Enhanced with Bun runtime security features
 
 ### **Audit Trail**
+
 - All transactions logged with timestamps
 - User tracking for all actions
 - Reference linking between withdrawals and transactions
@@ -312,6 +325,7 @@ bun run deps:check
 ## 🔗 **Integration Points**
 
 ### **Telegram Bot**
+
 - Real-time balance queries via `/balance` command
 - Database integration for live balance data
 - Username-based customer lookup
@@ -320,12 +334,14 @@ bun run deps:check
 - Enhanced with Bun runtime performance monitoring
 
 ### **Transaction System**
+
 - Automatic transaction logging
 - Balance updates
 - Reference tracking
 - Enhanced with performance metrics
 
 ### **Customer Management**
+
 - Balance tracking
 - Withdrawal history
 - Account status monitoring
@@ -334,12 +350,15 @@ bun run deps:check
 ## 🧪 **Enhanced Testing Framework**
 
 ### **Test Script**
+
 Run the comprehensive test suite:
+
 ```bash
 bun run test:withdrawals
 ```
 
 ### **Test Coverage**
+
 - ✅ Initial balance validation
 - ✅ Withdrawal request creation
 - ✅ Approval workflow
@@ -352,6 +371,7 @@ bun run test:withdrawals
 - ✅ Error handling scenarios
 
 ### **Enhanced Testing Commands**
+
 ```bash
 # Quick health check
 bun run test:quick
@@ -373,6 +393,7 @@ bun run health:comprehensive
 ## 📊 **Error Handling**
 
 ### **Common Error Scenarios**
+
 1. **Insufficient Funds**: Customer balance < withdrawal amount
 2. **Invalid Status**: Attempting to complete non-approved withdrawal
 3. **Missing Data**: Required fields not provided
@@ -380,6 +401,7 @@ bun run health:comprehensive
 5. **Runtime Errors**: Bun runtime compatibility issues
 
 ### **Enhanced Error Responses**
+
 ```json
 {
   "success": false,
@@ -394,6 +416,7 @@ bun run health:comprehensive
 ## 📈 **Monitoring & Analytics**
 
 ### **Key Metrics**
+
 - Total pending withdrawals
 - Approval rates
 - Processing times
@@ -403,6 +426,7 @@ bun run health:comprehensive
 - Runtime statistics
 
 ### **Dashboard Integration**
+
 - Real-time withdrawal status
 - Manager approval queue
 - Financial reporting
@@ -413,6 +437,7 @@ bun run health:comprehensive
 ## 🚀 **Future Enhancements**
 
 ### **Planned Features**
+
 - Automated approval for small amounts
 - Multi-currency support
 - Payment method validation
@@ -422,6 +447,7 @@ bun run health:comprehensive
 - Advanced performance monitoring
 
 ### **Scalability Considerations**
+
 - Batch processing for large volumes
 - Queue-based processing
 - Rate limiting
@@ -434,24 +460,28 @@ bun run health:comprehensive
 ### **Common Issues**
 
 #### **Balance Mismatch**
+
 - Check transaction logs for discrepancies
 - Verify withdrawal status progression
 - Review approval/completion sequence
 - Check performance metrics for timing issues
 
 #### **Missing Withdrawals**
+
 - Verify customer ID and status
 - Check database constraints
 - Review error logs
 - Validate Bun runtime compatibility
 
 #### **Telegram Integration Issues**
+
 - Verify telegram_username field exists
 - Check database connectivity
 - Validate user permissions
 - Check runtime performance metrics
 
 ### **Debug Commands**
+
 ```bash
 # Check withdrawal status
 curl -X GET "http://localhost:8787/api/withdrawals?status=pending"
@@ -487,6 +517,7 @@ bun run package:info
 ## 🆘 **Support**
 
 For technical support or questions about the withdrawal system:
+
 - Check error logs in console
 - Run test suite for validation
 - Review API documentation
@@ -494,6 +525,7 @@ For technical support or questions about the withdrawal system:
 - Contact development team
 
 ### **Support Commands**
+
 ```bash
 # System health check
 bun run test:quick
@@ -513,12 +545,12 @@ bun run test:withdrawals
 
 ---
 
-**🚀 The Withdrawal System is now fully enhanced with Fire22 Dashboard version 3.0.8!**
+**🚀 The Withdrawal System is now fully enhanced with Fire22 Dashboard version
+3.0.8!**
 
-**⚡ Enhanced with Bun runtime integration, advanced versioning, and comprehensive testing framework.**
+**⚡ Enhanced with Bun runtime integration, advanced versioning, and
+comprehensive testing framework.**
 
 **📊 Ready for production with quality gates and performance monitoring.**
 
-*Last Updated: 2025-08-27*
-*Version: 3.0.8*
-*Build: 1756255952096*
+_Last Updated: 2025-08-27_ _Version: 3.0.8_ _Build: 1756255952096_

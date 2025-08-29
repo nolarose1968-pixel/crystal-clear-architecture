@@ -2,16 +2,21 @@
 
 ## 🎯 **Overview**
 
-The **Enhanced Package Information Display** system provides clean, organized output of your Fire22 Dashboard package information using Bun's native `console.table()` functionality. This creates professional, easy-to-read tables instead of raw JSON or plain text output.
+The **Enhanced Package Information Display** system provides clean, organized
+output of your Fire22 Dashboard package information using Bun's native
+`console.table()` functionality. This creates professional, easy-to-read tables
+instead of raw JSON or plain text output.
 
 ## 🚀 **Key Features**
 
 ### **1. Clean Table Output**
+
 - **Bun Tables**: Uses `console.table()` for professional formatting
 - **Organized Layout**: Information grouped by category
 - **Easy Reading**: No more messy JSON or plain text
 
 ### **2. Comprehensive Information Display**
+
 - **Core Package Info**: Name, version, description, main entry, type, license
 - **Author & Contributors**: Team information with roles
 - **Repository Details**: Git info, URLs, directory structure
@@ -22,6 +27,7 @@ The **Enhanced Package Information Display** system provides clean, organized ou
 - **Matrix Health Commands**: Specialized health monitoring commands
 
 ### **3. Bunx Integration Examples**
+
 - **`--package` Flag**: Demonstrates the new Bunx functionality
 - **Real Examples**: Shows how to use external packages
 - **Fire22 Integration**: Examples specific to your dashboard
@@ -29,6 +35,7 @@ The **Enhanced Package Information Display** system provides clean, organized ou
 ## 🖥️ **Available Commands**
 
 ### **Core Package Information**
+
 ```bash
 # Display all package information
 bun run package:info
@@ -41,6 +48,7 @@ bun run package:summary
 ```
 
 ### **Detailed Information**
+
 ```bash
 # Author and contributors
 bun run package:author
@@ -62,6 +70,7 @@ bun run package:engines
 ```
 
 ### **Specialized Commands**
+
 ```bash
 # Matrix Health system commands
 bun run package:matrix
@@ -76,6 +85,7 @@ bun run package:bunx
 ## 📊 **Output Examples**
 
 ### **Core Package Information**
+
 ```
 🔥 Fire22 Dashboard - Core Package Information
 ==============================================
@@ -93,6 +103,7 @@ bun run package:bunx
 ```
 
 ### **Matrix Health Commands**
+
 ```
 🔍 Matrix Health System Status
 ================================
@@ -114,6 +125,7 @@ bun run package:bunx
 ```
 
 ### **Bunx Examples with --package Flag**
+
 ```
 ⚡ Bunx Examples with --package Flag
 =====================================
@@ -132,6 +144,7 @@ bun run package:bunx
 ## 🔧 **Technical Implementation**
 
 ### **Bun Table Functionality**
+
 The system leverages Bun's native `console.table()` method for clean output:
 
 ```typescript
@@ -142,18 +155,20 @@ const coreInfo = [
   ['Description', this.packageInfo.description],
   ['Main Entry', this.packageInfo.main],
   ['Module Type', this.packageInfo.type],
-  ['License', this.packageInfo.license]
+  ['License', this.packageInfo.license],
 ];
 
 console.table(coreInfo);
 ```
 
 ### **Async Data Loading**
+
 - **Lazy Loading**: Package info loaded only when needed
 - **Error Handling**: Graceful fallbacks for missing data
 - **Performance**: Efficient data access patterns
 
 ### **Modular Design**
+
 - **Separate Methods**: Each display category has its own method
 - **Reusable Components**: Easy to extend and modify
 - **Clean Architecture**: Well-organized class structure
@@ -161,9 +176,12 @@ console.table(coreInfo);
 ## 🚀 **Bunx --package Flag Integration**
 
 ### **What It Does**
-The new `--package` (or `-p`) flag allows you to run binaries from packages where the binary name differs from the package name.
+
+The new `--package` (or `-p`) flag allows you to run binaries from packages
+where the binary name differs from the package name.
 
 ### **Fire22 Dashboard Examples**
+
 ```bash
 # Run matrix health check using bunx
 bunx --package fire22-dashboard matrix:health
@@ -176,6 +194,7 @@ bunx --package fire22-dashboard matrix:status
 ```
 
 ### **External Package Examples**
+
 ```bash
 # Renovate config validator
 bunx --package renovate renovate-config-validator
@@ -190,6 +209,7 @@ bunx --package create-react-app create-react-app my-app
 ## 📱 **Usage Examples**
 
 ### **Quick Package Overview**
+
 ```bash
 # Get a quick summary
 bun run package:summary
@@ -202,6 +222,7 @@ bun run package:scripts
 ```
 
 ### **Matrix Health Integration**
+
 ```bash
 # View all matrix health commands
 bun run package:matrix
@@ -214,6 +235,7 @@ bun run package:bunx
 ```
 
 ### **Complete Information**
+
 ```bash
 # Display everything
 bun run package:info
@@ -227,10 +249,11 @@ bun run package:deps
 ## 🎨 **Customization Options**
 
 ### **Adding New Display Methods**
+
 ```typescript
 async displayCustomInfo() {
   await this.ensurePackageInfo();
-  
+
   console.log('\n🔧 Custom Information');
   console.log('=====================\n');
 
@@ -244,12 +267,13 @@ async displayCustomInfo() {
 ```
 
 ### **Modifying Table Formatting**
+
 ```typescript
 // Custom table headers
 const tableData = [
   ['Field', 'Value', 'Description'],
   ['Name', this.packageInfo.name, 'Package identifier'],
-  ['Version', this.packageInfo.version, 'Current version']
+  ['Version', this.packageInfo.version, 'Current version'],
 ];
 
 console.table(tableData);
@@ -260,11 +284,13 @@ console.table(tableData);
 ### **Common Issues**
 
 1. **"Script not found" Error**
+
    - Ensure the script is added to package.json
    - Check script path is correct
    - Verify script has execute permissions
 
 2. **Table Display Issues**
+
    - Ensure you're using Bun runtime
    - Check for console.table support
    - Verify data structure is correct
@@ -275,6 +301,7 @@ console.table(tableData);
    - Ensure proper file permissions
 
 ### **Debug Commands**
+
 ```bash
 # Test basic functionality
 bun run package:core
@@ -296,7 +323,8 @@ bun run package:info
 
 To enhance the package display system:
 
-1. **Add New Display Methods**: Create new async methods for additional information
+1. **Add New Display Methods**: Create new async methods for additional
+   information
 2. **Improve Table Formatting**: Enhance the visual presentation
 3. **Add New Commands**: Extend the CLI interface
 4. **Optimize Performance**: Improve data loading and caching
@@ -304,23 +332,26 @@ To enhance the package display system:
 ## 🎉 **Benefits**
 
 ### **For Developers**
+
 - **Clean Output**: Professional-looking tables instead of raw data
 - **Easy Navigation**: Organized information by category
 - **Quick Reference**: Fast access to package details
 
 ### **For Teams**
+
 - **Consistent Format**: Standardized information display
 - **Better Documentation**: Clear package overview
 - **Improved Workflow**: Faster package information access
 
 ### **For Users**
+
 - **Professional Appearance**: Enterprise-grade output quality
 - **Easy Reading**: No more parsing through JSON or text
 - **Quick Understanding**: Clear, organized information structure
 
 ---
 
-*Generated by Fire22 Enhanced Package Information Display System*
+_Generated by Fire22 Enhanced Package Information Display System_
 
 ## 🚀 **Quick Start**
 
@@ -337,4 +368,5 @@ bun run package:summary
 bunx --package fire22-dashboard matrix:health
 ```
 
-Your enhanced package information display system is now ready to provide clean, professional output for all your package information needs! 🎯
+Your enhanced package information display system is now ready to provide clean,
+professional output for all your package information needs! 🎯

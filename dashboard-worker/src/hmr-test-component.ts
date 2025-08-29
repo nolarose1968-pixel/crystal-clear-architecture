@@ -4,9 +4,9 @@
  * Edit this file while the dev server is running to see HMR in action!
  */
 
-import { logger } from "../scripts/enhanced-logging-system";
+import { logger } from '../scripts/enhanced-logging-system';
 
-// ==================== COMPONENT STATE ====================
+// !==!==!===== COMPONENT STATE !==!==!=====
 interface ComponentState {
   counter: number;
   lastUpdate: number;
@@ -21,90 +21,90 @@ const componentState: ComponentState = import.meta.hot?.data?.state ?? {
   lastUpdate: Date.now(),
   messages: ['Component initialized'],
   theme: 'dark',
-  version: '1.0.0'
+  version: '1.0.0',
 };
 
-// ==================== HMR EVENT HANDLERS ====================
+// !==!==!===== HMR EVENT HANDLERS !==!==!=====
 if (import.meta.hot) {
-  logger.info("HMR_TEST", "1.0.0", "🔥 HMR Test Component loaded");
-  
+  logger.info('HMR_TEST', '1.0.0', '🔥 HMR Test Component loaded');
+
   // Save state before updates
-  import.meta.hot.on("bun:beforeUpdate", () => {
+  import.meta.hot.on('bun:beforeUpdate', () => {
     componentState.lastUpdate = Date.now();
     componentState.messages.push(`Update #${componentState.counter + 1} preparing...`);
-    
+
     // Persist state
     import.meta.hot.data.state = componentState;
-    
-    logger.info("HMR_TEST", "1.0.0", `State saved: counter=${componentState.counter}`);
+
+    logger.info('HMR_TEST', '1.0.0', `State saved: counter=${componentState.counter}`);
   });
-  
+
   // Restore and apply after updates
-  import.meta.hot.on("bun:afterUpdate", () => {
+  import.meta.hot.on('bun:afterUpdate', () => {
     componentState.counter++;
     componentState.messages.push(`🎉 Hot reload #${componentState.counter} applied!`);
-    
-    logger.success("HMR_TEST", "1.0.0", `Hot reload #${componentState.counter} complete!`);
-    
+
+    logger.success('HMR_TEST', '1.0.0', `Hot reload #${componentState.counter} complete!`);
+
     // Notify UI if in browser
     if (typeof window !== 'undefined') {
       updateComponentUI();
       showUpdateNotification();
     }
   });
-  
+
   // Handle HMR errors
-  import.meta.hot.on("bun:error", (error) => {
+  import.meta.hot.on('bun:error', error => {
     componentState.messages.push(`❌ HMR Error: ${error.message}`);
-    logger.error("HMR_TEST", "1.0.0", `HMR error: ${error.message}`, "E1001");
+    logger.error('HMR_TEST', '1.0.0', `HMR error: ${error.message}`, 'E1001');
   });
-  
+
   // Connection status
-  import.meta.hot.on("bun:ws:connect", () => {
+  import.meta.hot.on('bun:ws:connect', () => {
     componentState.messages.push('🟢 HMR connected');
-    logger.success("HMR_TEST", "1.0.0", "HMR WebSocket connected");
+    logger.success('HMR_TEST', '1.0.0', 'HMR WebSocket connected');
   });
-  
-  import.meta.hot.on("bun:ws:disconnect", () => {
+
+  import.meta.hot.on('bun:ws:disconnect', () => {
     componentState.messages.push('🔴 HMR disconnected');
-    logger.warning("HMR_TEST", "1.0.0", "HMR WebSocket disconnected");
+    logger.warning('HMR_TEST', '1.0.0', 'HMR WebSocket disconnected');
   });
-  
+
   // Clean up on dispose
   import.meta.hot.dispose(() => {
-    logger.info("HMR_TEST", "1.0.0", "Cleaning up test component");
-    
+    logger.info('HMR_TEST', '1.0.0', 'Cleaning up test component');
+
     // Cleanup any intervals or resources
     if (typeof window !== 'undefined') {
       const intervals = import.meta.hot.data.intervals || [];
       intervals.forEach((id: number) => clearInterval(id));
     }
   });
-  
+
   // Accept hot updates
   import.meta.hot.accept();
 }
 
-// ==================== COMPONENT CLASS ====================
+// !==!==!===== COMPONENT CLASS !==!==!=====
 export class HMRTestComponent {
   private updateInterval: number | null = null;
-  
+
   constructor() {
     this.initialize();
   }
-  
+
   private initialize(): void {
-    logger.info("HMR_TEST", componentState.version, "Initializing test component");
-    
+    logger.info('HMR_TEST', componentState.version, 'Initializing test component');
+
     if (typeof window !== 'undefined') {
       this.createUI();
       this.startUpdates();
     }
-    
+
     // Log current state
     this.logCurrentState();
   }
-  
+
   private createUI(): void {
     const container = document.getElementById('hmr-test-container');
     if (!container) {
@@ -117,14 +117,14 @@ export class HMRTestComponent {
       // Update existing container
       container.innerHTML = this.getComponentHTML();
     }
-    
+
     // Add event listeners
     this.attachEventListeners();
-    
+
     // Update UI with current state
     this.updateComponentUI();
   }
-  
+
   private getComponentHTML(): string {
     return `
       <div class="hmr-test-component">
@@ -238,98 +238,99 @@ export class HMRTestComponent {
       </style>
     `;
   }
-  
+
   private attachEventListeners(): void {
     // Make component methods available globally
     (window as any).testComponent = this;
   }
-  
+
   private startUpdates(): void {
     // Clear existing interval
     if (this.updateInterval) {
       clearInterval(this.updateInterval);
     }
-    
+
     // Start periodic updates
     this.updateInterval = setInterval(() => {
       componentState.lastUpdate = Date.now();
       this.updateComponentUI();
-      
+
       // Randomly add messages
       if (Math.random() < 0.3) {
         const messages = [
           '📊 Component state updated',
           '🔄 Periodic refresh completed',
           '💫 Auto-update cycle',
-          '⚡ Live data refresh'
+          '⚡ Live data refresh',
         ];
         const randomMessage = messages[Math.floor(Math.random() * messages.length)];
         this.addMessage(randomMessage);
       }
     }, 3000);
-    
+
     // Store interval for HMR cleanup
     if (import.meta.hot) {
       import.meta.hot.data.intervals = import.meta.hot.data.intervals || [];
       import.meta.hot.data.intervals.push(this.updateInterval);
     }
   }
-  
-  // ==================== PUBLIC METHODS ====================
+
+  // !==!==!===== PUBLIC METHODS !==!==!=====
   public incrementCounter(): void {
     componentState.counter++;
     this.addMessage(`🔢 Counter incremented to ${componentState.counter}`);
     this.updateComponentUI();
-    
-    logger.info("HMR_TEST", componentState.version, `Counter: ${componentState.counter}`);
+
+    logger.info('HMR_TEST', componentState.version, `Counter: ${componentState.counter}`);
   }
-  
+
   public toggleTheme(): void {
     componentState.theme = componentState.theme === 'dark' ? 'light' : 'dark';
     this.addMessage(`🎨 Theme switched to ${componentState.theme}`);
     this.updateComponentUI();
-    
-    logger.info("HMR_TEST", componentState.version, `Theme: ${componentState.theme}`);
+
+    logger.info('HMR_TEST', componentState.version, `Theme: ${componentState.theme}`);
   }
-  
+
   public clearMessages(): void {
     componentState.messages = ['Messages cleared'];
     this.updateComponentUI();
-    
-    logger.info("HMR_TEST", componentState.version, "Messages cleared");
+
+    logger.info('HMR_TEST', componentState.version, 'Messages cleared');
   }
-  
+
   public addMessage(message: string): void {
     componentState.messages.push(`${new Date().toLocaleTimeString()}: ${message}`);
-    
+
     // Keep only last 10 messages
     if (componentState.messages.length > 10) {
       componentState.messages = componentState.messages.slice(-10);
     }
-    
+
     this.updateComponentUI();
   }
-  
-  // ==================== PRIVATE METHODS ====================
+
+  // !==!==!===== PRIVATE METHODS !==!==!=====
   private updateComponentUI(): void {
     if (typeof window === 'undefined') return;
-    
+
     // Update counter
     const counterEl = document.getElementById('hmr-counter');
     if (counterEl) counterEl.textContent = componentState.counter.toString();
-    
+
     // Update timestamp
     const timestampEl = document.getElementById('hmr-timestamp');
-    if (timestampEl) timestampEl.textContent = new Date(componentState.lastUpdate).toLocaleTimeString();
-    
+    if (timestampEl)
+      timestampEl.textContent = new Date(componentState.lastUpdate).toLocaleTimeString();
+
     // Update version
     const versionEl = document.getElementById('hmr-version');
     if (versionEl) versionEl.textContent = componentState.version;
-    
+
     // Update theme
     const themeEl = document.getElementById('hmr-theme');
     if (themeEl) themeEl.textContent = componentState.theme;
-    
+
     // Update theme styling
     const component = document.querySelector('.hmr-test-component');
     if (component) {
@@ -339,7 +340,7 @@ export class HMRTestComponent {
         component.classList.remove('light');
       }
     }
-    
+
     // Update messages
     const messageList = document.getElementById('hmr-message-list');
     if (messageList) {
@@ -348,37 +349,40 @@ export class HMRTestComponent {
         .join('');
     }
   }
-  
+
   private logCurrentState(): void {
-    logger.info("HMR_TEST", componentState.version, 
-      `State: counter=${componentState.counter}, theme=${componentState.theme}, messages=${componentState.messages.length}`);
+    logger.info(
+      'HMR_TEST',
+      componentState.version,
+      `State: counter=${componentState.counter}, theme=${componentState.theme}, messages=${componentState.messages.length}`
+    );
   }
-  
-  // ==================== GETTERS ====================
+
+  // !==!==!===== GETTERS !==!==!=====
   public getState(): ComponentState {
     return { ...componentState };
   }
-  
+
   public getHMRInfo(): any {
     return {
       isHMREnabled: !!import.meta.hot,
       reloadCount: componentState.counter,
       lastUpdate: componentState.lastUpdate,
-      version: componentState.version
+      version: componentState.version,
     };
   }
 }
 
-// ==================== UTILITY FUNCTIONS ====================
+// !==!==!===== UTILITY FUNCTIONS !==!==!=====
 function showUpdateNotification(): void {
   if (typeof window === 'undefined') return;
-  
+
   const notification = document.createElement('div');
   notification.className = 'hmr-update-notification';
   notification.textContent = `🔥 Hot Reload #${componentState.counter} - State Preserved!`;
-  
+
   document.body.appendChild(notification);
-  
+
   // Auto-remove after 3 seconds
   setTimeout(() => {
     if (notification.parentNode) {
@@ -395,7 +399,7 @@ function updateComponentUI(): void {
   }
 }
 
-// ==================== INITIALIZATION ====================
+// !==!==!===== INITIALIZATION !==!==!=====
 let testComponent: HMRTestComponent;
 
 if (typeof window !== 'undefined') {
@@ -412,7 +416,7 @@ if (typeof window !== 'undefined') {
   testComponent = new HMRTestComponent();
 }
 
-// ==================== EXPORTS ====================
+// !==!==!===== EXPORTS !==!==!=====
 export { testComponent, componentState, updateComponentUI, showUpdateNotification };
 
 // Make available globally for browser testing

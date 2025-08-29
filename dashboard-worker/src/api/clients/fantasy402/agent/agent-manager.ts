@@ -9,7 +9,7 @@ import type {
   DetailedAccountInfo,
   SubAgentInfo,
   ApiResponse,
-  ClientError
+  ClientError,
 } from '../../../../../core/types/fantasy402';
 
 export class AgentManager {
@@ -55,22 +55,21 @@ export class AgentManager {
         canDeleteBets: response.data.canDeleteBets || false,
         canViewReports: response.data.canViewReports || false,
         canAccessBilling: response.data.canAccessBilling || false,
-        rawPermissions: response.data
+        rawPermissions: response.data,
       };
 
       return {
         success: true,
         data: permissions,
         timestamp: new Date(),
-        requestId: `agent_permissions_${Date.now()}`
+        requestId: `agent_permissions_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
-        requestId: `agent_permissions_error_${Date.now()}`
+        requestId: `agent_permissions_error_${Date.now()}`,
       };
     }
   }
@@ -105,22 +104,21 @@ export class AgentManager {
         office: response.data.office || '',
         store: response.data.store || '',
         active: response.data.active !== false,
-        agentType: response.data.agentType || 'U'
+        agentType: response.data.agentType || 'U',
       };
 
       return {
         success: true,
         data: accountInfo,
         timestamp: new Date(),
-        requestId: `agent_account_${Date.now()}`
+        requestId: `agent_account_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
-        requestId: `agent_account_error_${Date.now()}`
+        requestId: `agent_account_error_${Date.now()}`,
       };
     }
   }
@@ -171,22 +169,21 @@ export class AgentManager {
           ? new Date(response.data.lastActivityTimestamp)
           : new Date(),
         subAgents: response.data.subAgents || [],
-        rawResponse: response.data
+        rawResponse: response.data,
       };
 
       return {
         success: true,
         data: detailedInfo,
         timestamp: new Date(),
-        requestId: `detailed_account_${Date.now()}`
+        requestId: `detailed_account_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
-        requestId: `detailed_account_error_${Date.now()}`
+        requestId: `detailed_account_error_${Date.now()}`,
       };
     }
   }
@@ -219,22 +216,21 @@ export class AgentManager {
         office: agent.office,
         balance: agent.balance || 0,
         active: agent.active !== false,
-        agentType: agent.agentType || 'U'
+        agentType: agent.agentType || 'U',
       }));
 
       return {
         success: true,
         data: subAgents,
         timestamp: new Date(),
-        requestId: `sub_agents_${Date.now()}`
+        requestId: `sub_agents_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
-        requestId: `sub_agents_error_${Date.now()}`
+        requestId: `sub_agents_error_${Date.now()}`,
       };
     }
   }
@@ -276,15 +272,14 @@ export class AgentManager {
         data: true,
         message: 'Agent settings updated successfully',
         timestamp: new Date(),
-        requestId: `update_settings_${Date.now()}`
+        requestId: `update_settings_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
-        requestId: `update_settings_error_${Date.now()}`
+        requestId: `update_settings_error_${Date.now()}`,
       };
     }
   }
@@ -315,15 +310,14 @@ export class AgentManager {
         success: true,
         data: response.data,
         timestamp: new Date(),
-        requestId: `agent_hierarchy_${Date.now()}`
+        requestId: `agent_hierarchy_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
-        requestId: `agent_hierarchy_error_${Date.now()}`
+        requestId: `agent_hierarchy_error_${Date.now()}`,
       };
     }
   }
@@ -334,7 +328,12 @@ export class AgentManager {
   async validateAgentCredentials(agentId: string, password: string): Promise<ApiResponse<boolean>> {
     try {
       if (!agentId || !password) {
-        throw new ClientError('Agent ID and password are required', 'MISSING_CREDENTIALS', 400, false);
+        throw new ClientError(
+          'Agent ID and password are required',
+          'MISSING_CREDENTIALS',
+          400,
+          false
+        );
       }
 
       const url = `${this.baseUrl}/agent/validate-credentials`;
@@ -347,15 +346,14 @@ export class AgentManager {
         data: isValid,
         message: isValid ? 'Credentials are valid' : 'Invalid credentials',
         timestamp: new Date(),
-        requestId: `validate_credentials_${Date.now()}`
+        requestId: `validate_credentials_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date(),
-        requestId: `validate_credentials_error_${Date.now()}`
+        requestId: `validate_credentials_error_${Date.now()}`,
       };
     }
   }
@@ -369,7 +367,7 @@ export class AgentManager {
   ): Promise<ApiResponse> {
     try {
       const headers: Record<string, string> = {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       };
 
       if (this.authToken) {
@@ -378,7 +376,7 @@ export class AgentManager {
 
       const requestOptions: RequestInit = {
         method,
-        headers
+        headers,
       };
 
       if (body && (method === 'POST' || method === 'PUT')) {
@@ -393,15 +391,14 @@ export class AgentManager {
         data: responseData,
         error: response.ok ? undefined : responseData.error,
         timestamp: new Date(),
-        requestId: `http_${Date.now()}`
+        requestId: `http_${Date.now()}`,
       };
-
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Network error',
         timestamp: new Date(),
-        requestId: `http_error_${Date.now()}`
+        requestId: `http_error_${Date.now()}`,
       };
     }
   }

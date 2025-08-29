@@ -2,18 +2,23 @@
 
 ## 🚀 **Overview**
 
-The **Fire22 P2P Queue System** now features comprehensive Telegram integration, providing real-time notifications, interactive buttons, and automated match processing for peer-to-peer transactions.
+The **Fire22 P2P Queue System** now features comprehensive Telegram integration,
+providing real-time notifications, interactive buttons, and automated match
+processing for peer-to-peer transactions.
 
 ## 🔧 **Key Features**
 
 ### **Telegram Integration**
+
 - ✅ **Real-time Notifications**: Instant updates for all P2P queue events
 - ✅ **Interactive Buttons**: Inline keyboards for quick actions
-- ✅ **Multi-channel Support**: Send notifications to groups, channels, and users
+- ✅ **Multi-channel Support**: Send notifications to groups, channels, and
+  users
 - ✅ **Admin Alerts**: Special notifications for administrators
 - ✅ **Bulk Notifications**: Send to multiple channels simultaneously
 
 ### **P2P Queue Capabilities**
+
 - 🎯 **Withdrawal Management**: Add and track withdrawal requests
 - 💰 **Deposit Processing**: Handle deposit submissions
 - 🔍 **Match Detection**: Automatic matching with confidence scoring
@@ -25,6 +30,7 @@ The **Fire22 P2P Queue System** now features comprehensive Telegram integration,
 ### **1. Queue Item Notifications**
 
 #### **Withdrawal Added** 🎯
+
 ```
 🎯 New Withdrawal Added to P2P Queue
 
@@ -40,6 +46,7 @@ Waiting for deposit match...
 ```
 
 #### **Deposit Added** 💸
+
 ```
 💸 New Deposit Added to P2P Queue
 
@@ -57,6 +64,7 @@ Looking for withdrawal match...
 ### **2. Match Notifications**
 
 #### **Match Found** 🎉
+
 ```
 🎉 P2P Match Found!
 
@@ -70,6 +78,7 @@ Processing match...
 ```
 
 #### **Match Approved** ✅
+
 ```
 ✅ P2P Match Approved!
 
@@ -81,6 +90,7 @@ Transaction processing...
 ```
 
 #### **Match Completed** 🎊
+
 ```
 🎊 P2P Transaction Completed!
 
@@ -92,6 +102,7 @@ Funds transferred successfully!
 ```
 
 #### **Match Failed** ❌
+
 ```
 ❌ P2P Match Failed
 
@@ -105,6 +116,7 @@ Returning to queue...
 ### **3. Status Notifications**
 
 #### **Queue Status** 📊
+
 ```
 📊 P2P Queue Status
 
@@ -122,6 +134,7 @@ Returning to queue...
 ```
 
 #### **Match Opportunities** 🔍
+
 ```
 🔍 P2P Match Opportunities
 
@@ -144,39 +157,27 @@ Returning to queue...
 
 ### **Basic P2P Queue Operations**
 
-```typescript
+````typescript
 ```javascript
 import { createP2PQueueAPI } from './src/p2p-queue-api';
-```
+````
 
 const p2pAPI = createP2PQueueAPI(env);
 
-// Add withdrawal with Telegram integration
-const withdrawalId = await p2pAPI.addWithdrawalToQueue({
-  customerId: 'cust-001',
-  amount: 500,
-  paymentType: 'Bank Transfer',
-  paymentDetails: 'Chase Bank - Account ending 1234',
-  priority: 1,
-  notes: 'Urgent withdrawal needed',
-  telegramGroupId: '-1001234567890', // Telegram group ID
-  telegramChatId: '123456789',       // Telegram user ID
-  telegramChannel: '@fire22_p2p'     // Telegram channel username
-});
+// Add withdrawal with Telegram integration const withdrawalId = await
+p2pAPI.addWithdrawalToQueue({ customerId: 'cust-001', amount: 500, paymentType:
+'Bank Transfer', paymentDetails: 'Chase Bank - Account ending 1234', priority:
+1, notes: 'Urgent withdrawal needed', telegramGroupId: '-1001234567890', //
+Telegram group ID telegramChatId: '123456789', // Telegram user ID
+telegramChannel: '@fire22_p2p' // Telegram channel username });
 
-// Add deposit with Telegram integration
-const depositId = await p2pAPI.addDepositToQueue({
-  customerId: 'cust-002',
-  amount: 500,
-  paymentType: 'Bank Transfer',
-  paymentDetails: 'Wells Fargo - Account ending 5678',
-  priority: 1,
-  notes: 'Ready to process',
-  telegramGroupId: '-1001234567890',
-  telegramChatId: '987654321',
-  telegramChannel: '@fire22_p2p'
-});
-```
+// Add deposit with Telegram integration const depositId = await
+p2pAPI.addDepositToQueue({ customerId: 'cust-002', amount: 500, paymentType:
+'Bank Transfer', paymentDetails: 'Wells Fargo - Account ending 5678', priority:
+1, notes: 'Ready to process', telegramGroupId: '-1001234567890', telegramChatId:
+'987654321', telegramChannel: '@fire22_p2p' });
+
+````
 
 ### **Telegram Notifications**
 
@@ -193,7 +194,7 @@ await p2pAPI.sendBulkP2PNotification('withdrawal_added', withdrawalData, [
   '123456789',       // User
   '@fire22_p2p'      // Channel
 ]);
-```
+````
 
 ### **Match Processing**
 
@@ -245,12 +246,14 @@ CREATE INDEX idx_telegram_data_group ON telegram_data(telegram_group_id);
 ## 📱 **Telegram Bot Setup**
 
 ### **1. Create Bot**
+
 1. Message `@BotFather` on Telegram
 2. Use `/newbot` command
 3. Follow setup instructions
 4. Save the bot token
 
 ### **2. Configure Webhook**
+
 ```typescript
 // Set webhook for your bot
 const webhookUrl = 'https://your-domain.com/webhook/telegram';
@@ -258,11 +261,13 @@ await telegramBot.setWebhook(webhookUrl);
 ```
 
 ### **3. Add Bot to Groups/Channels**
+
 1. Add bot to Telegram groups
 2. Make bot admin in channels
 3. Note down group/channel IDs
 
 ### **4. Test Integration**
+
 ```typescript
 // Test basic functionality
 await p2pAPI.sendQueueStatusNotification('-1001234567890');
@@ -271,22 +276,27 @@ await p2pAPI.sendQueueStatusNotification('-1001234567890');
 ## 🎯 **Advanced Features**
 
 ### **Automatic Match Detection**
+
 - **Real-time Scanning**: Continuously monitors for new matches
 - **Confidence Scoring**: Uses match score threshold (default: 0.8)
-- **Immediate Notifications**: Sends alerts when high-confidence matches are found
+- **Immediate Notifications**: Sends alerts when high-confidence matches are
+  found
 
 ### **Interactive Buttons**
+
 - **View Matches**: Shows available match opportunities
 - **Queue Status**: Displays current queue statistics
 - **Approve/Reject**: Quick match processing actions
 - **Refresh**: Update information in real-time
 
 ### **Bulk Operations**
+
 - **Multi-channel Notifications**: Send to multiple Telegram destinations
 - **Rate Limiting**: Built-in delays to avoid Telegram API limits
 - **Error Handling**: Graceful failure handling for individual channels
 
 ### **Admin Features**
+
 - **Special Alerts**: Dedicated admin notifications
 - **Match Processing**: Direct match approval/rejection
 - **System Monitoring**: Queue health and performance metrics
@@ -294,11 +304,13 @@ await p2pAPI.sendQueueStatusNotification('-1001234567890');
 ## 🔒 **Security & Privacy**
 
 ### **Data Protection**
+
 - **Encrypted Storage**: Sensitive data encrypted in database
 - **Access Control**: Telegram bot access limited to authorized users
 - **Audit Logging**: Complete notification history tracking
 
 ### **Rate Limiting**
+
 - **API Limits**: Respects Telegram Bot API rate limits
 - **Notification Delays**: Built-in delays between bulk notifications
 - **Error Handling**: Graceful handling of API failures
@@ -306,12 +318,14 @@ await p2pAPI.sendQueueStatusNotification('-1001234567890');
 ## 📊 **Performance & Monitoring**
 
 ### **Metrics**
+
 - **Notification Success Rate**: Track delivery success
 - **Response Times**: Monitor notification latency
 - **Queue Processing**: Real-time queue statistics
 - **Match Efficiency**: Track match success rates
 
 ### **Health Checks**
+
 ```typescript
 // Check Telegram bot status
 const botStatus = await p2pAPI.checkTelegramBotHealth();
@@ -328,6 +342,7 @@ const notificationStatus = await p2pAPI.getNotificationStatus();
 ### **Common Issues**
 
 #### **Telegram Bot Not Responding**
+
 ```bash
 # Check bot token
 echo $TELEGRAM_BOT_TOKEN
@@ -337,6 +352,7 @@ curl -X GET "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getWebhookInfo"
 ```
 
 #### **Notifications Not Sending**
+
 ```typescript
 // Check bot availability
 if (!env.TELEGRAM_BOT) {
@@ -350,6 +366,7 @@ if (!env.TELEGRAM_BOT) {
 ```
 
 #### **Database Errors**
+
 ```sql
 -- Check telegram_data table
 SELECT * FROM telegram_data LIMIT 5;
@@ -372,6 +389,7 @@ await p2pAPI.testTelegramIntegration();
 ## 🔮 **Future Enhancements**
 
 ### **Planned Features**
+
 - **AI-Powered Matching**: Machine learning for better match suggestions
 - **Multi-language Support**: Localized notifications
 - **Advanced Analytics**: Detailed performance metrics
@@ -379,6 +397,7 @@ await p2pAPI.testTelegramIntegration();
 - **Webhook Support**: External system integrations
 
 ### **Integration Opportunities**
+
 - **Payment Processors**: Direct payment system integration
 - **KYC/AML Systems**: Automated compliance checking
 - **Risk Management**: Advanced fraud detection [L-28]
@@ -389,34 +408,43 @@ await p2pAPI.testTelegramIntegration();
 ### **Core Methods**
 
 #### `addWithdrawalToQueue(withdrawal)`
+
 Adds withdrawal to P2P queue with Telegram notifications.
 
 #### `addDepositToQueue(deposit)`
+
 Adds deposit to P2P queue with Telegram notifications.
 
 #### `getQueueItems(filters)`
+
 Retrieves queue items with optional Telegram filtering.
 
 #### `getMatchingOpportunities()`
+
 Gets available P2P match opportunities.
 
 #### `processP2PMatch(matchId, action)`
+
 Processes P2P matches with Telegram notifications.
 
 ### **Telegram Methods**
 
 #### `sendQueueStatusNotification(chatId)`
+
 Sends current queue status to specified chat.
 
 #### `sendMatchOpportunitiesNotification(chatId)`
+
 Sends available match opportunities to specified chat.
 
 #### `sendBulkP2PNotification(event, item, channels)`
+
 Sends notifications to multiple channels.
 
 ## 🎉 **Getting Started**
 
 ### **1. Setup Environment**
+
 ```bash
 # Install dependencies
 bun install
@@ -427,6 +455,7 @@ cp .env.example .env
 ```
 
 ### **2. Initialize Database**
+
 ```bash
 # Run database migrations
 bun run db:migrate
@@ -436,6 +465,7 @@ bun run db:verify
 ```
 
 ### **3. Test Integration**
+
 ```bash
 # Test basic functionality
 bun run test:p2p-telegram
@@ -445,6 +475,7 @@ bun run test:all
 ```
 
 ### **4. Start Using**
+
 ```typescript
 // Your P2P queue with Telegram integration is ready!
 const p2pAPI = createP2PQueueAPI(env);
@@ -462,6 +493,7 @@ Your enhanced P2P Queue system now provides:
 ✅ **Automated Processing**: Smart match detection and processing  
 ✅ **Multi-channel Support**: Notifications to groups, channels, and users  
 ✅ **Professional Quality**: Enterprise-grade P2P queue management  
-✅ **Full Integration**: Seamless Telegram bot integration  
+✅ **Full Integration**: Seamless Telegram bot integration
 
-**🚀 Your P2P Queue system is now production-ready with comprehensive Telegram integration!**
+**🚀 Your P2P Queue system is now production-ready with comprehensive Telegram
+integration!**

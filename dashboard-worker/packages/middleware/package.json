@@ -15,8 +15,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/brendadeeznuts1111/fire22-dashboard-worker",
-    "directory": "packages/middleware"
+    "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture.git",
+    "directory": "dashboard-worker/packages/middleware"
   },
   "scripts": {
     "test:middleware:request-body": "bun test --test-name-pattern='middleware.*request'",

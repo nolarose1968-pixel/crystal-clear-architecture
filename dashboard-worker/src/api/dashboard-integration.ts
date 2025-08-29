@@ -20,28 +20,28 @@ export class DashboardIntegrationAPI {
       ipTracker: {
         enabled: true,
         realTimeUpdates: true,
-        riskThreshold: 70
+        riskThreshold: 70,
       },
       transactionHistory: {
         enabled: true,
         realTimeUpdates: true,
-        maxRecords: 1000
+        maxRecords: 1000,
       },
       collections: {
         enabled: true,
         realTimeUpdates: true,
-        autoSettlement: false
+        autoSettlement: false,
       },
       sportsbookLines: {
         enabled: true,
         realTimeUpdates: true,
-        autoRefresh: true
+        autoRefresh: true,
       },
       analysis: {
         enabled: true,
         realTimeUpdates: true,
-        predictiveEnabled: true
-      }
+        predictiveEnabled: true,
+      },
     });
   }
 
@@ -50,19 +50,25 @@ export class DashboardIntegrationAPI {
     try {
       const data = await this.unifiedIntegration.getDashboardData('ipTracker');
 
-      return new Response(JSON.stringify({
-        success: true,
-        data: data,
-        timestamp: new Date().toISOString()
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: data,
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error('IP Tracker API error:', error);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to fetch IP tracker data'
-      }), { status: 500 });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to fetch IP tracker data',
+        }),
+        { status: 500 }
+      );
     }
   }
 
@@ -78,28 +84,34 @@ export class DashboardIntegrationAPI {
       // Apply pagination
       const paginatedTransactions = data.transactions.slice(offset, offset + limit);
 
-      return new Response(JSON.stringify({
-        success: true,
-        data: {
-          transactions: paginatedTransactions,
-          summary: data.summary,
-          pagination: {
-            total: data.transactions.length,
-            limit,
-            offset,
-            hasMore: offset + limit < data.transactions.length
-          }
-        },
-        timestamp: new Date().toISOString()
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: {
+            transactions: paginatedTransactions,
+            summary: data.summary,
+            pagination: {
+              total: data.transactions.length,
+              limit,
+              offset,
+              hasMore: offset + limit < data.transactions.length,
+            },
+          },
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error('Transaction History API error:', error);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to fetch transaction history data'
-      }), { status: 500 });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to fetch transaction history data',
+        }),
+        { status: 500 }
+      );
     }
   }
 
@@ -108,19 +120,25 @@ export class DashboardIntegrationAPI {
     try {
       const data = await this.unifiedIntegration.getDashboardData('collections');
 
-      return new Response(JSON.stringify({
-        success: true,
-        data: data,
-        timestamp: new Date().toISOString()
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: data,
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error('Collections API error:', error);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to fetch collections data'
-      }), { status: 500 });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to fetch collections data',
+        }),
+        { status: 500 }
+      );
     }
   }
 
@@ -129,19 +147,25 @@ export class DashboardIntegrationAPI {
     try {
       const data = await this.unifiedIntegration.getDashboardData('sportsbookLines');
 
-      return new Response(JSON.stringify({
-        success: true,
-        data: data,
-        timestamp: new Date().toISOString()
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: data,
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error('Sportsbook Lines API error:', error);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to fetch sportsbook lines data'
-      }), { status: 500 });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to fetch sportsbook lines data',
+        }),
+        { status: 500 }
+      );
     }
   }
 
@@ -150,19 +174,25 @@ export class DashboardIntegrationAPI {
     try {
       const data = await this.unifiedIntegration.getDashboardData('analysis');
 
-      return new Response(JSON.stringify({
-        success: true,
-        data: data,
-        timestamp: new Date().toISOString()
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: data,
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error('Analysis API error:', error);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to fetch analysis data'
-      }), { status: 500 });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to fetch analysis data',
+        }),
+        { status: 500 }
+      );
     }
   }
 
@@ -172,26 +202,35 @@ export class DashboardIntegrationAPI {
       const { ip, reason } = await req.json();
 
       if (!ip) {
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'IP address is required'
-        }), { status: 400 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'IP address is required',
+          }),
+          { status: 400 }
+        );
       }
 
       const success = await this.unifiedIntegration.triggerIPBlock(ip, reason || 'Manual block');
 
-      return new Response(JSON.stringify({
-        success,
-        message: success ? `IP ${ip} blocked successfully` : `Failed to block IP ${ip}`
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          success,
+          message: success ? `IP ${ip} blocked successfully` : `Failed to block IP ${ip}`,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error('Block IP API error:', error);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to block IP'
-      }), { status: 500 });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to block IP',
+        }),
+        { status: 500 }
+      );
     }
   }
 
@@ -200,33 +239,51 @@ export class DashboardIntegrationAPI {
       const { wagerNumber, settlementType, notes } = await req.json();
 
       if (!wagerNumber || !settlementType) {
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Wager number and settlement type are required'
-        }), { status: 400 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Wager number and settlement type are required',
+          }),
+          { status: 400 }
+        );
       }
 
       if (!['win', 'loss', 'push', 'void'].includes(settlementType)) {
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Invalid settlement type'
-        }), { status: 400 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Invalid settlement type',
+          }),
+          { status: 400 }
+        );
       }
 
-      const success = await this.unifiedIntegration.processSettlement(wagerNumber, settlementType, notes);
+      const success = await this.unifiedIntegration.processSettlement(
+        wagerNumber,
+        settlementType,
+        notes
+      );
 
-      return new Response(JSON.stringify({
-        success,
-        message: success ? `Settlement processed for wager ${wagerNumber}` : `Failed to process settlement for ${wagerNumber}`
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          success,
+          message: success
+            ? `Settlement processed for wager ${wagerNumber}`
+            : `Failed to process settlement for ${wagerNumber}`,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error('Process Settlement API error:', error);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to process settlement'
-      }), { status: 500 });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to process settlement',
+        }),
+        { status: 500 }
+      );
     }
   }
 
@@ -235,26 +292,37 @@ export class DashboardIntegrationAPI {
       const { lineId, newOdds } = await req.json();
 
       if (!lineId || !newOdds) {
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Line ID and new odds are required'
-        }), { status: 400 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Line ID and new odds are required',
+          }),
+          { status: 400 }
+        );
       }
 
       const success = await this.unifiedIntegration.updateLineOdds(lineId, newOdds);
 
-      return new Response(JSON.stringify({
-        success,
-        message: success ? `Line odds updated for ${lineId}` : `Failed to update line odds for ${lineId}`
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          success,
+          message: success
+            ? `Line odds updated for ${lineId}`
+            : `Failed to update line odds for ${lineId}`,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error('Update Line Odds API error:', error);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to update line odds'
-      }), { status: 500 });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to update line odds',
+        }),
+        { status: 500 }
+      );
     }
   }
 
@@ -263,10 +331,13 @@ export class DashboardIntegrationAPI {
       const { customerId, message, severity } = await req.json();
 
       if (!customerId || !message) {
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Customer ID and message are required'
-        }), { status: 400 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Customer ID and message are required',
+          }),
+          { status: 400 }
+        );
       }
 
       const success = await this.unifiedIntegration.sendAlert(
@@ -275,18 +346,26 @@ export class DashboardIntegrationAPI {
         severity || 'medium'
       );
 
-      return new Response(JSON.stringify({
-        success,
-        message: success ? `Alert sent to customer ${customerId}` : `Failed to send alert to ${customerId}`
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          success,
+          message: success
+            ? `Alert sent to customer ${customerId}`
+            : `Failed to send alert to ${customerId}`,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error('Send Alert API error:', error);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to send alert'
-      }), { status: 500 });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to send alert',
+        }),
+        { status: 500 }
+      );
     }
   }
 
@@ -296,10 +375,13 @@ export class DashboardIntegrationAPI {
       const { settlements, notes } = await req.json();
 
       if (!settlements || !Array.isArray(settlements)) {
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Settlements array is required'
-        }), { status: 400 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Settlements array is required',
+          }),
+          { status: 400 }
+        );
       }
 
       const results = [];
@@ -313,37 +395,43 @@ export class DashboardIntegrationAPI {
           results.push({
             wagerNumber: settlement.wagerNumber,
             success,
-            message: success ? 'Processed' : 'Failed'
+            message: success ? 'Processed' : 'Failed',
           });
         } catch (error) {
           results.push({
             wagerNumber: settlement.wagerNumber,
             success: false,
-            message: error.message
+            message: error.message,
           });
         }
       }
 
       const successful = results.filter(r => r.success).length;
 
-      return new Response(JSON.stringify({
-        success: true,
-        data: {
-          total: settlements.length,
-          successful,
-          failed: settlements.length - successful,
-          results
-        },
-        message: `Bulk settlement completed: ${successful}/${settlements.length} successful`
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: {
+            total: settlements.length,
+            successful,
+            failed: settlements.length - successful,
+            results,
+          },
+          message: `Bulk settlement completed: ${successful}/${settlements.length} successful`,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error('Bulk Settle API error:', error);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to process bulk settlement'
-      }), { status: 500 });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to process bulk settlement',
+        }),
+        { status: 500 }
+      );
     }
   }
 
@@ -352,18 +440,24 @@ export class DashboardIntegrationAPI {
     try {
       const config = this.unifiedIntegration.getConfig();
 
-      return new Response(JSON.stringify({
-        success: true,
-        data: config
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: config,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error('Dashboard Config API error:', error);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to get dashboard configuration'
-      }), { status: 500 });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to get dashboard configuration',
+        }),
+        { status: 500 }
+      );
     }
   }
 
@@ -372,18 +466,24 @@ export class DashboardIntegrationAPI {
       const newConfig = await req.json();
       this.unifiedIntegration.updateConfig(newConfig);
 
-      return new Response(JSON.stringify({
-        success: true,
-        message: 'Dashboard configuration updated successfully'
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: 'Dashboard configuration updated successfully',
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error('Update Dashboard Config API error:', error);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to update dashboard configuration'
-      }), { status: 500 });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to update dashboard configuration',
+        }),
+        { status: 500 }
+      );
     }
   }
 
@@ -398,34 +498,40 @@ export class DashboardIntegrationAPI {
           p2pAutomation: true,
           interfaceIntegration: true,
           closingLines: true,
-          telegramAlerts: true
+          telegramAlerts: true,
         },
         dashboards: {
           ipTracker: true,
           transactionHistory: true,
           collections: true,
           sportsbookLines: true,
-          analysis: true
+          analysis: true,
         },
         performance: {
           uptime: process.uptime(),
           memoryUsage: process.memoryUsage(),
-          responseTime: Date.now() // This would be measured
-        }
+          responseTime: Date.now(), // This would be measured
+        },
       };
 
-      return new Response(JSON.stringify({
-        success: true,
-        data: health
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          data: health,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       console.error('System Health API error:', error);
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Failed to get system health'
-      }), { status: 500 });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Failed to get system health',
+        }),
+        { status: 500 }
+      );
     }
   }
 }

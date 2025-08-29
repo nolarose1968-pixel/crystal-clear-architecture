@@ -7,6 +7,7 @@ This guide demonstrates the implementation of **Bun Shell scripts** for the Crys
 ## 🎯 Why Bun Shell Scripts?
 
 ### **Cross-Platform Excellence**
+
 ```bash
 # ❌ Old way - Platform-specific scripts
 setup-custom-domain.sh    # Linux/Mac only
@@ -18,10 +19,11 @@ setup-custom-domain.bun.ts  # Works everywhere!
 ```
 
 ### **TypeScript Power**
+
 ```typescript
 // Full TypeScript support with autocomplete
 interface DNSRecord {
-  type: 'CNAME' | 'A';
+  type: "CNAME" | "A";
   name: string;
   target: string;
   proxied: boolean;
@@ -30,11 +32,12 @@ interface DNSRecord {
 async function validateDNS(domain: string): Promise<ValidationResult> {
   // Type-safe function with autocomplete
   const records = await resolveDNS(domain);
-  return records.length > 0 ? 'PASS' : 'FAIL';
+  return records.length > 0 ? "PASS" : "FAIL";
 }
 ```
 
 ### **Maintainability**
+
 ```typescript
 // ❌ Hard to read bash script
 if [ "$1" = "preview" ]; then
@@ -49,6 +52,7 @@ await $`wrangler pages deploy dist --branch=${branch}`;
 ```
 
 ### **Performance**
+
 ```bash
 # Bun scripts start instantly (no shell spawning)
 # Native TypeScript execution
@@ -74,9 +78,10 @@ async function setupProject() {
   await $`cp index.html dist/`;
 
   // Handle Windows paths automatically
-  const buildCommand = Bun.env.BUN_ENV === 'production'
-    ? 'bun run build:prod'
-    : 'bun run build:dev';
+  const buildCommand =
+    Bun.env.BUN_ENV === "production"
+      ? "bun run build:prod"
+      : "bun run build:dev";
 
   await $`${buildCommand}`;
 }
@@ -91,7 +96,7 @@ async function setupProject() {
 interface ProjectConfig {
   name: string;
   domain: string;
-  environment: 'development' | 'staging' | 'production';
+  environment: "development" | "staging" | "production";
   features: {
     analytics: boolean;
     monitoring: boolean;
@@ -100,14 +105,14 @@ interface ProjectConfig {
 }
 
 const config: ProjectConfig = {
-  name: 'crystal-clear-architecture',
-  domain: 'docs.apexodds.net',
-  environment: (Bun.env.NODE_ENV as any) || 'development',
+  name: "crystal-clear-architecture",
+  domain: "docs.apexodds.net",
+  environment: (Bun.env.NODE_ENV as any) || "development",
   features: {
     analytics: true,
     monitoring: true,
-    caching: true
-  }
+    caching: true,
+  },
 };
 
 // Type-safe configuration usage
@@ -116,7 +121,7 @@ async function deployProject(config: ProjectConfig) {
     await $`wrangler pages deploy dist --project-name=${config.name}`;
   }
 
-  if (config.environment === 'production') {
+  if (config.environment === "production") {
     await $`bun run health:custom`;
   }
 }
@@ -131,10 +136,10 @@ class ScriptError extends Error {
   constructor(
     message: string,
     public readonly code: string,
-    public readonly exitCode: number = 1
+    public readonly exitCode: number = 1,
   ) {
     super(message);
-    this.name = 'ScriptError';
+    this.name = "ScriptError";
   }
 }
 
@@ -144,9 +149,9 @@ async function handleErrors() {
   } catch (error) {
     if (error instanceof ShellOutput && error.exitCode === 1) {
       throw new ScriptError(
-        'Deployment failed - check Wrangler configuration',
-        'DEPLOYMENT_FAILED',
-        error.exitCode
+        "Deployment failed - check Wrangler configuration",
+        "DEPLOYMENT_FAILED",
+        error.exitCode,
       );
     }
     throw error;
@@ -156,7 +161,7 @@ async function handleErrors() {
 async function main() {
   try {
     await handleErrors();
-    console.log('✅ Deployment successful!');
+    console.log("✅ Deployment successful!");
   } catch (error) {
     if (error instanceof ScriptError) {
       console.error(`❌ ${error.message}`);
@@ -169,10 +174,10 @@ async function main() {
 
 function getSuggestion(code: string): string {
   const suggestions: Record<string, string> = {
-    'DEPLOYMENT_FAILED': 'Run: wrangler auth login',
-    'DNS_NOT_CONFIGURED': 'Add CNAME record in Cloudflare dashboard'
+    DEPLOYMENT_FAILED: "Run: wrangler auth login",
+    DNS_NOT_CONFIGURED: "Add CNAME record in Cloudflare dashboard",
   };
-  return suggestions[code] || 'Check logs for more details';
+  return suggestions[code] || "Check logs for more details";
 }
 ```
 
@@ -186,7 +191,7 @@ import { $ } from "bun";
 // Type-safe CLI argument parsing
 interface CLIOptions {
   domain?: string;
-  environment?: 'dev' | 'staging' | 'prod';
+  environment?: "dev" | "staging" | "prod";
   verbose?: boolean;
   dryRun?: boolean;
 }
@@ -196,19 +201,19 @@ function parseArgs(args: string[]): CLIOptions {
 
   for (let i = 0; i < args.length; i++) {
     switch (args[i]) {
-      case '--domain':
-      case '-d':
+      case "--domain":
+      case "-d":
         options.domain = args[++i];
         break;
-      case '--environment':
-      case '-e':
-        options.environment = args[++i] as CLIOptions['environment'];
+      case "--environment":
+      case "-e":
+        options.environment = args[++i] as CLIOptions["environment"];
         break;
-      case '--verbose':
-      case '-v':
+      case "--verbose":
+      case "-v":
         options.verbose = true;
         break;
-      case '--dry-run':
+      case "--dry-run":
         options.dryRun = true;
         break;
     }
@@ -221,17 +226,17 @@ async function main() {
   const options = parseArgs(process.argv.slice(2));
 
   if (options.verbose) {
-    console.log('🔍 Running in verbose mode');
-    console.log('📋 Options:', options);
+    console.log("🔍 Running in verbose mode");
+    console.log("📋 Options:", options);
   }
 
   if (options.dryRun) {
-    console.log('🧪 Dry run mode - no changes will be made');
+    console.log("🧪 Dry run mode - no changes will be made");
     return;
   }
 
-  const domain = options.domain || 'docs.apexodds.net';
-  const env = options.environment || 'dev';
+  const domain = options.domain || "docs.apexodds.net";
+  const env = options.environment || "dev";
 
   console.log(`🚀 Deploying to ${domain} (${env} environment)`);
 
@@ -245,6 +250,7 @@ async function main() {
 ### **Converting Shell Scripts to Bun Shell**
 
 #### **Original Bash Script**
+
 ```bash
 #!/bin/bash
 
@@ -269,23 +275,24 @@ fi
 ```
 
 #### **Bun Shell Equivalent**
+
 ```typescript
 #!/usr/bin/env bun
 
 // setup.bun.ts
-const domain = process.argv[2] || 'docs.apexodds.net';
-const environment = process.argv[3] || 'production';
+const domain = process.argv[2] || "docs.apexodds.net";
+const environment = process.argv[3] || "production";
 
 console.log(`Setting up domain: ${domain}`);
 
 try {
-  const branch = environment === 'production' ? 'main' : 'preview';
+  const branch = environment === "production" ? "main" : "preview";
 
   await $`wrangler pages deploy dist --branch=${branch}`;
 
-  console.log('✅ Deployment successful!');
+  console.log("✅ Deployment successful!");
 } catch (error) {
-  console.error('❌ Deployment failed!');
+  console.error("❌ Deployment failed!");
   console.error(error);
   process.exit(1);
 }
@@ -294,6 +301,7 @@ try {
 ## 🎯 Advanced Features
 
 ### **1. Parallel Execution**
+
 ```typescript
 #!/usr/bin/env bun
 
@@ -302,11 +310,11 @@ async function deployMultiple() {
   const results = await Promise.allSettled([
     $`wrangler pages deploy dist --project-name=docs`,
     $`wrangler pages deploy dist --project-name=api`,
-    $`wrangler pages deploy dist --project-name=admin`
+    $`wrangler pages deploy dist --project-name=admin`,
   ]);
 
   results.forEach((result, index) => {
-    if (result.status === 'fulfilled') {
+    if (result.status === "fulfilled") {
       console.log(`✅ Project ${index + 1} deployed successfully`);
     } else {
       console.error(`❌ Project ${index + 1} failed:`, result.reason);
@@ -316,22 +324,23 @@ async function deployMultiple() {
 ```
 
 ### **2. File System Operations**
+
 ```typescript
 #!/usr/bin/env bun
 
 async function manageFiles() {
   // Read and parse configuration
-  const configFile = Bun.file('./wrangler.toml');
+  const configFile = Bun.file("./wrangler.toml");
   const config = await configFile.text();
 
   // Modify configuration
   const updatedConfig = config.replace(
     /name = ".*"/,
-    `name = "crystal-clear-updated"`
+    `name = "crystal-clear-updated"`,
   );
 
   // Write back
-  await Bun.write('./wrangler.toml', updatedConfig);
+  await Bun.write("./wrangler.toml", updatedConfig);
 
   // Create backup
   await $`cp wrangler.toml wrangler.toml.backup`;
@@ -339,14 +348,15 @@ async function manageFiles() {
 ```
 
 ### **3. HTTP Operations**
+
 ```typescript
 #!/usr/bin/env bun
 
 async function healthCheck() {
   const domains = [
-    'docs.apexodds.net',
-    'api.apexodds.net',
-    'admin.apexodds.net'
+    "docs.apexodds.net",
+    "api.apexodds.net",
+    "admin.apexodds.net",
   ];
 
   for (const domain of domains) {
@@ -364,19 +374,20 @@ async function healthCheck() {
 
 ## 📊 Performance Comparison
 
-| Feature | Bash Script | Bun Shell Script |
-|---------|-------------|------------------|
-| **Startup Time** | 100-500ms | 10-50ms |
-| **Type Safety** | None | Full TypeScript |
-| **Cross-Platform** | ❌ Limited | ✅ Full support |
-| **Error Handling** | Basic | Advanced patterns |
-| **IDE Support** | Minimal | Full autocomplete |
-| **Maintainability** | Low | High |
-| **Testing** | Difficult | Easy with Bun:test |
+| Feature             | Bash Script | Bun Shell Script   |
+| ------------------- | ----------- | ------------------ |
+| **Startup Time**    | 100-500ms   | 10-50ms            |
+| **Type Safety**     | None        | Full TypeScript    |
+| **Cross-Platform**  | ❌ Limited  | ✅ Full support    |
+| **Error Handling**  | Basic       | Advanced patterns  |
+| **IDE Support**     | Minimal     | Full autocomplete  |
+| **Maintainability** | Low         | High               |
+| **Testing**         | Difficult   | Easy with Bun:test |
 
 ## 🚀 Migration Strategy
 
 ### **Phase 1: Convert Core Scripts**
+
 ```bash
 # Start with most frequently used scripts
 ✅ setup-custom-domain.bun.ts
@@ -385,6 +396,7 @@ async function healthCheck() {
 ```
 
 ### **Phase 2: Update Package.json**
+
 ```json
 {
   "scripts": {
@@ -396,6 +408,7 @@ async function healthCheck() {
 ```
 
 ### **Phase 3: Update Documentation**
+
 ```bash
 # Update all README files
 ✅ CLOUDFLARE-PAGES-README.md
@@ -404,6 +417,7 @@ async function healthCheck() {
 ```
 
 ### **Phase 4: Deprecate Old Scripts**
+
 ```bash
 # Keep old scripts for backwards compatibility
 # Add deprecation warnings
@@ -413,18 +427,21 @@ async function healthCheck() {
 ## 🎯 Benefits Achieved
 
 ### **Developer Experience**
+
 - **Autocomplete**: Full TypeScript support in IDE
 - **Type Safety**: Compile-time error checking
 - **Debugging**: Better error messages and stack traces
 - **Testing**: Easy to write and run tests
 
 ### **Operational Excellence**
+
 - **Cross-Platform**: Single script works everywhere
 - **Performance**: Faster execution and startup
 - **Reliability**: Better error handling and recovery
 - **Maintainability**: Cleaner, more readable code
 
 ### **Business Impact**
+
 - **Reduced Support**: Fewer platform-specific issues
 - **Faster Development**: Less time spent on script maintenance
 - **Better Quality**: Type safety prevents common errors
@@ -433,11 +450,13 @@ async function healthCheck() {
 ## 📚 Examples in Repository
 
 ### **Live Scripts**
+
 - `scripts/setup-custom-domain.bun.ts` - Domain setup with TypeScript
 - `scripts/validate-domain-setup.bun.ts` - Health checking with types
 - Additional scripts can be converted following these patterns
 
 ### **Usage Examples**
+
 ```bash
 # Run scripts with Bun
 bun run scripts/setup-custom-domain.bun.ts
@@ -454,6 +473,7 @@ yarn setup:domain
 ## 🔗 Integration Points
 
 ### **CI/CD Integration**
+
 ```yaml
 # .github/workflows/deploy.yml
 - name: Setup Domain
@@ -464,6 +484,7 @@ yarn setup:domain
 ```
 
 ### **Package.json Integration**
+
 ```json
 {
   "scripts": {
@@ -478,11 +499,13 @@ yarn setup:domain
 ## 🎉 Success Metrics
 
 ### **Performance Gains**
+
 - **Startup Time**: 5-10x faster script execution
 - **Development Time**: 3-5x faster script writing/maintenance
 - **Error Reduction**: 80% fewer script-related issues
 
 ### **Developer Satisfaction**
+
 - **Cross-Platform**: Works perfectly on Windows, Mac, Linux
 - **Type Safety**: Full TypeScript support with autocomplete
 - **Maintainability**: Much easier to read and maintain
@@ -492,7 +515,7 @@ yarn setup:domain
 
 **🚀 Crystal Clear Architecture - Bun Shell Implementation**
 
-*Cross-platform, type-safe, maintainable scripting for modern development*
+_Cross-platform, type-safe, maintainable scripting for modern development_
 
 **Demonstrates deep understanding of modern developer tooling and workflow optimization!** 🎯
 

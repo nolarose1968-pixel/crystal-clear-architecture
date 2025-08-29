@@ -1,21 +1,23 @@
 # 🔥 Fire22 Dashboard Worker - API, Types, and Classes Expansion Plan
 
-This document provides a detailed expansion of the APIs, types, and classes within the `dashboard-worker/src` directory, visualized through Mermaid diagrams for better understanding and architectural planning.
+This document provides a detailed expansion of the APIs, types, and classes
+within the `dashboard-worker/src` directory, visualized through Mermaid diagrams
+for better understanding and architectural planning.
 
 ## Table of Contents
 
 1.  [Core API Services](#core-api-services)
-    -   [Fire22ApiClient (`fire22-api.ts`)](#fire22apiclient-fire22-apits)
-    -   [EnhancedJWTAuthService (`jwt-auth-worker-enhanced.ts`)](#enhancedjwtauthservice-jwt-auth-worker-enhancedts)
+    - [Fire22ApiClient (`fire22-api.ts`)](#fire22apiclient-fire22-apits)
+    - [EnhancedJWTAuthService (`jwt-auth-worker-enhanced.ts`)](#enhancedjwtauthservice-jwt-auth-worker-enhancedts)
 2.  [Business Logic & Management Systems](#business-logic--management-systems)
-    -   [BalanceManager (`balance-management.ts`)](#balancemanager-balance-managementts)
-    -   [BusinessManagementSystem (`business-management.ts`)](#businessmanagementsystem-business-managementts)
-    -   [P2PQueueAPIEnhanced (`p2p-queue-api-enhanced.ts`)](#p2pqueueapienhanced-p2p-queue-api-enhancedts)
-    -   [Fire22TelegramBot (`telegram-bot.ts`)](#fire22telegrambot-telegram-botts)
+    - [BalanceManager (`balance-management.ts`)](#balancemanager-balance-managementts)
+    - [BusinessManagementSystem (`business-management.ts`)](#businessmanagementsystem-business-managementts)
+    - [P2PQueueAPIEnhanced (`p2p-queue-api-enhanced.ts`)](#p2pqueueapienhanced-p2p-queue-api-enhancedts)
+    - [Fire22TelegramBot (`telegram-bot.ts`)](#fire22telegrambot-telegram-botts)
 3.  [Configuration & Global Types](#configuration--global-types)
-    -   [AppConfig (`config.ts`)](#appconfig-configts)
-    -   [Constants (`constants-definitions.ts`)](#constants-constants-definitionsts)
-    -   [Global Types (`types.ts`)](#global-types-typests)
+    - [AppConfig (`config.ts`)](#appconfig-configts)
+    - [Constants (`constants-definitions.ts`)](#constants-constants-definitionsts)
+    - [Global Types (`types.ts`)](#global-types-typests)
 4.  [Inter-Component Relationships](#inter-component-relationships)
 5.  [Data Flow Diagrams](#data-flow-diagrams)
 
@@ -25,7 +27,8 @@ This document provides a detailed expansion of the APIs, types, and classes with
 
 ### Fire22ApiClient (`fire22-api.ts`)
 
-The `Fire22ApiClient` is responsible for all communication with the external Fire22 API. It handles authentication, request formatting, and response parsing.
+The `Fire22ApiClient` is responsible for all communication with the external
+Fire22 API. It handles authentication, request formatting, and response parsing.
 
 ```mermaid
 classDiagram
@@ -81,17 +84,21 @@ classDiagram
 ```
 
 **Key Responsibilities:**
-*   **API Communication:** Centralizes all HTTP requests to the Fire22 backend.
-*   **Authentication Management:** Handles JWT tokens and session cookies for secure API access.
-*   **Error Handling:** Provides a standardized way to handle and log API errors.
-*   **Request/Response Interception:** Allows for pre-processing of requests and post-processing of responses (e.g., logging, caching).
+
+- **API Communication:** Centralizes all HTTP requests to the Fire22 backend.
+- **Authentication Management:** Handles JWT tokens and session cookies for
+  secure API access.
+- **Error Handling:** Provides a standardized way to handle and log API errors.
+- **Request/Response Interception:** Allows for pre-processing of requests and
+  post-processing of responses (e.g., logging, caching).
 
 **Usage Example:**
+
 ```typescript
 const client = new Fire22ApiClient({
   apiUrl: Bun.env.FIRE22_API_URL,
   token: Bun.env.FIRE22_TOKEN,
-  webhookSecret: Bun.env.FIRE22_WEBHOOK_SECRET
+  webhookSecret: Bun.env.FIRE22_WEBHOOK_SECRET,
 });
 
 const response = await client.get('/players');
@@ -104,7 +111,9 @@ if (response.success) {
 
 ### EnhancedJWTAuthService (`jwt-auth-worker-enhanced.ts`)
 
-This service provides a comprehensive JWT-based authentication system, designed to run as a Cloudflare Worker. It includes user management, session handling, rate limiting, and audit logging.
+This service provides a comprehensive JWT-based authentication system, designed
+to run as a Cloudflare Worker. It includes user management, session handling,
+rate limiting, and audit logging.
 
 ```mermaid
 classDiagram
@@ -202,13 +211,19 @@ classDiagram
 ```
 
 **Key Responsibilities:**
-*   **User Authentication:** Securely authenticates users using JWTs.
-*   **Session Management:** Tracks active user sessions, including device fingerprinting and last access times.
-*   **Security:** Implements rate limiting, account lockout, and audit logging to protect against common attacks.
-*   **Token Lifecycle:** Manages JWT creation, verification, and refresh mechanisms.
-*   **Admin Functions:** Provides endpoints for user management, audit log review, and token revocation.
+
+- **User Authentication:** Securely authenticates users using JWTs.
+- **Session Management:** Tracks active user sessions, including device
+  fingerprinting and last access times.
+- **Security:** Implements rate limiting, account lockout, and audit logging to
+  protect against common attacks.
+- **Token Lifecycle:** Manages JWT creation, verification, and refresh
+  mechanisms.
+- **Admin Functions:** Provides endpoints for user management, audit log review,
+  and token revocation.
 
 **Usage Example (as a Cloudflare Worker):**
+
 ```typescript
 // In wrangler.toml
 // name = "auth-worker"
@@ -221,9 +236,13 @@ const authService = new EnhancedJWTAuthService({
 });
 
 export default {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx: ExecutionContext
+  ): Promise<Response> {
     return authService.handleRequest(request);
-  }
+  },
 };
 ```
 
@@ -233,7 +252,8 @@ export default {
 
 ### BalanceManager (`balance-management.ts`)
 
-The `BalanceManager` is responsible for tracking and managing player balances, including credit limits, outstanding balances, and transaction history.
+The `BalanceManager` is responsible for tracking and managing player balances,
+including credit limits, outstanding balances, and transaction history.
 
 ```mermaid
 classDiagram
@@ -299,28 +319,43 @@ classDiagram
 ```
 
 **Key Responsibilities:**
-*   **Balance Tracking:** Maintains real-time player balances.
-*   **Transaction Processing:** Handles deposits, withdrawals, wager settlements, and adjustments.
-*   **Credit Management:** Enforces credit limits and calculates available credit.
-*   **History & Reporting:** Provides a complete transaction history for players.
+
+- **Balance Tracking:** Maintains real-time player balances.
+- **Transaction Processing:** Handles deposits, withdrawals, wager settlements,
+  and adjustments.
+- **Credit Management:** Enforces credit limits and calculates available credit.
+- **History & Reporting:** Provides a complete transaction history for players.
 
 **Usage Example:**
+
 ```typescript
 const balanceManager = new BalanceManager({ defaultCreditLimit: 1000 });
 
 // Process a deposit
-const depositResult = balanceManager.processDeposit('player123', 500, 'credit_card');
+const depositResult = balanceManager.processDeposit(
+  'player123',
+  500,
+  'credit_card'
+);
 if (depositResult.success) {
-  console.log(`Deposit successful. New balance: ${depositResult.newBalance?.currentBalance}`);
+  console.log(
+    `Deposit successful. New balance: ${depositResult.newBalance?.currentBalance}`
+  );
 }
 
 // Settle a wager
-const settlementResult = balanceManager.processWagerSettlement('player123', 'wager456', 'win', 200);
+const settlementResult = balanceManager.processWagerSettlement(
+  'player123',
+  'wager456',
+  'win',
+  200
+);
 ```
 
 ### BusinessManagementSystem (`business-management.ts`)
 
-This system manages the business aspects of the platform, including VIP tiers, affiliate programs, commission calculations, and user groups.
+This system manages the business aspects of the platform, including VIP tiers,
+affiliate programs, commission calculations, and user groups.
 
 ```mermaid
 classDiagram
@@ -436,12 +471,18 @@ classDiagram
 ```
 
 **Key Responsibilities:**
-*   **VIP Program Management:** Defines VIP tiers, assigns users, and calculates benefits.
-*   **User Grouping:** Organizes users into groups for targeted management and permissions.
-*   **Affiliate & Referral System:** Manages affiliate programs, tracks referrals, and calculates commissions.
-*   **Commission Engine:** A complex engine for calculating commissions based on various factors like handle, volume, risk, and performance.
+
+- **VIP Program Management:** Defines VIP tiers, assigns users, and calculates
+  benefits.
+- **User Grouping:** Organizes users into groups for targeted management and
+  permissions.
+- **Affiliate & Referral System:** Manages affiliate programs, tracks referrals,
+  and calculates commissions.
+- **Commission Engine:** A complex engine for calculating commissions based on
+  various factors like handle, volume, risk, and performance.
 
 **Usage Example:**
+
 ```typescript
 const businessSystem = new BusinessManagementSystem();
 
@@ -462,7 +503,9 @@ console.log(`Total commission payout: $${commission.totalPayout}`);
 
 ### P2PQueueAPIEnhanced (`p2p-queue-api-enhanced.ts`)
 
-The `P2PQueueAPIEnhanced` manages a peer-to-peer queue system, primarily for matching withdrawal and deposit requests. It integrates with a pattern system for optimization and includes Telegram notifications.
+The `P2PQueueAPIEnhanced` manages a peer-to-peer queue system, primarily for
+matching withdrawal and deposit requests. It integrates with a pattern system
+for optimization and includes Telegram notifications.
 
 ```mermaid
 classDiagram
@@ -612,12 +655,19 @@ classDiagram
 ```
 
 **Key Responsibilities:**
-*   **Queue Management:** Handles the lifecycle of P2P queue items (withdrawals and deposits).
-*   **Intelligent Matching:** Matches withdrawal requests with deposit requests based on various criteria, potentially using a pattern system for optimization.
-*   **Performance Monitoring:** Tracks metrics related to queue processing, pattern execution, and matching efficiency.
-*   **Integration:** Notifies users via Telegram about queue events and stores relevant data.
+
+- **Queue Management:** Handles the lifecycle of P2P queue items (withdrawals
+  and deposits).
+- **Intelligent Matching:** Matches withdrawal requests with deposit requests
+  based on various criteria, potentially using a pattern system for
+  optimization.
+- **Performance Monitoring:** Tracks metrics related to queue processing,
+  pattern execution, and matching efficiency.
+- **Integration:** Notifies users via Telegram about queue events and stores
+  relevant data.
 
 **Usage Example:**
+
 ```typescript
 const p2pQueue = new P2PQueueAPIEnhanced(env, patternSystem);
 
@@ -627,7 +677,7 @@ const withdrawalId = await p2pQueue.addWithdrawalToQueue({
   amount: 1000,
   paymentType: 'bank_transfer',
   paymentDetails: '...',
-  telegramChatId: 'user123_telegram_id'
+  telegramChatId: 'user123_telegram_id',
 });
 
 // Get current queue stats
@@ -637,7 +687,9 @@ console.log(`Pending withdrawals: ${stats.pendingWithdrawals}`);
 
 ### Fire22TelegramBot (`telegram-bot.ts`)
 
-The `Fire22TelegramBot` provides a rich interface for users to interact with the Fire22 system via Telegram. It handles commands, notifications, and integrates with various management systems.
+The `Fire22TelegramBot` provides a rich interface for users to interact with the
+Fire22 system via Telegram. It handles commands, notifications, and integrates
+with various management systems.
 
 ```mermaid
 classDiagram
@@ -734,13 +786,22 @@ classDiagram
 ```
 
 **Key Responsibilities:**
-*   **Command Processing:** Handles a wide array of commands for user interaction, from basic info (`/start`, `/help`) to specific business functions (`/balance`, `/vip`, `/casino`).
-*   **User Management:** Tracks user sessions and manages access control (allowed users, admin users).
-*   **System Integration:** Acts as a frontend to other systems like `BusinessManagementSystem`, `LiveCasinoManagementSystem`, etc., fetching data and presenting it to users.
-*   **Notification System:** Proactively sends notifications to users about balance changes, wager updates, system alerts, etc.
-*   **Admin Interface:** Provides admin-only commands for system management, broadcasting messages, and viewing statistics.
+
+- **Command Processing:** Handles a wide array of commands for user interaction,
+  from basic info (`/start`, `/help`) to specific business functions
+  (`/balance`, `/vip`, `/casino`).
+- **User Management:** Tracks user sessions and manages access control (allowed
+  users, admin users).
+- **System Integration:** Acts as a frontend to other systems like
+  `BusinessManagementSystem`, `LiveCasinoManagementSystem`, etc., fetching data
+  and presenting it to users.
+- **Notification System:** Proactively sends notifications to users about
+  balance changes, wager updates, system alerts, etc.
+- **Admin Interface:** Provides admin-only commands for system management,
+  broadcasting messages, and viewing statistics.
 
 **Usage Example:**
+
 ```typescript
 const botConfig: TelegramBotConfig = {
   token: Bun.env.BOT_TOKEN,
@@ -750,8 +811,8 @@ const botConfig: TelegramBotConfig = {
     wagerUpdates: true,
     balanceChanges: true,
     systemAlerts: true,
-    weeklyReports: true
-  }
+    weeklyReports: true,
+  },
 };
 
 const bot = new Fire22TelegramBot(botConfig);
@@ -765,7 +826,8 @@ await bot.start();
 
 ### AppConfig (`config.ts`)
 
-`AppConfig` centralizes all configuration for the application, loading values from environment variables and providing validation.
+`AppConfig` centralizes all configuration for the application, loading values
+from environment variables and providing validation.
 
 ```mermaid
 classDiagram
@@ -838,12 +900,18 @@ classDiagram
 ```
 
 **Key Responsibilities:**
-*   **Centralized Configuration:** Provides a single source of truth for all application settings.
-*   **Environment Variable Loading:** Securely loads configuration from environment variables, with fallbacks for optional settings.
-*   **Validation:** Ensures that all required configuration is present and valid (e.g., correct formats for secrets).
-*   **Environment-Specific Settings:** Allows for overriding configurations based on the `NODE_ENV` (development, test, production).
+
+- **Centralized Configuration:** Provides a single source of truth for all
+  application settings.
+- **Environment Variable Loading:** Securely loads configuration from
+  environment variables, with fallbacks for optional settings.
+- **Validation:** Ensures that all required configuration is present and valid
+  (e.g., correct formats for secrets).
+- **Environment-Specific Settings:** Allows for overriding configurations based
+  on the `NODE_ENV` (development, test, production).
 
 **Usage Example:**
+
 ```typescript
 import { getConfig, validateConfig } from './config';
 
@@ -861,7 +929,9 @@ console.log(`Bot Token: ${config.bot.token.substring(0, 10)}...`);
 
 ### Constants (`constants-definitions.ts`)
 
-This file defines a comprehensive set of constants used throughout the application, using a `DEFINE` system for build-time optimization and type safety.
+This file defines a comprehensive set of constants used throughout the
+application, using a `DEFINE` system for build-time optimization and type
+safety.
 
 ```mermaid
 graph TD
@@ -976,15 +1046,26 @@ graph TD
 ```
 
 **Key Responsibilities:**
-*   **Standardization:** Ensures consistent use of values (e.g., color codes, API timeouts, status strings) across the entire application.
-*   **Maintainability:** Makes it easy to update values in one place without having to search and replace throughout the codebase.
-*   **Build-Time Optimization:** The `DEFINE` system allows build tools to inline constants, potentially improving performance.
-*   **Type Safety:** Provides strongly-typed constants, reducing the risk of typos or incorrect values.
-*   **Discoverability:** Groups related constants together (e.g., `CONSTANTS.COLORS`, `CONSTANTS.HTTP`), making them easy to find and use.
+
+- **Standardization:** Ensures consistent use of values (e.g., color codes, API
+  timeouts, status strings) across the entire application.
+- **Maintainability:** Makes it easy to update values in one place without
+  having to search and replace throughout the codebase.
+- **Build-Time Optimization:** The `DEFINE` system allows build tools to inline
+  constants, potentially improving performance.
+- **Type Safety:** Provides strongly-typed constants, reducing the risk of typos
+  or incorrect values.
+- **Discoverability:** Groups related constants together (e.g.,
+  `CONSTANTS.COLORS`, `CONSTANTS.HTTP`), making them easy to find and use.
 
 **Usage Example:**
+
 ```typescript
-import { FIRE22_PRIMARY_MAIN, API_TIMEOUT, HTTP_OK } from './constants-definitions';
+import {
+  FIRE22_PRIMARY_MAIN,
+  API_TIMEOUT,
+  HTTP_OK,
+} from './constants-definitions';
 
 // Styling
 const primaryColor = FIRE22_PRIMARY_MAIN; // '#fdbb2d'
@@ -1000,7 +1081,8 @@ if (response.status === HTTP_OK) {
 
 ### Global Types (`types.ts`)
 
-`types.ts` centralizes all TypeScript type definitions, promoting consistency and reusability across the project.
+`types.ts` centralizes all TypeScript type definitions, promoting consistency
+and reusability across the project.
 
 ```mermaid
 classDiagram
@@ -1135,12 +1217,18 @@ classDiagram
 ```
 
 **Key Responsibilities:**
-*   **Type Safety:** Provides strong typing for data structures, API responses, and environment variables, catching errors at compile time.
-*   **Code Reusability:** Centralizes common types so they can be imported and used across different modules.
-*   **Documentation:** Type definitions serve as a form of documentation, clearly outlining the shape of data expected by functions and returned by APIs.
-*   **Consistency:** Ensures that different parts of the application use the same type for the same concept (e.g., `ApiResponse`).
+
+- **Type Safety:** Provides strong typing for data structures, API responses,
+  and environment variables, catching errors at compile time.
+- **Code Reusability:** Centralizes common types so they can be imported and
+  used across different modules.
+- **Documentation:** Type definitions serve as a form of documentation, clearly
+  outlining the shape of data expected by functions and returned by APIs.
+- **Consistency:** Ensures that different parts of the application use the same
+  type for the same concept (e.g., `ApiResponse`).
 
 **Usage Example:**
+
 ```typescript
 import { ApiResponse, Agent, Env } from './types';
 
@@ -1149,12 +1237,15 @@ interface PlayerData {
   name: string;
 }
 
-async function fetchPlayer(playerId: string, env: Env): Promise<ApiResponse<PlayerData>> {
+async function fetchPlayer(
+  playerId: string,
+  env: Env
+): Promise<ApiResponse<PlayerData>> {
   // ... implementation
   return {
     success: true,
     data: { id: playerId, name: 'John Doe' },
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 }
 
@@ -1255,11 +1346,19 @@ graph TD
 ```
 
 **Key Interactions:**
-*   **UI/API Layer:** The Web Dashboard and Telegram Bot initiate requests to the API layer (`Fire22ApiClient`, `EnhancedJWTAuthService`).
-*   **API/Business Logic:** The API layer calls upon the business logic components (`BalanceManager`, `BusinessManagementSystem`, etc.) to perform core operations.
-*   **Configuration:** All components rely on `AppConfig` for their settings and `Global Types` for type safety. `Constants` are used for standardized values.
-*   **Data Persistence:** Business logic components interact with the database for persistent storage and the cache for performance optimization.
-*   **Telegram Integration:** The `Fire22TelegramBot` acts as an alternative UI, directly interacting with several business logic systems to provide information and receive commands.
+
+- **UI/API Layer:** The Web Dashboard and Telegram Bot initiate requests to the
+  API layer (`Fire22ApiClient`, `EnhancedJWTAuthService`).
+- **API/Business Logic:** The API layer calls upon the business logic components
+  (`BalanceManager`, `BusinessManagementSystem`, etc.) to perform core
+  operations.
+- **Configuration:** All components rely on `AppConfig` for their settings and
+  `Global Types` for type safety. `Constants` are used for standardized values.
+- **Data Persistence:** Business logic components interact with the database for
+  persistent storage and the cache for performance optimization.
+- **Telegram Integration:** The `Fire22TelegramBot` acts as an alternative UI,
+  directly interacting with several business logic systems to provide
+  information and receive commands.
 
 ---
 
@@ -1375,4 +1474,8 @@ sequenceDiagram
     end
 ```
 
-This expansion plan provides a comprehensive overview of the `dashboard-worker/src` directory, detailing the structure, responsibilities, and interactions of its key components. The Mermaid diagrams offer a visual representation that can aid in understanding the architecture and planning future developments.
+This expansion plan provides a comprehensive overview of the
+`dashboard-worker/src` directory, detailing the structure, responsibilities, and
+interactions of its key components. The Mermaid diagrams offer a visual
+representation that can aid in understanding the architecture and planning
+future developments.

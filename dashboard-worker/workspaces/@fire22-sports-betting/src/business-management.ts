@@ -142,7 +142,7 @@ export class BusinessManagementSystem {
         benefits: ['Priority Support', 'Basic Bonuses'],
         commissionRate: 0.05,
         bonusMultiplier: 1.0,
-        exclusiveFeatures: []
+        exclusiveFeatures: [],
       },
       {
         id: 'silver',
@@ -153,7 +153,7 @@ export class BusinessManagementSystem {
         benefits: ['Enhanced Support', 'Higher Bonuses', 'Exclusive Events'],
         commissionRate: 0.07,
         bonusMultiplier: 1.2,
-        exclusiveFeatures: ['Exclusive Promotions']
+        exclusiveFeatures: ['Exclusive Promotions'],
       },
       {
         id: 'gold',
@@ -162,9 +162,9 @@ export class BusinessManagementSystem {
         minBalance: 15000,
         minVolume: 100000,
         benefits: ['Premium Support', 'Maximum Bonuses', 'VIP Events', 'Personal Manager'],
-        commissionRate: 0.10,
+        commissionRate: 0.1,
         bonusMultiplier: 1.5,
-        exclusiveFeatures: ['Personal Manager', 'VIP Events', 'Exclusive Promotions']
+        exclusiveFeatures: ['Personal Manager', 'VIP Events', 'Exclusive Promotions'],
       },
       {
         id: 'platinum',
@@ -175,8 +175,8 @@ export class BusinessManagementSystem {
         benefits: ['Concierge Service', 'Elite Bonuses', 'Private Events', 'Custom Solutions'],
         commissionRate: 0.15,
         bonusMultiplier: 2.0,
-        exclusiveFeatures: ['Concierge Service', 'Private Events', 'Custom Solutions']
-      }
+        exclusiveFeatures: ['Concierge Service', 'Private Events', 'Custom Solutions'],
+      },
     ];
 
     tiers.forEach(tier => this.vipTiers.set(tier.id, tier));
@@ -198,10 +198,10 @@ export class BusinessManagementSystem {
           requireApproval: true,
           maxMembers: 100,
           autoArchive: false,
-          notifications: true
+          notifications: true,
         },
         created: new Date(),
-        lastActivity: new Date()
+        lastActivity: new Date(),
       },
       {
         id: 'agent-network',
@@ -214,10 +214,10 @@ export class BusinessManagementSystem {
           requireApproval: true,
           maxMembers: 500,
           autoArchive: true,
-          notifications: true
+          notifications: true,
         },
         created: new Date(),
-        lastActivity: new Date()
+        lastActivity: new Date(),
       },
       {
         id: 'affiliate-partners',
@@ -230,11 +230,11 @@ export class BusinessManagementSystem {
           requireApproval: true,
           maxMembers: 1000,
           autoArchive: true,
-          notifications: true
+          notifications: true,
         },
         created: new Date(),
-        lastActivity: new Date()
-      }
+        lastActivity: new Date(),
+      },
     ];
 
     defaultGroups.forEach(group => this.groups.set(group.id, group));
@@ -255,42 +255,81 @@ export class BusinessManagementSystem {
           { minVolume: 50001, maxVolume: 100000, commissionRate: 0.05, bonusMultiplier: 1.2 },
           { minVolume: 100001, maxVolume: 500000, commissionRate: 0.06, bonusMultiplier: 1.3 },
           { minVolume: 500001, maxVolume: 999999, commissionRate: 0.07, bonusMultiplier: 1.4 },
-          { minVolume: 1000000, maxVolume: Infinity, commissionRate: 0.08, bonusMultiplier: 1.5 }
+          { minVolume: 1000000, maxVolume: Infinity, commissionRate: 0.08, bonusMultiplier: 1.5 },
         ],
         performanceBonuses: [
-          { type: 'customer_acquisition', threshold: 10, bonus: 0.01, description: '10+ new customers' },
-          { type: 'volume_milestone', threshold: 100000, bonus: 0.005, description: '100k+ monthly volume' },
+          {
+            type: 'customer_acquisition',
+            threshold: 10,
+            bonus: 0.01,
+            description: '10+ new customers',
+          },
+          {
+            type: 'volume_milestone',
+            threshold: 100000,
+            bonus: 0.005,
+            description: '100k+ monthly volume',
+          },
           { type: 'risk_management', threshold: 0.95, bonus: 0.01, description: '95%+ risk score' },
-          { type: 'compliance', threshold: 100, bonus: 0.005, description: '100% compliance score' }
+          {
+            type: 'compliance',
+            threshold: 100,
+            bonus: 0.005,
+            description: '100% compliance score',
+          },
         ],
         riskAdjustments: [
           { riskLevel: 'low', adjustment: 1.0, description: 'Standard rate' },
           { riskLevel: 'medium', adjustment: 0.9, description: '10% reduction' },
-          { riskLevel: 'high', adjustment: 0.7, description: '30% reduction' }
+          { riskLevel: 'high', adjustment: 0.7, description: '30% reduction' },
         ],
         complianceMultipliers: [
           { score: 90, multiplier: 1.0, description: 'Standard rate' },
           { score: 95, multiplier: 1.05, description: '5% bonus' },
-          { score: 100, multiplier: 1.1, description: '10% bonus' }
-        ]
+          { score: 100, multiplier: 1.1, description: '10% bonus' },
+        ],
       },
       referralRewards: [
         { level: 1, commission: 0.03, bonus: 0.01, requirements: ['Direct referral'] },
         { level: 2, commission: 0.01, bonus: 0.005, requirements: ['Indirect referral'] },
-        { level: 3, commission: 0.005, bonus: 0.002, requirements: ['Third-level referral'] }
+        { level: 3, commission: 0.005, bonus: 0.002, requirements: ['Third-level referral'] },
       ],
       performanceTiers: [
-        { tier: 'Bronze', minReferrals: 5, minVolume: 10000, commissionRate: 0.03, exclusiveBenefits: ['Basic support'] },
-        { tier: 'Silver', minReferrals: 15, minVolume: 50000, commissionRate: 0.04, exclusiveBenefits: ['Enhanced support', 'Marketing materials'] },
-        { tier: 'Gold', minReferrals: 30, minVolume: 150000, commissionRate: 0.05, exclusiveBenefits: ['Priority support', 'Custom materials', 'Exclusive events'] },
-        { tier: 'Platinum', minReferrals: 50, minVolume: 500000, commissionRate: 0.06, exclusiveBenefits: ['Concierge service', 'Custom solutions', 'Private events'] }
+        {
+          tier: 'Bronze',
+          minReferrals: 5,
+          minVolume: 10000,
+          commissionRate: 0.03,
+          exclusiveBenefits: ['Basic support'],
+        },
+        {
+          tier: 'Silver',
+          minReferrals: 15,
+          minVolume: 50000,
+          commissionRate: 0.04,
+          exclusiveBenefits: ['Enhanced support', 'Marketing materials'],
+        },
+        {
+          tier: 'Gold',
+          minReferrals: 30,
+          minVolume: 150000,
+          commissionRate: 0.05,
+          exclusiveBenefits: ['Priority support', 'Custom materials', 'Exclusive events'],
+        },
+        {
+          tier: 'Platinum',
+          minReferrals: 50,
+          minVolume: 500000,
+          commissionRate: 0.06,
+          exclusiveBenefits: ['Concierge service', 'Custom solutions', 'Private events'],
+        },
       ],
       payoutSchedule: {
         frequency: 'monthly',
         dayOfMonth: 15,
         minimumPayout: 100,
-        processingTime: 3
-      }
+        processingTime: 3,
+      },
     };
 
     this.affiliatePrograms.set(program.id, program);
@@ -299,7 +338,7 @@ export class BusinessManagementSystem {
   /**
    * VIP Management Methods
    */
-  
+
   /**
    * Get VIP tier by user balance and volume
    */
@@ -349,10 +388,10 @@ export class BusinessManagementSystem {
         requireApproval: true,
         maxMembers: 100,
         autoArchive: false,
-        notifications: true
+        notifications: true,
       },
       created: new Date(),
-      lastActivity: new Date()
+      lastActivity: new Date(),
     };
 
     this.groups.set(group.id, group);
@@ -401,8 +440,7 @@ export class BusinessManagementSystem {
    * Get user's groups
    */
   getUserGroups(userId: string): Group[] {
-    return Array.from(this.groups.values())
-      .filter(group => group.members.includes(userId));
+    return Array.from(this.groups.values()).filter(group => group.members.includes(userId));
   }
 
   /**
@@ -430,7 +468,7 @@ export class BusinessManagementSystem {
     const volumeTier = program.commissionStructure.volumeTiers.find(
       tier => volume >= tier.minVolume && volume <= tier.maxVolume
     );
-    
+
     if (volumeTier) {
       baseCommission *= volumeTier.commissionRate / program.commissionStructure.baseRate;
       baseCommission *= volumeTier.bonusMultiplier;
@@ -485,7 +523,7 @@ export class BusinessManagementSystem {
       adjustments: baseCommission - adjustedCommission,
       totalPayout: totalCommission,
       status: 'calculated',
-      calculatedAt: new Date()
+      calculatedAt: new Date(),
     };
 
     this.commissionRecords.set(record.id, record);
@@ -526,10 +564,10 @@ export class BusinessManagementSystem {
   createUserLink(userId: string, linkType: 'referral' | 'affiliate' | 'vip'): string {
     const timestamp = Date.now();
     const linkId = `${linkType}_${userId}_${timestamp}`;
-    
+
     // TODO: Store link in database
     console.log(`Created ${linkType} link: ${linkId} for user ${userId}`);
-    
+
     return `https://fire22.com/join/${linkId}`;
   }
 
@@ -543,14 +581,14 @@ export class BusinessManagementSystem {
 
     const [type, userId, timestamp] = parts;
     const linkAge = Date.now() - parseInt(timestamp);
-    
+
     // Links expire after 30 days
     if (linkAge > 30 * 24 * 60 * 60 * 1000) return null;
 
     return {
       valid: true,
       type,
-      userId
+      userId,
     };
   }
 
@@ -561,12 +599,16 @@ export class BusinessManagementSystem {
     return {
       vipTiers: this.vipTiers.size,
       groups: this.groups.size,
-      totalGroupMembers: Array.from(this.groups.values())
-        .reduce((total, group) => total + group.members.length, 0),
+      totalGroupMembers: Array.from(this.groups.values()).reduce(
+        (total, group) => total + group.members.length,
+        0
+      ),
       affiliatePrograms: this.affiliatePrograms.size,
       commissionRecords: this.commissionRecords.size,
-      totalCommissions: Array.from(this.commissionRecords.values())
-        .reduce((total, record) => total + record.totalPayout, 0)
+      totalCommissions: Array.from(this.commissionRecords.values()).reduce(
+        (total, record) => total + record.totalPayout,
+        0
+      ),
     };
   }
 }

@@ -2,23 +2,30 @@
 
 ## Overview
 
-This guide explains how to migrate from the old manual URL pathname matching system to the new `itty-router` implementation for cleaner, more maintainable routing.
+This guide explains how to migrate from the old manual URL pathname matching
+system to the new `itty-router` implementation for cleaner, more maintainable
+routing.
 
 ## What Changed
 
 ### Before (Manual Routing)
+
 ```typescript
 // Old way - repetitive if statements
 if (url.pathname === '/api/auth/login' && req.method === 'POST') {
   // Handle login
 }
-if (url.pathname === '/api/manager/getWeeklyFigureByAgent' && req.method === 'POST') {
+if (
+  url.pathname === '/api/manager/getWeeklyFigureByAgent' &&
+  req.method === 'POST'
+) {
   // Handle weekly figures
 }
 // ... many more if statements
 ```
 
 ### After (itty-router)
+
 ```typescript
 // New way - clean, organized routing
 router.post('/api/auth/login', async (request, env) => {
@@ -42,6 +49,7 @@ router.post('/api/manager/getWeeklyFigureByAgent', async (request, env) => {
 ## Migration Steps
 
 ### 1. Install Dependencies ✅
+
 ```bash
 bun add itty-router
 ```
@@ -51,11 +59,13 @@ bun add itty-router
 We've created two router versions:
 
 - **`src/index-router.ts`** - Basic implementation with core endpoints
-- **`src/index-router-complete.ts`** - Comprehensive implementation with all major endpoints
+- **`src/index-router-complete.ts`** - Comprehensive implementation with all
+  major endpoints
 
 ### 3. Update Your Entry Point
 
 #### Option A: Replace the main index.ts
+
 ```bash
 # Backup the old implementation
 cp src/index.ts src/index.ts.backup
@@ -65,7 +75,9 @@ cp src/index-router-complete.ts src/index.ts
 ```
 
 #### Option B: Use the router alongside the old implementation
+
 Update your `wrangler.toml` to point to the router file:
+
 ```toml
 [build]
 command = "bun build src/index-router-complete.ts --target=bun --outdir ./dist"
@@ -89,19 +101,23 @@ bun run test:quick
 The new router organizes endpoints into logical groups:
 
 ### Static Routes
+
 - `GET /` - Login page
 - `GET /login` - Login page
 - `GET /dashboard` - Dashboard page
 
 ### Health & System
+
 - `GET /api/health/system` - System health check
 
 ### Authentication
+
 - `POST /api/auth/login` - User login
 - `POST /api/auth/logout` - User logout
 - `GET /api/auth/verify` - Verify token
 
 ### Manager Routes (Protected)
+
 - `POST /api/manager/getWeeklyFigureByAgent` - Weekly figures
 - `GET /api/manager/getWeeklyFigureByAgent` - Weekly figures (GET)
 - `POST /api/manager/getPending` - Pending wagers
@@ -111,11 +127,13 @@ The new router organizes endpoints into logical groups:
 - `GET /api/manager/getWagersByAgent` - Wagers by agent
 
 ### Admin Routes (Protected)
+
 - `POST /api/admin/settle-wager` - Settle individual wager
 - `POST /api/admin/bulk-settle` - Bulk settle wagers
 - `GET /api/admin/pending-settlements` - View pending settlements
 
 ### Debug & Utility
+
 - `GET /api/debug/cache-stats` - Public cache statistics
 - `GET /api/admin/debug/cache-stats` - Admin cache statistics (protected)
 
@@ -124,10 +142,13 @@ The new router organizes endpoints into logical groups:
 The new router includes built-in middleware:
 
 ### CORS Middleware
+
 Automatically handles CORS headers for all requests.
 
 ### Authentication Middleware
+
 Protects routes that require authentication:
+
 - All `/api/admin/*` routes
 - All `/api/manager/*` routes
 
@@ -140,7 +161,7 @@ To add a new route, simply add it to the appropriate section:
 router.get('/api/manager/newEndpoint', async (request, env) => {
   // Your route logic here
   return new Response(JSON.stringify({ success: true }), {
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json' },
   });
 });
 ```

@@ -10,7 +10,7 @@ console.log('\n📦 CookieMap Tests:');
 const cookies = new CookieMap({
   fire22_session: 'abc123',
   fire22_theme: 'dark',
-  fire22_lang: 'en'
+  fire22_lang: 'en',
 });
 
 console.log(`  Size: ${cookies.size}`);
@@ -35,7 +35,7 @@ const secureCookie = new Cookie('fire22_token', 'eyJhbGc...', {
   sameSite: 'strict',
   maxAge: 3600,
   path: '/api',
-  domain: '.fire22.ag'
+  domain: '.fire22.ag',
 });
 
 console.log(`  Name: ${secureCookie.name}`);
@@ -54,7 +54,7 @@ console.log(`  ${secureCookie.toString()}`);
 // Test expired cookie
 console.log('\n⏰ Expired Cookie Test:');
 const expiredCookie = new Cookie('old_session', 'xyz', {
-  expires: new Date(Date.now() - 1000)
+  expires: new Date(Date.now() - 1000),
 });
 console.log(`  Is expired: ${expiredCookie.isExpired()}`);
 
@@ -68,13 +68,13 @@ console.log(`  Parsed httpOnly: ${parsedCookie.httpOnly}`);
 // Test Set-Cookie headers generation
 console.log('\n📋 Generate Set-Cookie Headers:');
 const responseCookies = new CookieMap();
-responseCookies.set('session', 'new123', { 
-  secure: true, 
+responseCookies.set('session', 'new123', {
+  secure: true,
   httpOnly: true,
-  maxAge: 86400 
+  maxAge: 86400,
 });
-responseCookies.set('visited', 'true', { 
-  maxAge: 604800 
+responseCookies.set('visited', 'true', {
+  maxAge: 604800,
 });
 
 const headers = responseCookies.toSetCookieHeaders();

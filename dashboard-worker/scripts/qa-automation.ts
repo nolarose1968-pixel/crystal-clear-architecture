@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
  * 🔍 Fire22 QA Automation Suite
- * 
+ *
  * Comprehensive quality assurance automation including:
  * - Code quality checks (lint, format, typecheck)
  * - Security vulnerability scanning
@@ -9,7 +9,7 @@
  * - API contract validation
  * - Integration testing
  * - Pre-deployment validation
- * 
+ *
  * @version 3.0.9
  * @author Fire22 Development Team
  */
@@ -65,12 +65,12 @@ class QAAutomation {
       generateReport: true,
       failFast: false,
       scoreThreshold: 80,
-      ...config
+      ...config,
     };
 
     this.startTime = performance.now();
     console.log('🔍 Fire22 QA Automation Suite');
-    console.log('===========================\n');
+    console.log('!==!==!==!==!===\n');
   }
 
   /**
@@ -99,7 +99,7 @@ class QAAutomation {
     }
 
     const report = this.generateReport();
-    
+
     if (this.config.generateReport) {
       await this.saveReport(report);
     }
@@ -111,14 +111,16 @@ class QAAutomation {
   /**
    * Run steps sequentially
    */
-  private async runStepsSequential(steps: Array<{ name: string; fn: () => Promise<QAResult> }>): Promise<void> {
+  private async runStepsSequential(
+    steps: Array<{ name: string; fn: () => Promise<QAResult> }>
+  ): Promise<void> {
     for (const step of steps) {
       if (this.config.skipSteps.includes(step.name)) {
         this.results.push({
           step: step.name,
           status: 'skip',
           duration: 0,
-          message: 'Skipped by configuration'
+          message: 'Skipped by configuration',
         });
         console.log(`⏭️  Skipping ${step.name}`);
         continue;
@@ -129,8 +131,10 @@ class QAAutomation {
       this.results.push(result);
 
       const statusIcon = this.getStatusIcon(result.status);
-      console.log(`${statusIcon} ${step.name} - ${result.status.toUpperCase()} (${result.duration.toFixed(0)}ms)`);
-      
+      console.log(
+        `${statusIcon} ${step.name} - ${result.status.toUpperCase()} (${result.duration.toFixed(0)}ms)`
+      );
+
       if (result.message) {
         console.log(`   💬 ${result.message}`);
       }
@@ -152,14 +156,18 @@ class QAAutomation {
   /**
    * Run steps in parallel
    */
-  private async runStepsParallel(steps: Array<{ name: string; fn: () => Promise<QAResult> }>): Promise<void> {
+  private async runStepsParallel(
+    steps: Array<{ name: string; fn: () => Promise<QAResult> }>
+  ): Promise<void> {
     const filteredSteps = steps.filter(step => !this.config.skipSteps.includes(step.name));
-    
+
     console.log(`🚀 Running ${filteredSteps.length} steps in parallel...\n`);
-    
-    const promises = filteredSteps.map(async (step) => {
+
+    const promises = filteredSteps.map(async step => {
       const result = await step.fn();
-      console.log(`${this.getStatusIcon(result.status)} ${step.name} completed (${result.duration.toFixed(0)}ms)`);
+      console.log(
+        `${this.getStatusIcon(result.status)} ${step.name} completed (${result.duration.toFixed(0)}ms)`
+      );
       return result;
     });
 
@@ -171,16 +179,16 @@ class QAAutomation {
    */
   private async checkCodeFormatting(): Promise<QAResult> {
     const startTime = performance.now();
-    
+
     try {
       await this.execCommand('bun', ['run', 'format:check']);
-      
+
       return {
         step: 'code-format',
         status: 'pass',
         duration: performance.now() - startTime,
         message: 'All files are properly formatted',
-        score: 100
+        score: 100,
       };
     } catch (error) {
       return {
@@ -189,7 +197,7 @@ class QAAutomation {
         duration: performance.now() - startTime,
         message: 'Code formatting issues detected',
         details: ['Run "fire22 format" to fix formatting issues'],
-        score: 0
+        score: 0,
       };
     }
   }
@@ -199,16 +207,16 @@ class QAAutomation {
    */
   private async checkLinting(): Promise<QAResult> {
     const startTime = performance.now();
-    
+
     try {
       await this.execCommand('bun', ['run', 'lint']);
-      
+
       return {
         step: 'code-lint',
         status: 'pass',
         duration: performance.now() - startTime,
         message: 'No linting errors found',
-        score: 100
+        score: 100,
       };
     } catch (error) {
       return {
@@ -217,7 +225,7 @@ class QAAutomation {
         duration: performance.now() - startTime,
         message: 'Linting errors detected',
         details: ['Run "fire22 lint --fix" to fix linting issues'],
-        score: 20
+        score: 20,
       };
     }
   }
@@ -227,16 +235,16 @@ class QAAutomation {
    */
   private async checkTypeScript(): Promise<QAResult> {
     const startTime = performance.now();
-    
+
     try {
       await this.execCommand('bun', ['run', 'typecheck']);
-      
+
       return {
         step: 'type-check',
         status: 'pass',
         duration: performance.now() - startTime,
         message: 'TypeScript compilation successful',
-        score: 100
+        score: 100,
       };
     } catch (error) {
       return {
@@ -245,7 +253,7 @@ class QAAutomation {
         duration: performance.now() - startTime,
         message: 'TypeScript compilation errors',
         details: ['Fix TypeScript errors before proceeding'],
-        score: 0
+        score: 0,
       };
     }
   }
@@ -255,16 +263,16 @@ class QAAutomation {
    */
   private async runSecurityScan(): Promise<QAResult> {
     const startTime = performance.now();
-    
+
     try {
       await this.execCommand('bun', ['audit', '--audit-level', 'high']);
-      
+
       return {
         step: 'security-scan',
         status: 'pass',
         duration: performance.now() - startTime,
         message: 'No high-severity vulnerabilities found',
-        score: 100
+        score: 100,
       };
     } catch (error) {
       return {
@@ -273,7 +281,7 @@ class QAAutomation {
         duration: performance.now() - startTime,
         message: 'Security vulnerabilities detected',
         details: ['Update vulnerable dependencies', 'Review security audit output'],
-        score: 10
+        score: 10,
       };
     }
   }
@@ -283,16 +291,16 @@ class QAAutomation {
    */
   private async runUnitTests(): Promise<QAResult> {
     const startTime = performance.now();
-    
+
     try {
       await this.execCommand('bun', ['test']);
-      
+
       return {
         step: 'unit-tests',
         status: 'pass',
         duration: performance.now() - startTime,
         message: 'All unit tests passing',
-        score: 100
+        score: 100,
       };
     } catch (error) {
       return {
@@ -301,7 +309,7 @@ class QAAutomation {
         duration: performance.now() - startTime,
         message: 'Unit test failures detected',
         details: ['Fix failing unit tests', 'Ensure adequate test coverage'],
-        score: 30
+        score: 30,
       };
     }
   }
@@ -311,16 +319,16 @@ class QAAutomation {
    */
   private async runAPITests(): Promise<QAResult> {
     const startTime = performance.now();
-    
+
     try {
       await this.execCommand('bun', ['run', 'scripts/api-tester.ts']);
-      
+
       return {
         step: 'api-tests',
         status: 'pass',
         duration: performance.now() - startTime,
         message: 'All API endpoints responding correctly',
-        score: 100
+        score: 100,
       };
     } catch (error) {
       return {
@@ -329,7 +337,7 @@ class QAAutomation {
         duration: performance.now() - startTime,
         message: 'Some API tests failed (development environment)',
         details: ['API tests may fail in development without running server'],
-        score: 70
+        score: 70,
       };
     }
   }
@@ -339,33 +347,33 @@ class QAAutomation {
    */
   private async runPerformanceTests(): Promise<QAResult> {
     const startTime = performance.now();
-    
+
     try {
       await this.execCommand('bun', ['run', 'scripts/performance-monitor.ts']);
-      
+
       // Check if performance report exists and analyze
       const reportPath = 'performance-report.json';
       if (existsSync(reportPath)) {
         const report = JSON.parse(readFileSync(reportPath, 'utf8'));
         const avgTime = report.summary?.averageReadTime || 0;
-        
+
         if (avgTime > 50) {
           return {
             step: 'performance-tests',
             status: 'warning',
             duration: performance.now() - startTime,
             message: `Performance warning: Average response time ${avgTime.toFixed(2)}ms`,
-            score: 70
+            score: 70,
           };
         }
       }
-      
+
       return {
         step: 'performance-tests',
         status: 'pass',
         duration: performance.now() - startTime,
         message: 'Performance metrics within acceptable range',
-        score: 100
+        score: 100,
       };
     } catch (error) {
       return {
@@ -373,7 +381,7 @@ class QAAutomation {
         status: 'fail',
         duration: performance.now() - startTime,
         message: 'Performance test execution failed',
-        score: 0
+        score: 0,
       };
     }
   }
@@ -383,16 +391,16 @@ class QAAutomation {
    */
   private async validateBuild(): Promise<QAResult> {
     const startTime = performance.now();
-    
+
     try {
       await this.execCommand('bun', ['run', 'build:quick']);
-      
+
       return {
         step: 'build-validation',
         status: 'pass',
         duration: performance.now() - startTime,
         message: 'Build completed successfully',
-        score: 100
+        score: 100,
       };
     } catch (error) {
       return {
@@ -401,7 +409,7 @@ class QAAutomation {
         duration: performance.now() - startTime,
         message: 'Build process failed',
         details: ['Fix build errors before deployment'],
-        score: 0
+        score: 0,
       };
     }
   }
@@ -411,17 +419,17 @@ class QAAutomation {
    */
   private async auditDependencies(): Promise<QAResult> {
     const startTime = performance.now();
-    
+
     try {
       // Check for outdated packages
       const outdatedResult = await this.execCommand('bun', ['outdated'], true);
-      
+
       return {
         step: 'dependency-audit',
         status: 'pass',
         duration: performance.now() - startTime,
         message: 'Dependencies are up to date',
-        score: 100
+        score: 100,
       };
     } catch (error) {
       return {
@@ -430,7 +438,7 @@ class QAAutomation {
         duration: performance.now() - startTime,
         message: 'Some dependencies may be outdated',
         details: ['Review and update dependencies as needed'],
-        score: 80
+        score: 80,
       };
     }
   }
@@ -440,16 +448,11 @@ class QAAutomation {
    */
   private async checkDocumentation(): Promise<QAResult> {
     const startTime = performance.now();
-    
-    const requiredDocs = [
-      'README.md',
-      'CLAUDE.md',
-      'package.json',
-      'src/api/README.md'
-    ];
+
+    const requiredDocs = ['README.md', 'CLAUDE.md', 'package.json', 'src/api/README.md'];
 
     const missingDocs = requiredDocs.filter(doc => !existsSync(doc));
-    
+
     if (missingDocs.length > 0) {
       return {
         step: 'documentation',
@@ -457,7 +460,7 @@ class QAAutomation {
         duration: performance.now() - startTime,
         message: `Missing ${missingDocs.length} documentation files`,
         details: missingDocs.map(doc => `Missing: ${doc}`),
-        score: Math.max(0, 100 - (missingDocs.length * 20))
+        score: Math.max(0, 100 - missingDocs.length * 20),
       };
     }
 
@@ -466,7 +469,7 @@ class QAAutomation {
       status: 'pass',
       duration: performance.now() - startTime,
       message: 'All required documentation present',
-      score: 100
+      score: 100,
     };
   }
 
@@ -477,10 +480,10 @@ class QAAutomation {
     return new Promise((resolve, reject) => {
       const child = spawn(command, args, {
         stdio: 'pipe',
-        shell: true
+        shell: true,
       });
 
-      child.on('close', (code) => {
+      child.on('close', code => {
         if (code === 0 || allowFailure) {
           resolve();
         } else {
@@ -488,7 +491,7 @@ class QAAutomation {
         }
       });
 
-      child.on('error', (error) => {
+      child.on('error', error => {
         if (!allowFailure) {
           reject(error);
         } else {
@@ -503,29 +506,33 @@ class QAAutomation {
    */
   private generateReport(): QAReport {
     const totalDuration = performance.now() - this.startTime;
-    
+
     const summary = {
       passed: this.results.filter(r => r.status === 'pass').length,
       failed: this.results.filter(r => r.status === 'fail').length,
       warnings: this.results.filter(r => r.status === 'warning').length,
       skipped: this.results.filter(r => r.status === 'skip').length,
-      total: this.results.length
+      total: this.results.length,
     };
 
     const scores = this.results.filter(r => r.score !== undefined).map(r => r.score!);
-    const overallScore = scores.length > 0 ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length) : 0;
-    
-    const overallStatus = summary.failed > 0 ? 'fail' : 
-                         summary.warnings > 0 ? 'warning' : 'pass';
+    const overallScore =
+      scores.length > 0
+        ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length)
+        : 0;
+
+    const overallStatus = summary.failed > 0 ? 'fail' : summary.warnings > 0 ? 'warning' : 'pass';
 
     const recommendations: string[] = [];
-    
+
     if (summary.failed > 0) {
       recommendations.push('Fix all failing checks before deployment');
     }
-    
+
     if (overallScore < this.config.scoreThreshold) {
-      recommendations.push(`Improve overall quality score (${overallScore}% < ${this.config.scoreThreshold}%)`);
+      recommendations.push(
+        `Improve overall quality score (${overallScore}% < ${this.config.scoreThreshold}%)`
+      );
     }
 
     if (summary.warnings > 0) {
@@ -543,7 +550,7 @@ class QAAutomation {
       duration: totalDuration,
       results: this.results,
       summary,
-      recommendations
+      recommendations,
     };
   }
 
@@ -561,7 +568,7 @@ class QAAutomation {
    */
   private displaySummary(report: QAReport): void {
     console.log('\n📊 QA Automation Summary');
-    console.log('=' .repeat(40));
+    console.log('='.repeat(40));
     console.log(`🎯 Overall Status: ${report.overallStatus.toUpperCase()}`);
     console.log(`📈 Overall Score: ${report.overallScore}%`);
     console.log(`⏱️  Total Duration: ${(report.duration / 1000).toFixed(1)}s`);
@@ -597,11 +604,16 @@ class QAAutomation {
    */
   private getStatusIcon(status: QAResult['status']): string {
     switch (status) {
-      case 'pass': return '✅';
-      case 'fail': return '❌';
-      case 'warning': return '⚠️';
-      case 'skip': return '⏭️';
-      default: return '❓';
+      case 'pass':
+        return '✅';
+      case 'fail':
+        return '❌';
+      case 'warning':
+        return '⚠️';
+      case 'skip':
+        return '⏭️';
+      default:
+        return '❓';
     }
   }
 }
@@ -610,10 +622,10 @@ class QAAutomation {
 async function main() {
   const args = process.argv.slice(2);
   const config: Partial<QAConfig> = {};
-  
+
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    
+
     switch (arg) {
       case '--strict':
         config.strictMode = true;
@@ -675,7 +687,7 @@ EXAMPLES:
   }
 
   const qa = new QAAutomation(config);
-  
+
   try {
     await qa.runQASuite();
   } catch (error) {

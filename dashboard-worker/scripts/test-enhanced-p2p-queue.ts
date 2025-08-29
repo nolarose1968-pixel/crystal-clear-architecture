@@ -11,26 +11,31 @@ const mockEnv = {
     prepare: (sql: string) => ({
       bind: (...params: any[]) => ({
         all: async () => ({ results: [] }),
-        first: async () => ({ total_items: 0, pending_withdrawals: 0, pending_deposits: 0, matched_pairs: 0 }),
-        run: async () => ({ success: true })
-      })
-    })
+        first: async () => ({
+          total_items: 0,
+          pending_withdrawals: 0,
+          pending_deposits: 0,
+          matched_pairs: 0,
+        }),
+        run: async () => ({ success: true }),
+      }),
+    }),
   },
   TELEGRAM_BOT: {
-    sendMessage: async (message: any) => ({ success: true })
-  }
+    sendMessage: async (message: any) => ({ success: true }),
+  },
 };
 
 // Mock Pattern System for testing
 class MockPatternSystem {
   async applyPattern(patternName: string, context: any): Promise<any> {
     const startTime = performance.now();
-    
+
     // Simulate pattern processing
     await new Promise(resolve => setTimeout(resolve, Math.random() * 10));
-    
+
     const endTime = performance.now();
-    
+
     switch (patternName) {
       case 'SECURE':
         return {
@@ -39,9 +44,9 @@ class MockPatternSystem {
           operation: context.operation,
           riskProfile: context.riskProfile || 'medium',
           processingTime: endTime - startTime,
-          validated: true
+          validated: true,
         };
-      
+
       case 'STREAM':
         return {
           success: true,
@@ -51,42 +56,42 @@ class MockPatternSystem {
           chunks: [],
           totalChunks: 0,
           totalSize: 0,
-          processingTime: endTime - startTime
+          processingTime: endTime - startTime,
         };
-      
+
       case 'CACHE':
         return {
           success: true,
           pattern: 'CACHE',
           operation: 'cache_lookup',
           cached: true,
-          processingTime: endTime - startTime
+          processingTime: endTime - startTime,
         };
-      
+
       case 'TIMING':
         return {
           success: true,
           pattern: 'TIMING',
           result: await context(),
           duration: endTime - startTime,
-          processingTime: endTime - startTime
+          processingTime: endTime - startTime,
         };
-      
+
       case 'TABULAR':
         return {
           success: true,
           pattern: 'TABULAR',
           formatted: 'Table format applied',
           rows: Array.isArray(context.data) ? context.data.length : 1,
-          processingTime: endTime - startTime
+          processingTime: endTime - startTime,
         };
-      
+
       default:
         return {
           success: true,
           pattern: patternName,
           context,
-          processingTime: endTime - startTime
+          processingTime: endTime - startTime,
         };
     }
   }
@@ -96,7 +101,7 @@ class MockPatternSystem {
       totalPatterns: 13,
       activePatterns: 13,
       averageExecutionTime: 5.2,
-      successRate: 98.5
+      successRate: 98.5,
     };
   }
 
@@ -105,7 +110,7 @@ class MockPatternSystem {
       patternExecutions: 1250,
       cacheHits: 450,
       cacheMisses: 800,
-      averageResponseTime: 4.8
+      averageResponseTime: 4.8,
     };
   }
 
@@ -127,8 +132,8 @@ class MockPatternSystem {
         INTERACTIVE: 'active',
         STREAM: 'active',
         FILESYSTEM: 'active',
-        UTILITIES: 'active'
-      }
+        UTILITIES: 'active',
+      },
     };
   }
 }
@@ -155,12 +160,12 @@ async function testEnhancedP2PQueueSystem() {
       strategies: {
         matchOptimization: 'speed',
         queueOptimization: 'smart',
-        riskOptimization: 'aggressive'
+        riskOptimization: 'aggressive',
       },
       thresholds: {
         maxProcessingTime: 3000,
-        minMatchScore: 80
-      }
+        minMatchScore: 80,
+      },
     });
 
     const updatedConfig = p2pAPI.getOptimizationConfig();
@@ -183,8 +188,8 @@ async function testEnhancedP2PQueueSystem() {
         preferredPaymentTypes: ['bank_transfer', 'crypto'],
         amountTolerance: 150,
         timePreference: 'immediate',
-        riskProfile: 'low'
-      }
+        riskProfile: 'low',
+      },
     });
     console.log(`✅ Enhanced withdrawal added with ID: ${withdrawalId}`);
 
@@ -205,8 +210,8 @@ async function testEnhancedP2PQueueSystem() {
         preferredPaymentTypes: ['crypto', 'bank_transfer'],
         amountTolerance: 200,
         timePreference: 'flexible',
-        riskProfile: 'medium'
-      }
+        riskProfile: 'medium',
+      },
     });
     console.log(`✅ Enhanced deposit added with ID: ${depositId}`);
 
@@ -230,7 +235,7 @@ async function testEnhancedP2PQueueSystem() {
       const queueItems = await p2pAPI.getQueueItems({
         paymentType: 'bank_transfer',
         telegramGroupId: 'TEST_GROUP_001',
-        usePatternOptimization: true
+        usePatternOptimization: true,
       });
       console.log(`✅ Retrieved ${queueItems.length} queue items with pattern optimization`);
     } catch (error) {
@@ -246,7 +251,7 @@ async function testEnhancedP2PQueueSystem() {
 
     // Test pattern-based optimizations
     console.log('\n🔄 Testing pattern-based optimizations...');
-    
+
     // Test different optimization strategies
     const strategies = ['speed', 'accuracy', 'balanced'];
     for (const strategy of strategies) {
@@ -254,10 +259,10 @@ async function testEnhancedP2PQueueSystem() {
         strategies: {
           matchOptimization: strategy as any,
           queueOptimization: 'smart',
-          riskOptimization: 'moderate'
-        }
+          riskOptimization: 'moderate',
+        },
       });
-      
+
       const config = p2pAPI.getOptimizationConfig();
       console.log(`✅ Strategy '${strategy}' applied:`, config.strategies.matchOptimization);
     }
@@ -269,10 +274,10 @@ async function testEnhancedP2PQueueSystem() {
         strategies: {
           matchOptimization: 'balanced',
           queueOptimization: 'smart',
-          riskOptimization: level as any
-        }
+          riskOptimization: level as any,
+        },
       });
-      
+
       const config = p2pAPI.getOptimizationConfig();
       console.log(`✅ Risk level '${level}' applied:`, config.strategies.riskOptimization);
     }
@@ -304,8 +309,9 @@ async function testEnhancedP2PQueueSystem() {
     console.log('✅ Pattern system health monitoring');
     console.log('✅ Performance and metrics tracking');
 
-    console.log('\n🚀 Your Enhanced P2P Queue System is working perfectly with Pattern System integration!');
-
+    console.log(
+      '\n🚀 Your Enhanced P2P Queue System is working perfectly with Pattern System integration!'
+    );
   } catch (error) {
     console.error('❌ Test failed:', error);
     process.exit(1);

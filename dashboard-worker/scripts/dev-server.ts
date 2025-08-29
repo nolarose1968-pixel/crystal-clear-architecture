@@ -1,14 +1,14 @@
 #!/usr/bin/env bun
 /**
  * 🚀 Fire22 Enhanced Development Server
- * 
+ *
  * Advanced development server with:
  * - Request/response logging and monitoring
  * - API endpoint validation
  * - Hot reload capabilities
  * - Development-friendly error handling
  * - Performance monitoring
- * 
+ *
  * @version 3.0.9
  * @author Fire22 Development Team
  */
@@ -59,9 +59,9 @@ class Fire22DevServer {
       enableLogging: true,
       enableHotReload: true,
       logLevel: 'info',
-      ...config
+      ...config,
     };
-    
+
     this.startTime = Date.now();
     console.log('🔥 Initializing Fire22 Development Server...');
   }
@@ -75,7 +75,7 @@ class Fire22DevServer {
     const watchPaths = [
       join(process.cwd(), 'src'),
       join(process.cwd(), 'scripts'),
-      join(process.cwd(), 'package.json')
+      join(process.cwd(), 'package.json'),
     ];
 
     console.log('👀 Setting up hot reload file watching...');
@@ -104,9 +104,11 @@ class Fire22DevServer {
   private shouldReload(filename: string): boolean {
     const ext = extname(filename);
     const reloadExtensions = ['.ts', '.js', '.json'];
-    return reloadExtensions.includes(ext) && 
-           !filename.includes('node_modules') &&
-           !filename.includes('.git');
+    return (
+      reloadExtensions.includes(ext) &&
+      !filename.includes('node_modules') &&
+      !filename.includes('.git')
+    );
   }
 
   /**
@@ -124,13 +126,15 @@ class Fire22DevServer {
     const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
     const colors = {
       debug: '\x1b[36m', // Cyan
-      info: '\x1b[32m',  // Green
-      warn: '\x1b[33m',  // Yellow
+      info: '\x1b[32m', // Green
+      warn: '\x1b[33m', // Yellow
       error: '\x1b[31m', // Red
-      reset: '\x1b[0m'
+      reset: '\x1b[0m',
     };
 
-    console.log(`${colors[level]}[${timestamp}] [${level.toUpperCase()}]${colors.reset} ${message}`);
+    console.log(
+      `${colors[level]}[${timestamp}] [${level.toUpperCase()}]${colors.reset} ${message}`
+    );
   }
 
   /**
@@ -143,7 +147,7 @@ class Fire22DevServer {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
-      'Access-Control-Max-Age': '86400'
+      'Access-Control-Max-Age': '86400',
     };
   }
 
@@ -154,24 +158,25 @@ class Fire22DevServer {
     const method = request.method;
     const url = new URL(request.url);
     const path = url.pathname + url.search;
-    
+
     // Color code by method
     const methodColors = {
-      GET: '\x1b[32m',    // Green
-      POST: '\x1b[33m',   // Yellow
-      PUT: '\x1b[34m',    // Blue
+      GET: '\x1b[32m', // Green
+      POST: '\x1b[33m', // Yellow
+      PUT: '\x1b[34m', // Blue
       DELETE: '\x1b[31m', // Red
-      PATCH: '\x1b[35m',  // Magenta
-      OPTIONS: '\x1b[36m' // Cyan
+      PATCH: '\x1b[35m', // Magenta
+      OPTIONS: '\x1b[36m', // Cyan
     };
 
     // Color code by status
-    const statusColor = response.status >= 400 ? '\x1b[31m' : 
-                       response.status >= 300 ? '\x1b[33m' : '\x1b[32m';
+    const statusColor =
+      response.status >= 400 ? '\x1b[31m' : response.status >= 300 ? '\x1b[33m' : '\x1b[32m';
 
     const methodColor = methodColors[method as keyof typeof methodColors] || '\x1b[37m';
 
-    this.log('info', 
+    this.log(
+      'info',
       `${methodColor}${method}\x1b[0m ${path} ${statusColor}${response.status}\x1b[0m ${responseTime.toFixed(2)}ms`
     );
 
@@ -188,8 +193,8 @@ class Fire22DevServer {
       response: {
         status: response.status,
         headers: Object.fromEntries(response.headers.entries()),
-        responseTime
-      }
+        responseTime,
+      },
     });
   }
 
@@ -270,7 +275,9 @@ class Fire22DevServer {
                 </tr>
             </thead>
             <tbody>
-                ${recentRequests.map(log => `
+                ${recentRequests
+                  .map(
+                    log => `
                     <tr>
                         <td>${new Date(log.timestamp).toLocaleTimeString()}</td>
                         <td><span class="method">${log.method}</span></td>
@@ -278,7 +285,9 @@ class Fire22DevServer {
                         <td class="status-${Math.floor(log.response.status / 100)}00">${log.response.status}</td>
                         <td>${log.response.responseTime.toFixed(2)}ms</td>
                     </tr>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </tbody>
         </table>
     </div>
@@ -302,13 +311,13 @@ class Fire22DevServer {
   private async handleRequest(request: Request): Promise<Response> {
     const startTime = performance.now();
     const url = new URL(request.url);
-    
+
     try {
       // Handle CORS preflight
       if (request.method === 'OPTIONS') {
         return new Response(null, {
           status: 200,
-          headers: this.getCorsHeaders()
+          headers: this.getCorsHeaders(),
         });
       }
 
@@ -322,8 +331,8 @@ class Fire22DevServer {
         const response = new Response(this.createDashboardHTML(), {
           headers: {
             'Content-Type': 'text/html',
-            ...this.getCorsHeaders()
-          }
+            ...this.getCorsHeaders(),
+          },
         });
         const responseTime = performance.now() - startTime;
         this.logRequest(request, response, responseTime);
@@ -334,7 +343,7 @@ class Fire22DevServer {
       if (url.pathname.startsWith('/api')) {
         const apiResponse = await apiRouter.handle(request);
         const responseTime = performance.now() - startTime;
-        
+
         // Add CORS headers to API responses
         const corsHeaders = this.getCorsHeaders();
         Object.entries(corsHeaders).forEach(([key, value]) => {
@@ -351,32 +360,31 @@ class Fire22DevServer {
       }
 
       // Default 404
-      const response = new Response('Not Found', { 
+      const response = new Response('Not Found', {
         status: 404,
-        headers: this.getCorsHeaders()
+        headers: this.getCorsHeaders(),
       });
       const responseTime = performance.now() - startTime;
       this.logRequest(request, response, responseTime);
       return response;
-
     } catch (error) {
       this.log('error', `Request failed: ${error.message}`);
-      
+
       const response = new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: 'Internal Server Error',
           message: error.message,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         }),
         {
           status: 500,
           headers: {
             'Content-Type': 'application/json',
-            ...this.getCorsHeaders()
-          }
+            ...this.getCorsHeaders(),
+          },
         }
       );
-      
+
       const responseTime = performance.now() - startTime;
       this.logRequest(request, response, responseTime);
       return response;
@@ -392,36 +400,43 @@ class Fire22DevServer {
         return new Response(JSON.stringify(this.requestLogs, null, 2), {
           headers: {
             'Content-Type': 'application/json',
-            ...this.getCorsHeaders()
-          }
+            ...this.getCorsHeaders(),
+          },
         });
 
       case '/__dev/config':
         return new Response(JSON.stringify(this.config, null, 2), {
           headers: {
             'Content-Type': 'application/json',
-            ...this.getCorsHeaders()
-          }
+            ...this.getCorsHeaders(),
+          },
         });
 
       case '/__dev/health':
-        return new Response(JSON.stringify({
-          status: 'healthy',
-          uptime: Date.now() - this.startTime,
-          requests: this.requestLogs.length,
-          watchers: this.watchers.length,
-          timestamp: new Date().toISOString()
-        }, null, 2), {
-          headers: {
-            'Content-Type': 'application/json',
-            ...this.getCorsHeaders()
+        return new Response(
+          JSON.stringify(
+            {
+              status: 'healthy',
+              uptime: Date.now() - this.startTime,
+              requests: this.requestLogs.length,
+              watchers: this.watchers.length,
+              timestamp: new Date().toISOString(),
+            },
+            null,
+            2
+          ),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              ...this.getCorsHeaders(),
+            },
           }
-        });
+        );
 
       default:
-        return new Response('Dev endpoint not found', { 
+        return new Response('Dev endpoint not found', {
           status: 404,
-          headers: this.getCorsHeaders()
+          headers: this.getCorsHeaders(),
         });
     }
   }
@@ -431,11 +446,11 @@ class Fire22DevServer {
    */
   private async serveStaticFile(pathname: string): Promise<Response> {
     const filePath = join(process.cwd(), 'public', pathname);
-    
+
     if (!existsSync(filePath)) {
-      return new Response('File not found', { 
+      return new Response('File not found', {
         status: 404,
-        headers: this.getCorsHeaders()
+        headers: this.getCorsHeaders(),
       });
     }
 
@@ -444,13 +459,13 @@ class Fire22DevServer {
       return new Response(file, {
         headers: {
           'Content-Type': this.getContentType(pathname),
-          ...this.getCorsHeaders()
-        }
+          ...this.getCorsHeaders(),
+        },
       });
     } catch (error) {
-      return new Response('Error reading file', { 
+      return new Response('Error reading file', {
         status: 500,
-        headers: this.getCorsHeaders()
+        headers: this.getCorsHeaders(),
       });
     }
   }
@@ -486,7 +501,7 @@ class Fire22DevServer {
       this.server = serve({
         port: this.config.port,
         hostname: this.config.host,
-        fetch: (request) => this.handleRequest(request),
+        fetch: request => this.handleRequest(request),
       });
 
       console.log('🚀 Fire22 Development Server started successfully!');
@@ -495,7 +510,6 @@ class Fire22DevServer {
       console.log(`🔍 Dev Tools: http://${this.config.host}:${this.config.port}/__dev/logs`);
       console.log('👀 Hot reload enabled - watching for file changes...');
       console.log('\n🔥 Ready for development!');
-
     } catch (error) {
       this.log('error', `Failed to start server: ${error.message}`);
       process.exit(1);
@@ -527,7 +541,7 @@ async function main() {
   // Parse command line arguments
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    
+
     switch (arg) {
       case '--port':
       case '-p':
@@ -582,7 +596,7 @@ EXAMPLES:
 
   // Create and start server
   const server = new Fire22DevServer(config);
-  
+
   // Handle graceful shutdown
   process.on('SIGINT', async () => {
     console.log('\n🛑 Shutting down development server...');

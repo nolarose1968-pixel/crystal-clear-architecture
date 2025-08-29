@@ -2,14 +2,22 @@
 
 /**
  * 🚀 Fire22 Dashboard Pages Build System
- * 
+ *
  * Builds static pages optimized for Cloudflare Pages deployment
  * Integrates with existing department structure and RSS feeds
  */
 
-import { $ } from "bun";
-import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, readdirSync, statSync } from "fs";
-import { join, basename, dirname } from "path";
+import { $ } from 'bun';
+import {
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  mkdirSync,
+  copyFileSync,
+  readdirSync,
+  statSync,
+} from 'fs';
+import { join, basename, dirname } from 'path';
 
 interface Department {
   id: string;
@@ -32,7 +40,7 @@ class Fire22PagesBuildSystem {
   private readonly srcDir = join(process.cwd(), 'src');
   private readonly distDir = join(process.cwd(), 'dist', 'pages');
   private readonly teamDirectory: any;
-  
+
   constructor() {
     // Load team directory configuration
     const teamDirectoryPath = join(this.srcDir, 'communications', 'team-directory.json');
@@ -44,14 +52,14 @@ class Fire22PagesBuildSystem {
    */
   async build(options: BuildOptions = {}): Promise<void> {
     const startTime = Bun.nanoseconds();
-    
+
     console.log('🚀 Fire22 Dashboard Pages Build System');
-    console.log('====================================');
-    
+    console.log('!==!==!==!==!==!=====');
+
     const env = options.environment || 'development';
     console.log(`\n📦 Environment: ${env}`);
     console.log(`🎯 Output Directory: ${this.distDir}`);
-    
+
     if (options.dryRun) {
       console.log('🔍 DRY RUN MODE - No files will be written');
     }
@@ -59,25 +67,24 @@ class Fire22PagesBuildSystem {
     try {
       // Setup build environment
       await this.setupBuildEnvironment(options);
-      
+
       // Build department pages
       await this.buildDepartmentPages(options);
-      
+
       // Build RSS feeds
       await this.buildFeeds(options);
-      
+
       // Build main dashboard
       await this.buildMainDashboard(options);
-      
+
       // Build assets and styles
       await this.buildAssets(options);
-      
+
       // Generate deployment manifest
       await this.generateDeploymentManifest(options);
-      
+
       const buildTime = (Bun.nanoseconds() - startTime) / 1_000_000;
       console.log(`\n✅ Build completed successfully in ${buildTime.toFixed(2)}ms`);
-      
     } catch (error) {
       console.error('❌ Build failed:', error);
       process.exit(1);
@@ -89,14 +96,14 @@ class Fire22PagesBuildSystem {
    */
   private async setupBuildEnvironment(options: BuildOptions): Promise<void> {
     console.log('\n📁 Setting up build environment...');
-    
+
     if (!options.dryRun) {
       // Create output directories
       if (existsSync(this.distDir)) {
         await $`rm -rf ${this.distDir}`;
       }
       mkdirSync(this.distDir, { recursive: true });
-      
+
       // Create department-specific directories
       const departments = this.getDepartments();
       for (const dept of departments) {
@@ -104,11 +111,11 @@ class Fire22PagesBuildSystem {
         mkdirSync(deptDir, { recursive: true });
         console.log(`  📂 Created ${dept.name} directory`);
       }
-      
+
       // Create feeds directory
       mkdirSync(join(this.distDir, 'feeds'), { recursive: true });
       console.log('  📡 Created feeds directory');
-      
+
       // Create assets directory
       mkdirSync(join(this.distDir, 'assets'), { recursive: true });
       console.log('  🎨 Created assets directory');
@@ -168,20 +175,20 @@ class Fire22PagesBuildSystem {
    */
   private async buildFeeds(options: BuildOptions): Promise<void> {
     console.log('\n📡 Building RSS feeds...');
-    
+
     const feedsSourceDir = join(this.srcDir, 'feeds');
     const feedsOutputDir = join(this.distDir, 'feeds');
-    
+
     if (existsSync(feedsSourceDir)) {
       const feedFiles = ['error-codes-rss.xml', 'error-codes-atom.xml', 'index.html'];
-      
+
       for (const feedFile of feedFiles) {
         const sourcePath = join(feedsSourceDir, feedFile);
         const outputPath = join(feedsOutputDir, feedFile);
-        
+
         if (existsSync(sourcePath) && !options.dryRun) {
           let content = readFileSync(sourcePath, 'utf-8');
-          
+
           // Process feed URLs for production
           if (options.environment === 'production') {
             content = content.replace(
@@ -189,10 +196,10 @@ class Fire22PagesBuildSystem {
               'https://dashboard.fire22.ag'
             );
           }
-          
+
           writeFileSync(outputPath, content);
         }
-        
+
         console.log(`  📡 ${feedFile}`);
       }
     }
@@ -203,17 +210,13 @@ class Fire22PagesBuildSystem {
    */
   private async buildMainDashboard(options: BuildOptions): Promise<void> {
     console.log('\n🏠 Building main dashboard...');
-    
-    const dashboardFiles = [
-      'dashboard.html',
-      'dashboard-index.html',
-      'unified-dashboard.html'
-    ];
-    
+
+    const dashboardFiles = ['dashboard.html', 'dashboard-index.html', 'unified-dashboard.html'];
+
     for (const file of dashboardFiles) {
       const sourcePath = join(this.srcDir, file);
       const outputPath = join(this.distDir, file);
-      
+
       if (existsSync(sourcePath)) {
         if (!options.dryRun) {
           let content = readFileSync(sourcePath, 'utf-8');
@@ -223,7 +226,7 @@ class Fire22PagesBuildSystem {
         console.log(`  🏠 ${file}`);
       }
     }
-    
+
     // Create root index.html pointing to main dashboard
     if (!options.dryRun) {
       const indexContent = this.generateRootIndex(options);
@@ -237,7 +240,7 @@ class Fire22PagesBuildSystem {
    */
   private async buildAssets(options: BuildOptions): Promise<void> {
     console.log('\n🎨 Building assets and styles...');
-    
+
     // Copy CSS files
     const stylesDir = join(this.srcDir, 'styles');
     if (existsSync(stylesDir)) {
@@ -265,7 +268,7 @@ class Fire22PagesBuildSystem {
         console.log(`  🎨 ${cssFile}`);
       }
     }
-    
+
     // Copy JavaScript files
     const jsDir = join(this.srcDir, 'js');
     if (existsSync(jsDir)) {
@@ -290,7 +293,7 @@ class Fire22PagesBuildSystem {
    */
   private async generateDeploymentManifest(options: BuildOptions): Promise<void> {
     console.log('\n📋 Generating deployment manifest...');
-    
+
     const manifest = {
       buildTime: new Date().toISOString(),
       environment: options.environment || 'development',
@@ -300,26 +303,23 @@ class Fire22PagesBuildSystem {
         id: d.id,
         name: d.name,
         path: `/${d.id}/`,
-        admin: d.email
+        admin: d.email,
       })),
       feeds: {
         rss: '/feeds/error-codes-rss.xml',
         atom: '/feeds/error-codes-atom.xml',
-        index: '/feeds/index.html'
+        index: '/feeds/index.html',
       },
       assets: {
         styles: '/assets/',
-        scripts: '/assets/'
-      }
+        scripts: '/assets/',
+      },
     };
-    
+
     if (!options.dryRun) {
-      writeFileSync(
-        join(this.distDir, 'manifest.json'),
-        JSON.stringify(manifest, null, 2)
-      );
+      writeFileSync(join(this.distDir, 'manifest.json'), JSON.stringify(manifest, null, 2));
     }
-    
+
     console.log('  📋 manifest.json');
   }
 
@@ -328,7 +328,7 @@ class Fire22PagesBuildSystem {
    */
   private getDepartments(): Department[] {
     const departments: Department[] = [];
-    
+
     for (const [key, dept] of Object.entries(this.teamDirectory.departments)) {
       if (dept && typeof dept === 'object' && 'name' in dept) {
         departments.push({
@@ -337,11 +337,11 @@ class Fire22PagesBuildSystem {
           email: dept.email,
           domain: dept.domain,
           color: dept.color,
-          members: dept.members || []
+          members: dept.members || [],
         });
       }
     }
-    
+
     return departments;
   }
 
@@ -363,12 +363,15 @@ class Fire22PagesBuildSystem {
    */
   private processDashboardTemplate(html: string, options: BuildOptions): string {
     const departments = this.getDepartments();
-    
+
     // Generate department links
-    const departmentLinks = departments.map(dept => 
-      `<a href="/${dept.id}/" class="dept-link" style="border-left: 3px solid ${dept.color}">${dept.name}</a>`
-    ).join('\n    ');
-    
+    const departmentLinks = departments
+      .map(
+        dept =>
+          `<a href="/${dept.id}/" class="dept-link" style="border-left: 3px solid ${dept.color}">${dept.name}</a>`
+      )
+      .join('\n    ');
+
     return html
       .replace(/{{DEPARTMENT_LINKS}}/g, departmentLinks)
       .replace(/{{BUILD_TIME}}/g, new Date().toISOString())
@@ -380,7 +383,7 @@ class Fire22PagesBuildSystem {
    */
   private generateRootIndex(options: BuildOptions): string {
     const departments = this.getDepartments();
-    
+
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -409,12 +412,16 @@ class Fire22PagesBuildSystem {
         <p>Enterprise Dashboard System with Department Access Control</p>
         
         <div class="departments">
-            ${departments.map(dept => `
+            ${departments
+              .map(
+                dept => `
             <a href="/${dept.id}/" class="dept-card" style="--dept-color: ${dept.color};">
                 <div class="dept-name" style="color: ${dept.color};">${dept.name}</div>
                 <div class="dept-members">${dept.members.length} team members</div>
             </a>
-            `).join('')}
+            `
+              )
+              .join('')}
         </div>
         
         <div class="feeds-section">
@@ -435,9 +442,12 @@ class Fire22PagesBuildSystem {
   /**
    * 🧭 Generate department navigation
    */
-  private async generateDepartmentNavigation(dept: Department, options: BuildOptions): Promise<void> {
+  private async generateDepartmentNavigation(
+    dept: Department,
+    options: BuildOptions
+  ): Promise<void> {
     const departments = this.getDepartments();
-    
+
     const navContent = `
 <!-- Department Navigation -->
 <nav class="dept-navigation" style="background: rgba(10, 14, 39, 0.9); padding: 15px; border-bottom: 2px solid ${dept.color};">
@@ -448,14 +458,18 @@ class Fire22PagesBuildSystem {
             <span style="color: ${dept.color};">${dept.name}</span>
         </div>
         <div style="display: flex; gap: 15px;">
-            ${departments.map(d => `
+            ${departments
+              .map(
+                d => `
                 <a href="/${d.id}/" style="color: ${d.id === dept.id ? d.color : '#9ca3af'}; text-decoration: none; padding: 5px 10px; border-radius: 5px; ${d.id === dept.id ? `background: rgba(64, 224, 208, 0.1);` : ''}">${d.name}</a>
-            `).join('')}
+            `
+              )
+              .join('')}
         </div>
     </div>
 </nav>
 `;
-    
+
     if (!options.dryRun) {
       const navPath = join(this.distDir, dept.id, 'navigation.html');
       writeFileSync(navPath, navContent);
@@ -567,9 +581,9 @@ class Fire22PagesBuildSystem {
   private getDepartmentHtmlFileName(departmentId: string): string {
     // Handle special cases where department ID doesn't match file name
     const fileNameMapping: Record<string, string> = {
-      'support': 'customer-support-department.html',
-      'contributors': 'team-contributors-department.html',
-      'sportsbook-operations': 'sportsbook-operations-department.html'
+      support: 'customer-support-department.html',
+      contributors: 'team-contributors-department.html',
+      'sportsbook-operations': 'sportsbook-operations-department.html',
     };
 
     return fileNameMapping[departmentId] || `${departmentId}-department.html`;
@@ -578,7 +592,10 @@ class Fire22PagesBuildSystem {
   /**
    * 🔧 Create missing department page from template
    */
-  private async createMissingDepartmentPage(dept: Department, options: BuildOptions): Promise<void> {
+  private async createMissingDepartmentPage(
+    dept: Department,
+    options: BuildOptions
+  ): Promise<void> {
     const templatePath = join(this.srcDir, 'departments', '_department-template.html');
     const outputPath = join(this.distDir, dept.id, 'index.html');
 
@@ -721,15 +738,25 @@ class Fire22PagesBuildSystem {
         </div>
 
         <div class="team-grid">
-            ${dept.members.map(member => `
+            ${dept.members
+              .map(
+                member => `
             <div class="team-member">
-                <div class="member-avatar">${member.avatar || member.name.split(' ').map(n => n[0]).join('')}</div>
+                <div class="member-avatar">${
+                  member.avatar ||
+                  member.name
+                    .split(' ')
+                    .map(n => n[0])
+                    .join('')
+                }</div>
                 <h3>${member.name}</h3>
                 <p>${member.role}</p>
                 <p><small>${member.email}</small></p>
                 <p><span style="color: ${this.getStatusColor(member.status)};">●</span> ${this.getStatusText(member.status)}</p>
             </div>
-            `).join('')}
+            `
+              )
+              .join('')}
         </div>
 
         <div style="margin-top: 40px; text-align: center; font-size: 12px; color: #6b7280;">
@@ -745,16 +772,16 @@ class Fire22PagesBuildSystem {
    */
   private getStatusColor(status: string): string {
     const statusColors: Record<string, string> = {
-      'available': '#10b981',
-      'busy': '#ef4444',
+      available: '#10b981',
+      busy: '#ef4444',
       'in-meeting': '#f59e0b',
       'on-call': '#8b5cf6',
-      'coding': '#06b6d4',
+      coding: '#06b6d4',
       'creative-work': '#ec4899',
       'strategic-planning': '#6366f1',
-      'offline': '#6b7280',
-      'vacation': '#14b8a6',
-      'recruiting': '#f97316'
+      offline: '#6b7280',
+      vacation: '#14b8a6',
+      recruiting: '#f97316',
     };
     return statusColors[status] || '#6b7280';
   }
@@ -764,16 +791,16 @@ class Fire22PagesBuildSystem {
    */
   private getStatusText(status: string): string {
     const statusTexts: Record<string, string> = {
-      'available': 'Available',
-      'busy': 'Busy',
+      available: 'Available',
+      busy: 'Busy',
       'in-meeting': 'In Meeting',
       'on-call': 'On Call',
-      'coding': 'Deep Work',
+      coding: 'Deep Work',
       'creative-work': 'Creative Work',
       'strategic-planning': 'Strategic Planning',
-      'offline': 'Offline',
-      'vacation': 'On Vacation',
-      'recruiting': 'Position Open'
+      offline: 'Offline',
+      vacation: 'On Vacation',
+      recruiting: 'Position Open',
     };
     return statusTexts[status] || 'Unknown';
   }
@@ -786,13 +813,13 @@ async function main() {
     environment: 'development',
     minify: false,
     verbose: false,
-    dryRun: false
+    dryRun: false,
   };
-  
+
   // Parse command line arguments
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    
+
     switch (arg) {
       case '--env':
       case '--environment':
@@ -840,7 +867,7 @@ Examples:
         }
     }
   }
-  
+
   const buildSystem = new Fire22PagesBuildSystem();
   await buildSystem.build(options);
 }

@@ -43,7 +43,7 @@ export type {
   EntityValues,
   PartialEntity,
   CreateEntity,
-  UpdateEntity
+  UpdateEntity,
 } from './base';
 
 // Core entity types
@@ -63,7 +63,7 @@ export type {
   SystemConfig,
   AuditLog,
   Notification,
-  Report
+  Report,
 } from './entities';
 
 // Workspace-specific types
@@ -74,7 +74,7 @@ export {
   APIClient,
   SecurityRegistry,
   PatternSystem,
-  BuildSystem
+  BuildSystem,
 } from './workspaces';
 
 // Re-export constants types for convenience
@@ -87,7 +87,7 @@ export type {
   EventStatus,
   CustomerTier,
   RiskLevel,
-  AgentLevel
+  AgentLevel,
 } from '../../constants';
 
 // === UTILITY TYPES ===
@@ -95,7 +95,7 @@ export type {
 /**
  * Extract all entity types from the database schema
  */
-export type DatabaseEntity = 
+export type DatabaseEntity =
   | Customer
   | Agent
   | Transaction
@@ -112,7 +112,7 @@ export type DatabaseEntity =
 /**
  * Extract all auditable entity types
  */
-export type AuditableDatabaseEntity = 
+export type AuditableDatabaseEntity =
   | Customer
   | Agent
   | Transaction
@@ -240,61 +240,52 @@ export interface DatabaseOperations {
   connect(): Promise<void>;
   disconnect(): Promise<void>;
   isConnected(): boolean;
-  
+
   // Transaction management
   beginTransaction(): Promise<DatabaseTransaction>;
   commitTransaction(transaction: DatabaseTransaction): Promise<void>;
   rollbackTransaction(transaction: DatabaseTransaction): Promise<void>;
-  
+
   // Schema management
   getMigrationStatus(): Promise<MigrationStatus>;
   runMigrations(): Promise<MigrationResult[]>;
   rollbackMigration(version: string): Promise<MigrationResult>;
-  
+
   // Health and monitoring
   getHealth(): Promise<DatabaseHealth>;
   getStats(): Promise<TableStatistics[]>;
-  
+
   // Backup and restore
   createBackup(config: BackupConfig): Promise<BackupResult>;
   restoreBackup(backupId: string): Promise<boolean>;
-  
+
   // Generic entity operations
-  findEntity<T extends keyof EntityName>(
-    entityName: T,
-    id: string
-  ): Promise<EntityName[T] | null>;
-  
+  findEntity<T extends keyof EntityName>(entityName: T, id: string): Promise<EntityName[T] | null>;
+
   findEntities<T extends keyof EntityName>(
     entityName: T,
     params?: EntitySearchParams<T>
   ): Promise<EntitySearchResult<T>>;
-  
+
   createEntity<T extends keyof EntityName>(
     entityName: T,
     data: CreateEntityInput<T>
   ): Promise<EntityName[T]>;
-  
+
   updateEntity<T extends keyof EntityName>(
     entityName: T,
     id: string,
     data: UpdateEntityInput<T>
   ): Promise<EntityName[T]>;
-  
-  deleteEntity<T extends keyof EntityName>(
-    entityName: T,
-    id: string
-  ): Promise<boolean>;
-  
+
+  deleteEntity<T extends keyof EntityName>(entityName: T, id: string): Promise<boolean>;
+
   countEntities<T extends keyof EntityName>(
     entityName: T,
     filters?: FilterParams[]
   ): Promise<number>;
-  
-  existsEntity<T extends keyof EntityName>(
-    entityName: T,
-    id: string
-  ): Promise<boolean>;
+
+  existsEntity<T extends keyof EntityName>(entityName: T, id: string): Promise<boolean>;
 }
 
 // === WORKSPACE TYPE MAPPINGS ===
@@ -368,7 +359,7 @@ export default {
   DatabaseConfig,
   PaginationResult,
   SearchResult,
-  
+
   // Entity types
   Customer,
   Agent,
@@ -382,7 +373,7 @@ export default {
   AuditLog,
   Notification,
   Report,
-  
+
   // Workspace types
   CoreDashboard,
   SportsBetting,
@@ -390,5 +381,5 @@ export default {
   APIClient,
   SecurityRegistry,
   PatternSystem,
-  BuildSystem
+  BuildSystem,
 };

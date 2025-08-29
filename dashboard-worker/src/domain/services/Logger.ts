@@ -7,7 +7,7 @@ export enum LogLevel {
   DEBUG = 'debug',
   INFO = 'info',
   WARN = 'warn',
-  ERROR = 'error'
+  ERROR = 'error',
 }
 
 export interface LogEntry {
@@ -58,7 +58,12 @@ export class Logger {
     Logger.getInstance().log(LogLevel.DEBUG, message, metadata);
   }
 
-  private log(level: LogLevel, message: string, metadata?: Record<string, any>, error?: Error | any): void {
+  private log(
+    level: LogLevel,
+    message: string,
+    metadata?: Record<string, any>,
+    error?: Error | any
+  ): void {
     // Only log if level is at or above configured level
     if (this.shouldLog(level)) {
       const timestamp = new Date().toISOString();
@@ -68,7 +73,7 @@ export class Logger {
         message,
         service: this.serviceName,
         metadata,
-        error: error instanceof Error ? error : undefined
+        error: error instanceof Error ? error : undefined,
       };
 
       // Format log message
@@ -107,7 +112,7 @@ export class Logger {
       `[${entry.timestamp}]`,
       `[${entry.level.toUpperCase()}]`,
       entry.service ? `[${entry.service}]` : '',
-      entry.message
+      entry.message,
     ];
 
     if (entry.metadata && Object.keys(entry.metadata).length > 0) {

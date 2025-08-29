@@ -1,6 +1,6 @@
 /**
  * Manager Controller
- * 
+ *
  * Handles manager-level operations for Fire22 dashboard
  */
 
@@ -12,23 +12,26 @@ import { fire22Client } from '@fire22/validator';
  */
 export async function getWeeklyFigureByAgent(request: ValidatedRequest): Promise<Response> {
   try {
-    const { agentID } = request.validatedBody || await request.json();
-    
+    const { agentID } = request.validatedBody || (await request.json());
+
     // Use validated Fire22 client
     const response = await fire22Client.getWeeklyFigures(agentID);
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get weekly figures',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get weekly figures',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -37,29 +40,32 @@ export async function getWeeklyFigureByAgent(request: ValidatedRequest): Promise
  */
 export async function getPending(request: ValidatedRequest): Promise<Response> {
   try {
-    const { agentID } = request.validatedBody || await request.json();
-    
+    const { agentID } = request.validatedBody || (await request.json());
+
     // TODO: Implement pending operations logic
     const response = {
       success: true,
       data: {
         pending: [],
-        count: 0
-      }
+        count: 0,
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get pending operations',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get pending operations',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -70,28 +76,31 @@ export async function getTransactions(request: ValidatedRequest): Promise<Respon
   try {
     const url = new URL(request.url);
     const agentID = url.searchParams.get('agentID');
-    
+
     // TODO: Implement transactions logic
     const response = {
       success: true,
       data: {
         transactions: [],
-        count: 0
-      }
+        count: 0,
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get transactions',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get transactions',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -102,24 +111,27 @@ export async function getCustomers(request: ValidatedRequest): Promise<Response>
   try {
     const url = new URL(request.url);
     const agentID = url.searchParams.get('agentID');
-    
+
     // Use validated Fire22 client
     const response = await fire22Client.getCustomers({
-      agentId: agentID
+      agentId: agentID,
     });
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get customers',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get customers',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -133,22 +145,25 @@ export async function getLiveActivity(request: ValidatedRequest): Promise<Respon
       success: true,
       data: {
         activity: [],
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get live activity',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get live activity',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -159,22 +174,25 @@ export async function getLiveWagers(request: ValidatedRequest): Promise<Response
   try {
     const url = new URL(request.url);
     const agentID = url.searchParams.get('agentID');
-    
+
     // Use validated Fire22 client
     const response = await fire22Client.getLiveWagers(agentID!);
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get live wagers',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get live wagers',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -186,22 +204,25 @@ export async function getAgentPerformance(request: ValidatedRequest): Promise<Re
     const url = new URL(request.url);
     const agentID = url.searchParams.get('agentID');
     const period = url.searchParams.get('period') || 'weekly';
-    
+
     // Use validated Fire22 client
     const response = await fire22Client.getAgentPerformance(agentID!, period);
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get agent performance',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get agent performance',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -215,22 +236,25 @@ export async function getWagerAlerts(request: ValidatedRequest): Promise<Respons
       success: true,
       data: {
         alerts: [],
-        count: 0
-      }
+        count: 0,
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get wager alerts',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get wager alerts',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -244,22 +268,25 @@ export async function getVIPCustomers(request: ValidatedRequest): Promise<Respon
       success: true,
       data: {
         vipCustomers: [],
-        count: 0
-      }
+        count: 0,
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get VIP customers',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get VIP customers',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -273,22 +300,25 @@ export async function getBetTicker(request: ValidatedRequest): Promise<Response>
       success: true,
       data: {
         bets: [],
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get bet ticker',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get bet ticker',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -302,22 +332,25 @@ export async function getSportAnalytics(request: ValidatedRequest): Promise<Resp
       success: true,
       data: {
         analytics: {},
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get sports analytics',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get sports analytics',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -328,22 +361,25 @@ export async function getCustomerDetails(request: ValidatedRequest): Promise<Res
   try {
     const url = new URL(request.url);
     const customerID = url.searchParams.get('customerID');
-    
+
     // Use validated Fire22 client
     const response = await fire22Client.getCustomerDetails(customerID!);
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get customer details',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get customer details',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -357,22 +393,25 @@ export async function getSettings(request: ValidatedRequest): Promise<Response> 
       success: true,
       data: {
         settings: {},
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get settings',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get settings',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -383,22 +422,25 @@ export async function getAgentKPI(request: ValidatedRequest): Promise<Response> 
   try {
     const url = new URL(request.url);
     const agentID = url.searchParams.get('agentID');
-    
+
     // Use validated Fire22 client
     const response = await fire22Client.getKPIs();
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get agent KPI',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get agent KPI',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -408,19 +450,19 @@ export async function getAgentKPI(request: ValidatedRequest): Promise<Response> 
  */
 export async function getWeeklyFigureByAgentLite(request: ValidatedRequest): Promise<Response> {
   try {
-    const body = request.validatedBody || await request.json();
-    const { 
-      agentID, 
-      week = 0, 
+    const body = request.validatedBody || (await request.json());
+    const {
+      agentID,
+      week = 0,
       token,
       type = 'A',
       layout = 'byDay',
       operation = 'getWeeklyFigureByAgentLite',
       RRO = 1,
       agentOwner,
-      agentSite = 1
+      agentSite = 1,
     } = body;
-    
+
     // Use validated Fire22 client with lite endpoint
     const response = await fire22Client.getWeeklyFiguresLite({
       agentID,
@@ -431,21 +473,24 @@ export async function getWeeklyFigureByAgentLite(request: ValidatedRequest): Pro
       operation,
       RRO,
       agentOwner,
-      agentSite
+      agentSite,
     });
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get weekly figures (lite)',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get weekly figures (lite)',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -456,24 +501,27 @@ export async function getCustomersByAgent(request: ValidatedRequest): Promise<Re
   try {
     const url = new URL(request.url);
     const agentID = url.searchParams.get('agentID');
-    
+
     // Use validated Fire22 client
     const response = await fire22Client.getCustomers({
-      agentId: agentID
+      agentId: agentID,
     });
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get customers by agent',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get customers by agent',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -482,16 +530,16 @@ export async function getCustomersByAgent(request: ValidatedRequest): Promise<Re
  */
 export async function getCryptoInfo(request: ValidatedRequest): Promise<Response> {
   try {
-    const body = request.validatedBody || await request.json();
+    const body = request.validatedBody || (await request.json());
     const {
       account,
       operation = 'getCryptoInfo',
       RRO = 1,
       agentID,
       agentOwner,
-      agentSite = 1
+      agentSite = 1,
     } = body;
-    
+
     // Use validated Fire22 client to get crypto information
     const response = await fire22Client.getCryptoInfo({
       account,
@@ -499,21 +547,24 @@ export async function getCryptoInfo(request: ValidatedRequest): Promise<Response
       RRO,
       agentID,
       agentOwner,
-      agentSite
+      agentSite,
     });
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get crypto info',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get crypto info',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -522,16 +573,16 @@ export async function getCryptoInfo(request: ValidatedRequest): Promise<Response
  */
 export async function getInfoPlayer(request: ValidatedRequest): Promise<Response> {
   try {
-    const body = request.validatedBody || await request.json();
+    const body = request.validatedBody || (await request.json());
     const {
       customerID,
       agentID,
       operation = 'getInfoPlayer',
       RRO = 0,
       agentOwner,
-      agentSite = 1
+      agentSite = 1,
     } = body;
-    
+
     // Use validated Fire22 client to get player information
     const response = await fire22Client.getPlayerInfo({
       customerID,
@@ -539,20 +590,23 @@ export async function getInfoPlayer(request: ValidatedRequest): Promise<Response
       operation,
       RRO,
       agentOwner,
-      agentSite
+      agentSite,
     });
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get player info',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get player info',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }

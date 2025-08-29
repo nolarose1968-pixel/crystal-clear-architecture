@@ -110,7 +110,7 @@ export class LiveCasinoManagementSystem {
         currentRate: 0.03,
         popularity: 95,
         isActive: true,
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       },
       {
         id: 'roulette-live',
@@ -124,7 +124,7 @@ export class LiveCasinoManagementSystem {
         currentRate: 0.025,
         popularity: 90,
         isActive: true,
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       },
       {
         id: 'blackjack-live',
@@ -138,7 +138,7 @@ export class LiveCasinoManagementSystem {
         currentRate: 0.02,
         popularity: 88,
         isActive: true,
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       },
       {
         id: 'poker-live',
@@ -152,7 +152,7 @@ export class LiveCasinoManagementSystem {
         currentRate: 0.035,
         popularity: 85,
         isActive: true,
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       },
       {
         id: 'dice-live',
@@ -166,7 +166,7 @@ export class LiveCasinoManagementSystem {
         currentRate: 0.04,
         popularity: 75,
         isActive: true,
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       },
       {
         id: 'wheel-live',
@@ -180,8 +180,8 @@ export class LiveCasinoManagementSystem {
         currentRate: 0.045,
         popularity: 92,
         isActive: true,
-        lastUpdated: new Date()
-      }
+        lastUpdated: new Date(),
+      },
     ];
 
     defaultGames.forEach(game => this.games.set(game.id, game));
@@ -192,7 +192,7 @@ export class LiveCasinoManagementSystem {
    */
   private initializeDefaultRates() {
     const defaultAgents = ['agent1', 'agent2', 'agent3', 'agent4', 'agent5'];
-    
+
     defaultAgents.forEach(agentId => {
       this.games.forEach(game => {
         const rate: LiveCasinoRate = {
@@ -206,9 +206,9 @@ export class LiveCasinoManagementSystem {
           effectiveFrom: new Date(),
           isActive: true,
           createdBy: 'system',
-          createdAt: new Date()
+          createdAt: new Date(),
         };
-        
+
         this.rates.set(rate.id, rate);
       });
     });
@@ -260,7 +260,7 @@ export class LiveCasinoManagementSystem {
     const newGame: LiveCasinoGame = {
       ...game,
       id: `game_${Date.now()}`,
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     };
 
     this.games.set(newGame.id, newGame);
@@ -326,7 +326,7 @@ export class LiveCasinoManagementSystem {
       effectiveFrom: new Date(),
       isActive: true,
       createdBy,
-      createdAt: new Date()
+      createdAt: new Date(),
     };
 
     this.rates.set(newRateRecord.id, newRateRecord);
@@ -378,7 +378,7 @@ export class LiveCasinoManagementSystem {
       netResult: 0,
       commissionEarned: 0,
       rateUsed: this.getRate(agentId, gameId)?.adjustedRate || 0,
-      status: 'active'
+      status: 'active',
     };
 
     this.sessions.set(session.id, session);
@@ -388,14 +388,11 @@ export class LiveCasinoManagementSystem {
   /**
    * End a live casino session
    */
-  endSession(
-    sessionId: string,
-    totalBets: number,
-    totalWins: number
-  ): LiveCasinoSession | null {
-    const session = Array.from(this.sessions.values())
-      .find(s => s.sessionId === sessionId && s.status === 'active');
-    
+  endSession(sessionId: string, totalBets: number, totalWins: number): LiveCasinoSession | null {
+    const session = Array.from(this.sessions.values()).find(
+      s => s.sessionId === sessionId && s.status === 'active'
+    );
+
     if (!session) return null;
 
     session.endTime = new Date();
@@ -417,21 +414,22 @@ export class LiveCasinoManagementSystem {
    * Get active sessions for an agent
    */
   getActiveSessions(agentId: string): LiveCasinoSession[] {
-    return Array.from(this.sessions.values())
-      .filter(session => session.agentId === agentId && session.status === 'active');
+    return Array.from(this.sessions.values()).filter(
+      session => session.agentId === agentId && session.status === 'active'
+    );
   }
 
   /**
    * Get completed sessions for an agent
    */
   getCompletedSessions(agentId: string, period: string): LiveCasinoSession[] {
-    return Array.from(this.sessions.values())
-      .filter(session => 
-        session.agentId === agentId && 
+    return Array.from(this.sessions.values()).filter(
+      session =>
+        session.agentId === agentId &&
         session.status === 'completed' &&
         session.endTime &&
         session.endTime.toISOString().slice(0, 7) === period
-      );
+    );
   }
 
   /**
@@ -443,16 +441,17 @@ export class LiveCasinoManagementSystem {
    */
   calculateMonthlyRevenue(agentId: string, period: string): LiveCasinoRevenue {
     const sessions = this.getCompletedSessions(agentId, period);
-    
+
     const totalBets = sessions.reduce((sum, session) => sum + session.totalBets, 0);
     const totalWins = sessions.reduce((sum, session) => sum + session.totalWins, 0);
     const netRevenue = totalWins - totalBets;
     const commissionPaid = sessions.reduce((sum, session) => sum + session.commissionEarned, 0);
-    
+
     const uniquePlayers = new Set(sessions.map(s => s.playerId)).size;
-    const averageRate = sessions.length > 0 
-      ? sessions.reduce((sum, session) => sum + session.rateUsed, 0) / sessions.length 
-      : 0;
+    const averageRate =
+      sessions.length > 0
+        ? sessions.reduce((sum, session) => sum + session.rateUsed, 0) / sessions.length
+        : 0;
 
     const revenue: LiveCasinoRevenue = {
       id: `${agentId}-${period}`,
@@ -466,7 +465,7 @@ export class LiveCasinoManagementSystem {
       averageRate,
       playerCount: uniquePlayers,
       sessionCount: sessions.length,
-      calculatedAt: new Date()
+      calculatedAt: new Date(),
     };
 
     this.revenues.set(revenue.id, revenue);
@@ -493,12 +492,12 @@ export class LiveCasinoManagementSystem {
     const gameStats = new Map<string, LiveCasinoPerformance>();
 
     // Get all completed sessions for the period
-    const periodSessions = Array.from(this.sessions.values())
-      .filter(session => 
+    const periodSessions = Array.from(this.sessions.values()).filter(
+      session =>
         session.status === 'completed' &&
         session.endTime &&
         session.endTime.toISOString().slice(0, 7) === period
-      );
+    );
 
     // Group by game and calculate statistics
     periodSessions.forEach(session => {
@@ -518,7 +517,7 @@ export class LiveCasinoManagementSystem {
           playerCount: 0,
           winRate: 0,
           houseEdge: game.houseEdge,
-          popularity: game.popularity
+          popularity: game.popularity,
         });
       }
 
@@ -534,18 +533,16 @@ export class LiveCasinoManagementSystem {
     gameStats.forEach(stats => {
       const gameSessions = periodSessions.filter(s => s.gameId === stats.gameId);
       const uniquePlayers = new Set(gameSessions.map(s => s.playerId)).size;
-      
+
       stats.playerCount = uniquePlayers;
-      stats.averageRate = gameSessions.length > 0 
-        ? gameSessions.reduce((sum, s) => sum + s.rateUsed, 0) / gameSessions.length 
-        : 0;
-      stats.winRate = stats.totalBets > 0 
-        ? (stats.totalWins / stats.totalBets) * 100 
-        : 0;
+      stats.averageRate =
+        gameSessions.length > 0
+          ? gameSessions.reduce((sum, s) => sum + s.rateUsed, 0) / gameSessions.length
+          : 0;
+      stats.winRate = stats.totalBets > 0 ? (stats.totalWins / stats.totalBets) * 100 : 0;
     });
 
-    return Array.from(gameStats.values())
-      .sort((a, b) => b.totalBets - a.totalBets);
+    return Array.from(gameStats.values()).sort((a, b) => b.totalBets - a.totalBets);
   }
 
   /**
@@ -559,23 +556,26 @@ export class LiveCasinoManagementSystem {
     playerCount: number;
     averageRate: number;
   }> {
-    const agentStats = new Map<string, {
-      agentId: string;
-      totalRevenue: number;
-      totalCommission: number;
-      sessionCount: number;
-      playerCount: number;
-      totalRate: number;
-      rateCount: number;
-    }>();
+    const agentStats = new Map<
+      string,
+      {
+        agentId: string;
+        totalRevenue: number;
+        totalCommission: number;
+        sessionCount: number;
+        playerCount: number;
+        totalRate: number;
+        rateCount: number;
+      }
+    >();
 
     // Get all completed sessions for the period
-    const periodSessions = Array.from(this.sessions.values())
-      .filter(session => 
+    const periodSessions = Array.from(this.sessions.values()).filter(
+      session =>
         session.status === 'completed' &&
         session.endTime &&
         session.endTime.toISOString().slice(0, 7) === period
-      );
+    );
 
     // Calculate agent statistics
     periodSessions.forEach(session => {
@@ -587,7 +587,7 @@ export class LiveCasinoManagementSystem {
           sessionCount: 0,
           playerCount: 0,
           totalRate: 0,
-          rateCount: 0
+          rateCount: 0,
         });
       }
 
@@ -614,7 +614,7 @@ export class LiveCasinoManagementSystem {
         totalCommission: stats.totalCommission,
         sessionCount: stats.sessionCount,
         playerCount: stats.playerCount,
-        averageRate: stats.rateCount > 0 ? stats.totalRate / stats.rateCount : 0
+        averageRate: stats.rateCount > 0 ? stats.totalRate / stats.rateCount : 0,
       }))
       .sort((a, b) => b.totalRevenue - a.totalRevenue);
   }
@@ -628,11 +628,17 @@ export class LiveCasinoManagementSystem {
     const totalRates = this.rates.size;
     const activeRates = Array.from(this.rates.values()).filter(r => r.isActive).length;
     const totalSessions = this.sessions.size;
-    const activeSessions = Array.from(this.sessions.values()).filter(s => s.status === 'active').length;
-    const totalRevenue = Array.from(this.revenues.values())
-      .reduce((sum, r) => sum + r.netRevenue, 0);
-    const totalCommission = Array.from(this.revenues.values())
-      .reduce((sum, r) => sum + r.commissionPaid, 0);
+    const activeSessions = Array.from(this.sessions.values()).filter(
+      s => s.status === 'active'
+    ).length;
+    const totalRevenue = Array.from(this.revenues.values()).reduce(
+      (sum, r) => sum + r.netRevenue,
+      0
+    );
+    const totalCommission = Array.from(this.revenues.values()).reduce(
+      (sum, r) => sum + r.commissionPaid,
+      0
+    );
 
     return {
       totalGames,
@@ -642,7 +648,7 @@ export class LiveCasinoManagementSystem {
       totalSessions,
       activeSessions,
       totalRevenue,
-      totalCommission
+      totalCommission,
     };
   }
 }

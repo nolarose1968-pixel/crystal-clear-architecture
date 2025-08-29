@@ -8,28 +8,16 @@
       "severity": "critical",
       "duration": 30000,
       "enabled": true,
-      "targets": [
-        "fire22-dashboard",
-        "fire22-registry"
-      ],
+      "targets": ["fire22-dashboard", "fire22-registry"],
       "parameters": {
         "failureType": "connection_timeout",
-        "affectedQueries": [
-          "SELECT",
-          "INSERT",
-          "UPDATE"
-        ],
+        "affectedQueries": ["SELECT", "INSERT", "UPDATE"],
         "partialFailure": false
       },
       "expectedBehavior": {
-        "errorCodes": [
-          "E2001",
-          "E2002"
-        ],
+        "errorCodes": ["E2001", "E2002"],
         "recoveryTime": 15,
-        "alertsTriggered": [
-          "critical-database-errors"
-        ],
+        "alertsTriggered": ["critical-database-errors"],
         "gracefulDegradation": true
       }
     },
@@ -41,27 +29,16 @@
       "severity": "medium",
       "duration": 20000,
       "enabled": true,
-      "targets": [
-        "/api/errors",
-        "/api/customers",
-        "/health"
-      ],
+      "targets": ["/api/errors", "/api/customers", "/health"],
       "parameters": {
         "requestsPerSecond": 1000,
         "concurrent": 50,
-        "patterns": [
-          "burst",
-          "sustained"
-        ]
+        "patterns": ["burst", "sustained"]
       },
       "expectedBehavior": {
-        "errorCodes": [
-          "E3002"
-        ],
+        "errorCodes": ["E3002"],
         "recoveryTime": 10,
-        "alertsTriggered": [
-          "api-rate-limit-surge"
-        ],
+        "alertsTriggered": ["api-rate-limit-surge"],
         "gracefulDegradation": true
       }
     },
@@ -73,27 +50,16 @@
       "severity": "high",
       "duration": 45000,
       "enabled": true,
-      "targets": [
-        "hub-connection",
-        "telegram-bot",
-        "fire22-api"
-      ],
+      "targets": ["hub-connection", "telegram-bot", "fire22-api"],
       "parameters": {
         "partitionType": "intermittent",
-        "affectedServices": [
-          "50%"
-        ],
+        "affectedServices": ["50%"],
         "latencyIncrease": 5000
       },
       "expectedBehavior": {
-        "errorCodes": [
-          "E4001",
-          "E4002"
-        ],
+        "errorCodes": ["E4001", "E4002"],
         "recoveryTime": 30,
-        "alertsTriggered": [
-          "network-partition-alert"
-        ],
+        "alertsTriggered": ["network-partition-alert"],
         "gracefulDegradation": true
       }
     },
@@ -105,30 +71,16 @@
       "severity": "high",
       "duration": 25000,
       "enabled": true,
-      "targets": [
-        "error-tracker",
-        "error-registry",
-        "alert-system"
-      ],
+      "targets": ["error-tracker", "error-registry", "alert-system"],
       "parameters": {
         "errorVolume": 10000,
-        "errorTypes": [
-          "E1001",
-          "E2001",
-          "E3001",
-          "E4001",
-          "E5001"
-        ],
+        "errorTypes": ["E1001", "E2001", "E3001", "E4001", "E5001"],
         "concurrentStreams": 20
       },
       "expectedBehavior": {
-        "errorCodes": [
-          "E5001"
-        ],
+        "errorCodes": ["E5001"],
         "recoveryTime": 20,
-        "alertsTriggered": [
-          "error-system-overload"
-        ],
+        "alertsTriggered": ["error-system-overload"],
         "gracefulDegradation": true
       }
     },
@@ -140,23 +92,16 @@
       "severity": "critical",
       "duration": 60000,
       "enabled": true,
-      "targets": [
-        "error-tracker",
-        "hub-connection"
-      ],
+      "targets": ["error-tracker", "hub-connection"],
       "parameters": {
         "memoryPressure": "80%",
         "leakSimulation": true,
         "gcStress": true
       },
       "expectedBehavior": {
-        "errorCodes": [
-          "E1002"
-        ],
+        "errorCodes": ["E1002"],
         "recoveryTime": 45,
-        "alertsTriggered": [
-          "memory-pressure-alert"
-        ],
+        "alertsTriggered": ["memory-pressure-alert"],
         "gracefulDegradation": true
       }
     },
@@ -168,32 +113,16 @@
       "severity": "critical",
       "duration": 90000,
       "enabled": true,
-      "targets": [
-        "database",
-        "api",
-        "error-system",
-        "telegram"
-      ],
+      "targets": ["database", "api", "error-system", "telegram"],
       "parameters": {
         "initialFailure": "database",
         "propagationDelay": 5000,
-        "failureChain": [
-          "database",
-          "api",
-          "error-system"
-        ]
+        "failureChain": ["database", "api", "error-system"]
       },
       "expectedBehavior": {
-        "errorCodes": [
-          "E2001",
-          "E3001",
-          "E5001"
-        ],
+        "errorCodes": ["E2001", "E3001", "E5001"],
         "recoveryTime": 60,
-        "alertsTriggered": [
-          "cascade-failure-alert",
-          "critical-system-failure"
-        ],
+        "alertsTriggered": ["cascade-failure-alert", "critical-system-failure"],
         "gracefulDegradation": true
       }
     },
@@ -205,29 +134,16 @@
       "severity": "high",
       "duration": 40000,
       "enabled": true,
-      "targets": [
-        "fire22-api",
-        "fire22-auth",
-        "fire22-data-sync"
-      ],
+      "targets": ["fire22-api", "fire22-auth", "fire22-data-sync"],
       "parameters": {
         "disruptionType": "intermittent_500",
-        "affectedEndpoints": [
-          "customers",
-          "agents",
-          "transactions"
-        ],
+        "affectedEndpoints": ["customers", "agents", "transactions"],
         "errorRate": 0.7
       },
       "expectedBehavior": {
-        "errorCodes": [
-          "E7001",
-          "E7002"
-        ],
+        "errorCodes": ["E7001", "E7002"],
         "recoveryTime": 25,
-        "alertsTriggered": [
-          "fire22-integration-failures"
-        ],
+        "alertsTriggered": ["fire22-integration-failures"],
         "gracefulDegradation": true
       }
     },
@@ -239,25 +155,16 @@
       "severity": "medium",
       "duration": 15000,
       "enabled": true,
-      "targets": [
-        "error-registry",
-        "documentation-links"
-      ],
+      "targets": ["error-registry", "documentation-links"],
       "parameters": {
-        "brokenLinks": [
-          "50%"
-        ],
+        "brokenLinks": ["50%"],
         "registryCorruption": false,
         "validationFailure": true
       },
       "expectedBehavior": {
-        "errorCodes": [
-          "E5001"
-        ],
+        "errorCodes": ["E5001"],
         "recoveryTime": 10,
-        "alertsTriggered": [
-          "documentation-failure"
-        ],
+        "alertsTriggered": ["documentation-failure"],
         "gracefulDegradation": true
       }
     }

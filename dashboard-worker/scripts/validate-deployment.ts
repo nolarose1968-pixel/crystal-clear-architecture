@@ -5,7 +5,7 @@
  * Validates GitHub Pages, Cloudflare Pages, and Wiki deployments
  */
 
-import { $ } from "bun";
+import { $ } from 'bun';
 
 interface ValidationResult {
   target: string;
@@ -24,7 +24,7 @@ class DeploymentValidator {
 
   async validate(target?: string): Promise<void> {
     console.log('🔍 Deployment Validation');
-    console.log('========================');
+    console.log('!==!==!==!====');
 
     const targets = target ? [target] : ['github-pages', 'cloudflare-pages', 'wiki-mirror'];
 
@@ -51,7 +51,7 @@ class DeploymentValidator {
       target,
       status: 'success',
       checks: [],
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     switch (target) {
@@ -127,7 +127,7 @@ class DeploymentValidator {
     result.checks.push({
       name: 'Wiki Directory',
       passed: wikiExists,
-      message: wikiExists ? 'Wiki directory exists' : 'Wiki directory not found'
+      message: wikiExists ? 'Wiki directory exists' : 'Wiki directory not found',
     });
 
     // Check if wiki pages are generated
@@ -135,7 +135,7 @@ class DeploymentValidator {
     result.checks.push({
       name: 'Wiki Build Output',
       passed: distWikiExists,
-      message: distWikiExists ? 'Wiki pages generated' : 'Wiki pages not found'
+      message: distWikiExists ? 'Wiki pages generated' : 'Wiki pages not found',
     });
 
     // Check search index
@@ -143,7 +143,7 @@ class DeploymentValidator {
     result.checks.push({
       name: 'Search Index',
       passed: searchIndexExists,
-      message: searchIndexExists ? 'Search index generated' : 'Search index not found'
+      message: searchIndexExists ? 'Search index generated' : 'Search index not found',
     });
 
     // Validate wiki content
@@ -152,34 +152,40 @@ class DeploymentValidator {
       result.checks.push({
         name: 'Wiki Pages Count',
         passed: fileCount > 0,
-        message: `Found ${fileCount} wiki pages`
+        message: `Found ${fileCount} wiki pages`,
       });
     }
   }
 
-  private async checkUrl(result: ValidationResult, name: string, url: string, allowRedirect: boolean = false): Promise<void> {
+  private async checkUrl(
+    result: ValidationResult,
+    name: string,
+    url: string,
+    allowRedirect: boolean = false
+  ): Promise<void> {
     const startTime = Bun.nanoseconds();
-    
+
     try {
       const response = await fetch(url, {
         method: 'HEAD',
-        redirect: allowRedirect ? 'follow' : 'manual'
+        redirect: allowRedirect ? 'follow' : 'manual',
       });
-      
+
       const duration = (Bun.nanoseconds() - startTime) / 1_000_000;
-      const passed = response.ok || (allowRedirect && response.status >= 300 && response.status < 400);
-      
+      const passed =
+        response.ok || (allowRedirect && response.status >= 300 && response.status < 400);
+
       result.checks.push({
         name,
         passed,
         message: `Status: ${response.status} (${duration.toFixed(2)}ms)`,
-        duration
+        duration,
       });
     } catch (error) {
       result.checks.push({
         name,
         passed: false,
-        message: `Failed: ${error}`
+        message: `Failed: ${error}`,
       });
     }
   }
@@ -189,9 +195,9 @@ class DeploymentValidator {
       const repo = 'brendadeeznuts1111/fire22-dashboard-worker';
       const response = await fetch(`https://api.github.com/repos/${repo}/pages`, {
         headers: {
-          'Accept': 'application/vnd.github.v3+json',
-          'User-Agent': 'Fire22-Validator'
-        }
+          Accept: 'application/vnd.github.v3+json',
+          'User-Agent': 'Fire22-Validator',
+        },
       });
 
       if (response.ok) {
@@ -199,26 +205,26 @@ class DeploymentValidator {
         result.checks.push({
           name: 'GitHub Pages Status',
           passed: data.status === 'built',
-          message: `Status: ${data.status}`
+          message: `Status: ${data.status}`,
         });
       } else if (response.status === 404) {
         result.checks.push({
           name: 'GitHub Pages Status',
           passed: false,
-          message: 'GitHub Pages not enabled'
+          message: 'GitHub Pages not enabled',
         });
       } else {
         result.checks.push({
           name: 'GitHub Pages Status',
           passed: false,
-          message: `API returned ${response.status}`
+          message: `API returned ${response.status}`,
         });
       }
     } catch (error) {
       result.checks.push({
         name: 'GitHub Pages Status',
         passed: false,
-        message: `Failed to check: ${error}`
+        message: `Failed to check: ${error}`,
       });
     }
   }
@@ -227,17 +233,17 @@ class DeploymentValidator {
     try {
       const { stdout } = await $`nslookup ${domain}`.quiet();
       const hasAddress = stdout.includes('Address:') || stdout.includes('answer:');
-      
+
       result.checks.push({
         name: 'DNS Resolution',
         passed: hasAddress,
-        message: hasAddress ? 'Domain resolves correctly' : 'Domain resolution failed'
+        message: hasAddress ? 'Domain resolves correctly' : 'Domain resolution failed',
       });
     } catch (error) {
       result.checks.push({
         name: 'DNS Resolution',
         passed: false,
-        message: `Failed to resolve: ${error}`
+        message: `Failed to resolve: ${error}`,
       });
     }
   }
@@ -269,9 +275,9 @@ class DeploymentValidator {
       const icon = result.status === 'success' ? '✅' : result.status === 'warning' ? '⚠️' : '❌';
       const passed = result.checks.filter(c => c.passed).length;
       const total = result.checks.length;
-      
+
       console.log(`\n${icon} ${result.target}: ${passed}/${total} checks passed`);
-      
+
       // Show failed checks
       const failed = result.checks.filter(c => !c.passed);
       if (failed.length > 0) {
@@ -280,7 +286,7 @@ class DeploymentValidator {
           console.log(`    ❌ ${check.name}: ${check.message}`);
         }
       }
-      
+
       // Show slow checks
       const slow = result.checks.filter(c => c.duration && c.duration > 1000);
       if (slow.length > 0) {
@@ -308,11 +314,11 @@ class DeploymentValidator {
 
   private async saveResults(): Promise<void> {
     const reportPath = 'reports/deployment-validation.json';
-    
+
     try {
       // Ensure reports directory exists
       await $`mkdir -p reports`.quiet();
-      
+
       // Save validation results
       await Bun.write(reportPath, JSON.stringify(this.results, null, 2));
       console.log(`\n📁 Validation report saved to: ${reportPath}`);

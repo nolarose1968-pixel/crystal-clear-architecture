@@ -5,7 +5,12 @@
  * Demonstrates the enhanced timestamp utilities with the user's timestamp
  */
 
-import { TimestampUtils, parseTimestamp, validateTimestamp, formatTimestamp } from '../src/utils/timestamp-utils';
+import {
+  TimestampUtils,
+  parseTimestamp,
+  validateTimestamp,
+  formatTimestamp,
+} from '../src/utils/timestamp-utils';
 
 console.log('🕐 Fire22 Timestamp Utility Demo\n');
 
@@ -25,7 +30,9 @@ console.log(`   Unix timestamp: ${parsed.unix}`);
 console.log(`   ISO format: ${parsed.iso}`);
 console.log(`   Human readable: ${parsed.humanReadable}`);
 console.log(`   Relative: ${parsed.relative}`);
-console.log(`   Components: ${parsed.components.year}-${parsed.components.month.toString().padStart(2, '0')}-${parsed.components.day.toString().padStart(2, '0')} ${parsed.components.hour.toString().padStart(2, '0')}:${parsed.components.minute.toString().padStart(2, '0')}:${parsed.components.second.toString().padStart(2, '0')}.${parsed.components.millisecond.toString().padStart(3, '0')}\n`);
+console.log(
+  `   Components: ${parsed.components.year}-${parsed.components.month.toString().padStart(2, '0')}-${parsed.components.day.toString().padStart(2, '0')} ${parsed.components.hour.toString().padStart(2, '0')}:${parsed.components.minute.toString().padStart(2, '0')}:${parsed.components.second.toString().padStart(2, '0')}.${parsed.components.millisecond.toString().padStart(3, '0')}\n`
+);
 
 // 2. Validate the timestamp
 console.log('2️⃣ Validating timestamp...');
@@ -84,11 +91,11 @@ console.log(`   Business hours between now and timestamp: ${businessHours} hours
 // 8. Test with other timestamp formats
 console.log('8️⃣ Testing other timestamp formats...');
 const testTimestamps = [
-  '2025-08-25T20:05:00.000Z',  // ISO
-  '2025-08-25',                 // Date only
-  '20:05:00.000',               // Time only
-  '1754004300',                  // Unix
-  'Mon, 25 Aug 2025 20:05:00 +0000'  // RFC2822
+  '2025-08-25T20:05:00.000Z', // ISO
+  '2025-08-25', // Date only
+  '20:05:00.000', // Time only
+  '1754004300', // Unix
+  'Mon, 25 Aug 2025 20:05:00 +0000', // RFC2822
 ];
 
 testTimestamps.forEach((ts, index) => {
@@ -98,14 +105,28 @@ testTimestamps.forEach((ts, index) => {
 
 console.log('\n🎉 Demo completed! The timestamp utility successfully parsed your timestamp:');
 console.log(`   "${userTimestamp}" → ${parsed.relative}`);
-console.log(`   This timestamp is ${parsed.isFuture ? 'in the future' : 'in the past'} and represents ${parsed.components.day} ${getMonthName(parsed.components.month)} ${parsed.components.year} at ${parsed.components.hour.toString().padStart(2, '0')}:${parsed.components.minute.toString().padStart(2, '0')} ${parsed.components.hour >= 12 ? 'PM' : 'AM'}`);
-console.log(`   It's ${timeDiff.days} days, ${timeDiff.hours} hours, and ${timeDiff.minutes} minutes from now.`);
+console.log(
+  `   This timestamp is ${parsed.isFuture ? 'in the future' : 'in the past'} and represents ${parsed.components.day} ${getMonthName(parsed.components.month)} ${parsed.components.year} at ${parsed.components.hour.toString().padStart(2, '0')}:${parsed.components.minute.toString().padStart(2, '0')} ${parsed.components.hour >= 12 ? 'PM' : 'AM'}`
+);
+console.log(
+  `   It's ${timeDiff.days} days, ${timeDiff.hours} hours, and ${timeDiff.minutes} minutes from now.`
+);
 
 // Helper function for month names
 function getMonthName(month: number): string {
   const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
   return months[month - 1];
 }

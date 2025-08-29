@@ -1,6 +1,6 @@
 /**
  * Fire22 Registry Integration
- * 
+ *
  * Secure package registry with vulnerability scanning
  */
 
@@ -23,7 +23,7 @@ export interface InstallResult {
 
 export class Fire22Registry {
   private config: RegistryConfig;
-  
+
   constructor(config: Partial<RegistryConfig> = {}) {
     this.config = {
       url: 'https://fire22.workers.dev/registry/',
@@ -31,9 +31,9 @@ export class Fire22Registry {
       security: {
         scanning: true,
         audit: true,
-        strict: false
+        strict: false,
       },
-      ...config
+      ...config,
     };
   }
 
@@ -44,30 +44,29 @@ export class Fire22Registry {
     try {
       // Read package.json
       const packageJson = await this.readPackageJson();
-      
+
       // Perform security scan before publishing
       if (this.config.security.scanning) {
         const securityReport = await this.scanPackage();
-        
+
         if (this.config.security.strict && securityReport.score < 80) {
           throw new Error(`Package security score too low: ${securityReport.score}/100`);
         }
       }
-      
+
       // Prepare package for publishing
       const packageData = await this.preparePackage(packageJson);
-      
+
       // Upload to registry
       const result = await this.uploadPackage(packageData);
-      
+
       return {
         name: packageJson.name,
         version: packageJson.version,
         registry: this.config.url,
         securityScore: result.securityScore,
-        warnings: result.warnings
+        warnings: result.warnings,
       };
-      
     } catch (error) {
       throw new Error(`Publishing failed: ${error.message}`);
     }
@@ -80,24 +79,23 @@ export class Fire22Registry {
     try {
       // Fetch package metadata from registry
       const metadata = await this.fetchPackageMetadata(packageName);
-      
+
       // Validate security if enabled
       const securityWarnings: string[] = [];
       if (this.config.security.audit) {
         const warnings = await this.validatePackageSecurity(metadata);
         securityWarnings.push(...warnings);
       }
-      
+
       // Download and install package
       await this.downloadPackage(packageName, metadata.version);
-      
+
       return {
         name: packageName,
         version: metadata.version,
         securityWarnings,
-        dependencies: metadata.dependencies || []
+        dependencies: metadata.dependencies || [],
       };
-      
     } catch (error) {
       throw new Error(`Installation failed: ${error.message}`);
     }
@@ -106,21 +104,24 @@ export class Fire22Registry {
   /**
    * Search packages in Fire22 registry
    */
-  async search(query: string, options: { limit?: number; includePrerelease?: boolean } = {}): Promise<any[]> {
+  async search(
+    query: string,
+    options: { limit?: number; includePrerelease?: boolean } = {}
+  ): Promise<any[]> {
     const searchUrl = `${this.config.url}search?q=${encodeURIComponent(query)}`;
     const params = new URLSearchParams();
-    
+
     if (options.limit) params.set('limit', options.limit.toString());
     if (options.includePrerelease) params.set('prerelease', 'true');
-    
+
     const response = await fetch(`${searchUrl}&${params.toString()}`, {
-      headers: this.getAuthHeaders()
+      headers: this.getAuthHeaders(),
     });
-    
+
     if (!response.ok) {
       throw new Error(`Search failed: ${response.statusText}`);
     }
-    
+
     return response.json();
   }
 
@@ -129,18 +130,18 @@ export class Fire22Registry {
    */
   async info(packageName: string): Promise<any> {
     const infoUrl = `${this.config.url}${packageName}`;
-    
+
     const response = await fetch(infoUrl, {
-      headers: this.getAuthHeaders()
+      headers: this.getAuthHeaders(),
     });
-    
+
     if (!response.ok) {
       if (response.status === 404) {
         throw new Error(`Package ${packageName} not found`);
       }
       throw new Error(`Failed to fetch package info: ${response.statusText}`);
     }
-    
+
     return response.json();
   }
 
@@ -163,18 +164,20 @@ export class Fire22Registry {
   private async scanPackage(): Promise<{ score: number; vulnerabilities: any[] }> {
     // This would integrate with the SecurityScanner
     // For now, simulate a security scan
-    
+
     const packageJson = await this.readPackageJson();
     const hasVulnerabilities = Math.random() > 0.8; // 20% chance of vulnerabilities
-    
+
     return {
       score: hasVulnerabilities ? 65 : 95,
-      vulnerabilities: hasVulnerabilities ? [
-        {
-          severity: 'medium',
-          description: 'Potential security issue detected'
-        }
-      ] : []
+      vulnerabilities: hasVulnerabilities
+        ? [
+            {
+              severity: 'medium',
+              description: 'Potential security issue detected',
+            },
+          ]
+        : [],
     };
   }
 
@@ -184,14 +187,14 @@ export class Fire22Registry {
   private async preparePackage(packageJson: any): Promise<any> {
     // Create package tarball
     const files = await this.collectPackageFiles();
-    
+
     // Add security metadata
     const securityMetadata = {
       scannedAt: new Date().toISOString(),
       scanner: 'fire22-security-registry@1.0.0',
-      policies: this.config.security
+      policies: this.config.security,
     };
-    
+
     return {
       name: packageJson.name,
       version: packageJson.version,
@@ -200,7 +203,7 @@ export class Fire22Registry {
       dependencies: packageJson.dependencies,
       devDependencies: packageJson.devDependencies,
       files,
-      security: securityMetadata
+      security: securityMetadata,
     };
   }
 
@@ -216,27 +219,29 @@ export class Fire22Registry {
   /**
    * Upload package to registry
    */
-  private async uploadPackage(packageData: any): Promise<{ securityScore: number; warnings: string[] }> {
+  private async uploadPackage(
+    packageData: any
+  ): Promise<{ securityScore: number; warnings: string[] }> {
     const uploadUrl = `${this.config.url}${packageData.name}`;
-    
+
     const response = await fetch(uploadUrl, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        ...this.getAuthHeaders()
+        ...this.getAuthHeaders(),
       },
-      body: JSON.stringify(packageData)
+      body: JSON.stringify(packageData),
     });
-    
+
     if (!response.ok) {
       throw new Error(`Upload failed: ${response.statusText}`);
     }
-    
+
     const result = await response.json();
-    
+
     return {
       securityScore: result.security?.score || 100,
-      warnings: result.warnings || []
+      warnings: result.warnings || [],
     };
   }
 
@@ -245,18 +250,18 @@ export class Fire22Registry {
    */
   private async fetchPackageMetadata(packageName: string): Promise<any> {
     const metadataUrl = `${this.config.url}${packageName}`;
-    
+
     const response = await fetch(metadataUrl, {
-      headers: this.getAuthHeaders()
+      headers: this.getAuthHeaders(),
     });
-    
+
     if (!response.ok) {
       if (response.status === 404) {
         throw new Error(`Package ${packageName} not found in registry`);
       }
       throw new Error(`Failed to fetch metadata: ${response.statusText}`);
     }
-    
+
     return response.json();
   }
 
@@ -265,7 +270,7 @@ export class Fire22Registry {
    */
   private async validatePackageSecurity(metadata: any): Promise<string[]> {
     const warnings: string[] = [];
-    
+
     // Check security metadata
     if (!metadata.security) {
       warnings.push('Package has not been security scanned');
@@ -275,20 +280,20 @@ export class Fire22Registry {
         warnings.push(`Low security score: ${securityScore}/100`);
       }
     }
-    
+
     // Check for known vulnerabilities
     if (metadata.vulnerabilities && metadata.vulnerabilities.length > 0) {
       warnings.push(`${metadata.vulnerabilities.length} known vulnerabilities`);
     }
-    
+
     // Check package age
     const publishedDate = new Date(metadata.publishedAt || Date.now());
     const daysSincePublished = (Date.now() - publishedDate.getTime()) / (1000 * 60 * 60 * 24);
-    
+
     if (daysSincePublished > 365) {
       warnings.push('Package has not been updated in over a year');
     }
-    
+
     return warnings;
   }
 
@@ -297,20 +302,20 @@ export class Fire22Registry {
    */
   private async downloadPackage(packageName: string, version: string): Promise<void> {
     const downloadUrl = `${this.config.url}${packageName}/-/${packageName}-${version}.tgz`;
-    
+
     const response = await fetch(downloadUrl, {
-      headers: this.getAuthHeaders()
+      headers: this.getAuthHeaders(),
     });
-    
+
     if (!response.ok) {
       throw new Error(`Download failed: ${response.statusText}`);
     }
-    
+
     // Save package to local cache/node_modules
     const arrayBuffer = await response.arrayBuffer();
     const file = Bun.file(`./node_modules/${packageName}.tgz`);
     await Bun.write(file, arrayBuffer);
-    
+
     // Extract package (would use tar library in real implementation)
     console.log(`Package ${packageName}@${version} downloaded and extracted`);
   }
@@ -320,11 +325,11 @@ export class Fire22Registry {
    */
   private getAuthHeaders(): Record<string, string> {
     const headers: Record<string, string> = {};
-    
+
     if (this.config.token) {
       headers['Authorization'] = `Bearer ${this.config.token}`;
     }
-    
+
     return headers;
   }
 }

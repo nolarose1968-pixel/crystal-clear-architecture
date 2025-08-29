@@ -5,7 +5,12 @@
 
 import { BaseAuditableRepository } from './base-repository';
 import { CustomerEntity } from '../entities/customer';
-import type { DatabaseConnection, FilterParams, PaginationResult, SearchResult } from '../types/database/base';
+import type {
+  DatabaseConnection,
+  FilterParams,
+  PaginationResult,
+  SearchResult,
+} from '../types/database/base';
 import { DATABASE } from '../constants';
 
 export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> {
@@ -21,9 +26,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
    * Find customers by agent
    */
   async findByAgent(agentId: string, includeInactive: boolean = false): Promise<CustomerEntity[]> {
-    const filters: FilterParams[] = [
-      { field: 'agent_id', operator: 'eq', value: agentId }
-    ];
+    const filters: FilterParams[] = [{ field: 'agent_id', operator: 'eq', value: agentId }];
 
     if (!includeInactive) {
       filters.push({ field: 'status', operator: 'eq', value: 'active' });
@@ -39,7 +42,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
   async findByTier(tier: string): Promise<CustomerEntity[]> {
     const filters: FilterParams[] = [
       { field: 'tier', operator: 'eq', value: tier },
-      { field: 'status', operator: 'eq', value: 'active' }
+      { field: 'status', operator: 'eq', value: 'active' },
     ];
 
     const result = await this.find({ filters });
@@ -52,7 +55,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
   async findVipCustomers(): Promise<CustomerEntity[]> {
     const filters: FilterParams[] = [
       { field: 'vip_status', operator: 'eq', value: true },
-      { field: 'status', operator: 'eq', value: 'active' }
+      { field: 'status', operator: 'eq', value: 'active' },
     ];
 
     const result = await this.find({ filters });
@@ -65,7 +68,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
   async findByBalanceRange(minBalance: number, maxBalance: number): Promise<CustomerEntity[]> {
     const filters: FilterParams[] = [
       { field: 'balance', operator: 'between', value: [minBalance, maxBalance] },
-      { field: 'status', operator: 'eq', value: 'active' }
+      { field: 'status', operator: 'eq', value: 'active' },
     ];
 
     const result = await this.find({ filters });
@@ -78,7 +81,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
   async findHighRiskCustomers(riskThreshold: number = 75): Promise<CustomerEntity[]> {
     const filters: FilterParams[] = [
       { field: 'risk_score', operator: 'gte', value: riskThreshold },
-      { field: 'status', operator: 'eq', value: 'active' }
+      { field: 'status', operator: 'eq', value: 'active' },
     ];
 
     const result = await this.find({ filters });
@@ -89,9 +92,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
    * Find customers by KYC status
    */
   async findByKycStatus(status: 'pending' | 'approved' | 'rejected'): Promise<CustomerEntity[]> {
-    const filters: FilterParams[] = [
-      { field: 'kyc_status', operator: 'eq', value: status }
-    ];
+    const filters: FilterParams[] = [{ field: 'kyc_status', operator: 'eq', value: status }];
 
     const result = await this.find({ filters });
     return result.data;
@@ -101,11 +102,11 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
    * Find customers with recent activity
    */
   async findRecentlyActive(hoursBack: number = 24): Promise<CustomerEntity[]> {
-    const cutoffDate = new Date(Date.now() - (hoursBack * 60 * 60 * 1000)).toISOString();
-    
+    const cutoffDate = new Date(Date.now() - hoursBack * 60 * 60 * 1000).toISOString();
+
     const filters: FilterParams[] = [
       { field: 'last_activity', operator: 'gte', value: cutoffDate },
-      { field: 'status', operator: 'eq', value: 'active' }
+      { field: 'status', operator: 'eq', value: 'active' },
     ];
 
     const result = await this.find({ filters });
@@ -115,14 +116,15 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
   /**
    * Search customers by name, username, or email
    */
-  async searchCustomers(query: string, pagination?: { page: number; limit: number }): Promise<SearchResult<CustomerEntity>> {
+  async searchCustomers(
+    query: string,
+    pagination?: { page: number; limit: number }
+  ): Promise<SearchResult<CustomerEntity>> {
     return await this.search({
       query,
       fields: ['username', 'first_name', 'last_name', 'email', 'login'],
-      filters: [
-        { field: 'status', operator: 'eq', value: 'active' }
-      ],
-      pagination
+      filters: [{ field: 'status', operator: 'eq', value: 'active' }],
+      pagination,
     });
   }
 
@@ -130,9 +132,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
    * Find customers by username (exact match)
    */
   async findByUsername(username: string): Promise<CustomerEntity | null> {
-    const filters: FilterParams[] = [
-      { field: 'username', operator: 'eq', value: username }
-    ];
+    const filters: FilterParams[] = [{ field: 'username', operator: 'eq', value: username }];
 
     const result = await this.find({ filters });
     return result.data[0] || null;
@@ -142,9 +142,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
    * Find customers by login (exact match)
    */
   async findByLogin(login: string): Promise<CustomerEntity | null> {
-    const filters: FilterParams[] = [
-      { field: 'login', operator: 'eq', value: login }
-    ];
+    const filters: FilterParams[] = [{ field: 'login', operator: 'eq', value: login }];
 
     const result = await this.find({ filters });
     return result.data[0] || null;
@@ -154,9 +152,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
    * Find customers by email (exact match)
    */
   async findByEmail(email: string): Promise<CustomerEntity | null> {
-    const filters: FilterParams[] = [
-      { field: 'email', operator: 'eq', value: email }
-    ];
+    const filters: FilterParams[] = [{ field: 'email', operator: 'eq', value: email }];
 
     const result = await this.find({ filters });
     return result.data[0] || null;
@@ -175,25 +171,25 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
   }> {
     // This would typically be implemented with aggregate queries
     // For now, returning basic counts
-    
+
     const totalCustomers = await this.count();
-    
+
     const activeCustomers = await this.count([
-      { field: 'status', operator: 'eq', value: 'active' }
+      { field: 'status', operator: 'eq', value: 'active' },
     ]);
 
     const vipCustomers = await this.count([
       { field: 'vip_status', operator: 'eq', value: true },
-      { field: 'status', operator: 'eq', value: 'active' }
+      { field: 'status', operator: 'eq', value: 'active' },
     ]);
 
     const highRiskCustomers = await this.count([
       { field: 'risk_score', operator: 'gte', value: 75 },
-      { field: 'status', operator: 'eq', value: 'active' }
+      { field: 'status', operator: 'eq', value: 'active' },
     ]);
 
     const pendingKyc = await this.count([
-      { field: 'kyc_status', operator: 'eq', value: 'pending' }
+      { field: 'kyc_status', operator: 'eq', value: 'pending' },
     ]);
 
     // This would be calculated with SUM query in real implementation
@@ -205,7 +201,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
       vipCustomers,
       highRiskCustomers,
       pendingKyc,
-      totalBalance
+      totalBalance,
     };
   }
 
@@ -216,7 +212,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
     // This assumes a birthday field exists in the customer table
     const filters: FilterParams[] = [
       { field: 'birthday', operator: 'between', value: [startDate, endDate] },
-      { field: 'status', operator: 'eq', value: 'active' }
+      { field: 'status', operator: 'eq', value: 'active' },
     ];
 
     const result = await this.find({ filters });
@@ -229,7 +225,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
   async findByMasterAgent(masterAgentId: string): Promise<CustomerEntity[]> {
     const filters: FilterParams[] = [
       { field: 'master_agent', operator: 'eq', value: masterAgentId },
-      { field: 'status', operator: 'eq', value: 'active' }
+      { field: 'status', operator: 'eq', value: 'active' },
     ];
 
     const result = await this.find({ filters });
@@ -240,9 +236,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
    * Find suspended customers
    */
   async findSuspendedCustomers(): Promise<CustomerEntity[]> {
-    const filters: FilterParams[] = [
-      { field: 'status', operator: 'eq', value: 'suspended' }
-    ];
+    const filters: FilterParams[] = [{ field: 'status', operator: 'eq', value: 'suspended' }];
 
     const result = await this.find({ filters });
     return result.data;
@@ -256,7 +250,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
       { field: 'balance', operator: 'eq', value: 0 },
       { field: 'casino_balance', operator: 'eq', value: 0 },
       { field: 'sports_balance', operator: 'eq', value: 0 },
-      { field: 'status', operator: 'eq', value: 'active' }
+      { field: 'status', operator: 'eq', value: 'active' },
     ];
 
     const result = await this.find({ filters });
@@ -269,7 +263,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
   async findWithNegativeBalance(): Promise<CustomerEntity[]> {
     const filters: FilterParams[] = [
       { field: 'balance', operator: 'lt', value: 0 },
-      { field: 'status', operator: 'eq', value: 'active' }
+      { field: 'status', operator: 'eq', value: 'active' },
     ];
 
     const result = await this.find({ filters });
@@ -282,7 +276,7 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
   async findByCreditLimitRange(minLimit: number, maxLimit: number): Promise<CustomerEntity[]> {
     const filters: FilterParams[] = [
       { field: 'credit_limit', operator: 'between', value: [minLimit, maxLimit] },
-      { field: 'status', operator: 'eq', value: 'active' }
+      { field: 'status', operator: 'eq', value: 'active' },
     ];
 
     const result = await this.find({ filters });
@@ -293,11 +287,11 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
    * Find customers who haven't logged in for specified days
    */
   async findInactive(daysSinceLogin: number): Promise<CustomerEntity[]> {
-    const cutoffDate = new Date(Date.now() - (daysSinceLogin * 24 * 60 * 60 * 1000)).toISOString();
-    
+    const cutoffDate = new Date(Date.now() - daysSinceLogin * 24 * 60 * 60 * 1000).toISOString();
+
     const filters: FilterParams[] = [
       { field: 'last_login', operator: 'lt', value: cutoffDate },
-      { field: 'status', operator: 'eq', value: 'active' }
+      { field: 'status', operator: 'eq', value: 'active' },
     ];
 
     const result = await this.find({ filters });
@@ -310,16 +304,16 @@ export class CustomerRepository extends BaseAuditableRepository<CustomerEntity> 
   async updateCustomerTiers(): Promise<number> {
     // This would typically be done with a bulk update query
     // For now, we'll simulate the logic
-    const customers = await this.find({ 
-      filters: [{ field: 'status', operator: 'eq', value: 'active' }] 
+    const customers = await this.find({
+      filters: [{ field: 'status', operator: 'eq', value: 'active' }],
     });
 
     let updatedCount = 0;
-    
+
     for (const customer of customers.data) {
       const oldTier = customer.tier;
       customer.updateTier();
-      
+
       if (customer.tier !== oldTier) {
         await this.update(customer);
         updatedCount++;

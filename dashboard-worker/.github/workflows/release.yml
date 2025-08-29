@@ -4,7 +4,7 @@ on:
   push:
     tags:
       - 'v*.*.*'
-      - '*-v*.*.*'  # workspace-specific tags like api-client-v1.0.0
+      - '*-v*.*.*' # workspace-specific tags like api-client-v1.0.0
   workflow_dispatch:
     inputs:
       version:
@@ -27,7 +27,7 @@ on:
 
 env:
   BUN_VERSION: '1.2.21'
-  
+
 permissions:
   contents: write
   packages: write
@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: 🏷️ Extract Version Info
         id: version
         run: |
@@ -59,7 +59,7 @@ jobs:
           fi
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "Releasing version: ${VERSION}"
-      
+
       - name: 🏢 Determine Workspace Scope
         id: workspace
         run: |
@@ -77,13 +77,13 @@ jobs:
             echo "workspace=${{ github.event.inputs.workspace }}" >> $GITHUB_OUTPUT
             echo "is-workspace-release=${{ github.event.inputs.workspace != 'all' }}" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: 📝 Generate Release Info
         id: release-info
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           WORKSPACE="${{ steps.workspace.outputs.workspace }}"
-          
+
           if [[ "$WORKSPACE" == "all" ]]; then
             RELEASE_NAME="🔥 Fire22 Dashboard Worker ${VERSION}"
             RELEASE_BODY="## 🚀 Fire22 Dashboard Worker Release ${VERSION}
@@ -93,7 +93,7 @@ jobs:
           - Enhanced build system with SIMD acceleration
           - Cross-platform executables (Windows, Linux, macOS, Docker)
           - Advanced workspace orchestration
-          
+
           ### 🏢 Included Workspaces
           - 🔌 API Client - Fire22 integration
           - 📊 Core Dashboard - Real-time monitoring
@@ -101,13 +101,13 @@ jobs:
           - 📱 Telegram Integration - Bot system
           - 🏗️ Build System - Advanced compilation
           - 🔄 Pattern System - Processing engine
-          
+
           ### 📦 Downloads
           - [Windows Executable](./fire22-dashboard-windows.exe)
           - [Linux Binary](./fire22-dashboard-linux)
           - [macOS Binary](./fire22-dashboard-macos)
           - [Docker Image](./fire22-dashboard-docker)
-          
+
           ### 🔧 Installation
           \`\`\`bash
           # Download and run
@@ -118,16 +118,16 @@ jobs:
           else
             RELEASE_NAME="🏢 @fire22-${WORKSPACE} ${VERSION}"
             RELEASE_BODY="## 🚀 Workspace Release: @fire22-${WORKSPACE} ${VERSION}
-          
+
           ### 📦 Workspace: @fire22-${WORKSPACE}
           Focused release for the ${WORKSPACE} workspace component.
-          
+
           ### 🔧 Installation
           \`\`\`bash
           bun add @fire22/${WORKSPACE}@${VERSION}
           \`\`\`"
           fi
-          
+
           echo "release-name=${RELEASE_NAME}" >> $GITHUB_OUTPUT
           echo "release-body<<EOF" >> $GITHUB_OUTPUT
           echo "${RELEASE_BODY}" >> $GITHUB_OUTPUT
@@ -144,35 +144,35 @@ jobs:
         include:
           - os: ubuntu-latest
             platform: linux
-            ext: ""
+            ext: ''
           - os: windows-latest
             platform: windows
-            ext: ".exe"
+            ext: '.exe'
           - os: macos-latest
             platform: macos
-            ext: ""
+            ext: ''
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: ${{ env.BUN_VERSION }}
-      
+
       - name: 📦 Install Dependencies
         run: bun install --frozen-lockfile
-      
+
       - name: 🏗️ Build Enhanced Executables
         run: bun run scripts/enhanced-executable-builder.ts
-      
+
       - name: 📦 Package Release Artifacts
         shell: bash
         run: |
           VERSION="${{ needs.prepare-release.outputs.version }}"
           PLATFORM="${{ matrix.platform }}"
-          
+
           # Create release package
           mkdir -p release-artifacts
-          
+
           if [ -d "dist/executables" ]; then
             # Copy executables with version names
             if [ "$PLATFORM" == "windows" ]; then
@@ -196,14 +196,14 @@ jobs:
               fi
             fi
           fi
-          
+
           # Create compressed archives
           if [ "$PLATFORM" == "windows" ]; then
             cd release-artifacts && zip -r "../fire22-dashboard-${VERSION}-windows.zip" . && cd ..
           else
             cd release-artifacts && tar -czf "../fire22-dashboard-${VERSION}-${PLATFORM}.tar.gz" . && cd ..
           fi
-      
+
       - name: 📤 Upload Platform Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -222,23 +222,23 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: 📥 Download All Artifacts
         uses: actions/download-artifact@v4
         with:
           path: ./artifacts
-      
+
       - name: 📋 Prepare Release Assets
         run: |
           mkdir -p release-assets
-          
+
           # Collect all build artifacts
           find ./artifacts -type f \( -name "*.exe" -o -name "*.tar.gz" -o -name "*.zip" \) -exec cp {} release-assets/ \;
-          
+
           # List what we're releasing
           echo "📦 Release Assets:"
           ls -la release-assets/
-      
+
       - name: 🏷️ Create Release
         uses: actions/create-release@v1
         id: create_release
@@ -250,7 +250,7 @@ jobs:
           body: ${{ needs.prepare-release.outputs.release-body }}
           draft: false
           prerelease: ${{ contains(needs.prepare-release.outputs.version, 'beta') || contains(needs.prepare-release.outputs.version, 'alpha') }}
-      
+
       - name: 📤 Upload Release Assets
         uses: actions/upload-release-asset@v1
         env:
@@ -269,14 +269,14 @@ jobs:
     if: needs.prepare-release.outputs.is-workspace-release == 'true' || needs.prepare-release.outputs.workspace == 'all'
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: ${{ env.BUN_VERSION }}
-      
+
       - name: 📦 Install Dependencies
         run: bun install --frozen-lockfile
-      
+
       - name: 🚀 Multi-Registry Publisher
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -285,7 +285,7 @@ jobs:
           # Configure registries
           echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
           echo "@fire22:registry=https://registry.npmjs.org/" >> ~/.npmrc
-          
+
           # Run multi-registry publisher
           bun run scripts/multi-registry-publisher.ts --version="${{ needs.prepare-release.outputs.version }}" --workspace="${{ needs.prepare-release.outputs.workspace }}"
 
@@ -297,21 +297,21 @@ jobs:
     if: always() && needs.create-release.result == 'success'
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: 📊 Update Release Metrics
         run: |
           VERSION="${{ needs.prepare-release.outputs.version }}"
           echo "🎉 Release ${VERSION} completed successfully!"
           echo "📦 Artifacts published to GitHub Releases"
           echo "🚀 Packages published to registries"
-          
+
           # Update version in package.json metadata if needed
           if [ "${{ needs.prepare-release.outputs.workspace }}" == "all" ]; then
             echo "🔄 Full system release completed"
           else
             echo "🏢 Workspace-specific release completed"
           fi
-      
+
       - name: 📢 Release Notification
         run: |
           echo "## 🎉 Release Summary" >> $GITHUB_STEP_SUMMARY

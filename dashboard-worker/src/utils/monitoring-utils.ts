@@ -1,4 +1,10 @@
-import { type PerformanceMetrics, type SecurityEvent, type HealthStatus, type MonitoringConfig, type SecurityConfig } from '../types/enhanced-types';
+import {
+  type PerformanceMetrics,
+  type SecurityEvent,
+  type HealthStatus,
+  type MonitoringConfig,
+  type SecurityConfig,
+} from '../types/enhanced-types';
 
 /**
  * Utility functions for monitoring and observability
@@ -9,7 +15,10 @@ export class MonitoringUtils {
    * @param config Configuration options.
    * @returns MonitoringConfig object.
    */
-  static createMonitoringConfig(config: { enabled: boolean; logLevel: "debug" | "info" | "warn" | "error" | "verbose" }): MonitoringConfig {
+  static createMonitoringConfig(config: {
+    enabled: boolean;
+    logLevel: 'debug' | 'info' | 'warn' | 'error' | 'verbose';
+  }): MonitoringConfig {
     return {
       enabled: config.enabled,
       logLevel: config.logLevel,
@@ -25,7 +34,10 @@ export class MonitoringUtils {
    * @param config Configuration options.
    * @returns SecurityConfig object.
    */
-  static createSecurityConfig(config: { enableSecurityMonitoring: boolean; suspiciousActivityThreshold: number }): SecurityConfig {
+  static createSecurityConfig(config: {
+    enableSecurityMonitoring: boolean;
+    suspiciousActivityThreshold: number;
+  }): SecurityConfig {
     return {
       enableSecurityMonitoring: config.enableSecurityMonitoring,
       suspiciousActivityThreshold: config.suspiciousActivityThreshold,
@@ -53,17 +65,17 @@ export class MonitoringUtils {
     if (ms < 1000) {
       return `${ms}ms`;
     }
-    
+
     const seconds = ms / 1000;
     if (seconds < 60) {
       return `${seconds.toFixed(1)}s`;
     }
-    
+
     const minutes = seconds / 60;
     if (minutes < 60) {
       return `${minutes.toFixed(1)}m`;
     }
-    
+
     const hours = minutes / 60;
     return `${hours.toFixed(1)}h`;
   }
@@ -76,9 +88,9 @@ export class MonitoringUtils {
   static formatBytes(bytes: number): string {
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
     if (bytes === 0) return '0 B';
-    
+
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return `${Math.round(bytes / Math.pow(1024, i) * 100) / 100} ${sizes[i]}`;
+    return `${Math.round((bytes / Math.pow(1024, i)) * 100) / 100} ${sizes[i]}`;
   }
 
   /**
@@ -98,20 +110,17 @@ export class MonitoringUtils {
    */
   static validateSecurityEvent(event: SecurityEvent): boolean {
     const requiredFields = ['type', 'severity', 'details', 'timestamp'];
-    
+
     for (const field of requiredFields) {
       if (!(field in event)) {
         return false;
       }
     }
-    
+
     const validTypes = ['authentication', 'authorization', 'validation'];
     const validSeverities = ['low', 'medium', 'high'];
-    
-    return (
-      validTypes.includes(event.type) &&
-      validSeverities.includes(event.severity)
-    );
+
+    return validTypes.includes(event.type) && validSeverities.includes(event.severity);
   }
 
   /**
@@ -125,13 +134,13 @@ export class MonitoringUtils {
     sensitiveFields: string[] = ['password', 'token', 'secret', 'key', 'authorization']
   ): Record<string, any> {
     const sanitized = { ...data };
-    
+
     for (const field of sensitiveFields) {
       if (field in sanitized) {
         sanitized[field] = '[REDACTED]';
       }
     }
-    
+
     return sanitized;
   }
 
@@ -155,12 +164,12 @@ export class MonitoringUtils {
     const now = Date.now();
     const resetTime = now + (timeWindow - (now % timeWindow));
     const remaining = Math.max(0, limit - requestCount);
-    
+
     return {
       current: requestCount,
       remaining,
       reset: resetTime,
-      isLimited: requestCount >= limit
+      isLimited: requestCount >= limit,
     };
   }
 
@@ -175,7 +184,7 @@ export class MonitoringUtils {
     wait: number
   ): (...args: Parameters<T>) => void {
     let timeout: number | undefined;
-    
+
     return (...args: Parameters<T>) => {
       clearTimeout(timeout);
       timeout = setTimeout(() => func(...args), wait) as unknown as number;
@@ -193,12 +202,12 @@ export class MonitoringUtils {
     limit: number
   ): (...args: Parameters<T>) => void {
     let inThrottle: boolean;
-    
+
     return (...args: Parameters<T>) => {
       if (!inThrottle) {
         func(...args);
         inThrottle = true;
-        setTimeout(() => inThrottle = false, limit);
+        setTimeout(() => (inThrottle = false), limit);
       }
     };
   }
@@ -211,12 +220,12 @@ export class MonitoringUtils {
    */
   static calculateEMA(values: number[], alpha: number = 0.3): number {
     if (values.length === 0) return 0;
-    
+
     let ema = values[0];
     for (let i = 1; i < values.length; i++) {
       ema = alpha * values[i] + (1 - alpha) * ema;
     }
-    
+
     return ema;
   }
 
@@ -228,10 +237,10 @@ export class MonitoringUtils {
    */
   static calculatePercentile(values: number[], percentile: number): number {
     if (values.length === 0) return 0;
-    
+
     const sorted = [...values].sort((a, b) => a - b);
     const index = Math.ceil((percentile / 100) * sorted.length) - 1;
-    
+
     return sorted[Math.max(0, Math.min(index, sorted.length - 1))];
   }
 
@@ -241,7 +250,10 @@ export class MonitoringUtils {
    * @param buckets Number of buckets
    * @returns Histogram data
    */
-  static createHistogram(values: number[], buckets: number = 10): {
+  static createHistogram(
+    values: number[],
+    buckets: number = 10
+  ): {
     min: number;
     max: number;
     bucketSize: number;
@@ -254,37 +266,34 @@ export class MonitoringUtils {
         max: 0,
         bucketSize: 0,
         counts: Array(buckets).fill(0),
-        ranges: Array(buckets).fill('')
+        ranges: Array(buckets).fill(''),
       };
     }
-    
+
     const min = Math.min(...values);
     const max = Math.max(...values);
     const bucketSize = (max - min) / buckets;
-    
+
     const counts = Array(buckets).fill(0);
     const ranges: string[] = [];
-    
+
     for (let i = 0; i < buckets; i++) {
       const rangeStart = min + i * bucketSize;
       const rangeEnd = min + (i + 1) * bucketSize;
       ranges.push(`${rangeStart.toFixed(1)}-${rangeEnd.toFixed(1)}`);
     }
-    
+
     values.forEach(value => {
-      const bucketIndex = Math.min(
-        Math.floor((value - min) / bucketSize),
-        buckets - 1
-      );
+      const bucketIndex = Math.min(Math.floor((value - min) / bucketSize), buckets - 1);
       counts[bucketIndex]++;
     });
-    
+
     return {
       min,
       max,
       bucketSize,
       counts,
-      ranges
+      ranges,
     };
   }
 
@@ -295,15 +304,15 @@ export class MonitoringUtils {
    */
   static validateMonitoringConfig(config: MonitoringConfig): boolean {
     const requiredFields = ['enabled', 'logLevel', 'metricsInterval'];
-    
+
     for (const field of requiredFields) {
       if (!(field in config)) {
         return false;
       }
     }
-    
+
     const validLogLevels = ['debug', 'info', 'warn', 'error'];
-    
+
     return (
       typeof config.enabled === 'boolean' &&
       validLogLevels.includes(config.logLevel) &&
@@ -329,7 +338,7 @@ export class MonitoringUtils {
     return {
       timestamp: new Date().toISOString(),
       metrics,
-      tags
+      tags,
     };
   }
 
@@ -342,25 +351,25 @@ export class MonitoringUtils {
     const statusEmoji = {
       healthy: '✅',
       degraded: '⚠️',
-      unhealthy: '❌'
+      unhealthy: '❌',
     };
-    
+
     const emoji = statusEmoji[health.status];
     const timestamp = this.formatTimestamp(health.lastUpdated);
-    
+
     let message = `${emoji} System health: ${health.status.toUpperCase()} (${timestamp})\n\n`;
-    
+
     for (const [component, componentHealth] of Object.entries(health.components)) {
       const componentEmoji = statusEmoji[componentHealth.status];
       message += `  ${componentEmoji} ${component}: ${componentHealth.status.toUpperCase()}`;
-      
+
       if (componentHealth.message) {
         message += ` - ${componentHealth.message}`;
       }
-      
+
       message += '\n';
     }
-    
+
     return message;
   }
 
@@ -423,7 +432,7 @@ export class MonitoringUtils {
       responseTime,
       userId,
       correlationId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -436,7 +445,7 @@ export class MonitoringUtils {
     const cfConnectingIP = request.headers.get('CF-Connecting-IP');
     const xForwardedFor = request.headers.get('X-Forwarded-For');
     const xRealIP = request.headers.get('X-Real-IP');
-    
+
     return cfConnectingIP || xForwardedFor?.split(',')[0] || xRealIP || 'unknown';
   }
 }
@@ -461,10 +470,10 @@ export class MetricsAggregator {
     if (!this.data.has(key)) {
       this.data.set(key, []);
     }
-    
+
     const points = this.data.get(key)!;
     points.push(value);
-    
+
     // Keep only recent data points
     if (points.length > this.maxDataPoints) {
       points.splice(0, points.length - this.maxDataPoints);
@@ -486,13 +495,13 @@ export class MetricsAggregator {
     p99: number;
   } | null {
     const points = this.data.get(key);
-    
+
     if (!points || points.length === 0) {
       return null;
     }
-    
+
     const sorted = [...points].sort((a, b) => a - b);
-    
+
     return {
       count: points.length,
       min: sorted[0],
@@ -500,7 +509,7 @@ export class MetricsAggregator {
       avg: points.reduce((sum, val) => sum + val, 0) / points.length,
       p50: MonitoringUtils.calculatePercentile(sorted, 50),
       p95: MonitoringUtils.calculatePercentile(sorted, 95),
-      p99: MonitoringUtils.calculatePercentile(sorted, 99)
+      p99: MonitoringUtils.calculatePercentile(sorted, 99),
     };
   }
 
@@ -510,11 +519,11 @@ export class MetricsAggregator {
    */
   getAllMetrics(): Record<string, ReturnType<MetricsAggregator['getAggregatedMetrics']>> {
     const result: Record<string, ReturnType<MetricsAggregator['getAggregatedMetrics']>> = {};
-    
+
     for (const key of this.data.keys()) {
       result[key] = this.getAggregatedMetrics(key);
     }
-    
+
     return result;
   }
 

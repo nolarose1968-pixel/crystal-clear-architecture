@@ -2,7 +2,7 @@
 
 /**
  * Team Directory Verification Script
- * 
+ *
  * Verifies that all team members in the directory have complete information:
  * - Name
  * - Email address (following Fire22 domain conventions)
@@ -53,7 +53,7 @@ class TeamDirectoryVerifier {
 
   private loadTeamDirectory(): TeamDirectory {
     const directoryPath = join(this.projectRoot, 'src/communications/team-directory.json');
-    
+
     try {
       const content = readFileSync(directoryPath, 'utf8');
       return JSON.parse(content);
@@ -81,7 +81,11 @@ class TeamDirectoryVerifier {
 
   private validateAvatar(avatar: string, name: string): boolean {
     // Avatar should be initials (2-3 characters)
-    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+    const initials = name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase();
     return avatar === initials;
   }
 
@@ -157,11 +161,11 @@ class TeamDirectoryVerifier {
         const statusIcon = memberValid ? '✅' : '❌';
         console.log(`   ${statusIcon} ${member.name} (${member.role})`);
         console.log(`      📧 ${member.email}`);
-        
+
         if (member.phone) {
           console.log(`      📞 ${member.phone}`);
         }
-        
+
         if (!memberValid) {
           console.log(`      ⚠️  Issues: ${memberIssues.join(', ')}`);
           issues.push(`${department.name} - ${member.name}: ${memberIssues.join(', ')}`);
@@ -178,8 +182,9 @@ class TeamDirectoryVerifier {
     console.log(`Total Team Members: ${totalMembers}`);
     console.log(`Valid Members: ${validMembers}`);
     console.log(`Invalid Members: ${totalMembers - validMembers}`);
-    
-    const validPercentage = totalMembers > 0 ? ((validMembers / totalMembers) * 100).toFixed(1) : '0';
+
+    const validPercentage =
+      totalMembers > 0 ? ((validMembers / totalMembers) * 100).toFixed(1) : '0';
     console.log(`Validation Rate: ${validPercentage}%`);
 
     if (issues.length > 0) {
@@ -196,12 +201,13 @@ class TeamDirectoryVerifier {
     console.log('\n🏢 Department Breakdown:');
     console.log('─'.repeat(30));
     Object.entries(this.directory.departments).forEach(([key, dept]) => {
-      const validDeptMembers = dept.members.filter(member => 
-        member.name && member.email && member.role && member.slack && member.status
+      const validDeptMembers = dept.members.filter(
+        member => member.name && member.email && member.role && member.slack && member.status
       ).length;
       const totalDeptMembers = dept.members.length;
-      const deptRate = totalDeptMembers > 0 ? ((validDeptMembers / totalDeptMembers) * 100).toFixed(0) : '0';
-      
+      const deptRate =
+        totalDeptMembers > 0 ? ((validDeptMembers / totalDeptMembers) * 100).toFixed(0) : '0';
+
       console.log(`${dept.name}: ${validDeptMembers}/${totalDeptMembers} (${deptRate}%)`);
     });
 
@@ -210,13 +216,15 @@ class TeamDirectoryVerifier {
     console.log('─'.repeat(30));
     Object.entries(this.directory.departments).forEach(([key, dept]) => {
       const expectedDomain = dept.domain.replace('@', '');
-      const correctEmails = dept.members.filter(member => 
-        member.email && member.email.endsWith(expectedDomain)
+      const correctEmails = dept.members.filter(
+        member => member.email && member.email.endsWith(expectedDomain)
       ).length;
-      
+
       if (dept.members.length > 0) {
         const domainRate = ((correctEmails / dept.members.length) * 100).toFixed(0);
-        console.log(`${dept.name}: ${correctEmails}/${dept.members.length} use ${expectedDomain} (${domainRate}%)`);
+        console.log(
+          `${dept.name}: ${correctEmails}/${dept.members.length} use ${expectedDomain} (${domainRate}%)`
+        );
       }
     });
 
@@ -252,7 +260,7 @@ class TeamDirectoryVerifier {
 // Execute if run directly
 if (import.meta.main) {
   const verifier = new TeamDirectoryVerifier();
-  
+
   const args = process.argv.slice(2);
   const command = args[0] || 'verify';
 

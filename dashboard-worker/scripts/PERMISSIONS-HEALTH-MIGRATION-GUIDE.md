@@ -2,31 +2,39 @@
 
 ## Overview
 
-This guide provides step-by-step instructions for migrating from the original `test-permissions-health.ts` to the enhanced version `test-permissions-health-enhanced.ts`. The enhanced version includes significant improvements in type safety, configuration management, network resilience, and error handling.
+This guide provides step-by-step instructions for migrating from the original
+`test-permissions-health.ts` to the enhanced version
+`test-permissions-health-enhanced.ts`. The enhanced version includes significant
+improvements in type safety, configuration management, network resilience, and
+error handling.
 
 ## What's New in the Enhanced Version
 
 ### ✅ Key Improvements
 
 1. **Type Safety**
+
    - Complete TypeScript interfaces for all API responses
    - Strong typing for configuration options
    - Proper error type definitions
    - Exported types for better integration
 
 2. **Configuration Management**
+
    - Environment variable support for all configuration options
    - Runtime configuration updates
    - Command-line argument parsing
    - Verbose logging options
 
 3. **Network Resilience**
+
    - Configurable timeout handling
    - Automatic retry logic with exponential backoff
    - Proper cleanup of network resources
    - Detailed network error reporting
 
 4. **Enhanced Error Handling**
+
    - Structured error reporting with HTTP status codes
    - Detailed error messages and stack traces (optional)
    - Graceful handling of network failures
@@ -81,7 +89,8 @@ bun run dashboard-worker/scripts/test-permissions-health.ts
 
 ### Step 3: Update Script References
 
-If you have any scripts or automation that reference the original file, update them:
+If you have any scripts or automation that reference the original file, update
+them:
 
 ```json
 // package.json example
@@ -95,7 +104,8 @@ If you have any scripts or automation that reference the original file, update t
 
 ### Step 4: Update CI/CD Pipelines
 
-If you use the test in CI/CD pipelines, you may want to add the new configuration options:
+If you use the test in CI/CD pipelines, you may want to add the new
+configuration options:
 
 ```yaml
 # GitHub Actions example
@@ -103,31 +113,31 @@ If you use the test in CI/CD pipelines, you may want to add the new configuratio
   run: bun run dashboard-worker/scripts/test-permissions-health.ts
   env:
     PERMISSIONS_TEST_BASE_URL: ${{ vars.API_BASE_URL }}
-    PERMISSIONS_TEST_TIMEOUT: "30000"
-    PERMISSIONS_TEST_RETRIES: "5"
-    PERMISSIONS_TEST_VERBOSE: "true"
+    PERMISSIONS_TEST_TIMEOUT: '30000'
+    PERMISSIONS_TEST_RETRIES: '5'
+    PERMISSIONS_TEST_VERBOSE: 'true'
 ```
 
 ## Configuration Options
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PERMISSIONS_TEST_BASE_URL` | Base URL for the API | `http://localhost:8787` |
-| `PERMISSIONS_TEST_TIMEOUT` | Request timeout in milliseconds | `10000` |
-| `PERMISSIONS_TEST_RETRIES` | Number of retry attempts | `3` |
-| `PERMISSIONS_TEST_RETRY_DELAY` | Delay between retries in milliseconds | `1000` |
-| `PERMISSIONS_TEST_VERBOSE` | Enable verbose logging | `false` |
+| Variable                       | Description                           | Default                 |
+| ------------------------------ | ------------------------------------- | ----------------------- |
+| `PERMISSIONS_TEST_BASE_URL`    | Base URL for the API                  | `http://localhost:8787` |
+| `PERMISSIONS_TEST_TIMEOUT`     | Request timeout in milliseconds       | `10000`                 |
+| `PERMISSIONS_TEST_RETRIES`     | Number of retry attempts              | `3`                     |
+| `PERMISSIONS_TEST_RETRY_DELAY` | Delay between retries in milliseconds | `1000`                  |
+| `PERMISSIONS_TEST_VERBOSE`     | Enable verbose logging                | `false`                 |
 
 ### Command Line Arguments
 
-| Argument | Description | Example |
-|----------|-------------|---------|
-| `--url` | Set base URL | `--url https://api.example.com` |
-| `--timeout` | Set timeout in ms | `--timeout 15000` |
-| `--retries` | Set number of retries | `--retries 5` |
-| `--verbose` | Enable verbose logging | `--verbose true` |
+| Argument    | Description            | Example                         |
+| ----------- | ---------------------- | ------------------------------- |
+| `--url`     | Set base URL           | `--url https://api.example.com` |
+| `--timeout` | Set timeout in ms      | `--timeout 15000`               |
+| `--retries` | Set number of retries  | `--retries 5`                   |
+| `--verbose` | Enable verbose logging | `--verbose true`                |
 
 ### Programmatic Configuration
 
@@ -157,19 +167,25 @@ const config = tester.getConfig();
 
 ### 1. TypeScript Types
 
-The enhanced version exports TypeScript types. If you were importing the class, you might need to update your imports:
+The enhanced version exports TypeScript types. If you were importing the class,
+you might need to update your imports:
 
 ```typescript
 // Before (if you were importing types)
 import { PermissionsHealthTester } from './test-permissions-health';
 
 // After (with types)
-import { PermissionsHealthTester, type HealthResponse, type TestConfig } from './test-permissions-health';
+import {
+  PermissionsHealthTester,
+  type HealthResponse,
+  type TestConfig,
+} from './test-permissions-health';
 ```
 
 ### 2. Error Handling
 
-The enhanced version has more detailed error handling. If you were catching specific errors, you might need to update your error handling:
+The enhanced version has more detailed error handling. If you were catching
+specific errors, you might need to update your error handling:
 
 ```typescript
 // Before
@@ -194,7 +210,8 @@ try {
 
 ### 3. Constructor Behavior
 
-The constructor now accepts a partial configuration object and merges it with defaults:
+The constructor now accepts a partial configuration object and merges it with
+defaults:
 
 ```typescript
 // Before (hardcoded baseUrl)
@@ -253,11 +270,13 @@ mv dashboard-worker/scripts/test-permissions-health-original.ts dashboard-worker
 ### Common Issues
 
 1. **TypeScript Compilation Errors**
+
    - Ensure you're using the correct import statements
    - Check that all required dependencies are installed
    - Verify your TypeScript configuration
 
 2. **Network Timeout Issues**
+
    - Increase the timeout value: `--timeout 30000`
    - Check network connectivity to the API endpoint
    - Verify the API endpoint is accessible
@@ -271,7 +290,8 @@ mv dashboard-worker/scripts/test-permissions-health-original.ts dashboard-worker
 
 If you encounter issues during migration:
 
-1. Check the comprehensive documentation in `PERMISSIONS-HEALTH-ENHANCED-README.md`
+1. Check the comprehensive documentation in
+   `PERMISSIONS-HEALTH-ENHANCED-README.md`
 2. Review the unit tests in `test-permissions-health-enhanced.test.ts`
 3. Run tests with verbose logging to get detailed information
 4. Check the error messages for specific guidance
@@ -280,7 +300,8 @@ If you encounter issues during migration:
 
 ### ✅ Immediate Benefits
 
-1. **Better Reliability**: Automatic retry logic handles temporary network issues
+1. **Better Reliability**: Automatic retry logic handles temporary network
+   issues
 2. **Improved Debugging**: Enhanced error reporting with detailed information
 3. **Flexible Configuration**: Environment variables and command-line arguments
 4. **Type Safety**: Full TypeScript support prevents runtime errors
@@ -294,6 +315,13 @@ If you encounter issues during migration:
 
 ## Conclusion
 
-The enhanced permissions health test suite provides significant improvements over the original version while maintaining backward compatibility for basic usage. The migration process is straightforward, and the benefits in terms of reliability, maintainability, and developer experience make it a worthwhile upgrade.
+The enhanced permissions health test suite provides significant improvements
+over the original version while maintaining backward compatibility for basic
+usage. The migration process is straightforward, and the benefits in terms of
+reliability, maintainability, and developer experience make it a worthwhile
+upgrade.
 
-The enhanced version is designed to be a drop-in replacement for basic usage while providing powerful new features for advanced use cases. Take advantage of the new configuration options, improved error handling, and comprehensive testing infrastructure to build more robust and maintainable applications.
+The enhanced version is designed to be a drop-in replacement for basic usage
+while providing powerful new features for advanced use cases. Take advantage of
+the new configuration options, improved error handling, and comprehensive
+testing infrastructure to build more robust and maintainable applications.

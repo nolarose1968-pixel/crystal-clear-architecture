@@ -15,10 +15,13 @@ const eventSource = new EventSource('/api/live');
 ### Event Types
 
 #### fire22-status
+
 Real-time Fire22 API status updates.
 
-#### system-metrics  
+#### system-metrics
+
 System performance metrics and health data.
 
 #### user-actions
+
 Interactive dashboard updates and user activities.

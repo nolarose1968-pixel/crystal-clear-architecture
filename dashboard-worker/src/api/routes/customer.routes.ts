@@ -12,14 +12,12 @@ import * as schemas from '../schemas/index';
 const router = Router({ base: '/customers' });
 
 // /api/customer/getHeriarchy (from server.js:954)
-router.post('/getHeriarchy',
-  authorize(["customer.*"]),
-  controller.getHeriarchy
-);
+router.post('/getHeriarchy', authorize(['customer.*']), controller.getHeriarchy);
 
 // Create new customer
-router.post('/',
-  authorize(["customer.create", "admin.*"]),
+router.post(
+  '/',
+  authorize(['customer.create', 'admin.*']),
   validate(schemas.CreateCustomerDashboardRequestSchema),
   controller.createCustomer
 );

@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
  * MDX Sanitizer - Fixes common MDX compilation errors in documentation files
- * 
+ *
  * This script automatically fixes the most common MDX syntax errors:
  * 1. Invalid JSX component names (starting with numbers)
  * 2. Malformed JavaScript expressions
@@ -28,22 +28,30 @@ const SANITIZATION_RULES: SanitizationRule[] = [
     replacement: (match, componentName) => {
       const fixed = componentName.replace(/^(\d+)/, (num: string) => {
         const numMap: Record<string, string> = {
-          '1': 'One', '2': 'Two', '3': 'Three', '4': 'Four', '5': 'Five',
-          '6': 'Six', '7': 'Seven', '8': 'Eight', '9': 'Nine', '0': 'Zero'
+          '1': 'One',
+          '2': 'Two',
+          '3': 'Three',
+          '4': 'Four',
+          '5': 'Five',
+          '6': 'Six',
+          '7': 'Seven',
+          '8': 'Eight',
+          '9': 'Nine',
+          '0': 'Zero',
         };
         return numMap[num] || `Component${num}`;
       });
       return `<${fixed}`;
     },
-    description: 'Fix JSX component names starting with numbers'
+    description: 'Fix JSX component names starting with numbers',
   },
 
   // Fix standalone JavaScript functions in MDX (wrap in code blocks)
   {
     name: 'standalone-function-declarations',
     pattern: /^function\s+\w+\s*\([^)]*\)\s*\{[\s\S]*?^\}/gm,
-    replacement: (match) => `\`\`\`javascript\n${match}\n\`\`\``,
-    description: 'Wrap standalone function declarations in code blocks'
+    replacement: match => `\`\`\`javascript\n${match}\n\`\`\``,
+    description: 'Wrap standalone function declarations in code blocks',
   },
 
   // Fix malformed JSX expressions
@@ -60,31 +68,31 @@ const SANITIZATION_RULES: SanitizationRule[] = [
       }
       return match;
     },
-    description: 'Fix malformed JSX expressions'
+    description: 'Fix malformed JSX expressions',
   },
 
   // Escape problematic HTML-like syntax that's not valid JSX
   {
     name: 'escape-invalid-html',
     pattern: /<([^>]*\d+[^>]*)>/g,
-    replacement: (match) => `\`${match}\``,
-    description: 'Escape invalid HTML-like syntax'
+    replacement: match => `\`${match}\``,
+    description: 'Escape invalid HTML-like syntax',
   },
 
   // Fix import statements that should be in code blocks
   {
     name: 'fix-import-statements',
     pattern: /^import\s+.*?;$/gm,
-    replacement: (match) => `\`\`\`javascript\n${match}\n\`\`\``,
-    description: 'Wrap import statements in code blocks'
+    replacement: match => `\`\`\`javascript\n${match}\n\`\`\``,
+    description: 'Wrap import statements in code blocks',
   },
 
   // Fix export statements that should be in code blocks
   {
     name: 'fix-export-statements',
     pattern: /^export\s+.*?;$/gm,
-    replacement: (match) => `\`\`\`javascript\n${match}\n\`\`\``,
-    description: 'Wrap export statements in code blocks'
+    replacement: match => `\`\`\`javascript\n${match}\n\`\`\``,
+    description: 'Wrap export statements in code blocks',
   },
 
   // Fix unescaped angle brackets
@@ -92,7 +100,7 @@ const SANITIZATION_RULES: SanitizationRule[] = [
     name: 'escape-angle-brackets',
     pattern: /(?<!`)`([^`]*)<([^>]+)>([^`]*)`(?!`)/g,
     replacement: '`$1&lt;$2&gt;$3`',
-    description: 'Escape angle brackets in inline code'
+    description: 'Escape angle brackets in inline code',
   },
 
   // Fix JSX fragments with invalid syntax
@@ -100,8 +108,8 @@ const SANITIZATION_RULES: SanitizationRule[] = [
     name: 'fix-jsx-fragments',
     pattern: /<>\s*([^<]*)\s*<\/>/g,
     replacement: (match, content) => `\`${match}\``,
-    description: 'Escape invalid JSX fragments'
-  }
+    description: 'Escape invalid JSX fragments',
+  },
 ];
 
 class MDXSanitizer {
@@ -123,7 +131,7 @@ class MDXSanitizer {
       // Apply each sanitization rule
       for (const rule of SANITIZATION_RULES) {
         const beforeContent = sanitizedContent;
-        
+
         if (typeof rule.replacement === 'string') {
           sanitizedContent = sanitizedContent.replace(rule.pattern, rule.replacement);
         } else {
@@ -148,7 +156,7 @@ class MDXSanitizer {
         await this.log(`✅ Fixed: ${filePath}`);
         await this.log(`   Applied fixes: ${appliedFixes.join(', ')}`);
         await this.log(`   Backup created: ${backupPath}`);
-        
+
         return true;
       }
 
@@ -162,10 +170,10 @@ class MDXSanitizer {
 
   async sanitizeDirectory(dirPath: string): Promise<void> {
     try {
-      const markdownFiles = await glob('**/*.{md,mdx}', { 
+      const markdownFiles = await glob('**/*.{md,mdx}', {
         cwd: dirPath,
         absolute: true,
-        ignore: ['**/node_modules/**', '**/build/**', '**/dist/**']
+        ignore: ['**/node_modules/**', '**/build/**', '**/dist/**'],
       });
 
       console.log(`🔍 Found ${markdownFiles.length} markdown files to sanitize`);
@@ -190,14 +198,13 @@ class MDXSanitizer {
       console.log(`📁 Processed: ${processedCount} files`);
       console.log(`🔧 Fixed: ${fixedCount} files`);
       console.log(`❌ Errors: ${this.errorCount}`);
-      
+
       if (this.fixedFiles.length > 0) {
         console.log(`\n📝 Fixed Files:`);
         this.fixedFiles.forEach(file => console.log(`   • ${file}`));
       }
 
       await this.log(`Sanitization completed. ${fixedCount}/${processedCount} files fixed.`);
-
     } catch (error) {
       console.error('❌ Sanitization failed:', error);
       await this.log(`Fatal error: ${error.message}`);
@@ -208,7 +215,7 @@ class MDXSanitizer {
   private async log(message: string): Promise<void> {
     const timestamp = new Date().toISOString();
     const logMessage = `[${timestamp}] ${message}\n`;
-    
+
     try {
       // Ensure log directory exists
       await fs.mkdir(join(process.cwd(), 'logs'), { recursive: true });
@@ -227,8 +234,8 @@ class MDXSanitizer {
       fixedFiles: this.fixedFiles,
       appliedRules: SANITIZATION_RULES.map(rule => ({
         name: rule.name,
-        description: rule.description
-      }))
+        description: rule.description,
+      })),
     };
 
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
@@ -242,13 +249,13 @@ async function main() {
   const targetDir = args[0] || 'docs';
 
   console.log('🥖 Fire22 Dashboard - MDX Sanitizer');
-  console.log('=====================================');
+  console.log('!==!==!==!==!==!==!==');
   console.log(`🎯 Target directory: ${targetDir}`);
   console.log(`📅 Started at: ${new Date().toISOString()}`);
   console.log();
 
   const sanitizer = new MDXSanitizer();
-  
+
   // Check if target directory exists
   try {
     await fs.access(targetDir);

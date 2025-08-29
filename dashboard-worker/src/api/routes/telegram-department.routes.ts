@@ -2,7 +2,7 @@
 
 /**
  * 📱🏢 Telegram Department Routes
- * 
+ *
  * API endpoints for managing departmental Telegram bot interactions
  */
 
@@ -20,33 +20,41 @@ export async function submitCustomerInquiry(request: IRequest): Promise<Response
     const { user, message, priority = 'normal' } = await request.json();
 
     if (!user || !message) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Missing required fields: user, message'
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Missing required fields: user, message',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     const result = await departmentalBot.routeCustomerInquiry(user, message, priority);
 
-    return new Response(JSON.stringify({
-      success: true,
-      data: result,
-      message: 'Inquiry submitted successfully'
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: result,
+        message: 'Inquiry submitted successfully',
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -60,22 +68,27 @@ export async function getDepartmentStats(request: IRequest): Promise<Response> {
     const department = request.params?.department;
     const stats = departmentalBot.getDepartmentStats(department);
 
-    return new Response(JSON.stringify({
-      success: true,
-      data: stats,
-      timestamp: new Date().toISOString()
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: stats,
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -87,22 +100,27 @@ export async function getDepartments(request: IRequest): Promise<Response> {
   try {
     const departments = departmentalBot.getDepartments();
 
-    return new Response(JSON.stringify({
-      success: true,
-      data: departments,
-      total: departments.length
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: departments,
+        total: departments.length,
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -115,34 +133,42 @@ export async function getPendingInquiries(request: IRequest): Promise<Response> 
     const { department } = request.params;
 
     if (!department) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Department parameter required'
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Department parameter required',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     const inquiries = departmentalBot.getPendingInquiries(department);
 
-    return new Response(JSON.stringify({
-      success: true,
-      data: inquiries,
-      total: inquiries.length,
-      department
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: inquiries,
+        total: inquiries.length,
+        department,
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -155,42 +181,53 @@ export async function getInquiry(request: IRequest): Promise<Response> {
     const { inquiryId } = request.params;
 
     if (!inquiryId) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Inquiry ID parameter required'
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Inquiry ID parameter required',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     const inquiry = departmentalBot.getInquiry(inquiryId);
 
     if (!inquiry) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Inquiry not found'
-      }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Inquiry not found',
+        }),
+        {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
-    return new Response(JSON.stringify({
-      success: true,
-      data: inquiry
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: inquiry,
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -204,34 +241,42 @@ export async function escalateInquiry(request: IRequest): Promise<Response> {
     const { reason } = await request.json();
 
     if (!inquiryId || !reason) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Missing required fields: inquiryId, reason'
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Missing required fields: inquiryId, reason',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     await departmentalBot.escalateInquiry(inquiryId, reason);
 
-    return new Response(JSON.stringify({
-      success: true,
-      message: 'Inquiry escalated successfully',
-      inquiryId,
-      escalatedAt: new Date().toISOString()
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: 'Inquiry escalated successfully',
+        inquiryId,
+        escalatedAt: new Date().toISOString(),
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -245,35 +290,43 @@ export async function resolveInquiry(request: IRequest): Promise<Response> {
     const { agentId, resolutionNotes } = await request.json();
 
     if (!inquiryId || !agentId) {
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Missing required fields: inquiryId, agentId'
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Missing required fields: inquiryId, agentId',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     await departmentalBot.resolveInquiry(inquiryId, agentId, resolutionNotes);
 
-    return new Response(JSON.stringify({
-      success: true,
-      message: 'Inquiry resolved successfully',
-      inquiryId,
-      resolvedAt: new Date().toISOString(),
-      resolvedBy: agentId
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: 'Inquiry resolved successfully',
+        inquiryId,
+        resolvedAt: new Date().toISOString(),
+        resolvedBy: agentId,
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -285,24 +338,29 @@ export async function getPerformanceReport(request: IRequest): Promise<Response>
   try {
     const report = departmentalBot.generatePerformanceReport();
 
-    return new Response(JSON.stringify({
-      success: true,
-      data: {
-        report,
-        generatedAt: new Date().toISOString()
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: {
+          report,
+          generatedAt: new Date().toISOString(),
+        },
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
       }
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
-
+    );
   } catch (error) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -316,18 +374,18 @@ export async function testCustomerInquiry(request: IRequest): Promise<Response> 
       {
         user: { id: 12345, username: 'testuser1', first_name: 'John', language_code: 'en' },
         message: 'I need help with my withdrawal, it has been pending for 2 days',
-        priority: 'high'
+        priority: 'high',
       },
       {
         user: { id: 67890, username: 'testuser2', first_name: 'Maria', language_code: 'es' },
         message: 'Mi aplicación se cierra cuando intento apostar',
-        priority: 'urgent'
+        priority: 'urgent',
       },
       {
         user: { id: 11111, username: 'testuser3', first_name: 'João', language_code: 'pt' },
         message: 'Preciso verificar minha conta, que documentos são necessários?',
-        priority: 'normal'
-      }
+        priority: 'normal',
+      },
     ];
 
     const results = [];
@@ -335,46 +393,51 @@ export async function testCustomerInquiry(request: IRequest): Promise<Response> 
     for (const scenario of testScenarios) {
       try {
         const result = await departmentalBot.routeCustomerInquiry(
-          scenario.user, 
-          scenario.message, 
+          scenario.user,
+          scenario.message,
           scenario.priority
         );
         results.push({
           scenario,
           result,
-          success: true
+          success: true,
         });
       } catch (error) {
         results.push({
           scenario,
           error: error.message,
-          success: false
+          success: false,
         });
       }
     }
 
-    return new Response(JSON.stringify({
-      success: true,
-      data: {
-        testResults: results,
-        summary: {
-          total: testScenarios.length,
-          successful: results.filter(r => r.success).length,
-          failed: results.filter(r => !r.success).length
-        }
-      },
-      message: 'Test scenarios completed'
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: {
+          testResults: results,
+          summary: {
+            total: testScenarios.length,
+            successful: results.filter(r => r.success).length,
+            failed: results.filter(r => !r.success).length,
+          },
+        },
+        message: 'Test scenarios completed',
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }

@@ -6,7 +6,11 @@
  */
 
 import { EventEmitter } from 'events';
-import { patternWeaver, PatternMetrics, PatternConnection } from '../patterns/pattern-weaver-integration';
+import {
+  patternWeaver,
+  PatternMetrics,
+  PatternConnection,
+} from '../patterns/pattern-weaver-integration';
 
 export interface PatternAlert {
   id: string;
@@ -51,7 +55,7 @@ export class PatternObservabilitySystem extends EventEmitter {
     execution_time: 10_000_000, // 10ms in nanoseconds
     cache_miss_rate: 0.1, // 10%
     connection_strength: 0.5, // Minimum strength
-    memory_usage: 100 * 1024 * 1024 // 100MB
+    memory_usage: 100 * 1024 * 1024, // 100MB
   };
 
   constructor() {
@@ -71,20 +75,25 @@ export class PatternObservabilitySystem extends EventEmitter {
     }, 30_000);
 
     // Listen for pattern events
-    patternWeaver.on('pattern:executed', (data) => {
+    patternWeaver.on('pattern:executed', data => {
       this.recordPatternExecution(data.pattern, data.duration, data.success);
     });
 
-    patternWeaver.on('patterns:weaved', (data) => {
+    patternWeaver.on('patterns:weaved', data => {
       this.recordPatternWeaving(data.patterns, data.duration, data.connectionCount);
     });
 
-    patternWeaver.on('pattern:error', (data) => {
-      this.createAlert(data.pattern, 'critical', `Pattern execution failed: ${data.error.message}`, {
-        type: 'execution_time',
-        value: 0,
-        limit: 0
-      });
+    patternWeaver.on('pattern:error', data => {
+      this.createAlert(
+        data.pattern,
+        'critical',
+        `Pattern execution failed: ${data.error.message}`,
+        {
+          type: 'execution_time',
+          value: 0,
+          limit: 0,
+        }
+      );
     });
   }
 
@@ -93,25 +102,29 @@ export class PatternObservabilitySystem extends EventEmitter {
    */
   private performHealthChecks(): void {
     const allMetrics = patternWeaver.getMetrics() as Map<string, PatternMetrics>;
-    
+
     allMetrics.forEach((metrics, patternName) => {
       const healthCheck = this.evaluatePatternHealth(patternName, metrics);
       this.healthChecks.set(patternName, healthCheck);
-      
+
       // Emit health status changes
       this.emit('health:checked', {
         pattern: patternName,
-        health: healthCheck
+        health: healthCheck,
       });
-      
+
       // Create alerts for critical health issues
       if (healthCheck.status === 'critical') {
-        this.createAlert(patternName, 'critical', 
-          `Pattern health is critical: ${healthCheck.issues.join(', ')}`, {
-          type: 'execution_time',
-          value: metrics.executionTime,
-          limit: this.performanceThresholds.execution_time
-        });
+        this.createAlert(
+          patternName,
+          'critical',
+          `Pattern health is critical: ${healthCheck.issues.join(', ')}`,
+          {
+            type: 'execution_time',
+            value: metrics.executionTime,
+            limit: this.performanceThresholds.execution_time,
+          }
+        );
       }
     });
   }
@@ -125,7 +138,8 @@ export class PatternObservabilitySystem extends EventEmitter {
     let score = 100;
 
     // Check execution time
-    const avgExecutionTime = metrics.executionTime / Math.max(1, metrics.cacheHits + metrics.cacheMisses);
+    const avgExecutionTime =
+      metrics.executionTime / Math.max(1, metrics.cacheHits + metrics.cacheMisses);
     if (avgExecutionTime > this.performanceThresholds.execution_time) {
       issues.push('High execution time');
       recommendations.push('Consider optimizing pattern logic or caching');
@@ -143,7 +157,9 @@ export class PatternObservabilitySystem extends EventEmitter {
 
     // Check connection health
     const connections = patternWeaver.getConnections(patternName);
-    const weakConnections = connections.filter(c => c.strength < this.performanceThresholds.connection_strength);
+    const weakConnections = connections.filter(
+      c => c.strength < this.performanceThresholds.connection_strength
+    );
     if (weakConnections.length > connections.length * 0.5) {
       issues.push('Weak pattern connections');
       recommendations.push('Strengthen pattern relationships');
@@ -168,7 +184,7 @@ export class PatternObservabilitySystem extends EventEmitter {
       score: Math.max(0, score),
       issues,
       recommendations,
-      lastCheck: new Date()
+      lastCheck: new Date(),
     };
   }
 
@@ -177,27 +193,31 @@ export class PatternObservabilitySystem extends EventEmitter {
    */
   private detectAnomalies(): void {
     const allMetrics = patternWeaver.getMetrics() as Map<string, PatternMetrics>;
-    
+
     allMetrics.forEach((metrics, patternName) => {
       const trends = this.trends.get(patternName) || [];
-      
+
       // Detect execution time spikes
       const executionTrend = trends.find(t => t.metric === 'execution_time');
       if (executionTrend && executionTrend.values.length > 5) {
         const recent = executionTrend.values.slice(-3);
         const baseline = executionTrend.values.slice(0, -3);
-        
+
         const recentAvg = recent.reduce((sum, v) => sum + v.value, 0) / recent.length;
         const baselineAvg = baseline.reduce((sum, v) => sum + v.value, 0) / baseline.length;
-        
+
         // Alert if recent performance is 50% worse than baseline
         if (recentAvg > baselineAvg * 1.5) {
-          this.createAlert(patternName, 'warning', 
-            `Performance degradation detected: ${((recentAvg - baselineAvg) / baselineAvg * 100).toFixed(1)}% slower`, {
-            type: 'execution_time',
-            value: recentAvg,
-            limit: baselineAvg * 1.5
-          });
+          this.createAlert(
+            patternName,
+            'warning',
+            `Performance degradation detected: ${(((recentAvg - baselineAvg) / baselineAvg) * 100).toFixed(1)}% slower`,
+            {
+              type: 'execution_time',
+              value: recentAvg,
+              limit: baselineAvg * 1.5,
+            }
+          );
         }
       }
     });
@@ -209,10 +229,10 @@ export class PatternObservabilitySystem extends EventEmitter {
   private updateTrends(): void {
     const allMetrics = patternWeaver.getMetrics() as Map<string, PatternMetrics>;
     const now = new Date();
-    
+
     allMetrics.forEach((metrics, patternName) => {
       let patternTrends = this.trends.get(patternName) || [];
-      
+
       // Update execution time trend
       let executionTrend = patternTrends.find(t => t.metric === 'execution_time');
       if (!executionTrend) {
@@ -221,26 +241,26 @@ export class PatternObservabilitySystem extends EventEmitter {
           metric: 'execution_time',
           values: [],
           trend: 'stable',
-          prediction: 0
+          prediction: 0,
         };
         patternTrends.push(executionTrend);
       }
-      
+
       const totalRequests = metrics.cacheHits + metrics.cacheMisses;
       const avgExecutionTime = totalRequests > 0 ? metrics.executionTime / totalRequests : 0;
-      
+
       executionTrend.values.push({ timestamp: now, value: avgExecutionTime });
-      
+
       // Keep only last 20 values
       if (executionTrend.values.length > 20) {
         executionTrend.values = executionTrend.values.slice(-20);
       }
-      
+
       // Calculate trend direction
       if (executionTrend.values.length >= 5) {
         const recent = executionTrend.values.slice(-3).reduce((sum, v) => sum + v.value, 0) / 3;
         const older = executionTrend.values.slice(-8, -5).reduce((sum, v) => sum + v.value, 0) / 3;
-        
+
         if (recent < older * 0.9) {
           executionTrend.trend = 'improving';
         } else if (recent > older * 1.1) {
@@ -248,12 +268,12 @@ export class PatternObservabilitySystem extends EventEmitter {
         } else {
           executionTrend.trend = 'stable';
         }
-        
+
         // Simple linear prediction
         const slope = (recent - older) / 5;
         executionTrend.prediction = recent + slope * 3; // Predict 3 periods ahead
       }
-      
+
       // Update cache hit rate trend
       let cacheHitTrend = patternTrends.find(t => t.metric === 'cache_hit_rate');
       if (!cacheHitTrend) {
@@ -262,18 +282,18 @@ export class PatternObservabilitySystem extends EventEmitter {
           metric: 'cache_hit_rate',
           values: [],
           trend: 'stable',
-          prediction: 0
+          prediction: 0,
         };
         patternTrends.push(cacheHitTrend);
       }
-      
+
       const cacheHitRate = totalRequests > 0 ? metrics.cacheHits / totalRequests : 0;
       cacheHitTrend.values.push({ timestamp: now, value: cacheHitRate });
-      
+
       if (cacheHitTrend.values.length > 20) {
         cacheHitTrend.values = cacheHitTrend.values.slice(-20);
       }
-      
+
       this.trends.set(patternName, patternTrends);
     });
   }
@@ -293,9 +313,9 @@ export class PatternObservabilitySystem extends EventEmitter {
       cacheHits: 0,
       cacheMisses: 0,
       connectionsFormed: 0,
-      memoryUsed: 0
+      memoryUsed: 0,
     };
-    
+
     const alert: PatternAlert = {
       id: alertId,
       pattern,
@@ -303,20 +323,23 @@ export class PatternObservabilitySystem extends EventEmitter {
       message,
       timestamp: new Date(),
       metrics,
-      threshold
+      threshold,
     };
-    
+
     this.alerts.set(alertId, alert);
-    
+
     // Emit alert event
     this.emit('alert:created', alert);
-    
+
     // Auto-resolve info alerts after 5 minutes
     if (severity === 'info') {
-      setTimeout(() => {
-        this.alerts.delete(alertId);
-        this.emit('alert:resolved', alertId);
-      }, 5 * 60 * 1000);
+      setTimeout(
+        () => {
+          this.alerts.delete(alertId);
+          this.emit('alert:resolved', alertId);
+        },
+        5 * 60 * 1000
+      );
     }
   }
 
@@ -325,33 +348,41 @@ export class PatternObservabilitySystem extends EventEmitter {
    */
   private recordPatternExecution(pattern: string, duration: number, success: boolean): void {
     if (!success) return; // Errors are handled separately
-    
+
     // Check for performance alerts
     if (duration > this.performanceThresholds.execution_time) {
-      this.createAlert(pattern, 'warning', 
-        `Slow execution: ${(duration / 1_000_000).toFixed(2)}ms`, {
-        type: 'execution_time',
-        value: duration,
-        limit: this.performanceThresholds.execution_time
-      });
+      this.createAlert(
+        pattern,
+        'warning',
+        `Slow execution: ${(duration / 1_000_000).toFixed(2)}ms`,
+        {
+          type: 'execution_time',
+          value: duration,
+          limit: this.performanceThresholds.execution_time,
+        }
+      );
     }
-    
+
     this.emit('pattern:monitored', {
       pattern,
       duration,
-      durationMs: duration / 1_000_000
+      durationMs: duration / 1_000_000,
     });
   }
 
   /**
    * Record pattern weaving events
    */
-  private recordPatternWeaving(patterns: string[], duration: number, connectionCount: number): void {
+  private recordPatternWeaving(
+    patterns: string[],
+    duration: number,
+    connectionCount: number
+  ): void {
     this.emit('weaving:monitored', {
       patterns,
       duration,
       connectionCount,
-      efficiency: connectionCount / patterns.length // Connections per pattern
+      efficiency: connectionCount / patterns.length, // Connections per pattern
     });
   }
 
@@ -373,16 +404,16 @@ export class PatternObservabilitySystem extends EventEmitter {
     const degraded = patterns.filter(p => p.status === 'degraded').length;
     const critical = patterns.filter(p => p.status === 'critical').length;
     const totalScore = patterns.reduce((sum, p) => sum + p.score, 0) / patterns.length || 0;
-    
+
     let overall: 'healthy' | 'degraded' | 'critical';
     if (critical > 0) overall = 'critical';
     else if (degraded > patterns.length * 0.3) overall = 'degraded';
     else overall = 'healthy';
-    
+
     return {
       overall,
       patterns,
-      summary: { healthy, degraded, critical, totalScore }
+      summary: { healthy, degraded, critical, totalScore },
     };
   }
 
@@ -390,8 +421,9 @@ export class PatternObservabilitySystem extends EventEmitter {
    * Get active alerts
    */
   getActiveAlerts(): PatternAlert[] {
-    return Array.from(this.alerts.values())
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    return Array.from(this.alerts.values()).sort(
+      (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+    );
   }
 
   /**
@@ -401,7 +433,7 @@ export class PatternObservabilitySystem extends EventEmitter {
     if (patternName) {
       return this.trends.get(patternName) || [];
     }
-    
+
     return Array.from(this.trends.values()).flat();
   }
 
@@ -427,39 +459,42 @@ export class PatternObservabilitySystem extends EventEmitter {
     const alerts = this.getActiveAlerts();
     const trends = this.getTrends();
     const allMetrics = patternWeaver.getMetrics() as Map<string, PatternMetrics>;
-    
-    const totalExecutionTime = Array.from(allMetrics.values())
-      .reduce((sum, m) => sum + m.executionTime, 0);
-    const totalCacheHits = Array.from(allMetrics.values())
-      .reduce((sum, m) => sum + m.cacheHits, 0);
-    const totalCacheMisses = Array.from(allMetrics.values())
-      .reduce((sum, m) => sum + m.cacheMisses, 0);
+
+    const totalExecutionTime = Array.from(allMetrics.values()).reduce(
+      (sum, m) => sum + m.executionTime,
+      0
+    );
+    const totalCacheHits = Array.from(allMetrics.values()).reduce((sum, m) => sum + m.cacheHits, 0);
+    const totalCacheMisses = Array.from(allMetrics.values()).reduce(
+      (sum, m) => sum + m.cacheMisses,
+      0
+    );
     const totalRequests = totalCacheHits + totalCacheMisses;
-    
+
     // Generate recommendations based on current state
     const recommendations: string[] = [];
-    
+
     if (health.summary.critical > 0) {
       recommendations.push('🔴 Address critical pattern health issues immediately');
     }
-    
+
     if (totalRequests > 0 && totalCacheMisses / totalRequests > 0.2) {
       recommendations.push('📈 Consider improving caching strategies - high miss rate detected');
     }
-    
+
     if (alerts.filter(a => a.severity === 'warning').length > 5) {
       recommendations.push('⚠️ Multiple performance warnings - consider system optimization');
     }
-    
+
     const degradingTrends = trends.filter(t => t.trend === 'degrading').length;
     if (degradingTrends > trends.length * 0.3) {
       recommendations.push('📉 Multiple patterns showing performance degradation');
     }
-    
+
     if (recommendations.length === 0) {
       recommendations.push('✅ System is performing well - continue monitoring');
     }
-    
+
     return {
       timestamp: new Date(),
       health,
@@ -472,8 +507,8 @@ export class PatternObservabilitySystem extends EventEmitter {
         totalCacheHits,
         totalCacheMisses,
         cacheEfficiency: totalRequests > 0 ? (totalCacheHits / totalRequests) * 100 : 0,
-        averageExecutionTime: totalRequests > 0 ? totalExecutionTime / totalRequests : 0
-      }
+        averageExecutionTime: totalRequests > 0 ? totalExecutionTime / totalRequests : 0,
+      },
     };
   }
 
@@ -485,7 +520,7 @@ export class PatternObservabilitySystem extends EventEmitter {
       clearInterval(this.monitoringInterval);
       this.monitoringInterval = null;
     }
-    
+
     this.alerts.clear();
     this.healthChecks.clear();
     this.trends.clear();

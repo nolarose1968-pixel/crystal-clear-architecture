@@ -1,6 +1,6 @@
 /**
  * Authentication Middleware
- * 
+ *
  * Validates JWT tokens and attaches user context to requests
  */
 
@@ -23,7 +23,10 @@ export interface AuthenticatedRequest extends IRequest {
 }
 
 class AuthenticationError extends Error {
-  constructor(message: string, public statusCode: number = 401) {
+  constructor(
+    message: string,
+    public statusCode: number = 401
+  ) {
     super(message);
     this.name = 'AuthenticationError';
   }
@@ -34,12 +37,12 @@ class AuthenticationError extends Error {
  */
 function extractBearerToken(authorization?: string): string | null {
   if (!authorization) return null;
-  
+
   const parts = authorization.split(' ');
   if (parts.length !== 2 || parts[0] !== 'Bearer') {
     return null;
   }
-  
+
   return parts[1];
 }
 
@@ -51,17 +54,17 @@ async function getJWTSecret(): Promise<string> {
   if (typeof Bun !== 'undefined' && Bun.env.JWT_SECRET) {
     return Bun.env.JWT_SECRET;
   }
-  
+
   // Try process.env
   if (process.env.JWT_SECRET) {
     return process.env.JWT_SECRET;
   }
-  
+
   // Try Cloudflare Workers environment (passed via context)
   if (globalThis.JWT_SECRET) {
     return globalThis.JWT_SECRET;
   }
-  
+
   throw new AuthenticationError('JWT secret not configured');
 }
 
@@ -70,14 +73,14 @@ async function getJWTSecret(): Promise<string> {
  */
 async function validateToken(token: string): Promise<any> {
   const secret = await getJWTSecret();
-  
+
   try {
     const decoded = jwt.verify(token, secret, {
       algorithms: ['HS256'],
       issuer: 'fire22-dashboard',
-      audience: 'fire22-api'
+      audience: 'fire22-api',
     });
-    
+
     return decoded;
   } catch (error: any) {
     if (error.name === 'TokenExpiredError') {
@@ -95,7 +98,7 @@ async function validateToken(token: string): Promise<any> {
  */
 async function isTokenBlacklisted(jti?: string): Promise<boolean> {
   if (!jti) return false;
-  
+
   // Check against database or cache
   // For now, return false (implement actual check later)
   return false;
@@ -116,7 +119,7 @@ function getRolePermissions(role: string): string[] {
       'wager.*',
       'reports.*',
       'analytics.*',
-      'audit.view'
+      'audit.view',
     ],
     manager: [
       'manager.*',
@@ -127,7 +130,7 @@ function getRolePermissions(role: string): string[] {
       'reports.weekly',
       'reports.daily',
       'analytics.sports',
-      'financial.view'
+      'financial.view',
     ],
     agent: [
       'agent.own',
@@ -137,7 +140,7 @@ function getRolePermissions(role: string): string[] {
       'customer.create_sub',
       'reports.own',
       'queue.deposit',
-      'queue.withdrawal'
+      'queue.withdrawal',
     ],
     customer: [
       'customer.own',
@@ -147,10 +150,10 @@ function getRolePermissions(role: string): string[] {
       'bet.history_own',
       'withdrawal.request',
       'deposit.request',
-      'balance.view_own'
-    ]
+      'balance.view_own',
+    ],
   };
-  
+
   return rolePermissions[role] || [];
 }
 
@@ -163,9 +166,9 @@ function getRoleLevel(role: string): number {
     manager: 4,
     agent: 3,
     customer: 2,
-    public: 1
+    public: 1,
   };
-  
+
   return roleLevels[role] || 0;
 }
 
@@ -179,14 +182,14 @@ function getRoleScope(role: string, userId: string): any {
         type: 'agent',
         field: 'agentId',
         restriction: 'own_customers',
-        value: userId
+        value: userId,
       };
     case 'customer':
       return {
         type: 'customer',
         field: 'customerId',
         restriction: 'self_only',
-        value: userId
+        value: userId,
       };
     default:
       return null;
@@ -200,70 +203,81 @@ export async function authenticate(request: AuthenticatedRequest): Promise<Respo
   try {
     // Extract token from header
     const token = extractBearerToken(request.headers?.get?.('authorization'));
-    
+
     if (!token) {
-      return new Response(JSON.stringify({
-        error: 'Authentication required',
-        message: 'No token provided'
-      }), {
-        status: 401,
-        headers: {
-          'Content-Type': 'application/json',
-          'WWW-Authenticate': 'Bearer realm="fire22-api"'
+      return new Response(
+        JSON.stringify({
+          error: 'Authentication required',
+          message: 'No token provided',
+        }),
+        {
+          status: 401,
+          headers: {
+            'Content-Type': 'application/json',
+            'WWW-Authenticate': 'Bearer realm="fire22-api"',
+          },
         }
-      });
+      );
     }
-    
+
     // Validate token
     const payload = await validateToken(token);
-    
+
     // Check if token is blacklisted
     if (await isTokenBlacklisted(payload.jti)) {
-      return new Response(JSON.stringify({
-        error: 'Token revoked',
-        message: 'This token has been revoked'
-      }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Token revoked',
+          message: 'This token has been revoked',
+        }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
-    
+
     // Get user permissions and scope
     const permissions = payload.permissions || getRolePermissions(payload.role);
     const scope = payload.scope || getRoleScope(payload.role, payload.sub);
-    
+
     // Attach user context to request
     request.user = {
       id: payload.sub,
       role: payload.role,
       level: payload.level || getRoleLevel(payload.role),
       permissions,
-      scope
+      scope,
     };
-    
+
     request.token = token;
-    
+
     // Continue to next middleware
     return;
-    
   } catch (error: any) {
     if (error instanceof AuthenticationError) {
-      return new Response(JSON.stringify({
-        error: 'Authentication failed',
-        message: error.message
-      }), {
-        status: error.statusCode,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Authentication failed',
+          message: error.message,
+        }),
+        {
+          status: error.statusCode,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
-    
-    return new Response(JSON.stringify({
-      error: 'Internal error',
-      message: 'Authentication service unavailable'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+
+    return new Response(
+      JSON.stringify({
+        error: 'Internal error',
+        message: 'Authentication service unavailable',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -273,17 +287,17 @@ export async function authenticate(request: AuthenticatedRequest): Promise<Respo
 export async function authenticateOptional(request: AuthenticatedRequest): Promise<void> {
   try {
     const token = extractBearerToken(request.headers?.get?.('authorization'));
-    
+
     if (token) {
       const payload = await validateToken(token);
-      
-      if (!await isTokenBlacklisted(payload.jti)) {
+
+      if (!(await isTokenBlacklisted(payload.jti))) {
         request.user = {
           id: payload.sub,
           role: payload.role,
           level: payload.level || getRoleLevel(payload.role),
           permissions: payload.permissions || getRolePermissions(payload.role),
-          scope: payload.scope || getRoleScope(payload.role, payload.sub)
+          scope: payload.scope || getRoleScope(payload.role, payload.sub),
         };
         request.token = token;
       }
@@ -302,7 +316,7 @@ export async function generateToken(user: {
   permissions?: string[];
 }): Promise<string> {
   const secret = await getJWTSecret();
-  
+
   const token = jwt.sign(
     {
       sub: user.id,
@@ -310,17 +324,17 @@ export async function generateToken(user: {
       level: getRoleLevel(user.role),
       permissions: user.permissions || getRolePermissions(user.role),
       scope: getRoleScope(user.role, user.id),
-      type: 'access'
+      type: 'access',
     },
     secret,
     {
       expiresIn: '24h',
       issuer: 'fire22-dashboard',
       audience: 'fire22-api',
-      jwtId: crypto.randomUUID()
+      jwtId: crypto.randomUUID(),
     }
   );
-  
+
   return token;
 }
 
@@ -329,20 +343,20 @@ export async function generateToken(user: {
  */
 export async function generateRefreshToken(userId: string): Promise<string> {
   const secret = await getJWTSecret();
-  
+
   const token = jwt.sign(
     {
       sub: userId,
-      type: 'refresh'
+      type: 'refresh',
     },
     secret,
     {
       expiresIn: '7d',
       issuer: 'fire22-dashboard',
-      jwtId: crypto.randomUUID()
+      jwtId: crypto.randomUUID(),
     }
   );
-  
+
   return token;
 }
 

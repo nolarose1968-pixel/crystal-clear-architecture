@@ -5,7 +5,10 @@
  * Demonstrates VIP, Group, Affiliate, and Commission Management
  */
 
-import { createBusinessManagementSystem, BusinessManagementSystem } from '../src/business-management';
+import {
+  createBusinessManagementSystem,
+  BusinessManagementSystem,
+} from '../src/business-management';
 
 class BusinessManagementDemo {
   private businessSystem: BusinessManagementSystem;
@@ -40,7 +43,7 @@ class BusinessManagementDemo {
       { balance: 2000, volume: 8000, name: 'Bronze Eligible' },
       { balance: 8000, volume: 30000, name: 'Silver Eligible' },
       { balance: 20000, volume: 120000, name: 'Gold Eligible' },
-      { balance: 75000, volume: 600000, name: 'Platinum Eligible' }
+      { balance: 75000, volume: 600000, name: 'Platinum Eligible' },
     ];
 
     testCases.forEach(testCase => {
@@ -129,7 +132,9 @@ class BusinessManagementDemo {
     console.log('📈 **Volume Tiers:**');
     program.commissionStructure.volumeTiers.forEach(tier => {
       const maxVol = tier.maxVolume === Infinity ? '∞' : tier.maxVolume.toLocaleString();
-      console.log(`  $${tier.minVolume.toLocaleString()} - $${maxVol}: ${(tier.commissionRate * 100).toFixed(1)}% (${tier.bonusMultiplier}x)`);
+      console.log(
+        `  $${tier.minVolume.toLocaleString()} - $${maxVol}: ${(tier.commissionRate * 100).toFixed(1)}% (${tier.bonusMultiplier}x)`
+      );
     });
 
     console.log('\n🚀 **Performance Bonuses:**');
@@ -139,23 +144,31 @@ class BusinessManagementDemo {
 
     console.log('\n⚠️ **Risk Adjustments:**');
     program.commissionStructure.riskAdjustments.forEach(risk => {
-      console.log(`  ${risk.riskLevel.toUpperCase()}: ${(risk.adjustment * 100).toFixed(0)}% (${risk.description})`);
+      console.log(
+        `  ${risk.riskLevel.toUpperCase()}: ${(risk.adjustment * 100).toFixed(0)}% (${risk.description})`
+      );
     });
 
     console.log('\n✅ **Compliance Multipliers:**');
     program.commissionStructure.complianceMultipliers.forEach(compliance => {
-      console.log(`  ${compliance.score}%: ${(compliance.multiplier * 100).toFixed(0)}% (${compliance.description})`);
+      console.log(
+        `  ${compliance.score}%: ${(compliance.multiplier * 100).toFixed(0)}% (${compliance.description})`
+      );
     });
 
     console.log('\n🎯 **Referral Rewards:**');
     program.referralRewards.forEach(reward => {
-      console.log(`  Level ${reward.level}: ${(reward.commission * 100).toFixed(1)}% + ${(reward.bonus * 100).toFixed(1)}% bonus`);
+      console.log(
+        `  Level ${reward.level}: ${(reward.commission * 100).toFixed(1)}% + ${(reward.bonus * 100).toFixed(1)}% bonus`
+      );
       console.log(`    Requirements: ${reward.requirements.join(', ')}`);
     });
 
     console.log('\n🏆 **Performance Tiers:**');
     program.performanceTiers.forEach(tier => {
-      console.log(`  ${tier.tier}: ${tier.minReferrals} referrals, $${tier.minVolume.toLocaleString()} volume`);
+      console.log(
+        `  ${tier.tier}: ${tier.minReferrals} referrals, $${tier.minVolume.toLocaleString()} volume`
+      );
       console.log(`    Commission: ${(tier.commissionRate * 100).toFixed(1)}%`);
       console.log(`    Benefits: ${tier.exclusiveBenefits.join(', ')}`);
     });
@@ -181,7 +194,7 @@ class BusinessManagementDemo {
         volume: 8000,
         riskScore: 0.75,
         complianceScore: 85,
-        performanceMetrics: { newCustomers: 3 }
+        performanceMetrics: { newCustomers: 3 },
       },
       {
         name: 'Established Agent (Medium Volume)',
@@ -189,7 +202,7 @@ class BusinessManagementDemo {
         volume: 150000,
         riskScore: 0.92,
         complianceScore: 98,
-        performanceMetrics: { newCustomers: 15 }
+        performanceMetrics: { newCustomers: 15 },
       },
       {
         name: 'Top Agent (High Volume)',
@@ -197,7 +210,7 @@ class BusinessManagementDemo {
         volume: 800000,
         riskScore: 0.98,
         complianceScore: 100,
-        performanceMetrics: { newCustomers: 45 }
+        performanceMetrics: { newCustomers: 45 },
       },
       {
         name: 'Risk Agent (High Risk)',
@@ -205,8 +218,8 @@ class BusinessManagementDemo {
         volume: 200000,
         riskScore: 0.65,
         complianceScore: 70,
-        performanceMetrics: { newCustomers: 8 }
-      }
+        performanceMetrics: { newCustomers: 8 },
+      },
     ];
 
     testCases.forEach((testCase, index) => {
@@ -237,7 +250,6 @@ class BusinessManagementDemo {
 
         console.log(`  **Status:** ${commission.status.toUpperCase()}`);
         console.log(`  📅 Calculated: ${commission.calculatedAt.toLocaleDateString()}\n`);
-
       } catch (error) {
         console.log(`  ❌ Error calculating commission: ${error}\n`);
       }
@@ -266,7 +278,7 @@ class BusinessManagementDemo {
       const referralLink = this.businessSystem.createUserLink(user, 'referral');
       const linkId = referralLink.split('/').pop() || '';
       const validation = this.businessSystem.validateUserLink(linkId);
-      
+
       if (validation) {
         console.log(`  ✅ Link Validation:`);
         console.log(`    Type: ${validation.type}`);
@@ -283,7 +295,7 @@ class BusinessManagementDemo {
     console.log('\n📊 **System Statistics Demo**\n');
 
     const stats = this.businessSystem.getSystemStats();
-    
+
     console.log('📈 **Overall System Status:**');
     console.log(`  👑 VIP Tiers: ${stats.vipTiers}`);
     console.log(`  👥 Groups: ${stats.groups}`);
@@ -296,7 +308,7 @@ class BusinessManagementDemo {
     console.log('📋 **Sample Commission History:**');
     const sampleAgent = 'agent_2';
     const commissionHistory = this.businessSystem.getAgentCommissionHistory(sampleAgent);
-    
+
     if (commissionHistory.length > 0) {
       commissionHistory.forEach((record, index) => {
         console.log(`\n  **Record ${index + 1}:**`);
@@ -356,27 +368,27 @@ async function main() {
       case 'vip':
         await demo.runVIPDemo();
         break;
-        
+
       case 'groups':
         await demo.runGroupDemo();
         break;
-        
+
       case 'affiliate':
         await demo.runAffiliateDemo();
         break;
-        
+
       case 'commission':
         await demo.runCommissionDemo();
         break;
-        
+
       case 'linking':
         await demo.runLinkingDemo();
         break;
-        
+
       case 'stats':
         await demo.runStatsDemo();
         break;
-        
+
       case 'demo':
       default:
         await demo.runCompleteDemo();

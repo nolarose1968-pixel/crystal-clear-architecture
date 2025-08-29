@@ -1,0 +1,26 @@
+development:
+  adapter: sqlite
+  database: odds_movement_dev
+  filename: ./odds_movement_dev.sqlite
+
+test:
+  adapter: sqlite
+  database: ":memory:"
+
+staging:
+  adapter: mysql
+  hostname: staging-db.example.com
+  username: odds_user
+  password: ${DB_PASSWORD}
+  database: odds_movement_staging
+  port: 3306
+
+production:
+  adapter: postgres
+  hostname: prod-db.example.com
+  username: odds_user
+  password: ${DB_PASSWORD}
+  database: odds_movement_prod
+  port: 5432
+  ssl: true
+  audit_database: odds_movement_audit_prod

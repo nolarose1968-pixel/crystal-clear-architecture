@@ -1,10 +1,10 @@
 #!/usr/bin/env bun
 /**
  * 📊 Fire22 Monitor Snapshot
- * 
+ *
  * Demonstrates the monitoring dashboard output
  * Shows what fire22 monitor displays in real-time
- * 
+ *
  * @version 3.0.9
  * @author Fire22 Development Team
  */
@@ -13,11 +13,11 @@ import { RealTimeMonitor } from './real-time-monitor.ts';
 
 class MonitorSnapshot {
   private monitor: RealTimeMonitor;
-  
+
   constructor() {
     this.monitor = new RealTimeMonitor({
       interval: 5000,
-      apiBaseUrl: 'http://localhost:8080'
+      apiBaseUrl: 'http://localhost:8080',
     });
   }
 
@@ -27,10 +27,10 @@ class MonitorSnapshot {
   displaySnapshot(): void {
     // Clear screen for clean display
     console.clear();
-    
+
     // Display the dashboard header
     console.log('🔥 Fire22 Real-Time Performance Dashboard');
-    console.log('=' .repeat(50));
+    console.log('='.repeat(50));
     console.log(`📅 ${new Date().toLocaleString()}\n`);
 
     // System Metrics
@@ -38,11 +38,15 @@ class MonitorSnapshot {
     const cpuUsage = process.cpuUsage();
     const memPercent = Math.round((memUsage.heapUsed / memUsage.heapTotal) * 100);
     const cpuTime = (cpuUsage.user + cpuUsage.system) / 1000000;
-    
+
     console.log('💻 System Metrics:');
     console.log(`   CPU Usage: ${Math.round(cpuTime)}% ${this.getHealthIndicator(cpuTime, 80)}`);
-    console.log(`   Memory: ${Math.round(memUsage.heapUsed / 1024 / 1024)}MB / ${Math.round(memUsage.heapTotal / 1024 / 1024)}MB (${memPercent}%) ${this.getHealthIndicator(memPercent, 85)}`);
-    console.log(`   Uptime: ${Math.floor(process.uptime() / 60)}m ${Math.floor(process.uptime() % 60)}s`);
+    console.log(
+      `   Memory: ${Math.round(memUsage.heapUsed / 1024 / 1024)}MB / ${Math.round(memUsage.heapTotal / 1024 / 1024)}MB (${memPercent}%) ${this.getHealthIndicator(memPercent, 85)}`
+    );
+    console.log(
+      `   Uptime: ${Math.floor(process.uptime() / 60)}m ${Math.floor(process.uptime() % 60)}s`
+    );
     console.log(`   Bun Version: ${Bun.version}\n`);
 
     // API Endpoints Status (simulated)
@@ -51,21 +55,27 @@ class MonitorSnapshot {
       { path: '/api/health', status: 'healthy', responseTime: 45, successRate: 100 },
       { path: '/api/health/detailed', status: 'healthy', responseTime: 67, successRate: 100 },
       { path: '/api/manager/agents', status: 'warning', responseTime: 1250, successRate: 95 },
-      { path: '/dashboard', status: 'healthy', responseTime: 120, successRate: 99 }
+      { path: '/dashboard', status: 'healthy', responseTime: 120, successRate: 99 },
     ];
-    
+
     endpoints.forEach(endpoint => {
       const statusIcon = this.getStatusIcon(endpoint.status);
-      console.log(`   ${statusIcon} ${endpoint.path} - ${endpoint.responseTime}ms (${endpoint.successRate}% success)`);
+      console.log(
+        `   ${statusIcon} ${endpoint.path} - ${endpoint.responseTime}ms (${endpoint.successRate}% success)`
+      );
     });
 
     // Recent Alerts (simulated)
     console.log('\n🚨 Recent Alerts:');
     const alerts = [
-      { severity: 'medium', time: '10:45:23', message: 'Response time elevated for /api/manager/agents' },
-      { severity: 'low', time: '10:44:15', message: 'Memory usage approaching threshold (82%)' }
+      {
+        severity: 'medium',
+        time: '10:45:23',
+        message: 'Response time elevated for /api/manager/agents',
+      },
+      { severity: 'low', time: '10:44:15', message: 'Memory usage approaching threshold (82%)' },
     ];
-    
+
     if (alerts.length > 0) {
       alerts.forEach(alert => {
         const severityIcon = this.getSeverityIcon(alert.severity);
@@ -85,7 +95,7 @@ class MonitorSnapshot {
     // Footer
     console.log(`\n📊 Monitoring active | Interval: 5000ms | Press Ctrl+C to stop`);
     console.log('─'.repeat(50));
-    
+
     // Show sample data updates
     console.log('\n📡 Live Data Stream (Sample):');
     this.showLiveDataSample();
@@ -98,18 +108,26 @@ class MonitorSnapshot {
     const updates = [
       { time: '10:45:30', type: 'API', message: 'GET /api/health - 42ms - 200 OK' },
       { time: '10:45:31', type: 'SYS', message: 'Memory: 145MB used (68%)' },
-      { time: '10:45:32', type: 'API', message: 'POST /api/manager/getLiveWagers - 856ms - 200 OK' },
+      {
+        time: '10:45:32',
+        type: 'API',
+        message: 'POST /api/manager/getLiveWagers - 856ms - 200 OK',
+      },
       { time: '10:45:33', type: 'PERF', message: 'CPU spike detected: 87%' },
-      { time: '10:45:34', type: 'API', message: 'GET /dashboard - 98ms - 200 OK' }
+      { time: '10:45:34', type: 'API', message: 'GET /dashboard - 98ms - 200 OK' },
     ];
 
     updates.forEach(update => {
-      const typeColor = update.type === 'API' ? '\x1b[36m' :    // Cyan
-                       update.type === 'SYS' ? '\x1b[33m' :    // Yellow
-                       update.type === 'PERF' ? '\x1b[35m' :   // Magenta
-                       '\x1b[37m';                              // White
+      const typeColor =
+        update.type === 'API'
+          ? '\x1b[36m' // Cyan
+          : update.type === 'SYS'
+            ? '\x1b[33m' // Yellow
+            : update.type === 'PERF'
+              ? '\x1b[35m' // Magenta
+              : '\x1b[37m'; // White
       const reset = '\x1b[0m';
-      
+
       console.log(`   [${update.time}] ${typeColor}${update.type}${reset} ${update.message}`);
     });
   }
@@ -155,7 +173,7 @@ class MonitorSnapshot {
    */
   displayCapabilities(): void {
     console.log('\n🎯 Fire22 Monitor Capabilities:\n');
-    
+
     console.log('📊 Real-Time Metrics:');
     console.log('   • CPU usage and load tracking');
     console.log('   • Memory usage and heap analysis');
@@ -196,21 +214,31 @@ class MonitorSnapshot {
 
   private getStatusIcon(status: string): string {
     switch (status) {
-      case 'healthy': return '🟢';
-      case 'warning': return '🟡';
-      case 'critical': return '🟠';
-      case 'down': return '🔴';
-      default: return '⚪';
+      case 'healthy':
+        return '🟢';
+      case 'warning':
+        return '🟡';
+      case 'critical':
+        return '🟠';
+      case 'down':
+        return '🔴';
+      default:
+        return '⚪';
     }
   }
 
   private getSeverityIcon(severity: string): string {
     switch (severity) {
-      case 'low': return '🔵';
-      case 'medium': return '🟡';
-      case 'high': return '🟠';
-      case 'critical': return '🔴';
-      default: return '⚪';
+      case 'low':
+        return '🔵';
+      case 'medium':
+        return '🟡';
+      case 'high':
+        return '🟠';
+      case 'critical':
+        return '🔴';
+      default:
+        return '⚪';
     }
   }
 }
@@ -218,9 +246,9 @@ class MonitorSnapshot {
 // Main execution
 async function main() {
   const snapshot = new MonitorSnapshot();
-  
+
   const args = process.argv.slice(2);
-  
+
   if (args.includes('--tree')) {
     snapshot.displayMonitorTree();
   } else if (args.includes('--capabilities')) {

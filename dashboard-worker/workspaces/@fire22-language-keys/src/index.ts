@@ -2,17 +2,17 @@
 
 /**
  * 🔥 Fire22 Language Keys System - Core Module
- * 
+ *
  * Centralized Fire22 L-key management for all workspaces
  * Provides authentic multilingual support (EN/ES/PT) based on real Fire22 language keys
- * 
+ *
  * Usage across workspaces:
  * ```typescript
  * import { Fire22LanguageManager, fire22Language } from '@fire22/language-keys';
- * 
+ *
  * // Singleton instance (recommended)
  * const text = fire22Language.getText('L-69'); // "Amount"
- * 
+ *
  * // Custom instance
  * const manager = new Fire22LanguageManager('es');
  * const spanishText = manager.getText('L-69'); // "Cantidad"
@@ -21,62 +21,62 @@
 
 export interface Fire22LanguageKeys {
   // Betting Types (Sports & Casino)
-  'L-12': string;  // Straights (Directas / Diretas)
-  'L-15': string;  // Parlays (Combinadas / Combinadas)  
-  'L-16': string;  // If Bets (Apuestas Si / Apostas Se)
-  'L-85': string;  // Teasers (Teasers / Teasers)
+  'L-12': string; // Straights (Directas / Diretas)
+  'L-15': string; // Parlays (Combinadas / Combinadas)
+  'L-16': string; // If Bets (Apuestas Si / Apostas Se)
+  'L-85': string; // Teasers (Teasers / Teasers)
   'L-1390': string; // Live/Props (En Vivo/Props / Ao Vivo/Props)
 
   // Financial & Transaction Keys
-  'L-69': string;   // Amount (Cantidad / Quantidade)
-  'L-627': string;  // Risk Amount (Cantidad Riesgo / Valor Risco)
-  'L-628': string;  // Win Amount (Cantidad Ganancia / Valor Ganho)
-  'L-187': string;  // Balance (Saldo / Saldo)
-  'L-281': string;  // Credit (Crédito / Crédito)
+  'L-69': string; // Amount (Cantidad / Quantidade)
+  'L-627': string; // Risk Amount (Cantidad Riesgo / Valor Risco)
+  'L-628': string; // Win Amount (Cantidad Ganancia / Valor Ganho)
+  'L-187': string; // Balance (Saldo / Saldo)
+  'L-281': string; // Credit (Crédito / Crédito)
 
   // Customer & Identity
-  'L-152': string;  // Type (Tipo / Tipo)
-  'L-214': string;  // Password (Contraseña / Senha)
-  'L-526': string;  // Name (Nombre / Nome)
-  'L-603': string;  // Customer ID (ID Cliente / ID Cliente)
+  'L-152': string; // Type (Tipo / Tipo)
+  'L-214': string; // Password (Contraseña / Senha)
+  'L-526': string; // Name (Nombre / Nome)
+  'L-603': string; // Customer ID (ID Cliente / ID Cliente)
 
   // System & Interface
-  'L-407': string;  // Settings (Configuración / Configurações)
-  'L-449': string;  // Today (Hoy / Hoje)
-  'L-451': string;  // Time (Hora / Hora)
-  'L-792': string;  // Okay (Aceptar / OK)
-  'L-880': string;  // All (Todo / Todos)
+  'L-407': string; // Settings (Configuración / Configurações)
+  'L-449': string; // Today (Hoy / Hoje)
+  'L-451': string; // Time (Hora / Hora)
+  'L-792': string; // Okay (Aceptar / OK)
+  'L-880': string; // All (Todo / Todos)
 
   // Reporting & Analytics
-  'L-849': string;  // Report Settings (Configuración Reportes / Configurações Relatório)
-  'L-885': string;  // Order By (Ordenar Por / Ordenar Por)
-  'L-886': string;  // Sort (Ordenar / Ordenar)
-  'L-892': string;  // Filter (Filtro / Filtro)
+  'L-849': string; // Report Settings (Configuración Reportes / Configurações Relatório)
+  'L-885': string; // Order By (Ordenar Por / Ordenar Por)
+  'L-886': string; // Sort (Ordenar / Ordenar)
+  'L-892': string; // Filter (Filtro / Filtro)
 
   // Advanced Keys (L-868 to L-896)
-  'L-868': string;  // Commission (Comisión / Comissão)
-  'L-869': string;  // Agent (Agente / Agente)
-  'L-871': string;  // Player (Jugador / Jogador)
-  'L-881': string;  // Active (Activo / Ativo)
-  'L-882': string;  // Inactive (Inactivo / Inativo)
-  'L-883': string;  // Pending (Pendiente / Pendente)
-  'L-884': string;  // Completed (Completado / Concluído)
-  'L-887': string;  // Status (Estado / Status)
-  'L-888': string;  // Agent ID (ID Agente / ID Agente)
-  'L-889': string;  // Login ID (ID Login / ID Login)
-  'L-890': string;  // Date Range (Rango Fecha / Período)
-  'L-891': string;  // From Date (Desde Fecha / Data Inicial)
-  'L-893': string;  // To Date (Hasta Fecha / Data Final)
-  'L-894': string;  // Search (Buscar / Buscar)
-  'L-895': string;  // Export (Exportar / Exportar)
-  'L-896': string;  // Print (Imprimir / Imprimir)
+  'L-868': string; // Commission (Comisión / Comissão)
+  'L-869': string; // Agent (Agente / Agente)
+  'L-871': string; // Player (Jugador / Jogador)
+  'L-881': string; // Active (Activo / Ativo)
+  'L-882': string; // Inactive (Inactivo / Inativo)
+  'L-883': string; // Pending (Pendiente / Pendente)
+  'L-884': string; // Completed (Completado / Concluído)
+  'L-887': string; // Status (Estado / Status)
+  'L-888': string; // Agent ID (ID Agente / ID Agente)
+  'L-889': string; // Login ID (ID Login / ID Login)
+  'L-890': string; // Date Range (Rango Fecha / Período)
+  'L-891': string; // From Date (Desde Fecha / Data Inicial)
+  'L-893': string; // To Date (Hasta Fecha / Data Final)
+  'L-894': string; // Search (Buscar / Buscar)
+  'L-895': string; // Export (Exportar / Exportar)
+  'L-896': string; // Print (Imprimir / Imprimir)
 
   // Business Operations
-  'L-202': string;  // Deposit (Depósito / Depósito)
-  'L-206': string;  // Withdrawal (Retiro / Saque)
-  'L-287': string;  // Transaction (Transacción / Transação)
-  'L-426': string;  // Account (Cuenta / Conta)
-  'L-475': string;  // Limit (Límite / Limite)
+  'L-202': string; // Deposit (Depósito / Depósito)
+  'L-206': string; // Withdrawal (Retiro / Saque)
+  'L-287': string; // Transaction (Transacción / Transação)
+  'L-426': string; // Account (Cuenta / Conta)
+  'L-475': string; // Limit (Límite / Limite)
 
   // Enhanced Keys
   'L-1351': string; // Dashboard (Panel / Painel)
@@ -86,10 +86,10 @@ export interface Fire22LanguageKeys {
  * Complete Fire22 language key mappings with authentic translations
  */
 export const FIRE22_LANGUAGE_KEYS: Record<string, Fire22LanguageKeys> = {
-  'en': {
+  en: {
     // Betting Types
     'L-12': 'Straights',
-    'L-15': 'Parlays', 
+    'L-15': 'Parlays',
     'L-16': 'If Bets',
     'L-85': 'Teasers',
     'L-1390': 'Live/Props',
@@ -101,7 +101,7 @@ export const FIRE22_LANGUAGE_KEYS: Record<string, Fire22LanguageKeys> = {
     'L-187': 'Balance',
     'L-281': 'Credit',
 
-    // Customer & Identity  
+    // Customer & Identity
     'L-152': 'Type',
     'L-214': 'Password',
     'L-526': 'Name',
@@ -146,9 +146,9 @@ export const FIRE22_LANGUAGE_KEYS: Record<string, Fire22LanguageKeys> = {
     'L-475': 'Limit',
 
     // Enhanced Keys
-    'L-1351': 'Dashboard'
+    'L-1351': 'Dashboard',
   },
-  'es': {
+  es: {
     // Betting Types
     'L-12': 'Directas',
     'L-15': 'Combinadas',
@@ -208,9 +208,9 @@ export const FIRE22_LANGUAGE_KEYS: Record<string, Fire22LanguageKeys> = {
     'L-475': 'Límite',
 
     // Enhanced Keys
-    'L-1351': 'Panel'
+    'L-1351': 'Panel',
   },
-  'pt': {
+  pt: {
     // Betting Types
     'L-12': 'Diretas',
     'L-15': 'Combinadas',
@@ -270,30 +270,30 @@ export const FIRE22_LANGUAGE_KEYS: Record<string, Fire22LanguageKeys> = {
     'L-475': 'Limite',
 
     // Enhanced Keys
-    'L-1351': 'Painel'
-  }
+    'L-1351': 'Painel',
+  },
 };
 
 /**
  * Water-themed depth contexts for Fire22 language organization
  */
 export interface DepthContext {
-  surface: Array<keyof Fire22LanguageKeys>;     // Basic UI elements
+  surface: Array<keyof Fire22LanguageKeys>; // Basic UI elements
   'mid-water': Array<keyof Fire22LanguageKeys>; // Core business logic
   'deep-water': Array<keyof Fire22LanguageKeys>; // Advanced features
-  abyssal: Array<keyof Fire22LanguageKeys>;     // System-level operations
+  abyssal: Array<keyof Fire22LanguageKeys>; // System-level operations
 }
 
 export const FIRE22_DEPTH_CONTEXTS: DepthContext = {
   surface: ['L-407', 'L-449', 'L-792', 'L-880'], // Settings, Today, Okay, All
   'mid-water': ['L-603', 'L-526', 'L-69', 'L-152'], // Customer ID, Name, Amount, Type
   'deep-water': ['L-849', 'L-885', 'L-886', 'L-892'], // Report Settings, Order By, Sort, Filter
-  abyssal: ['L-1390', 'L-888', 'L-889', 'L-880'] // Live/Props, Agent ID, Login ID, All
+  abyssal: ['L-1390', 'L-888', 'L-889', 'L-880'], // Live/Props, Agent ID, Login ID, All
 };
 
 /**
  * Fire22 Language Manager Class
- * 
+ *
  * Provides centralized multilingual support for all Fire22 workspaces
  */
 export class Fire22LanguageManager {
@@ -309,17 +309,17 @@ export class Fire22LanguageManager {
    */
   private normalizeLanguageCode(langCode: string): string {
     if (!langCode) return 'en';
-    
+
     const normalized = langCode.toLowerCase().substring(0, 2);
-    
+
     // Map common language variations
     const languageMap: Record<string, string> = {
-      'es': 'es', // Spanish
-      'pt': 'pt', // Portuguese  
+      es: 'es', // Spanish
+      pt: 'pt', // Portuguese
       'pt-br': 'pt', // Brazilian Portuguese
-      'en': 'en', // English
+      en: 'en', // English
       'en-us': 'en', // US English
-      'en-gb': 'en' // UK English
+      'en-gb': 'en', // UK English
     };
 
     return languageMap[normalized] || 'en';
@@ -333,13 +333,13 @@ export class Fire22LanguageManager {
     if (languageSet && languageSet[key]) {
       return languageSet[key];
     }
-    
+
     // Fallback to English if available
     const englishSet = FIRE22_LANGUAGE_KEYS['en'];
     if (englishSet && englishSet[key]) {
       return englishSet[key];
     }
-    
+
     return fallback || key;
   }
 
@@ -374,7 +374,9 @@ export class Fire22LanguageManager {
   /**
    * Get language keys by water depth context
    */
-  getContextKeys(depth: keyof DepthContext): Array<{key: keyof Fire22LanguageKeys; text: string}> {
+  getContextKeys(
+    depth: keyof DepthContext
+  ): Array<{ key: keyof Fire22LanguageKeys; text: string }> {
     if (!this.depthContext) {
       return [];
     }
@@ -382,7 +384,7 @@ export class Fire22LanguageManager {
     const keys = this.depthContext[depth] || [];
     return keys.map(key => ({
       key,
-      text: this.getText(key)
+      text: this.getText(key),
     }));
   }
 
@@ -409,11 +411,9 @@ export class Fire22LanguageManager {
   /**
    * Create multilingual data structure for Fire22 UI components
    */
-  createMultilingualData<T>(
-    structure: Record<keyof Fire22LanguageKeys, T>
-  ): Record<string, T> {
+  createMultilingualData<T>(structure: Record<keyof Fire22LanguageKeys, T>): Record<string, T> {
     const result: Record<string, T> = {};
-    
+
     Object.keys(structure).forEach(key => {
       const lKey = key as keyof Fire22LanguageKeys;
       const translatedKey = this.getText(lKey);
@@ -428,11 +428,11 @@ export class Fire22LanguageManager {
    */
   formatAmount(amount: number, currency: string = 'USD'): string {
     const amountLabel = this.getText('L-69'); // Amount
-    
+
     const formatter = new Intl.NumberFormat(this.getLocale(), {
       style: 'currency',
       currency: currency,
-      minimumFractionDigits: 2
+      minimumFractionDigits: 2,
     });
 
     return `${amountLabel}: ${formatter.format(amount)}`;
@@ -443,9 +443,9 @@ export class Fire22LanguageManager {
    */
   private getLocale(): string {
     const localeMap: Record<string, string> = {
-      'en': 'en-US',
-      'es': 'es-ES', 
-      'pt': 'pt-BR'
+      en: 'en-US',
+      es: 'es-ES',
+      pt: 'pt-BR',
     };
     return localeMap[this.currentLanguage] || 'en-US';
   }
@@ -480,14 +480,14 @@ export class Fire22LanguageManager {
       currentLanguage: this.currentLanguage,
       supportedLanguages: this.getSupportedLanguages(),
       keys: this.getAllKeys(),
-      depthContext: this.depthContext
+      depthContext: this.depthContext,
     };
   }
 }
 
 /**
  * Singleton Fire22 Language Manager instance for workspace-wide usage
- * 
+ *
  * Usage:
  * ```typescript
  * import { fire22Language } from '@fire22/language-keys';
@@ -511,22 +511,22 @@ export const Fire22LanguageUtils = {
       today: manager.getText('L-449'),
       okay: manager.getText('L-792'),
       all: manager.getText('L-880'),
-      
+
       // Financial Operations
       amount: manager.getText('L-69'),
       balance: manager.getText('L-187'),
       deposit: manager.getText('L-202'),
       withdrawal: manager.getText('L-206'),
-      
+
       // Customer Management
       customerId: manager.getText('L-603'),
       name: manager.getText('L-526'),
       type: manager.getText('L-152'),
-      
+
       // Betting Operations
       straights: manager.getText('L-12'),
       parlays: manager.getText('L-15'),
-      liveProps: manager.getText('L-1390')
+      liveProps: manager.getText('L-1390'),
     };
   },
 
@@ -551,7 +551,7 @@ export const Fire22LanguageUtils = {
   getAllAvailableLKeys: (): string[] => {
     const englishSet = FIRE22_LANGUAGE_KEYS['en'];
     return Object.keys(englishSet);
-  }
+  },
 };
 
 // Type exports for workspace integration

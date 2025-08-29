@@ -21,8 +21,12 @@ export interface SecurityAuditResult {
   success: boolean;
   score: number;
   issues: Array<{
-    type: 'weak_secret' | 'default_value' | 'exposed_pattern' | 'missing_required';
-    severity: 'low' | 'medium' | 'high' | 'critical';
+    type:
+      | "weak_secret"
+      | "default_value"
+      | "exposed_pattern"
+      | "missing_required";
+    severity: "low" | "medium" | "high" | "critical";
     message: string;
     variable?: string;
     recommendation: string;
@@ -56,24 +60,35 @@ export class EnvironmentManager {
     try {
       // Check if current environment is supported
       if (!this.config.envFiles[currentEnv]) {
-        errors.push(`Environment '${currentEnv}' is not supported. Supported: ${Object.keys(this.config.envFiles).join(', ')}`);
+        errors.push(
+          `Environment '${currentEnv}' is not supported. Supported: ${Object.keys(this.config.envFiles).join(", ")}`,
+        );
       }
 
       // Validate required environment variables
       for (const requiredVar of this.config.envValidation.required) {
         const value = Bun.env[requiredVar];
         if (!value) {
-          errors.push(`Required environment variable '${requiredVar}' is not set`);
-        } else if (value.length < 32 && this.config.envValidation.secrets.includes(requiredVar)) {
-          warnings.push(`Secret '${requiredVar}' is shorter than recommended 32 characters`);
+          errors.push(
+            `Required environment variable '${requiredVar}' is not set`,
+          );
+        } else if (
+          value.length < 32 &&
+          this.config.envValidation.secrets.includes(requiredVar)
+        ) {
+          warnings.push(
+            `Secret '${requiredVar}' is shorter than recommended 32 characters`,
+          );
         }
       }
 
       // Check optional variables
       for (const optionalVar of this.config.envValidation.optional) {
         const value = Bun.env[optionalVar];
-        if (value && value.includes('dev_') || value?.includes('test_')) {
-          warnings.push(`Optional variable '${optionalVar}' contains development/test pattern: ${value}`);
+        if ((value && value.includes("dev_")) || value?.includes("test_")) {
+          warnings.push(
+            `Optional variable '${optionalVar}' contains development/test pattern: ${value}`,
+          );
         }
       }
 
@@ -82,10 +97,14 @@ export class EnvironmentManager {
         const value = Bun.env[secretVar];
         if (value) {
           if (value.length < 32) {
-            errors.push(`Secret '${secretVar}' must be at least 32 characters long`);
+            errors.push(
+              `Secret '${secretVar}' must be at least 32 characters long`,
+            );
           }
-          if (value === 'your-secret-key' || value === 'dev_secret') {
-            errors.push(`Secret '${secretVar}' contains default/placeholder value`);
+          if (value === "your-secret-key" || value === "dev_secret") {
+            errors.push(
+              `Secret '${secretVar}' contains default/placeholder value`,
+            );
           }
         }
       }
@@ -98,12 +117,12 @@ export class EnvironmentManager {
         errors,
         warnings,
         environment: currentEnv,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       // Cache result
       this.validationCache.set(currentEnv, result);
-      
+
       return result;
     } catch (error) {
       const accessTime = performance.now() - startTime;
@@ -111,10 +130,12 @@ export class EnvironmentManager {
 
       return {
         success: false,
-        errors: [`Validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`],
+        errors: [
+          `Validation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        ],
         warnings: [],
         environment: currentEnv,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -122,7 +143,7 @@ export class EnvironmentManager {
   // Perform security audit
   async performSecurityAudit(): Promise<SecurityAuditResult> {
     const startTime = performance.now();
-    const issues: SecurityAuditResult['issues'] = [];
+    const issues: SecurityAuditResult["issues"] = [];
     let score = 100;
 
     try {
@@ -132,32 +153,33 @@ export class EnvironmentManager {
         if (value) {
           if (value.length < 32) {
             issues.push({
-              type: 'weak_secret',
-              severity: 'high',
+              type: "weak_secret",
+              severity: "high",
               message: `Secret '${secretVar}' is too short (${value.length} chars)`,
               variable: secretVar,
-              recommendation: 'Generate a secret with at least 32 characters'
+              recommendation: "Generate a secret with at least 32 characters",
             });
             score -= 20;
           }
-          
-          if (value === 'your-secret-key' || value === 'dev_secret') {
+
+          if (value === "your-secret-key" || value === "dev_secret") {
             issues.push({
-              type: 'default_value',
-              severity: 'critical',
+              type: "default_value",
+              severity: "critical",
               message: `Secret '${secretVar}' contains default value`,
               variable: secretVar,
-              recommendation: 'Replace with a strong, unique secret'
+              recommendation: "Replace with a strong, unique secret",
             });
             score -= 30;
           }
         } else {
           issues.push({
-            type: 'missing_required',
-            severity: 'critical',
+            type: "missing_required",
+            severity: "critical",
             message: `Required secret '${secretVar}' is not set`,
             variable: secretVar,
-            recommendation: 'Set this environment variable with a strong secret'
+            recommendation:
+              "Set this environment variable with a strong secret",
           });
           score -= 25;
         }
@@ -165,13 +187,16 @@ export class EnvironmentManager {
 
       // Check for exposed patterns
       for (const [key, value] of Object.entries(Bun.env)) {
-        if (value && (value.includes('sk_live_') || value.includes('pk_live_'))) {
+        if (
+          value &&
+          (value.includes("sk_live_") || value.includes("pk_live_"))
+        ) {
           issues.push({
-            type: 'exposed_pattern',
-            severity: 'critical',
+            type: "exposed_pattern",
+            severity: "critical",
             message: `Live API key detected in '${key}'`,
             variable: key,
-            recommendation: 'Use test keys in development environments'
+            recommendation: "Use test keys in development environments",
           });
           score -= 25;
         }
@@ -184,7 +209,7 @@ export class EnvironmentManager {
         success: score >= 70,
         score: Math.max(0, score),
         issues,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       const accessTime = performance.now() - startTime;
@@ -193,13 +218,15 @@ export class EnvironmentManager {
       return {
         success: false,
         score: 0,
-        issues: [{
-          type: 'exposed_pattern',
-          severity: 'critical',
-          message: `Security audit failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-          recommendation: 'Check system configuration and try again'
-        }],
-        timestamp: new Date().toISOString()
+        issues: [
+          {
+            type: "exposed_pattern",
+            severity: "critical",
+            message: `Security audit failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+            recommendation: "Check system configuration and try again",
+          },
+        ],
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -211,14 +238,16 @@ export class EnvironmentManager {
     }
 
     const latest = this.performanceMetrics[this.performanceMetrics.length - 1];
-    const avgAccessTime = this.performanceMetrics.reduce((sum, m) => sum + m.accessTime, 0) / this.performanceMetrics.length;
+    const avgAccessTime =
+      this.performanceMetrics.reduce((sum, m) => sum + m.accessTime, 0) /
+      this.performanceMetrics.length;
     const opsPerSecond = 1000 / avgAccessTime; // Rough calculation
 
     return {
       accessTime: avgAccessTime,
       operationsPerSecond: opsPerSecond,
       memoryUsage: performance.memory?.usedJSHeapSize || 0,
-      timestamp: latest.timestamp
+      timestamp: latest.timestamp,
     };
   }
 
@@ -228,7 +257,7 @@ export class EnvironmentManager {
       accessTime,
       operationsPerSecond: 0, // Will be calculated when retrieved
       memoryUsage: performance.memory?.usedJSHeapSize || 0,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     // Keep only last 1000 metrics
@@ -262,18 +291,18 @@ export class EnvironmentManager {
 
 // Default configuration
 const defaultConfig: EnvironmentConfig = {
-  environment: Bun.env.NODE_ENV || 'development',
+  environment: Bun.env.NODE_ENV || "development",
   envFiles: {
-    development: '.env.development',
-    staging: '.env.staging',
-    production: '.env.production',
-    test: '.env.test'
+    development: ".env.development",
+    staging: ".env.staging",
+    production: ".env.production",
+    test: ".env.test",
   },
   envValidation: {
-    required: ['JWT_SECRET', 'ADMIN_PASSWORD'],
-    optional: ['BOT_TOKEN', 'DEMO_MODE'],
-    secrets: ['JWT_SECRET', 'ADMIN_PASSWORD']
-  }
+    required: ["JWT_SECRET", "ADMIN_PASSWORD"],
+    optional: ["BOT_TOKEN", "DEMO_MODE"],
+    secrets: ["JWT_SECRET", "ADMIN_PASSWORD"],
+  },
 };
 
 // Export default instance

@@ -42,6 +42,7 @@ tests/
 ## 🚀 **Running Tests**
 
 ### Quick Commands
+
 ```bash
 # Run all tests
 bun test
@@ -64,6 +65,7 @@ bun test --watch
 ```
 
 ### Environment-Specific Testing
+
 ```bash
 # Development tests
 NODE_ENV=development bun test
@@ -78,26 +80,31 @@ NODE_ENV=staging bun test
 ## 📊 **Test Categories**
 
 ### 🔧 **Unit Tests**
+
 - Test individual functions and components in isolation
 - Fast execution, no external dependencies
 - High code coverage target: 90%+
 
 ### 🔗 **Integration Tests**
+
 - Test component interactions
 - Database and API integrations
 - External service mocking
 
 ### 🎭 **End-to-End Tests**
+
 - Complete user workflows
 - Real browser testing
 - Full system validation
 
 ### ⚡ **Performance Tests**
+
 - API response times
 - Database query performance
 - Load testing scenarios
 
 ### 🔒 **Security Tests**
+
 - Authentication and authorization
 - Input validation and sanitization
 - Vulnerability scanning
@@ -105,6 +112,7 @@ NODE_ENV=staging bun test
 ## 🛠️ **Test Configuration**
 
 ### Test Environment Variables
+
 ```bash
 # Test database
 TEST_DATABASE_URL=file:./test-dashboard.db
@@ -120,6 +128,7 @@ TEST_DEBUG=true
 ```
 
 ### Test Database Setup
+
 ```typescript
 // Separate test database for isolation
 const testDb = new Database('./test-dashboard.db');
@@ -138,6 +147,7 @@ afterEach(async () => {
 ## 📝 **Writing Tests**
 
 ### Test Naming Convention
+
 ```typescript
 // ✅ Good test names
 describe('API Health Endpoint', () => {
@@ -154,6 +164,7 @@ describe('Health', () => {
 ```
 
 ### Test Structure
+
 ```typescript
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
 
@@ -169,10 +180,10 @@ describe('Feature Name', () => {
   it('should do something specific', () => {
     // Arrange
     const input = 'test data';
-    
+
     // Act
     const result = functionUnderTest(input);
-    
+
     // Assert
     expect(result).toBe('expected output');
   });
@@ -182,11 +193,13 @@ describe('Feature Name', () => {
 ## 🎯 **Test Coverage Goals**
 
 ### Coverage Targets
+
 - **Unit Tests**: 90%+ line coverage
 - **Integration Tests**: 80%+ feature coverage
 - **E2E Tests**: 100% critical path coverage
 
 ### Coverage Reports
+
 ```bash
 # Generate coverage report
 bun test --coverage
@@ -199,6 +212,7 @@ open coverage/index.html
 ## 🔄 **Continuous Integration**
 
 ### Pre-commit Hooks
+
 ```bash
 # Run tests before commit
 bun test
@@ -211,6 +225,7 @@ bun run type-check
 ```
 
 ### CI Pipeline
+
 ```yaml
 # Example GitHub Actions
 - name: Run Tests
@@ -223,6 +238,7 @@ bun run type-check
 ## 🐛 **Debugging Tests**
 
 ### Debug Mode
+
 ```bash
 # Run tests with debug output
 TEST_DEBUG=true bun test
@@ -232,6 +248,7 @@ bun test --debug tests/unit/api/health.test.ts
 ```
 
 ### Test Isolation
+
 ```typescript
 // Use test.only for debugging specific tests
 it.only('should debug this specific test', () => {
@@ -259,4 +276,5 @@ it.skip('should skip this test for now', () => {
 
 ---
 
-*This testing suite ensures the reliability and quality of the Fire22 Dashboard system.*
+_This testing suite ensures the reliability and quality of the Fire22 Dashboard
+system._

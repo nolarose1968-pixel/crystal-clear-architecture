@@ -4,9 +4,9 @@
  * Fixes all registry issues and ensures proper npm registry connectivity
  */
 
-import { $ } from "bun";
-import { writeFile, readFile, exists } from "node:fs/promises";
-import { join } from "node:path";
+import { $ } from 'bun';
+import { writeFile, readFile, exists } from 'node:fs/promises';
+import { join } from 'node:path';
 
 interface RegistryError {
   code: string;
@@ -17,83 +17,85 @@ interface RegistryError {
 
 const REGISTRY_ERRORS: RegistryError[] = [
   {
-    code: "404_PACKAGE_NOT_FOUND",
-    description: "Package not found in registry",
-    solution: "Ensure package name is correct and registry URL is valid",
-    url: "https://packages.apexodds.net"
+    code: '404_PACKAGE_NOT_FOUND',
+    description: 'Package not found in registry',
+    solution: 'Ensure package name is correct and registry URL is valid',
+    url: 'https://packages.apexodds.net',
   },
   {
-    code: "INVALID_REGISTRY",
-    description: "Registry URL is not accessible or returns errors",
-    solution: "Use official npm registry: https://registry.npmjs.org/",
+    code: 'INVALID_REGISTRY',
+    description: 'Registry URL is not accessible or returns errors',
+    solution: 'Use official npm registry: https://registry.npmjs.org/',
   },
   {
-    code: "SCOPED_REGISTRY_FAIL",
-    description: "Scoped package registry is not accessible",
-    solution: "Fallback to main registry for scoped packages",
+    code: 'SCOPED_REGISTRY_FAIL',
+    description: 'Scoped package registry is not accessible',
+    solution: 'Fallback to main registry for scoped packages',
   },
   {
-    code: "VERSION_MISMATCH",
-    description: "Requested version not available in registry",
-    solution: "Use latest compatible version or check package.json constraints",
-  }
+    code: 'VERSION_MISMATCH',
+    description: 'Requested version not available in registry',
+    solution: 'Use latest compatible version or check package.json constraints',
+  },
 ];
 
 class RegistryFixer {
-  private readonly NPM_REGISTRY = "https://registry.npmjs.org/";
-  private readonly CONFIG_FILES = [".npmrc", "bunfig.toml", ".yarnrc"];
-  
+  private readonly NPM_REGISTRY = 'https://registry.npmjs.org/';
+  private readonly CONFIG_FILES = ['.npmrc', 'bunfig.toml', '.yarnrc'];
+
   async diagnose(): Promise<void> {
-    console.log("🔍 Diagnosing registry configuration issues...\n");
-    
+    console.log('🔍 Diagnosing registry configuration issues...\n');
+
     // Check current registry settings
     await this.checkRegistryConfig();
-    
+
     // Test registry connectivity
     await this.testRegistryConnectivity();
-    
+
     // Document errors
     await this.documentErrors();
   }
-  
+
   async checkRegistryConfig(): Promise<void> {
-    console.log("📋 Checking configuration files:");
-    
+    console.log('📋 Checking configuration files:');
+
     for (const file of this.CONFIG_FILES) {
       if (await exists(file)) {
         console.log(`  ✓ Found ${file}`);
-        const content = await readFile(file, "utf-8");
-        
+        const content = await readFile(file, 'utf-8');
+
         // Check for problematic registries
-        if (content.includes("packages.apexodds.net")) {
+        if (content.includes('packages.apexodds.net')) {
           console.log(`    ⚠️  Found problematic registry: packages.apexodds.net`);
         }
-        if (content.includes("fire22.workers.dev/registry")) {
+        if (content.includes('fire22.workers.dev/registry')) {
           console.log(`    ⚠️  Found custom registry: fire22.workers.dev/registry`);
         }
       }
     }
     console.log();
   }
-  
+
   async testRegistryConnectivity(): Promise<void> {
-    console.log("🌐 Testing registry connectivity:");
-    
+    console.log('🌐 Testing registry connectivity:');
+
     const registries = [
-      { name: "NPM Official", url: "https://registry.npmjs.org/" },
-      { name: "Packages ApexOdds", url: "https://packages.apexodds.net/" },
-      { name: "Fire22 Workers", url: "https://fire22.workers.dev/registry/" }
+      { name: 'NPM Official', url: 'https://registry.npmjs.org/' },
+      { name: 'Packages ApexOdds', url: 'https://packages.apexodds.net/' },
+      { name: 'Fire22 Workers', url: 'https://fire22.workers.dev/registry/' },
     ];
-    
+
     for (const registry of registries) {
       try {
-        const response = await fetch(registry.url, { 
-          method: "HEAD",
-          signal: AbortSignal.timeout(5000) 
+        const response = await fetch(registry.url, {
+          method: 'HEAD',
+          signal: AbortSignal.timeout(5000),
         });
-        
+
         if (response.ok || response.status === 404) {
-          console.log(`  ✓ ${registry.name}: ${response.status === 404 ? 'Accessible but returns 404' : 'OK'}`);
+          console.log(
+            `  ✓ ${registry.name}: ${response.status === 404 ? 'Accessible but returns 404' : 'OK'}`
+          );
         } else {
           console.log(`  ✗ ${registry.name}: HTTP ${response.status}`);
         }
@@ -103,28 +105,28 @@ class RegistryFixer {
     }
     console.log();
   }
-  
+
   async fix(): Promise<void> {
-    console.log("🔧 Fixing registry configuration...\n");
-    
+    console.log('🔧 Fixing registry configuration...\n');
+
     // 1. Fix .npmrc
     await this.fixNpmrc();
-    
+
     // 2. Fix bunfig.toml
     await this.fixBunfig();
-    
+
     // 3. Create .env for registry overrides
     await this.createEnvOverrides();
-    
+
     // 4. Clean cache
     await this.cleanCache();
-    
-    console.log("✅ Registry configuration fixed!\n");
+
+    console.log('✅ Registry configuration fixed!\n');
   }
-  
+
   async fixNpmrc(): Promise<void> {
-    console.log("📝 Fixing .npmrc...");
-    
+    console.log('📝 Fixing .npmrc...');
+
     const npmrcContent = `# NPM Configuration for Fire22 Dashboard Worker
 # Fixed by fix-registry-config.ts
 
@@ -156,14 +158,14 @@ progress=true
 # Workspace Settings
 workspaces-update=false
 `;
-    
-    await writeFile(".npmrc", npmrcContent);
-    console.log("  ✓ .npmrc updated");
+
+    await writeFile('.npmrc', npmrcContent);
+    console.log('  ✓ .npmrc updated');
   }
-  
+
   async fixBunfig(): Promise<void> {
-    console.log("📝 Fixing bunfig.toml...");
-    
+    console.log('📝 Fixing bunfig.toml...');
+
     const bunfigContent = `# Fire22 Dashboard - Bun Configuration
 # Fixed by fix-registry-config.ts
 
@@ -215,14 +217,14 @@ plugins = []
 "/styles" = "./src/styles"
 "/js" = "./src/js"
 `;
-    
-    await writeFile("bunfig.toml", bunfigContent);
-    console.log("  ✓ bunfig.toml updated");
+
+    await writeFile('bunfig.toml', bunfigContent);
+    console.log('  ✓ bunfig.toml updated');
   }
-  
+
   async createEnvOverrides(): Promise<void> {
-    console.log("📝 Creating registry overrides...");
-    
+    console.log('📝 Creating registry overrides...');
+
     const envContent = `# Registry Overrides for Bun
 BUN_CONFIG_REGISTRY=https://registry.npmjs.org/
 NPM_CONFIG_REGISTRY=https://registry.npmjs.org/
@@ -235,35 +237,37 @@ BUN_CONFIG_NO_CUSTOM_REGISTRIES=true
 BUN_CONFIG_CACHE_DIR=.bun/cache
 BUN_CONFIG_INSTALL_CACHE_DIR=.bun/install-cache
 `;
-    
-    await writeFile(".env.registry", envContent);
-    console.log("  ✓ .env.registry created");
+
+    await writeFile('.env.registry', envContent);
+    console.log('  ✓ .env.registry created');
   }
-  
+
   async cleanCache(): Promise<void> {
-    console.log("🗑️  Cleaning cache...");
-    
+    console.log('🗑️  Cleaning cache...');
+
     try {
       await $`rm -rf node_modules .bun bun.lockb package-lock.json yarn.lock`.quiet();
-      console.log("  ✓ Cache cleaned");
+      console.log('  ✓ Cache cleaned');
     } catch (error) {
-      console.log("  ⚠️  Some cache files not found (this is OK)");
+      console.log('  ⚠️  Some cache files not found (this is OK)');
     }
   }
-  
+
   async documentErrors(): Promise<void> {
-    console.log("📚 Creating error documentation...");
-    
+    console.log('📚 Creating error documentation...');
+
     const errorDocs = `# Registry Error Documentation
 
 ## Common Registry Errors and Solutions
 
-${REGISTRY_ERRORS.map(error => `
+${REGISTRY_ERRORS.map(
+  error => `
 ### ${error.code}
 **Description:** ${error.description}
 **Solution:** ${error.solution}
 ${error.url ? `**Related URL:** ${error.url}` : ''}
-`).join('\n')}
+`
+).join('\n')}
 
 ## Quick Fixes
 
@@ -310,14 +314,14 @@ Set these in your shell or .env file:
 - \`NPM_CONFIG_REGISTRY\`: NPM registry override
 - \`BUN_CONFIG_NO_CUSTOM_REGISTRIES\`: Disable all custom registries
 `;
-    
-    await writeFile("docs/REGISTRY-ERRORS.md", errorDocs);
-    console.log("  ✓ Error documentation created at docs/REGISTRY-ERRORS.md");
+
+    await writeFile('docs/REGISTRY-ERRORS.md', errorDocs);
+    console.log('  ✓ Error documentation created at docs/REGISTRY-ERRORS.md');
   }
-  
+
   async createDependencyProcess(): Promise<void> {
-    console.log("🔧 Creating dependency management process...");
-    
+    console.log('🔧 Creating dependency management process...');
+
     const processDoc = `# Dependency Management Process
 
 ## Adding New Dependencies
@@ -398,30 +402,30 @@ bun audit
 bun audit fix
 \`\`\`
 `;
-    
-    await writeFile("docs/DEPENDENCY-PROCESS.md", processDoc);
-    console.log("  ✓ Dependency process documentation created");
+
+    await writeFile('docs/DEPENDENCY-PROCESS.md', processDoc);
+    console.log('  ✓ Dependency process documentation created');
   }
 }
 
 // Main execution
 async function main() {
   const fixer = new RegistryFixer();
-  
+
   const args = process.argv.slice(2);
-  
-  if (args.includes("--fix")) {
+
+  if (args.includes('--fix')) {
     await fixer.fix();
     await fixer.createDependencyProcess();
-  } else if (args.includes("--diagnose")) {
+  } else if (args.includes('--diagnose')) {
     await fixer.diagnose();
   } else {
     // Default: diagnose, then fix
     await fixer.diagnose();
-    console.log("🔄 Applying fixes...\n");
+    console.log('🔄 Applying fixes...\n');
     await fixer.fix();
     await fixer.createDependencyProcess();
-    
+
     console.log(`
 ✅ Registry configuration has been fixed!
 

@@ -2,15 +2,19 @@
 
 ## 🎯 Overview
 
-This guide explains how to integrate the Fire22 Dashboard Worker's existing build tools and automation scripts with GitHub Actions for seamless CI/CD workflows.
+This guide explains how to integrate the Fire22 Dashboard Worker's existing
+build tools and automation scripts with GitHub Actions for seamless CI/CD
+workflows.
 
 ## 🏗️ Existing Build System Integration
 
 ### Enhanced Executable Builder Integration
 
-The existing `scripts/enhanced-executable-builder.ts` is already integrated into GitHub Actions workflows:
+The existing `scripts/enhanced-executable-builder.ts` is already integrated into
+GitHub Actions workflows:
 
 **CI Workflow Integration:**
+
 ```yaml
 # .github/workflows/ci.yml (lines 89-103)
 - name: 🚀 Build Enhanced Executables
@@ -29,6 +33,7 @@ The existing `scripts/enhanced-executable-builder.ts` is already integrated into
 ```
 
 **Release Workflow Integration:**
+
 ```yaml
 # .github/workflows/release.yml (lines 67-69)
 - name: 🏗️ Build Enhanced Executables
@@ -40,13 +45,15 @@ The existing `scripts/enhanced-executable-builder.ts` is already integrated into
 The workspace orchestration system is integrated through multiple CI checks:
 
 **Workspace Health Monitoring:**
+
 ```yaml
 # CI workflow automatically runs
-bun run scripts/workspace-health-monitor.ts
-bun run scripts/workspace-consistency-validator.ts
+bun run scripts/workspace-health-monitor.ts bun run
+scripts/workspace-consistency-validator.ts
 ```
 
 **Workspace-Aware Testing:**
+
 - Detects changes in specific workspaces
 - Runs targeted tests per affected workspace
 - Validates workspace isolation boundaries
@@ -74,16 +81,18 @@ The existing multi-registry publisher is integrated into the release workflow:
 Navigate to your repository settings and configure:
 
 **Topics (Repository Settings > General):**
+
 ```
-bun, typescript, fire22, sportsbook, dashboard, cloudflare-workers, 
-real-time, api, workspace-orchestration, simd-acceleration, 
+bun, typescript, fire22, sportsbook, dashboard, cloudflare-workers,
+real-time, api, workspace-orchestration, simd-acceleration,
 cross-platform, executable-compilation
 ```
 
 **Description:**
+
 ```
-🔥 Fire22 Dashboard Worker - Advanced Bun runtime system with workspace 
-orchestration, real-time Fire22 API integration, and cross-platform 
+🔥 Fire22 Dashboard Worker - Advanced Bun runtime system with workspace
+orchestration, real-time Fire22 API integration, and cross-platform
 executable compilation
 ```
 
@@ -94,6 +103,7 @@ executable compilation
 Navigate to Settings > Branches and create protection rules:
 
 **Main Branch Protection:**
+
 - Require pull request reviews: 2 required reviewers
 - Require review from code owners: ✅ Enabled
 - Dismiss stale reviews: ✅ Enabled
@@ -119,6 +129,7 @@ Navigate to Settings > Branches and create protection rules:
 Create teams in your GitHub organization:
 
 **Required Teams:**
+
 - `@fire22/engineering` - Maintain access
 - `@fire22/backend` - Push access
 - `@fire22/frontend` - Push access
@@ -130,15 +141,18 @@ Create teams in your GitHub organization:
 
 ### 4. Secrets Configuration
 
-Configure the following repository secrets (Settings > Secrets and variables > Actions):
+Configure the following repository secrets (Settings > Secrets and variables >
+Actions):
 
 **Required Secrets:**
+
 ```
 NPM_TOKEN                 # For package publishing
 GITHUB_TOKEN             # Automatically provided by GitHub
 ```
 
 **Optional Secrets (for enhanced features):**
+
 ```
 SLACK_WEBHOOK_URL        # For Slack notifications
 DISCORD_WEBHOOK_URL      # For Discord notifications
@@ -150,16 +164,19 @@ CODECOV_TOKEN           # For code coverage reporting
 ### CI Workflow Triggers
 
 **Automatic Triggers:**
+
 - Push to `main` or `develop` branches
 - Pull requests to `main` or `develop` branches
 
 **Manual Trigger:**
+
 ```bash
 # Dispatch workflow manually with full test suite
 gh workflow run ci.yml -f run_full_suite=true
 ```
 
 **Workflow Behavior:**
+
 1. **Change Detection**: Identifies which workspaces have changes
 2. **Targeted Testing**: Runs tests only for affected workspaces
 3. **Cross-Platform Building**: Builds executables on Windows, Linux, macOS
@@ -169,6 +186,7 @@ gh workflow run ci.yml -f run_full_suite=true
 ### Release Workflow Triggers
 
 **Tag-Based Releases:**
+
 ```bash
 # Full system release
 git tag v3.1.0
@@ -180,6 +198,7 @@ git push origin api-client-v1.2.0
 ```
 
 **Manual Releases:**
+
 ```bash
 # Manual release dispatch
 gh workflow run release.yml \
@@ -194,6 +213,7 @@ gh workflow run release.yml \
 The GitHub Actions workflows leverage existing build scripts:
 
 **Enhanced Executable Builder:**
+
 ```typescript
 // scripts/enhanced-executable-builder.ts
 // Already integrated - builds cross-platform executables with:
@@ -204,6 +224,7 @@ The GitHub Actions workflows leverage existing build scripts:
 ```
 
 **Workspace Orchestrator:**
+
 ```typescript
 // scripts/workspace-orchestrator.ts
 // Integrated for workspace management:
@@ -213,6 +234,7 @@ The GitHub Actions workflows leverage existing build scripts:
 ```
 
 **Performance Monitor:**
+
 ```typescript
 // scripts/performance-monitor.ts
 // Integrated for performance regression detection
@@ -223,12 +245,14 @@ The GitHub Actions workflows leverage existing build scripts:
 Existing security tools are integrated:
 
 **Security Scanner:**
+
 ```bash
 # Runs in security workflow
 bun run scripts/security-scanner-demo.ts
 ```
 
 **Environment Manager:**
+
 ```bash
 # Validates environment configuration
 bun run scripts/secure-env-manager.ts audit
@@ -239,12 +263,14 @@ bun run scripts/secure-env-manager.ts audit
 Existing QA tools are leveraged:
 
 **Edge Case Testing:**
+
 ```bash
 # Runs in CI for comprehensive testing
 bun run scripts/edge-case-test-runner.ts
 ```
 
 **Benchmark Suite:**
+
 ```bash
 # Performance validation
 bun run bench/benchmark-suite.ts
@@ -255,12 +281,14 @@ bun run bench/benchmark-suite.ts
 ### GitHub Actions Integration
 
 **Step Summaries:**
+
 - Each workflow step adds summary information to GitHub's step summary
 - Security scan results are displayed in PR checks
 - Build artifacts are uploaded and accessible
 - Performance metrics are tracked over time
 
 **Artifact Management:**
+
 ```yaml
 # Build artifacts are automatically uploaded
 - name: 📤 Upload Build Artifacts
@@ -276,6 +304,7 @@ bun run bench/benchmark-suite.ts
 The GitHub workflows integrate with existing monitoring:
 
 **Workspace Health Reports:**
+
 ```json
 // workspace-health-report.json
 // Generated by scripts/workspace-health-monitor.ts
@@ -283,6 +312,7 @@ The GitHub workflows integrate with existing monitoring:
 ```
 
 **Performance Benchmarks:**
+
 ```json
 // benchmark-results.json
 // Generated by existing benchmark suite
@@ -296,6 +326,7 @@ The GitHub workflows integrate with existing monitoring:
 The system integrates with existing Cloudflare Workers deployment:
 
 **Wrangler Integration:**
+
 ```yaml
 # Deploy to Cloudflare Workers after successful CI
 - name: 🚀 Deploy to Cloudflare Workers
@@ -305,6 +336,7 @@ The system integrates with existing Cloudflare Workers deployment:
 ```
 
 **Multi-Environment Deployment:**
+
 - Development: Automatic deployment on develop branch
 - Staging: Manual deployment trigger
 - Production: Release-triggered deployment
@@ -314,6 +346,7 @@ The system integrates with existing Cloudflare Workers deployment:
 GitHub Releases integrate with the existing build system:
 
 **Cross-Platform Executables:**
+
 - Windows: `fire22-dashboard-v3.1.0-windows.exe`
 - Linux: `fire22-dashboard-v3.1.0-linux`
 - macOS: `fire22-dashboard-v3.1.0-macos`
@@ -324,18 +357,21 @@ GitHub Releases integrate with the existing build system:
 ### Common Integration Issues
 
 **Build Failures:**
+
 ```bash
 # Debug build issues locally
 bun run scripts/enhanced-executable-builder.ts
 ```
 
 **Test Failures:**
+
 ```bash
 # Run specific workspace tests
 bun test workspaces/@fire22-api-client/
 ```
 
 **Security Failures:**
+
 ```bash
 # Run security audit locally
 bun run security:audit
@@ -344,6 +380,7 @@ bun run security:audit
 ### Workflow Debugging
 
 **Local Workflow Testing:**
+
 ```bash
 # Install act for local GitHub Actions testing
 curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
@@ -353,6 +390,7 @@ act -W .github/workflows/ci.yml
 ```
 
 **Workflow Logs:**
+
 - Access detailed logs in GitHub Actions tab
 - Download artifacts for offline analysis
 - Review step summaries for quick status overview
@@ -360,15 +398,20 @@ act -W .github/workflows/ci.yml
 ## 📚 Additional Resources
 
 ### Documentation
+
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [Bun Runtime Guide](https://bun.sh/docs)
 - [Fire22 API Documentation](./FIRE22-INTEGRATION-GUIDE.md)
 
 ### Internal Tools
+
 - [Enhanced Build Documentation](./ENHANCED-BUILD-DOCUMENTATION.md)
 - [Workspace Architecture](./WORKSPACE-SUMMARY.md)
 - [Security Integration Guide](./SECURITY-INTEGRATION-GUIDE.md)
 
 ---
 
-This integration guide ensures seamless collaboration between the Fire22 Dashboard Worker's advanced build system and GitHub's collaboration features, maintaining the high-performance characteristics while adding enterprise-grade development workflows.
+This integration guide ensures seamless collaboration between the Fire22
+Dashboard Worker's advanced build system and GitHub's collaboration features,
+maintaining the high-performance characteristics while adding enterprise-grade
+development workflows.

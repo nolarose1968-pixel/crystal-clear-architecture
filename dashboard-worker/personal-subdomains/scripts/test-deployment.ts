@@ -23,7 +23,7 @@ async function main() {
 
   // Test 2: Executive Subdomains
   console.log('\n👑 Testing Executive Subdomains');
-  results.push(...await testExecutiveSubdomains());
+  results.push(...(await testExecutiveSubdomains()));
 
   // Test 3: Root Domain
   console.log('\n🌐 Testing Root Domain');
@@ -31,11 +31,11 @@ async function main() {
 
   // Test 4: SSL Certificates
   console.log('\n🔒 Testing SSL Certificates');
-  results.push(...await testSSLCertificates());
+  results.push(...(await testSSLCertificates()));
 
   // Test 5: API Endpoints
   console.log('\n🔌 Testing API Endpoints');
-  results.push(...await testAPIEndpoints());
+  results.push(...(await testAPIEndpoints()));
 
   // Test 6: Error Handling
   console.log('\n❌ Testing Error Handling');
@@ -88,7 +88,7 @@ async function testVIPSubdomain(): Promise<TestResult> {
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'Fire22-Test-Suite/1.0',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       },
     });
     const responseTime = Date.now() - startTime;
@@ -133,7 +133,6 @@ async function testVIPSubdomain(): Promise<TestResult> {
       url,
       responseTime,
     };
-
   } catch (error) {
     return {
       name: 'Vinny2Times Profile Page',

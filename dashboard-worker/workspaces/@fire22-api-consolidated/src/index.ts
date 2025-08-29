@@ -1,6 +1,6 @@
 /**
  * @fire22/api-consolidated
- * 
+ *
  * Enterprise-grade consolidated Fire22 API implementation
  * Features: RBAC, JWT auth, Zod validation, rate limiting, comprehensive testing
  */

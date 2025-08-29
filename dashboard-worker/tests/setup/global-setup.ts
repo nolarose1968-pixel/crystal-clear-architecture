@@ -14,7 +14,7 @@ export const TEST_CONFIG = {
   SERVER_PORT: 4001,
   API_KEY: 'test_key_123',
   TIMEOUT: 30000,
-  DEBUG: process.env.TEST_DEBUG === 'true'
+  DEBUG: process.env.TEST_DEBUG === 'true',
 };
 
 // Global test database instance
@@ -97,42 +97,80 @@ export async function seedTestDatabase(db: Database): Promise<void> {
   const customers = [
     { customer_id: 'TEST001', username: 'testuser1', first_name: 'John', last_name: 'Doe' },
     { customer_id: 'TEST002', username: 'testuser2', first_name: 'Jane', last_name: 'Smith' },
-    { customer_id: 'TEST003', username: 'testuser3', first_name: 'Bob', last_name: 'Johnson' }
+    { customer_id: 'TEST003', username: 'testuser3', first_name: 'Bob', last_name: 'Johnson' },
   ];
 
   for (const customer of customers) {
-    db.query(`
+    db.query(
+      `
       INSERT OR IGNORE INTO customers (customer_id, username, first_name, last_name, login)
       VALUES (?, ?, ?, ?, ?)
-    `).run(customer.customer_id, customer.username, customer.first_name, customer.last_name, customer.customer_id);
+    `
+    ).run(
+      customer.customer_id,
+      customer.username,
+      customer.first_name,
+      customer.last_name,
+      customer.customer_id
+    );
   }
 
   // Insert test transactions
   const transactions = [
     { customer_id: 'TEST001', amount: 1000, tran_type: 'deposit', short_desc: 'Test deposit 1' },
     { customer_id: 'TEST002', amount: 500, tran_type: 'deposit', short_desc: 'Test deposit 2' },
-    { customer_id: 'TEST003', amount: 750, tran_type: 'deposit', short_desc: 'Test deposit 3' }
+    { customer_id: 'TEST003', amount: 750, tran_type: 'deposit', short_desc: 'Test deposit 3' },
   ];
 
   for (const transaction of transactions) {
-    db.query(`
+    db.query(
+      `
       INSERT OR IGNORE INTO transactions (customer_id, amount, tran_type, short_desc)
       VALUES (?, ?, ?, ?)
-    `).run(transaction.customer_id, transaction.amount, transaction.tran_type, transaction.short_desc);
+    `
+    ).run(
+      transaction.customer_id,
+      transaction.amount,
+      transaction.tran_type,
+      transaction.short_desc
+    );
   }
 
   // Insert test bets
   const bets = [
-    { customer_id: 1, amount: 50, odds: 1.85, type: 'moneyline', status: 'pending', teams: 'Lakers vs Warriors' },
-    { customer_id: 2, amount: 100, odds: 2.10, type: 'spread', status: 'won', teams: 'Cowboys vs Giants' },
-    { customer_id: 3, amount: 25, odds: 1.95, type: 'total', status: 'pending', teams: 'Heat vs Celtics' }
+    {
+      customer_id: 1,
+      amount: 50,
+      odds: 1.85,
+      type: 'moneyline',
+      status: 'pending',
+      teams: 'Lakers vs Warriors',
+    },
+    {
+      customer_id: 2,
+      amount: 100,
+      odds: 2.1,
+      type: 'spread',
+      status: 'won',
+      teams: 'Cowboys vs Giants',
+    },
+    {
+      customer_id: 3,
+      amount: 25,
+      odds: 1.95,
+      type: 'total',
+      status: 'pending',
+      teams: 'Heat vs Celtics',
+    },
   ];
 
   for (const bet of bets) {
-    db.query(`
+    db.query(
+      `
       INSERT OR IGNORE INTO bets (customer_id, amount, odds, type, status, teams)
       VALUES (?, ?, ?, ?, ?, ?)
-    `).run(bet.customer_id, bet.amount, bet.odds, bet.type, bet.status, bet.teams);
+    `
+    ).run(bet.customer_id, bet.amount, bet.odds, bet.type, bet.status, bet.teams);
   }
 
   if (TEST_CONFIG.DEBUG) {
@@ -236,11 +274,11 @@ export const testUtils = {
   cleanupTestDatabase,
   resetTestDatabase,
   getTestDatabase,
-  TEST_CONFIG
+  TEST_CONFIG,
 };
 
 export default {
   globalSetup,
   globalTeardown,
-  testUtils
+  testUtils,
 };

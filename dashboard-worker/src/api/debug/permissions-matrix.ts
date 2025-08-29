@@ -3,7 +3,7 @@
 /**
  * 🔍 Permissions Matrix Debug API
  * Comprehensive debugging endpoints for the Enhanced Permissions Matrix Validation System
- * 
+ *
  * Endpoints:
  * - /api/debug/permissions-matrix (Structure)
  * - /api/debug/permissions-matrix/validation (Validation Details)
@@ -141,34 +141,34 @@ export class PermissionsMatrixDebugAPI {
   async getMatrixStructure(): Promise<DebugResponse & { data: MatrixData }> {
     try {
       this.requestCount++;
-      
+
       // Get agents from database
       const agents = await this.getAgentsFromDB();
-      
+
       // Analyze matrix structure
       const matrixStructure = this.analyzeMatrixStructure(agents);
-      
+
       // Generate validation summary
       const validationSummary = this.generateValidationSummary(agents);
-      
+
       const data: MatrixData = {
         totalAgents: agents.length,
         matrixStructure,
-        validationSummary
+        validationSummary,
       };
 
       return {
         success: true,
         timestamp: new Date().toISOString(),
         endpoint: '/api/debug/permissions-matrix',
-        data
+        data,
       };
     } catch (error) {
       return {
         success: false,
         timestamp: new Date().toISOString(),
         endpoint: '/api/debug/permissions-matrix',
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -180,28 +180,28 @@ export class PermissionsMatrixDebugAPI {
     try {
       this.requestCount++;
       this.validationCount++;
-      
+
       const agents = await this.getAgentsFromDB();
-      
+
       const data: ValidationResults = {
         structureValidation: this.validatePermissionsStructure(agents),
         commissionValidation: this.validateCommissionRates(agents),
         statusValidation: this.validateAgentStatus(agents),
-        completeValidation: this.validateCompleteMatrix(agents)
+        completeValidation: this.validateCompleteMatrix(agents),
       };
 
       return {
         success: true,
         timestamp: new Date().toISOString(),
         endpoint: '/api/debug/permissions-matrix/validation',
-        data
+        data,
       };
     } catch (error) {
       return {
         success: false,
         timestamp: new Date().toISOString(),
         endpoint: '/api/debug/permissions-matrix/validation',
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -212,30 +212,30 @@ export class PermissionsMatrixDebugAPI {
   async getAgentDetails(): Promise<DebugResponse & { data: AgentDetails }> {
     try {
       this.requestCount++;
-      
+
       const agents = await this.getAgentsFromDB();
-      
+
       const agentDetails = this.analyzeAgentDetails(agents);
       const validationSummary = this.generateAgentValidationSummary(agents);
-      
+
       const data: AgentDetails = {
         agents: agents.slice(0, 10), // Limit to first 10 for performance
         agentDetails,
-        validationSummary
+        validationSummary,
       };
 
       return {
         success: true,
         timestamp: new Date().toISOString(),
         endpoint: '/api/debug/permissions-matrix/agents',
-        data
+        data,
       };
     } catch (error) {
       return {
         success: false,
         timestamp: new Date().toISOString(),
         endpoint: '/api/debug/permissions-matrix/agents',
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -246,26 +246,26 @@ export class PermissionsMatrixDebugAPI {
   async getPerformanceMetrics(): Promise<DebugResponse & { data: PerformanceMetrics }> {
     try {
       this.requestCount++;
-      
+
       const data: PerformanceMetrics = {
         responseTimes: this.calculateResponseTimes(),
         throughput: this.calculateThroughput(),
         cacheStats: this.calculateCacheStats(),
-        validationMetrics: this.calculateValidationMetrics()
+        validationMetrics: this.calculateValidationMetrics(),
       };
 
       return {
         success: true,
         timestamp: new Date().toISOString(),
         endpoint: '/api/debug/permissions-matrix/performance',
-        data
+        data,
       };
     } catch (error) {
       return {
         success: false,
         timestamp: new Date().toISOString(),
         endpoint: '/api/debug/permissions-matrix/performance',
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -276,32 +276,32 @@ export class PermissionsMatrixDebugAPI {
   async getRealTimeStatus(): Promise<DebugResponse & { data: RealTimeStatus }> {
     try {
       this.requestCount++;
-      
+
       const agents = await this.getAgentsFromDB();
-      
+
       const data: RealTimeStatus = {
         liveMetrics: {
           totalAgents: agents.length,
           activeValidations: this.getActiveValidationsCount(),
-          lastValidationTime: this.getLastValidationTime()
+          lastValidationTime: this.getLastValidationTime(),
         },
         activeValidations: this.getActiveValidations(),
         systemStatus: this.getSystemStatus(),
-        lastUpdate: new Date().toISOString()
+        lastUpdate: new Date().toISOString(),
       };
 
       return {
         success: true,
         timestamp: new Date().toISOString(),
         endpoint: '/api/debug/permissions-matrix/realtime',
-        data
+        data,
       };
     } catch (error) {
       return {
         success: false,
         timestamp: new Date().toISOString(),
         endpoint: '/api/debug/permissions-matrix/realtime',
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -311,7 +311,8 @@ export class PermissionsMatrixDebugAPI {
   private async getAgentsFromDB(): Promise<any[]> {
     try {
       // Query agents from D1 database
-      const result = await this.env.DB.prepare(`
+      const result = await this.env.DB.prepare(
+        `
         SELECT 
           agent_id,
           permissions,
@@ -322,7 +323,8 @@ export class PermissionsMatrixDebugAPI {
         FROM agent_configs 
         ORDER BY created_at DESC
         LIMIT 100
-      `).all();
+      `
+      ).all();
 
       return result.results || [];
     } catch (error) {
@@ -337,26 +339,38 @@ export class PermissionsMatrixDebugAPI {
         permissions: false,
         commissionRates: false,
         status: false,
-        complete: false
+        complete: false,
       };
     }
 
     const firstAgent = agents[0];
-    
+
     return {
       permissions: !!(firstAgent.permissions && typeof firstAgent.permissions === 'object'),
-      commissionRates: !!(firstAgent.commissionRates && typeof firstAgent.commissionRates === 'object'),
+      commissionRates: !!(
+        firstAgent.commissionRates && typeof firstAgent.commissionRates === 'object'
+      ),
       status: !!(firstAgent.status && typeof firstAgent.status === 'object'),
-      complete: !!(firstAgent.agent_id && firstAgent.permissions && firstAgent.commissionRates && firstAgent.status)
+      complete: !!(
+        firstAgent.agent_id &&
+        firstAgent.permissions &&
+        firstAgent.commissionRates &&
+        firstAgent.status
+      ),
     };
   }
 
   private generateValidationSummary(agents: any[]): MatrixData['validationSummary'] {
-    let valid = 0, invalid = 0, warning = 0, pending = 0;
+    let valid = 0,
+      invalid = 0,
+      warning = 0,
+      pending = 0;
 
     agents.forEach(agent => {
       const hasPermissions = !!(agent.permissions && typeof agent.permissions === 'object');
-      const hasCommissionRates = !!(agent.commissionRates && typeof agent.commissionRates === 'object');
+      const hasCommissionRates = !!(
+        agent.commissionRates && typeof agent.commissionRates === 'object'
+      );
       const hasStatus = !!(agent.status && typeof agent.status === 'object');
 
       if (hasPermissions && hasCommissionRates && hasStatus) {
@@ -378,7 +392,7 @@ export class PermissionsMatrixDebugAPI {
       return {
         status: 'pending',
         details: 'No agents found',
-        errors: ['No agents available for validation']
+        errors: ['No agents available for validation'],
       };
     }
 
@@ -400,7 +414,7 @@ export class PermissionsMatrixDebugAPI {
       // Check for required permissions
       const hasCanPlaceBets = 'canPlaceBets' in agent.permissions;
       const hasCanModifyInfo = 'canModifyInfo' in agent.permissions;
-      
+
       if (!hasCanPlaceBets) {
         errors.push(`Agent ${index + 1}: Missing canPlaceBets permission`);
         return;
@@ -409,13 +423,13 @@ export class PermissionsMatrixDebugAPI {
       validCount++;
     });
 
-    const status = errors.length === 0 ? 'valid' : 
-                   validCount > agents.length * 0.8 ? 'warning' : 'invalid';
+    const status =
+      errors.length === 0 ? 'valid' : validCount > agents.length * 0.8 ? 'warning' : 'invalid';
 
     return {
       status,
       details: `${validCount}/${agents.length} agents have valid permissions structure`,
-      errors: errors.slice(0, 10) // Limit errors for performance
+      errors: errors.slice(0, 10), // Limit errors for performance
     };
   }
 
@@ -424,7 +438,7 @@ export class PermissionsMatrixDebugAPI {
       return {
         status: 'pending',
         details: 'No agents found',
-        errors: ['No agents available for validation']
+        errors: ['No agents available for validation'],
       };
     }
 
@@ -439,7 +453,7 @@ export class PermissionsMatrixDebugAPI {
 
       const requiredRates = ['inet', 'casino', 'propBuilder'];
       const missingRates = requiredRates.filter(rate => !(rate in agent.commissionRates));
-      
+
       if (missingRates.length > 0) {
         errors.push(`Agent ${index + 1}: Missing commission rates: ${missingRates.join(', ')}`);
         return;
@@ -464,13 +478,13 @@ export class PermissionsMatrixDebugAPI {
       validCount++;
     });
 
-    const status = errors.length === 0 ? 'valid' : 
-                   validCount > agents.length * 0.8 ? 'warning' : 'invalid';
+    const status =
+      errors.length === 0 ? 'valid' : validCount > agents.length * 0.8 ? 'warning' : 'invalid';
 
     return {
       status,
       details: `${validCount}/${agents.length} agents have valid commission rates`,
-      errors: errors.slice(0, 10)
+      errors: errors.slice(0, 10),
     };
   }
 
@@ -479,7 +493,7 @@ export class PermissionsMatrixDebugAPI {
       return {
         status: 'pending',
         details: 'No agents found',
-        errors: ['No agents available for validation']
+        errors: ['No agents available for validation'],
       };
     }
 
@@ -507,23 +521,27 @@ export class PermissionsMatrixDebugAPI {
       try {
         const lastActivity = new Date(agent.status.lastActivity);
         if (lastActivity < thirtyDaysAgo) {
-          errors.push(`Agent ${index + 1}: Last activity ${lastActivity.toISOString()} is more than 30 days ago`);
+          errors.push(
+            `Agent ${index + 1}: Last activity ${lastActivity.toISOString()} is more than 30 days ago`
+          );
         }
       } catch (error) {
-        errors.push(`Agent ${index + 1}: Invalid lastActivity format: ${agent.status.lastActivity}`);
+        errors.push(
+          `Agent ${index + 1}: Invalid lastActivity format: ${agent.status.lastActivity}`
+        );
         return;
       }
 
       validCount++;
     });
 
-    const status = errors.length === 0 ? 'valid' : 
-                   validCount > agents.length * 0.8 ? 'warning' : 'invalid';
+    const status =
+      errors.length === 0 ? 'valid' : validCount > agents.length * 0.8 ? 'warning' : 'invalid';
 
     return {
       status,
       details: `${validCount}/${agents.length} agents have valid status information`,
-      errors: errors.slice(0, 10)
+      errors: errors.slice(0, 10),
     };
   }
 
@@ -532,7 +550,7 @@ export class PermissionsMatrixDebugAPI {
       return {
         status: 'pending',
         details: 'No agents found',
-        errors: ['No agents available for validation']
+        errors: ['No agents available for validation'],
       };
     }
 
@@ -570,13 +588,13 @@ export class PermissionsMatrixDebugAPI {
       validCount++;
     });
 
-    const status = errors.length === 0 ? 'valid' : 
-                   validCount > agents.length * 0.8 ? 'warning' : 'invalid';
+    const status =
+      errors.length === 0 ? 'valid' : validCount > agents.length * 0.8 ? 'warning' : 'invalid';
 
     return {
       status,
       details: `${validCount}/${agents.length} agents have complete and valid matrix data`,
-      errors: errors.slice(0, 10)
+      errors: errors.slice(0, 10),
     };
   }
 
@@ -587,17 +605,20 @@ export class PermissionsMatrixDebugAPI {
         withPermissions: 0,
         withCommissionRates: 0,
         withStatus: 0,
-        complete: 0
+        complete: 0,
       };
     }
 
-    let withPermissions = 0, withCommissionRates = 0, withStatus = 0, complete = 0;
+    let withPermissions = 0,
+      withCommissionRates = 0,
+      withStatus = 0,
+      complete = 0;
 
     agents.forEach(agent => {
       if (agent.permissions && typeof agent.permissions === 'object') withPermissions++;
       if (agent.commissionRates && typeof agent.commissionRates === 'object') withCommissionRates++;
       if (agent.status && typeof agent.status === 'object') withStatus++;
-      
+
       if (agent.agent_id && agent.permissions && agent.commissionRates && agent.status) {
         complete++;
       }
@@ -608,7 +629,7 @@ export class PermissionsMatrixDebugAPI {
       withPermissions,
       withCommissionRates,
       withStatus,
-      complete
+      complete,
     };
   }
 
@@ -618,73 +639,81 @@ export class PermissionsMatrixDebugAPI {
         structureValid: 0,
         commissionValid: 0,
         statusValid: 0,
-        completeValid: 0
+        completeValid: 0,
       };
     }
 
-    let structureValid = 0, commissionValid = 0, statusValid = 0, completeValid = 0;
+    let structureValid = 0,
+      commissionValid = 0,
+      statusValid = 0,
+      completeValid = 0;
 
     agents.forEach(agent => {
       if (agent.permissions && typeof agent.permissions === 'object') structureValid++;
       if (agent.commissionRates && typeof agent.commissionRates === 'object') commissionValid++;
       if (agent.status && typeof agent.status === 'object') statusValid++;
-      if (agent.agent_id && agent.permissions && agent.commissionRates && agent.status) completeValid++;
+      if (agent.agent_id && agent.permissions && agent.commissionRates && agent.status)
+        completeValid++;
     });
 
     return {
       structureValid,
       commissionValid,
       statusValid,
-      completeValid
+      completeValid,
     };
   }
 
   private calculateResponseTimes(): PerformanceMetrics['responseTimes'] {
     const uptime = Date.now() - this.startTime;
     const avgResponseTime = uptime > 0 ? Math.round(uptime / this.requestCount) : 0;
-    
+
     return {
       average: avgResponseTime,
       min: Math.max(0, avgResponseTime - 50),
       max: avgResponseTime + 100,
-      p95: Math.round(avgResponseTime * 1.5)
+      p95: Math.round(avgResponseTime * 1.5),
     };
   }
 
   private calculateThroughput(): PerformanceMetrics['throughput'] {
     const uptime = Date.now() - this.startTime;
-    const requestsPerSecond = uptime > 0 ? (this.requestCount / (uptime / 1000)) : 0;
-    
+    const requestsPerSecond = uptime > 0 ? this.requestCount / (uptime / 1000) : 0;
+
     return {
       requestsPerSecond: Math.round(requestsPerSecond * 100) / 100,
       totalRequests: this.requestCount,
-      successfulRequests: this.requestCount // Assuming all requests are successful for debug
+      successfulRequests: this.requestCount, // Assuming all requests are successful for debug
     };
   }
 
   private calculateCacheStats(): PerformanceMetrics['cacheStats'] {
     const totalCacheAccess = this.cacheHits + this.cacheMisses;
-    const hitRate = totalCacheAccess > 0 ? 
-      `${Math.round((this.cacheHits / totalCacheAccess) * 100)}%` : '0%';
-    
+    const hitRate =
+      totalCacheAccess > 0 ? `${Math.round((this.cacheHits / totalCacheAccess) * 100)}%` : '0%';
+
     return {
       hitRate,
       cacheSize: 1000, // Mock cache size
-      evictions: Math.floor(this.cacheMisses / 10) // Mock evictions
+      evictions: Math.floor(this.cacheMisses / 10), // Mock evictions
     };
   }
 
   private calculateValidationMetrics(): PerformanceMetrics['validationMetrics'] {
-    const avgValidationTime = this.validationCount > 0 ? 
-      Math.round((Date.now() - this.startTime) / this.validationCount) : 0;
-    
-    const successRate = this.validationCount > 0 ? 
-      `${Math.round((this.validationCount / this.validationCount) * 100)}%` : '0%';
-    
+    const avgValidationTime =
+      this.validationCount > 0
+        ? Math.round((Date.now() - this.startTime) / this.validationCount)
+        : 0;
+
+    const successRate =
+      this.validationCount > 0
+        ? `${Math.round((this.validationCount / this.validationCount) * 100)}%`
+        : '0%';
+
     return {
       totalValidations: this.validationCount,
       averageValidationTime: avgValidationTime,
-      validationSuccessRate: successRate
+      validationSuccessRate: successRate,
     };
   }
 
@@ -703,12 +732,12 @@ export class PermissionsMatrixDebugAPI {
     // Mock active validations
     const types = ['structure', 'commission', 'status', 'complete'];
     const statuses = ['running', 'queued', 'processing'];
-    
+
     return Array.from({ length: this.getActiveValidationsCount() }, (_, i) => ({
       id: `validation_${i + 1}`,
       type: types[Math.floor(Math.random() * types.length)],
       status: statuses[Math.floor(Math.random() * statuses.length)],
-      startTime: new Date(Date.now() - Math.random() * 60000).toISOString() // Within last minute
+      startTime: new Date(Date.now() - Math.random() * 60000).toISOString(), // Within last minute
     }));
   }
 
@@ -716,7 +745,7 @@ export class PermissionsMatrixDebugAPI {
     // Mock system status based on performance
     const uptime = Date.now() - this.startTime;
     const avgResponseTime = uptime > 0 ? uptime / this.requestCount : 0;
-    
+
     if (avgResponseTime < 100) return 'Excellent';
     if (avgResponseTime < 500) return 'Good';
     if (avgResponseTime < 1000) return 'Fair';

@@ -77,10 +77,10 @@ describe('End-to-End Integration Tests', () => {
       betTypeId: 'betType101',
       selections: [
         { selectionId: 'sel001', odds: 150, line: -5.5 },
-        { selectionId: 'sel002', odds: -110 }
+        { selectionId: 'sel002', odds: -110 },
       ],
       amountWagered: 100,
-      betType: 'straight'
+      betType: 'straight',
     };
 
     const response = await fetch(`${BASE_URL}/api/wager/create`, {
@@ -126,7 +126,7 @@ describe('End-to-End Integration Tests', () => {
       wagerNumber: createdWagerNumber,
       settlementType: 'win',
       settlementAmount: 150, // Example amount
-      settledBy: 'test_user'
+      settledBy: 'test_user',
     };
 
     const response = await fetch(`${BASE_URL}/api/wager/settle`, {
@@ -153,7 +153,7 @@ describe('End-to-End Integration Tests', () => {
       wagerNumber: nonExistentWagerNumber,
       settlementType: 'win',
       settlementAmount: 100,
-      settledBy: 'test_user'
+      settledBy: 'test_user',
     };
 
     const response = await fetch(`${BASE_URL}/api/wager/settle`, {

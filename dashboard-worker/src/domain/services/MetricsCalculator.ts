@@ -10,7 +10,7 @@ import {
   MonthlyMetric,
   AgentMetrics,
   MerchantMetrics,
-  MetricCalculationParams
+  MetricCalculationParams,
 } from '../models';
 import { Logger } from './Logger';
 
@@ -88,13 +88,13 @@ export class MetricsCalculator {
         activeMerchants,
         activeAgents,
         period: `${dateFrom.toISOString().split('T')[0]} to ${dateTo.toISOString().split('T')[0]}`,
-        calculatedAt: new Date()
+        calculatedAt: new Date(),
       };
 
       Logger.info('Revenue metrics calculated successfully', {
         totalRevenue,
         successRate,
-        totalTransactions
+        totalTransactions,
       });
 
       return metrics;
@@ -107,7 +107,10 @@ export class MetricsCalculator {
   /**
    * Get agent performance metrics
    */
-  static async getAgentPerformance(agentId?: string, params?: MetricCalculationParams): Promise<AgentMetrics[]> {
+  static async getAgentPerformance(
+    agentId?: string,
+    params?: MetricCalculationParams
+  ): Promise<AgentMetrics[]> {
     try {
       Logger.info(`Getting performance metrics for agent: ${agentId || 'all'}`, params);
 
@@ -151,7 +154,7 @@ export class MetricsCalculator {
         const revenue = Math.random() * 5000 + 1000;
         const transactions = Math.floor(Math.random() * 20 + 5);
         const volume = revenue;
-        const fees = revenue * 0.029 + transactions * 0.30;
+        const fees = revenue * 0.029 + transactions * 0.3;
 
         breakdown.push({
           date: dateStr,
@@ -160,7 +163,7 @@ export class MetricsCalculator {
           transactions,
           fees: Math.round(fees * 100) / 100,
           successRate: 95 + Math.random() * 5,
-          averageProcessingTime: 1.5 + Math.random() * 1
+          averageProcessingTime: 1.5 + Math.random() * 1,
         });
       }
 
@@ -177,15 +180,19 @@ export class MetricsCalculator {
     // Mock calculation - in real implementation, this would query the database
     const days = Math.ceil((dateTo.getTime() - dateFrom.getTime()) / (1000 * 60 * 60 * 24));
     const averageDailyRevenue = 8500;
-    return Math.round((days * averageDailyRevenue) * 100) / 100;
+    return Math.round(days * averageDailyRevenue * 100) / 100;
   }
 
   private static async calculateTotalFees(dateFrom: Date, dateTo: Date): Promise<number> {
     const revenue = await this.calculateTotalRevenue(dateFrom, dateTo);
-    return Math.round((revenue * 0.029) * 100) / 100; // 2.9% fee
+    return Math.round(revenue * 0.029 * 100) / 100; // 2.9% fee
   }
 
-  private static async calculateVolume(period: 'daily' | 'weekly' | 'monthly', dateFrom: Date, dateTo: Date): Promise<number> {
+  private static async calculateVolume(
+    period: 'daily' | 'weekly' | 'monthly',
+    dateFrom: Date,
+    dateTo: Date
+  ): Promise<number> {
     const totalRevenue = await this.calculateTotalRevenue(dateFrom, dateTo);
     const periods = period === 'daily' ? 30 : period === 'weekly' ? 4 : 1;
     return Math.round((totalRevenue / periods) * 100) / 100;
@@ -196,12 +203,19 @@ export class MetricsCalculator {
     return Math.round((95 + Math.random() * 4) * 100) / 100;
   }
 
-  private static async calculateAverageProcessingTime(dateFrom: Date, dateTo: Date): Promise<number> {
+  private static async calculateAverageProcessingTime(
+    dateFrom: Date,
+    dateTo: Date
+  ): Promise<number> {
     // Mock processing time between 1.5-3.5 hours
     return Math.round((1.5 + Math.random() * 2) * 100) / 100;
   }
 
-  private static async calculateGrowthRate(metric: 'revenue' | 'volume' | 'fees', dateFrom: Date, dateTo: Date): Promise<number> {
+  private static async calculateGrowthRate(
+    metric: 'revenue' | 'volume' | 'fees',
+    dateFrom: Date,
+    dateTo: Date
+  ): Promise<number> {
     // Mock growth rate between -5% to +15%
     return Math.round((Math.random() * 20 - 5) * 100) / 100;
   }
@@ -219,7 +233,11 @@ export class MetricsCalculator {
     return Math.round((totalRevenue / agents.length) * 100) / 100;
   }
 
-  private static async calculateAgentMetrics(agentId: string, dateFrom: Date, dateTo: Date): Promise<AgentMetrics> {
+  private static async calculateAgentMetrics(
+    agentId: string,
+    dateFrom: Date,
+    dateTo: Date
+  ): Promise<AgentMetrics> {
     // Mock agent metrics - in real implementation, this would query the database
     const totalRevenue = Math.random() * 10000 + 5000;
     const totalTransactions = Math.floor(Math.random() * 50 + 10);
@@ -233,8 +251,8 @@ export class MetricsCalculator {
       totalTransactions,
       successRate: Math.round(successRate * 100) / 100,
       averageProcessingTime: 2 + Math.random(),
-      commissionEarned: Math.round((totalRevenue * 0.05) * 100) / 100, // 5% commission
-      period: `${dateFrom.toISOString().split('T')[0]} to ${dateTo.toISOString().split('T')[0]}`
+      commissionEarned: Math.round(totalRevenue * 0.05 * 100) / 100, // 5% commission
+      period: `${dateFrom.toISOString().split('T')[0]} to ${dateTo.toISOString().split('T')[0]}`,
     };
   }
 
@@ -259,7 +277,7 @@ export class MetricsCalculator {
         transactions: Math.floor(Math.random() * 150 + 50),
         fees: Math.round((Math.random() * 900 + 300) * 100) / 100,
         successRate: 95 + Math.random() * 5,
-        averageProcessingTime: 1.5 + Math.random() * 1
+        averageProcessingTime: 1.5 + Math.random() * 1,
       });
     }
 
@@ -282,7 +300,7 @@ export class MetricsCalculator {
         transactions: Math.floor(Math.random() * 600 + 200),
         fees: Math.round((Math.random() * 3600 + 1200) * 100) / 100,
         successRate: 95 + Math.random() * 5,
-        averageProcessingTime: 1.5 + Math.random() * 1
+        averageProcessingTime: 1.5 + Math.random() * 1,
       });
     }
 

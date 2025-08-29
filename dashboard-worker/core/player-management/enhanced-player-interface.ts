@@ -3,8 +3,15 @@
  * Comprehensive player dashboard with integrated cashier, P2P, peer networks, and advanced analytics
  */
 
-import { CustomerDatabaseManagement, CustomerProfile } from '../customers/customer-database-management';
-import { EnhancedCashierSystem, CashierSession, CashierTransaction } from '../cashier/enhanced-cashier-system';
+import {
+  CustomerDatabaseManagement,
+  CustomerProfile,
+} from '../customers/customer-database-management';
+import {
+  EnhancedCashierSystem,
+  CashierSession,
+  CashierTransaction,
+} from '../cashier/enhanced-cashier-system';
 import { PeerGroupManager, PeerGroup, PeerRelationship } from '../peer-network/peer-group-manager';
 import { P2PPaymentMatching, P2PPaymentRequest } from '../payments/p2p-payment-matching';
 import { CustomerPaymentValidation } from '../payments/customer-payment-validation';
@@ -23,7 +30,14 @@ export interface PlayerManagementSession {
 
 export interface PlayerAction {
   actionId: string;
-  type: 'view_profile' | 'update_limits' | 'process_transaction' | 'send_message' | 'update_permissions' | 'risk_assessment' | 'peer_network_action';
+  type:
+    | 'view_profile'
+    | 'update_limits'
+    | 'process_transaction'
+    | 'send_message'
+    | 'update_permissions'
+    | 'risk_assessment'
+    | 'peer_network_action';
   timestamp: string;
   details: Record<string, any>;
   agentId: string;
@@ -173,12 +187,12 @@ export class EnhancedPlayerInterface {
       deviceInfo: {
         userAgent: 'PlayerManagementInterface/1.0',
         platform: 'web',
-        language: 'en-US'
+        language: 'en-US',
       },
       enablePeerMatching: true,
       enableAutoApproval: false,
       maxTransactionAmount: 5000,
-      requireValidation: true
+      requireValidation: true,
     });
 
     const session: PlayerManagementSession = {
@@ -189,17 +203,24 @@ export class EnhancedPlayerInterface {
       actions: [],
       cashierSession,
       ipTracking: this.getIPTrackingData(customerId),
-      status: 'active'
+      status: 'active',
     };
 
     this.activeSessions.set(sessionId, session);
 
     // Log initial action
-    await this.logPlayerAction(sessionId, 'view_profile', {
-      customerId,
+    await this.logPlayerAction(
+      sessionId,
+      'view_profile',
+      {
+        customerId,
+        agentId,
+        action: 'session_started',
+      },
       agentId,
-      action: 'session_started'
-    }, agentId, ipAddress, true);
+      ipAddress,
+      true
+    );
 
     return session;
   }
@@ -248,7 +269,7 @@ export class EnhancedPlayerInterface {
       ipTracking,
       collections,
       agentPerformance,
-      alerts
+      alerts,
     };
   }
 
@@ -273,12 +294,19 @@ export class EnhancedPlayerInterface {
     }
 
     // Log the action
-    await this.logPlayerAction(sessionId, 'process_transaction', {
-      transactionType,
-      amount,
-      paymentMethod,
-      options
-    }, session.agentId, session.ipTracking.currentIP, true);
+    await this.logPlayerAction(
+      sessionId,
+      'process_transaction',
+      {
+        transactionType,
+        amount,
+        paymentMethod,
+        options,
+      },
+      session.agentId,
+      session.ipTracking.currentIP,
+      true
+    );
 
     if (transactionType === 'deposit') {
       return await this.cashierSystem.processDeposit(
@@ -289,7 +317,7 @@ export class EnhancedPlayerInterface {
         {
           preferPeerMatching: options.usePeerMatching,
           maxWaitTime: 30,
-          autoApprove: false
+          autoApprove: false,
         }
       );
     } else {
@@ -333,11 +361,18 @@ export class EnhancedPlayerInterface {
     }
 
     // Log the action
-    await this.logPlayerAction(sessionId, 'update_permissions', {
-      transactionId,
-      action,
-      notes
-    }, session.agentId, session.ipTracking.currentIP, true);
+    await this.logPlayerAction(
+      sessionId,
+      'update_permissions',
+      {
+        transactionId,
+        action,
+        notes,
+      },
+      session.agentId,
+      session.ipTracking.currentIP,
+      true
+    );
   }
 
   /**
@@ -358,10 +393,17 @@ export class EnhancedPlayerInterface {
     }
 
     // Log the action
-    await this.logPlayerAction(sessionId, 'peer_network_action', {
-      action,
-      groupData
-    }, session.agentId, session.ipTracking.currentIP, true);
+    await this.logPlayerAction(
+      sessionId,
+      'peer_network_action',
+      {
+        action,
+        groupData,
+      },
+      session.agentId,
+      session.ipTracking.currentIP,
+      true
+    );
 
     if (action === 'create' && groupData) {
       await this.peerGroupManager.createPeerGroup(
@@ -389,38 +431,38 @@ export class EnhancedPlayerInterface {
       agentId,
       period: {
         startDate: startOfMonth.toISOString(),
-        endDate: endOfMonth.toISOString()
+        endDate: endOfMonth.toISOString(),
       },
       transactions: {
         total: 245,
         successful: 238,
         failed: 4,
         pending: 3,
-        successRate: 0.97
+        successRate: 0.97,
       },
       volume: {
         total: 125000,
         deposits: 75000,
         withdrawals: 35000,
-        p2pMatches: 15000
+        p2pMatches: 15000,
       },
       customers: {
         totalServed: 89,
         newCustomers: 23,
         repeatCustomers: 66,
-        vipCustomers: 12
+        vipCustomers: 12,
       },
       performance: {
         averageSessionTime: 1800, // seconds
         averageTransactionTime: 45, // seconds
         customerSatisfaction: 4.7,
-        efficiencyScore: 92
+        efficiencyScore: 92,
       },
       peerNetwork: {
         groupsCreated: 5,
         successfulMatches: 34,
-        networkStrength: 88
-      }
+        networkStrength: 88,
+      },
     };
   }
 
@@ -432,43 +474,40 @@ export class EnhancedPlayerInterface {
     // For now, return mock data
     return {
       customerId,
-      outstandingBalance: 250.00,
+      outstandingBalance: 250.0,
       dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       paymentPlan: {
-        totalAmount: 250.00,
+        totalAmount: 250.0,
         installments: [
           {
-            amount: 125.00,
+            amount: 125.0,
             dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-            status: 'pending'
+            status: 'pending',
           },
           {
-            amount: 125.00,
+            amount: 125.0,
             dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-            status: 'pending'
-          }
+            status: 'pending',
+          },
         ],
         nextPayment: {
-          amount: 125.00,
-          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-        }
+          amount: 125.0,
+          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        },
       },
       paymentHistory: [
         {
-          amount: 500.00,
+          amount: 500.0,
           date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
           method: 'venmo',
-          status: 'paid'
-        }
+          status: 'paid',
+        },
       ],
       riskAssessment: {
         collectionRisk: 'low',
         paymentReliability: 94,
-        recommendedActions: [
-          'Monitor payment due date',
-          'Send reminder notification'
-        ]
-      }
+        recommendedActions: ['Monitor payment due date', 'Send reminder notification'],
+      },
     };
   }
 
@@ -483,7 +522,7 @@ export class EnhancedPlayerInterface {
         currentIP,
         previousIPs: [],
         suspiciousActivity: [],
-        riskScore: 0
+        riskScore: 0,
       };
       this.ipTrackingData.set(customerId, trackingData);
     }
@@ -498,7 +537,7 @@ export class EnhancedPlayerInterface {
         ip: currentIP,
         firstSeen: new Date().toISOString(),
         lastSeen: new Date().toISOString(),
-        sessionCount: 1
+        sessionCount: 1,
       });
 
       // Check for suspicious activity
@@ -507,7 +546,7 @@ export class EnhancedPlayerInterface {
           ip: currentIP,
           activity: 'New IP address detected',
           timestamp: new Date().toISOString(),
-          riskLevel: 'medium'
+          riskLevel: 'medium',
         });
         trackingData.riskScore += 15;
       }
@@ -521,14 +560,14 @@ export class EnhancedPlayerInterface {
       country: 'US',
       region: 'California',
       city: 'Los Angeles',
-      isp: 'Comcast'
+      isp: 'Comcast',
     };
 
     // Calculate overall risk score
     trackingData.riskScore = Math.min(
       trackingData.suspiciousActivity.length * 15 +
-      (trackingData.previousIPs.length > 5 ? 20 : 0) +
-      (this.isSuspiciousIP(currentIP) ? 30 : 0),
+        (trackingData.previousIPs.length > 5 ? 20 : 0) +
+        (this.isSuspiciousIP(currentIP) ? 30 : 0),
       100
     );
   }
@@ -537,12 +576,14 @@ export class EnhancedPlayerInterface {
    * Get IP tracking data for a customer
    */
   private getIPTrackingData(customerId: string): IPTrackingData {
-    return this.ipTrackingData.get(customerId) || {
-      currentIP: 'unknown',
-      previousIPs: [],
-      suspiciousActivity: [],
-      riskScore: 0
-    };
+    return (
+      this.ipTrackingData.get(customerId) || {
+        currentIP: 'unknown',
+        previousIPs: [],
+        suspiciousActivity: [],
+        riskScore: 0,
+      }
+    );
   }
 
   /**
@@ -558,7 +599,7 @@ export class EnhancedPlayerInterface {
         type: 'security',
         severity: 'high',
         message: `${ipData.suspiciousActivity.length} suspicious IP activities detected`,
-        actionRequired: true
+        actionRequired: true,
       });
     }
 
@@ -569,7 +610,7 @@ export class EnhancedPlayerInterface {
         type: 'transaction',
         severity: 'medium',
         message: 'High transaction volume detected',
-        actionRequired: false
+        actionRequired: false,
       });
     }
 
@@ -580,7 +621,7 @@ export class EnhancedPlayerInterface {
         type: 'peer',
         severity: 'low',
         message: 'Peer network strength is low - consider joining more groups',
-        actionRequired: false
+        actionRequired: false,
       });
     }
 
@@ -590,7 +631,7 @@ export class EnhancedPlayerInterface {
         type: 'risk',
         severity: 'high',
         message: `High risk score detected: ${ipData.riskScore}`,
-        actionRequired: true
+        actionRequired: true,
       });
     }
 
@@ -620,7 +661,7 @@ export class EnhancedPlayerInterface {
       agentId,
       ipAddress,
       success,
-      notes
+      notes,
     };
 
     session.actions.push(action);
@@ -695,11 +736,14 @@ export class EnhancedPlayerInterface {
   } {
     const activeSessions = this.activeSessions.size;
     const totalAgents = new Set(Array.from(this.activeSessions.values()).map(s => s.agentId)).size;
-    const totalCustomers = new Set(Array.from(this.activeSessions.values()).map(s => s.customerId)).size;
+    const totalCustomers = new Set(Array.from(this.activeSessions.values()).map(s => s.customerId))
+      .size;
 
     // Calculate security metrics
-    const suspiciousIPCount = Array.from(this.ipTrackingData.values())
-      .reduce((count, data) => count + data.suspiciousActivity.length, 0);
+    const suspiciousIPCount = Array.from(this.ipTrackingData.values()).reduce(
+      (count, data) => count + data.suspiciousActivity.length,
+      0
+    );
 
     return {
       activeSessions,
@@ -708,13 +752,13 @@ export class EnhancedPlayerInterface {
       systemPerformance: {
         averageSessionTime: 1800, // seconds
         transactionSuccessRate: 0.96,
-        peerMatchRate: 0.78
+        peerMatchRate: 0.78,
       },
       securityMetrics: {
         suspiciousIPCount,
         riskAlertsTriggered: suspiciousIPCount,
-        blockedTransactions: Math.floor(suspiciousIPCount * 0.1)
-      }
+        blockedTransactions: Math.floor(suspiciousIPCount * 0.1),
+      },
     };
   }
 }

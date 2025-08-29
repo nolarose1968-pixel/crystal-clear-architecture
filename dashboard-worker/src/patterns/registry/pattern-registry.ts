@@ -9,7 +9,7 @@ import type {
   PatternDefinition,
   PatternConnection,
   DEFAULT_PATTERN_CONFIG,
-  PATTERN_DESCRIPTIONS
+  PATTERN_DESCRIPTIONS,
 } from '../core/pattern-types';
 
 export class PatternRegistry {
@@ -91,7 +91,7 @@ export class PatternRegistry {
       this.connections.get(reverseKey)!.push({
         ...connection,
         from: connection.to,
-        to: connection.from
+        to: connection.from,
       });
     }
   }
@@ -164,7 +164,7 @@ export class PatternRegistry {
       return {
         isValid: false,
         errors: [`Pattern ${pattern} is not registered`],
-        warnings: []
+        warnings: [],
       };
     }
 
@@ -203,8 +203,7 @@ export class PatternRegistry {
     contextsCovered: number;
     patternDistribution: Record<PatternType, number>;
   } {
-    const enabledPatterns = Array.from(this.patterns.values())
-      .filter(p => p.config.enabled).length;
+    const enabledPatterns = Array.from(this.patterns.values()).filter(p => p.config.enabled).length;
 
     let totalConnections = 0;
     for (const connections of this.connections.values()) {
@@ -223,7 +222,7 @@ export class PatternRegistry {
       enabledPatterns,
       totalConnections: totalConnections / 2, // Divide by 2 since connections are stored bidirectionally
       contextsCovered: this.contextMappings.size,
-      patternDistribution
+      patternDistribution,
     };
   }
 
@@ -255,7 +254,7 @@ export class PatternRegistry {
       patterns,
       connections,
       contextMappings,
-      statistics: this.getStatistics()
+      statistics: this.getStatistics(),
     };
   }
 
@@ -263,9 +262,19 @@ export class PatternRegistry {
 
   private initializePatterns(): void {
     const patternTypes: PatternType[] = [
-      'LOADER', 'STYLER', 'TABULAR', 'SECURE', 'TIMING',
-      'BUILDER', 'VERSIONER', 'SHELL', 'BUNX', 'INTERACTIVE',
-      'STREAM', 'FILESYSTEM', 'UTILITIES'
+      'LOADER',
+      'STYLER',
+      'TABULAR',
+      'SECURE',
+      'TIMING',
+      'BUILDER',
+      'VERSIONER',
+      'SHELL',
+      'BUNX',
+      'INTERACTIVE',
+      'STREAM',
+      'FILESYSTEM',
+      'UTILITIES',
     ];
 
     patternTypes.forEach(patternType => {
@@ -278,7 +287,7 @@ export class PatternRegistry {
         emoji: description.emoji,
         contexts: this.getContextsForPattern(patternType),
         dependencies: this.getDefaultDependencies(patternType),
-        config
+        config,
       };
 
       this.registerPattern(pattern);
@@ -297,7 +306,7 @@ export class PatternRegistry {
       ['FILESYSTEM', 'LOADER', 0.9, false],
       ['UTILITIES', 'TABULAR', 0.5, true],
       ['STREAM', 'TIMING', 0.7, true],
-      ['INTERACTIVE', 'SHELL', 0.8, false]
+      ['INTERACTIVE', 'SHELL', 0.8, false],
     ];
 
     defaultConnections.forEach(([from, to, strength, bidirectional]) => {
@@ -305,7 +314,7 @@ export class PatternRegistry {
         from,
         to,
         strength,
-        bidirectional
+        bidirectional,
       });
     });
 
@@ -334,7 +343,7 @@ export class PatternRegistry {
       TEXT: ['UTILITIES', 'TABULAR', 'TIMING'],
       COMPRESSION: ['UTILITIES', 'FILESYSTEM', 'TIMING'],
       DEBUGGING: ['UTILITIES', 'TIMING', 'TABULAR', 'INTERACTIVE'],
-      PERFORMANCE: ['UTILITIES', 'TIMING', 'TABULAR']
+      PERFORMANCE: ['UTILITIES', 'TIMING', 'TABULAR'],
     };
 
     for (const [context, patterns] of Object.entries(contextMappings)) {
@@ -358,7 +367,7 @@ export class PatternRegistry {
       INTERACTIVE: ['SHELL'],
       STREAM: [],
       FILESYSTEM: [],
-      UTILITIES: []
+      UTILITIES: [],
     };
 
     return dependencies[pattern] || [];

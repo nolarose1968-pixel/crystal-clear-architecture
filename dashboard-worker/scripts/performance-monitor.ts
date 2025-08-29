@@ -2,7 +2,7 @@
 
 /**
  * Fire22 Dashboard Performance Monitor
- * 
+ *
  * This script monitors performance metrics using Bun's native file I/O
  * and provides real-time performance analytics for the dashboard.
  */
@@ -49,7 +49,7 @@ class PerformanceMonitor {
       fileOperations: { packageJson: 0, configFiles: 0, totalFiles: 0, averageTime: 0 },
       memory: { used: 0, total: 0, percentage: 0 },
       cpu: { load: 0, uptime: 0 },
-      bun: { version: '', platform: '', arch: '' }
+      bun: { version: '', platform: '', arch: '' },
     };
   }
 
@@ -58,25 +58,20 @@ class PerformanceMonitor {
    */
   async monitorFileOperations(): Promise<FileOperationResult[]> {
     console.log('📊 Monitoring File I/O Performance...\n');
-    
-    const filesToTest = [
-      'package.json',
-      'bun.config.ts',
-      '.env.example',
-      'tsconfig.json'
-    ];
+
+    const filesToTest = ['package.json', 'bun.config.ts', '.env.example', 'tsconfig.json'];
 
     for (const file of filesToTest) {
       const result = await this.testFileOperation(file);
       this.fileResults.push(result);
-      
+
       // Display result immediately
       this.displayFileResult(result);
     }
 
     // Calculate aggregate metrics
     this.calculateFileMetrics();
-    
+
     return this.fileResults;
   }
 
@@ -101,7 +96,7 @@ class PerformanceMonitor {
       // Test reading
       const readStart = performance.now();
       let content: string | object;
-      
+
       if (filePath.endsWith('.json')) {
         content = await file.json();
         parseTime = performance.now() - readStart;
@@ -109,11 +104,10 @@ class PerformanceMonitor {
         content = await file.text();
         parseTime = 0; // No parsing for text files
       }
-      
+
       readTime = performance.now() - readStart;
       size = typeof content === 'string' ? content.length : JSON.stringify(content).length;
       success = true;
-      
     } catch (err) {
       error = err instanceof Error ? err.message : 'Unknown error';
       success = false;
@@ -128,7 +122,7 @@ class PerformanceMonitor {
       parseTime,
       totalTime,
       success,
-      error
+      error,
     };
   }
 
@@ -138,7 +132,7 @@ class PerformanceMonitor {
   private displayFileResult(result: FileOperationResult): void {
     const status = result.success ? '✅' : '❌';
     const sizeKB = (result.size / 1024).toFixed(2);
-    
+
     console.log(`${status} ${result.file}`);
     console.log(`   Size: ${sizeKB} KB`);
     console.log(`   Read Time: ${result.readTime.toFixed(2)}ms`);
@@ -146,7 +140,7 @@ class PerformanceMonitor {
       console.log(`   Parse Time: ${result.parseTime.toFixed(2)}ms`);
     }
     console.log(`   Total Time: ${result.totalTime.toFixed(2)}ms`);
-    
+
     if (result.error) {
       console.log(`   Error: ${result.error}`);
     }
@@ -158,12 +152,17 @@ class PerformanceMonitor {
    */
   private calculateFileMetrics(): void {
     const successfulResults = this.fileResults.filter(r => r.success);
-    
+
     if (successfulResults.length > 0) {
       this.metrics.fileOperations.totalFiles = successfulResults.length;
-      this.metrics.fileOperations.packageJson = successfulResults.filter(r => r.file === 'package.json').length;
-      this.metrics.fileOperations.configFiles = successfulResults.filter(r => r.file !== 'package.json').length;
-      this.metrics.fileOperations.averageTime = successfulResults.reduce((sum, r) => sum + r.totalTime, 0) / successfulResults.length;
+      this.metrics.fileOperations.packageJson = successfulResults.filter(
+        r => r.file === 'package.json'
+      ).length;
+      this.metrics.fileOperations.configFiles = successfulResults.filter(
+        r => r.file !== 'package.json'
+      ).length;
+      this.metrics.fileOperations.averageTime =
+        successfulResults.reduce((sum, r) => sum + r.totalTime, 0) / successfulResults.length;
     }
   }
 
@@ -172,12 +171,14 @@ class PerformanceMonitor {
    */
   async monitorSystemPerformance(): Promise<void> {
     console.log('🖥️  Monitoring System Performance...\n');
-    
+
     // Memory usage
     const memUsage = process.memoryUsage();
     this.metrics.memory.used = Math.round(memUsage.heapUsed / 1024 / 1024);
     this.metrics.memory.total = Math.round(memUsage.heapTotal / 1024 / 1024);
-    this.metrics.memory.percentage = Math.round((this.metrics.memory.used / this.metrics.memory.total) * 100);
+    this.metrics.memory.percentage = Math.round(
+      (this.metrics.memory.used / this.metrics.memory.total) * 100
+    );
 
     // CPU and uptime
     this.metrics.cpu.uptime = process.uptime();
@@ -212,14 +213,14 @@ class PerformanceMonitor {
    */
   async runComprehensiveTest(): Promise<void> {
     console.log('🎯 Fire22 Dashboard Performance Monitor');
-    console.log('=======================================\n');
+    console.log('!==!==!==!==!==!==!====\n');
 
     // Monitor file operations
     await this.monitorFileOperations();
-    
+
     // Monitor system performance
     await this.monitorSystemPerformance();
-    
+
     // Display summary
     this.displaySummary();
   }
@@ -229,8 +230,8 @@ class PerformanceMonitor {
    */
   private displaySummary(): void {
     console.log('📊 Performance Summary');
-    console.log('======================\n');
-    
+    console.log('!==!==!==!===\n');
+
     console.log('📁 File Operations:');
     console.log(`   Total Files Tested: ${this.metrics.fileOperations.totalFiles}`);
     console.log(`   Package Files: ${this.metrics.fileOperations.packageJson}`);
@@ -270,14 +271,14 @@ class PerformanceMonitor {
         totalFiles: this.metrics.fileOperations.totalFiles,
         averageReadTime: this.metrics.fileOperations.averageTime,
         memoryUsage: this.metrics.memory.percentage,
-        cpuLoad: this.metrics.cpu.load
-      }
+        cpuLoad: this.metrics.cpu.load,
+      },
     };
 
     // Export to JSON file
     const exportPath = 'performance-report.json';
     await Bun.write(exportPath, JSON.stringify(exportData, null, 2));
-    
+
     console.log(`📤 Performance data exported to: ${exportPath}`);
   }
 }
@@ -285,7 +286,7 @@ class PerformanceMonitor {
 // CLI interface
 if (import.meta.main) {
   const monitor = new PerformanceMonitor();
-  
+
   try {
     await monitor.runComprehensiveTest();
     await monitor.exportPerformanceData();

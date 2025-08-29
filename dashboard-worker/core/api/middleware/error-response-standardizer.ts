@@ -49,22 +49,25 @@ interface StandardErrorResponse {
 }
 
 interface ErrorRegistryCache {
-  errorCodes: Record<string, {
-    code: string;
-    name: string;
-    message: string;
-    severity: string;
-    category: string;
-    httpStatusCode: number;
-    description: string;
-    solutions: string[];
-    documentation: Array<{
-      title: string;
-      url: string;
-      type: string;
-    }>;
-    relatedCodes: string[];
-  }>;
+  errorCodes: Record<
+    string,
+    {
+      code: string;
+      name: string;
+      message: string;
+      severity: string;
+      category: string;
+      httpStatusCode: number;
+      description: string;
+      solutions: string[];
+      documentation: Array<{
+        title: string;
+        url: string;
+        type: string;
+      }>;
+      relatedCodes: string[];
+    }
+  >;
   lastUpdated: Date;
 }
 
@@ -85,9 +88,12 @@ class ErrorResponseStandardizer {
    */
   private loadErrorRegistry(): ErrorRegistryCache['errorCodes'] {
     const now = new Date();
-    
+
     // Check cache validity
-    if (this.registryCache && (now.getTime() - this.registryCache.lastUpdated.getTime()) < this.cacheExpiry) {
+    if (
+      this.registryCache &&
+      now.getTime() - this.registryCache.lastUpdated.getTime() < this.cacheExpiry
+    ) {
       return this.registryCache.errorCodes;
     }
 
@@ -95,12 +101,12 @@ class ErrorResponseStandardizer {
       const registryPath = join(process.cwd(), 'docs', 'error-codes.json');
       const content = readFileSync(registryPath, 'utf-8');
       const registry = JSON.parse(content);
-      
+
       this.registryCache = {
         errorCodes: registry.errorCodes || {},
-        lastUpdated: now
+        lastUpdated: now,
       };
-      
+
       return this.registryCache.errorCodes;
     } catch (error) {
       console.warn('⚠️ Failed to load error registry, using fallback:', error.message);
@@ -125,8 +131,8 @@ class ErrorResponseStandardizer {
     } = {}
   ): StandardErrorResponse {
     const registry = this.loadErrorRegistry();
-    const startTime = context.metadata?.startTime as number || Date.now();
-    
+    const startTime = (context.metadata?.startTime as number) || Date.now();
+
     // Determine if input is error code or message
     const isErrorCode = /^E[1-8]\d{3}$/.test(errorCodeOrMessage);
     let errorDetails: any;
@@ -153,7 +159,7 @@ class ErrorResponseStandardizer {
         description: 'An unknown error occurred',
         solutions: ['Contact support if this error persists'],
         documentation: [],
-        relatedCodes: []
+        relatedCodes: [],
       };
     }
 
@@ -164,7 +170,7 @@ class ErrorResponseStandardizer {
         method: this.getMethod(context.request),
         userAgent: this.getUserAgent(context.request),
         userId: context.userId,
-        sessionId: context.sessionId
+        sessionId: context.sessionId,
       });
     }
 
@@ -179,8 +185,8 @@ class ErrorResponseStandardizer {
         category: errorDetails.category,
         httpStatusCode: errorDetails.httpStatusCode,
         timestamp: new Date().toISOString(),
-        requestId: context.requestId || this.generateRequestId()
-      }
+        requestId: context.requestId || this.generateRequestId(),
+      },
     };
 
     // Add documentation links
@@ -188,8 +194,9 @@ class ErrorResponseStandardizer {
       const docs = errorDetails.documentation;
       response.error.documentation = {
         primary: docs.find(d => d.type === 'guide')?.url || docs[0]?.url || '/docs/troubleshooting',
-        troubleshooting: docs.find(d => d.type === 'troubleshooting')?.url || '/docs/troubleshooting',
-        apiReference: docs.find(d => d.type === 'reference')?.url || '/docs/api'
+        troubleshooting:
+          docs.find(d => d.type === 'troubleshooting')?.url || '/docs/troubleshooting',
+        apiReference: docs.find(d => d.type === 'reference')?.url || '/docs/api',
       };
     }
 
@@ -200,7 +207,7 @@ class ErrorResponseStandardizer {
         method: this.getMethod(context.request),
         userAgent: this.getUserAgent(context.request),
         solutions: errorDetails.solutions || [],
-        relatedCodes: errorDetails.relatedCodes || []
+        relatedCodes: errorDetails.relatedCodes || [],
       };
     }
 
@@ -211,13 +218,13 @@ class ErrorResponseStandardizer {
         correlationId: this.generateCorrelationId(),
         userId: context.userId,
         sessionId: context.sessionId,
-        traceId: context.metadata?.traceId as string
+        traceId: context.metadata?.traceId as string,
       };
     }
 
     // Add metadata
     response.metadata = {
-      processingTime: Date.now() - startTime
+      processingTime: Date.now() - startTime,
     };
 
     // Add rate limiting info if applicable
@@ -239,7 +246,7 @@ class ErrorResponseStandardizer {
   private findErrorCodeFromMessage(message: string): string {
     // Check constants for matching messages
     const errorMessages = ERROR_MESSAGES;
-    
+
     for (const category of Object.values(errorMessages)) {
       for (const errorInfo of Object.values(category)) {
         if (typeof errorInfo === 'object' && errorInfo.message === message) {
@@ -255,7 +262,7 @@ class ErrorResponseStandardizer {
     if (message.includes('rate limit')) return 'E3002';
     if (message.includes('validation')) return 'E5001';
     if (message.includes('not found')) return 'E3005';
-    
+
     return 'E5000'; // Generic application error
   }
 
@@ -264,7 +271,7 @@ class ErrorResponseStandardizer {
    */
   private getEndpoint(request?: Request | Context): string {
     if (!request) return 'unknown';
-    
+
     if ('req' in request) {
       // Hono context
       return request.req.url;
@@ -279,7 +286,7 @@ class ErrorResponseStandardizer {
    */
   private getMethod(request?: Request | Context): string {
     if (!request) return 'unknown';
-    
+
     if ('req' in request) {
       // Hono context
       return request.req.method;
@@ -294,7 +301,7 @@ class ErrorResponseStandardizer {
    */
   private getUserAgent(request?: Request | Context): string | undefined {
     if (!request) return undefined;
-    
+
     if ('req' in request) {
       // Hono context
       return request.req.header('User-Agent');
@@ -324,25 +331,22 @@ class ErrorResponseStandardizer {
   honoMiddleware() {
     return async (c: Context, next: () => Promise<void>) => {
       const startTime = Date.now();
-      
+
       try {
         await next();
       } catch (error) {
         console.error('🚨 API Error caught by standardizer:', error);
-        
-        const standardError = this.createErrorResponse(
-          error.message || 'Internal server error',
-          {
-            request: c,
-            originalError: error,
-            statusCode: error.status || 500,
-            requestId: c.get('requestId'),
-            userId: c.get('userId'),
-            sessionId: c.get('sessionId'),
-            includeDebug: process.env.NODE_ENV !== 'production',
-            metadata: { startTime }
-          }
-        );
+
+        const standardError = this.createErrorResponse(error.message || 'Internal server error', {
+          request: c,
+          originalError: error,
+          statusCode: error.status || 500,
+          requestId: c.get('requestId'),
+          userId: c.get('userId'),
+          sessionId: c.get('sessionId'),
+          includeDebug: process.env.NODE_ENV !== 'production',
+          metadata: { startTime },
+        });
 
         return c.json(standardError, standardError.error.httpStatusCode);
       }
@@ -355,24 +359,21 @@ class ErrorResponseStandardizer {
   expressMiddleware() {
     return (error: Error, req: any, res: any, next: any) => {
       console.error('🚨 API Error caught by standardizer:', error);
-      
-      const standardError = this.createErrorResponse(
-        error.message || 'Internal server error',
-        {
-          originalError: error,
-          statusCode: error.status || 500,
-          requestId: req.id || req.headers['x-request-id'],
-          userId: req.user?.id,
-          sessionId: req.sessionId,
-          includeDebug: process.env.NODE_ENV !== 'production',
-          metadata: { 
-            startTime: req.startTime || Date.now(),
-            endpoint: req.originalUrl,
-            method: req.method,
-            userAgent: req.headers['user-agent']
-          }
-        }
-      );
+
+      const standardError = this.createErrorResponse(error.message || 'Internal server error', {
+        originalError: error,
+        statusCode: error.status || 500,
+        requestId: req.id || req.headers['x-request-id'],
+        userId: req.user?.id,
+        sessionId: req.sessionId,
+        includeDebug: process.env.NODE_ENV !== 'production',
+        metadata: {
+          startTime: req.startTime || Date.now(),
+          endpoint: req.originalUrl,
+          method: req.method,
+          userAgent: req.headers['user-agent'],
+        },
+      });
 
       res.status(standardError.error.httpStatusCode).json(standardError);
     };
@@ -402,7 +403,7 @@ class ErrorResponseStandardizer {
       message: context.message,
       requestId: context.requestId || this.generateRequestId(),
       timestamp: new Date().toISOString(),
-      metadata: context.metadata
+      metadata: context.metadata,
     };
   }
 }

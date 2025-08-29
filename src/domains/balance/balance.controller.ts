@@ -3,17 +3,20 @@
  * Domain-Driven Design Implementation
  */
 
-import { BalanceService } from './services/balance-service';
-import { BalanceRepository } from './repositories/balance-repository';
-import { BalanceLimits } from './value-objects/balance-limits';
-import { DomainEvents } from '../shared/events/domain-events';
-import { DomainError } from '../shared/domain-entity';
+import { BalanceService } from "./services/balance-service";
+import { BalanceRepository } from "./repositories/balance-repository";
+import { BalanceLimits } from "./value-objects/balance-limits";
+import { DomainEvents } from "../shared/events/domain-events";
+import { DomainError } from "../shared/domain-entity";
 
 export class BalanceController {
   private balanceService: BalanceService;
 
   constructor(repository: BalanceRepository) {
-    this.balanceService = new BalanceService(repository, DomainEvents.getInstance());
+    this.balanceService = new BalanceService(
+      repository,
+      DomainEvents.getInstance(),
+    );
   }
 
   /**
@@ -21,13 +24,15 @@ export class BalanceController {
    */
   async createBalance(request: CreateBalanceRequest): Promise<BalanceResponse> {
     try {
-      const limits = request.limits ? BalanceLimits.create(request.limits) : undefined;
+      const limits = request.limits
+        ? BalanceLimits.create(request.limits)
+        : undefined;
 
       const balance = await this.balanceService.createBalance({
         customerId: request.customerId,
         agentId: request.agentId,
         initialBalance: request.initialBalance,
-        limits
+        limits,
       });
 
       return {
@@ -39,14 +44,17 @@ export class BalanceController {
           currentBalance: balance.getCurrentBalance(),
           isActive: balance.getIsActive(),
           thresholdStatus: balance.getThresholdStatus(),
-          lastActivity: balance.getLastActivity()
-        }
+          lastActivity: balance.getLastActivity(),
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -54,7 +62,9 @@ export class BalanceController {
   /**
    * Process balance change
    */
-  async processBalanceChange(request: BalanceChangeRequest): Promise<BalanceChangeResponse> {
+  async processBalanceChange(
+    request: BalanceChangeRequest,
+  ): Promise<BalanceChangeResponse> {
     try {
       const result = await this.balanceService.processBalanceChange(request);
 
@@ -65,7 +75,7 @@ export class BalanceController {
           customerId: result.balance.getCustomerId(),
           currentBalance: result.balance.getCurrentBalance(),
           thresholdStatus: result.balance.getThresholdStatus(),
-          lastActivity: result.balance.getLastActivity()
+          lastActivity: result.balance.getLastActivity(),
         },
         change: {
           id: result.change.getId(),
@@ -74,14 +84,17 @@ export class BalanceController {
           previousBalance: result.change.getPreviousBalance(),
           newBalance: result.change.getNewBalance(),
           reason: result.change.getReason(),
-          performedBy: result.change.getPerformedBy()
-        }
+          performedBy: result.change.getPerformedBy(),
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -102,14 +115,17 @@ export class BalanceController {
           isActive: result.balance.getIsActive(),
           thresholdStatus: result.status,
           requiresAttention: result.requiresAttention,
-          lastActivity: result.balance.getLastActivity()
-        }
+          lastActivity: result.balance.getLastActivity(),
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -117,9 +133,15 @@ export class BalanceController {
   /**
    * Get balance history
    */
-  async getBalanceHistory(customerId: string, limit?: number): Promise<BalanceHistoryResponse> {
+  async getBalanceHistory(
+    customerId: string,
+    limit?: number,
+  ): Promise<BalanceHistoryResponse> {
     try {
-      const result = await this.balanceService.getBalanceHistory(customerId, limit);
+      const result = await this.balanceService.getBalanceHistory(
+        customerId,
+        limit,
+      );
 
       return {
         success: true,
@@ -127,9 +149,9 @@ export class BalanceController {
           id: result.balance.getId(),
           customerId: result.balance.getCustomerId(),
           currentBalance: result.balance.getCurrentBalance(),
-          lastActivity: result.balance.getLastActivity()
+          lastActivity: result.balance.getLastActivity(),
         },
-        changes: result.changes.map(change => ({
+        changes: result.changes.map((change) => ({
           id: change.getId(),
           changeType: change.getChangeType(),
           amount: change.getAmount(),
@@ -137,14 +159,17 @@ export class BalanceController {
           newBalance: change.getNewBalance(),
           reason: change.getReason(),
           performedBy: change.getPerformedBy(),
-          createdAt: change.getCreatedAt()
-        }))
+          createdAt: change.getCreatedAt(),
+        })),
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -157,7 +182,7 @@ export class BalanceController {
       const balance = await this.balanceService.freezeBalance(
         request.customerId,
         request.reason,
-        request.performedBy
+        request.performedBy,
       );
 
       return {
@@ -169,14 +194,17 @@ export class BalanceController {
           currentBalance: balance.getCurrentBalance(),
           isActive: balance.getIsActive(),
           thresholdStatus: balance.getThresholdStatus(),
-          lastActivity: balance.getLastActivity()
-        }
+          lastActivity: balance.getLastActivity(),
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -190,20 +218,23 @@ export class BalanceController {
 
       return {
         success: true,
-        alerts: alerts.map(balance => ({
+        alerts: alerts.map((balance) => ({
           id: balance.getId(),
           customerId: balance.getCustomerId(),
           agentId: balance.getAgentId(),
           currentBalance: balance.getCurrentBalance(),
           thresholdStatus: balance.getThresholdStatus(),
-          lastActivity: balance.getLastActivity()
-        }))
+          lastActivity: balance.getLastActivity(),
+        })),
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -211,19 +242,24 @@ export class BalanceController {
   /**
    * Get agent balance summary
    */
-  async getAgentBalanceSummary(agentId: string): Promise<AgentBalanceSummaryResponse> {
+  async getAgentBalanceSummary(
+    agentId: string,
+  ): Promise<AgentBalanceSummaryResponse> {
     try {
       const summary = await this.balanceService.getAgentBalanceSummary(agentId);
 
       return {
         success: true,
-        summary
+        summary,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -247,7 +283,7 @@ export interface CreateBalanceRequest {
 export interface BalanceChangeRequest {
   customerId: string;
   amount: number;
-  changeType: 'credit' | 'debit';
+  changeType: "credit" | "debit";
   reason: string;
   performedBy: string;
   metadata?: Record<string, any>;

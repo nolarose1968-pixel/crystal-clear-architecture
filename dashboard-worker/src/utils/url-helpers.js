@@ -20,7 +20,7 @@ export const apiUrl = {
   health: () => `${getBaseUrl()}${CONSTANTS.API_CONFIG.ENDPOINTS.HEALTH}`,
   systemStatus: () => `${getBaseUrl()}${CONSTANTS.API_CONFIG.ENDPOINTS.SYSTEM_STATUS}`,
   docsStatus: () => `${getBaseUrl()}${CONSTANTS.API_CONFIG.ENDPOINTS.DOCS_DIAGNOSTICS}`,
-  
+
   // Manager endpoints
   manager: {
     liveWagers: () => `${getBaseUrl()}/api/manager/getLiveWagers`,
@@ -30,20 +30,20 @@ export const apiUrl = {
     agentPerformance: () => `${getBaseUrl()}/api/manager/getAgentPerformance`,
     customerSummary: () => `${getBaseUrl()}/api/manager/getCustomerSummary`,
     transactions: () => `${getBaseUrl()}/api/manager/getTransactions`,
-    bets: () => `${getBaseUrl()}/api/manager/getBets`
+    bets: () => `${getBaseUrl()}/api/manager/getBets`,
   },
-  
+
   // Customer endpoints
   customer: {
-    hierarchy: () => `${getBaseUrl()}/api/customer/getHeriarchy`
+    hierarchy: () => `${getBaseUrl()}/api/customer/getHeriarchy`,
   },
-  
+
   // Admin endpoints
   admin: {
     createCustomer: () => `${getBaseUrl()}/api/admin/create-customer`,
     processDeposit: () => `${getBaseUrl()}/api/admin/process-deposit`,
-    importCustomers: () => `${getBaseUrl()}/api/admin/import-customers`
-  }
+    importCustomers: () => `${getBaseUrl()}/api/admin/import-customers`,
+  },
 };
 
 /**
@@ -59,19 +59,19 @@ export const docsUrl = {
   fire22Config: () => `${getBaseUrl()}/docs/fire22-dashboard-config.html`,
   wagerSystem: () => `${getBaseUrl()}/docs/wager-system-overview.html`,
   apiIntegration: () => `${getBaseUrl()}/docs/fire22-api-integration.html`,
-  hub: () => `${getBaseUrl()}/docs/DOCUMENTATION-HUB.html`
+  hub: () => `${getBaseUrl()}/docs/DOCUMENTATION-HUB.html`,
 };
 
 /**
  * Generate static asset URLs
  */
 export const assetUrl = {
-  styles: (filename) => `${getBaseUrl()}/src/styles/${filename}`,
+  styles: filename => `${getBaseUrl()}/src/styles/${filename}`,
   framework: () => `${getBaseUrl()}/src/styles/framework.css`,
   fire22Theme: () => `${getBaseUrl()}/src/styles/themes/fire22.css`,
   components: () => `${getBaseUrl()}/src/styles/components`,
-  images: (filename) => `${getBaseUrl()}/static/images/${filename}`,
-  icons: (filename) => `${getBaseUrl()}/static/icons/${filename}`
+  images: filename => `${getBaseUrl()}/static/images/${filename}`,
+  icons: filename => `${getBaseUrl()}/static/icons/${filename}`,
 };
 
 /**
@@ -82,13 +82,13 @@ export const dashboardUrl = {
   login: () => `${getBaseUrl()}/login`,
   admin: () => `${getBaseUrl()}/admin`,
   reports: () => `${getBaseUrl()}/reports`,
-  settings: () => `${getBaseUrl()}/settings`
+  settings: () => `${getBaseUrl()}/settings`,
 };
 
 /**
  * Validate URL format
  */
-export const isValidUrl = (url) => {
+export const isValidUrl = url => {
   try {
     new URL(url);
     return true;
@@ -100,7 +100,7 @@ export const isValidUrl = (url) => {
 /**
  * Build query string from object
  */
-export const buildQueryString = (params) => {
+export const buildQueryString = params => {
   const searchParams = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
     if (value !== null && value !== undefined) {
@@ -121,7 +121,7 @@ export const buildUrl = (baseUrl, params = {}) => {
 /**
  * Get relative path from absolute URL
  */
-export const getRelativePath = (absoluteUrl) => {
+export const getRelativePath = absoluteUrl => {
   try {
     const url = new URL(absoluteUrl);
     return url.pathname + url.search + url.hash;
@@ -141,17 +141,17 @@ export const navigation = {
     { name: '🔌 API', url: docsUrl.apiPackages() },
     { name: '⚙️ Config', url: docsUrl.fire22Config() },
     { name: '🧪 Testing', url: docsUrl.packagesAdvanced() },
-    { name: '🎯 Wager System', url: docsUrl.wagerSystem() }
+    { name: '🎯 Wager System', url: docsUrl.wagerSystem() },
   ],
-  
+
   dashboard: [
     { name: '🏠 Dashboard', url: dashboardUrl.main() },
     { name: '👥 Customers', url: `${dashboardUrl.main()}#customers` },
     { name: '💰 Transactions', url: `${dashboardUrl.main()}#transactions` },
     { name: '🎲 Bets', url: `${dashboardUrl.main()}#bets` },
     { name: '📊 Reports', url: dashboardUrl.reports() },
-    { name: '⚙️ Settings', url: dashboardUrl.settings() }
-  ]
+    { name: '⚙️ Settings', url: dashboardUrl.settings() },
+  ],
 };
 
 /**
@@ -167,5 +167,5 @@ export default {
   buildQueryString,
   buildUrl,
   getRelativePath,
-  navigation
+  navigation,
 };

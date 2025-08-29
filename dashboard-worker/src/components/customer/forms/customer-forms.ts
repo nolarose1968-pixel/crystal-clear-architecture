@@ -8,9 +8,12 @@ import type {
   CustomerFormMode,
   CustomerValidationResult,
   CustomerValidationError,
-  CustomerValidationWarning
+  CustomerValidationWarning,
 } from '../core/customer-interface-types';
-import { CustomerInformationService, CustomerProfile } from '../../../services/customer-information-service';
+import {
+  CustomerInformationService,
+  CustomerProfile,
+} from '../../../services/customer-information-service';
 import { FormManagementService } from '../../../services/form-management-service';
 
 export class CustomerForms {
@@ -27,7 +30,10 @@ export class CustomerForms {
   /**
    * Create customer form
    */
-  createForm(mode: CustomerFormMode, customerId?: string): {
+  createForm(
+    mode: CustomerFormMode,
+    customerId?: string
+  ): {
     form: HTMLFormElement;
     formId: string;
   } {
@@ -77,18 +83,18 @@ export class CustomerForms {
         city: customer.address?.city || '',
         state: customer.address?.state || '',
         zipCode: customer.address?.zipCode || '',
-        country: customer.address?.country || ''
+        country: customer.address?.country || '',
       },
       preferences: {
         language: customer.preferences?.language || 'en',
         currency: customer.preferences?.currency || 'USD',
         notifications: customer.preferences?.notifications ?? true,
-        marketingEmails: customer.preferences?.marketingEmails ?? false
+        marketingEmails: customer.preferences?.marketingEmails ?? false,
       },
       status: customer.status || 'active',
       vipTier: customer.vipTier || 'bronze',
       riskLevel: customer.riskLevel || 'low',
-      notes: customer.notes || ''
+      notes: customer.notes || '',
     };
 
     // Store form data
@@ -109,7 +115,7 @@ export class CustomerForms {
       return {
         isValid: false,
         errors: [{ field: 'form', code: 'FORM_NOT_FOUND', message: 'Form not found' }],
-        warnings: []
+        warnings: [],
       };
     }
 
@@ -129,18 +135,18 @@ export class CustomerForms {
         city: data['address.city'] || '',
         state: data['address.state'] || '',
         zipCode: data['address.zipCode'] || '',
-        country: data['address.country'] || ''
+        country: data['address.country'] || '',
       },
       preferences: {
         language: data['preferences.language'] || 'en',
         currency: data['preferences.currency'] || 'USD',
         notifications: data['preferences.notifications'] === 'on',
-        marketingEmails: data['preferences.marketingEmails'] === 'on'
+        marketingEmails: data['preferences.marketingEmails'] === 'on',
       },
-      status: data.status as any || 'active',
-      vipTier: data.vipTier as any || 'bronze',
-      riskLevel: data.riskLevel as any || 'low',
-      notes: data.notes || ''
+      status: (data.status as any) || 'active',
+      vipTier: (data.vipTier as any) || 'bronze',
+      riskLevel: (data.riskLevel as any) || 'low',
+      notes: data.notes || '',
     };
 
     // Perform validation
@@ -174,7 +180,7 @@ export class CustomerForms {
       if (!validation.isValid) {
         return {
           success: false,
-          error: `Validation failed: ${validation.errors.map(e => e.message).join(', ')}`
+          error: `Validation failed: ${validation.errors.map(e => e.message).join(', ')}`,
         };
       }
 
@@ -192,13 +198,13 @@ export class CustomerForms {
           ...formData,
           id: '', // Will be generated
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         } as CustomerProfile);
       } else if (mode === 'edit' && customerId) {
         // Update existing customer
         customer = await this.customerService.updateCustomer(customerId, {
           ...formData,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         } as Partial<CustomerProfile>);
       } else {
         return { success: false, error: 'Invalid form mode or missing customer ID' };
@@ -209,7 +215,6 @@ export class CustomerForms {
 
       console.log(`✅ Form submitted successfully: ${formId}`);
       return { success: true, customer };
-
     } catch (error) {
       console.error(`❌ Form submission failed: ${formId}`, error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
@@ -422,27 +427,31 @@ export class CustomerForms {
         </div>
       </div>
 
-      ${!isView ? `
+      ${
+        !isView
+          ? `
         <div class="customer-form-footer">
           <button type="button" class="btn btn-secondary" data-action="reset">Reset</button>
           <button type="submit" class="btn btn-primary">${isEdit ? 'Update Customer' : 'Create Customer'}</button>
         </div>
-      ` : ''}
+      `
+          : ''
+      }
     `;
   }
 
   private setupFormEventListeners(form: HTMLFormElement, formId: string): void {
     // Handle form submission
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', async e => {
       e.preventDefault();
       const event = new CustomEvent('form-submit', {
-        detail: { formId, form }
+        detail: { formId, form },
       });
       form.dispatchEvent(event);
     });
 
     // Handle input validation
-    form.addEventListener('input', (e) => {
+    form.addEventListener('input', e => {
       const target = e.target as HTMLInputElement;
       this.validateField(target);
     });
@@ -504,7 +513,7 @@ export class CustomerForms {
       errors.push({
         field: 'firstName',
         code: 'REQUIRED',
-        message: 'First name is required'
+        message: 'First name is required',
       });
     }
 
@@ -512,7 +521,7 @@ export class CustomerForms {
       errors.push({
         field: 'lastName',
         code: 'REQUIRED',
-        message: 'Last name is required'
+        message: 'Last name is required',
       });
     }
 
@@ -520,13 +529,13 @@ export class CustomerForms {
       errors.push({
         field: 'email',
         code: 'REQUIRED',
-        message: 'Email is required'
+        message: 'Email is required',
       });
     } else if (!this.isValidEmail(data.email)) {
       errors.push({
         field: 'email',
         code: 'INVALID_FORMAT',
-        message: 'Invalid email format'
+        message: 'Invalid email format',
       });
     }
 
@@ -535,7 +544,7 @@ export class CustomerForms {
       warnings.push({
         field: 'phone',
         code: 'INVALID_FORMAT',
-        message: 'Phone number format may be invalid'
+        message: 'Phone number format may be invalid',
       });
     }
 
@@ -546,13 +555,13 @@ export class CustomerForms {
         errors.push({
           field: 'dateOfBirth',
           code: 'AGE_RESTRICTION',
-          message: 'Customer must be at least 18 years old'
+          message: 'Customer must be at least 18 years old',
         });
       } else if (age < 21) {
         warnings.push({
           field: 'dateOfBirth',
           code: 'AGE_WARNING',
-          message: 'Customer is under 21 - additional verification may be required'
+          message: 'Customer is under 21 - additional verification may be required',
         });
       }
     }
@@ -564,7 +573,7 @@ export class CustomerForms {
         errors.push({
           field: 'email',
           code: 'DUPLICATE',
-          message: 'Email address already exists'
+          message: 'Email address already exists',
         });
       }
     }
@@ -572,7 +581,7 @@ export class CustomerForms {
     return {
       isValid: errors.length === 0,
       errors,
-      warnings
+      warnings,
     };
   }
 

@@ -1,6 +1,8 @@
 # @fire22/security-scanner
 
-Production-ready Bun Security Scanner with enterprise-grade threat detection for Fire22 workspace. Implements the complete Bun Security Scanner API with threat feed integration, vulnerability detection, and custom security policies.
+Production-ready Bun Security Scanner with enterprise-grade threat detection for
+Fire22 workspace. Implements the complete Bun Security Scanner API with threat
+feed integration, vulnerability detection, and custom security policies.
 
 ## 🚀 Quick Start
 
@@ -19,26 +21,31 @@ bun install
 ## 🛡️ Security Features
 
 ### Fatal Level Protection
+
 - **Malware Detection**: Backdoors, token stealers, botnet packages
 - **Cryptocurrency Mining**: Blocks crypto mining packages (Fire22 policy)
 - **Typosquatting**: Detects packages impersonating popular libraries
 - **Critical CVEs**: Known severe vulnerabilities with immediate blocking
 
 ### Warning Level Advisories
+
 - **Policy Violations**: Fire22 workspace-specific security policies
 - **Deprecated Packages**: Outdated or unmaintained packages
 - **Pre-release Versions**: Alpha/beta packages in production context
 - **Suspicious Patterns**: Network tunneling, obfuscation tools
 
 ### Enterprise Integration
+
 - **Threat Feed**: Real-time security intelligence with Zod validation
-- **CVE Database**: Automated vulnerability detection using `Bun.semver.satisfies()`
+- **CVE Database**: Automated vulnerability detection using
+  `Bun.semver.satisfies()`
 - **Fire22 Policies**: Custom workspace security rules
 - **Performance**: Sub-100ms scanning with efficient caching
 
 ## 🔧 Configuration
 
 ### bunfig.toml
+
 ```toml
 [install.security]
 scanner = "@fire22/security-scanner"
@@ -56,6 +63,7 @@ scopes = {
 ```
 
 ### Advanced Configuration
+
 ```javascript
 // Custom scanner config (optional)
 export default {
@@ -63,7 +71,7 @@ export default {
     enabled: true,
     url: 'https://api.fire22.com/security/threat-feed',
     updateInterval: 3600000, // 1 hour
-    timeout: 10000
+    timeout: 10000,
   },
   policies: {
     fire22Workspace: true,
@@ -72,14 +80,14 @@ export default {
         name: 'no-eval-usage',
         pattern: /eval-/i,
         level: 'fatal',
-        description: 'Packages using eval() are prohibited'
-      }
-    ]
+        description: 'Packages using eval() are prohibited',
+      },
+    ],
   },
   typosquatDetection: {
     enabled: true,
-    threshold: 2 // Levenshtein distance
-  }
+    threshold: 2, // Levenshtein distance
+  },
 };
 ```
 
@@ -87,14 +95,15 @@ export default {
 
 ### Fire22 Workspace Policies
 
-| Policy | Level | Description |
-|--------|--------|-------------|
-| **Crypto Mining** | Fatal | Blocks cryptocurrency mining packages |
-| **Gambling** | Warn | Non-Fire22 gambling packages require approval |
-| **Network Tunneling** | Warn | VPN/proxy packages need security review |
-| **Code Obfuscation** | Warn | Minification/obfuscation tools flagged |
+| Policy                | Level | Description                                   |
+| --------------------- | ----- | --------------------------------------------- |
+| **Crypto Mining**     | Fatal | Blocks cryptocurrency mining packages         |
+| **Gambling**          | Warn  | Non-Fire22 gambling packages require approval |
+| **Network Tunneling** | Warn  | VPN/proxy packages need security review       |
+| **Code Obfuscation**  | Warn  | Minification/obfuscation tools flagged        |
 
 ### Trusted Packages
+
 - `@fire22/*` - All Fire22 internal packages automatically trusted
 - `@types/*` - TypeScript definitions allowed
 - Core libraries: `express`, `zod`, `typescript`, etc.
@@ -102,21 +111,23 @@ export default {
 ## 🔍 Detection Capabilities
 
 ### Threat Categories
+
 ```typescript
-type ThreatCategory = 
-  | 'backdoor'      // Remote access trojans
-  | 'botnet'        // Botnet participation
-  | 'malware'       // General malicious software
+type ThreatCategory =
+  | 'backdoor' // Remote access trojans
+  | 'botnet' // Botnet participation
+  | 'malware' // General malicious software
   | 'token-stealer' // Credential theft
-  | 'crypto-miner'  // Cryptocurrency mining
-  | 'protestware'   // Political/protest software
-  | 'adware'        // Advertising injection
-  | 'deprecated'    // Unmaintained packages
+  | 'crypto-miner' // Cryptocurrency mining
+  | 'protestware' // Political/protest software
+  | 'adware' // Advertising injection
+  | 'deprecated' // Unmaintained packages
   | 'typosquatting' // Name similarity attacks
-  | 'suspicious';   // Unusual behavior patterns
+  | 'suspicious'; // Unusual behavior patterns
 ```
 
 ### Vulnerability Detection
+
 - **CVE Integration**: Real-time CVE database checking
 - **Semver Ranges**: Precise version vulnerability matching
 - **Severity Scoring**: CVSS-based risk assessment
@@ -130,6 +141,7 @@ type ThreatCategory =
 - **Batch Processing**: Optimized for large dependency trees
 
 ### Benchmarks
+
 ```bash
 # 100 packages scanned in ~95ms
 ✅ Packages Scanned: 100
@@ -155,6 +167,7 @@ bun test --watch
 ```
 
 ### Test Coverage
+
 - ✅ Fatal threat detection (malware, crypto mining, typosquats)
 - ✅ Warning scenarios (policies, pre-releases, deprecated)
 - ✅ Fire22 workspace integration
@@ -166,11 +179,13 @@ bun test --watch
 ## 📋 API Reference
 
 ### Main Scanner Function
+
 ```typescript
-async function scan(request: ScanRequest): Promise<ScanResult>
+async function scan(request: ScanRequest): Promise<ScanResult>;
 ```
 
 ### Request Format
+
 ```typescript
 interface ScanRequest {
   packages: Array<{
@@ -186,6 +201,7 @@ interface ScanRequest {
 ```
 
 ### Response Format
+
 ```typescript
 interface ScanResult {
   advisories: SecurityAdvisory[];
@@ -199,6 +215,7 @@ interface ScanResult {
 ```
 
 ### Advisory Levels
+
 ```typescript
 interface SecurityAdvisory {
   level: 'fatal' | 'warn';
@@ -215,6 +232,7 @@ interface SecurityAdvisory {
 ## 🔗 Integration Examples
 
 ### Fire22 Workspace
+
 ```typescript
 import scan from '@fire22/security-scanner';
 
@@ -224,6 +242,7 @@ import scan from '@fire22/security-scanner';
 ```
 
 ### CI/CD Pipeline
+
 ```bash
 # Pre-deployment security check
 bun install --frozen-lockfile
@@ -232,6 +251,7 @@ bun install --frozen-lockfile
 ```
 
 ### Development Workflow
+
 ```bash
 # Add new dependency with security validation
 bun add express
@@ -242,12 +262,14 @@ bun add express
 ## 🌐 Threat Intelligence
 
 ### Sources
+
 - **Fire22 Threat Feed**: Enterprise security intelligence
-- **CVE Database**: MITRE CVE database integration  
+- **CVE Database**: MITRE CVE database integration
 - **Community Reports**: Crowdsourced threat detection
 - **Behavioral Analysis**: Package pattern analysis
 
 ### Update Frequency
+
 - **Threat Feed**: Hourly updates with immediate critical alerts
 - **CVE Database**: Daily updates with severity prioritization
 - **Policy Updates**: Real-time Fire22 workspace policy changes
@@ -255,12 +277,14 @@ bun add express
 ## 🔒 Security Guarantees
 
 ### Data Privacy
+
 - **No Package Content Scanning**: Only metadata analysis
 - **Local Processing**: All analysis performed locally
 - **Minimal Network**: Only threat feed updates require network
 - **Zero Logging**: No package information stored or transmitted
 
 ### Reliability
+
 - **Graceful Degradation**: Continues operation if threat feed unavailable
 - **Error Recovery**: Robust error handling with detailed diagnostics
 - **Performance Monitoring**: Built-in performance tracking

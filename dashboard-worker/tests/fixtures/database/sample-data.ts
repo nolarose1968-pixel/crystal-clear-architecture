@@ -49,36 +49,36 @@ export const sampleCustomers: CustomerFixture[] = [
     username: 'johndoe',
     first_name: 'John',
     last_name: 'Doe',
-    login: 'CUST001'
+    login: 'CUST001',
   },
   {
     customer_id: 'CUST002',
     username: 'janesmith',
     first_name: 'Jane',
     last_name: 'Smith',
-    login: 'CUST002'
+    login: 'CUST002',
   },
   {
     customer_id: 'CUST003',
     username: 'bobjohnson',
     first_name: 'Bob',
     last_name: 'Johnson',
-    login: 'CUST003'
+    login: 'CUST003',
   },
   {
     customer_id: 'CUST004',
     username: 'alicebrown',
     first_name: 'Alice',
     last_name: 'Brown',
-    login: 'CUST004'
+    login: 'CUST004',
   },
   {
     customer_id: 'CUST005',
     username: 'charliewilson',
     first_name: 'Charlie',
     last_name: 'Wilson',
-    login: 'CUST005'
-  }
+    login: 'CUST005',
+  },
 ];
 
 /**
@@ -92,7 +92,7 @@ export const sampleTransactions: TransactionFixture[] = [
     short_desc: 'Initial deposit',
     agent_id: 'BLAKEPPH',
     tran_code: 'DEP',
-    entered_by: 'SYSTEM'
+    entered_by: 'SYSTEM',
   },
   {
     customer_id: 'CUST001',
@@ -101,7 +101,7 @@ export const sampleTransactions: TransactionFixture[] = [
     short_desc: 'Sports bet - Lakers vs Warriors',
     agent_id: 'BLAKEPPH',
     tran_code: 'BET',
-    entered_by: 'SYSTEM'
+    entered_by: 'SYSTEM',
   },
   {
     customer_id: 'CUST002',
@@ -110,7 +110,7 @@ export const sampleTransactions: TransactionFixture[] = [
     short_desc: 'Credit card deposit',
     agent_id: 'BLAKEPPH',
     tran_code: 'DEP',
-    entered_by: 'AGENT'
+    entered_by: 'AGENT',
   },
   {
     customer_id: 'CUST002',
@@ -119,7 +119,7 @@ export const sampleTransactions: TransactionFixture[] = [
     short_desc: 'Bet win - Cowboys vs Giants',
     agent_id: 'BLAKEPPH',
     tran_code: 'WIN',
-    entered_by: 'SYSTEM'
+    entered_by: 'SYSTEM',
   },
   {
     customer_id: 'CUST003',
@@ -128,7 +128,7 @@ export const sampleTransactions: TransactionFixture[] = [
     short_desc: 'Bank transfer',
     agent_id: 'BLAKEPPH',
     tran_code: 'DEP',
-    entered_by: 'SYSTEM'
+    entered_by: 'SYSTEM',
   },
   {
     customer_id: 'CUST003',
@@ -137,7 +137,7 @@ export const sampleTransactions: TransactionFixture[] = [
     short_desc: 'Sports bet - Heat vs Celtics',
     agent_id: 'BLAKEPPH',
     tran_code: 'BET',
-    entered_by: 'SYSTEM'
+    entered_by: 'SYSTEM',
   },
   {
     customer_id: 'CUST004',
@@ -146,7 +146,7 @@ export const sampleTransactions: TransactionFixture[] = [
     short_desc: 'Welcome bonus',
     agent_id: 'BLAKEPPH',
     tran_code: 'BON',
-    entered_by: 'AGENT'
+    entered_by: 'AGENT',
   },
   {
     customer_id: 'CUST005',
@@ -155,8 +155,8 @@ export const sampleTransactions: TransactionFixture[] = [
     short_desc: 'Reload bonus',
     agent_id: 'BLAKEPPH',
     tran_code: 'BON',
-    entered_by: 'AGENT'
-  }
+    entered_by: 'AGENT',
+  },
 ];
 
 /**
@@ -169,16 +169,16 @@ export const sampleBets: BetFixture[] = [
     odds: 1.85,
     type: 'moneyline',
     status: 'pending',
-    teams: 'Lakers vs Warriors'
+    teams: 'Lakers vs Warriors',
   },
   {
     customer_id: 2, // CUST002
     amount: 100,
-    odds: 2.10,
+    odds: 2.1,
     type: 'spread',
     status: 'won',
     outcome: 'win',
-    teams: 'Cowboys vs Giants'
+    teams: 'Cowboys vs Giants',
   },
   {
     customer_id: 3, // CUST003
@@ -186,7 +186,7 @@ export const sampleBets: BetFixture[] = [
     odds: 1.95,
     type: 'total',
     status: 'pending',
-    teams: 'Heat vs Celtics'
+    teams: 'Heat vs Celtics',
   },
   {
     customer_id: 1, // CUST001
@@ -195,7 +195,7 @@ export const sampleBets: BetFixture[] = [
     type: 'moneyline',
     status: 'lost',
     outcome: 'loss',
-    teams: 'Yankees vs Red Sox'
+    teams: 'Yankees vs Red Sox',
   },
   {
     customer_id: 4, // CUST004
@@ -203,17 +203,17 @@ export const sampleBets: BetFixture[] = [
     odds: 1.75,
     type: 'spread',
     status: 'pending',
-    teams: 'Chiefs vs Bills'
+    teams: 'Chiefs vs Bills',
   },
   {
     customer_id: 5, // CUST005
     amount: 40,
-    odds: 2.50,
+    odds: 2.5,
     type: 'total',
     status: 'won',
     outcome: 'win',
-    teams: 'Dodgers vs Padres'
-  }
+    teams: 'Dodgers vs Padres',
+  },
 ];
 
 /**
@@ -221,7 +221,7 @@ export const sampleBets: BetFixture[] = [
  */
 export const generateLargeCustomerDataset = (count: number): CustomerFixture[] => {
   const customers: CustomerFixture[] = [];
-  
+
   for (let i = 1; i <= count; i++) {
     const paddedId = i.toString().padStart(6, '0');
     customers.push({
@@ -229,30 +229,34 @@ export const generateLargeCustomerDataset = (count: number): CustomerFixture[] =
       username: `perfuser${paddedId}`,
       first_name: `First${paddedId}`,
       last_name: `Last${paddedId}`,
-      login: `PERF${paddedId}`
+      login: `PERF${paddedId}`,
     });
   }
-  
+
   return customers;
 };
 
 /**
  * Generate large transaction dataset
  */
-export const generateLargeTransactionDataset = (customerCount: number, transactionsPerCustomer: number): TransactionFixture[] => {
+export const generateLargeTransactionDataset = (
+  customerCount: number,
+  transactionsPerCustomer: number
+): TransactionFixture[] => {
   const transactions: TransactionFixture[] = [];
   const transactionTypes = ['deposit', 'wager', 'win', 'loss', 'bonus'];
-  
+
   for (let i = 1; i <= customerCount; i++) {
     const paddedId = i.toString().padStart(6, '0');
     const customerId = `PERF${paddedId}`;
-    
+
     for (let j = 1; j <= transactionsPerCustomer; j++) {
       const type = transactionTypes[Math.floor(Math.random() * transactionTypes.length)];
-      const amount = type === 'wager' || type === 'loss' 
-        ? -(Math.floor(Math.random() * 500) + 10)
-        : Math.floor(Math.random() * 1000) + 10;
-      
+      const amount =
+        type === 'wager' || type === 'loss'
+          ? -(Math.floor(Math.random() * 500) + 10)
+          : Math.floor(Math.random() * 1000) + 10;
+
       transactions.push({
         customer_id: customerId,
         amount,
@@ -260,11 +264,11 @@ export const generateLargeTransactionDataset = (customerCount: number, transacti
         short_desc: `Performance test ${type} ${j}`,
         agent_id: 'BLAKEPPH',
         tran_code: type.toUpperCase().substring(0, 3),
-        entered_by: 'SYSTEM'
+        entered_by: 'SYSTEM',
       });
     }
   }
-  
+
   return transactions;
 };
 
@@ -277,22 +281,22 @@ export const edgeCaseCustomers: CustomerFixture[] = [
     username: 'emptyid',
     first_name: 'Empty',
     last_name: 'ID',
-    login: ''
+    login: '',
   },
   {
     customer_id: 'VERY_LONG_CUSTOMER_ID_THAT_EXCEEDS_NORMAL_LIMITS_123456789',
     username: 'longid',
     first_name: 'Long',
     last_name: 'ID',
-    login: 'VERY_LONG_CUSTOMER_ID_THAT_EXCEEDS_NORMAL_LIMITS_123456789'
+    login: 'VERY_LONG_CUSTOMER_ID_THAT_EXCEEDS_NORMAL_LIMITS_123456789',
   },
   {
     customer_id: 'SPECIAL!@#$%',
     username: 'special',
     first_name: 'Special',
     last_name: 'Characters',
-    login: 'SPECIAL!@#$%'
-  }
+    login: 'SPECIAL!@#$%',
+  },
 ];
 
 /**
@@ -303,20 +307,20 @@ export const invalidTransactions: Partial<TransactionFixture>[] = [
     customer_id: 'NONEXISTENT',
     amount: 100,
     tran_type: 'deposit',
-    short_desc: 'Invalid customer'
+    short_desc: 'Invalid customer',
   },
   {
     customer_id: 'CUST001',
     amount: -999999999,
     tran_type: 'deposit',
-    short_desc: 'Negative deposit'
+    short_desc: 'Negative deposit',
   },
   {
     customer_id: 'CUST001',
     // Missing amount
     tran_type: 'deposit',
-    short_desc: 'Missing amount'
-  }
+    short_desc: 'Missing amount',
+  },
 ];
 
 /**
@@ -346,7 +350,10 @@ export class TestDataInserter {
   /**
    * Insert sample transactions into database
    */
-  static insertTransactions(db: any, transactions: TransactionFixture[] = sampleTransactions): void {
+  static insertTransactions(
+    db: any,
+    transactions: TransactionFixture[] = sampleTransactions
+  ): void {
     const insertQuery = db.query(`
       INSERT INTO transactions (customer_id, amount, tran_type, short_desc, agent_id, tran_code, entered_by)
       VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -405,5 +412,5 @@ export default {
   invalidTransactions,
   generateLargeCustomerDataset,
   generateLargeTransactionDataset,
-  TestDataInserter
+  TestDataInserter,
 };

@@ -1,16 +1,20 @@
 #!/usr/bin/env bun
 /**
  * 🧪 Authentication Test Suite
- * 
+ *
  * Comprehensive testing for the Fire22 authentication system
  * Tests JWT validation, rate limiting, security features, and more
- * 
+ *
  * @version 3.0.9
  * @author Fire22 Development Team
  */
 
 import { generateToken, generateRefreshToken } from '../src/api/middleware/auth.middleware.js';
-import { enhancedAuthenticate, generateEnhancedToken, SecurityManager } from '../src/api/middleware/enhanced-auth.middleware.js';
+import {
+  enhancedAuthenticate,
+  generateEnhancedToken,
+  SecurityManager,
+} from '../src/api/middleware/enhanced-auth.middleware.js';
 
 interface TestCase {
   name: string;
@@ -38,8 +42,8 @@ class AuthTestSuite {
   private createMockRequest(headers: Record<string, string> = {}): any {
     return {
       headers: {
-        get: (key: string) => headers[key.toLowerCase()] || null
-      }
+        get: (key: string) => headers[key.toLowerCase()] || null,
+      },
     };
   }
 
@@ -48,7 +52,7 @@ class AuthTestSuite {
    */
   async runAllTests(): Promise<void> {
     console.log('🧪 Fire22 Authentication Test Suite');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
     console.log('Testing JWT validation, security features, and more...\n');
 
     const testCases: TestCase[] = [
@@ -57,129 +61,129 @@ class AuthTestSuite {
         name: 'Generate Valid JWT Token',
         test: this.testTokenGeneration.bind(this),
         category: 'JWT',
-        critical: true
+        critical: true,
       },
       {
         name: 'Generate Refresh Token',
         test: this.testRefreshTokenGeneration.bind(this),
         category: 'JWT',
-        critical: true
+        critical: true,
       },
       {
         name: 'Validate JWT Token Structure',
         test: this.testTokenValidation.bind(this),
         category: 'JWT',
-        critical: true
+        critical: true,
       },
       {
         name: 'Handle Expired Tokens',
         test: this.testExpiredToken.bind(this),
         category: 'JWT',
-        critical: true
+        critical: true,
       },
-      
+
       // Authentication Middleware Tests
       {
         name: 'Authenticate Valid Request',
         test: this.testValidAuthentication.bind(this),
         category: 'Authentication',
-        critical: true
+        critical: true,
       },
       {
         name: 'Reject Missing Token',
         test: this.testMissingToken.bind(this),
         category: 'Authentication',
-        critical: true
+        critical: true,
       },
       {
         name: 'Reject Invalid Token',
         test: this.testInvalidToken.bind(this),
         category: 'Authentication',
-        critical: true
+        critical: true,
       },
       {
         name: 'Handle Malformed Authorization Header',
         test: this.testMalformedHeader.bind(this),
         category: 'Authentication',
-        critical: true
+        critical: true,
       },
-      
+
       // Security Features Tests
       {
         name: 'Rate Limiting Enforcement',
         test: this.testRateLimiting.bind(this),
         category: 'Security',
-        critical: true
+        critical: true,
       },
       {
         name: 'Token Blacklisting',
         test: this.testTokenBlacklisting.bind(this),
         category: 'Security',
-        critical: true
+        critical: true,
       },
       {
         name: 'Suspicious Activity Detection',
         test: this.testSuspiciousActivity.bind(this),
         category: 'Security',
-        critical: false
+        critical: false,
       },
       {
         name: 'Security Event Logging',
         test: this.testSecurityLogging.bind(this),
         category: 'Security',
-        critical: false
+        critical: false,
       },
-      
+
       // Role-Based Access Control Tests
       {
         name: 'Admin Role Permissions',
         test: this.testAdminPermissions.bind(this),
         category: 'RBAC',
-        critical: true
+        critical: true,
       },
       {
         name: 'Manager Role Permissions',
         test: this.testManagerPermissions.bind(this),
         category: 'RBAC',
-        critical: true
+        critical: true,
       },
       {
         name: 'Agent Role Permissions',
         test: this.testAgentPermissions.bind(this),
         category: 'RBAC',
-        critical: true
+        critical: true,
       },
       {
         name: 'Customer Role Permissions',
         test: this.testCustomerPermissions.bind(this),
         category: 'RBAC',
-        critical: true
+        critical: true,
       },
-      
+
       // Enhanced Security Tests
       {
         name: 'Enhanced Token Generation',
         test: this.testEnhancedTokenGeneration.bind(this),
         category: 'Enhanced',
-        critical: false
+        critical: false,
       },
       {
         name: 'Security Health Check',
         test: this.testSecurityHealthCheck.bind(this),
         category: 'Enhanced',
-        critical: false
-      }
+        critical: false,
+      },
     ];
 
     // Run tests by category
     const categories = [...new Set(testCases.map(t => t.category))];
-    
+
     for (const category of categories) {
       console.log(`\n📦 ${category} Tests`);
       console.log('-'.repeat(40));
-      
+
       const categoryTests = testCases.filter(t => t.category === category);
-      
+
       for (const testCase of categoryTests) {
         await this.runSingleTest(testCase);
       }
@@ -194,38 +198,39 @@ class AuthTestSuite {
   private async runSingleTest(testCase: TestCase): Promise<void> {
     const startTime = Date.now();
     process.stdout.write(`  Testing ${testCase.name}... `);
-    
+
     try {
       const passed = await testCase.test();
       const duration = Date.now() - startTime;
-      
+
       this.results.push({
         name: testCase.name,
         category: testCase.category,
         passed,
         duration,
-        critical: testCase.critical
+        critical: testCase.critical,
       });
-      
+
       if (passed) {
         console.log(`✅ PASS (${duration}ms)`);
       } else {
         console.log(`❌ FAIL (${duration}ms)`);
       }
-      
     } catch (error) {
       const duration = Date.now() - startTime;
-      
+
       this.results.push({
         name: testCase.name,
         category: testCase.category,
         passed: false,
         duration,
         error: error instanceof Error ? error.message : 'Unknown error',
-        critical: testCase.critical
+        critical: testCase.critical,
       });
-      
-      console.log(`❌ ERROR (${duration}ms): ${error instanceof Error ? error.message : 'Unknown error'}`);
+
+      console.log(
+        `❌ ERROR (${duration}ms): ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -234,9 +239,9 @@ class AuthTestSuite {
   private async testTokenGeneration(): Promise<boolean> {
     const token = await generateToken({
       id: 'test-user',
-      role: 'customer'
+      role: 'customer',
     });
-    
+
     return typeof token === 'string' && token.length > 0;
   }
 
@@ -248,9 +253,9 @@ class AuthTestSuite {
   private async testTokenValidation(): Promise<boolean> {
     const token = await generateToken({
       id: 'test-user',
-      role: 'admin'
+      role: 'admin',
     });
-    
+
     // Token should have 3 parts (header.payload.signature)
     const parts = token.split('.');
     return parts.length === 3 && parts.every(part => part.length > 0);
@@ -260,9 +265,9 @@ class AuthTestSuite {
     // This test would require creating an expired token
     // For now, we'll simulate the behavior
     const request = this.createMockRequest({
-      authorization: 'Bearer expired.token.here'
+      authorization: 'Bearer expired.token.here',
     });
-    
+
     try {
       const result = await enhancedAuthenticate(request);
       // Should return error response for expired token
@@ -275,14 +280,14 @@ class AuthTestSuite {
   private async testValidAuthentication(): Promise<boolean> {
     const token = await generateToken({
       id: 'test-user',
-      role: 'admin'
+      role: 'admin',
     });
-    
+
     const request = this.createMockRequest({
       authorization: `Bearer ${token}`,
-      'cf-connecting-ip': '127.0.0.1'
+      'cf-connecting-ip': '127.0.0.1',
     });
-    
+
     try {
       const result = await enhancedAuthenticate(request);
       return result === undefined && request.user?.id === 'test-user';
@@ -293,9 +298,9 @@ class AuthTestSuite {
 
   private async testMissingToken(): Promise<boolean> {
     const request = this.createMockRequest({
-      'cf-connecting-ip': '127.0.0.1'
+      'cf-connecting-ip': '127.0.0.1',
     });
-    
+
     const result = await enhancedAuthenticate(request);
     return result instanceof Response && result.status === 401;
   }
@@ -303,9 +308,9 @@ class AuthTestSuite {
   private async testInvalidToken(): Promise<boolean> {
     const request = this.createMockRequest({
       authorization: 'Bearer invalid.token.here',
-      'cf-connecting-ip': '127.0.0.1'
+      'cf-connecting-ip': '127.0.0.1',
     });
-    
+
     const result = await enhancedAuthenticate(request);
     return result instanceof Response && result.status === 401;
   }
@@ -313,44 +318,44 @@ class AuthTestSuite {
   private async testMalformedHeader(): Promise<boolean> {
     const request = this.createMockRequest({
       authorization: 'NotBearer token-without-bearer',
-      'cf-connecting-ip': '127.0.0.1'
+      'cf-connecting-ip': '127.0.0.1',
     });
-    
+
     const result = await enhancedAuthenticate(request);
     return result instanceof Response && result.status === 401;
   }
 
   private async testRateLimiting(): Promise<boolean> {
     const ip = '192.168.1.100'; // Test IP
-    
+
     // Clear any existing rate limit for this IP
     this.securityManager['rateLimitMap'].delete(`rate_limit_${ip}`);
-    
+
     // Make multiple requests to trigger rate limiting
     let blockedResponse: Response | undefined;
-    
+
     for (let i = 0; i < 10; i++) {
       const request = this.createMockRequest({
         authorization: 'Bearer invalid.token',
-        'cf-connecting-ip': ip
+        'cf-connecting-ip': ip,
       });
-      
+
       const result = await enhancedAuthenticate(request);
       if (result instanceof Response && result.status === 429) {
         blockedResponse = result;
         break;
       }
     }
-    
+
     return blockedResponse !== undefined;
   }
 
   private async testTokenBlacklisting(): Promise<boolean> {
     const token = 'test-blacklisted-token';
-    
+
     // Add token to blacklist
     this.securityManager.blacklistToken(token);
-    
+
     // Check if token is blacklisted
     return this.securityManager.isTokenBlacklisted(token);
   }
@@ -358,31 +363,31 @@ class AuthTestSuite {
   private async testSuspiciousActivity(): Promise<boolean> {
     const ip = '192.168.1.200';
     const userId = 'test-user';
-    
+
     // Generate multiple failed login events
     for (let i = 0; i < 12; i++) {
       this.securityManager.logSecurityEvent({
         type: 'login_failure',
         ip,
         userId,
-        timestamp: new Date()
+        timestamp: new Date(),
       });
     }
-    
+
     // Check if suspicious activity is detected
     return this.securityManager.detectSuspiciousActivity(ip, userId);
   }
 
   private async testSecurityLogging(): Promise<boolean> {
     const initialEventCount = this.securityManager['securityEvents'].length;
-    
+
     this.securityManager.logSecurityEvent({
       type: 'login_success',
       userId: 'test-user',
       ip: '127.0.0.1',
-      timestamp: new Date()
+      timestamp: new Date(),
     });
-    
+
     const newEventCount = this.securityManager['securityEvents'].length;
     return newEventCount > initialEventCount;
   }
@@ -390,75 +395,83 @@ class AuthTestSuite {
   private async testAdminPermissions(): Promise<boolean> {
     const token = await generateToken({
       id: 'admin-user',
-      role: 'admin'
+      role: 'admin',
     });
-    
+
     const request = this.createMockRequest({
       authorization: `Bearer ${token}`,
-      'cf-connecting-ip': '127.0.0.1'
+      'cf-connecting-ip': '127.0.0.1',
     });
-    
+
     await enhancedAuthenticate(request);
-    
-    return request.user?.role === 'admin' && 
-           request.user?.level === 5 &&
-           request.user?.permissions?.includes('admin.*');
+
+    return (
+      request.user?.role === 'admin' &&
+      request.user?.level === 5 &&
+      request.user?.permissions?.includes('admin.*')
+    );
   }
 
   private async testManagerPermissions(): Promise<boolean> {
     const token = await generateToken({
       id: 'manager-user',
-      role: 'manager'
+      role: 'manager',
     });
-    
+
     const request = this.createMockRequest({
       authorization: `Bearer ${token}`,
-      'cf-connecting-ip': '127.0.0.1'
+      'cf-connecting-ip': '127.0.0.1',
     });
-    
+
     await enhancedAuthenticate(request);
-    
-    return request.user?.role === 'manager' && 
-           request.user?.level === 4 &&
-           request.user?.permissions?.includes('manager.*');
+
+    return (
+      request.user?.role === 'manager' &&
+      request.user?.level === 4 &&
+      request.user?.permissions?.includes('manager.*')
+    );
   }
 
   private async testAgentPermissions(): Promise<boolean> {
     const token = await generateToken({
       id: 'agent-user',
-      role: 'agent'
+      role: 'agent',
     });
-    
+
     const request = this.createMockRequest({
       authorization: `Bearer ${token}`,
-      'cf-connecting-ip': '127.0.0.1'
+      'cf-connecting-ip': '127.0.0.1',
     });
-    
+
     await enhancedAuthenticate(request);
-    
-    return request.user?.role === 'agent' && 
-           request.user?.level === 3 &&
-           request.user?.permissions?.includes('agent.own') &&
-           request.user?.scope?.type === 'agent';
+
+    return (
+      request.user?.role === 'agent' &&
+      request.user?.level === 3 &&
+      request.user?.permissions?.includes('agent.own') &&
+      request.user?.scope?.type === 'agent'
+    );
   }
 
   private async testCustomerPermissions(): Promise<boolean> {
     const token = await generateToken({
       id: 'customer-user',
-      role: 'customer'
+      role: 'customer',
     });
-    
+
     const request = this.createMockRequest({
       authorization: `Bearer ${token}`,
-      'cf-connecting-ip': '127.0.0.1'
+      'cf-connecting-ip': '127.0.0.1',
     });
-    
+
     await enhancedAuthenticate(request);
-    
-    return request.user?.role === 'customer' && 
-           request.user?.level === 2 &&
-           request.user?.permissions?.includes('customer.own') &&
-           request.user?.scope?.type === 'customer';
+
+    return (
+      request.user?.role === 'customer' &&
+      request.user?.level === 2 &&
+      request.user?.permissions?.includes('customer.own') &&
+      request.user?.scope?.type === 'customer'
+    );
   }
 
   private async testEnhancedTokenGeneration(): Promise<boolean> {
@@ -466,12 +479,10 @@ class AuthTestSuite {
       const result = await generateEnhancedToken({
         id: 'test-user',
         role: 'customer',
-        ip: '127.0.0.1'
+        ip: '127.0.0.1',
       });
-      
-      return result.accessToken && 
-             result.refreshToken && 
-             result.expiresAt instanceof Date;
+
+      return result.accessToken && result.refreshToken && result.expiresAt instanceof Date;
     } catch {
       return false;
     }
@@ -479,12 +490,14 @@ class AuthTestSuite {
 
   private async testSecurityHealthCheck(): Promise<boolean> {
     const stats = this.securityManager.getSecurityStats();
-    
-    return typeof stats === 'object' &&
-           typeof stats.totalEvents === 'number' &&
-           typeof stats.recentFailures === 'number' &&
-           typeof stats.activeBlocks === 'number' &&
-           typeof stats.blacklistedTokens === 'number';
+
+    return (
+      typeof stats === 'object' &&
+      typeof stats.totalEvents === 'number' &&
+      typeof stats.recentFailures === 'number' &&
+      typeof stats.activeBlocks === 'number' &&
+      typeof stats.blacklistedTokens === 'number'
+    );
   }
 
   /**
@@ -497,8 +510,8 @@ class AuthTestSuite {
     const critical = this.results.filter(r => r.critical);
     const criticalPassed = critical.filter(r => r.passed).length;
     const passRate = ((passed / total) * 100).toFixed(1);
-    
-    console.log('\n' + '=' .repeat(60));
+
+    console.log('\n' + '='.repeat(60));
     console.log('🔐 Authentication Test Summary');
     console.log('-'.repeat(60));
     console.log(`Total Tests: ${total}`);
@@ -506,7 +519,7 @@ class AuthTestSuite {
     console.log(`❌ Failed: ${failed}`);
     console.log(`📈 Pass Rate: ${passRate}%`);
     console.log(`🔥 Critical Tests: ${criticalPassed}/${critical.length} passed`);
-    
+
     if (failed > 0) {
       console.log('\n❌ Failed Tests:');
       this.results
@@ -519,9 +532,9 @@ class AuthTestSuite {
           }
         });
     }
-    
+
     // Overall status
-    console.log('\n' + '=' .repeat(60));
+    console.log('\n' + '='.repeat(60));
     if (passed === total) {
       console.log('✅ All authentication tests passed! Security system is ready.');
     } else if (criticalPassed === critical.length && passRate >= '80') {
@@ -535,7 +548,7 @@ class AuthTestSuite {
 // Main execution
 async function main() {
   const args = process.argv.slice(2);
-  
+
   if (args.includes('--help') || args.includes('-h')) {
     console.log(`
 🧪 Fire22 Authentication Test Suite
@@ -560,7 +573,7 @@ EXAMPLES:
   }
 
   const suite = new AuthTestSuite();
-  
+
   try {
     await suite.runAllTests();
     process.exit(0);

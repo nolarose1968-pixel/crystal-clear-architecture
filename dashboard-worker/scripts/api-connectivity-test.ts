@@ -6,7 +6,7 @@
  * Ensures full connectivity between portals and services
  */
 
-import { $ } from "bun";
+import { $ } from 'bun';
 
 interface EndpointTest {
   name: string;
@@ -37,7 +37,7 @@ class APIConnectivityTester {
       method: 'GET',
       expectedStatus: 200,
       timeout: 5000,
-      description: 'Retrieve all agents with hierarchy and performance data'
+      description: 'Retrieve all agents with hierarchy and performance data',
     },
     {
       name: 'Agent Performance',
@@ -45,7 +45,7 @@ class APIConnectivityTester {
       method: 'GET',
       expectedStatus: 200,
       timeout: 3000,
-      description: 'Get agent performance metrics and analytics'
+      description: 'Get agent performance metrics and analytics',
     },
 
     // Betting System Endpoints
@@ -55,7 +55,7 @@ class APIConnectivityTester {
       method: 'GET',
       expectedStatus: 200,
       timeout: 2000,
-      description: 'Real-time betting activity feed'
+      description: 'Real-time betting activity feed',
     },
     {
       name: 'Ticketwriter',
@@ -63,7 +63,7 @@ class APIConnectivityTester {
       method: 'GET',
       expectedStatus: 200,
       timeout: 3000,
-      description: 'Bet placement interface with market lines'
+      description: 'Bet placement interface with market lines',
     },
     {
       name: 'Sportsbook Lines',
@@ -71,7 +71,7 @@ class APIConnectivityTester {
       method: 'GET',
       expectedStatus: 200,
       timeout: 3000,
-      description: 'Live odds and line management'
+      description: 'Live odds and line management',
     },
 
     // Customer Management
@@ -81,7 +81,7 @@ class APIConnectivityTester {
       method: 'GET',
       expectedStatus: 200,
       timeout: 5000,
-      description: 'Active customer accounts (4,320 expected)'
+      description: 'Active customer accounts (4,320 expected)',
     },
 
     // System Health
@@ -91,7 +91,7 @@ class APIConnectivityTester {
       method: 'GET',
       expectedStatus: 200,
       timeout: 1000,
-      description: 'Overall system health and status'
+      description: 'Overall system health and status',
     },
     {
       name: 'Database Health',
@@ -99,13 +99,13 @@ class APIConnectivityTester {
       method: 'GET',
       expectedStatus: 200,
       timeout: 2000,
-      description: 'Database connectivity and performance'
-    }
+      description: 'Database connectivity and performance',
+    },
   ];
 
   async runConnectivityTest(): Promise<void> {
     console.log('🔗 FIRE22 API CONNECTIVITY TEST');
-    console.log('=====================================');
+    console.log('!==!==!==!==!==!==!==');
     console.log(`Testing ${this.endpoints.length} endpoints...\n`);
 
     for (const endpoint of this.endpoints) {
@@ -129,8 +129,8 @@ class APIConnectivityTester {
         signal: controller.signal,
         headers: {
           'Content-Type': 'application/json',
-          'User-Agent': 'Fire22-API-Tester/1.0'
-        }
+          'User-Agent': 'Fire22-API-Tester/1.0',
+        },
       });
 
       clearTimeout(timeoutId);
@@ -140,7 +140,7 @@ class APIConnectivityTester {
         endpoint: endpoint.name,
         status: response.status === endpoint.expectedStatus ? 'success' : 'failed',
         responseTime,
-        statusCode: response.status
+        statusCode: response.status,
       };
 
       this.results.push(result);
@@ -151,27 +151,28 @@ class APIConnectivityTester {
       if (response.status !== endpoint.expectedStatus) {
         console.log(`   Expected: ${endpoint.expectedStatus}, Got: ${response.status}`);
       }
-
     } catch (error) {
       const responseTime = Date.now() - startTime;
       const result: ConnectivityResult = {
         endpoint: endpoint.name,
         status: error.name === 'AbortError' ? 'timeout' : 'failed',
         responseTime,
-        error: error.message
+        error: error.message,
       };
 
       this.results.push(result);
 
       const statusIcon = error.name === 'AbortError' ? '⏰' : '❌';
-      console.log(`${statusIcon} ${endpoint.name}: ${error.name === 'AbortError' ? 'TIMEOUT' : 'ERROR'} (${responseTime}ms)`);
+      console.log(
+        `${statusIcon} ${endpoint.name}: ${error.name === 'AbortError' ? 'TIMEOUT' : 'ERROR'} (${responseTime}ms)`
+      );
       console.log(`   Error: ${error.message}`);
     }
   }
 
   private displayResults(): void {
     console.log('\n📊 CONNECTIVITY TEST RESULTS');
-    console.log('=============================');
+    console.log('!==!==!==!==!====');
 
     const successful = this.results.filter(r => r.status === 'success').length;
     const failed = this.results.filter(r => r.status === 'failed').length;
@@ -182,7 +183,8 @@ class APIConnectivityTester {
     console.log(`⏰ Timeouts: ${timeouts}`);
     console.log(`📈 Success Rate: ${((successful / this.results.length) * 100).toFixed(1)}%`);
 
-    const avgResponseTime = this.results.reduce((sum, r) => sum + r.responseTime, 0) / this.results.length;
+    const avgResponseTime =
+      this.results.reduce((sum, r) => sum + r.responseTime, 0) / this.results.length;
     console.log(`⚡ Average Response Time: ${avgResponseTime.toFixed(0)}ms`);
 
     // Show failed endpoints
@@ -207,10 +209,11 @@ class APIConnectivityTester {
         successful: this.results.filter(r => r.status === 'success').length,
         failed: this.results.filter(r => r.status === 'failed').length,
         timeouts: this.results.filter(r => r.status === 'timeout').length,
-        averageResponseTime: this.results.reduce((sum, r) => sum + r.responseTime, 0) / this.results.length
+        averageResponseTime:
+          this.results.reduce((sum, r) => sum + r.responseTime, 0) / this.results.length,
       },
       results: this.results,
-      recommendations: this.generateRecommendations()
+      recommendations: this.generateRecommendations(),
     };
 
     // Ensure reports directory exists
@@ -232,7 +235,8 @@ class APIConnectivityTester {
   private generateRecommendations(): string[] {
     const recommendations: string[] = [];
     const failedCount = this.results.filter(r => r.status !== 'success').length;
-    const avgResponseTime = this.results.reduce((sum, r) => sum + r.responseTime, 0) / this.results.length;
+    const avgResponseTime =
+      this.results.reduce((sum, r) => sum + r.responseTime, 0) / this.results.length;
 
     if (failedCount > 0) {
       recommendations.push(`Fix ${failedCount} failed endpoints`);
@@ -248,8 +252,8 @@ class APIConnectivityTester {
 
     // Check for critical endpoints
     const criticalEndpoints = ['Agent Management', 'Bet Ticker', 'Customer List'];
-    const criticalFailed = this.results.filter(r =>
-      criticalEndpoints.includes(r.endpoint) && r.status !== 'success'
+    const criticalFailed = this.results.filter(
+      r => criticalEndpoints.includes(r.endpoint) && r.status !== 'success'
     );
 
     if (criticalFailed.length > 0) {
@@ -261,7 +265,7 @@ class APIConnectivityTester {
 
   async testDataConsistency(): Promise<void> {
     console.log('\n🔍 DATA CONSISTENCY CHECK');
-    console.log('==========================');
+    console.log('!==!==!==!==!==');
 
     try {
       // Test agent count consistency
@@ -282,7 +286,6 @@ class APIConnectivityTester {
           console.log(`⚠️  Expected 4,320 active customers, got ${activeCount}`);
         }
       }
-
     } catch (error) {
       console.log(`❌ Data consistency check failed: ${error.message}`);
     }

@@ -20,9 +20,12 @@
 
 ## 🔥 Overview
 
-The Fire22 P2P Queue System API provides comprehensive peer-to-peer transaction management with advanced matching algorithms, Telegram integration, and real-time queue monitoring.
+The Fire22 P2P Queue System API provides comprehensive peer-to-peer transaction
+management with advanced matching algorithms, Telegram integration, and
+real-time queue monitoring.
 
 ### Key Features
+
 - **Real-time Queue Management** - Live withdrawal and deposit queues
 - **Intelligent Matching** - Auto-matching algorithm with confidence scoring
 - **Telegram Integration** - Native notification system
@@ -32,7 +35,8 @@ The Fire22 P2P Queue System API provides comprehensive peer-to-peer transaction 
 
 ## 🔐 Authentication
 
-All API endpoints are currently accessible without authentication in development mode. In production, endpoints will require:
+All API endpoints are currently accessible without authentication in development
+mode. In production, endpoints will require:
 
 - **API Key**: `X-API-Key` header
 - **JWT Token**: `Authorization: Bearer <token>`
@@ -40,9 +44,11 @@ All API endpoints are currently accessible without authentication in development
 ## 📊 Queue Data Endpoints
 
 ### GET /api/p2p/queue/withdrawals
+
 Retrieve all pending withdrawal requests.
 
 **Response Schema:**
+
 ```json
 [
   {
@@ -66,13 +72,16 @@ Retrieve all pending withdrawal requests.
 ```
 
 **Status Codes:**
+
 - `200` - Success
 - `500` - Server Error
 
 ### GET /api/p2p/queue/deposits
+
 Retrieve all pending deposit requests.
 
 **Response Schema:**
+
 ```json
 [
   {
@@ -96,9 +105,11 @@ Retrieve all pending deposit requests.
 ```
 
 ### GET /api/p2p/queue/matches
+
 Retrieve available matching opportunities.
 
 **Response Schema:**
+
 ```json
 [
   {
@@ -123,9 +134,11 @@ Retrieve available matching opportunities.
 ```
 
 ### GET /api/p2p/queue/stats
+
 Retrieve comprehensive queue statistics.
 
 **Response Schema:**
+
 ```json
 {
   "totalItems": 6,
@@ -139,7 +152,7 @@ Retrieve comprehensive queue statistics.
   "pendingDeposits": 3,
   "completedToday": 47,
   "revenue": {
-    "today": 1247.50,
+    "today": 1247.5,
     "thisWeek": 8930.25,
     "thisMonth": 34562.75
   },
@@ -154,9 +167,11 @@ Retrieve comprehensive queue statistics.
 ## ⚙️ Queue Management
 
 ### POST /api/p2p/queue/cancel
+
 Cancel a specific queue item.
 
 **Request Body:**
+
 ```json
 {
   "itemId": "w1",
@@ -165,6 +180,7 @@ Cancel a specific queue item.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -178,9 +194,11 @@ Cancel a specific queue item.
 ```
 
 ### PUT /api/p2p/queue/update
+
 Update queue item details.
 
 **Request Body:**
+
 ```json
 {
   "itemId": "w1",
@@ -193,6 +211,7 @@ Update queue item details.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -210,9 +229,11 @@ Update queue item details.
 ```
 
 ### GET /api/p2p/queue/item/{id}
+
 Get detailed information for a specific queue item.
 
 **Response:**
+
 ```json
 {
   "id": "w1",
@@ -239,7 +260,7 @@ Get detailed information for a specific queue item.
     "priority": "normal",
     "processingTime": "1-2 hours",
     "fees": {
-      "base": 5.00,
+      "base": 5.0,
       "percentage": 0.5
     }
   }
@@ -249,9 +270,11 @@ Get detailed information for a specific queue item.
 ## 🤖 Matching System
 
 ### POST /api/p2p/queue/auto-match
+
 Run the automated matching algorithm.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -281,9 +304,11 @@ Run the automated matching algorithm.
 ```
 
 ### POST /api/p2p/queue/approve
+
 Approve a specific match.
 
 **Request Body:**
+
 ```json
 {
   "matchId": "m1"
@@ -291,6 +316,7 @@ Approve a specific match.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -306,9 +332,11 @@ Approve a specific match.
 ```
 
 ### POST /api/p2p/queue/reject
+
 Reject a specific match.
 
 **Request Body:**
+
 ```json
 {
   "matchId": "m1",
@@ -317,6 +345,7 @@ Reject a specific match.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -331,9 +360,11 @@ Reject a specific match.
 ## 📱 Telegram Integration
 
 ### POST /api/p2p/queue/telegram/notify
+
 Send Telegram notification to customers.
 
 **Request Body:**
+
 ```json
 {
   "itemId": "w1",
@@ -343,6 +374,7 @@ Send Telegram notification to customers.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -357,9 +389,11 @@ Send Telegram notification to customers.
 ## 📤 Data Export
 
 ### GET /api/p2p/queue/export
+
 Export complete queue data as JSON.
 
 **Response:**
+
 ```json
 {
   "metadata": {
@@ -388,6 +422,7 @@ Export complete queue data as JSON.
 The API implements comprehensive error handling with circuit breaker patterns:
 
 ### Standard Error Response
+
 ```json
 {
   "error": "Resource not found",
@@ -398,11 +433,13 @@ The API implements comprehensive error handling with circuit breaker patterns:
 ```
 
 ### Circuit Breaker States
+
 - **CLOSED**: Normal operation
 - **OPEN**: Service temporarily unavailable
 - **HALF_OPEN**: Testing service recovery
 
 ### Status Codes
+
 - `200` - Success
 - `201` - Created
 - `400` - Bad Request
@@ -420,6 +457,7 @@ The API implements comprehensive error handling with circuit breaker patterns:
 - **Bulk Updates**: 20 requests per minute
 
 Rate limit headers:
+
 - `X-RateLimit-Limit`: Requests per window
 - `X-RateLimit-Remaining`: Remaining requests
 - `X-RateLimit-Reset`: Window reset time
@@ -427,15 +465,17 @@ Rate limit headers:
 ## 📝 Examples
 
 ### JavaScript/TypeScript
+
 ```javascript
 // Fetch withdrawal queue
-const withdrawals = await fetch('/api/p2p/queue/withdrawals')
-  .then(res => res.json());
+const withdrawals = await fetch('/api/p2p/queue/withdrawals').then(res =>
+  res.json()
+);
 
 // Run auto-matching
 const matchResult = await fetch('/api/p2p/queue/auto-match', {
   method: 'POST',
-  headers: { 'Content-Type': 'application/json' }
+  headers: { 'Content-Type': 'application/json' },
 }).then(res => res.json());
 
 // Send Telegram notification
@@ -445,12 +485,13 @@ const notification = await fetch('/api/p2p/queue/telegram/notify', {
   body: JSON.stringify({
     itemId: 'w1',
     telegramChatId: 'CHAT_001',
-    message: 'Processing update'
-  })
+    message: 'Processing update',
+  }),
 }).then(res => res.json());
 ```
 
 ### cURL
+
 ```bash
 # Get queue statistics
 curl -X GET http://localhost:3001/api/p2p/queue/stats
@@ -466,6 +507,7 @@ curl -X GET http://localhost:3001/api/p2p/queue/export \
 ```
 
 ### Python
+
 ```python
 import requests
 import json

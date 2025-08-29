@@ -3,11 +3,7 @@
  * Business logic for Fire22 agent operations
  */
 
-import type { 
-  Fire22Agent, 
-  AgentType, 
-  AgentStatus 
-} from '../../types/fire22/entities';
+import type { Fire22Agent, AgentType, AgentStatus } from '../../types/fire22/entities';
 import { AuditableEntityClass } from '../base';
 import { FIRE22_CONSTRAINTS } from '../../types/fire22/entities';
 
@@ -17,13 +13,13 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
   public agent_login: string = '';
   public agent_name: string = '';
   public agent_type: AgentType = 'agent';
-  
+
   // Hierarchy
   public parent_agent?: string;
   public master_agent?: string;
   public level: number = 1;
   public territory?: string;
-  
+
   // Performance metrics
   public commission_rate: number = 0;
   public total_customers: number = 0;
@@ -31,34 +27,34 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
   public total_volume: number = 0;
   public total_commission: number = 0;
   public performance_score: number = 0;
-  
+
   // Permissions and access
   public permissions: string = '{}';
   public access_level: number = 1;
   public allowed_sports: string = '[]';
   public max_bet_limit: number = 0;
   public max_payout_limit: number = 0;
-  
+
   // Contact information
   public contact_email?: string;
   public contact_phone?: string;
   public contact_address?: string;
   public emergency_contact?: string;
-  
+
   // Specializations
   public specializations: string = '[]';
   public languages_spoken: string = '["en"]';
-  
+
   // Activity tracking
   public last_login?: string;
   public login_count: number = 0;
   public session_count: number = 0;
-  
+
   // Financial
   public commission_balance: number = 0;
   public pending_commission: number = 0;
   public total_paid_commission: number = 0;
-  
+
   // Status
   public status: AgentStatus = 'active';
   public termination_reason?: string;
@@ -71,7 +67,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     }
   }
 
-  // ===== HIERARCHY MANAGEMENT =====
+  // !== HIERARCHY MANAGEMENT !==
 
   /**
    * Check if agent is a master agent
@@ -102,11 +98,11 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     this.master_agent = masterAgent;
     this.level = level;
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
-  // ===== COMMISSION CALCULATIONS =====
+  // !== COMMISSION CALCULATIONS !==
 
   /**
    * Calculate commission based on customer activity
@@ -126,7 +122,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
 
     this.pending_commission += amount;
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -135,7 +131,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
    */
   public processCommissionPayment(amount?: number): this {
     const paymentAmount = amount || this.pending_commission;
-    
+
     if (paymentAmount > this.pending_commission) {
       throw new Error('Payment amount exceeds pending commission');
     }
@@ -144,7 +140,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     this.commission_balance += paymentAmount;
     this.total_paid_commission += paymentAmount;
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -155,7 +151,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     return this.total_paid_commission + this.pending_commission;
   }
 
-  // ===== CUSTOMER MANAGEMENT =====
+  // !== CUSTOMER MANAGEMENT !==
 
   /**
    * Add customer to agent
@@ -165,7 +161,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     this.active_customers++;
     this.updatePerformanceScore();
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -176,14 +172,14 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     if (this.total_customers > 0) {
       this.total_customers--;
     }
-    
+
     if (isActive && this.active_customers > 0) {
       this.active_customers--;
     }
-    
+
     this.updatePerformanceScore();
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -195,7 +191,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     this.active_customers = activeCustomers;
     this.updatePerformanceScore();
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -207,7 +203,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     return (this.active_customers / this.total_customers) * 100;
   }
 
-  // ===== PERFORMANCE MANAGEMENT =====
+  // !== PERFORMANCE MANAGEMENT !==
 
   /**
    * Update performance score based on various metrics
@@ -257,11 +253,11 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     this.total_volume += volume;
     this.updatePerformanceScore();
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
-  // ===== PERMISSIONS AND ACCESS =====
+  // !== PERMISSIONS AND ACCESS !==
 
   /**
    * Get permissions object
@@ -282,7 +278,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     const updatedPermissions = { ...currentPermissions, ...newPermissions };
     this.permissions = JSON.stringify(updatedPermissions);
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -315,7 +311,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
       this.allowed_sports = JSON.stringify(sports);
       this.updated_at = new Date().toISOString();
     }
-    
+
     return this;
   }
 
@@ -327,7 +323,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     const filteredSports = sports.filter(s => s !== sport);
     this.allowed_sports = JSON.stringify(filteredSports);
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -339,7 +335,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     return allowedSports.length === 0 || allowedSports.includes(sport);
   }
 
-  // ===== SPECIALIZATIONS =====
+  // !== SPECIALIZATIONS !==
 
   /**
    * Get specializations list
@@ -362,7 +358,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
       this.specializations = JSON.stringify(specs);
       this.updated_at = new Date().toISOString();
     }
-    
+
     return this;
   }
 
@@ -384,7 +380,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     return this.getLanguagesSpoken().includes(language);
   }
 
-  // ===== ACTIVITY TRACKING =====
+  // !== ACTIVITY TRACKING !==
 
   /**
    * Record login
@@ -393,7 +389,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     this.login_count++;
     this.last_login = new Date().toISOString();
     this.updatePerformanceScore();
-    
+
     return this;
   }
 
@@ -403,7 +399,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
   public recordSession(): this {
     this.session_count++;
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -412,10 +408,8 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
    */
   public getDaysSinceLastLogin(): number {
     if (!this.last_login) return Infinity;
-    
-    return Math.floor(
-      (Date.now() - new Date(this.last_login).getTime()) / (1000 * 60 * 60 * 24)
-    );
+
+    return Math.floor((Date.now() - new Date(this.last_login).getTime()) / (1000 * 60 * 60 * 24));
   }
 
   /**
@@ -425,7 +419,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     return this.status === 'active' && this.getDaysSinceLastLogin() <= 7;
   }
 
-  // ===== BETTING LIMITS =====
+  // !== BETTING LIMITS !==
 
   /**
    * Check if bet amount is within agent's limits
@@ -452,11 +446,11 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     this.max_bet_limit = maxBet;
     this.max_payout_limit = maxPayout;
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
-  // ===== STATUS MANAGEMENT =====
+  // !== STATUS MANAGEMENT !==
 
   /**
    * Activate agent
@@ -466,7 +460,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     this.termination_reason = undefined;
     this.termination_date = undefined;
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -479,7 +473,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
       this.termination_reason = reason;
     }
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -491,7 +485,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     this.termination_reason = reason;
     this.termination_date = new Date().toISOString();
     this.updated_at = new Date().toISOString();
-    
+
     return this;
   }
 
@@ -502,60 +496,72 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
     return this.status === 'active' && this.isActiveAgent();
   }
 
-  // ===== VALIDATION =====
+  // !== VALIDATION !==
 
   public validate(): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
-    
+
     // Required fields
     if (!this.agent_id) {
       errors.push('Agent ID is required');
     }
-    
+
     if (!this.agent_login) {
       errors.push('Agent login is required');
     }
-    
+
     if (!this.agent_name) {
       errors.push('Agent name is required');
     }
-    
+
     // Field length validation
     const constraints = FIRE22_CONSTRAINTS;
-    
-    if (this.agent_id && 
-        (this.agent_id.length < constraints.AGENT_ID_LENGTH.min ||
-         this.agent_id.length > constraints.AGENT_ID_LENGTH.max)) {
-      errors.push(`Agent ID must be ${constraints.AGENT_ID_LENGTH.min}-${constraints.AGENT_ID_LENGTH.max} characters`);
+
+    if (
+      this.agent_id &&
+      (this.agent_id.length < constraints.AGENT_ID_LENGTH.min ||
+        this.agent_id.length > constraints.AGENT_ID_LENGTH.max)
+    ) {
+      errors.push(
+        `Agent ID must be ${constraints.AGENT_ID_LENGTH.min}-${constraints.AGENT_ID_LENGTH.max} characters`
+      );
     }
-    
+
     // Business rule validation
-    if (this.commission_rate < constraints.COMMISSION_RATE.min || 
-        this.commission_rate > constraints.COMMISSION_RATE.max) {
-      errors.push(`Commission rate must be between ${constraints.COMMISSION_RATE.min}-${constraints.COMMISSION_RATE.max}`);
+    if (
+      this.commission_rate < constraints.COMMISSION_RATE.min ||
+      this.commission_rate > constraints.COMMISSION_RATE.max
+    ) {
+      errors.push(
+        `Commission rate must be between ${constraints.COMMISSION_RATE.min}-${constraints.COMMISSION_RATE.max}`
+      );
     }
-    
-    if (this.performance_score < constraints.PERFORMANCE_SCORE.min || 
-        this.performance_score > constraints.PERFORMANCE_SCORE.max) {
-      errors.push(`Performance score must be between ${constraints.PERFORMANCE_SCORE.min}-${constraints.PERFORMANCE_SCORE.max}`);
+
+    if (
+      this.performance_score < constraints.PERFORMANCE_SCORE.min ||
+      this.performance_score > constraints.PERFORMANCE_SCORE.max
+    ) {
+      errors.push(
+        `Performance score must be between ${constraints.PERFORMANCE_SCORE.min}-${constraints.PERFORMANCE_SCORE.max}`
+      );
     }
-    
+
     if (this.level < 1 || this.level > 8) {
       errors.push('Agent level must be between 1-8');
     }
-    
+
     // Email validation
     if (this.contact_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.contact_email)) {
       errors.push('Invalid contact email format');
     }
-    
+
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
-  // ===== SERIALIZATION =====
+  // !== SERIALIZATION !==
 
   public toJSON(): Record<string, any> {
     return {
@@ -572,11 +578,11 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
       permissions_parsed: this.getPermissions(),
       allowed_sports_parsed: this.getAllowedSports(),
       specializations_parsed: this.getSpecializations(),
-      languages_spoken_parsed: this.getLanguagesSpoken()
+      languages_spoken_parsed: this.getLanguagesSpoken(),
     };
   }
 
-  // ===== STATIC FACTORY METHODS =====
+  // !== STATIC FACTORY METHODS !==
 
   /**
    * Create new agent with defaults
@@ -598,7 +604,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
       max_bet_limit: 1000,
       max_payout_limit: 10000,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     });
   }
 
@@ -622,7 +628,7 @@ export class Fire22AgentEntity extends AuditableEntityClass implements Fire22Age
       status: apiData.status || 'active',
       contact_email: apiData.contact_email,
       contact_phone: apiData.contact_phone,
-      last_login: apiData.last_login
+      last_login: apiData.last_login,
     });
   }
 }

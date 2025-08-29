@@ -2,7 +2,7 @@
 
 /**
  * Fire22 Dashboard Worker - Comprehensive Build Automation System
- * 
+ *
  * This script automates the entire build process including:
  * - Automatic version management
  * - Documentation generation and embedding
@@ -80,79 +80,78 @@ class BuildAutomation {
       duration: 0,
       steps: [],
       errors: [],
-      warnings: []
+      warnings: [],
     };
   }
 
   async run(): Promise<BuildResult> {
     console.log('🔥 Fire22 Build Automation Starting...\n');
-    
+
     try {
       // Step 1: Pre-build validation
       await this.runStep('Pre-build Validation', this.validateEnvironment.bind(this));
-      
+
       // Step 2: Version management
       if (this.config.version.autoIncrement) {
         await this.runStep('Version Management', this.manageVersion.bind(this));
       }
-      
+
       // Step 3: Dependency management
       if (this.config.dependencies.analyze || this.config.dependencies.update) {
         await this.runStep('Dependency Management', this.manageDependencies.bind(this));
       }
-      
+
       // Step 4: Documentation generation
       if (this.config.documentation.generate) {
         await this.runStep('Documentation Generation', this.generateDocumentation.bind(this));
       }
-      
+
       // Step 5: Metadata generation
       if (this.config.metadata.generate) {
         await this.runStep('Metadata Generation', this.generateMetadata.bind(this));
       }
-      
+
       // Step 6: Quality checks
       if (this.config.quality.lint || this.config.quality.test) {
         await this.runStep('Quality Checks', this.runQualityChecks.bind(this));
       }
-      
+
       // Step 7: Build packages
       await this.runStep('Package Building', this.buildPackages.bind(this));
-      
+
       // Step 8: Package embedding
       if (this.config.packaging.embed) {
         await this.runStep('Package Embedding', this.embedPackages.bind(this));
       }
-      
+
       // Step 9: Main build
       await this.runStep('Main Build', this.buildMain.bind(this));
-      
+
       // Step 10: Documentation embedding
       if (this.config.documentation.embed) {
         await this.runStep('Documentation Embedding', this.embedDocumentation.bind(this));
       }
-      
+
       // Step 11: Final validation
       await this.runStep('Final Validation', this.validateBuild.bind(this));
-      
+
       // Step 12: Post-build tasks
       await this.runStep('Post-build Tasks', this.postBuildTasks.bind(this));
-      
+
       this.result.success = true;
       this.result.duration = Date.now() - this.startTime;
-      
+
       console.log('\n✅ Build completed successfully!');
       this.printSummary();
-      
     } catch (error) {
       this.result.success = false;
       this.result.duration = Date.now() - this.startTime;
       this.result.errors.push(error instanceof Error ? error.message : String(error));
-      
+
       console.error('\n❌ Build failed!');
       this.printSummary();
     }
-    
+
     return this.result;
   }
 
@@ -160,14 +159,14 @@ class BuildAutomation {
     const step: BuildStep = {
       name,
       status: 'running',
-      duration: 0
+      duration: 0,
     };
-    
+
     this.result.steps.push(step);
     const stepStartTime = Date.now();
-    
+
     console.log(`\n🔄 ${name}...`);
-    
+
     try {
       await fn();
       step.status = 'completed';
@@ -189,20 +188,20 @@ class BuildAutomation {
     if (!packageJson.name || !packageJson.name.includes('fire22-dashboard-worker')) {
       throw new Error('Must run from dashboard-worker directory');
     }
-    
+
     // Check required tools
     const bunVersion = await $`bun --version`.text();
     console.log(`📦 Bun version: ${bunVersion.trim()}`);
-    
+
     // Check if packages directory exists
     const packagesPath = 'packages';
     const currentDir = await $`pwd`.text();
     console.log(`📍 Current directory: ${currentDir.trim()}`);
-    
+
     // Try different path approaches
     let packagesFound = false;
     const possiblePaths = ['packages', './packages', '../packages'];
-    
+
     for (const path of possiblePaths) {
       try {
         const stat = await Bun.file(path).stat();
@@ -215,7 +214,7 @@ class BuildAutomation {
         console.log(`❌ Path ${path} not accessible:`, error.message);
       }
     }
-    
+
     if (!packagesFound) {
       // Try using shell command as fallback
       try {
@@ -228,11 +227,13 @@ class BuildAutomation {
         console.log(`❌ Shell command also failed:`, error.message);
       }
     }
-    
+
     if (!packagesFound) {
-      throw new Error(`Packages directory not found. Tried: ${possiblePaths.join(', ')} and shell command`);
+      throw new Error(
+        `Packages directory not found. Tried: ${possiblePaths.join(', ')} and shell command`
+      );
     }
-    
+
     // List packages for verification
     const packageDirs = await $`ls packages`.text();
     console.log(`📦 Found packages: ${packageDirs.trim()}`);
@@ -242,7 +243,7 @@ class BuildAutomation {
     // Read current version
     const packageJson = await Bun.file('package.json').json();
     const currentVersion = packageJson.version;
-    
+
     // Determine new version
     let newVersion: string;
     if (this.config.version.type === 'prerelease') {
@@ -250,29 +251,32 @@ class BuildAutomation {
     } else {
       newVersion = await this.incrementVersion(currentVersion, this.config.version.type);
     }
-    
+
     // Update package.json
     packageJson.version = newVersion;
     await Bun.write('package.json', JSON.stringify(packageJson, null, 2));
-    
+
     // Update metadata
     if (packageJson.metadata) {
       packageJson.metadata.versioning = {
         ...packageJson.metadata.versioning,
         lastRelease: currentVersion,
         nextRelease: newVersion,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
       await Bun.write('package.json', JSON.stringify(packageJson, null, 2));
     }
-    
+
     this.result.version = newVersion;
     console.log(`📈 Version updated: ${currentVersion} → ${newVersion}`);
   }
 
-  private async incrementVersion(currentVersion: string, type: 'patch' | 'minor' | 'major'): Promise<string> {
+  private async incrementVersion(
+    currentVersion: string,
+    type: 'patch' | 'minor' | 'major'
+  ): Promise<string> {
     const [major, minor, patch] = currentVersion.split('.').map(Number);
-    
+
     switch (type) {
       case 'major':
         return `${major + 1}.0.0`;
@@ -287,7 +291,7 @@ class BuildAutomation {
 
   private async incrementPrereleaseVersion(currentVersion: string): Promise<string> {
     const prereleaseId = this.config.version.prereleaseId || 'beta';
-    
+
     if (currentVersion.includes('-')) {
       const [version, prerelease] = currentVersion.split('-');
       const [id, number] = prerelease.split('.');
@@ -295,7 +299,7 @@ class BuildAutomation {
         return `${version}-${id}.${Number(number) + 1}`;
       }
     }
-    
+
     return `${currentVersion}-${prereleaseId}.1`;
   }
 
@@ -305,13 +309,13 @@ class BuildAutomation {
       const outdated = await $`bun outdated`.text();
       console.log('📊 Outdated packages:', outdated);
     }
-    
+
     if (this.config.dependencies.update) {
       console.log('🔄 Updating dependencies...');
       await $`bun update`;
       console.log('✅ Dependencies updated');
     }
-    
+
     if (this.config.dependencies.audit) {
       console.log('🔒 Auditing dependencies...');
       try {
@@ -326,20 +330,20 @@ class BuildAutomation {
 
   private async generateDocumentation(): Promise<void> {
     console.log('📚 Generating documentation...');
-    
+
     // Generate API documentation
     if (this.config.documentation.formats.includes('html')) {
       await this.generateHtmlDocs();
     }
-    
+
     if (this.config.documentation.formats.includes('md')) {
       await this.generateMarkdownDocs();
     }
-    
+
     if (this.config.documentation.formats.includes('json')) {
       await this.generateJsonDocs();
     }
-    
+
     console.log('✅ Documentation generated');
   }
 
@@ -363,9 +367,9 @@ class BuildAutomation {
 
   private async generateMetadata(): Promise<void> {
     console.log('🏷️ Generating metadata...');
-    
+
     const packageJson = await Bun.file('package.json').json();
-    
+
     // Generate comprehensive metadata
     const metadata = {
       build: {
@@ -375,53 +379,53 @@ class BuildAutomation {
         platform: process.platform,
         arch: process.arch,
         nodeVersion: process.version,
-        bunVersion: (await $`bun --version`.text()).trim()
+        bunVersion: (await $`bun --version`.text()).trim(),
       },
       packages: await this.analyzePackages(),
       dependencies: await this.analyzeDependencies(),
       performance: await this.analyzePerformance(),
-      quality: await this.analyzeQuality()
+      quality: await this.analyzeQuality(),
     };
-    
+
     // Update package.json metadata
     packageJson.metadata = {
       ...packageJson.metadata,
-      build: metadata
+      build: metadata,
     };
-    
+
     await Bun.write('package.json', JSON.stringify(packageJson, null, 2));
     console.log('✅ Metadata generated and updated');
   }
 
   private async analyzePackages(): Promise<any> {
     const packages: any = {};
-    
+
     try {
       const packageDirs = await $`ls packages`.text();
       const packageList = packageDirs.trim().split('\n');
-      
+
       for (const pkg of packageList) {
         const packagePath = `packages/${pkg}`;
         const packageJsonPath = `${packagePath}/package.json`;
-        
+
         if (await Bun.file(packageJsonPath).exists()) {
           const packageJson = await Bun.file(packageJsonPath).json();
           const distPath = `${packagePath}/dist`;
-          
+
           packages[pkg] = {
             name: packageJson.name,
             version: packageJson.version,
             description: packageJson.description,
             size: await this.calculatePackageSize(packagePath),
-            buildStatus: await Bun.file(distPath).exists() ? 'built' : 'not-built',
-            lastModified: await this.getLastModified(packagePath)
+            buildStatus: (await Bun.file(distPath).exists()) ? 'built' : 'not-built',
+            lastModified: await this.getLastModified(packagePath),
           };
         }
       }
     } catch (error) {
       console.warn('⚠️ Could not analyze packages:', error);
     }
-    
+
     return packages;
   }
 
@@ -429,11 +433,13 @@ class BuildAutomation {
     try {
       const packageJson = await Bun.file('package.json').json();
       return {
-        total: Object.keys(packageJson.dependencies || {}).length + Object.keys(packageJson.devDependencies || {}).length,
+        total:
+          Object.keys(packageJson.dependencies || {}).length +
+          Object.keys(packageJson.devDependencies || {}).length,
         production: Object.keys(packageJson.dependencies || {}).length,
         development: Object.keys(packageJson.devDependencies || {}).length,
         outdated: await this.getOutdatedCount(),
-        vulnerabilities: await this.getVulnerabilityCount()
+        vulnerabilities: await this.getVulnerabilityCount(),
       };
     } catch (error) {
       return { error: error.message };
@@ -446,7 +452,7 @@ class BuildAutomation {
       memoryUsage: process.memoryUsage(),
       cpuUsage: process.cpuUsage(),
       platform: process.platform,
-      arch: process.arch
+      arch: process.arch,
     };
   }
 
@@ -455,20 +461,20 @@ class BuildAutomation {
       lintStatus: 'pending',
       testStatus: 'pending',
       coverageStatus: 'pending',
-      buildStatus: 'in-progress'
+      buildStatus: 'in-progress',
     };
   }
 
   private async buildPackages(): Promise<void> {
     console.log('🏗️ Building packages...');
-    
+
     const packageDirs = await $`ls packages`.text();
     const packageList = packageDirs.trim().split('\n');
-    
+
     for (const pkg of packageList) {
       const packagePath = `packages/${pkg}`;
       const packageJsonPath = `${packagePath}/package.json`;
-      
+
       if (await Bun.file(packageJsonPath).exists()) {
         console.log(`  📦 Building ${pkg}...`);
         try {
@@ -484,26 +490,26 @@ class BuildAutomation {
 
   private async embedPackages(): Promise<void> {
     console.log('🔗 Embedding packages...');
-    
+
     // Create embedded packages file
     const embeddedPackages = await this.createEmbeddedPackages();
     await Bun.write('src/embedded-packages.ts', embeddedPackages);
-    
+
     console.log('✅ Packages embedded');
   }
 
   private async buildMain(): Promise<void> {
     console.log('🏗️ Building main application...');
-    
+
     // Run the main build using manual build command
     await $`bun build ./src/index.ts --target=bun --outdir ./dist`;
-    
+
     console.log('✅ Main application built');
   }
 
   private async runQualityChecks(): Promise<void> {
     console.log('🧪 Running quality checks...');
-    
+
     if (this.config.quality.lint) {
       console.log('  🔍 Running linting...');
       try {
@@ -513,7 +519,7 @@ class BuildAutomation {
         console.warn('  ⚠️ Linting failed (non-blocking):', error.message);
       }
     }
-    
+
     if (this.config.quality.test) {
       console.log('  🧪 Running tests...');
       try {
@@ -523,7 +529,7 @@ class BuildAutomation {
         console.warn('  ⚠️ Tests failed (non-blocking):', error.message);
       }
     }
-    
+
     if (this.config.quality.coverage) {
       console.log('  📊 Running coverage...');
       try {
@@ -533,30 +539,30 @@ class BuildAutomation {
         console.warn('  ⚠️ Coverage failed (non-blocking):', error.message);
       }
     }
-    
+
     console.log('✅ Quality checks completed');
   }
 
   private async embedDocumentation(): Promise<void> {
     console.log('📚 Embedding documentation...');
-    
+
     // Embed documentation into the build
     const embeddedDocs = await this.createEmbeddedDocumentation();
     await Bun.write('src/embedded-documentation.ts', embeddedDocs);
-    
+
     console.log('✅ Documentation embedded');
   }
 
   private async validateBuild(): Promise<void> {
     console.log('✅ Validating build...');
-    
+
     // Check current directory and list contents
     const currentDir = await $`pwd`.text();
     console.log(`📍 Validation directory: ${currentDir.trim()}`);
-    
+
     const lsResult = await $`ls -la`.text();
     console.log('📁 Directory contents:', lsResult);
-    
+
     // Check if dist directory exists and has content using shell commands
     try {
       // Use shell command to check if dist exists
@@ -564,20 +570,21 @@ class BuildAutomation {
       if (distCheck.trim() !== 'exists') {
         throw new Error('Build output directory not found');
       }
-      
+
       const distFiles = await $`ls -la dist`.text();
       console.log('📁 Build output:', distFiles);
-      
+
       // Validate package builds
       const packageDirs = await $`ls packages`.text();
       const packageList = packageDirs.trim().split('\n');
-      
+
       for (const pkg of packageList) {
         if (pkg === 'README.md') continue; // Skip README file
-        
+
         const distPath = `packages/${pkg}/dist`;
         try {
-          const pkgDistCheck = await $`test -d ${distPath} && echo "exists" || echo "not found"`.text();
+          const pkgDistCheck =
+            await $`test -d ${distPath} && echo "exists" || echo "not found"`.text();
           if (pkgDistCheck.trim() === 'exists') {
             const files = await $`ls ${distPath}`.text();
             console.log(`  📦 ${pkg} dist files:`, files.trim());
@@ -588,7 +595,7 @@ class BuildAutomation {
           console.log(`  ❌ Error checking ${pkg}:`, error.message);
         }
       }
-      
+
       console.log('✅ Build validation passed');
     } catch (error) {
       console.error('❌ Validation error:', error);
@@ -598,23 +605,23 @@ class BuildAutomation {
 
   private async postBuildTasks(): Promise<void> {
     console.log('🚀 Running post-build tasks...');
-    
+
     // Generate build report
     const buildReport = await this.generateBuildReport();
     await Bun.write('BUILD-REPORT.md', buildReport);
-    
+
     // Update CHANGELOG
     await this.updateChangelog();
-    
+
     // Clean up temporary files
     await this.cleanup();
-    
+
     console.log('✅ Post-build tasks completed');
   }
 
   private async generateBuildReport(): Promise<string> {
     const packageJson = await Bun.file('package.json').json();
-    
+
     return `# Fire22 Dashboard Worker - Build Report
 
 **Build Date**: ${new Date().toLocaleDateString()}
@@ -625,9 +632,12 @@ class BuildAutomation {
 
 ## Build Steps
 
-${this.result.steps.map(step => 
-  `- **${step.name}**: ${step.status} ${step.duration ? `(${step.duration}ms)` : ''} ${step.error ? `- ${step.error}` : ''}`
-).join('\n')}
+${this.result.steps
+  .map(
+    step =>
+      `- **${step.name}**: ${step.status} ${step.duration ? `(${step.duration}ms)` : ''} ${step.error ? `- ${step.error}` : ''}`
+  )
+  .join('\n')}
 
 ## Errors
 
@@ -639,9 +649,9 @@ ${this.result.warnings.length > 0 ? this.result.warnings.map(warning => `- ${war
 
 ## Package Status
 
-${Object.entries(await this.analyzePackages()).map(([name, info]: [string, any]) => 
-  `- **${name}**: ${info.buildStatus} (${info.size})`
-).join('\n')}
+${Object.entries(await this.analyzePackages())
+  .map(([name, info]: [string, any]) => `- **${name}**: ${info.buildStatus} (${info.size})`)
+  .join('\n')}
 
 ---
 *Generated by Fire22 Build Automation System*
@@ -651,12 +661,12 @@ ${Object.entries(await this.analyzePackages()).map(([name, info]: [string, any])
   private async updateChangelog(): Promise<void> {
     const packageJson = await Bun.file('package.json').json();
     const changelogPath = 'CHANGELOG.md';
-    
+
     let changelog = '';
     if (await Bun.file(changelogPath).exists()) {
       changelog = await Bun.file(changelogPath).text();
     }
-    
+
     const newEntry = `## [${packageJson.version}] - ${new Date().toISOString().split('T')[0]}
 
 ### Added
@@ -678,14 +688,14 @@ ${Object.entries(await this.analyzePackages()).map(([name, info]: [string, any])
 ---
 
 `;
-    
+
     const updatedChangelog = newEntry + changelog;
     await Bun.write(changelogPath, updatedChangelog);
   }
 
   private async cleanup(): Promise<void> {
     console.log('🧹 Cleaning up...');
-    
+
     // Remove temporary files
     try {
       await $`rm -rf .build-temp`;
@@ -693,7 +703,7 @@ ${Object.entries(await this.analyzePackages()).map(([name, info]: [string, any])
     } catch (error) {
       // Ignore cleanup errors
     }
-    
+
     console.log('✅ Cleanup completed');
   }
 
@@ -799,9 +809,12 @@ export default embeddedDocumentation;
     <div class="section">
         <h2>Build Steps</h2>
         <ul>
-            ${this.result.steps.map(step => 
-              `<li><strong>${step.name}:</strong> ${step.status} ${step.duration ? `(${step.duration}ms)` : ''}</li>`
-            ).join('')}
+            ${this.result.steps
+              .map(
+                step =>
+                  `<li><strong>${step.name}:</strong> ${step.status} ${step.duration ? `(${step.duration}ms)` : ''}</li>`
+              )
+              .join('')}
         </ul>
     </div>
     
@@ -916,41 +929,45 @@ This build system integrates with:
   }
 
   private async generateComprehensiveJsonDocs(): Promise<string> {
-    return JSON.stringify({
-      buildSystem: {
-        name: 'Fire22 Build Automation System',
-        version: '1.0.0',
-        description: 'Comprehensive build automation and documentation system',
-        features: [
-          'Automatic version management',
-          'Documentation generation',
-          'Dependency management',
-          'Metadata generation',
-          'Package embedding',
-          'Quality checks'
-        ],
-        configuration: this.config,
-        buildResult: this.result,
-        timestamp: new Date().toISOString()
-      }
-    }, null, 2);
+    return JSON.stringify(
+      {
+        buildSystem: {
+          name: 'Fire22 Build Automation System',
+          version: '1.0.0',
+          description: 'Comprehensive build automation and documentation system',
+          features: [
+            'Automatic version management',
+            'Documentation generation',
+            'Dependency management',
+            'Metadata generation',
+            'Package embedding',
+            'Quality checks',
+          ],
+          configuration: this.config,
+          buildResult: this.result,
+          timestamp: new Date().toISOString(),
+        },
+      },
+      null,
+      2
+    );
   }
 
   private printSummary(): void {
     console.log('\n📊 Build Summary');
-    console.log('================');
+    console.log('!==!==!==');
     console.log(`Status: ${this.result.success ? '✅ SUCCESS' : '❌ FAILED'}`);
     console.log(`Version: ${this.result.version}`);
     console.log(`Duration: ${this.result.duration}ms`);
     console.log(`Steps: ${this.result.steps.length}`);
     console.log(`Errors: ${this.result.errors.length}`);
     console.log(`Warnings: ${this.result.warnings.length}`);
-    
+
     if (this.result.errors.length > 0) {
       console.log('\n❌ Errors:');
       this.result.errors.forEach(error => console.log(`  - ${error}`));
     }
-    
+
     if (this.result.warnings.length > 0) {
       console.log('\n⚠️ Warnings:');
       this.result.warnings.forEach(warning => console.log(`  - ${warning}`));
@@ -962,33 +979,33 @@ This build system integrates with:
 const defaultConfig: BuildConfig = {
   version: {
     autoIncrement: true,
-    type: 'patch'
+    type: 'patch',
   },
   documentation: {
     generate: true,
     embed: true,
-    formats: ['html', 'md', 'json']
+    formats: ['html', 'md', 'json'],
   },
   dependencies: {
     analyze: true,
     update: false,
-    audit: true
+    audit: true,
   },
   metadata: {
     generate: true,
     update: true,
-    validate: true
+    validate: true,
   },
   packaging: {
     embed: true,
     bundle: true,
-    optimize: true
+    optimize: true,
   },
   quality: {
     lint: true,
     test: true,
-    coverage: true
-  }
+    coverage: true,
+  },
 };
 
 // Production configuration
@@ -996,28 +1013,28 @@ const productionConfig: BuildConfig = {
   ...defaultConfig,
   version: {
     autoIncrement: true,
-    type: 'minor'
+    type: 'minor',
   },
   dependencies: {
     analyze: true,
     update: true,
-    audit: true
+    audit: true,
   },
   quality: {
     lint: true,
     test: true,
-    coverage: true
-  }
+    coverage: true,
+  },
 };
 
 // Main execution
 async function main() {
   const args = process.argv.slice(2);
   const config = args.includes('--production') ? productionConfig : defaultConfig;
-  
+
   const automation = new BuildAutomation(config);
   const result = await automation.run();
-  
+
   process.exit(result.success ? 0 : 1);
 }
 

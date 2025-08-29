@@ -2,10 +2,10 @@
 
 /**
  * 🔧 Fire22 Build Utilities - Shared Build Components
- * 
+ *
  * Reusable utilities and common patterns for the Fire22 build system.
  * Provides performance monitoring, validation, artifact tracking, and reporting.
- * 
+ *
  * @version 3.0.8
  * @author Fire22 Development Team
  * @see docs/BUILD-INDEX.md for usage guide
@@ -60,34 +60,34 @@ export interface BuildConstants {
   LOG_LEVEL: string;
   API_URL: string;
   BUN_VERSION: string;
-  
+
   // Git information (dynamic)
   GIT_COMMIT?: string;
   GIT_BRANCH?: string;
   GIT_TAG?: string;
   GIT_DIRTY?: boolean;
-  
+
   // Process environment replacements (property access patterns)
   'process.env.NODE_ENV': string;
   'process.env.API_URL': string;
   'process.env.BUILD_ENV': string;
-  
+
   // Feature flags for dead code elimination
   ENABLE_ANALYTICS: boolean;
   ENABLE_DEBUG_LOGS: boolean;
   ENABLE_PERFORMANCE_MONITORING: boolean;
   ENABLE_SENTRY: boolean;
-  
+
   // Configuration objects (complex types)
   FIRE22_CONFIG: object;
   PLATFORM_CONFIG: object;
   FEATURE_FLAGS: object;
-  
+
   // Package metadata
   PACKAGE_NAME: string;
   PACKAGE_DESCRIPTION: string;
   DEPENDENCIES_COUNT: number;
-  
+
   // Build system metadata
   BUILD_PLATFORM: string;
   BUILD_ARCH: string;
@@ -100,7 +100,7 @@ export interface BuildConstants {
 export class BuildUtilities {
   private context: BuildContext;
   private stats: BuildStats;
-  
+
   constructor(context: BuildContext) {
     this.context = context;
     this.stats = {
@@ -111,10 +111,10 @@ export class BuildUtilities {
       success: false,
       errors: [],
       warnings: [],
-      artifacts: []
+      artifacts: [],
     };
   }
-  
+
   /**
    * 📁 Directory Management
    */
@@ -124,65 +124,65 @@ export class BuildUtilities {
       this.context.tempDir,
       join(this.context.outputDir, 'packages'),
       join(this.context.outputDir, 'docs'),
-      join(this.context.outputDir, 'executables')
+      join(this.context.outputDir, 'executables'),
     ];
-    
+
     for (const dir of dirs) {
       if (!existsSync(dir)) {
         mkdirSync(dir, { recursive: true });
       }
     }
   }
-  
+
   async cleanDirectories(force = false): Promise<void> {
     const dirs = force ? [this.context.outputDir, this.context.tempDir] : [this.context.tempDir];
-    
+
     for (const dir of dirs) {
       if (existsSync(dir)) {
         rmSync(dir, { recursive: true, force: true });
       }
     }
   }
-  
+
   /**
    * ⚡ Performance Monitoring
    */
   startTimer(): number {
     return Bun.nanoseconds();
   }
-  
+
   endTimer(startTime: number): number {
     return (Bun.nanoseconds() - startTime) / 1_000_000; // Convert to milliseconds
   }
-  
+
   recordMemoryUsage(): NodeJS.MemoryUsage {
     const usage = process.memoryUsage();
     this.stats.memoryUsage = usage;
     return usage;
   }
-  
+
   /**
    * 📊 Build Statistics
    */
   addArtifact(artifact: BuildArtifact): void {
     this.stats.artifacts.push(artifact);
   }
-  
+
   addError(error: string): void {
     this.stats.errors.push(error);
   }
-  
+
   addWarning(warning: string): void {
     this.stats.warnings.push(warning);
   }
-  
+
   getStats(): BuildStats {
     this.stats.endTime = Date.now();
     this.stats.duration = this.stats.endTime - this.stats.startTime;
     this.stats.success = this.stats.errors.length === 0;
     return { ...this.stats };
   }
-  
+
   /**
    * 📝 Logging Utilities
    */
@@ -191,18 +191,18 @@ export class BuildUtilities {
     const prefix = {
       info: '📝',
       warn: '⚠️',
-      error: '❌'
+      error: '❌',
     }[level];
-    
+
     console.log(`${prefix} [${timestamp}] ${message}`);
-    
+
     if (level === 'error') {
       this.addError(message);
     } else if (level === 'warn') {
       this.addWarning(message);
     }
   }
-  
+
   /**
    * 🚀 Enhanced Spawn Utilities
    */
@@ -223,17 +223,17 @@ export class BuildUtilities {
         timeout: options.timeout || 5000, // 5 second timeout
         maxBuffer: options.maxBuffer || 1024 * 1024, // 1MB max buffer
       });
-      
+
       if (proc.success && proc.stdout) {
         return proc.stdout.toString('utf-8');
       }
-      
+
       return null;
     } catch (error) {
       return null;
     }
   }
-  
+
   private async spawnCommandAsync(
     command: string[],
     options: {
@@ -243,7 +243,7 @@ export class BuildUtilities {
       signal?: AbortSignal;
     } = {}
   ): Promise<{ success: boolean; output: string; error?: string; exitCode?: number }> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const proc = Bun.spawn({
         cmd: command,
         cwd: options.cwd || this.context.rootDir,
@@ -257,23 +257,25 @@ export class BuildUtilities {
             success,
             output: '',
             error: error?.message,
-            exitCode: exitCode || undefined
+            exitCode: exitCode || undefined,
           });
-        }
+        },
       });
-      
+
       // Stream output if handler provided
       if (options.onOutput && proc.stdout) {
-        proc.stdout.pipeTo(new WritableStream({
-          write(chunk) {
-            const text = new TextDecoder().decode(chunk);
-            options.onOutput!(text);
-          }
-        }));
+        proc.stdout.pipeTo(
+          new WritableStream({
+            write(chunk) {
+              const text = new TextDecoder().decode(chunk);
+              options.onOutput!(text);
+            },
+          })
+        );
       }
     });
   }
-  
+
   /**
    * 🔍 Validation Utilities
    */
@@ -287,20 +289,25 @@ export class BuildUtilities {
         this.addError('Bun not found or not working');
         return false;
       }
-      
+
       // Check TypeScript using spawn
-      const tsVersion = await this.spawnCommand(['bunx', '--package=typescript', 'tsc', '--version']);
+      const tsVersion = await this.spawnCommand([
+        'bunx',
+        '--package=typescript',
+        'tsc',
+        '--version',
+      ]);
       if (tsVersion) {
         this.log(`TypeScript version: ${tsVersion.trim()}`);
       } else {
         this.addWarning('TypeScript not available via bunx');
       }
-      
+
       // Validate environment variables access
       this.log(`Environment access: Bun.env=${typeof Bun.env}, process.env=${typeof process.env}`);
       this.log(`NODE_ENV: ${Bun.env.NODE_ENV || 'not set'}`);
       this.log(`TZ: ${Bun.env.TZ || 'system default'}`);
-      
+
       // Check required directories
       const requiredDirs = ['src', 'scripts'];
       for (const dir of requiredDirs) {
@@ -309,7 +316,7 @@ export class BuildUtilities {
           return false;
         }
       }
-      
+
       // Check environment files (following Bun's precedence order)
       const envFiles = ['.env', `.env.${this.context.environment}`, '.env.local'];
       for (const envFile of envFiles) {
@@ -318,14 +325,14 @@ export class BuildUtilities {
           this.log(`Environment file found: ${envFile}`);
         }
       }
-      
+
       return true;
     } catch (error) {
       this.addError(`Environment validation failed: ${error}`);
       return false;
     }
   }
-  
+
   async validateDependencies(): Promise<boolean> {
     try {
       // Check package.json
@@ -334,43 +341,43 @@ export class BuildUtilities {
         this.addError('package.json not found');
         return false;
       }
-      
+
       // Check node_modules
       const nodeModulesPath = join(this.context.rootDir, 'node_modules');
       if (!existsSync(nodeModulesPath)) {
         this.addWarning('node_modules not found - running bun install');
-        
+
         const installResult = await this.spawnCommandAsync(['bun', 'install'], {
           timeout: 120000, // 2 minutes for install
-          onOutput: (data) => this.log(`Install: ${data.trim()}`)
+          onOutput: data => this.log(`Install: ${data.trim()}`),
         });
-        
+
         if (!installResult.success) {
           this.addError(`Failed to install dependencies: ${installResult.error}`);
           return false;
         }
       }
-      
+
       // Audit dependencies
       if (this.context.profile.dependencies.audit) {
         const auditResult = await this.spawnCommandAsync(['bun', 'pm', 'audit'], {
-          timeout: 60000 // 1 minute for audit
+          timeout: 60000, // 1 minute for audit
         });
-        
+
         if (auditResult.success) {
           this.log('Dependency audit passed');
         } else {
           this.addWarning(`Dependency audit found issues: ${auditResult.error}`);
         }
       }
-      
+
       return true;
     } catch (error) {
       this.addError(`Dependency validation failed: ${error}`);
       return false;
     }
   }
-  
+
   /**
    * 📊 Build Constants Generation
    */
@@ -382,19 +389,19 @@ export class BuildUtilities {
     const buildTime = now.toISOString();
     const buildTimestamp = Math.floor(now.getTime() / 1000);
     process.env.TZ = originalTZ;
-    
+
     // Get Git information dynamically
     const gitInfo = await this.getGitInfo();
-    
+
     // Get package information
     const packageInfo = await this.getPackageInfo();
-    
+
     // Generate feature flags based on environment
     const featureFlags = this.generateFeatureFlags();
-    
+
     // Generate configuration objects
     const configs = await this.generateConfigs();
-    
+
     const constants: BuildConstants = {
       // Basic build metadata
       BUILD_VERSION: this.context.version,
@@ -406,48 +413,49 @@ export class BuildUtilities {
       LOG_LEVEL: this.getLogLevel(),
       API_URL: this.getApiUrl(),
       BUN_VERSION: Bun.version,
-      
+
       // Git information
       ...gitInfo,
-      
+
       // Process environment replacements
       'process.env.NODE_ENV': this.context.environment,
       'process.env.API_URL': this.getApiUrl(),
       'process.env.BUILD_ENV': this.context.environment,
-      
+
       // Feature flags
       ...featureFlags,
-      
+
       // Configuration objects
       ...configs,
-      
+
       // Package metadata
       PACKAGE_NAME: packageInfo.name,
       PACKAGE_DESCRIPTION: packageInfo.description,
       DEPENDENCIES_COUNT: packageInfo.dependenciesCount,
-      
+
       // Build system metadata
       BUILD_PLATFORM: process.platform,
       BUILD_ARCH: process.arch,
-      COMPILER_VERSION: Bun.version
+      COMPILER_VERSION: Bun.version,
     };
-    
+
     return constants;
   }
-  
+
   private async getGitInfo(): Promise<Partial<BuildConstants>> {
     try {
       // Use Bun.spawnSync for better performance and error handling
-      const gitCommit = await this.spawnCommand(['git', 'rev-parse', 'HEAD']) || 'unknown';
-      const gitBranch = await this.spawnCommand(['git', 'rev-parse', '--abbrev-ref', 'HEAD']) || 'unknown';
+      const gitCommit = (await this.spawnCommand(['git', 'rev-parse', 'HEAD'])) || 'unknown';
+      const gitBranch =
+        (await this.spawnCommand(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])) || 'unknown';
       const gitTag = await this.spawnCommand(['git', 'describe', '--tags', '--exact-match']);
-      const gitStatus = await this.spawnCommand(['git', 'status', '--porcelain']) || '';
-      
+      const gitStatus = (await this.spawnCommand(['git', 'status', '--porcelain'])) || '';
+
       return {
         GIT_COMMIT: gitCommit.trim(),
         GIT_BRANCH: gitBranch.trim(),
         GIT_TAG: gitTag?.trim(),
-        GIT_DIRTY: gitStatus.trim().length > 0
+        GIT_DIRTY: gitStatus.trim().length > 0,
       };
     } catch (error) {
       // Fallback to environment variables
@@ -455,100 +463,112 @@ export class BuildUtilities {
         GIT_COMMIT: process.env.GITHUB_SHA || process.env.GIT_COMMIT || 'unknown',
         GIT_BRANCH: process.env.GITHUB_REF_NAME || process.env.GIT_BRANCH || 'unknown',
         GIT_TAG: process.env.GITHUB_REF_TYPE === 'tag' ? process.env.GITHUB_REF_NAME : undefined,
-        GIT_DIRTY: false
+        GIT_DIRTY: false,
       };
     }
   }
-  
-  private async getPackageInfo(): Promise<{name: string; description: string; dependenciesCount: number}> {
+
+  private async getPackageInfo(): Promise<{
+    name: string;
+    description: string;
+    dependenciesCount: number;
+  }> {
     try {
       const packageJsonPath = join(this.context.rootDir, 'package.json');
       const packageJson = await Bun.file(packageJsonPath).json();
-      
-      const dependenciesCount = 
+
+      const dependenciesCount =
         Object.keys(packageJson.dependencies || {}).length +
         Object.keys(packageJson.devDependencies || {}).length;
-      
+
       return {
         name: packageJson.name || 'unknown',
         description: packageJson.description || '',
-        dependenciesCount
+        dependenciesCount,
       };
     } catch (error) {
       return {
         name: 'unknown',
         description: '',
-        dependenciesCount: 0
+        dependenciesCount: 0,
       };
     }
   }
-  
+
   private generateFeatureFlags(): Partial<BuildConstants> {
     const isProduction = this.context.environment === 'production';
     const isDevelopment = this.context.environment === 'development';
-    
+
     return {
       ENABLE_ANALYTICS: isProduction,
       ENABLE_DEBUG_LOGS: isDevelopment,
       ENABLE_PERFORMANCE_MONITORING: !isDevelopment,
-      ENABLE_SENTRY: isProduction
+      ENABLE_SENTRY: isProduction,
     };
   }
-  
+
   private async generateConfigs(): Promise<Partial<BuildConstants>> {
     const fire22Config = {
       apiUrl: this.getApiUrl(),
       timeout: this.context.environment === 'production' ? 5000 : 10000,
       retries: this.context.environment === 'production' ? 3 : 1,
-      debug: this.context.environment === 'development'
+      debug: this.context.environment === 'development',
     };
-    
+
     const platformConfig = {
       platform: process.platform,
       arch: process.arch,
       nodeVersion: process.version,
-      bunVersion: Bun.version
+      bunVersion: Bun.version,
     };
-    
+
     const featureFlags = {
       newDashboard: this.context.environment !== 'production',
       advancedCharts: true,
       realTimeUpdates: this.context.environment !== 'development',
-      betaFeatures: this.context.environment === 'development'
+      betaFeatures: this.context.environment === 'development',
     };
-    
+
     return {
       FIRE22_CONFIG: fire22Config,
       PLATFORM_CONFIG: platformConfig,
-      FEATURE_FLAGS: featureFlags
+      FEATURE_FLAGS: featureFlags,
     };
   }
-  
+
   private getLogLevel(): string {
     switch (this.context.environment) {
-      case 'development': return 'debug';
-      case 'staging': return 'info';
-      case 'production': return 'warn';
-      default: return 'info';
+      case 'development':
+        return 'debug';
+      case 'staging':
+        return 'info';
+      case 'production':
+        return 'warn';
+      default:
+        return 'info';
     }
   }
-  
+
   private getApiUrl(): string {
     switch (this.context.environment) {
-      case 'development': return 'http://localhost:3000';
-      case 'staging': return 'https://staging-api.fire22.com';
-      case 'production': return 'https://api.fire22.com';
-      default: return 'http://localhost:3000';
+      case 'development':
+        return 'http://localhost:3000';
+      case 'staging':
+        return 'https://staging-api.fire22.com';
+      case 'production':
+        return 'https://api.fire22.com';
+      default:
+        return 'http://localhost:3000';
     }
   }
-  
+
   formatDefineFlags(constants: BuildConstants): string[] {
     const flags: string[] = [];
-    
+
     for (const [key, value] of Object.entries(constants)) {
       if (value !== undefined) {
         let formattedValue: string;
-        
+
         if (typeof value === 'string') {
           // String values need to be JSON stringified and wrapped
           formattedValue = `'${JSON.stringify(value)}'`;
@@ -559,14 +579,14 @@ export class BuildUtilities {
           // Primitives (boolean, number) can be used directly
           formattedValue = `'${value}'`;
         }
-        
+
         flags.push(`--define`, `${key}=${formattedValue}`);
       }
     }
-    
+
     return flags;
   }
-  
+
   /**
    * 🔨 Build Operations
    */
@@ -582,10 +602,10 @@ export class BuildUtilities {
     target?: 'browser' | 'bun' | 'node';
   }): Promise<string[]> {
     const constants = await this.generateBuildConstants();
-    
+
     try {
       this.log(`Building bundle with Bun.build API: ${options.outputDir}`);
-      
+
       // Prepare define object
       const define: Record<string, string> = {};
       for (const [key, value] of Object.entries(constants)) {
@@ -599,7 +619,7 @@ export class BuildUtilities {
           }
         }
       }
-      
+
       const buildResult = await Bun.build({
         entrypoints: [options.entrypoint],
         outdir: options.outputDir,
@@ -612,50 +632,49 @@ export class BuildUtilities {
         naming: {
           entry: '[dir]/[name].[ext]',
           chunk: '[name]-[hash].[ext]',
-          asset: '[name]-[hash].[ext]'
-        }
+          asset: '[name]-[hash].[ext]',
+        },
       });
-      
+
       if (!buildResult.success) {
         const errors = buildResult.logs.map(log => log.message).join(', ');
         throw new Error(`Bundle build failed: ${errors}`);
       }
-      
+
       // Record artifacts
       const outputPaths: string[] = [];
       for (const output of buildResult.outputs) {
         const size = await output.size;
         const path = output.path;
         outputPaths.push(path);
-        
+
         this.addArtifact({
           name: `Bundle (${options.format || 'esm'})`,
           path,
           size,
-          type: 'bundle'
+          type: 'bundle',
         });
       }
-      
+
       this.log(`✅ Bundle built successfully: ${outputPaths.length} files`);
       return outputPaths;
-      
     } catch (error) {
       this.addError(`Bundle build failed: ${error}`);
       throw error;
     }
   }
-  
+
   async runTypeCheck(): Promise<boolean> {
     if (!this.context.profile.quality.lint) return true;
-    
+
     const result = await this.spawnCommandAsync(
       ['bunx', '--package=typescript', 'tsc', '--noEmit'],
       {
         timeout: 60000, // 1 minute timeout for type checking
-        onOutput: (data) => this.log(`TypeCheck: ${data.trim()}`)
+        onOutput: data => this.log(`TypeCheck: ${data.trim()}`),
       }
     );
-    
+
     if (result.success) {
       this.log('TypeScript type checking passed');
       return true;
@@ -664,18 +683,18 @@ export class BuildUtilities {
       return false;
     }
   }
-  
+
   async runLinting(): Promise<boolean> {
     if (!this.context.profile.quality.lint) return true;
-    
+
     const result = await this.spawnCommandAsync(
       ['bunx', '--package=eslint', 'eslint', 'src', '--ext', '.ts'],
       {
         timeout: 30000, // 30 seconds for linting
-        onOutput: (data) => this.log(`Lint: ${data.trim()}`)
+        onOutput: data => this.log(`Lint: ${data.trim()}`),
       }
     );
-    
+
     if (result.success) {
       this.log('Linting passed');
       return true;
@@ -684,19 +703,19 @@ export class BuildUtilities {
       return false;
     }
   }
-  
+
   async runTests(): Promise<boolean> {
     if (!this.context.profile.quality.test) return true;
-    
-    const command = this.context.profile.quality.coverage ? 
-      ['bun', 'test', '--coverage'] : 
-      ['bun', 'test'];
-    
+
+    const command = this.context.profile.quality.coverage
+      ? ['bun', 'test', '--coverage']
+      : ['bun', 'test'];
+
     const result = await this.spawnCommandAsync(command, {
       timeout: 300000, // 5 minutes for tests
-      onOutput: (data) => this.log(`Test: ${data.trim()}`)
+      onOutput: data => this.log(`Test: ${data.trim()}`),
     });
-    
+
     if (result.success) {
       this.log('Tests passed');
       return true;
@@ -705,20 +724,20 @@ export class BuildUtilities {
       return false;
     }
   }
-  
+
   /**
    * 📄 TypeScript Declaration Generation
    */
   async generateBuildConstantsDeclaration(): Promise<string> {
     const constants = await this.generateBuildConstants();
-    
+
     const declarations: string[] = [
       '// Auto-generated build constants declarations',
       '// This file is generated automatically during the build process',
       '',
-      'declare global {'
+      'declare global {',
     ];
-    
+
     for (const [key, value] of Object.entries(constants)) {
       if (value !== undefined) {
         let type: string;
@@ -733,41 +752,37 @@ export class BuildUtilities {
         } else {
           type = 'any';
         }
-        
+
         declarations.push(`  const ${key}: ${type};`);
       }
     }
-    
-    declarations.push(
-      '}',
-      '',
-      'export {};'
-    );
-    
+
+    declarations.push('}', '', 'export {};');
+
     return declarations.join('\n');
   }
-  
+
   async saveBuildConstantsDeclaration(): Promise<void> {
     const declaration = await this.generateBuildConstantsDeclaration();
     const declarationPath = join(this.context.rootDir, 'src/types/build-constants.d.ts');
-    
+
     // Ensure the types directory exists
     const typesDir = join(this.context.rootDir, 'src/types');
     if (!existsSync(typesDir)) {
       mkdirSync(typesDir, { recursive: true });
     }
-    
+
     await Bun.write(declarationPath, declaration);
     this.addArtifact({
       name: 'Build Constants Declaration',
       path: declarationPath,
       size: declaration.length,
-      type: 'metadata'
+      type: 'metadata',
     });
-    
+
     this.log(`TypeScript declarations generated: ${declarationPath}`);
   }
-  
+
   /**
    * 🚀 Bun.build JavaScript API Integration
    */
@@ -787,10 +802,10 @@ export class BuildUtilities {
     };
   }): Promise<void> {
     const constants = await this.generateBuildConstants();
-    
+
     try {
       this.log(`Building executable with Bun.build API: ${options.outputPath}`);
-      
+
       // Prepare define object for Bun.build
       const define: Record<string, string> = {};
       for (const [key, value] of Object.entries(constants)) {
@@ -804,40 +819,39 @@ export class BuildUtilities {
           }
         }
       }
-      
+
       // Build with Bun.build API
       const buildResult = await Bun.build({
         entrypoints: [options.entrypoint],
         outdir: dirname(options.outputPath),
         naming: {
-          entry: '[dir]/[name][ext]'
+          entry: '[dir]/[name][ext]',
         },
         minify: options.minify || false,
         sourcemap: options.sourcemap ? 'external' : 'none',
         define,
         target: 'bun',
-        format: 'esm'
+        format: 'esm',
       });
-      
+
       if (!buildResult.success) {
         const errors = buildResult.logs.map(log => log.message).join(', ');
         throw new Error(`Bun.build failed: ${errors}`);
       }
-      
+
       this.log(`✅ Bun.build completed successfully`);
-      
+
       // For now, we still need the command-line approach for --compile
       // since Bun.build doesn't support --compile flag yet
       this.log('Note: Using command-line fallback for --compile functionality');
       await this.buildExecutable(options);
-      
     } catch (error) {
       this.addError(`Bun.build API failed: ${error}`);
       this.log('Falling back to command-line build method');
       await this.buildExecutable(options);
     }
   }
-  
+
   /**
    * 🏗️ Executable Building
    */
@@ -858,25 +872,28 @@ export class BuildUtilities {
   }): Promise<void> {
     const constants = await this.generateBuildConstants();
     const defineFlags = this.formatDefineFlags(constants);
-    
+
     // Build the command
     const cmd = [
-      'bun', 'build', options.entrypoint,
+      'bun',
+      'build',
+      options.entrypoint,
       '--compile',
-      '--outfile', options.outputPath,
-      ...defineFlags
+      '--outfile',
+      options.outputPath,
+      ...defineFlags,
     ];
-    
+
     // Add compile execution arguments
     if (options.execArgs && options.execArgs.length > 0) {
-      cmd.push('--compile-exec-argv', `"${options.execArgs.join(' ')}"`);  
+      cmd.push('--compile-exec-argv', `"${options.execArgs.join(' ')}"`);
     }
-    
+
     // Add optimization flags
     if (options.minify) cmd.push('--minify');
     if (options.sourcemap) cmd.push('--sourcemap');
     if (options.bytecode) cmd.push('--bytecode');
-    
+
     // Add Windows-specific options
     if (options.windowsOptions) {
       const win = options.windowsOptions;
@@ -886,54 +903,55 @@ export class BuildUtilities {
       if (win.description) cmd.push('--windows-description', `"${win.description}"`);
       if (win.copyright) cmd.push('--windows-copyright', `"${win.copyright}"`);
     }
-    
+
     this.log(`Building executable: ${options.outputPath}`);
     this.log(`Build constants: ${JSON.stringify(constants, null, 2)}`);
-    
+
     try {
       // Use enhanced executeCommand with Bun.spawn
       const result = await executeCommand(cmd, {
         timeout: 300000, // 5 minutes for executable compilation
         cwd: this.context.rootDir,
-        onOutput: (data) => this.log(`Build: ${data.trim()}`),
-        streaming: true
+        onOutput: data => this.log(`Build: ${data.trim()}`),
+        streaming: true,
       });
-      
+
       if (!result.success) {
         throw new Error(result.error || `Build failed with exit code ${result.exitCode}`);
       }
-      
+
       // Log resource usage if available
       if (result.resourceUsage) {
         const usage = result.resourceUsage;
-        this.log(`Build completed - CPU: ${usage.cpuTime.user}µs user, ${usage.cpuTime.system}µs system, Max Memory: ${Math.round(usage.maxRSS / 1024)}KB`);
+        this.log(
+          `Build completed - CPU: ${usage.cpuTime.user}µs user, ${usage.cpuTime.system}µs system, Max Memory: ${Math.round(usage.maxRSS / 1024)}KB`
+        );
       }
-      
+
       // Record artifact
       const size = await this.calculateFileSize(options.outputPath);
       const checksum = await this.generateChecksum(options.outputPath);
-      
+
       this.addArtifact({
         name: `Executable (${this.context.environment})`,
         path: options.outputPath,
         size,
         type: 'executable',
-        checksum
+        checksum,
       });
-      
+
       this.log(`✅ Executable built: ${formatFileSize(size)}`);
-      
+
       // Generate TypeScript declarations if enabled
       if (this.context.profile.quality.typescript) {
         await this.saveBuildConstantsDeclaration();
       }
-      
     } catch (error) {
       this.addError(`Executable build failed: ${error}`);
       throw error;
     }
   }
-  
+
   /**
    * 📦 Package Operations
    */
@@ -945,7 +963,7 @@ export class BuildUtilities {
       return 0;
     }
   }
-  
+
   async generateChecksum(filePath: string): Promise<string> {
     try {
       const file = Bun.file(filePath);
@@ -957,23 +975,23 @@ export class BuildUtilities {
       return '';
     }
   }
-  
+
   /**
    * 📋 Report Generation
    */
   async generateBuildReport(): Promise<string> {
     const stats = this.getStats();
     const memoryMB = Math.round(stats.memoryUsage.heapUsed / 1024 / 1024);
-    
+
     // Set timezone for consistent reporting
     const originalTZ = process.env.TZ;
     process.env.TZ = 'UTC';
     const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
     process.env.TZ = originalTZ;
-    
+
     const report = `
 🏗️ **Fire22 Build Report**
-=========================
+!==!==!==!=====
 
 📊 **Summary**
 - Profile: ${this.context.profile.name}
@@ -987,23 +1005,31 @@ export class BuildUtilities {
 📦 **Artifacts (${stats.artifacts.length})**
 ${stats.artifacts.map(a => `- ${a.name} (${a.type}): ${formatFileSize(a.size)}`).join('\n')}
 
-${stats.errors.length > 0 ? `
+${
+  stats.errors.length > 0
+    ? `
 ❌ **Errors (${stats.errors.length})**
 ${stats.errors.map(e => `- ${e}`).join('\n')}
-` : ''}
+`
+    : ''
+}
 
-${stats.warnings.length > 0 ? `
+${
+  stats.warnings.length > 0
+    ? `
 ⚠️ **Warnings (${stats.warnings.length})**
 ${stats.warnings.map(w => `- ${w}`).join('\n')}
-` : ''}
+`
+    : ''
+}
 
 🕐 **Generated**: ${timestamp}
 📚 **Documentation**: docs/BUILD-INDEX.md
 `;
-    
+
     return report.trim();
   }
-  
+
   async saveBuildReport(report: string): Promise<void> {
     const reportPath = join(this.context.outputDir, 'build-report.md');
     await Bun.write(reportPath, report);
@@ -1011,7 +1037,7 @@ ${stats.warnings.map(w => `- ${w}`).join('\n')}
       name: 'Build Report',
       path: reportPath,
       size: report.length,
-      type: 'metadata'
+      type: 'metadata',
     });
   }
 }
@@ -1028,7 +1054,7 @@ export function createBuildContext(
   options: Partial<BuildContext> = {}
 ): BuildContext {
   const rootDir = options.rootDir || process.cwd();
-  
+
   return {
     profile,
     rootDir,
@@ -1037,7 +1063,7 @@ export function createBuildContext(
     version: options.version || '0.0.0',
     environment: options.environment || 'development',
     startTime: options.startTime || Date.now(),
-    ...options
+    ...options,
   };
 }
 
@@ -1048,12 +1074,12 @@ export function formatFileSize(bytes: number): string {
   const units = ['B', 'KB', 'MB', 'GB'];
   let size = bytes;
   let unitIndex = 0;
-  
+
   while (size >= 1024 && unitIndex < units.length - 1) {
     size /= 1024;
     unitIndex++;
   }
-  
+
   return `${Math.round(size * 100) / 100}${units[unitIndex]}`;
 }
 
@@ -1064,12 +1090,12 @@ export function formatDuration(milliseconds: number): string {
   if (milliseconds < 1000) {
     return `${Math.round(milliseconds)}ms`;
   }
-  
+
   const seconds = milliseconds / 1000;
   if (seconds < 60) {
     return `${Math.round(seconds * 100) / 100}s`;
   }
-  
+
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.round(seconds % 60);
   return `${minutes}m ${remainingSeconds}s`;
@@ -1090,16 +1116,22 @@ export async function executeCommand(
     env?: Record<string, string>;
     streaming?: boolean;
   } = {}
-): Promise<{ success: boolean; output: string; error?: string; exitCode?: number; resourceUsage?: any }> {
+): Promise<{
+  success: boolean;
+  output: string;
+  error?: string;
+  exitCode?: number;
+  resourceUsage?: any;
+}> {
   try {
     const cmd = Array.isArray(command) ? command : command.split(' ');
-    
+
     if (options.streaming) {
       // Use async spawn for streaming output
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         let output = '';
         let error = '';
-        
+
         const proc = Bun.spawn({
           cmd,
           cwd: options.cwd || process.cwd(),
@@ -1111,43 +1143,49 @@ export async function executeCommand(
           onExit: (subprocess, exitCode, signalCode, exitError) => {
             const success = exitCode === 0 && !exitError;
             const resourceUsage = subprocess.resourceUsage();
-            
+
             if (!success && options.onError) {
-              const err = new Error(exitError?.message || `Command failed with exit code ${exitCode}`);
+              const err = new Error(
+                exitError?.message || `Command failed with exit code ${exitCode}`
+              );
               options.onError(err);
             }
-            
+
             resolve({
               success,
               output,
               error: exitError?.message || error,
               exitCode: exitCode || undefined,
-              resourceUsage
+              resourceUsage,
             });
-          }
+          },
         });
-        
+
         // Handle stdout streaming
         if (proc.stdout) {
-          proc.stdout.pipeTo(new WritableStream({
-            write(chunk) {
-              const text = new TextDecoder().decode(chunk);
-              output += text;
-              if (options.onOutput) {
-                options.onOutput(text);
-              }
-            }
-          }));
+          proc.stdout.pipeTo(
+            new WritableStream({
+              write(chunk) {
+                const text = new TextDecoder().decode(chunk);
+                output += text;
+                if (options.onOutput) {
+                  options.onOutput(text);
+                }
+              },
+            })
+          );
         }
-        
+
         // Handle stderr streaming
         if (proc.stderr) {
-          proc.stderr.pipeTo(new WritableStream({
-            write(chunk) {
-              const text = new TextDecoder().decode(chunk);
-              error += text;
-            }
-          }));
+          proc.stderr.pipeTo(
+            new WritableStream({
+              write(chunk) {
+                const text = new TextDecoder().decode(chunk);
+                error += text;
+              },
+            })
+          );
         }
       });
     } else {
@@ -1159,23 +1197,23 @@ export async function executeCommand(
         stderr: 'pipe',
         timeout: options.timeout || 120000,
         maxBuffer: options.maxBuffer || 1024 * 1024 * 10, // 10MB default
-        env: options.env ? { ...process.env, ...options.env } : undefined
+        env: options.env ? { ...process.env, ...options.env } : undefined,
       });
-      
+
       const output = result.stdout ? result.stdout.toString('utf-8') : '';
       const errorOutput = result.stderr ? result.stderr.toString('utf-8') : '';
-      
+
       if (!result.success && options.onError) {
         const err = new Error(errorOutput || `Command failed with exit code ${result.exitCode}`);
         options.onError(err);
       }
-      
+
       return {
         success: result.success,
         output,
         error: errorOutput || undefined,
         exitCode: result.exitCode,
-        resourceUsage: result.resourceUsage
+        resourceUsage: result.resourceUsage,
       };
     }
   } catch (error) {
@@ -1183,11 +1221,11 @@ export async function executeCommand(
     if (options.onError) {
       options.onError(error instanceof Error ? error : new Error(errorMessage));
     }
-    
+
     return {
       success: false,
       output: '',
-      error: errorMessage
+      error: errorMessage,
     };
   }
 }
@@ -1197,7 +1235,7 @@ export async function executeCommand(
  */
 export class BuildCommandGenerator {
   constructor(private context: BuildContext) {}
-  
+
   async generateExecutableCommand(options: {
     entrypoint: string;
     outputPath: string;
@@ -1210,29 +1248,29 @@ export class BuildCommandGenerator {
     const utilities = new BuildUtilities(this.context);
     const constants = await utilities.generateBuildConstants();
     const defineFlags = utilities.formatDefineFlags(constants);
-    
+
     const cmd = [
       'bun build',
       options.entrypoint,
       '--compile',
       `--outfile=${options.outputPath}`,
-      ...defineFlags
+      ...defineFlags,
     ];
-    
+
     if (options.execArgs?.length) {
       cmd.push(`--compile-exec-argv="${options.execArgs.join(' ')}"`);
     }
-    
+
     if (options.minify) cmd.push('--minify');
-    if (options.sourcemap) cmd.push('--sourcemap'); 
+    if (options.sourcemap) cmd.push('--sourcemap');
     if (options.bytecode) cmd.push('--bytecode');
-    
+
     return cmd.join(' \\\\\n  ');
   }
-  
+
   async generateBuildScript(profiles: string[]): Promise<string> {
     const scripts: string[] = [];
-    
+
     for (const profile of profiles) {
       const cmd = await this.generateExecutableCommand({
         entrypoint: './src/index.ts',
@@ -1241,22 +1279,27 @@ export class BuildCommandGenerator {
         minify: profile === 'production',
         sourcemap: true,
         bytecode: profile === 'production',
-        execArgs: [`--env=${profile}`, `--port=${this.getPortForProfile(profile)}`]
+        execArgs: [`--env=${profile}`, `--port=${this.getPortForProfile(profile)}`],
       });
-      
+
       scripts.push(`# ${profile.charAt(0).toUpperCase() + profile.slice(1)} build\n${cmd}`);
     }
-    
+
     return scripts.join('\n\n');
   }
-  
+
   private getPortForProfile(profile: string): string {
     switch (profile) {
-      case 'development': return '3000';
-      case 'staging': return '3001'; 
-      case 'production': return '8080';
-      case 'demo': return '3002';
-      default: return '3000';
+      case 'development':
+        return '3000';
+      case 'staging':
+        return '3001';
+      case 'production':
+        return '8080';
+      case 'demo':
+        return '3002';
+      default:
+        return '3000';
     }
   }
 }

@@ -2,7 +2,10 @@
 
 ## Overview
 
-The Test Policy System enforces code quality gates before allowing any test execution. This ensures that tests only run on code that passes fundamental quality checks, preventing wasted time and resources on fundamentally broken code.
+The Test Policy System enforces code quality gates before allowing any test
+execution. This ensures that tests only run on code that passes fundamental
+quality checks, preventing wasted time and resources on fundamentally broken
+code.
 
 ## How It Works
 
@@ -50,6 +53,7 @@ BYPASS_REQUIRES_CONFIRMATION=true
 ## Commands
 
 ### Standard Test Commands (With Policy Enforcement)
+
 ```bash
 bun test                    # Full test suite with pre-checks
 bun run test:unit          # Unit tests with pre-checks
@@ -59,6 +63,7 @@ bun run test:coverage     # Coverage tests with pre-checks
 ```
 
 ### Emergency Bypass (Use Only When Necessary)
+
 ```bash
 # Individual test bypass
 bun run test:bypass test
@@ -72,26 +77,31 @@ bun run scripts/test-emergency-bypass.ts test
 ## Pre-Check Details
 
 ### 1. Code Linting (`bun run lint`)
+
 - Runs ESLint on all TypeScript/JavaScript files
 - Checks code style, potential bugs, and best practices
 - **Failure**: Syntax errors, style violations, or linting rules
 
 ### 2. TypeScript Type Checking (`bun run typecheck`)
+
 - Runs `tsc --noEmit` to validate TypeScript types
 - Ensures type safety without generating output
 - **Failure**: Type errors, missing types, or configuration issues
 
 ### 3. Syntax Validation
+
 - Uses Bun's built-in parser to validate syntax
 - Runs `bun build --target=bun --no-bundle` to check compilation
 - **Failure**: Syntax errors, import issues, or parse failures
 
 ### 4. Security Scan (`bun run security:audit`)
+
 - Runs security audit on dependencies
 - Uses `bun audit --audit-level=high` to check vulnerabilities
 - **Failure**: High-severity security vulnerabilities found
 
 ### 5. Dependency Audit
+
 - Additional security check for package dependencies
 - Validates package integrity and known vulnerabilities
 - **Failure**: Compromised or vulnerable dependencies
@@ -99,6 +109,7 @@ bun run scripts/test-emergency-bypass.ts test
 ## Policy Benefits
 
 ### ✅ Advantages
+
 - **Time Savings**: Prevents running tests on broken code
 - **Resource Efficiency**: Avoids wasted CI/CD resources
 - **Quality Assurance**: Enforces minimum code quality standards
@@ -106,6 +117,7 @@ bun run scripts/test-emergency-bypass.ts test
 - **Developer Productivity**: Faster feedback on fundamental issues
 
 ### ⚠️ Considerations
+
 - **Initial Setup**: Requires existing code to pass all checks
 - **Strict Enforcement**: May initially block legitimate test runs
 - **Emergency Situations**: Bypass procedures needed for urgent fixes
@@ -114,7 +126,8 @@ bun run scripts/test-emergency-bypass.ts test
 
 ### Policy Enforcement Failed
 
-1. **Check the error details** - The policy enforcer shows specific failure reasons
+1. **Check the error details** - The policy enforcer shows specific failure
+   reasons
 2. **Fix the underlying issues** - Address linting, type, or security issues
 3. **Run checks individually**:
    ```bash
@@ -141,22 +154,26 @@ POLICY_ENABLED=false
 
 1. **Missing .testpolicy file**: The system will terminate immediately
 2. **Invalid configuration**: Check syntax in .testpolicy file
-3. **Missing dependencies**: Ensure ESLint, TypeScript, and other tools are installed
+3. **Missing dependencies**: Ensure ESLint, TypeScript, and other tools are
+   installed
 
 ## Best Practices
 
 ### For Developers
+
 - **Fix issues early**: Address linting/type issues as you code
 - **Regular checks**: Run `bun run lint` and `bun run typecheck` frequently
 - **Clean commits**: Ensure code passes all checks before committing
 - **Emergency use**: Use bypass only for genuine emergencies
 
 ### For CI/CD
+
 - **Pipeline Integration**: The policy system works seamlessly with CI
 - **Failure Handling**: CI will exit with proper error codes on failures
 - **Logging**: All policy enforcement is logged for audit purposes
 
 ### For Team Leads
+
 - **Policy Tuning**: Adjust .testpolicy settings based on team needs
 - **Training**: Ensure team understands the policy system
 - **Monitoring**: Review bypass logs regularly for policy effectiveness
@@ -164,6 +181,7 @@ POLICY_ENABLED=false
 ## Configuration Examples
 
 ### Lenient Development Environment
+
 ```bash
 POLICY_ENABLED=true
 STRICT_MODE=false
@@ -175,7 +193,8 @@ REQUIRE_SECURITY_SCAN=false
 REQUIRE_DEPENDENCY_AUDIT=false
 ```
 
-### Strict Production Environment  
+### Strict Production Environment
+
 ```bash
 POLICY_ENABLED=true
 STRICT_MODE=true
@@ -189,6 +208,7 @@ ALLOW_BYPASS_WITH_FLAG=false
 ```
 
 ### Emergency/Debug Mode
+
 ```bash
 POLICY_ENABLED=false
 # All other settings ignored when disabled
@@ -197,11 +217,13 @@ POLICY_ENABLED=false
 ## Logging and Auditing
 
 ### Policy Enforcement Logs
+
 - All policy enforcement actions are logged
 - Timestamps and check results recorded
 - Bypass attempts tracked in `.bypass-log`
 
 ### Log Locations
+
 - **Console Output**: Real-time policy enforcement status
 - **Bypass Log**: `.bypass-log` file for emergency bypass tracking
 - **CI Logs**: Integrated with CI/CD pipeline logging
@@ -218,17 +240,20 @@ POLICY_ENABLED=false
 ### Existing Projects
 
 1. **Add the policy file**:
+
    ```bash
    cp .testpolicy.example .testpolicy
    ```
 
 2. **Fix existing issues**:
+
    ```bash
    bun run lint:fix
    bun run typecheck
    ```
 
 3. **Test the policy**:
+
    ```bash
    bun test  # Should now run pre-checks
    ```
@@ -246,6 +271,10 @@ POLICY_ENABLED=false
 
 ## Summary
 
-The Test Policy System ensures high code quality by enforcing fundamental checks before test execution. While it adds a gate to the testing process, it ultimately saves time and resources by preventing tests from running on fundamentally broken code.
+The Test Policy System ensures high code quality by enforcing fundamental checks
+before test execution. While it adds a gate to the testing process, it
+ultimately saves time and resources by preventing tests from running on
+fundamentally broken code.
 
-For emergency situations, bypass mechanisms are available but should be used sparingly and with proper justification.
+For emergency situations, bypass mechanisms are available but should be used
+sparingly and with proper justification.

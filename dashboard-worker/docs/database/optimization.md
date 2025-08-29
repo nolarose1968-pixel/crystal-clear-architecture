@@ -1,9 +1,13 @@
 # 🚀 Fire22 Dashboard - Database Optimization v4.0.0-staging
 
 ## Overview
-Comprehensive database optimization strategies for Fire22 Dashboard using SQLite (development) and Cloudflare D1 (production) with performance monitoring, query optimization, and cache management.
+
+Comprehensive database optimization strategies for Fire22 Dashboard using SQLite
+(development) and Cloudflare D1 (production) with performance monitoring, query
+optimization, and cache management.
 
 ## Table of Contents
+
 - [Performance Overview](#performance-overview)
 - [Query Optimization](#query-optimization)
 - [Index Management](#index-management)
@@ -21,6 +25,7 @@ Comprehensive database optimization strategies for Fire22 Dashboard using SQLite
 ## Performance Overview
 
 ### Current Performance Metrics
+
 - **Query Response Time**: < 50ms average
 - **Cache Hit Rate**: 85%+ target
 - **Concurrent Connections**: 20 max (PostgreSQL dev), Unlimited (D1 prod)
@@ -28,6 +33,7 @@ Comprehensive database optimization strategies for Fire22 Dashboard using SQLite
 - **Transaction Throughput**: 1,000+ TPS
 
 ### Architecture Overview
+
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Application   │───▶│   Cache Layer   │───▶│   Database     │
@@ -47,37 +53,40 @@ Comprehensive database optimization strategies for Fire22 Dashboard using SQLite
 ### Optimized Query Patterns
 
 #### 1. **Customer Queries**
+
 ```sql
 -- ❌ Unoptimized
 SELECT * FROM customers WHERE name LIKE '%john%';
 
 -- ✅ Optimized
-SELECT id, name, email, status, balance 
-FROM customers 
-WHERE name LIKE 'john%' 
+SELECT id, name, email, status, balance
+FROM customers
+WHERE name LIKE 'john%'
 AND status = 'active'
-ORDER BY created_at DESC 
+ORDER BY created_at DESC
 LIMIT 50;
 ```
 
 #### 2. **Agent Hierarchy Queries**
+
 ```sql
 -- ❌ Unoptimized
 SELECT * FROM agents WHERE commission_rate > 0.05;
 
 -- ✅ Optimized with index
 SELECT id, name, code, commission_rate, total_volume
-FROM agents 
-WHERE status = 'active' 
+FROM agents
+WHERE status = 'active'
 AND commission_rate BETWEEN 0.05 AND 0.15
 ORDER BY total_volume DESC;
 ```
 
 #### 3. **Wager Queries with Joins**
+
 ```sql
 -- ❌ Unoptimized
-SELECT w.*, c.name, a.name 
-FROM wagers w, customers c, agents a 
+SELECT w.*, c.name, a.name
+FROM wagers w, customers c, agents a
 WHERE w.customer_id = c.id AND w.agent_id = a.id;
 
 -- ✅ Optimized with proper JOINs
@@ -92,12 +101,13 @@ LIMIT 100;
 ```
 
 ### Query Analysis Tools
+
 ```sql
 -- SQLite Query Plan Analysis
-EXPLAIN QUERY PLAN 
-SELECT w.id, w.amount, c.name 
-FROM wagers w 
-JOIN customers c ON w.customer_id = c.id 
+EXPLAIN QUERY PLAN
+SELECT w.id, w.amount, c.name
+FROM wagers w
+JOIN customers c ON w.customer_id = c.id
 WHERE w.status = 'active';
 
 -- Index Usage Statistics
@@ -107,6 +117,7 @@ SELECT * FROM sqlite_stat1;
 ```
 
 ### Parameterized Queries
+
 ```javascript
 // ✅ Safe and optimized parameterized queries
 async function getCustomerWagers(customerId, limit = 50) {
@@ -118,7 +129,7 @@ async function getCustomerWagers(customerId, limit = 50) {
     ORDER BY created_at DESC 
     LIMIT ?
   `;
-  
+
   return await cache.query(sql, [customerId, limit], 30000); // 30s cache
 }
 ```
@@ -130,6 +141,7 @@ async function getCustomerWagers(customerId, limit = 50) {
 ### Essential Indexes
 
 #### Primary Performance Indexes
+
 ```sql
 -- Customer table indexes
 CREATE INDEX IF NOT EXISTS idx_customers_agent_id ON customers(agent_id);
@@ -137,7 +149,7 @@ CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);
 CREATE INDEX IF NOT EXISTS idx_customers_status ON customers(status);
 CREATE INDEX IF NOT EXISTS idx_customers_created_at ON customers(created_at);
 
--- Wagers table indexes  
+-- Wagers table indexes
 CREATE INDEX IF NOT EXISTS idx_wagers_customer_id ON wagers(customer_id);
 CREATE INDEX IF NOT EXISTS idx_wagers_agent_id ON wagers(agent_id);
 CREATE INDEX IF NOT EXISTS idx_wagers_status ON wagers(status);
@@ -151,6 +163,7 @@ CREATE INDEX IF NOT EXISTS idx_wagers_status_created ON wagers(status, created_a
 ```
 
 #### Transaction Table Indexes
+
 ```sql
 -- Transaction performance indexes
 CREATE INDEX IF NOT EXISTS idx_transactions_customer_id ON transactions(customer_id);
@@ -161,9 +174,10 @@ CREATE INDEX IF NOT EXISTS idx_transactions_customer_type ON transactions(custom
 ```
 
 ### Index Monitoring
+
 ```sql
 -- Check index effectiveness
-SELECT 
+SELECT
   name as index_name,
   tbl as table_name,
   stat as usage_stats
@@ -175,6 +189,7 @@ EXPLAIN QUERY PLAN SELECT * FROM wagers WHERE status = 'pending';
 ```
 
 ### Index Maintenance Commands
+
 ```bash
 # Analyze database statistics
 sqlite3 database.db "ANALYZE;"
@@ -191,6 +206,7 @@ sqlite3 database.db "PRAGMA integrity_check;"
 ## Cache Strategies
 
 ### Fire22Cache Implementation
+
 The Fire22Cache class provides intelligent caching with automatic cleanup:
 
 ```javascript
@@ -204,7 +220,7 @@ class Fire22Cache {
   async get<T>(key: string, factory: () => Promise<T>, ttl = this.defaultTTL): Promise<T> {
     const now = Date.now();
     const hit = this.cache.get(key);
-    
+
     if (hit && hit.expires > now) {
       this.cacheHits++;
       return hit.data;
@@ -228,28 +244,42 @@ class Fire22Cache {
 ```
 
 ### Cache TTL Strategy
-| Data Type | TTL | Reason |
-|-----------|-----|--------|
-| Customer Data | 5 minutes | Moderate change frequency |
-| Agent Data | 10 minutes | Infrequent changes |
-| Wager Data | 30 seconds | High change frequency |
-| System Config | 1 hour | Very infrequent changes |
-| Reports | 2 minutes | Balance between freshness and performance |
+
+| Data Type     | TTL        | Reason                                    |
+| ------------- | ---------- | ----------------------------------------- |
+| Customer Data | 5 minutes  | Moderate change frequency                 |
+| Agent Data    | 10 minutes | Infrequent changes                        |
+| Wager Data    | 30 seconds | High change frequency                     |
+| System Config | 1 hour     | Very infrequent changes                   |
+| Reports       | 2 minutes  | Balance between freshness and performance |
 
 ### Cache Warming Strategies
+
 ```javascript
 // Proactive cache warming for frequently accessed data
 async function warmCache() {
   const cache = new Fire22Cache(db);
-  
+
   // Warm customer cache
-  await cache.query('SELECT id, name, status FROM customers WHERE status = ?', ['active'], 300000);
-  
+  await cache.query(
+    'SELECT id, name, status FROM customers WHERE status = ?',
+    ['active'],
+    300000
+  );
+
   // Warm agent hierarchy cache
-  await cache.query('SELECT id, name, code FROM agents WHERE status = ?', ['active'], 600000);
-  
+  await cache.query(
+    'SELECT id, name, code FROM agents WHERE status = ?',
+    ['active'],
+    600000
+  );
+
   // Warm active wagers cache
-  await cache.query('SELECT id, customer_id, status FROM wagers WHERE status IN (?, ?)', ['pending', 'active'], 30000);
+  await cache.query(
+    'SELECT id, customer_id, status FROM wagers WHERE status IN (?, ?)',
+    ['pending', 'active'],
+    30000
+  );
 }
 ```
 
@@ -258,6 +288,7 @@ async function warmCache() {
 ## Connection Pooling
 
 ### PostgreSQL Development Configuration
+
 ```javascript
 // Enhanced connection pool configuration
 const poolConfig = {
@@ -266,29 +297,30 @@ const poolConfig = {
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  
+
   // Performance settings
-  max: 20,                    // Maximum connections
-  min: 2,                     // Minimum connections
-  idleTimeoutMillis: 30000,   // 30 seconds idle timeout
+  max: 20, // Maximum connections
+  min: 2, // Minimum connections
+  idleTimeoutMillis: 30000, // 30 seconds idle timeout
   connectionTimeoutMillis: 5000, // 5 seconds connection timeout
-  acquireTimeoutMillis: 10000,   // 10 seconds acquire timeout
-  
+  acquireTimeoutMillis: 10000, // 10 seconds acquire timeout
+
   // Health checks
   testOnBorrow: true,
   testOnReturn: false,
   testWhileIdle: true,
   numTestsPerRun: 3,
   timeBetweenEvictionRunsMillis: 30000,
-  
+
   // Error handling
-  errorHandler: (error) => {
+  errorHandler: error => {
     console.error('Database pool error:', error);
-  }
+  },
 };
 ```
 
 ### Connection Monitoring
+
 ```javascript
 // Connection pool health monitoring
 function monitorConnectionPool(pool) {
@@ -297,11 +329,11 @@ function monitorConnectionPool(pool) {
       totalConnections: pool.totalCount,
       activeConnections: pool.activeCount,
       idleConnections: pool.idleCount,
-      waitingRequests: pool.waitingCount
+      waitingRequests: pool.waitingCount,
     };
-    
+
     console.log('Pool Stats:', stats);
-    
+
     // Alert if pool is under stress
     if (pool.waitingCount > 5) {
       console.warn('Connection pool under stress:', stats);
@@ -315,21 +347,22 @@ function monitorConnectionPool(pool) {
 ## Monitoring & Metrics
 
 ### Database Performance Metrics
+
 ```javascript
 // Comprehensive database monitoring
 class DatabaseMonitor {
   private queryTimes = new Map();
   private slowQueries = [];
-  
+
   async trackQuery(sql: string, params: any[], executor: () => Promise<any>) {
     const startTime = Date.now();
-    
+
     try {
       const result = await executor();
       const duration = Date.now() - startTime;
-      
+
       this.recordQueryTime(sql, duration);
-      
+
       // Track slow queries (> 100ms)
       if (duration > 100) {
         this.slowQueries.push({
@@ -339,14 +372,14 @@ class DatabaseMonitor {
           timestamp: new Date().toISOString()
         });
       }
-      
+
       return result;
     } catch (error) {
       console.error('Query failed:', { sql, params, error: error.message });
       throw error;
     }
   }
-  
+
   getStats() {
     return {
       averageQueryTime: this.calculateAverageQueryTime(),
@@ -358,6 +391,7 @@ class DatabaseMonitor {
 ```
 
 ### Performance Dashboard Endpoint
+
 ```bash
 # Get database performance metrics
 curl -s http://localhost:3001/api/database/stats | jq
@@ -388,6 +422,7 @@ curl -s http://localhost:3001/api/database/stats | jq
 ## SQLite Optimization
 
 ### SQLite-Specific Optimizations
+
 ```sql
 -- Performance pragmas for SQLite
 PRAGMA journal_mode = WAL;          -- Write-Ahead Logging
@@ -402,6 +437,7 @@ PRAGMA analysis_limit = 1000;      -- Limit analysis depth
 ```
 
 ### SQLite Maintenance
+
 ```bash
 # Database maintenance script
 #!/bin/bash
@@ -422,6 +458,7 @@ echo "Database maintenance completed"
 ```
 
 ### SQLite Performance Tips
+
 1. **Use WAL Mode**: Better concurrent read performance
 2. **Increase Cache Size**: More memory = fewer disk I/O
 3. **Regular VACUUM**: Keeps database compact
@@ -435,6 +472,7 @@ echo "Database maintenance completed"
 ### D1-Specific Best Practices
 
 #### Efficient Query Patterns
+
 ```javascript
 // ✅ Optimized D1 queries
 async function getCustomersByAgent(agentId, limit = 50) {
@@ -446,7 +484,7 @@ async function getCustomersByAgent(agentId, limit = 50) {
     ORDER BY created_at DESC 
     LIMIT ?
   `);
-  
+
   const { results } = await stmt.bind(agentId, limit).all();
   return results;
 }
@@ -457,14 +495,17 @@ async function batchInsertWagers(wagers) {
     INSERT INTO wagers (wager_number, customer_id, agent_id, amount, description)
     VALUES (?, ?, ?, ?, ?)
   `);
-  
+
   // D1 supports batching for better performance
-  const batch = wagers.map(w => stmt.bind(w.number, w.customerId, w.agentId, w.amount, w.description));
+  const batch = wagers.map(w =>
+    stmt.bind(w.number, w.customerId, w.agentId, w.amount, w.description)
+  );
   return await db.batch(batch);
 }
 ```
 
 #### D1 Transaction Handling
+
 ```javascript
 // D1 transaction pattern
 async function processWagerSettlement(wagerId, result) {
@@ -475,17 +516,16 @@ async function processWagerSettlement(wagerId, result) {
       SET status = 'settled', result = ?, settled_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `);
-    
+
     const insertTransaction = db.prepare(`
       INSERT INTO transactions (customer_id, type, amount, reference)
       SELECT customer_id, 'settlement', potential_win, ?
       FROM wagers WHERE id = ?
     `);
-    
+
     // Execute in sequence for data consistency
     await updateWager.bind(result, wagerId).run();
     await insertTransaction.bind(`wager_${wagerId}`, wagerId).run();
-    
   } catch (error) {
     console.error('Settlement failed:', error);
     throw error;
@@ -494,6 +534,7 @@ async function processWagerSettlement(wagerId, result) {
 ```
 
 ### D1 Limitations & Workarounds
+
 1. **No Transactions**: Use application-level consistency
 2. **Limited Joins**: Optimize with indexed lookups
 3. **No Stored Procedures**: Implement in application logic
@@ -504,40 +545,50 @@ async function processWagerSettlement(wagerId, result) {
 ## Performance Benchmarks
 
 ### Target Performance Metrics
-| Operation | Target Time | Current Performance |
-|-----------|-------------|-------------------|
-| Customer Lookup | < 10ms | 8.3ms avg |
-| Agent Hierarchy | < 20ms | 15.7ms avg |
-| Wager Creation | < 50ms | 42.1ms avg |
-| Report Generation | < 500ms | 380ms avg |
-| Cache Hit | < 1ms | 0.3ms avg |
+
+| Operation         | Target Time | Current Performance |
+| ----------------- | ----------- | ------------------- |
+| Customer Lookup   | < 10ms      | 8.3ms avg           |
+| Agent Hierarchy   | < 20ms      | 15.7ms avg          |
+| Wager Creation    | < 50ms      | 42.1ms avg          |
+| Report Generation | < 500ms     | 380ms avg           |
+| Cache Hit         | < 1ms       | 0.3ms avg           |
 
 ### Benchmark Test Suite
+
 ```javascript
 // Performance benchmark tests
 async function runPerformanceBenchmarks() {
   const results = [];
-  
+
   // Customer query benchmark
   const customerStart = Date.now();
-  await db.prepare('SELECT * FROM customers WHERE status = ?').bind('active').all();
+  await db
+    .prepare('SELECT * FROM customers WHERE status = ?')
+    .bind('active')
+    .all();
   results.push({ test: 'customer_query', time: Date.now() - customerStart });
-  
+
   // Wager join benchmark
   const wagerStart = Date.now();
-  await db.prepare(`
+  await db
+    .prepare(
+      `
     SELECT w.id, w.amount, c.name 
     FROM wagers w 
     JOIN customers c ON w.customer_id = c.id 
     LIMIT 100
-  `).all();
+  `
+    )
+    .all();
   results.push({ test: 'wager_join', time: Date.now() - wagerStart });
-  
+
   return results;
 }
 ```
 
 ### Continuous Performance Monitoring
+
 ```bash
 # Automated performance monitoring
 #!/bin/bash
@@ -560,6 +611,7 @@ fi
 ## Best Practices
 
 ### Query Design Principles
+
 1. **Select Only Needed Columns**: Avoid `SELECT *`
 2. **Use Appropriate Indexes**: Match WHERE clauses to indexes
 3. **Limit Result Sets**: Always use LIMIT for large queries
@@ -567,6 +619,7 @@ fi
 5. **Cache Frequently Accessed Data**: Implement intelligent caching
 
 ### Schema Design Guidelines
+
 1. **Normalize Appropriately**: Balance normalization vs. query complexity
 2. **Use Appropriate Data Types**: Choose efficient data types
 3. **Add Constraints**: Ensure data integrity
@@ -574,25 +627,29 @@ fi
 5. **Document Relationships**: Clear foreign key relationships
 
 ### Monitoring & Alerting
+
 ```javascript
 // Performance alerting system
 function setupPerformanceAlerts() {
   setInterval(async () => {
     const stats = await db.getPerformanceStats();
-    
+
     // Alert on high response times
     if (stats.averageResponseTime > 100) {
       console.warn('High database response time:', stats.averageResponseTime);
     }
-    
+
     // Alert on low cache hit rate
     if (stats.cacheHitRate < 0.8) {
       console.warn('Low cache hit rate:', stats.cacheHitRate);
     }
-    
+
     // Alert on connection pool exhaustion
     if (stats.connectionPoolUtilization > 0.9) {
-      console.error('Connection pool near exhaustion:', stats.connectionPoolUtilization);
+      console.error(
+        'Connection pool near exhaustion:',
+        stats.connectionPoolUtilization
+      );
     }
   }, 60000); // Check every minute
 }
@@ -605,8 +662,9 @@ function setupPerformanceAlerts() {
 ### Common Performance Issues
 
 #### 1. **Slow Queries**
-**Symptoms**: High response times, timeout errors
-**Diagnosis**:
+
+**Symptoms**: High response times, timeout errors **Diagnosis**:
+
 ```sql
 -- Check query execution plan
 EXPLAIN QUERY PLAN SELECT * FROM wagers WHERE status = 'pending';
@@ -616,14 +674,16 @@ SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='wagers';
 ```
 
 **Solutions**:
+
 - Add missing indexes
 - Optimize WHERE clauses
 - Reduce result set size
 - Use parameterized queries
 
 #### 2. **High Memory Usage**
-**Symptoms**: Out of memory errors, slow performance
-**Diagnosis**:
+
+**Symptoms**: Out of memory errors, slow performance **Diagnosis**:
+
 ```bash
 # Check cache size
 curl -s http://localhost:3001/api/cache/stats
@@ -633,26 +693,30 @@ ps aux | grep node
 ```
 
 **Solutions**:
+
 - Implement cache cleanup
 - Reduce cache TTL
 - Optimize query result sets
 - Add memory limits
 
 #### 3. **Connection Pool Exhaustion**
-**Symptoms**: Connection timeout errors
-**Diagnosis**:
+
+**Symptoms**: Connection timeout errors **Diagnosis**:
+
 ```bash
 # Check connection pool status
 curl -s http://localhost:3001/api/database/pool-stats
 ```
 
 **Solutions**:
+
 - Increase pool size
 - Reduce connection timeout
 - Fix connection leaks
 - Implement connection monitoring
 
 ### Debug Commands
+
 ```bash
 # Database performance analysis
 curl -s http://localhost:3001/api/database/analyze | jq
@@ -668,6 +732,7 @@ curl -s http://localhost:3001/api/database/slow-queries | jq
 ```
 
 ### Recovery Procedures
+
 ```bash
 # Emergency database recovery
 #!/bin/bash
@@ -698,24 +763,28 @@ echo "Database recovery completed"
 ## Maintenance Schedule
 
 ### Daily Tasks
+
 - ✅ Monitor query performance
 - ✅ Check cache hit rates
 - ✅ Review slow query logs
 - ✅ Monitor connection pool health
 
-### Weekly Tasks  
+### Weekly Tasks
+
 - ✅ Run ANALYZE to update statistics
 - ✅ Review and optimize slow queries
 - ✅ Clean up old cache entries
 - ✅ Performance benchmark tests
 
 ### Monthly Tasks
+
 - ✅ VACUUM database (SQLite)
 - ✅ Review and update indexes
 - ✅ Performance trend analysis
 - ✅ Capacity planning review
 
 ### Quarterly Tasks
+
 - ✅ Full database backup and restore test
 - ✅ Schema optimization review
 - ✅ Security audit
@@ -723,6 +792,5 @@ echo "Database recovery completed"
 
 ---
 
-*Last Updated: 2025-08-28*
-*Version: 4.0.0-staging*
-*Database Optimization Guide for Fire22 Dashboard*
+_Last Updated: 2025-08-28_ _Version: 4.0.0-staging_ _Database Optimization Guide
+for Fire22 Dashboard_

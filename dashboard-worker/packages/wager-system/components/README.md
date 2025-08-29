@@ -5,29 +5,39 @@ Detailed documentation for each component of the Fire22 Wager System.
 ## 📋 **Component Overview**
 
 ### **🏗️ Core Components**
+
 - **[wager-engine.md](./wager-engine.md)** - Main wager processing engine
 - **[risk-manager.md](./risk-manager.md)** - Risk assessment and management
-- **[commission-calculator.md](./commission-calculator.md)** - Commission calculation engine
+- **[commission-calculator.md](./commission-calculator.md)** - Commission
+  calculation engine
 - **[validation-engine.md](./validation-engine.md)** - Wager validation system
-- **[settlement-processor.md](./settlement-processor.md)** - Wager settlement processing
+- **[settlement-processor.md](./settlement-processor.md)** - Wager settlement
+  processing
 
 ### **🔧 Support Components**
+
 - **[template-manager.md](./template-manager.md)** - Wager template management
 - **[event-manager.md](./event-manager.md)** - Sports event management
 - **[customer-manager.md](./customer-manager.md)** - Customer data management
 - **[agent-manager.md](./agent-manager.md)** - Agent hierarchy management
-- **[notification-system.md](./notification-system.md)** - Notification and alerting
+- **[notification-system.md](./notification-system.md)** - Notification and
+  alerting
 
 ### **📊 Data Components**
+
 - **[database-layer.md](./database-layer.md)** - Database abstraction layer
-- **[cache-manager.md](./cache-manager.md)** - Caching and performance optimization
+- **[cache-manager.md](./cache-manager.md)** - Caching and performance
+  optimization
 - **[audit-logger.md](./audit-logger.md)** - Audit trail and logging
-- **[metrics-collector.md](./metrics-collector.md)** - Performance metrics collection
-- **[report-generator.md](./report-generator.md)** - Report generation and export
+- **[metrics-collector.md](./metrics-collector.md)** - Performance metrics
+  collection
+- **[report-generator.md](./report-generator.md)** - Report generation and
+  export
 
 ## 🚀 **Component Architecture**
 
 ### **🏗️ System Architecture**
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    Wager System                            │
@@ -55,6 +65,7 @@ Detailed documentation for each component of the Fire22 Wager System.
 ```
 
 ### **🔗 Component Dependencies**
+
 ```typescript
 interface ComponentDependencies {
   wagerEngine: {
@@ -83,6 +94,7 @@ interface ComponentDependencies {
 ## 🔧 **Component Configuration**
 
 ### **⚙️ Configuration Interface**
+
 ```typescript
 interface ComponentConfig {
   name: string;
@@ -109,23 +121,31 @@ interface ComponentConfig {
 ```
 
 ### **🔧 Configuration Management**
+
 ```typescript
 class ComponentManager {
   private components: Map<string, Component> = new Map();
   private configs: Map<string, ComponentConfig> = new Map();
-  
+
   // Register a component
-  async registerComponent(name: string, component: Component, config: ComponentConfig): Promise<void>;
-  
+  async registerComponent(
+    name: string,
+    component: Component,
+    config: ComponentConfig
+  ): Promise<void>;
+
   // Configure a component
-  async configureComponent(name: string, config: Partial<ComponentConfig>): Promise<void>;
-  
+  async configureComponent(
+    name: string,
+    config: Partial<ComponentConfig>
+  ): Promise<void>;
+
   // Get component configuration
   getComponentConfig(name: string): ComponentConfig | undefined;
-  
+
   // List all components
   listComponents(): string[];
-  
+
   // Check component health
   async checkComponentHealth(name: string): Promise<HealthStatus>;
 }
@@ -134,6 +154,7 @@ class ComponentManager {
 ## 📊 **Component Metrics**
 
 ### **🚀 Performance Metrics**
+
 ```typescript
 interface ComponentMetrics {
   component: string;
@@ -178,22 +199,29 @@ interface ComponentMetrics {
 ```
 
 ### **📈 Metrics Collection**
+
 ```typescript
 class MetricsCollector {
   private metrics: Map<string, ComponentMetrics[]> = new Map();
-  
+
   // Collect metrics from a component
   async collectMetrics(component: string): Promise<ComponentMetrics>;
-  
+
   // Store metrics
-  async storeMetrics(component: string, metrics: ComponentMetrics): Promise<void>;
-  
+  async storeMetrics(
+    component: string,
+    metrics: ComponentMetrics
+  ): Promise<void>;
+
   // Get metrics for a component
   getMetrics(component: string, timeRange?: TimeRange): ComponentMetrics[];
-  
+
   // Aggregate metrics
-  aggregateMetrics(component: string, aggregation: AggregationType): AggregatedMetrics;
-  
+  aggregateMetrics(
+    component: string,
+    aggregation: AggregationType
+  ): AggregatedMetrics;
+
   // Export metrics
   exportMetrics(format: 'json' | 'csv' | 'prometheus'): Promise<string>;
 }
@@ -202,6 +230,7 @@ class MetricsCollector {
 ## 🧪 **Component Testing**
 
 ### **🔍 Testing Framework**
+
 ```typescript
 interface ComponentTest {
   name: string;
@@ -224,34 +253,36 @@ interface TestResult {
 ```
 
 ### **🧪 Test Categories**
+
 ```typescript
 const testCategories = {
   unit: {
     name: 'Unit Tests',
     description: 'Test individual component functionality',
-    command: 'bun run test:component:unit --component=<name>'
+    command: 'bun run test:component:unit --component=<name>',
   },
   integration: {
     name: 'Integration Tests',
     description: 'Test component interactions',
-    command: 'bun run test:component:integration --component=<name>'
+    command: 'bun run test:component:integration --component=<name>',
   },
   performance: {
     name: 'Performance Tests',
     description: 'Test component performance',
-    command: 'bun run test:component:performance --component=<name>'
+    command: 'bun run test:component:performance --component=<name>',
   },
   stress: {
     name: 'Stress Tests',
     description: 'Test component under load',
-    command: 'bun run test:component:stress --component=<name>'
-  }
+    command: 'bun run test:component:stress --component=<name>',
+  },
 };
 ```
 
 ## 🔍 **Component Monitoring**
 
 ### **📊 Health Monitoring**
+
 ```typescript
 interface HealthStatus {
   component: string;
@@ -272,6 +303,7 @@ interface HealthCheck {
 ```
 
 ### **🚨 Alerting System**
+
 ```typescript
 interface AlertRule {
   id: string;
@@ -299,6 +331,7 @@ interface AlertAction {
 ## 📚 **Component Documentation**
 
 ### **📝 Documentation Standards**
+
 Each component should include:
 
 1. **Overview**: High-level description and purpose
@@ -313,6 +346,7 @@ Each component should include:
 10. **Changelog**: Version history and changes
 
 ### **🔍 Documentation Generation**
+
 ```bash
 # Generate component documentation
 bun run docs:generate --components
@@ -330,6 +364,7 @@ bun run docs:generate --performance
 ## 🚀 **Component Development**
 
 ### **🔧 Development Workflow**
+
 1. **Component Design**: Define interface and responsibilities
 2. **Implementation**: Write component code with tests
 3. **Integration**: Integrate with other components
@@ -340,6 +375,7 @@ bun run docs:generate --performance
 8. **Validation**: Verify functionality and performance
 
 ### **📋 Development Checklist**
+
 - [ ] Component interface defined
 - [ ] Dependencies identified and documented
 - [ ] Configuration options documented
@@ -354,6 +390,7 @@ bun run docs:generate --performance
 ## 🔍 **Component Troubleshooting**
 
 ### **🚨 Common Issues**
+
 1. **Component Not Starting**: Check dependencies and configuration
 2. **High Memory Usage**: Monitor memory patterns and optimize
 3. **Slow Performance**: Profile operations and identify bottlenecks
@@ -361,6 +398,7 @@ bun run docs:generate --performance
 5. **Configuration Errors**: Validate configuration values and format
 
 ### **🔧 Debug Commands**
+
 ```bash
 # Check component status
 bun run component:status --name=<component>
@@ -380,4 +418,5 @@ bun run component:test --name=<component>
 
 ---
 
-**🔧 Ready to explore the components? Check out the individual component documentation for detailed information!**
+**🔧 Ready to explore the components? Check out the individual component
+documentation for detailed information!**

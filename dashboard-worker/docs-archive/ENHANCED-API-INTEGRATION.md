@@ -1,16 +1,20 @@
 # 🚀 Enhanced API Integration with Fire22 Security
 
-This document provides comprehensive guidance on using the enhanced API integration that extends your existing Fire22 security infrastructure with JWT tokens, enhanced headers, and comprehensive security features.
+This document provides comprehensive guidance on using the enhanced API
+integration that extends your existing Fire22 security infrastructure with JWT
+tokens, enhanced headers, and comprehensive security features.
 
 ## 🚀 Overview
 
 The Enhanced API Integration provides:
 
-- **JWT Token Authentication**: Secure token-based authentication with automatic refresh
+- **JWT Token Authentication**: Secure token-based authentication with automatic
+  refresh
 - **Enhanced Security Headers**: Comprehensive security headers and validation
 - **Protected Resource Access**: Secure access to protected API endpoints
 - **Security Monitoring**: Comprehensive audit logging and security monitoring
-- **Fire22 Integration**: Seamless integration with enhanced security infrastructure
+- **Fire22 Integration**: Seamless integration with enhanced security
+  infrastructure
 
 ## 📋 Prerequisites
 
@@ -22,20 +26,16 @@ The Enhanced API Integration provides:
 
 ### 1. **Enhanced API Service Setup**
 
-```typescript
+````typescript
 ```javascript
 import { EnhancedAPIService } from './src/api/enhanced-api-service';
-```
+````
 
-// Initialize with enhanced security
-const api = new EnhancedAPIService({
-  baseURL: 'https://api.fire22.com',
-  apiVersion: 'v1',
-  securityLevel: 'enhanced',
-  timeout: 30000,
-  retryAttempts: 3
-});
-```
+// Initialize with enhanced security const api = new EnhancedAPIService({
+baseURL: 'https://api.fire22.com', apiVersion: 'v1', securityLevel: 'enhanced',
+timeout: 30000, retryAttempts: 3 });
+
+````
 
 ### 2. **Authentication Flow**
 
@@ -59,7 +59,7 @@ const verifyResponse = await api.verifyToken();
 
 // Access protected resources
 const protectedData = await api.getProtectedResource('/api/v1/protected');
-```
+````
 
 ### 3. **Enhanced Security Headers**
 
@@ -184,7 +184,7 @@ const response = await api.getProtectedResource('/api/v1/users/profile');
 ```typescript
 const response = await api.postProtectedResource('/api/v1/users', {
   name: 'John Doe',
-  email: 'john@fire22.com'
+  email: 'john@fire22.com',
 });
 ```
 
@@ -193,7 +193,7 @@ const response = await api.postProtectedResource('/api/v1/users', {
 ```typescript
 const response = await api.putProtectedResource('/api/v1/users/123', {
   name: 'John Updated',
-  email: 'john.updated@fire22.com'
+  email: 'john.updated@fire22.com',
 });
 ```
 
@@ -254,22 +254,22 @@ The API service automatically logs security events:
 
 ```typescript
 interface APIConfig {
-  baseURL: string;           // API base URL
-  apiVersion: string;        // API version (e.g., 'v1')
-  clientId: string;          // Client identifier
-  timeout: number;           // Request timeout in milliseconds
-  retryAttempts: number;     // Number of retry attempts
+  baseURL: string; // API base URL
+  apiVersion: string; // API version (e.g., 'v1')
+  clientId: string; // Client identifier
+  timeout: number; // Request timeout in milliseconds
+  retryAttempts: number; // Number of retry attempts
   securityLevel: 'standard' | 'enhanced' | 'strict';
 }
 ```
 
 ### **Security Levels**
 
-| Level | Description | Features |
-|-------|-------------|----------|
-| `standard` | Basic security | JWT tokens, basic headers |
+| Level      | Description                 | Features                                    |
+| ---------- | --------------------------- | ------------------------------------------- |
+| `standard` | Basic security              | JWT tokens, basic headers                   |
 | `enhanced` | Enhanced security (default) | All standard + enhanced headers, monitoring |
-| `strict` | Maximum security | All enhanced + additional validations |
+| `strict`   | Maximum security            | All enhanced + additional validations       |
 
 ### **Update Configuration**
 
@@ -278,7 +278,7 @@ interface APIConfig {
 api.updateSecurityConfig({
   securityLevel: 'strict',
   timeout: 45000,
-  retryAttempts: 5
+  retryAttempts: 5,
 });
 ```
 
@@ -296,14 +296,14 @@ The enhanced Cloudflare Worker provides:
 
 ### **Worker Endpoints**
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/v1/auth/login` | POST | User authentication |
-| `/api/v1/auth/refresh` | POST | Token refresh |
-| `/api/v1/auth/verify` | GET | Token verification |
-| `/api/v1/auth/logout` | POST | User logout |
-| `/api/v1/protected` | GET | Protected resource access |
-| `/api/v1/security/status` | GET | Security status information |
+| Endpoint                  | Method | Description                 |
+| ------------------------- | ------ | --------------------------- |
+| `/api/v1/auth/login`      | POST   | User authentication         |
+| `/api/v1/auth/refresh`    | POST   | Token refresh               |
+| `/api/v1/auth/verify`     | GET    | Token verification          |
+| `/api/v1/auth/logout`     | POST   | User logout                 |
+| `/api/v1/protected`       | GET    | Protected resource access   |
+| `/api/v1/security/status` | GET    | Security status information |
 
 ### **Worker Security Features**
 
@@ -318,16 +318,16 @@ The enhanced Cloudflare Worker provides:
 ### **HTML Meta Tags**
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <meta name="csrf-token" content="<csrf_token_value>">
-  `&lt;meta name="api-base-url" content="https://api.fire22.com"&gt;`
-  `&lt;meta name="api-version" content="v1"&gt;`
-</head>
-<body>
-  <!-- Your dashboard content -->
-</body>
+  <head>
+    <meta name="csrf-token" content="<csrf_token_value>" />
+    `&lt;meta name="api-base-url" content="https://api.fire22.com"&gt;`
+    `&lt;meta name="api-version" content="v1"&gt;`
+  </head>
+  <body>
+    <!-- Your dashboard content -->
+  </body>
 </html>
 ```
 
@@ -338,7 +338,7 @@ The enhanced Cloudflare Worker provides:
 const api = new EnhancedAPIService({
   baseURL: document.querySelector('meta[name="api-base-url"]').content,
   apiVersion: document.querySelector('meta[name="api-version"]').content,
-  securityLevel: 'enhanced'
+  securityLevel: 'enhanced',
 });
 
 // Login user
@@ -402,7 +402,7 @@ The demo showcases:
 // Test with different security levels
 const testApi = new EnhancedAPIService({
   baseURL: 'http://localhost:3000',
-  securityLevel: 'strict'
+  securityLevel: 'strict',
 });
 
 // Test error handling
@@ -465,27 +465,30 @@ console.log('Security config:', config);
 ```typescript
 class EnhancedAPIService {
   // Constructor
-  constructor(config: Partial<APIConfig> = {})
-  
+  constructor(config: Partial<APIConfig> = {});
+
   // Authentication
-  async login(credentials: { username: string; password: string }): Promise<Response>
-  async logout(): Promise<Response>
-  async verifyToken(): Promise<Response>
-  async refreshAuthToken(): Promise<boolean>
-  
+  async login(credentials: {
+    username: string;
+    password: string;
+  }): Promise<Response>;
+  async logout(): Promise<Response>;
+  async verifyToken(): Promise<Response>;
+  async refreshAuthToken(): Promise<boolean>;
+
   // Protected Resources
-  async getProtectedResource(endpoint: string): Promise<Response>
-  async postProtectedResource(endpoint: string, data: any): Promise<Response>
-  async putProtectedResource(endpoint: string, data: any): Promise<Response>
-  async deleteProtectedResource(endpoint: string): Promise<Response>
-  
+  async getProtectedResource(endpoint: string): Promise<Response>;
+  async postProtectedResource(endpoint: string, data: any): Promise<Response>;
+  async putProtectedResource(endpoint: string, data: any): Promise<Response>;
+  async deleteProtectedResource(endpoint: string): Promise<Response>;
+
   // Security
-  getSecurityStatus(): SecurityStatus
-  updateSecurityConfig(updates: Partial<APIConfig>): void
-  clearTokens(): void
-  
+  getSecurityStatus(): SecurityStatus;
+  updateSecurityConfig(updates: Partial<APIConfig>): void;
+  clearTokens(): void;
+
   // Core
-  async request(endpoint: string, options?: RequestInit): Promise<Response>
+  async request(endpoint: string, options?: RequestInit): Promise<Response>;
 }
 ```
 
@@ -502,7 +505,7 @@ interface APIConfig {
 }
 
 interface SecurityHeaders {
-  'Authorization'?: string;
+  Authorization?: string;
   'X-API-Version': string;
   'X-Client-ID': string;
   'X-CSRF-Token'?: string;

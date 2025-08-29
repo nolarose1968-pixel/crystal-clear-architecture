@@ -32,7 +32,7 @@ export class SIMDLogger {
         return Bun.stripANSI(text);
       }
     }
-    
+
     // Fallback to regex-based stripping
     return text.replace(/\u001b\[[0-9;]*m/g, '');
   }
@@ -42,21 +42,22 @@ export class SIMDLogger {
    */
   log(level: 'debug' | 'info' | 'warn' | 'error', message: string, ...args: any[]): void {
     const processedMessage = this.stripANSI(message);
-    const fullMessage = args.length > 0 
-      ? `${processedMessage} ${args.map(a => JSON.stringify(a)).join(' ')}`
-      : processedMessage;
+    const fullMessage =
+      args.length > 0
+        ? `${processedMessage} ${args.map(a => JSON.stringify(a)).join(' ')}`
+        : processedMessage;
 
     const entry: LogEntry = {
       timestamp: Date.now(),
       level,
       message: fullMessage,
       platform: globalThis.TARGET_PLATFORM || 'unknown',
-      userAgent: globalThis.USER_AGENT || 'Fire22-Dashboard/3.0.9'
+      userAgent: globalThis.USER_AGENT || 'Fire22-Dashboard/3.0.9',
     };
 
     // Add to buffer for batch processing
     this.buffer.push(entry);
-    
+
     if (this.buffer.length >= this.maxBufferSize) {
       this.flush();
     }
@@ -73,7 +74,7 @@ export class SIMDLogger {
   private consoleOutput(entry: LogEntry): void {
     const timestamp = new Date(entry.timestamp).toISOString();
     const prefix = `[${timestamp}] [${entry.level.toUpperCase()}] [${entry.platform}]`;
-    
+
     switch (entry.level) {
       case 'error':
         console.error(`🔥 ${prefix}`, entry.message);
@@ -98,7 +99,7 @@ export class SIMDLogger {
 
     // Process buffer in batches for performance
     const batch = this.buffer.splice(0, Math.min(100, this.buffer.length));
-    
+
     batch.forEach(entry => {
       if (entry.level !== 'error' && entry.level !== 'warn') {
         this.consoleOutput(entry);
@@ -116,7 +117,7 @@ export class SIMDLogger {
       platform: globalThis.TARGET_PLATFORM || 'unknown',
       simdEnabled: globalThis.ENABLE_SIMD_ANSI || false,
       userAgent: globalThis.USER_AGENT || 'Fire22-Dashboard/3.0.9',
-      ...metadata
+      ...metadata,
     };
 
     this.log('info', `🚀 Performance: ${operation}`, metrics);
@@ -127,18 +128,26 @@ export class SIMDLogger {
    */
   logHttpRequest(method: string, url: string, status: number, duration: number): void {
     const userAgent = globalThis.USER_AGENT || 'Fire22-Dashboard/3.0.9';
-    
+
     this.log('info', `🌐 HTTP ${method} ${url} - ${status} (${duration}ms)`, {
       userAgent,
-      platform: globalThis.TARGET_PLATFORM
+      platform: globalThis.TARGET_PLATFORM,
     });
   }
 
   // Convenience methods
-  debug(message: string, ...args: any[]): void { this.log('debug', message, ...args); }
-  info(message: string, ...args: any[]): void { this.log('info', message, ...args); }
-  warn(message: string, ...args: any[]): void { this.log('warn', message, ...args); }
-  error(message: string, ...args: any[]): void { this.log('error', message, ...args); }
+  debug(message: string, ...args: any[]): void {
+    this.log('debug', message, ...args);
+  }
+  info(message: string, ...args: any[]): void {
+    this.log('info', message, ...args);
+  }
+  warn(message: string, ...args: any[]): void {
+    this.log('warn', message, ...args);
+  }
+  error(message: string, ...args: any[]): void {
+    this.log('error', message, ...args);
+  }
 }
 
 // Global logger instance

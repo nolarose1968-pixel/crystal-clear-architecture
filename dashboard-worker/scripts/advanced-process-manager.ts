@@ -2,14 +2,14 @@
 
 /**
  * 🚀 Advanced Process Manager for Fire22 Build System
- * 
+ *
  * Sophisticated process management using Bun.spawn with:
  * - Resource monitoring and analytics
  * - Timeout management with graceful termination
  * - IPC communication for real-time progress
  * - Parallel process orchestration
  * - Advanced error handling and recovery
- * 
+ *
  * @version 3.0.8
  * @author Fire22 Development Team
  * @see docs/BUILD-INDEX.md for usage guide
@@ -91,7 +91,7 @@ export interface ResourceUsage {
 export class AdvancedProcessManager {
   private runningProcesses = new Map<number, Bun.Subprocess>();
   private processMetrics = new Map<number, { startTime: number; command: string[] }>();
-  
+
   /**
    * Execute a single process with enhanced Bun-native monitoring
    */
@@ -101,39 +101,44 @@ export class AdvancedProcessManager {
     let stdout = '';
     let stderr = '';
     let timedOut = false;
-    
+
     // Enhanced analytics tracking
     const memoryTrend: number[] = [];
     const cpuTrend: number[] = [];
     let peakMemory = startMemory.rss;
     let totalCpuSamples = 0;
-    
+
     return new Promise((resolve, reject) => {
       // Start resource monitoring interval
       const monitoringInterval = setInterval(() => {
         const currentMemory = process.memoryUsage();
         const cpuUsage = process.cpuUsage();
-        
+
         memoryTrend.push(currentMemory.rss);
         cpuTrend.push(cpuUsage.user + cpuUsage.system);
-        
+
         if (currentMemory.rss > peakMemory) {
           peakMemory = currentMemory.rss;
         }
         totalCpuSamples++;
-        
+
         // Report resource updates if callback provided
         if (options.onResourceUpdate) {
           options.onResourceUpdate({
             cpuTime: { user: cpuUsage.user, system: cpuUsage.system },
-            memory: { rss: currentMemory.rss, heapUsed: currentMemory.heapUsed, heapTotal: currentMemory.heapTotal, external: currentMemory.external },
+            memory: {
+              rss: currentMemory.rss,
+              heapUsed: currentMemory.heapUsed,
+              heapTotal: currentMemory.heapTotal,
+              external: currentMemory.external,
+            },
             contextSwitches: { voluntary: 0, involuntary: 0 },
             io: { in: 0, out: 0 },
-            messages: { sent: 0, received: 0 }
+            messages: { sent: 0, received: 0 },
           });
         }
       }, 100); // Sample every 100ms
-      
+
       const proc = Bun.spawn({
         cmd: options.command,
         cwd: options.cwd || process.cwd(),
@@ -148,53 +153,58 @@ export class AdvancedProcessManager {
           const duration = (Bun.nanoseconds() - startTimeNs) / 1_000_000; // Convert to ms
           this.runningProcesses.delete(subprocess.pid);
           this.processMetrics.delete(subprocess.pid);
-          
+
           const resourceUsage = this.formatResourceUsage(subprocess.resourceUsage());
-          
+
           if (options.onResourceUpdate) {
             options.onResourceUpdate(resourceUsage);
           }
-          
+
           // Check if process timed out
           timedOut = signalCode === 'SIGTERM' && options.timeout && duration >= options.timeout;
-          
+
           // Stop monitoring
-        clearInterval(monitoringInterval);
-        
-        // Calculate analytics
-        const endTimeNs = Bun.nanoseconds();
-        const uptimeNs = endTimeNs - startTimeNs;
-        const endMemory = process.memoryUsage();
-        
-        const avgMemoryUsage = memoryTrend.length > 0 ? 
-          memoryTrend.reduce((sum, mem) => sum + mem, 0) / memoryTrend.length : startMemory.rss;
-        const avgCpuUsage = cpuTrend.length > 0 ?
-          cpuTrend.reduce((sum, cpu) => sum + cpu, 0) / cpuTrend.length : 0;
-        
-        const performanceScore = Math.max(0, 100 - (duration / 1000) * 2 - (avgMemoryUsage / 1024 / 1024) * 0.1);
-        const efficiency = duration > 0 ? (avgCpuUsage / duration) * 100 : 100;
-        
-        const analytics = {
-          startTimeNs,
-          endTimeNs,
-          uptimeNs,
-          memoryTrend: memoryTrend.slice(-50), // Keep last 50 samples
-          cpuTrend: cpuTrend.slice(-50), // Keep last 50 samples
-          performanceScore: Math.round(performanceScore),
-          efficiency: Math.round(efficiency * 100) / 100,
-          peakMemory,
-          avgCpuUsage: Math.round(avgCpuUsage)
-        };
-        
-        const bunMetrics = {
-          heapUsed: endMemory.heapUsed,
-          heapTotal: endMemory.heapTotal,
-          external: endMemory.external,
-          arrayBuffers: endMemory.arrayBuffers,
-          rss: endMemory.rss
-        };
-        
-        resolve({
+          clearInterval(monitoringInterval);
+
+          // Calculate analytics
+          const endTimeNs = Bun.nanoseconds();
+          const uptimeNs = endTimeNs - startTimeNs;
+          const endMemory = process.memoryUsage();
+
+          const avgMemoryUsage =
+            memoryTrend.length > 0
+              ? memoryTrend.reduce((sum, mem) => sum + mem, 0) / memoryTrend.length
+              : startMemory.rss;
+          const avgCpuUsage =
+            cpuTrend.length > 0 ? cpuTrend.reduce((sum, cpu) => sum + cpu, 0) / cpuTrend.length : 0;
+
+          const performanceScore = Math.max(
+            0,
+            100 - (duration / 1000) * 2 - (avgMemoryUsage / 1024 / 1024) * 0.1
+          );
+          const efficiency = duration > 0 ? (avgCpuUsage / duration) * 100 : 100;
+
+          const analytics = {
+            startTimeNs,
+            endTimeNs,
+            uptimeNs,
+            memoryTrend: memoryTrend.slice(-50), // Keep last 50 samples
+            cpuTrend: cpuTrend.slice(-50), // Keep last 50 samples
+            performanceScore: Math.round(performanceScore),
+            efficiency: Math.round(efficiency * 100) / 100,
+            peakMemory,
+            avgCpuUsage: Math.round(avgCpuUsage),
+          };
+
+          const bunMetrics = {
+            heapUsed: endMemory.heapUsed,
+            heapTotal: endMemory.heapTotal,
+            external: endMemory.external,
+            arrayBuffers: endMemory.arrayBuffers,
+            rss: endMemory.rss,
+          };
+
+          resolve({
             success: exitCode === 0 && !error,
             exitCode,
             signalCode,
@@ -205,46 +215,50 @@ export class AdvancedProcessManager {
             pid: subprocess.pid,
             timedOut,
             analytics,
-            bunMetrics
+            bunMetrics,
           });
-        }
+        },
       });
-      
+
       // Track running process
       this.runningProcesses.set(proc.pid, proc);
-      this.processMetrics.set(proc.pid, { 
-        startTime: Date.now(), 
-        command: options.command 
+      this.processMetrics.set(proc.pid, {
+        startTime: Date.now(),
+        command: options.command,
       });
-      
+
       // Handle stdout streaming
       if (proc.stdout) {
-        proc.stdout.pipeTo(new WritableStream({
-          write(chunk) {
-            const content = new TextDecoder().decode(chunk);
-            stdout += content;
-            if (options.onProgress) {
-              options.onProgress({ type: 'stdout', content });
-            }
-          }
-        }));
+        proc.stdout.pipeTo(
+          new WritableStream({
+            write(chunk) {
+              const content = new TextDecoder().decode(chunk);
+              stdout += content;
+              if (options.onProgress) {
+                options.onProgress({ type: 'stdout', content });
+              }
+            },
+          })
+        );
       }
-      
+
       // Handle stderr streaming
       if (proc.stderr) {
-        proc.stderr.pipeTo(new WritableStream({
-          write(chunk) {
-            const content = new TextDecoder().decode(chunk);
-            stderr += content;
-            if (options.onProgress) {
-              options.onProgress({ type: 'stderr', content });
-            }
-          }
-        }));
+        proc.stderr.pipeTo(
+          new WritableStream({
+            write(chunk) {
+              const content = new TextDecoder().decode(chunk);
+              stderr += content;
+              if (options.onProgress) {
+                options.onProgress({ type: 'stderr', content });
+              }
+            },
+          })
+        );
       }
     });
   }
-  
+
   /**
    * Execute multiple processes in parallel with resource monitoring
    */
@@ -260,45 +274,47 @@ export class AdvancedProcessManager {
     const results: ProcessResult[] = [];
     const executing = new Set<Promise<ProcessResult>>();
     let index = 0;
-    
+
     const executeNext = async (): Promise<ProcessResult | null> => {
       if (index >= processes.length) return null;
-      
+
       const processOptions = processes[index++];
       const result = await this.execute(processOptions);
-      
+
       if (progressCallback) {
         progressCallback(results.length + 1, processes.length, result);
       }
-      
+
       if (failFast && !result.success) {
         // Kill remaining processes
         await this.killAll();
-        throw new Error(`Process failed: ${processOptions.command.join(' ')} (exit code: ${result.exitCode})`);
+        throw new Error(
+          `Process failed: ${processOptions.command.join(' ')} (exit code: ${result.exitCode})`
+        );
       }
-      
+
       return result;
     };
-    
+
     // Start initial batch
     for (let i = 0; i < Math.min(maxConcurrency, processes.length); i++) {
       executing.add(executeNext());
     }
-    
+
     // Process results as they complete
     while (executing.size > 0) {
       const result = await Promise.race(executing);
-      
+
       if (result) {
         results.push(result);
-        
+
         // Start next process if available
         const nextPromise = executeNext();
         if (nextPromise) {
           executing.add(nextPromise);
         }
       }
-      
+
       // Remove completed promises
       for (const promise of executing) {
         try {
@@ -313,10 +329,10 @@ export class AdvancedProcessManager {
         }
       }
     }
-    
+
     return results;
   }
-  
+
   /**
    * Execute a command with retry logic and exponential backoff
    */
@@ -333,22 +349,25 @@ export class AdvancedProcessManager {
       maxRetries = 3,
       backoffMs = 1000,
       backoffMultiplier = 2,
-      retryCondition = (result) => !result.success && result.exitCode !== 0
+      retryCondition = result => !result.success && result.exitCode !== 0,
     } = retryOptions;
-    
+
     let lastResult: ProcessResult;
     let currentBackoff = backoffMs;
-    
+
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         lastResult = await this.execute(options);
-        
+
         if (!retryCondition(lastResult)) {
           return lastResult;
         }
-        
+
         if (attempt < maxRetries) {
-          console.warn(`Command failed (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${currentBackoff}ms:`, options.command.join(' '));
+          console.warn(
+            `Command failed (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${currentBackoff}ms:`,
+            options.command.join(' ')
+          );
           await new Promise(resolve => setTimeout(resolve, currentBackoff));
           currentBackoff *= backoffMultiplier;
         }
@@ -356,16 +375,19 @@ export class AdvancedProcessManager {
         if (attempt === maxRetries) {
           throw error;
         }
-        
-        console.warn(`Command error (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${currentBackoff}ms:`, error);
+
+        console.warn(
+          `Command error (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${currentBackoff}ms:`,
+          error
+        );
         await new Promise(resolve => setTimeout(resolve, currentBackoff));
         currentBackoff *= backoffMultiplier;
       }
     }
-    
+
     return lastResult!;
   }
-  
+
   /**
    * Get real-time status of all running processes
    */
@@ -374,19 +396,19 @@ export class AdvancedProcessManager {
     return Array.from(this.processMetrics.entries()).map(([pid, metrics]) => ({
       pid,
       command: metrics.command,
-      duration: now - metrics.startTime
+      duration: now - metrics.startTime,
     }));
   }
-  
+
   /**
    * Kill all running processes gracefully
    */
   async killAll(signal: string | number = 'SIGTERM'): Promise<void> {
     const killPromises: Promise<void>[] = [];
-    
+
     for (const [pid, proc] of this.runningProcesses) {
       killPromises.push(
-        new Promise((resolve) => {
+        new Promise(resolve => {
           const timeout = setTimeout(() => {
             // Force kill if graceful termination takes too long
             try {
@@ -396,12 +418,12 @@ export class AdvancedProcessManager {
             }
             resolve();
           }, 5000);
-          
+
           proc.exited.then(() => {
             clearTimeout(timeout);
             resolve();
           });
-          
+
           try {
             proc.kill(signal);
           } catch (error) {
@@ -411,19 +433,19 @@ export class AdvancedProcessManager {
         })
       );
     }
-    
+
     await Promise.all(killPromises);
     this.runningProcesses.clear();
     this.processMetrics.clear();
   }
-  
+
   /**
    * Kill a specific process by PID
    */
   async killProcess(pid: number, signal: string | number = 'SIGTERM'): Promise<boolean> {
     const proc = this.runningProcesses.get(pid);
     if (!proc) return false;
-    
+
     try {
       proc.kill(signal);
       await proc.exited;
@@ -434,7 +456,7 @@ export class AdvancedProcessManager {
       return false;
     }
   }
-  
+
   /**
    * Get aggregated resource usage across all completed processes
    */
@@ -443,27 +465,27 @@ export class AdvancedProcessManager {
       cpuTime: {
         user: usage?.cpuTime?.user || 0,
         system: usage?.cpuTime?.system || 0,
-        total: (usage?.cpuTime?.user || 0) + (usage?.cpuTime?.system || 0)
+        total: (usage?.cpuTime?.user || 0) + (usage?.cpuTime?.system || 0),
       },
       memory: {
         maxRSS: usage?.maxRSS || 0,
-        current: process.memoryUsage().heapUsed
+        current: process.memoryUsage().heapUsed,
       },
       contextSwitches: {
         voluntary: usage?.contextSwitches?.voluntary || 0,
-        involuntary: usage?.contextSwitches?.involuntary || 0
+        involuntary: usage?.contextSwitches?.involuntary || 0,
       },
       io: {
         in: usage?.ops?.in || 0,
-        out: usage?.ops?.out || 0
+        out: usage?.ops?.out || 0,
       },
       messages: {
         sent: usage?.messages?.sent || 0,
-        received: usage?.messages?.received || 0
-      }
+        received: usage?.messages?.received || 0,
+      },
     };
   }
-  
+
   /**
    * Clean up resources and kill all processes
    */

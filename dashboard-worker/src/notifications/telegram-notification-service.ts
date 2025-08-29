@@ -69,7 +69,7 @@ export class TelegramNotificationService {
     totalFailed: 0,
     totalQueued: 0,
     averageProcessingTime: 0,
-    queueSize: 0
+    queueSize: 0,
   };
 
   constructor(telegramBot: Fire22TelegramBot, config?: Partial<NotificationConfig>) {
@@ -80,24 +80,29 @@ export class TelegramNotificationService {
       batchSize: 10,
       rateLimit: {
         messagesPerMinute: 30,
-        messagesPerHour: 1000
+        messagesPerHour: 1000,
       },
       queueSize: 1000,
-      ...config
+      ...config,
     };
 
     // Start processing queue
     this.startQueueProcessor();
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📤 SEND NOTIFICATIONS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   /**
    * Send notification to user by telegram ID
    */
-  async sendToUser(telegramId: number, message: string, type: NotificationMessage['type'] = 'custom', priority: NotificationMessage['priority'] = 'medium'): Promise<string> {
+  async sendToUser(
+    telegramId: number,
+    message: string,
+    type: NotificationMessage['type'] = 'custom',
+    priority: NotificationMessage['priority'] = 'medium'
+  ): Promise<string> {
     const notification: NotificationMessage = {
       id: this.generateId(),
       type,
@@ -107,9 +112,9 @@ export class TelegramNotificationService {
       metadata: {
         createdAt: new Date(),
         retryCount: 0,
-        maxRetries: this.config.maxRetries
+        maxRetries: this.config.maxRetries,
       },
-      status: 'pending'
+      status: 'pending',
     };
 
     return this.queueNotification(notification);
@@ -118,7 +123,12 @@ export class TelegramNotificationService {
   /**
    * Send notification to user by username
    */
-  async sendToUsername(username: string, message: string, type: NotificationMessage['type'] = 'custom', priority: NotificationMessage['priority'] = 'medium'): Promise<string> {
+  async sendToUsername(
+    username: string,
+    message: string,
+    type: NotificationMessage['type'] = 'custom',
+    priority: NotificationMessage['priority'] = 'medium'
+  ): Promise<string> {
     const notification: NotificationMessage = {
       id: this.generateId(),
       type,
@@ -128,9 +138,9 @@ export class TelegramNotificationService {
       metadata: {
         createdAt: new Date(),
         retryCount: 0,
-        maxRetries: this.config.maxRetries
+        maxRetries: this.config.maxRetries,
       },
-      status: 'pending'
+      status: 'pending',
     };
 
     return this.queueNotification(notification);
@@ -139,7 +149,12 @@ export class TelegramNotificationService {
   /**
    * Send scheduled notification
    */
-  async sendScheduled(telegramId: number, message: string, scheduledFor: Date, type: NotificationMessage['type'] = 'custom'): Promise<string> {
+  async sendScheduled(
+    telegramId: number,
+    message: string,
+    scheduledFor: Date,
+    type: NotificationMessage['type'] = 'custom'
+  ): Promise<string> {
     const notification: NotificationMessage = {
       id: this.generateId(),
       type,
@@ -150,9 +165,9 @@ export class TelegramNotificationService {
         createdAt: new Date(),
         scheduledFor,
         retryCount: 0,
-        maxRetries: this.config.maxRetries
+        maxRetries: this.config.maxRetries,
       },
-      status: 'pending'
+      status: 'pending',
     };
 
     return this.queueNotification(notification);
@@ -161,7 +176,11 @@ export class TelegramNotificationService {
   /**
    * Send bulk notifications
    */
-  async sendBulk(recipients: Array<{ telegramId?: number; username?: string }>, message: string, type: NotificationMessage['type'] = 'custom'): Promise<string[]> {
+  async sendBulk(
+    recipients: Array<{ telegramId?: number; username?: string }>,
+    message: string,
+    type: NotificationMessage['type'] = 'custom'
+  ): Promise<string[]> {
     const notificationIds: string[] = [];
 
     for (const recipient of recipients) {
@@ -174,9 +193,9 @@ export class TelegramNotificationService {
         metadata: {
           createdAt: new Date(),
           retryCount: 0,
-          maxRetries: this.config.maxRetries
+          maxRetries: this.config.maxRetries,
         },
-        status: 'pending'
+        status: 'pending',
       };
 
       notificationIds.push(await this.queueNotification(notification));
@@ -185,9 +204,9 @@ export class TelegramNotificationService {
     return notificationIds;
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🔄 QUEUE MANAGEMENT
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   /**
    * Add notification to queue
@@ -243,9 +262,9 @@ export class TelegramNotificationService {
     return false;
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // ⚙️ QUEUE PROCESSOR
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   /**
    * Start queue processing
@@ -284,10 +303,12 @@ export class TelegramNotificationService {
         id: this.generateId(),
         messages: activeMessages,
         status: 'processing',
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
-      console.log(`🔄 Processing batch ${this.processingBatch.id} with ${activeMessages.length} messages`);
+      console.log(
+        `🔄 Processing batch ${this.processingBatch.id} with ${activeMessages.length} messages`
+      );
 
       // Process batch
       await this.processBatch(this.processingBatch);
@@ -297,7 +318,6 @@ export class TelegramNotificationService {
       this.processingBatch.processedAt = new Date();
 
       console.log(`✅ Batch ${this.processingBatch.id} completed`);
-
     } catch (error) {
       console.error('❌ Error processing queue:', error);
 
@@ -341,7 +361,6 @@ export class TelegramNotificationService {
         notification.status = 'sent';
 
         console.log(`✅ Notification ${notification.id} sent successfully`);
-
       } catch (error) {
         await this.handleSendError(notification, error);
       }
@@ -361,9 +380,15 @@ export class TelegramNotificationService {
 
     try {
       if (notification.recipient.telegramId) {
-        await this.telegramBot.sendNotificationById(notification.recipient.telegramId, notification.content.text);
+        await this.telegramBot.sendNotificationById(
+          notification.recipient.telegramId,
+          notification.content.text
+        );
       } else if (notification.recipient.username) {
-        await this.telegramBot.sendNotificationByUsername(notification.recipient.username, notification.content.text);
+        await this.telegramBot.sendNotificationByUsername(
+          notification.recipient.username,
+          notification.content.text
+        );
       } else {
         throw new Error('No recipient specified');
       }
@@ -379,7 +404,10 @@ export class TelegramNotificationService {
     notification.metadata.retryCount++;
     notification.metadata.errorMessage = error.message;
 
-    console.error(`❌ Notification ${notification.id} failed (attempt ${notification.metadata.retryCount}/${notification.metadata.maxRetries}):`, error.message);
+    console.error(
+      `❌ Notification ${notification.id} failed (attempt ${notification.metadata.retryCount}/${notification.metadata.maxRetries}):`,
+      error.message
+    );
 
     if (notification.metadata.retryCount < notification.metadata.maxRetries) {
       // Re-queue for retry
@@ -394,13 +422,15 @@ export class TelegramNotificationService {
       notification.status = 'failed';
       this.stats.totalFailed++;
 
-      console.error(`💀 Notification ${notification.id} permanently failed after ${notification.metadata.maxRetries} attempts`);
+      console.error(
+        `💀 Notification ${notification.id} permanently failed after ${notification.metadata.maxRetries} attempts`
+      );
     }
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🛡️ RATE LIMITING
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   /**
    * Check rate limits
@@ -435,9 +465,9 @@ export class TelegramNotificationService {
     return true;
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 STATISTICS & MONITORING
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   /**
    * Get service statistics
@@ -450,9 +480,9 @@ export class TelegramNotificationService {
       currentBatch: this.processingBatch?.id || null,
       rateLimits: {
         minute: this.messageCount.minute || 0,
-        hour: this.messageCount.hour || 0
+        hour: this.messageCount.hour || 0,
       },
-      config: this.config
+      config: this.config,
     };
   }
 
@@ -472,27 +502,33 @@ export class TelegramNotificationService {
       failed,
       cancelled,
       priorityBreakdown: this.getPriorityBreakdown(),
-      typeBreakdown: this.getTypeBreakdown()
+      typeBreakdown: this.getTypeBreakdown(),
     };
   }
 
   private getPriorityBreakdown() {
-    return this.notificationQueue.reduce((acc, n) => {
-      acc[n.priority] = (acc[n.priority] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    return this.notificationQueue.reduce(
+      (acc, n) => {
+        acc[n.priority] = (acc[n.priority] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   }
 
   private getTypeBreakdown() {
-    return this.notificationQueue.reduce((acc, n) => {
-      acc[n.type] = (acc[n.type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    return this.notificationQueue.reduce(
+      (acc, n) => {
+        acc[n.type] = (acc[n.type] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🛠️ UTILITIES
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   /**
    * Generate unique ID
@@ -511,17 +547,18 @@ export class TelegramNotificationService {
   /**
    * Clean up old notifications
    */
-  cleanup(maxAge: number = 24 * 60 * 60 * 1000): void { // 24 hours
+  cleanup(maxAge: number = 24 * 60 * 60 * 1000): void {
+    // 24 hours
     const cutoff = new Date(Date.now() - maxAge);
-    this.notificationQueue = this.notificationQueue.filter(n =>
-      n.metadata.createdAt > cutoff || n.status === 'processing'
+    this.notificationQueue = this.notificationQueue.filter(
+      n => n.metadata.createdAt > cutoff || n.status === 'processing'
     );
   }
 }
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🎯 PREDEFINED NOTIFICATION TEMPLATES
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 export const NOTIFICATION_TEMPLATES = {
   wagerUpdate: (amount: number, game: string, status: string) => `
@@ -545,7 +582,11 @@ ${newBalance > oldBalance ? '📈' : '📉'} **Change:** $${Math.abs(newBalance 
 ⏰ **Updated:** ${new Date().toLocaleString()}
   `,
 
-  systemAlert: (title: string, message: string, severity: 'low' | 'medium' | 'high' | 'critical') => {
+  systemAlert: (
+    title: string,
+    message: string,
+    severity: 'low' | 'medium' | 'high' | 'critical'
+  ) => {
     const emoji = { low: 'ℹ️', medium: '⚠️', high: '🚨', critical: '💀' }[severity];
     return `
 ${emoji} **${title}**
@@ -567,11 +608,11 @@ ${message}
 
 📅 **Period:** Last 7 days
 ⏰ **Generated:** ${new Date().toLocaleString()}
-  `
+  `,
 };
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🎯 EXPORT DEFAULT
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 export default TelegramNotificationService;

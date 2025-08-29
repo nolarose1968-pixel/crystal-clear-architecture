@@ -1,7 +1,7 @@
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // FIRE22 DASHBOARD WORKER - HIERARCHY SYSTEM & MATRIX ORGANIZATION
-// ============================================================================
-// 
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
+//
 // ARCHITECTURE OVERVIEW:
 // ┌─────────────────────────────────────────────────────────────────────────┐
 // │                           REQUEST LAYER                                │
@@ -41,41 +41,41 @@
 // • Data Flow → Request → Auth → Service → Cache → Database → Response
 // • Error Handling → Service → Response → Client
 //
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Bun Environment Variable Type Definitions
 // This provides proper TypeScript support for environment variables
-declare module "bun" {
+declare module 'bun' {
   interface Env {
-    // ===== DATABASE LAYER =====
+    // !== DATABASE LAYER !==
     DB: D1Database;
-    
-    // ===== BOT CONFIGURATION LAYER =====
+
+    // !== BOT CONFIGURATION LAYER !==
     BOT_TOKEN?: string;
     CASHIER_BOT_TOKEN?: string;
-    
-    // ===== FIRE22 INTEGRATION LAYER =====
+
+    // !== FIRE22 INTEGRATION LAYER !==
     FIRE22_API_URL?: string;
     FIRE22_TOKEN?: string;
     FIRE22_WEBHOOK_SECRET?: string;
-    
-    // ===== AUTHENTICATION LAYER =====
+
+    // !== AUTHENTICATION LAYER !==
     JWT_SECRET: string;
     ADMIN_PASSWORD: string;
-    
-    // ===== PAYMENT GATEWAY LAYER =====
+
+    // !== PAYMENT GATEWAY LAYER !==
     STRIPE_SECRET_KEY: string;
     STRIPE_WEBHOOK_SECRET: string;
-    
-    // ===== COMMUNICATION SERVICES LAYER =====
+
+    // !== COMMUNICATION SERVICES LAYER !==
     SENDGRID_API_KEY: string;
     TWILIO_ACCOUNT_SID: string;
     TWILIO_AUTH_TOKEN: string;
-    
-    // ===== SYSTEM CONFIGURATION LAYER =====
+
+    // !== SYSTEM CONFIGURATION LAYER !==
     CRON_SECRET: string;
-    
-    // ===== DEVELOPMENT SETTINGS LAYER =====
+
+    // !== DEVELOPMENT SETTINGS LAYER !==
     NODE_ENV?: string;
     BUN_CONFIG_VERBOSE_FETCH?: string;
     BUN_CONFIG_MAX_HTTP_REQUESTS?: string;
@@ -90,9 +90,9 @@ export * from './types';
 export * from './utils';
 export * from './config';
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // CORE INTERFACES & TYPES - HIERARCHY FOUNDATION
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Cache entry structure
 interface CacheEntry<T> {
@@ -112,9 +112,9 @@ interface Fire22CacheInterface {
   };
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // CACHE LAYER IMPLEMENTATION
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Adapted Fire22Cache for Cloudflare D1
 class Fire22Cache implements Fire22CacheInterface {
@@ -124,7 +124,8 @@ class Fire22Cache implements Fire22CacheInterface {
   private cacheHits = 0;
   private cacheMisses = 0;
 
-  constructor(d1Database: any) { // Constructor takes D1 database binding
+  constructor(d1Database: any) {
+    // Constructor takes D1 database binding
     this.db = d1Database;
     // Auto-cleanup for expired cache entries
     setInterval(() => this.cleanup(), 30_000);
@@ -147,11 +148,18 @@ class Fire22Cache implements Fire22CacheInterface {
   // Caching method specifically for D1 SQL queries
   async query<T>(sql: string, params?: any[], ttl = this.defaultTTL): Promise<T[]> {
     const cacheKey = sql + JSON.stringify(params || []);
-    return this.get(cacheKey, async () => {
-      // Use this.db.prepare for D1
-      const { results } = await this.db.prepare(sql).bind(...(params || [])).all();
-      return results as T[]; // D1 returns results in `results` array
-    }, ttl);
+    return this.get(
+      cacheKey,
+      async () => {
+        // Use this.db.prepare for D1
+        const { results } = await this.db
+          .prepare(sql)
+          .bind(...(params || []))
+          .all();
+        return results as T[]; // D1 returns results in `results` array
+      },
+      ttl
+    );
   }
 
   // --- NEW METHOD TO EXPOSE CACHE STATS ---
@@ -160,7 +168,10 @@ class Fire22Cache implements Fire22CacheInterface {
       cacheSize: this.cache.size,
       cacheHits: this.cacheHits,
       cacheMisses: this.cacheMisses,
-      hitRate: this.cacheHits + this.cacheMisses === 0 ? "0%" : `${((this.cacheHits / (this.cacheHits + this.cacheMisses)) * 100).toFixed(1)}%`
+      hitRate:
+        this.cacheHits + this.cacheMisses === 0
+          ? '0%'
+          : `${((this.cacheHits / (this.cacheHits + this.cacheMisses)) * 100).toFixed(1)}%`,
     };
   }
 
@@ -174,9 +185,9 @@ class Fire22Cache implements Fire22CacheInterface {
   }
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // VERSION MANAGEMENT IMPLEMENTATION
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Version cache implementation
 class VersionCache implements VersionCacheInterface {
@@ -235,7 +246,7 @@ class VersionCache implements VersionCacheInterface {
 
   private async generateDefaultVersionInfo(): Promise<VersionInfo> {
     const packageJson = await this.readPackageJson();
-    
+
     return {
       current: packageJson.version || '1.0.0',
       previous: '0.0.0',
@@ -246,24 +257,26 @@ class VersionCache implements VersionCacheInterface {
       gitCommit: process.env.GIT_COMMIT || 'unknown',
       gitBranch: process.env.GIT_BRANCH || 'main',
       changelog: [],
-      metadata: await this.generateDefaultBuildMetrics()
+      metadata: await this.generateDefaultBuildMetrics(),
     };
   }
 
   private async generateDefaultVersionHistory(): Promise<VersionChange[]> {
     const packageJson = await this.readPackageJson();
-    
-    return [{
-      version: packageJson.version || '1.0.0',
-      date: new Date().toISOString(),
-      type: 'patch',
-      description: 'Initial version',
-      author: packageJson.author?.name || 'Unknown',
-      breakingChanges: [],
-      newFeatures: [],
-      bugFixes: [],
-      securityUpdates: []
-    }];
+
+    return [
+      {
+        version: packageJson.version || '1.0.0',
+        date: new Date().toISOString(),
+        type: 'patch',
+        description: 'Initial version',
+        author: packageJson.author?.name || 'Unknown',
+        breakingChanges: [],
+        newFeatures: [],
+        bugFixes: [],
+        securityUpdates: [],
+      },
+    ];
   }
 
   private async generateDefaultBuildMetrics(): Promise<VersionMetadata> {
@@ -278,7 +291,7 @@ class VersionCache implements VersionCacheInterface {
         testPassRate: 100,
         buildSuccess: true,
         securityScore: 100,
-        performanceScore: 100
+        performanceScore: 100,
       },
       deploymentStatus: {
         environment: process.env.NODE_ENV || 'development',
@@ -289,9 +302,9 @@ class VersionCache implements VersionCacheInterface {
           status: 'healthy',
           score: 100,
           lastChecked: new Date().toISOString(),
-          issues: []
-        }
-      }
+          issues: [],
+        },
+      },
     };
   }
 
@@ -306,12 +319,12 @@ class VersionCache implements VersionCacheInterface {
       // For now, return a default structure
       return {
         version: '1.0.0',
-        author: { name: 'Fire22 Development Team' }
+        author: { name: 'Fire22 Development Team' },
       };
     } catch (error) {
       return {
         version: '1.0.0',
-        author: { name: 'Unknown' }
+        author: { name: 'Unknown' },
       };
     }
   }
@@ -350,7 +363,7 @@ class VersionDatabase implements VersionDatabaseInterface {
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
       )
     `;
-    
+
     await this.db.exec(sql);
   }
 
@@ -361,7 +374,7 @@ class VersionDatabase implements VersionDatabaseInterface {
         breaking_changes, new_features, bug_fixes, security_updates
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    
+
     const params = [
       version.version,
       version.type,
@@ -371,18 +384,21 @@ class VersionDatabase implements VersionDatabaseInterface {
       JSON.stringify(version.breakingChanges),
       JSON.stringify(version.newFeatures),
       JSON.stringify(version.bugFixes),
-      JSON.stringify(version.securityUpdates)
+      JSON.stringify(version.securityUpdates),
     ];
-    
-    await this.db.prepare(sql).bind(...params).run();
+
+    await this.db
+      .prepare(sql)
+      .bind(...params)
+      .run();
   }
 
   async getVersionByNumber(versionNumber: string): Promise<VersionChange | null> {
     const sql = 'SELECT * FROM versions WHERE version_number = ?';
     const result = await this.db.prepare(sql).bind(versionNumber).first();
-    
+
     if (!result) return null;
-    
+
     return {
       version: result.version_number,
       date: result.release_date,
@@ -392,16 +408,16 @@ class VersionDatabase implements VersionDatabaseInterface {
       breakingChanges: JSON.parse(result.breaking_changes || '[]'),
       newFeatures: JSON.parse(result.new_features || '[]'),
       bugFixes: JSON.parse(result.bug_fixes || '[]'),
-      securityUpdates: JSON.parse(result.security_updates || '[]')
+      securityUpdates: JSON.parse(result.security_updates || '[]'),
     };
   }
 
   async getRecentVersions(limit: number): Promise<VersionChange[]> {
     const sql = 'SELECT * FROM versions ORDER BY release_date DESC LIMIT ?';
     const { results } = await this.db.prepare(sql).bind(limit).all();
-    
+
     if (!results) return [];
-    
+
     return results.map(result => ({
       version: result.version_number,
       date: result.release_date,
@@ -411,11 +427,14 @@ class VersionDatabase implements VersionDatabaseInterface {
       breakingChanges: JSON.parse(result.breaking_changes || '[]'),
       newFeatures: JSON.parse(result.new_features || '[]'),
       bugFixes: JSON.parse(result.bug_fixes || '[]'),
-      securityUpdates: JSON.parse(result.security_updates || '[]')
+      securityUpdates: JSON.parse(result.security_updates || '[]'),
     }));
   }
 
-  async updateVersionMetadata(versionNumber: string, metadata: Partial<VersionMetadata>): Promise<void> {
+  async updateVersionMetadata(
+    versionNumber: string,
+    metadata: Partial<VersionMetadata>
+  ): Promise<void> {
     // This would update version metadata in a separate table
     // For now, just log the update
     console.log(`Updating metadata for version ${versionNumber}:`, metadata);
@@ -428,9 +447,9 @@ class VersionDatabase implements VersionDatabaseInterface {
   }
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // VERSION MANAGEMENT DATA LAYER
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Version information structure
 interface VersionInfo {
@@ -525,9 +544,9 @@ interface VersionDatabaseInterface {
   getDeploymentHistory(environment: string): Promise<DeploymentStatus[]>;
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // DATABASE LAYER INTERFACES - HIERARCHY CONTRACTS
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Cloudflare D1 Database interface
 interface D1Database {
@@ -562,9 +581,9 @@ interface D1RunResult {
   meta: any;
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // SERVICE LAYER INTERFACES - HIERARCHY CONTRACTS
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Base service interface for all services
 interface BaseService {
@@ -577,7 +596,11 @@ interface BaseService {
 // Payment service interface
 interface PaymentServiceInterface extends BaseService {
   createPaymentIntent(amount: number, customerId: string, currency?: string): Promise<any>;
-  processSuccessfulPayment(paymentIntentId: string, customerId: string, amount: number): Promise<boolean>;
+  processSuccessfulPayment(
+    paymentIntentId: string,
+    customerId: string,
+    amount: number
+  ): Promise<boolean>;
   createPayout(amount: number, customerId: string, bankAccount: any): Promise<any>;
 }
 
@@ -598,7 +621,13 @@ interface AccountServiceInterface extends BaseService {
 // Settlement service interface
 interface SettlementServiceInterface extends BaseService {
   calculateSettlementAmount(wager: any, settlementType: string): number;
-  settleWager(wagerNumber: number, settlementType: 'win' | 'loss' | 'push' | 'void', settledBy: string, notes?: string, batchId?: string): Promise<any>;
+  settleWager(
+    wagerNumber: number,
+    settlementType: 'win' | 'loss' | 'push' | 'void',
+    settledBy: string,
+    notes?: string,
+    batchId?: string
+  ): Promise<any>;
   bulkSettleWagers(settlements: any[], settledBy: string, batchNotes?: string): Promise<any>;
 }
 
@@ -625,9 +654,9 @@ interface VersionManagementServiceInterface extends BaseService {
   validateVersionFormat(version: string): Promise<boolean>;
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // DATA MODEL INTERFACES - HIERARCHY STRUCTURE
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // User model interface
 interface User {
@@ -682,9 +711,9 @@ interface SettlementResult {
   error?: string;
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // HIERARCHY MATRIX OVERVIEW
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 //
 // SERVICE DEPENDENCY MATRIX:
 // ┌─────────────────────────────────────────────────────────────────────────┐
@@ -716,9 +745,9 @@ interface SettlementResult {
 // │  DB     │  Query Error       │  500 Server Error    │  Cached Data     │
 // └─────────────────────────────────────────────────────────────────────────┘
 //
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // SERVICE IMPLEMENTATIONS - HIERARCHY LAYERS
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Login page HTML
 const loginHtml = `<!DOCTYPE html>
@@ -930,7 +959,7 @@ class PaymentService {
       const response = await fetch(`${this.stripeApiUrl}/payment_intents`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.env.STRIPE_SECRET_KEY}`,
+          Authorization: `Bearer ${this.env.STRIPE_SECRET_KEY}`,
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
@@ -953,24 +982,40 @@ class PaymentService {
   }
 
   // Process successful payment
-  async processSuccessfulPayment(paymentIntentId: string, customerId: string, amount: number): Promise<boolean> {
+  async processSuccessfulPayment(
+    paymentIntentId: string,
+    customerId: string,
+    amount: number
+  ): Promise<boolean> {
     try {
       // Update customer balance
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         UPDATE players SET balance = balance + ? WHERE customer_id = ?
-      `).bind(amount, customerId).run();
+      `
+      )
+        .bind(amount, customerId)
+        .run();
 
       // Record transaction
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         INSERT INTO transactions (customer_id, amount, transaction_type, reference_id, notes, created_at)
         VALUES (?, ?, 'deposit', ?, 'Stripe payment processed', datetime('now'))
-      `).bind(customerId, amount, paymentIntentId).run();
+      `
+      )
+        .bind(customerId, amount, paymentIntentId)
+        .run();
 
       // Record payment in payments table
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         INSERT INTO payments (id, customer_id, amount, payment_method, status, gateway_reference, created_at)
         VALUES (?, ?, ?, 'stripe', 'completed', ?, datetime('now'))
-      `).bind(crypto.randomUUID(), customerId, amount, paymentIntentId).run();
+      `
+      )
+        .bind(crypto.randomUUID(), customerId, amount, paymentIntentId)
+        .run();
 
       return true;
     } catch (error) {
@@ -985,7 +1030,7 @@ class PaymentService {
       const response = await fetch(`${this.stripeApiUrl}/transfers`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.env.STRIPE_SECRET_KEY}`,
+          Authorization: `Bearer ${this.env.STRIPE_SECRET_KEY}`,
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
@@ -1017,18 +1062,27 @@ class CommunicationService {
   }
 
   // Send email via SendGrid
-  async sendEmail(to: string, subject: string, content: string, templateId?: string): Promise<boolean> {
+  async sendEmail(
+    to: string,
+    subject: string,
+    content: string,
+    templateId?: string
+  ): Promise<boolean> {
     try {
       const emailData: any = {
-        personalizations: [{
-          to: [{ email: to }],
-          subject: subject
-        }],
+        personalizations: [
+          {
+            to: [{ email: to }],
+            subject: subject,
+          },
+        ],
         from: { email: 'noreply@fire22dashboard.com', name: 'Fire22 Dashboard' },
-        content: [{
-          type: 'text/html',
-          value: content
-        }]
+        content: [
+          {
+            type: 'text/html',
+            value: content,
+          },
+        ],
       };
 
       if (templateId) {
@@ -1038,7 +1092,7 @@ class CommunicationService {
       const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.env.SENDGRID_API_KEY}`,
+          Authorization: `Bearer ${this.env.SENDGRID_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(emailData),
@@ -1054,18 +1108,21 @@ class CommunicationService {
   // Send SMS via Twilio
   async sendSMS(to: string, message: string): Promise<boolean> {
     try {
-      const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${this.env.TWILIO_ACCOUNT_SID}/Messages.json`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Basic ${btoa(`${this.env.TWILIO_ACCOUNT_SID}:${this.env.TWILIO_AUTH_TOKEN}`)}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          To: to,
-          From: '+1234567890', // Your Twilio phone number
-          Body: message,
-        }),
-      });
+      const response = await fetch(
+        `https://api.twilio.com/2010-04-01/Accounts/${this.env.TWILIO_ACCOUNT_SID}/Messages.json`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Basic ${btoa(`${this.env.TWILIO_ACCOUNT_SID}:${this.env.TWILIO_AUTH_TOKEN}`)}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            To: to,
+            From: '+1234567890', // Your Twilio phone number
+            Body: message,
+          }),
+        }
+      );
 
       return response.ok;
     } catch (error: unknown) {
@@ -1078,9 +1135,13 @@ class CommunicationService {
   async sendNotification(customerId: string, type: string, data: any): Promise<void> {
     try {
       // Get customer contact info
-      const customer = await this.env.DB.prepare(`
+      const customer = await this.env.DB.prepare(
+        `
         SELECT name, email, phone FROM players WHERE customer_id = ?
-      `).bind(customerId).first();
+      `
+      )
+        .bind(customerId)
+        .first();
 
       if (!customer) return;
 
@@ -1117,11 +1178,14 @@ class CommunicationService {
       }
 
       // Log notification
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         INSERT INTO notifications (id, customer_id, type, subject, message, sent_at)
         VALUES (?, ?, ?, ?, ?, datetime('now'))
-      `).bind(crypto.randomUUID(), customerId, type, subject, message).run();
-
+      `
+      )
+        .bind(crypto.randomUUID(), customerId, type, subject, message)
+        .run();
     } catch (error: unknown) {
       console.error('Notification sending error:', error);
     }
@@ -1142,17 +1206,25 @@ class AccountService {
   async suspendAccount(customerId: string, reason: string, suspendedBy: string): Promise<boolean> {
     try {
       // Update account status
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         UPDATE players
         SET account_status = 'suspended', status_reason = ?, status_updated_by = ?, status_updated_at = datetime('now')
         WHERE customer_id = ?
-      `).bind(reason, suspendedBy, customerId).run();
+      `
+      )
+        .bind(reason, suspendedBy, customerId)
+        .run();
 
       // Log the action
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         INSERT INTO customer_notes (id, customer_id, note, category, agent_id, created_at)
         VALUES (?, ?, ?, 'account', ?, datetime('now'))
-      `).bind(crypto.randomUUID(), customerId, `Account suspended: ${reason}`, suspendedBy).run();
+      `
+      )
+        .bind(crypto.randomUUID(), customerId, `Account suspended: ${reason}`, suspendedBy)
+        .run();
 
       // Send notification
       await this.communication.sendNotification(customerId, 'account_suspended', { reason });
@@ -1168,17 +1240,25 @@ class AccountService {
   async activateAccount(customerId: string, activatedBy: string): Promise<boolean> {
     try {
       // Update account status
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         UPDATE players
         SET account_status = 'active', status_reason = NULL, status_updated_by = ?, status_updated_at = datetime('now')
         WHERE customer_id = ?
-      `).bind(activatedBy, customerId).run();
+      `
+      )
+        .bind(activatedBy, customerId)
+        .run();
 
       // Log the action
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         INSERT INTO customer_notes (id, customer_id, note, category, agent_id, created_at)
         VALUES (?, ?, ?, 'account', ?, datetime('now'))
-      `).bind(crypto.randomUUID(), customerId, 'Account activated', activatedBy).run();
+      `
+      )
+        .bind(crypto.randomUUID(), customerId, 'Account activated', activatedBy)
+        .run();
 
       return true;
     } catch (error) {
@@ -1190,21 +1270,29 @@ class AccountService {
   // Get account status and history
   async getAccountStatus(customerId: string): Promise<any> {
     try {
-      const account = await this.env.DB.prepare(`
+      const account = await this.env.DB.prepare(
+        `
         SELECT account_status, status_reason, status_updated_by, status_updated_at,
                balance, credit_limit, wager_limit, total_deposits, total_withdrawals
         FROM players WHERE customer_id = ?
-      `).bind(customerId).first();
+      `
+      )
+        .bind(customerId)
+        .first();
 
-      const recentActivity = await this.env.DB.prepare(`
+      const recentActivity = await this.env.DB.prepare(
+        `
         SELECT * FROM customer_notes
         WHERE customer_id = ? AND category = 'account'
         ORDER BY created_at DESC LIMIT 10
-      `).bind(customerId).all();
+      `
+      )
+        .bind(customerId)
+        .all();
 
       return {
         account,
-        recentActivity: recentActivity.results || []
+        recentActivity: recentActivity.results || [],
       };
     } catch (error) {
       console.error('Account status error:', error);
@@ -1248,9 +1336,13 @@ class SettlementService {
       // Note: D1 doesn't support explicit transactions, so we'll do atomic operations
 
       // Get wager details
-      const wager = await this.env.DB.prepare(`
+      const wager = await this.env.DB.prepare(
+        `
         SELECT * FROM wagers WHERE wager_number = ? AND settlement_status = 'pending'
-      `).bind(wagerNumber).first();
+      `
+      )
+        .bind(wagerNumber)
+        .first();
 
       if (!wager) {
         return {
@@ -1259,14 +1351,18 @@ class SettlementService {
           settlementAmount: 0,
           balanceBefore: 0,
           balanceAfter: 0,
-          error: 'Wager not found or already settled'
+          error: 'Wager not found or already settled',
         };
       }
 
       // Get customer balance
-      const customer = await this.env.DB.prepare(`
+      const customer = await this.env.DB.prepare(
+        `
         SELECT balance FROM players WHERE customer_id = ?
-      `).bind(wager.customer_id).first();
+      `
+      )
+        .bind(wager.customer_id)
+        .first();
 
       if (!customer) {
         return {
@@ -1275,7 +1371,7 @@ class SettlementService {
           settlementAmount: 0,
           balanceBefore: 0,
           balanceAfter: 0,
-          error: 'Customer not found'
+          error: 'Customer not found',
         };
       }
 
@@ -1284,32 +1380,52 @@ class SettlementService {
       const balanceAfter = balanceBefore + settlementAmount;
 
       // Update wager status
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         UPDATE wagers
         SET settlement_status = ?, settled_at = datetime('now'), settled_by = ?,
             settlement_amount = ?, settlement_notes = ?, original_status = ?
         WHERE wager_number = ?
-      `).bind(settlementType, settledBy, settlementAmount, notes || '', wager.status, wagerNumber).run();
+      `
+      )
+        .bind(settlementType, settledBy, settlementAmount, notes || '', wager.status, wagerNumber)
+        .run();
 
       // Update customer balance if there's a payout
       if (settlementAmount > 0) {
-        await this.env.DB.prepare(`
+        await this.env.DB.prepare(
+          `
           UPDATE players SET balance = balance + ? WHERE customer_id = ?
-        `).bind(settlementAmount, wager.customer_id).run();
+        `
+        )
+          .bind(settlementAmount, wager.customer_id)
+          .run();
       }
 
       // Log settlement
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         INSERT INTO settlement_log (
           wager_number, customer_id, agent_id, settlement_type,
           original_amount, settlement_amount, balance_before, balance_after,
           settled_by, notes, batch_id
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(
-        wagerNumber, wager.customer_id, wager.agent_id, settlementType,
-        wager.amount_wagered, settlementAmount, balanceBefore, balanceAfter,
-        settledBy, notes || '', batchId || null
-      ).run();
+      `
+      )
+        .bind(
+          wagerNumber,
+          wager.customer_id,
+          wager.agent_id,
+          settlementType,
+          wager.amount_wagered,
+          settlementAmount,
+          balanceBefore,
+          balanceAfter,
+          settledBy,
+          notes || '',
+          batchId || null
+        )
+        .run();
 
       return {
         wagerNumber,
@@ -1317,9 +1433,8 @@ class SettlementService {
         settlementAmount,
         balanceBefore,
         balanceAfter,
-        error: undefined
+        error: undefined,
       };
-
     } catch (error: unknown) {
       console.error('Settlement error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Settlement failed';
@@ -1329,7 +1444,7 @@ class SettlementService {
         settlementAmount: 0,
         balanceBefore: 0,
         balanceAfter: 0,
-        error: errorMessage
+        error: errorMessage,
       };
     }
   }
@@ -1345,10 +1460,14 @@ class SettlementService {
 
     try {
       // Create batch record
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         INSERT INTO settlement_batches (id, created_by, total_wagers, total_amount, notes)
         VALUES (?, ?, ?, 0, ?)
-      `).bind(batchId, settledBy, settlements.length, batchNotes || '').run();
+      `
+      )
+        .bind(batchId, settledBy, settlements.length, batchNotes || '')
+        .run();
 
       // Process each settlement
       for (const settlement of settlements) {
@@ -1368,11 +1487,15 @@ class SettlementService {
       const totalAmount = successful.reduce((sum, r) => sum + r.settlementAmount, 0);
 
       // Update batch record
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         UPDATE settlement_batches
         SET status = 'completed', completed_at = datetime('now'), total_amount = ?
         WHERE id = ?
-      `).bind(totalAmount, batchId).run();
+      `
+      )
+        .bind(totalAmount, batchId)
+        .run();
 
       return {
         batchId,
@@ -1381,15 +1504,18 @@ class SettlementService {
           total: settlements.length,
           successful: successful.length,
           failed: failed.length,
-          totalAmount
-        }
+          totalAmount,
+        },
       };
-
     } catch (error) {
       // Mark batch as failed
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         UPDATE settlement_batches SET status = 'failed' WHERE id = ?
-      `).bind(batchId).run();
+      `
+      )
+        .bind(batchId)
+        .run();
 
       throw error;
     }
@@ -1428,7 +1554,7 @@ class AuthService {
       agentID: user.agentID,
       permissions: user.permissions,
       iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
+      exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours
     };
 
     // Simple JWT implementation for Cloudflare Workers
@@ -1471,7 +1597,11 @@ class AuthService {
       const isValid = await crypto.subtle.verify(
         'HMAC',
         key,
-        new Uint8Array(atob(signature).split('').map(c => c.charCodeAt(0))),
+        new Uint8Array(
+          atob(signature)
+            .split('')
+            .map(c => c.charCodeAt(0))
+        ),
         encoder.encode(`${header}.${payload}`)
       );
 
@@ -1493,9 +1623,13 @@ class AuthService {
   // Get user by username
   async getUserByUsername(username: string): Promise<User | null> {
     try {
-      const result = await this.env.DB.prepare(`
+      const result = await this.env.DB.prepare(
+        `
         SELECT * FROM users WHERE username = ? AND status = 'active'
-      `).bind(username).first();
+      `
+      )
+        .bind(username)
+        .first();
 
       return result as User | null;
     } catch (error) {
@@ -1507,21 +1641,27 @@ class AuthService {
   // Create default admin user if none exists
   async ensureAdminUser(): Promise<void> {
     try {
-      const adminExists = await this.env.DB.prepare(`
+      const adminExists = await this.env.DB.prepare(
+        `
         SELECT id FROM users WHERE role = 'admin' LIMIT 1
-      `).first();
+      `
+      ).first();
 
       if (!adminExists && this.env.ADMIN_PASSWORD) {
         const passwordHash = await this.hashPassword(this.env.ADMIN_PASSWORD);
 
-        await this.env.DB.prepare(`
+        await this.env.DB.prepare(
+          `
           INSERT INTO users (id, username, password_hash, role, permissions, status, created_at)
           VALUES (?, 'admin', ?, 'admin', ?, 'active', datetime('now'))
-        `).bind(
-          crypto.randomUUID(),
-          passwordHash,
-          JSON.stringify(['*']) // Admin has all permissions
-        ).run();
+        `
+        )
+          .bind(
+            crypto.randomUUID(),
+            passwordHash,
+            JSON.stringify(['*']) // Admin has all permissions
+          )
+          .run();
 
         console.log('✅ Default admin user created');
       }
@@ -1531,9 +1671,9 @@ class AuthService {
   }
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // VERSION MANAGEMENT SERVICE IMPLEMENTATION
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 class VersionManagementService implements VersionManagementServiceInterface {
   readonly env: Env;
@@ -1560,7 +1700,7 @@ class VersionManagementService implements VersionManagementServiceInterface {
   getStatus(): { status: string; timestamp: string } {
     return {
       status: 'active',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -1571,7 +1711,7 @@ class VersionManagementService implements VersionManagementServiceInterface {
   async incrementVersion(type: 'patch' | 'minor' | 'major' | 'prerelease'): Promise<string> {
     const currentVersion = await this.getCurrentVersion();
     const newVersion = this.calculateNextVersion(currentVersion.current, type);
-    
+
     // Update version info
     const updatedVersionInfo: VersionInfo = {
       ...currentVersion,
@@ -1579,11 +1719,11 @@ class VersionManagementService implements VersionManagementServiceInterface {
       current: newVersion,
       next: this.calculateNextVersion(newVersion, 'patch'),
       buildNumber: Date.now(),
-      buildDate: new Date().toISOString()
+      buildDate: new Date().toISOString(),
     };
-    
+
     await this.versionCache.updateVersionInfo(updatedVersionInfo);
-    
+
     // Create version entry
     await this.createVersionEntry({
       version: newVersion,
@@ -1593,9 +1733,9 @@ class VersionManagementService implements VersionManagementServiceInterface {
       breakingChanges: [],
       newFeatures: [],
       bugFixes: [],
-      securityUpdates: []
+      securityUpdates: [],
     });
-    
+
     return newVersion;
   }
 
@@ -1606,11 +1746,11 @@ class VersionManagementService implements VersionManagementServiceInterface {
   async createVersionEntry(version: Omit<VersionChange, 'date'>): Promise<void> {
     const versionEntry: VersionChange = {
       ...version,
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
     };
-    
+
     await this.versionDatabase.insertVersion(versionEntry);
-    
+
     // Update cache
     const history = await this.versionCache.getVersionHistory();
     history.unshift(versionEntry);
@@ -1627,9 +1767,9 @@ class VersionManagementService implements VersionManagementServiceInterface {
     const currentMetrics = await this.getBuildMetrics();
     const updatedMetrics: VersionMetadata = {
       ...currentMetrics,
-      ...metrics
+      ...metrics,
     };
-    
+
     // Update cache
     const versionInfo = await this.getCurrentVersion();
     versionInfo.metadata = updatedMetrics;
@@ -1647,7 +1787,7 @@ class VersionManagementService implements VersionManagementServiceInterface {
       if (!targetVersion) {
         throw new Error(`Version ${versionNumber} not found`);
       }
-      
+
       // Update current version
       const currentVersion = await this.getCurrentVersion();
       const rollbackVersionInfo: VersionInfo = {
@@ -1656,11 +1796,11 @@ class VersionManagementService implements VersionManagementServiceInterface {
         current: versionNumber,
         next: this.calculateNextVersion(versionNumber, 'patch'),
         buildNumber: Date.now(),
-        buildDate: new Date().toISOString()
-    };
-      
+        buildDate: new Date().toISOString(),
+      };
+
       await this.versionCache.updateVersionInfo(rollbackVersionInfo);
-      
+
       // Create rollback entry
       await this.createVersionEntry({
         version: versionNumber,
@@ -1670,9 +1810,9 @@ class VersionManagementService implements VersionManagementServiceInterface {
         breakingChanges: [],
         newFeatures: [],
         bugFixes: [],
-        securityUpdates: []
+        securityUpdates: [],
       });
-      
+
       return true;
     } catch (error) {
       console.error('❌ Rollback failed:', error);
@@ -1682,27 +1822,26 @@ class VersionManagementService implements VersionManagementServiceInterface {
 
   async generateChangelog(fromVersion?: string, toVersion?: string): Promise<string> {
     const history = await this.getVersionHistory(100);
-    
+
     if (!fromVersion && !toVersion) {
       // Generate changelog for current version
       const currentVersion = await this.getCurrentVersion();
       fromVersion = currentVersion.previous;
       toVersion = currentVersion.current;
     }
-    
-    const relevantVersions = history.filter(v => 
-      (!fromVersion || v.version >= fromVersion) && 
-      (!toVersion || v.version <= toVersion)
+
+    const relevantVersions = history.filter(
+      v => (!fromVersion || v.version >= fromVersion) && (!toVersion || v.version <= toVersion)
     );
-    
+
     let changelog = `# Changelog\n\n`;
     changelog += `## ${fromVersion || '0.0.0'} → ${toVersion || 'latest'}\n\n`;
-    
+
     for (const version of relevantVersions) {
       changelog += `### ${version.version} - ${new Date(version.date).toLocaleDateString()}\n\n`;
       changelog += `**Type:** ${version.type}\n\n`;
       changelog += `**Description:** ${version.description}\n\n`;
-      
+
       if (version.breakingChanges.length > 0) {
         changelog += `**⚠️ Breaking Changes:**\n`;
         version.breakingChanges.forEach(change => {
@@ -1710,7 +1849,7 @@ class VersionManagementService implements VersionManagementServiceInterface {
         });
         changelog += `\n`;
       }
-      
+
       if (version.newFeatures.length > 0) {
         changelog += `**✨ New Features:**\n`;
         version.newFeatures.forEach(feature => {
@@ -1718,7 +1857,7 @@ class VersionManagementService implements VersionManagementServiceInterface {
         });
         changelog += `\n`;
       }
-      
+
       if (version.bugFixes.length > 0) {
         changelog += `**🐛 Bug Fixes:**\n`;
         version.bugFixes.forEach(fix => {
@@ -1726,7 +1865,7 @@ class VersionManagementService implements VersionManagementServiceInterface {
         });
         changelog += `\n`;
       }
-      
+
       if (version.securityUpdates.length > 0) {
         changelog += `**🔒 Security Updates:**\n`;
         version.securityUpdates.forEach(update => {
@@ -1734,21 +1873,25 @@ class VersionManagementService implements VersionManagementServiceInterface {
         });
         changelog += `\n`;
       }
-      
+
       changelog += `---\n\n`;
     }
-    
+
     return changelog;
   }
 
   async validateVersionFormat(version: string): Promise<boolean> {
-    const semverRegex = /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/;
+    const semverRegex =
+      /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/;
     return semverRegex.test(version);
   }
 
-  private calculateNextVersion(currentVersion: string, type: 'patch' | 'minor' | 'major' | 'prerelease'): string {
+  private calculateNextVersion(
+    currentVersion: string,
+    type: 'patch' | 'minor' | 'major' | 'prerelease'
+  ): string {
     const [major, minor, patch] = currentVersion.split('.').map(Number);
-    
+
     switch (type) {
       case 'major':
         return `${major + 1}.0.0`;
@@ -1771,7 +1914,9 @@ async function query(env: Env, sql: string, params: any[] = []) {
   }
 
   try {
-    const result = await env.DB.prepare(sql).bind(...params).all();
+    const result = await env.DB.prepare(sql)
+      .bind(...params)
+      .all();
     return result.results || [];
   } catch (error) {
     console.error('D1 Query Error:', error);
@@ -1871,10 +2016,12 @@ class Fire22APIService {
   private baseURL = 'https://fire22.ag/cloud/api/Manager';
   private customerURL = 'https://fire22.ag/cloud/api/Customer';
   // Updated token from real Fire22 request (captured 2025-08-26)
-  private authToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJCTEFLRVBQSCIsInR5cGUiOjAsImFnIjoiM05PTEFQUEgiLCJpbXAiOiIiLCJvZmYiOiJOT0xBUk9TRSIsInJiIjoiTiIsIm5iZiI6MTc1NjE4NzIzNywiZXhwIjoxNzU2MTg4NDk3fQ.s-koe08nq7cAeoySKzRul1OY9sfkOWr_culxYIYXMbc';
+  private authToken =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJCTEFLRVBQSCIsInR5cGUiOjAsImFnIjoiM05PTEFQUEgiLCJpbXAiOiIiLCJvZmYiOiJOT0xBUk9TRSIsInJiIjoiTiIsIm5iZiI6MTc1NjE4NzIzNywiZXhwIjoxNzU2MTg4NDk3fQ.s-koe08nq7cAeoySKzRul1OY9sfkOWr_culxYIYXMbc';
 
   // Cloudflare bypass cookies from real Fire22 session
-  private sessionCookies = 'PHPSESSID=uef1tmpql55db31v1rpjpjmcvo; __cf_bm=peBnxq6iJB.GKb53cQ.BzeIABoWv57YAV4ujQ6kwVEY-1756186546-1.0.1.1-8BO1kaDegrQ_zVy3atq.Qs32EMm4wX8VIZGN5dC6jnICpCDR6gXJu1VXQVe9fjPRN9bOaBC6ddUVMdj7ZKrHfpiH.r9kiFVNbtoW2.232dg';
+  private sessionCookies =
+    'PHPSESSID=uef1tmpql55db31v1rpjpjmcvo; __cf_bm=peBnxq6iJB.GKb53cQ.BzeIABoWv57YAV4ujQ6kwVEY-1756186546-1.0.1.1-8BO1kaDegrQ_zVy3atq.Qs32EMm4wX8VIZGN5dC6jnICpCDR6gXJu1VXQVe9fjPRN9bOaBC6ddUVMdj7ZKrHfpiH.r9kiFVNbtoW2.232dg';
 
   // 🆕 NEW: Custom User-Agent support for Bun v1.2.21+
   private getUserAgent(): string {
@@ -1882,7 +2029,7 @@ class Fire22APIService {
     if (process.env.BUN_USER_AGENT) {
       return process.env.BUN_USER_AGENT;
     }
-    
+
     // Default User-Agent for Fire22 API
     return 'Fire22-Dashboard/3.0.8';
   }
@@ -1900,7 +2047,7 @@ class Fire22APIService {
         agentOwner: 'BLAKEPPH',
         agentSite: '1',
         RRO: '1',
-        ...additionalParams
+        ...additionalParams,
       };
 
       // Add operation-specific parameters
@@ -1927,13 +2074,13 @@ class Fire22APIService {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'Accept': '*/*',
+          Accept: '*/*',
           'Accept-Language': 'en-US,en;q=0.9',
-          'Authorization': `Bearer ${this.authToken}`,
+          Authorization: `Bearer ${this.authToken}`,
           'Cache-Control': 'no-cache',
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'Pragma': 'no-cache',
-          'Priority': 'u=1, i',
+          Pragma: 'no-cache',
+          Priority: 'u=1, i',
           'Sec-Ch-Ua': '"Not;A=Brand";v="99", "Google Chrome";v="139", "Chromium";v="139"',
           'Sec-Ch-Ua-Mobile': '?1',
           'Sec-Ch-Ua-Platform': '"Android"',
@@ -1942,10 +2089,10 @@ class Fire22APIService {
           'Sec-Fetch-Site': 'same-origin',
           'User-Agent': this.getUserAgent(), // 🆕 NEW: Custom User-Agent support
           'X-Requested-With': 'XMLHttpRequest',
-          'Cookie': this.sessionCookies,
-          'Referer': `https://fire22.ag/manager.html?v=${Date.now()}`
+          Cookie: this.sessionCookies,
+          Referer: `https://fire22.ag/manager.html?v=${Date.now()}`,
         },
-        body: formData
+        body: formData,
       });
 
       console.log(`Fire22 API Response Status: ${response.status}`);
@@ -2016,7 +2163,7 @@ class Fire22APIService {
         telegram_id: null,
         telegram_username: null,
         active: Boolean(row.active),
-        last_activity: row.last_activity
+        last_activity: row.last_activity,
       }));
     } catch (error) {
       console.error('Error fetching customers:', error);
@@ -2039,7 +2186,7 @@ class Fire22APIService {
       telegram_id: customer.telegram_id || null,
       telegram_username: customer.telegram_username || null,
       active: Boolean(customer.active),
-      last_activity: customer.lastActivity || customer.last_activity
+      last_activity: customer.lastActivity || customer.last_activity,
     }));
   }
 
@@ -2106,7 +2253,7 @@ class Fire22APIService {
         ShortDesc: row.ShortDesc,
         VIP: row.VIP,
         AgentLogin: row.AgentLogin,
-        Status: row.Status
+        Status: row.Status,
       }));
 
       return {
@@ -2115,7 +2262,7 @@ class Fire22APIService {
         totalVolume: wagers.reduce((sum, w) => sum + w.VolumeAmount, 0),
         totalRisk: wagers.reduce((sum, w) => sum + w.ToWinAmount, 0),
         agents: [...new Set(wagers.map(w => w.AgentID))],
-        customers: [...new Set(wagers.map(w => w.CustomerID))]
+        customers: [...new Set(wagers.map(w => w.CustomerID))],
       };
     } catch (error) {
       console.error('Error fetching wagers:', error);
@@ -2125,7 +2272,7 @@ class Fire22APIService {
         totalVolume: 0,
         totalRisk: 0,
         agents: [],
-        customers: []
+        customers: [],
       };
     }
   }
@@ -2133,14 +2280,17 @@ class Fire22APIService {
   async getRealTimeKPIs() {
     try {
       // Get live data from database (SQLite syntax)
-      const [row] = await query(this.env, `
+      const [row] = await query(
+        this.env,
+        `
         SELECT
           COALESCE(SUM(amount_wagered), 0) AS revenue,
           COUNT(DISTINCT customer_id) AS activePlayers,
           COUNT(*) AS totalWagers
         FROM wagers
         WHERE created_at > datetime('now', '-1 day')
-      `);
+      `
+      );
 
       const customers = await this.getRealCustomers();
       const activeCustomers = customers.filter(c => c.active);
@@ -2161,12 +2311,14 @@ class Fire22APIService {
         revenue: parseFloat(row.revenue) || 0,
         dailyActivePlayers: parseInt(row.activeplayers) || 0,
         dailyWagers: parseInt(row.totalwagers) || 0,
-        alerts: activeCustomers.filter(c => c.balance >= 10000).map(c => ({
-          customerID: c.customer_id,
-          balance: c.balance,
-          weeklyPNL: c.weekly_pnl,
-          telegram: c.telegram_username
-        }))
+        alerts: activeCustomers
+          .filter(c => c.balance >= 10000)
+          .map(c => ({
+            customerID: c.customer_id,
+            balance: c.balance,
+            weeklyPNL: c.weekly_pnl,
+            telegram: c.telegram_username,
+          })),
       };
     } catch (error) {
       console.error('Error fetching KPIs:', error);
@@ -2182,7 +2334,7 @@ class Fire22APIService {
         revenue: 0,
         dailyActivePlayers: 0,
         dailyWagers: 0,
-        alerts: []
+        alerts: [],
       };
     }
   }
@@ -2203,7 +2355,7 @@ class Fire22APIService {
             totalRisk: 0,
             averageWager: 0,
             largeWagers: 0,
-            vipWagers: 0
+            vipWagers: 0,
           };
         }
 
@@ -2215,7 +2367,7 @@ class Fire22APIService {
           acc[agent].largeWagers += 1;
         }
 
-        if (wager.VIP === "1") {
+        if (wager.VIP === '1') {
           acc[agent].vipWagers += 1;
         }
 
@@ -2232,8 +2384,8 @@ class Fire22APIService {
         grandTotal: {
           totalVolume: wagers.reduce((sum: number, w: any) => sum + w.VolumeAmount, 0),
           totalRisk: wagers.reduce((sum: number, w: any) => sum + w.ToWinAmount, 0),
-          totalWagers: wagers.length
-        }
+          totalWagers: wagers.length,
+        },
       };
     } catch (error) {
       console.error('Error fetching agent performance:', error);
@@ -2243,8 +2395,8 @@ class Fire22APIService {
         grandTotal: {
           totalVolume: 0,
           totalRisk: 0,
-          totalWagers: 0
-        }
+          totalWagers: 0,
+        },
       };
     }
   }
@@ -2253,22 +2405,22 @@ class Fire22APIService {
   async getSystemHealth() {
     try {
       const startTime = Date.now();
-      
+
       // Test multiple endpoints to assess overall health
       const healthChecks = await Promise.allSettled([
         this.callFire22API('getCustomerAdmin'),
         this.callFire22API('getLiveWagers'),
-        this.getRealTimeKPIs()
+        this.getRealTimeKPIs(),
       ]);
-      
+
       const endTime = Date.now();
       const responseTime = endTime - startTime;
-      
+
       const successful = healthChecks.filter(check => check.status === 'fulfilled').length;
       const failed = healthChecks.filter(check => check.status === 'rejected').length;
-      
+
       const healthScore = Math.round((successful / healthChecks.length) * 100);
-      
+
       return {
         status: healthScore >= 80 ? 'healthy' : healthScore >= 60 ? 'degraded' : 'unhealthy',
         healthScore,
@@ -2276,14 +2428,17 @@ class Fire22APIService {
         endpoints: {
           total: healthChecks.length,
           successful,
-          failed
+          failed,
         },
         timestamp: new Date().toISOString(),
-        recommendations: healthScore < 80 ? [
-          'Check Fire22 API connectivity',
-          'Verify authentication tokens',
-          'Review network configuration'
-        ] : []
+        recommendations:
+          healthScore < 80
+            ? [
+                'Check Fire22 API connectivity',
+                'Verify authentication tokens',
+                'Review network configuration',
+              ]
+            : [],
       };
     } catch (error) {
       console.error('Error checking Fire22 system health:', error);
@@ -2297,8 +2452,8 @@ class Fire22APIService {
         recommendations: [
           'Check Fire22 API connectivity',
           'Verify authentication tokens',
-          'Review network configuration'
-        ]
+          'Review network configuration',
+        ],
       };
     }
   }
@@ -2315,8 +2470,8 @@ class Fire22APIService {
         endpoints: {
           getCustomerAdmin: { calls: 0, success: 0, failure: 0 },
           getLiveWagers: { calls: 0, success: 0, failure: 0 },
-          getPending: { calls: 0, success: 0, failure: 0 }
-        }
+          getPending: { calls: 0, success: 0, failure: 0 },
+        },
       };
 
       // This would typically be tracked over time, but for now return current snapshot
@@ -2324,7 +2479,7 @@ class Fire22APIService {
         ...metrics,
         timestamp: new Date().toISOString(),
         uptime: '100%', // Would be calculated from actual uptime tracking
-        status: 'operational'
+        status: 'operational',
       };
     } catch (error) {
       console.error('Error fetching API metrics:', error);
@@ -2338,7 +2493,7 @@ class Fire22APIService {
         timestamp: new Date().toISOString(),
         uptime: '0%',
         status: 'error',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -2349,38 +2504,39 @@ class Fire22APIService {
       const [customers, wagers, kpis] = await Promise.all([
         this.getRealCustomers(),
         this.getRealWagers(),
-        this.getRealTimeKPIs()
+        this.getRealTimeKPIs(),
       ]);
 
       const validationResults = {
         customers: {
           total: customers.length,
           hasRequiredFields: customers.every((c: any) => c.customer_id && c.balance !== undefined),
-          dataQuality: customers.length > 0 ? 'good' : 'poor'
+          dataQuality: customers.length > 0 ? 'good' : 'poor',
         },
         wagers: {
           total: wagers.wagers?.length || 0,
-          hasRequiredFields: wagers.wagers?.every((w: any) => 
-            w.CustomerID && w.AmountWagered !== undefined
-          ) || false,
-          dataQuality: wagers.wagers?.length > 0 ? 'good' : 'poor'
+          hasRequiredFields:
+            wagers.wagers?.every((w: any) => w.CustomerID && w.AmountWagered !== undefined) ||
+            false,
+          dataQuality: wagers.wagers?.length > 0 ? 'good' : 'poor',
         },
         kpis: {
           hasData: kpis.totalCustomers > 0,
-          dataQuality: kpis.totalCustomers > 0 ? 'good' : 'poor'
-        }
+          dataQuality: kpis.totalCustomers > 0 ? 'good' : 'poor',
+        },
       };
 
       const overallScore = Math.round(
-        (Object.values(validationResults).filter(r => r.dataQuality === 'good').length / 
-         Object.keys(validationResults).length) * 100
+        (Object.values(validationResults).filter(r => r.dataQuality === 'good').length /
+          Object.keys(validationResults).length) *
+          100
       );
 
       return {
         overallScore: `${overallScore}%`,
         validationResults,
         timestamp: new Date().toISOString(),
-        status: overallScore >= 80 ? 'excellent' : overallScore >= 60 ? 'good' : 'needs_attention'
+        status: overallScore >= 80 ? 'excellent' : overallScore >= 60 ? 'good' : 'needs_attention',
       };
     } catch (error) {
       console.error('Error validating data integrity:', error);
@@ -2389,33 +2545,35 @@ class Fire22APIService {
         validationResults: {},
         timestamp: new Date().toISOString(),
         status: 'error',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
 }
 
-// ===== MATRIX HEALTH HELPER FUNCTIONS =====
+// !== MATRIX HEALTH HELPER FUNCTIONS !==
 // Helper functions for matrix health calculations
 
 async function calculateConfigCompleteness(env: Env): Promise<number> {
   try {
-    const result = await env.DB.prepare(`
+    const result = await env.DB.prepare(
+      `
       SELECT 
         COUNT(*) as total,
         SUM(CASE WHEN permissions IS NOT NULL AND permissions != '' THEN 1 ELSE 0 END) as with_permissions,
         SUM(CASE WHEN commission_rates IS NOT NULL AND commission_rates != '' THEN 1 ELSE 0 END) as with_commission_rates
       FROM agent_configs
-    `).first();
-    
+    `
+    ).first();
+
     if (!result) return 0;
-    
+
     const total = result.total || 0;
     const withPermissions = result.with_permissions || 0;
     const withCommissionRates = result.with_commission_rates || 0;
-    
+
     if (total === 0) return 0;
-    
+
     return Math.round(((withPermissions + withCommissionRates) / (total * 2)) * 100);
   } catch (error) {
     console.error('Error calculating config completeness:', error);
@@ -2425,20 +2583,22 @@ async function calculateConfigCompleteness(env: Env): Promise<number> {
 
 async function calculatePermissionCoverage(env: Env): Promise<number> {
   try {
-    const result = await env.DB.prepare(`
+    const result = await env.DB.prepare(
+      `
       SELECT 
         COUNT(*) as total,
         SUM(CASE WHEN permissions IS NOT NULL AND permissions != '' THEN 1 ELSE 0 END) as with_permissions
       FROM agent_configs
-    `).first();
-    
+    `
+    ).first();
+
     if (!result) return 0;
-    
+
     const total = result.total || 0;
     const withPermissions = result.with_permissions || 0;
-    
+
     if (total === 0) return 0;
-    
+
     return Math.round((withPermissions / total) * 100);
   } catch (error) {
     console.error('Error calculating permission coverage:', error);
@@ -2448,29 +2608,31 @@ async function calculatePermissionCoverage(env: Env): Promise<number> {
 
 async function calculateCustomerDistribution(env: Env): Promise<number> {
   try {
-    const result = await env.DB.prepare(`
+    const result = await env.DB.prepare(
+      `
       SELECT 
         COUNT(DISTINCT ac.agent_id) as total_agents,
         COUNT(cc.customer_id) as total_customers
       FROM agent_configs ac
       LEFT JOIN customer_configs cc ON ac.agent_id = cc.agent_id
-    `).first();
-    
+    `
+    ).first();
+
     if (!result) return 0;
-    
+
     const totalAgents = result.total_agents || 0;
     const totalCustomers = result.total_customers || 0;
-    
+
     if (totalAgents === 0) return 0;
-    
+
     // Score based on customer distribution (ideal: 5-20 customers per agent)
     const avgCustomersPerAgent = totalCustomers / totalAgents;
-    
+
     if (avgCustomersPerAgent >= 5 && avgCustomersPerAgent <= 20) return 100;
     if (avgCustomersPerAgent >= 3 && avgCustomersPerAgent <= 30) return 80;
     if (avgCustomersPerAgent >= 1 && avgCustomersPerAgent <= 50) return 60;
     if (avgCustomersPerAgent > 0) return 40;
-    
+
     return 0;
   } catch (error) {
     console.error('Error calculating customer distribution:', error);
@@ -2480,14 +2642,15 @@ async function calculateCustomerDistribution(env: Env): Promise<number> {
 
 function calculateMatrixHealthScore(healthMetrics: any): number {
   try {
-    const { total_agents, active_agents, configs_with_permissions, configs_with_commission_rates } = healthMetrics;
-    
+    const { total_agents, active_agents, configs_with_permissions, configs_with_commission_rates } =
+      healthMetrics;
+
     if (total_agents === 0) return 0;
-    
+
     const activeScore = (active_agents / total_agents) * 30;
     const permissionsScore = (configs_with_permissions / total_agents) * 35;
     const commissionScore = (configs_with_commission_rates / total_agents) * 35;
-    
+
     return Math.round(activeScore + permissionsScore + commissionScore);
   } catch (error) {
     console.error('Error calculating matrix health score:', error);
@@ -2497,27 +2660,33 @@ function calculateMatrixHealthScore(healthMetrics: any): number {
 
 function generateMatrixRecommendations(enhancedScore: any): string[] {
   const recommendations = [];
-  
+
   if (enhancedScore.config_completeness < 80) {
-    recommendations.push('Increase agent configuration completeness by filling missing permissions and commission rates');
+    recommendations.push(
+      'Increase agent configuration completeness by filling missing permissions and commission rates'
+    );
   }
-  
+
   if (enhancedScore.permission_coverage < 90) {
-    recommendations.push('Improve permission coverage by ensuring all agents have proper permission configurations');
+    recommendations.push(
+      'Improve permission coverage by ensuring all agents have proper permission configurations'
+    );
   }
-  
+
   if (enhancedScore.customer_distribution < 70) {
     recommendations.push('Optimize customer distribution across agents for better load balancing');
   }
-  
+
   if (enhancedScore.overall_score < 80) {
     recommendations.push('Review and update agent configurations to improve overall matrix health');
   }
-  
+
   if (recommendations.length === 0) {
-    recommendations.push('Matrix health is excellent! Continue monitoring and maintaining current configurations');
+    recommendations.push(
+      'Matrix health is excellent! Continue monitoring and maintaining current configurations'
+    );
   }
-  
+
   return recommendations;
 }
 
@@ -2549,22 +2718,27 @@ export default {
     }
 
     // --- Global JSON Parsing Error Handler ---
-    if (['POST', 'PUT', 'PATCH'].includes(req.method) && 
-        req.headers.get('Content-Type')?.includes('application/json')) {
+    if (
+      ['POST', 'PUT', 'PATCH'].includes(req.method) &&
+      req.headers.get('Content-Type')?.includes('application/json')
+    ) {
       try {
         // Try to parse JSON, if it fails, return 400 Bad Request
         await req.clone().json(); // Use clone() to avoid consuming the request body
       } catch (e: any) {
         if (e instanceof SyntaxError && e.message.includes('JSON')) {
           console.error('Malformed JSON received:', e.message);
-          return new Response(JSON.stringify({ 
-            success: false, 
-            error: 'Malformed JSON in request body', 
-            details: e.message 
-          }), { 
-            status: 400,
-            headers: { 'Content-Type': 'application/json' }
-          });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Malformed JSON in request body',
+              details: e.message,
+            }),
+            {
+              status: 400,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
         }
         // Re-throw other errors to be handled by other parts of the system
         throw e;
@@ -2605,62 +2779,84 @@ export default {
         const { username, password } = await req.json();
 
         if (!username || !password) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Username and password required'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Username and password required',
+            }),
+            { status: 400 }
+          );
         }
 
         const user = await auth.getUserByUsername(username);
         if (!user) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Invalid credentials'
-          }), { status: 401 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Invalid credentials',
+            }),
+            { status: 401 }
+          );
         }
 
         const isValidPassword = await auth.verifyPassword(password, user.password_hash);
         if (!isValidPassword) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Invalid credentials'
-          }), { status: 401 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Invalid credentials',
+            }),
+            { status: 401 }
+          );
         }
 
         // Update last login
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           UPDATE users SET last_login = datetime('now') WHERE id = ?
-        `).bind(user.id).run();
+        `
+        )
+          .bind(user.id)
+          .run();
 
         const token = await auth.generateToken(user);
 
         // Remove password hash from response
         const { password_hash, ...userResponse } = user;
 
-        return new Response(JSON.stringify({
-          success: true,
-          token,
-          user: userResponse
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            token,
+            user: userResponse,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Login error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Login failed'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Login failed',
+          }),
+          { status: 500 }
+        );
       }
     }
 
     // Logout endpoint (client-side token removal)
     if (url.pathname === '/api/auth/logout' && req.method === 'POST') {
-      return new Response(JSON.stringify({
-        success: true,
-        message: 'Logged out successfully'
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: 'Logged out successfully',
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     // Verify token endpoint
@@ -2668,40 +2864,52 @@ export default {
       try {
         const authHeader = req.headers.get('Authorization');
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'No token provided'
-          }), { status: 401 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'No token provided',
+            }),
+            { status: 401 }
+          );
         }
 
         const token = authHeader.substring(7);
         const payload = await auth.verifyToken(token);
 
         if (!payload) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Invalid or expired token'
-          }), { status: 401 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Invalid or expired token',
+            }),
+            { status: 401 }
+          );
         }
 
-        return new Response(JSON.stringify({
-          success: true,
-          user: {
-            userId: payload.userId,
-            username: payload.username,
-            role: payload.role,
-            agentID: payload.agentID,
-            permissions: payload.permissions
+        return new Response(
+          JSON.stringify({
+            success: true,
+            user: {
+              userId: payload.userId,
+              username: payload.username,
+              role: payload.role,
+              agentID: payload.agentID,
+              permissions: payload.permissions,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Token verification error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Token verification failed'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Token verification failed',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -2709,28 +2917,37 @@ export default {
     const requireAuth = async (requiredRole?: string): Promise<JWTPayload | Response> => {
       const authHeader = req.headers.get('Authorization');
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Authentication required'
-        }), { status: 401 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Authentication required',
+          }),
+          { status: 401 }
+        );
       }
 
       const token = authHeader.substring(7);
       const payload = await auth.verifyToken(token);
 
       if (!payload) {
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Invalid or expired token'
-        }), { status: 401 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Invalid or expired token',
+          }),
+          { status: 401 }
+        );
       }
 
       // Check role if specified
       if (requiredRole && payload.role !== 'admin' && payload.role !== requiredRole) {
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Insufficient permissions'
-        }), { status: 403 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Insufficient permissions',
+          }),
+          { status: 403 }
+        );
       }
 
       return payload;
@@ -2744,11 +2961,18 @@ export default {
       try {
         const { wagerNumber, settlementType, notes } = await req.json();
 
-        if (!wagerNumber || !settlementType || !['win', 'loss', 'push', 'void'].includes(settlementType)) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Invalid wagerNumber or settlementType (must be win/loss/push/void)'
-          }), { status: 400 });
+        if (
+          !wagerNumber ||
+          !settlementType ||
+          !['win', 'loss', 'push', 'void'].includes(settlementType)
+        ) {
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Invalid wagerNumber or settlementType (must be win/loss/push/void)',
+            }),
+            { status: 400 }
+          );
         }
 
         const result = await settlement.settleWager(
@@ -2758,20 +2982,26 @@ export default {
           notes
         );
 
-        return new Response(JSON.stringify({
-          success: result.success,
-          data: result,
-          error: result.error
-        }), {
-          status: result.success ? 200 : 400,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: result.success,
+            data: result,
+            error: result.error,
+          }),
+          {
+            status: result.success ? 200 : 400,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Settle wager error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to settle wager'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to settle wager',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -2784,41 +3014,52 @@ export default {
         const { wagers, batchNotes } = await req.json();
 
         if (!Array.isArray(wagers) || wagers.length === 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Invalid wagers array'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Invalid wagers array',
+            }),
+            { status: 400 }
+          );
         }
 
         // Validate each wager in the batch
         for (const wager of wagers) {
-          if (!wager.wagerNumber || !wager.settlementType ||
-              !['win', 'loss', 'push', 'void'].includes(wager.settlementType)) {
-            return new Response(JSON.stringify({
-              success: false,
-              error: 'Invalid wager data in batch'
-            }), { status: 400 });
+          if (
+            !wager.wagerNumber ||
+            !wager.settlementType ||
+            !['win', 'loss', 'push', 'void'].includes(wager.settlementType)
+          ) {
+            return new Response(
+              JSON.stringify({
+                success: false,
+                error: 'Invalid wager data in batch',
+              }),
+              { status: 400 }
+            );
           }
         }
 
-        const result = await settlement.bulkSettleWagers(
-          wagers,
-          authResult.userId,
-          batchNotes
-        );
+        const result = await settlement.bulkSettleWagers(wagers, authResult.userId, batchNotes);
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: result
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: result,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Bulk settlement error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to process bulk settlement'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to process bulk settlement',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -2850,23 +3091,31 @@ export default {
         query += ' ORDER BY w.created_at DESC LIMIT ?';
         bindings.push(limit);
 
-        const result = await env.DB.prepare(query).bind(...bindings).all();
+        const result = await env.DB.prepare(query)
+          .bind(...bindings)
+          .all();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            pendingWagers: result.results || [],
-            total: (result.results || []).length
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              pendingWagers: result.results || [],
+              total: (result.results || []).length,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Pending settlements error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch pending settlements'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch pending settlements',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -2914,36 +3163,47 @@ export default {
         query += ' ORDER BY sl.settled_at DESC LIMIT ?';
         bindings.push(limit);
 
-        const result = await env.DB.prepare(query).bind(...bindings).all();
+        const result = await env.DB.prepare(query)
+          .bind(...bindings)
+          .all();
 
         // Calculate summary statistics
         const settlements = result.results || [];
         const summary = {
           totalSettlements: settlements.length,
-          totalAmount: settlements.reduce((sum: number, s: any) => sum + (s.settlement_amount || 0), 0),
+          totalAmount: settlements.reduce(
+            (sum: number, s: any) => sum + (s.settlement_amount || 0),
+            0
+          ),
           byType: {
             win: settlements.filter((s: any) => s.settlement_type === 'win').length,
             loss: settlements.filter((s: any) => s.settlement_type === 'loss').length,
             push: settlements.filter((s: any) => s.settlement_type === 'push').length,
-            void: settlements.filter((s: any) => s.settlement_type === 'void').length
-          }
+            void: settlements.filter((s: any) => s.settlement_type === 'void').length,
+          },
         };
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            settlements,
-            summary
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              settlements,
+              summary,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Settlement history error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch settlement history'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch settlement history',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -2956,10 +3216,13 @@ export default {
         const { wagerNumber, reason } = await req.json();
 
         if (!wagerNumber) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Wager number required'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Wager number required',
+            }),
+            { status: 400 }
+          );
         }
 
         const result = await settlement.settleWager(
@@ -2969,26 +3232,32 @@ export default {
           reason || 'Wager voided'
         );
 
-        return new Response(JSON.stringify({
-          success: result.success,
-          data: result,
-          error: result.error
-        }), {
-          status: result.success ? 200 : 400,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: result.success,
+            data: result,
+            error: result.error,
+          }),
+          {
+            status: result.success ? 200 : 400,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Void wager error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to void wager'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to void wager',
+          }),
+          { status: 500 }
+        );
       }
     }
 
-    // ========================================
+    // !==!==!==!==!==!==!====
     // PHASE 3: CRITICAL OPERATIONS
-    // ========================================
+    // !==!==!==!==!==!==!====
 
     // 1. WITHDRAWAL PROCESSING SYSTEM
     // Request withdrawal
@@ -3000,70 +3269,112 @@ export default {
         const { customerId, amount, method, paymentType, paymentDetails, notes } = await req.json();
 
         if (!customerId || !amount || amount <= 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Invalid customerId or amount'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Invalid customerId or amount',
+            }),
+            { status: 400 }
+          );
         }
 
         // Validate payment type
-        const validPaymentTypes = ['venmo', 'paypal', 'cashapp', 'cash', 'transfer', 'bank_transfer'];
+        const validPaymentTypes = [
+          'venmo',
+          'paypal',
+          'cashapp',
+          'cash',
+          'transfer',
+          'bank_transfer',
+        ];
         if (paymentType && !validPaymentTypes.includes(paymentType)) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: `Invalid payment type. Must be one of: ${validPaymentTypes.join(', ')}`
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: `Invalid payment type. Must be one of: ${validPaymentTypes.join(', ')}`,
+            }),
+            { status: 400 }
+          );
         }
 
         // Check customer balance
-        const customer = await env.DB.prepare(`
+        const customer = await env.DB.prepare(
+          `
           SELECT balance, telegram_username, telegram_id, telegram_group_id FROM players WHERE customer_id = ?
-        `).bind(customerId).first();
+        `
+        )
+          .bind(customerId)
+          .first();
 
         if (!customer) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Customer not found'
-          }), { status: 404 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Customer not found',
+            }),
+            { status: 404 }
+          );
         }
 
         if (customer.balance < amount) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Insufficient funds'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Insufficient funds',
+            }),
+            { status: 400 }
+          );
         }
 
         // Create withdrawal request
         const withdrawalId = crypto.randomUUID();
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           INSERT INTO withdrawals (id, customer_id, amount, method, payment_type, payment_details, status, requested_by, notes, created_at)
           VALUES (?, ?, ?, ?, ?, ?, 'pending', ?, ?, datetime('now'))
-        `).bind(withdrawalId, customerId, amount, method || 'bank_transfer', paymentType || 'bank_transfer', paymentDetails || '', authResult.userId, notes || '').run();
+        `
+        )
+          .bind(
+            withdrawalId,
+            customerId,
+            amount,
+            method || 'bank_transfer',
+            paymentType || 'bank_transfer',
+            paymentDetails || '',
+            authResult.userId,
+            notes || ''
+          )
+          .run();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: { 
-            id: withdrawalId, 
-            customerId, 
-            amount, 
-            paymentType: paymentType || 'bank_transfer',
-            status: 'pending',
-            telegramInfo: {
-              username: customer.telegram_username,
-              telegramId: customer.telegram_id,
-              groupId: customer.telegram_group_id
-            }
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              id: withdrawalId,
+              customerId,
+              amount,
+              paymentType: paymentType || 'bank_transfer',
+              status: 'pending',
+              telegramInfo: {
+                username: customer.telegram_username,
+                telegramId: customer.telegram_id,
+                groupId: customer.telegram_group_id,
+              },
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Withdrawal request error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to process withdrawal request'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to process withdrawal request',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -3076,54 +3387,87 @@ export default {
         const { id, notes } = await req.json();
 
         if (!id) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Withdrawal ID required'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Withdrawal ID required',
+            }),
+            { status: 400 }
+          );
         }
 
         // Get withdrawal details
-        const withdrawal = await env.DB.prepare(`
+        const withdrawal = await env.DB.prepare(
+          `
           SELECT * FROM withdrawals WHERE id = ? AND status = 'pending'
-        `).bind(id).first();
+        `
+        )
+          .bind(id)
+          .first();
 
         if (!withdrawal) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Withdrawal not found or already processed'
-          }), { status: 404 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Withdrawal not found or already processed',
+            }),
+            { status: 404 }
+          );
         }
 
         // Update withdrawal status
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           UPDATE withdrawals
           SET status = 'approved', approved_by = ?, approved_at = datetime('now'), approval_notes = ?
           WHERE id = ?
-        `).bind(authResult.userId, notes || '', id).run();
+        `
+        )
+          .bind(authResult.userId, notes || '', id)
+          .run();
 
         // Update customer balance
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           UPDATE players SET balance = balance - ? WHERE customer_id = ?
-        `).bind(withdrawal.amount, withdrawal.customer_id).run();
+        `
+        )
+          .bind(withdrawal.amount, withdrawal.customer_id)
+          .run();
 
         // Log transaction
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           INSERT INTO transactions (customer_id, amount, transaction_type, agent_id, notes, created_at)
           VALUES (?, ?, 'withdrawal', ?, ?, datetime('now'))
-        `).bind(withdrawal.customer_id, -withdrawal.amount, authResult.agentID || authResult.userId, `Withdrawal approved: ${notes || ''}`, ).run();
+        `
+        )
+          .bind(
+            withdrawal.customer_id,
+            -withdrawal.amount,
+            authResult.agentID || authResult.userId,
+            `Withdrawal approved: ${notes || ''}`
+          )
+          .run();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: { id, status: 'approved', amount: withdrawal.amount }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: { id, status: 'approved', amount: withdrawal.amount },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Withdrawal approval error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to approve withdrawal'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to approve withdrawal',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -3136,56 +3480,90 @@ export default {
         const { id, paymentReference, notes } = await req.json();
 
         if (!id) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Withdrawal ID required'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Withdrawal ID required',
+            }),
+            { status: 400 }
+          );
         }
 
         // Get withdrawal details
-        const withdrawal = await env.DB.prepare(`
+        const withdrawal = await env.DB.prepare(
+          `
           SELECT * FROM withdrawals WHERE id = ? AND status = 'approved'
-        `).bind(id).first();
+        `
+        )
+          .bind(id)
+          .first();
 
         if (!withdrawal) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Withdrawal not found or not approved'
-          }), { status: 404 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Withdrawal not found or not approved',
+            }),
+            { status: 404 }
+          );
         }
 
         // Update withdrawal status to completed
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           UPDATE withdrawals
           SET status = 'completed', completed_at = datetime('now'), approval_notes = ?
           WHERE id = ?
-        `).bind(`${notes || ''} Payment Reference: ${paymentReference || 'N/A'}`, id).run();
+        `
+        )
+          .bind(`${notes || ''} Payment Reference: ${paymentReference || 'N/A'}`, id)
+          .run();
 
         // Update player's total withdrawals
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           UPDATE players 
           SET total_withdrawals = total_withdrawals + ?, last_withdrawal = datetime('now')
           WHERE customer_id = ?
-        `).bind(withdrawal.amount, withdrawal.customer_id).run();
+        `
+        )
+          .bind(withdrawal.amount, withdrawal.customer_id)
+          .run();
 
         // Log completion transaction
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           INSERT INTO transactions (customer_id, amount, transaction_type, agent_id, notes, reference_id, created_at)
           VALUES (?, ?, 'withdrawal_completed', ?, ?, ?, datetime('now'))
-        `).bind(withdrawal.customer_id, -withdrawal.amount, authResult.agentID || authResult.userId, `Withdrawal completed: ${notes || ''}`, id).run();
+        `
+        )
+          .bind(
+            withdrawal.customer_id,
+            -withdrawal.amount,
+            authResult.agentID || authResult.userId,
+            `Withdrawal completed: ${notes || ''}`,
+            id
+          )
+          .run();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: { id, status: 'completed', amount: withdrawal.amount, paymentReference }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: { id, status: 'completed', amount: withdrawal.amount, paymentReference },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Withdrawal completion error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to complete withdrawal'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to complete withdrawal',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -3198,49 +3576,79 @@ export default {
         const { id, reason, notes } = await req.json();
 
         if (!id || !reason) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Withdrawal ID and rejection reason required'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Withdrawal ID and rejection reason required',
+            }),
+            { status: 400 }
+          );
         }
 
         // Get withdrawal details
-        const withdrawal = await env.DB.prepare(`
+        const withdrawal = await env.DB.prepare(
+          `
           SELECT * FROM withdrawals WHERE id = ? AND status = 'pending'
-        `).bind(id).first();
+        `
+        )
+          .bind(id)
+          .first();
 
         if (!withdrawal) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Withdrawal not found or already processed'
-          }), { status: 404 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Withdrawal not found or already processed',
+            }),
+            { status: 404 }
+          );
         }
 
         // Update withdrawal status to rejected
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           UPDATE withdrawals
           SET status = 'rejected', approved_by = ?, approved_at = datetime('now'), approval_notes = ?
           WHERE id = ?
-        `).bind(authResult.userId, `REJECTED: ${reason}. ${notes || ''}`, id).run();
+        `
+        )
+          .bind(authResult.userId, `REJECTED: ${reason}. ${notes || ''}`, id)
+          .run();
 
         // Log rejection transaction
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           INSERT INTO transactions (customer_id, amount, transaction_type, agent_id, notes, reference_id, created_at)
           VALUES (?, ?, 'withdrawal_rejected', ?, ?, ?, datetime('now'))
-        `).bind(withdrawal.customer_id, 0, authResult.agentID || authResult.userId, `Withdrawal rejected: ${reason} - ${notes || ''}`, id).run();
+        `
+        )
+          .bind(
+            withdrawal.customer_id,
+            0,
+            authResult.agentID || authResult.userId,
+            `Withdrawal rejected: ${reason} - ${notes || ''}`,
+            id
+          )
+          .run();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: { id, status: 'rejected', reason, amount: withdrawal.amount }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: { id, status: 'rejected', reason, amount: withdrawal.amount },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Withdrawal rejection error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to reject withdrawal'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to reject withdrawal',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -3265,21 +3673,27 @@ export default {
 
         const result = await env.DB.prepare(query).bind(limit).all();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            withdrawals: result.results || [],
-            total: (result.results || []).length
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              withdrawals: result.results || [],
+              total: (result.results || []).length,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Pending withdrawals error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch pending withdrawals'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch pending withdrawals',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -3320,24 +3734,32 @@ export default {
           LIMIT ? OFFSET ?
         `;
 
-        const result = await env.DB.prepare(query).bind(...bindParams).all();
+        const result = await env.DB.prepare(query)
+          .bind(...bindParams)
+          .all();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            withdrawals: result.results || [],
-            total: (result.results || []).length,
-            filters: { status, customerId, limit, offset }
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              withdrawals: result.results || [],
+              total: (result.results || []).length,
+              filters: { status, customerId, limit, offset },
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Get withdrawals error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch withdrawals'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch withdrawals',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -3347,57 +3769,84 @@ export default {
       if (authResult instanceof Response) return authResult;
 
       try {
-        const { customerId, telegramUsername, telegramId, telegramGroupId, telegramChatId } = await req.json();
+        const { customerId, telegramUsername, telegramId, telegramGroupId, telegramChatId } =
+          await req.json();
 
         if (!customerId) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Customer ID required'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Customer ID required',
+            }),
+            { status: 400 }
+          );
         }
 
         // Update customer Telegram information
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           UPDATE players 
           SET telegram_username = ?, telegram_id = ?, telegram_group_id = ?, telegram_chat_id = ?
           WHERE customer_id = ?
-        `).bind(telegramUsername || null, telegramId || null, telegramGroupId || null, telegramChatId || null, customerId).run();
+        `
+        )
+          .bind(
+            telegramUsername || null,
+            telegramId || null,
+            telegramGroupId || null,
+            telegramChatId || null,
+            customerId
+          )
+          .run();
 
         // Get updated customer info
-        const customer = await env.DB.prepare(`
+        const customer = await env.DB.prepare(
+          `
           SELECT customer_id, name, balance, telegram_username, telegram_id, telegram_group_id, telegram_chat_id
           FROM players WHERE customer_id = ?
-        `).bind(customerId).first();
+        `
+        )
+          .bind(customerId)
+          .first();
 
         if (!customer) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Customer not found'
-          }), { status: 404 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Customer not found',
+            }),
+            { status: 404 }
+          );
         }
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            customerId: customer.customer_id,
-            name: customer.name,
-            balance: customer.balance,
-            telegramInfo: {
-              username: customer.telegram_username,
-              telegramId: customer.telegram_id,
-              groupId: customer.telegram_group_id,
-              chatId: customer.telegram_chat_id
-            }
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              customerId: customer.customer_id,
+              name: customer.name,
+              balance: customer.balance,
+              telegramInfo: {
+                username: customer.telegram_username,
+                telegramId: customer.telegram_id,
+                groupId: customer.telegram_group_id,
+                chatId: customer.telegram_chat_id,
+              },
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Update Telegram info error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to update Telegram information'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to update Telegram information',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -3410,65 +3859,95 @@ export default {
         const { customerId, amount, odds, description, sport, teams } = await req.json();
 
         if (!customerId || !amount || amount <= 0 || !description) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Missing required fields: customerId, amount, description'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Missing required fields: customerId, amount, description',
+            }),
+            { status: 400 }
+          );
         }
 
         // Verify customer exists and has sufficient balance/credit
-        const customer = await env.DB.prepare(`
+        const customer = await env.DB.prepare(
+          `
           SELECT balance, credit_limit, wager_limit FROM players WHERE customer_id = ?
-        `).bind(customerId).first();
+        `
+        )
+          .bind(customerId)
+          .first();
 
         if (!customer) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Customer not found'
-          }), { status: 404 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Customer not found',
+            }),
+            { status: 404 }
+          );
         }
 
         if (amount > customer.wager_limit) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Amount exceeds customer wager limit'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Amount exceeds customer wager limit',
+            }),
+            { status: 400 }
+          );
         }
 
         // Generate wager number
         const wagerNumber = Math.floor(Math.random() * 900000000) + 100000000;
-        const toWinAmount = odds ? (amount * (odds > 0 ? odds / 100 : 100 / Math.abs(odds))) : amount;
+        const toWinAmount = odds ? amount * (odds > 0 ? odds / 100 : 100 / Math.abs(odds)) : amount;
 
         // Create manual wager
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           INSERT INTO wagers (
             wager_number, customer_id, agent_id, amount_wagered, to_win_amount,
             odds, description, status, ticket_writer, sport, teams, created_at
           ) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', 'phone', ?, ?, datetime('now'))
-        `).bind(
-          wagerNumber, customerId, authResult.agentID || authResult.userId,
-          amount, toWinAmount, odds || null, description, sport || null, teams || null
-        ).run();
-
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
+        `
+        )
+          .bind(
             wagerNumber,
             customerId,
+            authResult.agentID || authResult.userId,
             amount,
             toWinAmount,
+            odds || null,
             description,
-            status: 'pending'
+            sport || null,
+            teams || null
+          )
+          .run();
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              wagerNumber,
+              customerId,
+              amount,
+              toWinAmount,
+              description,
+              status: 'pending',
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Manual wager creation error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to create manual wager'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to create manual wager',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -3500,7 +3979,9 @@ export default {
           bindings.push(agentID);
         }
 
-        const exposure = await env.DB.prepare(query).bind(...bindings).first();
+        const exposure = await env.DB.prepare(query)
+          .bind(...bindings)
+          .first();
 
         // Get sport breakdown
         const sportQuery = `
@@ -3516,7 +3997,9 @@ export default {
           ORDER BY liability DESC
         `;
 
-        const sportBreakdown = await env.DB.prepare(sportQuery).bind(...bindings).all();
+        const sportBreakdown = await env.DB.prepare(sportQuery)
+          .bind(...bindings)
+          .all();
 
         // Get large wagers (risk alerts)
         const alertQuery = `
@@ -3528,31 +4011,39 @@ export default {
           LIMIT 10
         `;
 
-        const riskAlerts = await env.DB.prepare(alertQuery).bind(...bindings).all();
+        const riskAlerts = await env.DB.prepare(alertQuery)
+          .bind(...bindings)
+          .all();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            exposure: {
-              total_liability: exposure?.total_liability || 0,
-              total_handle: exposure?.total_handle || 0,
-              open_wagers: exposure?.open_wagers || 0,
-              max_single_wager: exposure?.max_single_wager || 0,
-              max_single_payout: exposure?.max_single_payout || 0,
-              avg_wager_size: exposure?.avg_wager_size || 0
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              exposure: {
+                total_liability: exposure?.total_liability || 0,
+                total_handle: exposure?.total_handle || 0,
+                open_wagers: exposure?.open_wagers || 0,
+                max_single_wager: exposure?.max_single_wager || 0,
+                max_single_payout: exposure?.max_single_payout || 0,
+                avg_wager_size: exposure?.avg_wager_size || 0,
+              },
+              sportBreakdown: sportBreakdown.results || [],
+              riskAlerts: riskAlerts.results || [],
             },
-            sportBreakdown: sportBreakdown.results || [],
-            riskAlerts: riskAlerts.results || []
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Risk exposure error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch risk exposure'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch risk exposure',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -3567,30 +4058,43 @@ export default {
         const { note, category } = await req.json();
 
         if (!note || !customerId) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Customer ID and note required'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Customer ID and note required',
+            }),
+            { status: 400 }
+          );
         }
 
         const noteId = crypto.randomUUID();
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           INSERT INTO customer_notes (id, customer_id, note, category, agent_id, created_at)
           VALUES (?, ?, ?, ?, ?, datetime('now'))
-        `).bind(noteId, customerId, note, category || 'general', authResult.userId).run();
+        `
+        )
+          .bind(noteId, customerId, note, category || 'general', authResult.userId)
+          .run();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: { id: noteId, customerId, note, category }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: { id: noteId, customerId, note, category },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Customer note error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to add customer note'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to add customer note',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -3604,10 +4108,13 @@ export default {
         const { maxWager, creditLine, status } = await req.json();
 
         if (!customerId) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Customer ID required'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Customer ID required',
+            }),
+            { status: 400 }
+          );
         }
 
         // Build update query dynamically
@@ -3630,41 +4137,58 @@ export default {
         }
 
         if (updates.length === 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'No updates provided'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'No updates provided',
+            }),
+            { status: 400 }
+          );
         }
 
         bindings.push(customerId);
 
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           UPDATE players SET ${updates.join(', ')} WHERE customer_id = ?
-        `).bind(...bindings).run();
+        `
+        )
+          .bind(...bindings)
+          .run();
 
         // Log the change
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           INSERT INTO customer_notes (id, customer_id, note, category, agent_id, created_at)
           VALUES (?, ?, ?, 'system', ?, datetime('now'))
-        `).bind(
-          crypto.randomUUID(),
-          customerId,
-          `Limits updated: ${JSON.stringify({ maxWager, creditLine, status })}`,
-          authResult.userId
-        ).run();
+        `
+        )
+          .bind(
+            crypto.randomUUID(),
+            customerId,
+            `Limits updated: ${JSON.stringify({ maxWager, creditLine, status })}`,
+            authResult.userId
+          )
+          .run();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: { customerId, updates: { maxWager, creditLine, status } }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: { customerId, updates: { maxWager, creditLine, status } },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Customer limits error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to update customer limits'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to update customer limits',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -3678,37 +4202,47 @@ export default {
         const params = new URL(req.url).searchParams;
         const limit = parseInt(params.get('limit') || '50');
 
-        const result = await env.DB.prepare(`
+        const result = await env.DB.prepare(
+          `
           SELECT cn.*, u.username as agent_name
           FROM customer_notes cn
           LEFT JOIN users u ON cn.agent_id = u.id
           WHERE cn.customer_id = ?
           ORDER BY cn.created_at DESC
           LIMIT ?
-        `).bind(customerId, limit).all();
+        `
+        )
+          .bind(customerId, limit)
+          .all();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            notes: result.results || [],
-            customerId,
-            total: (result.results || []).length
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              notes: result.results || [],
+              customerId,
+              total: (result.results || []).length,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Customer notes error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch customer notes'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch customer notes',
+          }),
+          { status: 500 }
+        );
       }
     }
 
-    // ========================================
+    // !==!==!==!==!==!==!====
     // MISSING FIRE22 API ENDPOINTS FOR DASHBOARD
-    // ========================================
+    // !==!==!==!==!==!==!====
 
     // POST /api/manager/getWeeklyFigureByAgent - Dashboard expects this format
     if (url.pathname === '/api/manager/getWeeklyFigureByAgent' && req.method === 'POST') {
@@ -3741,7 +4275,7 @@ export default {
           handle: row.handle || 0,
           win: row.win || 0,
           volume: row.volume || 0,
-          bets: row.bets || 0
+          bets: row.bets || 0,
         }));
 
         // Fill missing days with zeros
@@ -3750,33 +4284,39 @@ export default {
           return existing || { day, handle: 0, win: 0, volume: 0, bets: 0 };
         });
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            agentID: agentID,
-            weeklyFigures: allDays,
-            totalHandle: allDays.reduce((sum, day) => sum + day.handle, 0),
-            totalWin: allDays.reduce((sum, day) => sum + day.win, 0),
-            totalVolume: allDays.reduce((sum, day) => sum + day.volume, 0),
-            totalBets: allDays.reduce((sum, day) => sum + day.bets, 0)
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              agentID: agentID,
+              weeklyFigures: allDays,
+              totalHandle: allDays.reduce((sum, day) => sum + day.handle, 0),
+              totalWin: allDays.reduce((sum, day) => sum + day.win, 0),
+              totalVolume: allDays.reduce((sum, day) => sum + day.volume, 0),
+              totalBets: allDays.reduce((sum, day) => sum + day.bets, 0),
+            },
+          }),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+              'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+            },
           }
-        }), {
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-          }
-        });
+        );
       } catch (error) {
         console.error('Error in getWeeklyFigureByAgent:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch weekly figures'
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch weekly figures',
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -3815,49 +4355,58 @@ export default {
           toWin: item.to_win_amount,
           teams: item.description,
           time: new Date(item.created_at).toLocaleTimeString(),
-          odds: 'Live'
+          odds: 'Live',
         }));
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            agentID: agentID,
-            date: date,
-            pendingItems: pendingItems,
-            totalPending: pendingItems.length,
-            totalAmount: pendingItems.reduce((sum, item) => sum + item.amount, 0)
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              agentID: agentID,
+              date: date,
+              pendingItems: pendingItems,
+              totalPending: pendingItems.length,
+              totalAmount: pendingItems.reduce((sum, item) => sum + item.amount, 0),
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' }
-        });
+        );
       } catch (error) {
         console.error('Error in getPending:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch pending items'
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch pending items',
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
-    // ========================================
+    // !==!==!==!==!==!==!====
     // DASHBOARD BACKEND PACK - Real-time SSE & APIs
-    // ========================================
+    // !==!==!==!==!==!==!====
 
     // 1. Real-time SSE endpoint for live dashboard updates (NO AUTH REQUIRED)
     if (url.pathname === '/api/live' && req.method === 'GET') {
-
       const encoder = new TextEncoder();
       const stream = new ReadableStream({
         async start(controller) {
           // Send immediate initial data
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-            type: 'connected',
-            timestamp: new Date().toISOString(),
-            message: 'SSE connection established'
-          })}\n\n`));
+          controller.enqueue(
+            encoder.encode(
+              `data: ${JSON.stringify({
+                type: 'connected',
+                timestamp: new Date().toISOString(),
+                message: 'SSE connection established',
+              })}\n\n`
+            )
+          );
 
           const sendUpdate = async () => {
             try {
@@ -3930,13 +4479,13 @@ export default {
                   revenue: kpi?.revenue || 0,
                   activePlayers: kpi?.activePlayers || 0,
                   pending: kpi?.pending || 0,
-                  totalLiability: kpi?.totalLiability || 0
+                  totalLiability: kpi?.totalLiability || 0,
                 },
                 weeklyData: {
                   totalHandle: weeklyData?.totalHandle || 0,
                   totalWin: weeklyData?.totalWin || 0,
                   totalVolume: weeklyData?.totalVolume || 0,
-                  totalBets: weeklyData?.totalBets || 0
+                  totalBets: weeklyData?.totalBets || 0,
                 },
                 pendingData: {
                   totalPending: pendingWagers.results?.length || 0,
@@ -3946,8 +4495,8 @@ export default {
                     amount: w.amount,
                     teams: w.description,
                     time: new Date(w.created_at).toLocaleTimeString(),
-                    odds: 'Live'
-                  }))
+                    odds: 'Live',
+                  })),
                 },
                 activities: (activities.results || []).map(a => ({
                   id: a.id,
@@ -3956,14 +4505,18 @@ export default {
                   user: a.customer_id,
                   action: a.description,
                   time: new Date(a.created_at).toLocaleTimeString(),
-                  amount: a.amount
-                }))
+                  amount: a.amount,
+                })),
               };
 
               controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
             } catch (error) {
               console.error('SSE update error:', error);
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({type: 'error', message: 'Update failed'})}\n\n`));
+              controller.enqueue(
+                encoder.encode(
+                  `data: ${JSON.stringify({ type: 'error', message: 'Update failed' })}\n\n`
+                )
+              );
             }
           };
 
@@ -3985,17 +4538,17 @@ export default {
 
           // Handle client disconnect
           req.signal?.addEventListener('abort', abortHandler);
-        }
+        },
       });
 
       return new Response(stream, {
         headers: {
           'Content-Type': 'text/event-stream',
           'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive',
+          Connection: 'keep-alive',
           'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Cache-Control'
-        }
+          'Access-Control-Allow-Headers': 'Cache-Control',
+        },
       });
     }
 
@@ -4031,7 +4584,9 @@ export default {
         query += ' ORDER BY t.created_at DESC LIMIT ? OFFSET ?';
         bindings.push(size, offset);
 
-        const result = await env.DB.prepare(query).bind(...bindings).all();
+        const result = await env.DB.prepare(query)
+          .bind(...bindings)
+          .all();
 
         // Get total count
         let countQuery = 'SELECT COUNT(*) as total FROM transactions WHERE 1=1';
@@ -4042,30 +4597,38 @@ export default {
           countBindings.push(customerId);
         }
 
-        const countResult = await env.DB.prepare(countQuery).bind(...countBindings).first();
+        const countResult = await env.DB.prepare(countQuery)
+          .bind(...countBindings)
+          .first();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            transactions: result.results || [],
-            total: countResult?.total || 0,
-            page,
-            size
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              transactions: result.results || [],
+              total: countResult?.total || 0,
+              page,
+              size,
+            },
+          }),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+              'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+            },
           }
-        }), {
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-          }
-        });
+        );
       } catch (error) {
         console.error('Transactions API error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch transactions'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch transactions',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -4093,30 +4656,39 @@ export default {
 
         const result = await env.DB.prepare(query).all();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            customers: result.results || []
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              customers: result.results || [],
+            },
+          }),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+              'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+            },
           }
-        }), {
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-          }
-        });
+        );
       } catch (error) {
         console.error('Customers API error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch customers'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch customers',
+          }),
+          { status: 500 }
+        );
       }
     }
 
     // 3. Customer Details API for dashboard customer actions
-    if (url.pathname.match(/^\/api\/manager\/getCustomerDetails\/([^\/]+)$/) && req.method === 'GET') {
+    if (
+      url.pathname.match(/^\/api\/manager\/getCustomerDetails\/([^\/]+)$/) &&
+      req.method === 'GET'
+    ) {
       const authResult = await requireAuth();
       if (authResult instanceof Response) return authResult;
 
@@ -4124,10 +4696,13 @@ export default {
         const customerId = url.pathname.split('/').pop();
 
         if (!customerId) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Customer ID required'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Customer ID required',
+            }),
+            { status: 400 }
+          );
         }
 
         // Get customer details with aggregated data
@@ -4145,10 +4720,13 @@ export default {
         const customer = await env.DB.prepare(customerQuery).bind(customerId).first();
 
         if (!customer) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Customer not found'
-          }), { status: 404 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Customer not found',
+            }),
+            { status: 404 }
+          );
         }
 
         // Get recent wagers
@@ -4183,30 +4761,36 @@ export default {
 
         const customerNotes = await env.DB.prepare(notesQuery).bind(customerId).all();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            customer: {
-              ...customer,
-              agent_code: customer.agent_id,
-              total_wagered: customer.total_wagered || 0,
-              total_won: customer.total_won || 0,
-              total_bets: customer.total_bets || 0,
-              pending_bets: customer.pending_bets || 0
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              customer: {
+                ...customer,
+                agent_code: customer.agent_id,
+                total_wagered: customer.total_wagered || 0,
+                total_won: customer.total_won || 0,
+                total_bets: customer.total_bets || 0,
+                pending_bets: customer.pending_bets || 0,
+              },
+              recentWagers: recentWagers.results || [],
+              recentTransactions: recentTransactions.results || [],
+              customerNotes: customerNotes.results || [],
             },
-            recentWagers: recentWagers.results || [],
-            recentTransactions: recentTransactions.results || [],
-            customerNotes: customerNotes.results || []
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' }
-        });
+        );
       } catch (error) {
         console.error('Customer details API error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch customer details'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch customer details',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -4258,14 +4842,17 @@ export default {
           LIMIT ?
         `;
 
-        const transactionActivities = await env.DB.prepare(transactionActivitiesQuery).bind(limit).all();
+        const transactionActivities = await env.DB.prepare(transactionActivitiesQuery)
+          .bind(limit)
+          .all();
 
         // Combine and sort activities
         const allActivities = [
           ...(wagerActivities.results || []),
-          ...(transactionActivities.results || [])
-        ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-         .slice(0, limit);
+          ...(transactionActivities.results || []),
+        ]
+          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          .slice(0, limit);
 
         // Format activities for dashboard
         const formattedActivities = allActivities.map(activity => ({
@@ -4276,45 +4863,57 @@ export default {
           action: activity.description || `${activity.type} activity`,
           time: new Date(activity.created_at).toLocaleTimeString(),
           amount: activity.amount,
-          status: activity.status
+          status: activity.status,
         }));
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            activities: formattedActivities,
-            total: formattedActivities.length,
-            timeframe: `${hours} hour${hours > 1 ? 's' : ''}`
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              activities: formattedActivities,
+              total: formattedActivities.length,
+              timeframe: `${hours} hour${hours > 1 ? 's' : ''}`,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' }
-        });
+        );
       } catch (error) {
         console.error('Live activity API error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch live activity'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch live activity',
+          }),
+          { status: 500 }
+        );
       }
     }
 
     // Helper function for activity icons
     function getActivityIcon(type: string, status?: string): string {
       switch (type) {
-        case 'deposit': return 'fas fa-dollar-sign';
-        case 'withdrawal': return 'fas fa-money-bill-wave';
+        case 'deposit':
+          return 'fas fa-dollar-sign';
+        case 'withdrawal':
+          return 'fas fa-money-bill-wave';
         case 'wager':
           return status === 'pending' ? 'fas fa-clock' : 'fas fa-trophy';
-        case 'win': return 'fas fa-star';
-        case 'loss': return 'fas fa-times-circle';
-        default: return 'fas fa-info-circle';
+        case 'win':
+          return 'fas fa-star';
+        case 'loss':
+          return 'fas fa-times-circle';
+        default:
+          return 'fas fa-info-circle';
       }
     }
 
     // Analytics endpoints for charts and trends
     if (url.pathname === '/api/analytics/daily') {
       try {
-        const result = await env.DB.prepare(`
+        const result = await env.DB.prepare(
+          `
           SELECT
             DATE(created_at) as day,
             SUM(amount_wagered) as volume,
@@ -4324,27 +4923,35 @@ export default {
           WHERE created_at >= datetime('now', '-30 days')
           GROUP BY DATE(created_at)
           ORDER BY day DESC
-        `).all();
+        `
+        ).all();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: result.results || []
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: result.results || [],
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Analytics error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch analytics'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch analytics',
+          }),
+          { status: 500 }
+        );
       }
     }
 
     // Hourly analytics for today
     if (url.pathname === '/api/analytics/hourly') {
       try {
-        const result = await env.DB.prepare(`
+        const result = await env.DB.prepare(
+          `
           SELECT
             strftime('%H', created_at) as hour,
             SUM(amount_wagered) as volume,
@@ -4353,20 +4960,27 @@ export default {
           WHERE DATE(created_at) = DATE('now')
           GROUP BY strftime('%H', created_at)
           ORDER BY hour
-        `).all();
+        `
+        ).all();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: result.results || []
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: result.results || [],
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Hourly analytics error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch hourly analytics'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch hourly analytics',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -4377,52 +4991,69 @@ export default {
       const type = params.get('type') || 'all'; // 'customers', 'wagers', 'all'
 
       if (!query || query.length < 2) {
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Query must be at least 2 characters'
-        }), { status: 400 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Query must be at least 2 characters',
+          }),
+          { status: 400 }
+        );
       }
 
       try {
         const results: any = { customers: [], wagers: [] };
 
         if (type === 'customers' || type === 'all') {
-          const customerResults = await env.DB.prepare(`
+          const customerResults = await env.DB.prepare(
+            `
             SELECT customer_id, name, balance, agent_id, status
             FROM players
             WHERE customer_id LIKE ? OR name LIKE ?
             LIMIT 20
-          `).bind(`%${query}%`, `%${query}%`).all();
+          `
+          )
+            .bind(`%${query}%`, `%${query}%`)
+            .all();
 
           results.customers = customerResults.results || [];
         }
 
         if (type === 'wagers' || type === 'all') {
-          const wagerResults = await env.DB.prepare(`
+          const wagerResults = await env.DB.prepare(
+            `
             SELECT wager_number, customer_id, agent_id, amount_wagered, to_win_amount, status, description
             FROM wagers
             WHERE customer_id LIKE ? OR description LIKE ? OR wager_number LIKE ?
             ORDER BY created_at DESC
             LIMIT 20
-          `).bind(`%${query}%`, `%${query}%`, `%${query}%`).all();
+          `
+          )
+            .bind(`%${query}%`, `%${query}%`, `%${query}%`)
+            .all();
 
           results.wagers = wagerResults.results || [];
         }
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: results,
-          query: query,
-          total: results.customers.length + results.wagers.length
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: results,
+            query: query,
+            total: results.customers.length + results.wagers.length,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Search error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Search failed'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Search failed',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -4432,35 +5063,48 @@ export default {
         const { ids, agentID } = await req.json();
 
         if (!Array.isArray(ids) || ids.length === 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Invalid wager IDs'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Invalid wager IDs',
+            }),
+            { status: 400 }
+          );
         }
 
         // Update wagers to approved status
         const placeholders = ids.map(() => '?').join(',');
-        const result = await env.DB.prepare(`
+        const result = await env.DB.prepare(
+          `
           UPDATE wagers
           SET status = 'approved', settled_at = datetime('now')
           WHERE wager_number IN (${placeholders}) AND agent_id = ?
-        `).bind(...ids, agentID).run();
+        `
+        )
+          .bind(...ids, agentID)
+          .run();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            updated: result.meta?.changes || 0,
-            ids: ids
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              updated: result.meta?.changes || 0,
+              ids: ids,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Bulk approve error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Bulk approval failed'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Bulk approval failed',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -4470,35 +5114,48 @@ export default {
         const { ids, agentID, reason } = await req.json();
 
         if (!Array.isArray(ids) || ids.length === 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Invalid wager IDs'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Invalid wager IDs',
+            }),
+            { status: 400 }
+          );
         }
 
         const placeholders = ids.map(() => '?').join(',');
-        const result = await env.DB.prepare(`
+        const result = await env.DB.prepare(
+          `
           UPDATE wagers
           SET status = 'rejected', settled_at = datetime('now'), comments = ?
           WHERE wager_number IN (${placeholders}) AND agent_id = ?
-        `).bind(reason || 'Bulk rejected', ...ids, agentID).run();
+        `
+        )
+          .bind(reason || 'Bulk rejected', ...ids, agentID)
+          .run();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            updated: result.meta?.changes || 0,
-            ids: ids,
-            reason: reason
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              updated: result.meta?.changes || 0,
+              ids: ids,
+              reason: reason,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Bulk reject error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Bulk rejection failed'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Bulk rejection failed',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -4508,34 +5165,47 @@ export default {
         const { customerID, name, agentID, creditLimit, wagerLimit, email } = await req.json();
 
         if (!customerID || !name || !agentID) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Missing required fields: customerID, name, agentID'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Missing required fields: customerID, name, agentID',
+            }),
+            { status: 400 }
+          );
         }
 
-        const result = await env.DB.prepare(`
+        const result = await env.DB.prepare(
+          `
           INSERT INTO players (customer_id, name, agent_id, balance, credit_limit, wager_limit, email, status, created_at)
           VALUES (?, ?, ?, 0, ?, ?, ?, 'active', datetime('now'))
-        `).bind(customerID, name, agentID, creditLimit || 0, wagerLimit || 100000, email || '').run();
+        `
+        )
+          .bind(customerID, name, agentID, creditLimit || 0, wagerLimit || 100000, email || '')
+          .run();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            customerID,
-            name,
-            agentID,
-            created: true
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              customerID,
+              name,
+              agentID,
+              created: true,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Create customer error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to create customer'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to create customer',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -4545,41 +5215,56 @@ export default {
         const { customerID, amount, agentID, notes } = await req.json();
 
         if (!customerID || !amount || amount <= 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Invalid customerID or amount'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Invalid customerID or amount',
+            }),
+            { status: 400 }
+          );
         }
 
         // Update customer balance
-        const updateResult = await env.DB.prepare(`
+        const updateResult = await env.DB.prepare(
+          `
           UPDATE players SET balance = balance + ?, last_transaction = datetime('now')
           WHERE customer_id = ?
-        `).bind(amount, customerID).run();
+        `
+        )
+          .bind(amount, customerID)
+          .run();
 
         // Record transaction
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           INSERT INTO transactions (customer_id, amount, transaction_type, agent_id, notes, created_at)
           VALUES (?, ?, 'deposit', ?, ?, datetime('now'))
-        `).bind(customerID, amount, agentID, notes || '');
+        `
+        ).bind(customerID, amount, agentID, notes || '');
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            customerID,
-            amount,
-            type: 'deposit',
-            processed: true
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              customerID,
+              amount,
+              type: 'deposit',
+              processed: true,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Process deposit error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to process deposit'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to process deposit',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -4589,22 +5274,32 @@ export default {
         const { wagerNumber, result, agentID, notes } = await req.json();
 
         if (!wagerNumber || !result || !['win', 'loss', 'push'].includes(result)) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Invalid wagerNumber or result (must be win/loss/push)'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Invalid wagerNumber or result (must be win/loss/push)',
+            }),
+            { status: 400 }
+          );
         }
 
         // Get wager details
-        const wager = await env.DB.prepare(`
+        const wager = await env.DB.prepare(
+          `
           SELECT * FROM wagers WHERE wager_number = ? AND status = 'pending'
-        `).bind(wagerNumber).first();
+        `
+        )
+          .bind(wagerNumber)
+          .first();
 
         if (!wager) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Wager not found or already settled'
-          }), { status: 404 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Wager not found or already settled',
+            }),
+            { status: 404 }
+          );
         }
 
         let settlementAmount = 0;
@@ -4618,37 +5313,51 @@ export default {
         // loss = 0 (customer loses bet amount)
 
         // Update wager
-        await env.DB.prepare(`
+        await env.DB.prepare(
+          `
           UPDATE wagers
           SET status = ?, settled_amount = ?, settled_at = datetime('now'), comments = ?
           WHERE wager_number = ?
-        `).bind(status, settlementAmount, notes || '', wagerNumber).run();
+        `
+        )
+          .bind(status, settlementAmount, notes || '', wagerNumber)
+          .run();
 
         // Update customer balance if win or push
         if (settlementAmount > 0) {
-          await env.DB.prepare(`
+          await env.DB.prepare(
+            `
             UPDATE players SET balance = balance + ?
             WHERE customer_id = ?
-          `).bind(settlementAmount, wager.customer_id).run();
+          `
+          )
+            .bind(settlementAmount, wager.customer_id)
+            .run();
         }
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            wagerNumber,
-            result,
-            settlementAmount,
-            customerID: wager.customer_id
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              wagerNumber,
+              result,
+              settlementAmount,
+              customerID: wager.customer_id,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Settle wager error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to settle wager'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to settle wager',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -4668,7 +5377,8 @@ export default {
           bindings.push(startDate, endDate);
         }
 
-        const result = await env.DB.prepare(`
+        const result = await env.DB.prepare(
+          `
           SELECT
             DATE(created_at) as date,
             SUM(CASE WHEN status = 'win' THEN -settled_amount ELSE 0 END) as customer_wins,
@@ -4680,7 +5390,10 @@ export default {
           WHERE agent_id = ? ${dateFilter}
           GROUP BY DATE(created_at)
           ORDER BY date DESC
-        `).bind(...bindings).all();
+        `
+        )
+          .bind(...bindings)
+          .all();
 
         const summary = {
           totalHandle: 0,
@@ -4688,7 +5401,7 @@ export default {
           totalCustomerWins: 0,
           netProfit: 0,
           totalWagers: 0,
-          pendingRisk: 0
+          pendingRisk: 0,
         };
 
         (result.results || []).forEach((row: any) => {
@@ -4701,21 +5414,27 @@ export default {
 
         summary.netProfit = summary.totalHouseWins - summary.totalCustomerWins;
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            daily: result.results || [],
-            summary
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              daily: result.results || [],
+              summary,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('P&L report error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to generate P&L report'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to generate P&L report',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -4727,55 +5446,76 @@ export default {
         const limit = parseInt(params.get('limit') || '50');
 
         if (!customerID) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'customerID required'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'customerID required',
+            }),
+            { status: 400 }
+          );
         }
 
         // Get wager history
-        const wagers = await env.DB.prepare(`
+        const wagers = await env.DB.prepare(
+          `
           SELECT wager_number, amount_wagered, to_win_amount, status, description, created_at
           FROM wagers
           WHERE customer_id = ?
           ORDER BY created_at DESC
           LIMIT ?
-        `).bind(customerID, limit).all();
+        `
+        )
+          .bind(customerID, limit)
+          .all();
 
         // Get transaction history
-        const transactions = await env.DB.prepare(`
+        const transactions = await env.DB.prepare(
+          `
           SELECT amount, transaction_type, notes, created_at
           FROM transactions
           WHERE customer_id = ?
           ORDER BY created_at DESC
           LIMIT ?
-        `).bind(customerID, limit).all();
+        `
+        )
+          .bind(customerID, limit)
+          .all();
 
         // Get customer info
-        const customer = await env.DB.prepare(`
+        const customer = await env.DB.prepare(
+          `
           SELECT customer_id, name, balance, credit_limit, status, created_at
           FROM players
           WHERE customer_id = ?
-        `).bind(customerID).first();
+        `
+        )
+          .bind(customerID)
+          .first();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            customer,
-            wagers: wagers.results || [],
-            transactions: transactions.results || [],
-            totalWagers: (wagers.results || []).length,
-            totalTransactions: (transactions.results || []).length
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              customer,
+              wagers: wagers.results || [],
+              transactions: transactions.results || [],
+              totalWagers: (wagers.results || []).length,
+              totalTransactions: (transactions.results || []).length,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Customer activity report error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to generate customer activity report'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to generate customer activity report',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -5204,7 +5944,7 @@ export default {
   </script>
 </body>
 </html>`;
-      
+
       return new Response(dashboardHtml, {
         headers: { 'Content-Type': 'text/html; charset=utf-8' },
       });
@@ -5216,11 +5956,11 @@ export default {
         // Import the live casino management system
         const { createLiveCasinoManagementSystem } = await import('./live-casino-management');
         const casinoSystem = createLiveCasinoManagementSystem();
-        
+
         // Get live casino data
         const games = casinoSystem.getAllGames();
         const systemStats = casinoSystem.getSystemStats();
-        
+
         // Get sample agent rates (for demo purposes)
         const sampleAgentRates = [
           {
@@ -5234,10 +5974,10 @@ export default {
             effectiveFrom: new Date(),
             isActive: true,
             createdBy: 'System',
-            createdAt: new Date()
-          }
+            createdAt: new Date(),
+          },
         ];
-        
+
         // Get sample active sessions (for demo purposes)
         const sampleActiveSessions = [
           {
@@ -5252,10 +5992,10 @@ export default {
             netResult: -700,
             commissionEarned: 22.4,
             rateUsed: 0.032,
-            status: 'active'
-          }
+            status: 'active',
+          },
         ];
-        
+
         const response = {
           success: true,
           data: {
@@ -5265,22 +6005,25 @@ export default {
             avgRate: 0.032, // Default average rate for demo
             games: games,
             agentRates: sampleAgentRates,
-            activeSessionsList: sampleActiveSessions
-          }
+            activeSessionsList: sampleActiveSessions,
+          },
         };
-        
+
         return new Response(JSON.stringify(response), {
           headers: { 'Content-Type': 'application/json' },
         });
       } catch (error) {
         console.error('Error fetching live casino data:', error);
-        return new Response(JSON.stringify({ 
-          success: false, 
-          error: 'Failed to fetch live casino data' 
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch live casino data',
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -5289,7 +6032,7 @@ export default {
       try {
         const params = new URL(req.url).searchParams;
         const agentId = params.get('agentId');
-        
+
         // Use the agent_configs table that actually exists in your D1 database
         let query = `
           SELECT 
@@ -5298,22 +6041,24 @@ export default {
             max_wager, updated_at, commission_type, head_count_rate, min_wager, sports_rate
           FROM agent_configs
         `;
-        
+
         const bindings: any[] = [];
-        
+
         if (agentId) {
           query += ' WHERE agent_id = ?';
           bindings.push(agentId);
         }
-        
+
         query += ' ORDER BY agent_id';
-        
+
         console.log('Executing query:', query);
         console.log('Bindings:', bindings);
-        
-        const configs = await env.DB.prepare(query).bind(...bindings).all();
+
+        const configs = await env.DB.prepare(query)
+          .bind(...bindings)
+          .all();
         console.log('Query result:', configs);
-        
+
         // Transform the data to match what the frontend expects
         const transformedAgents = (configs.results || []).map(agent => ({
           agent_id: agent.agent_id || 'Unknown',
@@ -5323,65 +6068,71 @@ export default {
           master_agent: agent.master_agent_id || '',
           active: 1, // Default to active since this column doesn't exist
           created_date: agent.updated_at || new Date().toISOString(), // Use updated_at as created_date
-          
+
           // Add the nested objects the frontend expects
           permissions: {
             canPlaceBets: agent.allow_place_bet === 1,
             canModifyInfo: true, // Default to true since we don't have this column
             canChangeAccounts: true, // Default to true since we don't have this column
             canOpenParlays: true, // Default to true since we don't have this column
-            canRoundRobin: true // Default to true since we don't have this column
+            canRoundRobin: true, // Default to true since we don't have this column
           },
-          
+
           commissionRates: {
             inet: agent.inet_head_count_rate || 0.05, // Use actual column value
             casino: agent.live_casino_rate || 0.03, // Use actual column value
-            propBuilder: agent.sports_rate || 0.04 // Use actual column value
+            propBuilder: agent.sports_rate || 0.04, // Use actual column value
           },
-          
+
           limits: {
             maxWager: agent.max_wager || 100000, // Use actual column value
             minWager: agent.min_wager || 10, // Use actual column value
-            dailyLimit: 1000000 // Default value
+            dailyLimit: 1000000, // Default value
           },
-          
+
           status: {
             isActive: true, // Default to true since we don't have active column
-            lastActivity: agent.updated_at || new Date().toISOString()
+            lastActivity: agent.updated_at || new Date().toISOString(),
           },
-          
+
           pending_wagers: 0, // Default values - you can calculate these from wagers table
-          pending_amount: 0
+          pending_amount: 0,
         }));
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            agents: transformedAgents,
-            lastUpdated: new Date().toISOString()
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              agents: transformedAgents,
+              lastUpdated: new Date().toISOString(),
+            },
+          }),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            },
           }
-        }), {
-          headers: { 
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          },
-        });
+        );
       } catch (error: unknown) {
         console.error('Error fetching agent configs for dashboard:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         const errorStack = error instanceof Error ? error.stack : 'No stack trace';
-        return new Response(JSON.stringify({ 
-          success: false, 
-          error: 'Failed to fetch agent configs',
-          details: errorMessage,
-          stack: errorStack
-        }), {
-          status: 500,
-          headers: { 
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch agent configs',
+            details: errorMessage,
+            stack: errorStack,
+          }),
+          {
+            status: 500,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            },
+          }
+        );
       }
     }
 
@@ -5390,32 +6141,38 @@ export default {
       try {
         const body = await req.text();
         const params = new URLSearchParams(body);
-        
+
         const agentID = params.get('agentID') || '';
         const customerID = params.get('customerID') || '';
         const wagerType = params.get('wagerType') || '';
-        
+
         const data = await api.getRealWagers({ agentID, customerID, wagerType });
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            wagers: data.wagers,
-            totalWagers: data.totalWagers,
-            totalVolume: data.totalVolume,
-            totalRisk: data.totalRisk,
-            agents: data.agents,
-            customers: data.customers
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              wagers: data.wagers,
+              totalWagers: data.totalWagers,
+              totalVolume: data.totalVolume,
+              totalRisk: data.totalRisk,
+              agents: data.agents,
+              customers: data.customers,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Error in getLiveWagers:', error);
-        return new Response(JSON.stringify({ success: false, error: 'Failed to fetch live wagers' }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({ success: false, error: 'Failed to fetch live wagers' }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -5423,29 +6180,35 @@ export default {
       try {
         const body = await req.text();
         const params = new URLSearchParams(body);
-        
+
         const agentID = params.get('agentID') || '';
         const startDate = params.get('startDate') || '2025-08-25';
         const endDate = params.get('endDate') || '2025-08-25';
-        
+
         const data = await api.getAgentPerformance({ agentID, startDate, endDate });
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            performance: data.performance,
-            totalAgents: data.totalAgents,
-            grandTotal: data.grandTotal
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              performance: data.performance,
+              totalAgents: data.totalAgents,
+              grandTotal: data.grandTotal,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Error in getAgentPerformance:', error);
-        return new Response(JSON.stringify({ success: false, error: 'Failed to fetch agent performance' }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({ success: false, error: 'Failed to fetch agent performance' }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -5453,37 +6216,43 @@ export default {
       try {
         const body = await req.text();
         const params = new URLSearchParams(body);
-        
+
         const threshold = parseInt(params.get('threshold') || '10000');
         const agentID = params.get('agentID') || '';
-        
+
         const data = await api.getRealWagers({ agentID });
         const alerts = data.wagers.filter((w: any) => w.AmountWagered >= threshold);
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            alerts,
-            totalAlerts: alerts.length,
-            totalRisk: alerts.reduce((sum: number, w: any) => sum + w.ToWinAmount, 0),
-            threshold: threshold
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              alerts,
+              totalAlerts: alerts.length,
+              totalRisk: alerts.reduce((sum: number, w: any) => sum + w.ToWinAmount, 0),
+              threshold: threshold,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Error in getWagerAlerts:', error);
-        return new Response(JSON.stringify({ success: false, error: 'Failed to fetch wager alerts' }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({ success: false, error: 'Failed to fetch wager alerts' }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
     if (url.pathname === '/api/manager/getVIPCustomers') {
       try {
         const data = await api.getRealWagers();
-        const vipWagers = data.wagers.filter((w: any) => w.VIP === "1");
+        const vipWagers = data.wagers.filter((w: any) => w.VIP === '1');
         const vipCustomers = [...new Set(vipWagers.map((w: any) => w.CustomerID))];
 
         // Get customers once, outside the map
@@ -5499,27 +6268,35 @@ export default {
             totalWagers: customerWagers.length,
             totalVolume: customerWagers.reduce((sum: number, w: any) => sum + w.VolumeAmount, 0),
             totalRisk: customerWagers.reduce((sum: number, w: any) => sum + w.ToWinAmount, 0),
-            averageWager: customerWagers.reduce((sum: number, w: any) => sum + w.VolumeAmount, 0) / customerWagers.length,
-            customer: customer
+            averageWager:
+              customerWagers.reduce((sum: number, w: any) => sum + w.VolumeAmount, 0) /
+              customerWagers.length,
+            customer: customer,
           };
         });
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            vipCustomers: customerData,
-            totalVIP: customerData.length,
-            totalVIPVolume: vipWagers.reduce((sum: number, w: any) => sum + w.VolumeAmount, 0)
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              vipCustomers: customerData,
+              totalVIP: customerData.length,
+              totalVIPVolume: vipWagers.reduce((sum: number, w: any) => sum + w.VolumeAmount, 0),
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Error in getVIPCustomers:', error);
-        return new Response(JSON.stringify({ success: false, error: 'Failed to fetch VIP customers' }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({ success: false, error: 'Failed to fetch VIP customers' }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -5527,29 +6304,39 @@ export default {
       try {
         const body = await req.text();
         const params = new URLSearchParams(body);
-        
+
         const limit = parseInt(params.get('limit') || '50');
         const agentID = params.get('agentID') || '';
-        
-        const data = await api.getRealWagers({ agentID });
-        const tickerWagers = [...data.wagers].sort((a, b) => new Date(b.InsertDateTime).getTime() - new Date(a.InsertDateTime).getTime()).slice(0, limit);
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            ticker: tickerWagers,
-            totalTicker: tickerWagers.length,
-            lastUpdate: new Date().toISOString()
+        const data = await api.getRealWagers({ agentID });
+        const tickerWagers = [...data.wagers]
+          .sort(
+            (a, b) => new Date(b.InsertDateTime).getTime() - new Date(a.InsertDateTime).getTime()
+          )
+          .slice(0, limit);
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              ticker: tickerWagers,
+              totalTicker: tickerWagers.length,
+              lastUpdate: new Date().toISOString(),
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Error in getBetTicker:', error);
-        return new Response(JSON.stringify({ success: false, error: 'Failed to fetch bet ticker' }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({ success: false, error: 'Failed to fetch bet ticker' }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -5557,10 +6344,14 @@ export default {
       try {
         const data = await api.getRealWagers();
         const sportData = data.wagers.reduce((acc: any, wager: any) => {
-          const sport = wager.ShortDesc.includes('Baseball') ? 'Baseball' : 
-                       wager.ShortDesc.includes('Tennis') ? 'Tennis' : 
-                       wager.ShortDesc.includes('Football') ? 'Football' : 'Other';
-          
+          const sport = wager.ShortDesc.includes('Baseball')
+            ? 'Baseball'
+            : wager.ShortDesc.includes('Tennis')
+              ? 'Tennis'
+              : wager.ShortDesc.includes('Football')
+                ? 'Football'
+                : 'Other';
+
           if (!acc[sport]) {
             acc[sport] = {
               sport: sport,
@@ -5568,46 +6359,52 @@ export default {
               totalVolume: 0,
               totalRisk: 0,
               averageWager: 0,
-              wagerTypes: {}
+              wagerTypes: {},
             };
           }
-          
+
           acc[sport].totalWagers += 1;
           acc[sport].totalVolume += wager.VolumeAmount;
           acc[sport].totalRisk += wager.ToWinAmount;
-          
+
           if (!acc[sport].wagerTypes[wager.WagerType]) {
             acc[sport].wagerTypes[wager.WagerType] = 0;
           }
           acc[sport].wagerTypes[wager.WagerType] += 1;
-          
+
           acc[sport].averageWager = acc[sport].totalVolume / acc[sport].totalWagers;
-          
+
           return acc;
         }, {});
 
         const analytics = Object.values(sportData);
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            analytics,
-            totalSports: analytics.length,
-            grandTotal: {
-              totalVolume: data.wagers.reduce((sum: number, w: Wager) => sum + w.VolumeAmount, 0),
-              totalRisk: data.wagers.reduce((sum: number, w: Wager) => sum + w.ToWinAmount, 0),
-              totalWagers: data.wagers.length
-            }
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              analytics,
+              totalSports: analytics.length,
+              grandTotal: {
+                totalVolume: data.wagers.reduce((sum: number, w: Wager) => sum + w.VolumeAmount, 0),
+                totalRisk: data.wagers.reduce((sum: number, w: Wager) => sum + w.ToWinAmount, 0),
+                totalWagers: data.wagers.length,
+              },
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Error in getSportAnalytics:', error);
-        return new Response(JSON.stringify({ success: false, error: 'Failed to fetch sport analytics' }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({ success: false, error: 'Failed to fetch sport analytics' }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -5617,49 +6414,58 @@ export default {
         const customerID = url.searchParams.get('customerID') || 'BB6121';
         const customers = await api.getRealCustomers();
         const customer = customers.find(c => c.customer_id === customerID);
-        
+
         if (!customer) {
           return new Response(JSON.stringify({ success: false, error: 'Customer not found' }), {
             status: 404,
             headers: { 'Content-Type': 'application/json' },
           });
         }
-        
+
         const data = await api.getRealWagers();
         const customerWagers = data.wagers.filter((w: Wager) => w.CustomerID === customerID);
-        
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            customer: {
-              customer_id: customer.customer_id,
-              username: customer.customer_id,
-              name: customer.customer_id,
-              available_balance: customer.balance,
-              current_balance: customer.balance,
-              freeplay_balance: 0,
-              pending_wager_balance: 0,
-              agent_id: 'BLAKEPPH',
-              master_agent: 'BLAKEPPH',
-              active: customer.active,
-              sportbook_active: customer.active,
-              casino_active: customer.active,
-              open_date: customer.last_activity || '2025-01-01'
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              customer: {
+                customer_id: customer.customer_id,
+                username: customer.customer_id,
+                name: customer.customer_id,
+                available_balance: customer.balance,
+                current_balance: customer.balance,
+                freeplay_balance: 0,
+                pending_wager_balance: 0,
+                agent_id: 'BLAKEPPH',
+                master_agent: 'BLAKEPPH',
+                active: customer.active,
+                sportbook_active: customer.active,
+                casino_active: customer.active,
+                open_date: customer.last_activity || '2025-01-01',
+              },
+              wagers: customerWagers,
+              totalWagers: customerWagers.length,
+              totalVolume: customerWagers.reduce(
+                (sum: number, w: Wager) => sum + w.VolumeAmount,
+                0
+              ),
+              totalRisk: customerWagers.reduce((sum: number, w: Wager) => sum + w.ToWinAmount, 0),
             },
-            wagers: customerWagers,
-            totalWagers: customerWagers.length,
-            totalVolume: customerWagers.reduce((sum: number, w: Wager) => sum + w.VolumeAmount, 0),
-            totalRisk: customerWagers.reduce((sum: number, w: Wager) => sum + w.ToWinAmount, 0)
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Error in getCustomerDetails:', error);
-        return new Response(JSON.stringify({ success: false, error: 'Failed to fetch customer details' }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({ success: false, error: 'Failed to fetch customer details' }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -5669,24 +6475,30 @@ export default {
         const api = new Fire22APIService(env);
         const result = await api.callFire22API('getAuthorizations');
 
-        return new Response(JSON.stringify({
-          success: true,
-          fire22Response: result,
-          message: result ? 'Fire22 API working' : 'Fire22 API failed, using D1 fallback'
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            fire22Response: result,
+            message: result ? 'Fire22 API working' : 'Fire22 API failed, using D1 fallback',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error: unknown) {
         console.error('Error testing Fire22 API:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Fire22 API test failed',
-          message: errorMessage
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Fire22 API test failed',
+            message: errorMessage,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -5695,26 +6507,32 @@ export default {
       try {
         const api = new Fire22APIService(env);
         const customers = await api.getRealCustomers();
-        
-        return new Response(JSON.stringify({
-          success: true,
-          data: customers,
-          total: customers.length,
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: customers,
+            total: customers.length,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error: unknown) {
         console.error('Error fetching Fire22 customers:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch customers',
-          message: errorMessage
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch customers',
+            message: errorMessage,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -5723,25 +6541,31 @@ export default {
       try {
         const api = new Fire22APIService(env);
         const wagers = await api.getRealWagers();
-        
-        return new Response(JSON.stringify({
-          success: true,
-          data: wagers,
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: wagers,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error: unknown) {
         console.error('Error fetching Fire22 wagers:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch wagers',
-          message: errorMessage
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch wagers',
+            message: errorMessage,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -5750,25 +6574,31 @@ export default {
       try {
         const api = new Fire22APIService(env);
         const kpis = await api.getRealTimeKPIs();
-        
-        return new Response(JSON.stringify({
-          success: true,
-          data: kpis,
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: kpis,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error: unknown) {
         console.error('Error fetching Fire22 KPIs:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch KPIs',
-          message: errorMessage
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch KPIs',
+            message: errorMessage,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -5777,25 +6607,31 @@ export default {
       try {
         const api = new Fire22APIService(env);
         const performance = await api.getAgentPerformance();
-        
-        return new Response(JSON.stringify({
-          success: true,
-          data: performance,
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: performance,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error: unknown) {
         console.error('Error fetching Fire22 agent performance:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch agent performance',
-          message: errorMessage
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch agent performance',
+            message: errorMessage,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -5804,99 +6640,143 @@ export default {
       try {
         const customerId = url.searchParams.get('customerId');
         if (!customerId) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Customer ID is required'
-          }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-          });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Customer ID is required',
+            }),
+            {
+              status: 400,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
         }
 
         // Get customer config from database
-        const customerConfig = await query(env, 
-          'SELECT * FROM customer_configs WHERE customer_id = ?', 
+        const customerConfig = await query(
+          env,
+          'SELECT * FROM customer_configs WHERE customer_id = ?',
           [customerId]
         );
 
         if (customerConfig.length === 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Customer configuration not found'
-          }), {
-            status: 404,
-            headers: { 'Content-Type': 'application/json' },
-          });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Customer configuration not found',
+            }),
+            {
+              status: 404,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
         }
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: customerConfig[0],
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: customerConfig[0],
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error: unknown) {
         console.error('Error fetching customer configuration:', error);
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch customer configuration',
-          message: errorMessage
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch customer configuration',
+            message: errorMessage,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
     if (url.pathname === '/api/customer-config' && req.method === 'POST') {
       try {
         const body = await req.json();
-        const { customer_id, agent_id, permissions, betting_limits, account_settings, vip_status, risk_profile, created_by } = body;
+        const {
+          customer_id,
+          agent_id,
+          permissions,
+          betting_limits,
+          account_settings,
+          vip_status,
+          risk_profile,
+          created_by,
+        } = body;
 
         // Validate required fields
         if (!customer_id || !agent_id || !created_by) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Customer ID, Agent ID, and Created By are required'
-          }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-          });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Customer ID, Agent ID, and Created By are required',
+            }),
+            {
+              status: 400,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
         }
 
         // Insert or update customer config
         const now = new Date().toISOString();
-        const result = await query(env, `
+        const result = await query(
+          env,
+          `
           INSERT OR REPLACE INTO customer_configs (
             customer_id, agent_id, permissions, betting_limits, account_settings, 
             vip_status, risk_profile, created_at, updated_at, created_by, updated_by, status
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [
-          customer_id, agent_id, JSON.stringify(permissions), JSON.stringify(betting_limits),
-          JSON.stringify(account_settings), JSON.stringify(vip_status), JSON.stringify(risk_profile),
-          now, now, created_by, created_by, 'active'
-        ]);
+        `,
+          [
+            customer_id,
+            agent_id,
+            JSON.stringify(permissions),
+            JSON.stringify(betting_limits),
+            JSON.stringify(account_settings),
+            JSON.stringify(vip_status),
+            JSON.stringify(risk_profile),
+            now,
+            now,
+            created_by,
+            created_by,
+            'active',
+          ]
+        );
 
-        return new Response(JSON.stringify({
-          success: true,
-          message: 'Customer configuration saved successfully',
-          data: { customer_id, agent_id, created_at: now },
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: 'Customer configuration saved successfully',
+            data: { customer_id, agent_id, created_at: now },
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Error saving customer configuration:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to save customer configuration',
-          message: error.message
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to save customer configuration',
+            message: error.message,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -5904,40 +6784,46 @@ export default {
       try {
         const agentId = url.searchParams.get('agentId');
         const status = url.searchParams.get('status') || 'active';
-        
+
         let sql = 'SELECT * FROM customer_configs WHERE status = ?';
         let params = [status];
-        
+
         if (agentId) {
           sql += ' AND agent_id = ?';
           params.push(agentId);
         }
-        
+
         sql += ' ORDER BY created_at DESC';
-        
+
         const customerConfigs = await query(env, sql, params);
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            customerConfigs,
-            totalCustomers: customerConfigs.length,
-            filters: { agentId, status }
-          },
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              customerConfigs,
+              totalCustomers: customerConfigs.length,
+              filters: { agentId, status },
+            },
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Error fetching customer configurations:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch customer configurations',
-          message: error.message
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch customer configurations',
+            message: error.message,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -5947,19 +6833,22 @@ export default {
         const { customer_id, updates, updated_by } = body;
 
         if (!customer_id || !updates || !updated_by) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Customer ID, updates, and updated by are required'
-          }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-          });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Customer ID, updates, and updated by are required',
+            }),
+            {
+              status: 400,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
         }
 
         // Build dynamic update query
         const updateFields = [];
         const updateValues = [];
-        
+
         Object.entries(updates).forEach(([key, value]) => {
           if (key !== 'customer_id' && key !== 'created_at' && key !== 'created_by') {
             updateFields.push(`${key} = ?`);
@@ -5968,13 +6857,16 @@ export default {
         });
 
         if (updateFields.length === 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'No valid fields to update'
-          }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-          });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'No valid fields to update',
+            }),
+            {
+              status: 400,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
         }
 
         updateFields.push('updated_at = ?');
@@ -5985,36 +6877,45 @@ export default {
         const sql = `UPDATE customer_configs SET ${updateFields.join(', ')}, updated_by = ? WHERE customer_id = ?`;
         await query(env, sql, updateValues);
 
-        return new Response(JSON.stringify({
-          success: true,
-          message: 'Customer configuration updated successfully',
-          data: { customer_id, updated_at: new Date().toISOString() },
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: 'Customer configuration updated successfully',
+            data: { customer_id, updated_at: new Date().toISOString() },
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Error updating customer configuration:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to update customer configuration',
-          message: error.message
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to update customer configuration',
+            message: error.message,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
     // 🆕 ADDED: Simple test endpoint to verify deployment
     if (url.pathname === '/api/test-deployment') {
-      return new Response(JSON.stringify({
-        message: 'Deployment working!',
-        timestamp: new Date().toISOString(),
-        version: '2025-08-26-v2'
-      }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({
+          message: 'Deployment working!',
+          timestamp: new Date().toISOString(),
+          version: '2025-08-26-v2',
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     // 🆕 ADDED: Live metrics endpoint
@@ -6032,26 +6933,32 @@ export default {
 
         const kpi = await env.DB.prepare(kpiQuery).first();
 
-        return new Response(JSON.stringify({
-          success: true,
-          revenue: kpi?.revenue || 0,
-          activePlayers: kpi?.activePlayers || 0,
-          totalWagers: kpi?.totalWagers || 0,
-          timestamp: new Date().toISOString(),
-          source: 'd1_database'
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            revenue: kpi?.revenue || 0,
+            activePlayers: kpi?.activePlayers || 0,
+            totalWagers: kpi?.totalWagers || 0,
+            timestamp: new Date().toISOString(),
+            source: 'd1_database',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Live metrics error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch live metrics',
-          message: error.message
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch live metrics',
+            message: error.message,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -6088,48 +6995,62 @@ export default {
 
         // Create cache key based on parameters
         const cacheKey = `customers:${agent || 'all'}:${page}:${limit}`;
-        
+
         // Try to get from cache first
-        const cachedResult = await cache.get(cacheKey, async () => {
-          const customers = await env.DB.prepare(query).bind(...bindings).all();
+        const cachedResult = await cache.get(
+          cacheKey,
+          async () => {
+            const customers = await env.DB.prepare(query)
+              .bind(...bindings)
+              .all();
 
-          // Get total count
-          let countQuery = 'SELECT COUNT(*) as total FROM players WHERE 1=1';
-          const countBindings: any[] = [];
+            // Get total count
+            let countQuery = 'SELECT COUNT(*) as total FROM players WHERE 1=1';
+            const countBindings: any[] = [];
 
-          if (agent) {
-            countQuery += ' AND agent_id = ?';
-            countBindings.push(agent);
+            if (agent) {
+              countQuery += ' AND agent_id = ?';
+              countBindings.push(agent);
+            }
+
+            const countResult = await env.DB.prepare(countQuery)
+              .bind(...countBindings)
+              .first();
+
+            return {
+              customers: customers.results || [],
+              total: countResult?.total || 0,
+              page,
+              limit,
+              source: 'd1_database_cached',
+            };
+          },
+          15000
+        ); // Cache for 15 seconds
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            ...cachedResult,
+            cached: true,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-
-          const countResult = await env.DB.prepare(countQuery).bind(...countBindings).first();
-
-          return {
-            customers: customers.results || [],
-            total: countResult?.total || 0,
-            page,
-            limit,
-            source: 'd1_database_cached'
-          };
-        }, 15000); // Cache for 15 seconds
-
-        return new Response(JSON.stringify({
-          success: true,
-          ...cachedResult,
-          cached: true
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Customers endpoint error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch customers',
-          message: error.message
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch customers',
+            message: error.message,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -6137,7 +7058,8 @@ export default {
     if (url.pathname === '/api/health/permissions' && req.method === 'GET') {
       try {
         // Get all agent configs to validate permissions structure
-        const agentConfigs = await env.DB.prepare(`
+        const agentConfigs = await env.DB.prepare(
+          `
           SELECT 
             agent_id, master_agent_id, 
             allow_place_bet, allow_mod_info, allow_change_accounts, 
@@ -6145,7 +7067,8 @@ export default {
             max_wager, min_wager, sports_rate
             -- Select all relevant columns for validation
           FROM agent_configs
-        `).all();
+        `
+        ).all();
 
         // Import live casino system for enhanced validation
         let liveCasinoStats = null;
@@ -6158,46 +7081,50 @@ export default {
         }
 
         const agents = agentConfigs.results || [];
-        
+
         let totalAgents = agents.length;
         let agentsWithErrors = 0;
         let totalAgentScore = 0;
-        const agentDetails: { agent_id: string; status: string; score: number; errors: string[] }[] = [];
+        const agentDetails: {
+          agent_id: string;
+          status: string;
+          score: number;
+          errors: string[];
+        }[] = [];
         const overallValidationSummary: { [key: string]: number } = {
           valid_permissions: 0,
           valid_commission_rates: 0,
           has_required_fields: 0,
-          valid_max_wager_type: 0 // New specific check
+          valid_max_wager_type: 0, // New specific check
         };
-        
+
         // Define a minimum set of critical permissions to check
-        const criticalPermissions = [
-            'allow_place_bet', 'allow_mod_info', 'allow_change_accounts'
-        ];
+        const criticalPermissions = ['allow_place_bet', 'allow_mod_info', 'allow_change_accounts'];
         // Define a minimum set of critical commission/rate fields
-        const criticalRates = [
-            'commission_percent', 'inet_head_count_rate', 'live_casino_rate'
-        ];
-        
+        const criticalRates = ['commission_percent', 'inet_head_count_rate', 'live_casino_rate'];
+
         // Enhanced live casino specific validation
         const liveCasinoValidation = {
           has_live_casino_rates: 0,
           valid_casino_rates: 0,
           casino_rate_coverage: 0,
-          casino_performance_ready: 0
+          casino_performance_ready: 0,
         };
 
         if (totalAgents === 0) {
-          return new Response(JSON.stringify({ 
-            success: true,
-            status: "ERROR", // Critical if no configs exist
-            health_score: 0,
-            message: "No agent configurations found.",
-            agentDetails: []
-          }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
-          });
+          return new Response(
+            JSON.stringify({
+              success: true,
+              status: 'ERROR', // Critical if no configs exist
+              health_score: 0,
+              message: 'No agent configurations found.',
+              agentDetails: [],
+            }),
+            {
+              status: 500,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
         }
 
         agents.forEach(agent => {
@@ -6206,7 +7133,7 @@ export default {
 
           // 1. Check for required fields (e.g., agent_id)
           if (!agent.agent_id || !agent.master_agent_id) {
-            agentErrors.push("Missing critical agent_id or master_agent_id.");
+            agentErrors.push('Missing critical agent_id or master_agent_id.');
             agentScore -= 20; // Significant deduction
           } else {
             overallValidationSummary.has_required_fields++;
@@ -6214,46 +7141,59 @@ export default {
 
           // 2. Validate permission fields (e.g., allow_place_bet)
           criticalPermissions.forEach(permKey => {
-              // Assuming 'Y'/'N' for TEXT, 1/0 for INTEGER. Handle based on your schema.
-              const value = agent[permKey];
-              if (value === undefined || (typeof value === 'string' && !['Y', 'N'].includes(value.toUpperCase())) || (typeof value === 'number' && ![0, 1].includes(value))) {
-                  agentErrors.push(`Invalid or missing permission '${permKey}'. Expected 'Y'/'N' or 0/1.`);
-                  agentScore -= 10;
-              }
+            // Assuming 'Y'/'N' for TEXT, 1/0 for INTEGER. Handle based on your schema.
+            const value = agent[permKey];
+            if (
+              value === undefined ||
+              (typeof value === 'string' && !['Y', 'N'].includes(value.toUpperCase())) ||
+              (typeof value === 'number' && ![0, 1].includes(value))
+            ) {
+              agentErrors.push(
+                `Invalid or missing permission '${permKey}'. Expected 'Y'/'N' or 0/1.`
+              );
+              agentScore -= 10;
+            }
           });
-          if (criticalPermissions.every(pk => agent[pk] !== undefined)) { // If all critical permissions were found
-              overallValidationSummary.valid_permissions++;
+          if (criticalPermissions.every(pk => agent[pk] !== undefined)) {
+            // If all critical permissions were found
+            overallValidationSummary.valid_permissions++;
           }
 
           // 3. Validate commission rates and other numeric fields
           criticalRates.forEach(rateKey => {
-              const value = agent[rateKey];
-              if (typeof value !== 'number' || value < 0) {
-                  agentErrors.push(`Invalid or negative rate for '${rateKey}'.`);
-                  agentScore -= 5;
-              }
+            const value = agent[rateKey];
+            if (typeof value !== 'number' || value < 0) {
+              agentErrors.push(`Invalid or negative rate for '${rateKey}'.`);
+              agentScore -= 5;
+            }
           });
-          if (criticalRates.every(rk => typeof agent[rk] === 'number' && agent[rk] >= 0)) { // If all critical rates were found and valid
-              overallValidationSummary.valid_commission_rates++;
+          if (criticalRates.every(rk => typeof agent[rk] === 'number' && agent[rk] >= 0)) {
+            // If all critical rates were found and valid
+            overallValidationSummary.valid_commission_rates++;
           }
 
           // 4. Enhanced Live Casino Rate Validation
           const liveCasinoRate = agent.live_casino_rate;
           if (liveCasinoRate !== undefined && liveCasinoRate !== null) {
             liveCasinoValidation.has_live_casino_rates++;
-            
+
             if (typeof liveCasinoRate === 'number' && liveCasinoRate >= 0 && liveCasinoRate <= 1) {
               liveCasinoValidation.valid_casino_rates++;
-              
+
               // Check if rate is within reasonable bounds for live casino
-              if (liveCasinoRate >= 0.01 && liveCasinoRate <= 0.15) { // 1% to 15% range
+              if (liveCasinoRate >= 0.01 && liveCasinoRate <= 0.15) {
+                // 1% to 15% range
                 liveCasinoValidation.casino_performance_ready++;
               } else {
-                agentErrors.push(`Live casino rate ${(liveCasinoRate * 100).toFixed(2)}% is outside recommended range (1%-15%)`);
+                agentErrors.push(
+                  `Live casino rate ${(liveCasinoRate * 100).toFixed(2)}% is outside recommended range (1%-15%)`
+                );
                 agentScore -= 3;
               }
             } else {
-              agentErrors.push(`Invalid live casino rate: ${liveCasinoRate}. Expected number between 0 and 1.`);
+              agentErrors.push(
+                `Invalid live casino rate: ${liveCasinoRate}. Expected number between 0 and 1.`
+              );
               agentScore -= 5;
             }
           } else {
@@ -6264,10 +7204,13 @@ export default {
           // 5. Specific data quality check for max_wager (text 'Y'/'N' vs numeric value)
           const maxWager = agent.max_wager;
           if (typeof maxWager === 'string' && !['Y', 'N'].includes(maxWager.toUpperCase())) {
-            if (!isNaN(parseFloat(maxWager))) { // It's a number as string
+            if (!isNaN(parseFloat(maxWager))) {
+              // It's a number as string
               overallValidationSummary.valid_max_wager_type++;
             } else {
-              agentErrors.push(`Invalid 'max_wager' format: '${maxWager}'. Expected 'Y', 'N', or a numeric string.`);
+              agentErrors.push(
+                `Invalid 'max_wager' format: '${maxWager}'. Expected 'Y', 'N', or a numeric string.`
+              );
               agentScore -= 5;
             }
           } else if (typeof maxWager === 'number' && maxWager < 0) {
@@ -6289,19 +7232,19 @@ export default {
           totalAgentScore += agentScore;
           agentDetails.push({
             agent_id: agent.agent_id,
-            status: agentErrors.length === 0 ? "OK" : "ERROR",
+            status: agentErrors.length === 0 ? 'OK' : 'ERROR',
             score: agentScore,
             errors: agentErrors,
           });
         });
 
         const averageAgentScore = totalAgents > 0 ? Math.round(totalAgentScore / totalAgents) : 0;
-        
-        let overallHealthStatus = "OK";
+
+        let overallHealthStatus = 'OK';
         if (agentsWithErrors > 0 && agentsWithErrors < totalAgents) {
-          overallHealthStatus = "WARNING"; // Some agents have errors
+          overallHealthStatus = 'WARNING'; // Some agents have errors
         } else if (agentsWithErrors === totalAgents) {
-          overallHealthStatus = "ERROR"; // All agents have errors
+          overallHealthStatus = 'ERROR'; // All agents have errors
         }
 
         // Calculate live casino coverage
@@ -6316,7 +7259,7 @@ export default {
         console.log(`Health Score: ${averageAgentScore}%`);
         console.log(`Total Agents: ${totalAgents}`);
         console.log(`Agents with Errors: ${agentsWithErrors}`);
-        
+
         if (liveCasinoStats) {
           console.log('\n🎰 LIVE CASINO INTEGRATION:');
           console.log(`  Total Games: ${liveCasinoStats.totalGames}`);
@@ -6324,35 +7267,53 @@ export default {
           console.log(`  Total Sessions: ${liveCasinoStats.totalSessions}`);
           console.log(`  Active Sessions: ${liveCasinoStats.activeSessions}`);
         }
-        
+
         console.log('\n💰 LIVE CASINO RATE VALIDATION:');
-        console.log(`  Agents with Casino Rates: ${liveCasinoValidation.has_live_casino_rates}/${totalAgents} (${liveCasinoValidation.casino_rate_coverage}%)`);
-        console.log(`  Valid Casino Rates: ${liveCasinoValidation.valid_casino_rates}/${totalAgents}`);
-        console.log(`  Performance Ready: ${liveCasinoValidation.casino_performance_ready}/${totalAgents}`);
-        
+        console.log(
+          `  Agents with Casino Rates: ${liveCasinoValidation.has_live_casino_rates}/${totalAgents} (${liveCasinoValidation.casino_rate_coverage}%)`
+        );
+        console.log(
+          `  Valid Casino Rates: ${liveCasinoValidation.valid_casino_rates}/${totalAgents}`
+        );
+        console.log(
+          `  Performance Ready: ${liveCasinoValidation.casino_performance_ready}/${totalAgents}`
+        );
+
         console.log('='.repeat(50));
 
-        return new Response(JSON.stringify({
-          success: true,
-          status: overallHealthStatus,
-          timestamp: new Date().toISOString(),
-          health_score: averageAgentScore, // Use average score as overall health
-          average_agent_score: averageAgentScore,
-          total_agents: totalAgents,
-          agents_with_errors: agentsWithErrors,
-          validation_summary: overallValidationSummary,
-          live_casino_validation: liveCasinoValidation,
-          live_casino_stats: liveCasinoStats,
-          agent_validation_details: agentDetails.length > 0 ? agentDetails : undefined, // Provide details if there are agents
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            status: overallHealthStatus,
+            timestamp: new Date().toISOString(),
+            health_score: averageAgentScore, // Use average score as overall health
+            average_agent_score: averageAgentScore,
+            total_agents: totalAgents,
+            agents_with_errors: agentsWithErrors,
+            validation_summary: overallValidationSummary,
+            live_casino_validation: liveCasinoValidation,
+            live_casino_stats: liveCasinoStats,
+            agent_validation_details: agentDetails.length > 0 ? agentDetails : undefined, // Provide details if there are agents
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error: any) {
-        console.error("Error in /api/health/permissions:", error.message, error.stack);
-        return new Response(JSON.stringify({ success: false, status: "ERROR", health_score: 0, message: "Failed to perform permissions health check.", error: error.message }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        console.error('Error in /api/health/permissions:', error.message, error.stack);
+        return new Response(
+          JSON.stringify({
+            success: false,
+            status: 'ERROR',
+            health_score: 0,
+            message: 'Failed to perform permissions health check.',
+            error: error.message,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -6360,14 +7321,16 @@ export default {
     if (url.pathname === '/api/health/permissions-matrix' && req.method === 'GET') {
       try {
         // Test the actual permissions matrix generation
-        const configs = await env.DB.prepare(`
+        const configs = await env.DB.prepare(
+          `
           SELECT 
             id, agent_id, master_agent_id, 
             allow_place_bet, commission_percent, inet_head_count_rate, live_casino_rate, 
             max_wager, updated_at, commission_type, head_count_rate, min_wager, sports_rate
           FROM agent_configs
           ORDER BY agent_id
-        `).all();
+        `
+        ).all();
 
         // Import live casino system for enhanced matrix validation
         let liveCasinoMatrixStats = null;
@@ -6378,16 +7341,18 @@ export default {
             totalGames: casinoSystem.getAllGames().length,
             activeGames: casinoSystem.getAllGames().filter(g => g.isActive).length,
             totalRates: 0, // Will be calculated from agent configs
-            casinoRateCoverage: 0
+            casinoRateCoverage: 0,
           };
-          
+
           // Calculate casino rate coverage from agent configs
-          const agentsWithCasinoRates = configs.results?.filter(agent => 
-            agent.live_casino_rate !== undefined && 
-            agent.live_casino_rate !== null && 
-            typeof agent.live_casino_rate === 'number'
-          ).length || 0;
-          
+          const agentsWithCasinoRates =
+            configs.results?.filter(
+              agent =>
+                agent.live_casino_rate !== undefined &&
+                agent.live_casino_rate !== null &&
+                typeof agent.live_casino_rate === 'number'
+            ).length || 0;
+
           liveCasinoMatrixStats.totalRates = agentsWithCasinoRates;
           liveCasinoMatrixStats.casinoRateCoverage = Math.round(
             (agentsWithCasinoRates / (configs.results?.length || 1)) * 100
@@ -6397,24 +7362,32 @@ export default {
         }
 
         const agents = configs.results || [];
-        
+
         if (agents.length === 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            status: 'WARNING',
-            matrix_health_score: 0,
-            error: 'No agent configs found in D1 database',
-            timestamp: new Date().toISOString()
-          }), {
-            status: 200, // Use 200 for warnings
-            headers: { 'Content-Type': 'application/json' },
-          });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              status: 'WARNING',
+              matrix_health_score: 0,
+              error: 'No agent configs found in D1 database',
+              timestamp: new Date().toISOString(),
+            }),
+            {
+              status: 200, // Use 200 for warnings
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
         }
 
         // Define expected permission structure
         const knownPermissions = [
-          'canPlaceBets', 'canModifyInfo', 'canChangeAccounts', 
-          'canOpenParlays', 'canRoundRobin', 'canPropBuilder', 'canCrash'
+          'canPlaceBets',
+          'canModifyInfo',
+          'canChangeAccounts',
+          'canOpenParlays',
+          'canRoundRobin',
+          'canPropBuilder',
+          'canCrash',
         ];
 
         // Generate comprehensive permissions matrix with validation
@@ -6433,21 +7406,23 @@ export default {
             canOpenParlays: true, // Default since we don't have this column
             canRoundRobin: true, // Default since we don't have this column
             canPropBuilder: agent.sports_rate !== undefined,
-            canCrash: false // Default since we don't have this column
+            canCrash: false, // Default since we don't have this column
           };
-          
+
           // Add all permission keys to the set
           Object.keys(permissions).forEach(key => allPermissionKeys.add(key));
-          
+
           // Validate each permission value
           Object.entries(permissions).forEach(([key, value]) => {
             totalCells++;
-            
+
             if (typeof value === 'boolean') {
               validCells++;
             } else if (value !== undefined && value !== null) {
               warningCells++;
-              matrixIssues.push(`Agent ${agent.agent_id}: '${key}' has unexpected value '${value}'`);
+              matrixIssues.push(
+                `Agent ${agent.agent_id}: '${key}' has unexpected value '${value}'`
+              );
             } else {
               matrixIssues.push(`Agent ${agent.agent_id}: '${key}' is undefined/null`);
             }
@@ -6457,22 +7432,28 @@ export default {
             agent_id: agent.agent_id,
             permissions,
             permission_count: Object.values(permissions).filter(Boolean).length,
-            permission_coverage: Math.round((Object.values(permissions).filter(Boolean).length / Object.keys(permissions).length) * 100),
+            permission_coverage: Math.round(
+              (Object.values(permissions).filter(Boolean).length /
+                Object.keys(permissions).length) *
+                100
+            ),
             commission_rates: {
               inet: agent.inet_head_count_rate || 0,
               casino: agent.live_casino_rate || 0,
-              propBuilder: agent.sports_rate || 0
+              propBuilder: agent.sports_rate || 0,
             },
             data_quality: {
               has_required_fields: !!(agent.agent_id && agent.allow_place_bet !== undefined),
-              commission_rates_complete: !!(agent.inet_head_count_rate !== undefined && agent.live_casino_rate !== undefined),
-              last_updated: agent.updated_at
-            }
+              commission_rates_complete: !!(
+                agent.inet_head_count_rate !== undefined && agent.live_casino_rate !== undefined
+              ),
+              last_updated: agent.updated_at,
+            },
           };
         });
 
         const permissionKeys = Array.from(allPermissionKeys);
-        
+
         // Calculate comprehensive matrix health metrics
         const totalPermissions = permissionKeys.length;
         const totalMatrixCells = agents.length * totalPermissions;
@@ -6484,12 +7465,12 @@ export default {
         const dataCompleteness = Math.round((validCells / totalCells) * 100);
         const permissionCoverage = Math.round((validMatrixCells / totalMatrixCells) * 100);
         const agentDataQuality = Math.round(
-          matrixData.filter(a => a.data_quality.has_required_fields).length / agents.length * 100
+          (matrixData.filter(a => a.data_quality.has_required_fields).length / agents.length) * 100
         );
-        
+
         // Weighted health score
         const matrixHealthScore = Math.round(
-          (dataCompleteness * 0.4) + (permissionCoverage * 0.4) + (agentDataQuality * 0.2)
+          dataCompleteness * 0.4 + permissionCoverage * 0.4 + agentDataQuality * 0.2
         );
 
         // Determine overall status
@@ -6507,88 +7488,105 @@ export default {
         console.log(`Matrix Health Score: ${matrixHealthScore}%`);
         console.log(`Total Agents: ${agents.length}`);
         console.log(`Total Permissions: ${totalPermissions}`);
-        console.log(`Matrix Cells: ${totalCells} total, ${validCells} valid, ${warningCells} warnings`);
-        
+        console.log(
+          `Matrix Cells: ${totalCells} total, ${validCells} valid, ${warningCells} warnings`
+        );
+
         if (liveCasinoMatrixStats) {
           console.log('\n🎰 LIVE CASINO MATRIX INTEGRATION:');
           console.log(`  Total Games: ${liveCasinoMatrixStats.totalGames}`);
           console.log(`  Active Games: ${liveCasinoMatrixStats.activeGames}`);
-          console.log(`  Agents with Casino Rates: ${liveCasinoMatrixStats.totalRates}/${agents.length}`);
+          console.log(
+            `  Agents with Casino Rates: ${liveCasinoMatrixStats.totalRates}/${agents.length}`
+          );
           console.log(`  Casino Rate Coverage: ${liveCasinoMatrixStats.casinoRateCoverage}%`);
         }
-        
+
         console.log('\n📊 Matrix Statistics:');
-        console.table([{
-          data_completeness: `${dataCompleteness}%`,
-          permission_coverage: `${permissionCoverage}%`,
-          agent_data_quality: `${agentDataQuality}%`,
-          total_matrix_cells: totalMatrixCells,
-          valid_matrix_cells: validMatrixCells
-        }]);
-        
+        console.table([
+          {
+            data_completeness: `${dataCompleteness}%`,
+            permission_coverage: `${permissionCoverage}%`,
+            agent_data_quality: `${agentDataQuality}%`,
+            total_matrix_cells: totalMatrixCells,
+            valid_matrix_cells: validMatrixCells,
+          },
+        ]);
+
         if (matrixIssues.length > 0) {
           console.log('\n⚠️ Matrix Issues:');
           console.table(matrixIssues.map((issue, index) => ({ index: index + 1, issue })));
         }
-        
+
         console.log('='.repeat(50));
 
-        return new Response(JSON.stringify({
-          success: true,
-          status,
-          timestamp: new Date().toISOString(),
-          matrix_health_score: matrixHealthScore,
-          matrix_stats: {
-            total_agents: agents.length,
-            total_permissions: totalPermissions,
-            total_matrix_cells: totalMatrixCells,
-            valid_matrix_cells: validMatrixCells,
-            data_completeness: dataCompleteness,
-            permission_coverage: permissionCoverage,
-            agent_data_quality: agentDataQuality
-          },
-          live_casino_matrix_stats: liveCasinoMatrixStats,
-          cell_validation: {
-            total_cells: totalCells,
-            valid_cells: validCells,
-            warning_cells: warningCells,
-            invalid_cells: totalCells - validCells - warningCells
-          },
-          permission_keys: permissionKeys,
-          matrix_data: matrixData,
-          matrix_issues: matrixIssues.length > 0 ? matrixIssues : undefined,
-          recommendations: status === 'ERROR' ? [
-            '🚨 CRITICAL: Matrix generation has serious issues',
-            'Check permissions matrix generation logic',
-            'Verify agent permission assignments',
-            'Review matrix rendering in dashboard',
-            'Check for data corruption in agent_configs'
-          ] : status === 'WARNING' ? [
-            '⚠️ WARNING: Some matrix issues detected',
-            'Review matrix issues above',
-            'Check agent permission assignments',
-            'Consider data cleanup procedures'
-          ] : [
-            '✅ Permissions matrix is healthy',
-            'All matrix cells are valid',
-            'Continue monitoring for any changes'
-          ]
-        }), {
-          status: status === 'ERROR' ? 500 : 200,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            status,
+            timestamp: new Date().toISOString(),
+            matrix_health_score: matrixHealthScore,
+            matrix_stats: {
+              total_agents: agents.length,
+              total_permissions: totalPermissions,
+              total_matrix_cells: totalMatrixCells,
+              valid_matrix_cells: validMatrixCells,
+              data_completeness: dataCompleteness,
+              permission_coverage: permissionCoverage,
+              agent_data_quality: agentDataQuality,
+            },
+            live_casino_matrix_stats: liveCasinoMatrixStats,
+            cell_validation: {
+              total_cells: totalCells,
+              valid_cells: validCells,
+              warning_cells: warningCells,
+              invalid_cells: totalCells - validCells - warningCells,
+            },
+            permission_keys: permissionKeys,
+            matrix_data: matrixData,
+            matrix_issues: matrixIssues.length > 0 ? matrixIssues : undefined,
+            recommendations:
+              status === 'ERROR'
+                ? [
+                    '🚨 CRITICAL: Matrix generation has serious issues',
+                    'Check permissions matrix generation logic',
+                    'Verify agent permission assignments',
+                    'Review matrix rendering in dashboard',
+                    'Check for data corruption in agent_configs',
+                  ]
+                : status === 'WARNING'
+                  ? [
+                      '⚠️ WARNING: Some matrix issues detected',
+                      'Review matrix issues above',
+                      'Check agent permission assignments',
+                      'Consider data cleanup procedures',
+                    ]
+                  : [
+                      '✅ Permissions matrix is healthy',
+                      'All matrix cells are valid',
+                      'Continue monitoring for any changes',
+                    ],
+          }),
+          {
+            status: status === 'ERROR' ? 500 : 200,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error: any) {
         console.error('Permissions matrix health check error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          status: 'ERROR',
-          error: 'Permissions matrix health check failed',
-          message: error.message,
-          timestamp: new Date().toISOString()
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            status: 'ERROR',
+            error: 'Permissions matrix health check failed',
+            message: error.message,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -6596,26 +7594,31 @@ export default {
     if (url.pathname === '/api/debug/permissions-matrix' && req.method === 'GET') {
       try {
         // Get comprehensive matrix data for debugging
-        const configs = await env.DB.prepare(`
+        const configs = await env.DB.prepare(
+          `
           SELECT 
             id, agent_id, master_agent_id, 
             allow_place_bet, commission_percent, inet_head_count_rate, live_casino_rate, 
             max_wager, updated_at, commission_type, head_count_rate, min_wager, sports_rate
           FROM agent_configs
           ORDER BY agent_id
-        `).all();
+        `
+        ).all();
 
         const agents = configs.results || [];
-        
+
         if (agents.length === 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'No agent configs found',
-            timestamp: new Date().toISOString()
-          }), {
-            status: 404,
-            headers: { 'Content-Type': 'application/json' },
-          });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'No agent configs found',
+              timestamp: new Date().toISOString(),
+            }),
+            {
+              status: 404,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
         }
 
         // Generate matrix data for debugging
@@ -6628,145 +7631,183 @@ export default {
             canOpenParlays: true,
             canRoundRobin: true,
             canPropBuilder: agent.sports_rate !== undefined,
-            canCrash: false
+            canCrash: false,
           },
           commission_rates: {
             inet: agent.inet_head_count_rate || 0,
             casino: agent.live_casino_rate || 0,
-            propBuilder: agent.sports_rate || 0
+            propBuilder: agent.sports_rate || 0,
           },
           data_quality: {
             has_required_fields: !!(agent.agent_id && agent.allow_place_bet !== undefined),
-            commission_rates_complete: !!(agent.inet_head_count_rate !== undefined && agent.live_casino_rate !== undefined),
-            last_updated: agent.updated_at
-          }
+            commission_rates_complete: !!(
+              agent.inet_head_count_rate !== undefined && agent.live_casino_rate !== undefined
+            ),
+            last_updated: agent.updated_at,
+          },
         }));
 
-        return new Response(JSON.stringify({
-          success: true,
-          matrixData,
-          validationResults: {
+        return new Response(
+          JSON.stringify({
+            success: true,
+            matrixData,
+            validationResults: {
+              totalAgents: agents.length,
+              validAgents: matrixData.filter(a => a.data_quality.has_required_fields).length,
+              dataQuality: Math.round(
+                (matrixData.filter(a => a.data_quality.has_required_fields).length /
+                  agents.length) *
+                  100
+              ),
+            },
             totalAgents: agents.length,
-            validAgents: matrixData.filter(a => a.data_quality.has_required_fields).length,
-            dataQuality: Math.round((matrixData.filter(a => a.data_quality.has_required_fields).length / agents.length) * 100)
-          },
-          totalAgents: agents.length,
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error: any) {
         console.error('Permissions matrix debug error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Permissions matrix debug failed',
-          message: error.message,
-          timestamp: new Date().toISOString()
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Permissions matrix debug failed',
+            message: error.message,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
     if (url.pathname === '/api/debug/permissions-matrix/validation' && req.method === 'GET') {
       try {
-        const configs = await env.DB.prepare(`
+        const configs = await env.DB.prepare(
+          `
           SELECT 
             id, agent_id, master_agent_id, 
             allow_place_bet, commission_percent, inet_head_count_rate, live_casino_rate, 
             max_wager, updated_at, commission_type, head_count_rate, min_wager, sports_rate
           FROM agent_configs
           ORDER BY agent_id
-        `).all();
+        `
+        ).all();
 
         const agents = configs.results || [];
-        
+
         if (agents.length === 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'No agent configs found',
-            timestamp: new Date().toISOString()
-          }), {
-            status: 404,
-            headers: { 'Content-Type': 'application/json' },
-          });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'No agent configs found',
+              timestamp: new Date().toISOString(),
+            }),
+            {
+              status: 404,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
         }
 
         // Validation results
         const structureValidation = {
           status: 'valid',
           totalAgents: agents.length,
-          hasRequiredFields: agents.every(a => a.agent_id && a.allow_place_bet !== undefined)
+          hasRequiredFields: agents.every(a => a.agent_id && a.allow_place_bet !== undefined),
         };
 
         const commissionValidation = {
-          status: agents.every(a => a.inet_head_count_rate !== undefined && a.live_casino_rate !== undefined) ? 'valid' : 'warning',
+          status: agents.every(
+            a => a.inet_head_count_rate !== undefined && a.live_casino_rate !== undefined
+          )
+            ? 'valid'
+            : 'warning',
           totalAgents: agents.length,
-          hasCommissionRates: agents.filter(a => a.inet_head_count_rate !== undefined && a.live_casino_rate !== undefined).length
+          hasCommissionRates: agents.filter(
+            a => a.inet_head_count_rate !== undefined && a.live_casino_rate !== undefined
+          ).length,
         };
 
         const statusValidation = {
           status: 'valid',
           totalAgents: agents.length,
-          activeAgents: agents.length
+          activeAgents: agents.length,
         };
 
         const completeValidation = {
-          status: structureValidation.status === 'valid' && commissionValidation.status === 'valid' ? 'valid' : 'warning',
+          status:
+            structureValidation.status === 'valid' && commissionValidation.status === 'valid'
+              ? 'valid'
+              : 'warning',
           totalAgents: agents.length,
           validationScore: Math.round(
-            ((structureValidation.hasRequiredFields ? 1 : 0) + 
-             (commissionValidation.hasCommissionRates / agents.length)) * 50
-          )
+            ((structureValidation.hasRequiredFields ? 1 : 0) +
+              commissionValidation.hasCommissionRates / agents.length) *
+              50
+          ),
         };
 
-        return new Response(JSON.stringify({
-          success: true,
-          structureValidation,
-          commissionValidation,
-          statusValidation,
-          completeValidation,
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            structureValidation,
+            commissionValidation,
+            statusValidation,
+            completeValidation,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error: any) {
         console.error('Permissions validation debug error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Permissions validation debug failed',
-          message: error.message,
-          timestamp: new Date().toISOString()
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Permissions validation debug failed',
+            message: error.message,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
     if (url.pathname === '/api/debug/permissions-matrix/agents' && req.method === 'GET') {
       try {
-        const configs = await env.DB.prepare(`
+        const configs = await env.DB.prepare(
+          `
           SELECT 
             id, agent_id, master_agent_id, 
             allow_place_bet, commission_percent, inet_head_count_rate, live_casino_rate, 
             max_wager, updated_at, commission_type, head_count_rate, min_wager, sports_rate
           FROM agent_configs
           ORDER BY agent_id
-        `).all();
+        `
+        ).all();
 
         const agents = configs.results || [];
-        
+
         if (agents.length === 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'No agent configs found',
-            timestamp: new Date().toISOString()
-          }), {
-            status: 404,
-            headers: { 'Content-Type': 'application/json' },
-          });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'No agent configs found',
+              timestamp: new Date().toISOString(),
+            }),
+            {
+              status: 404,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
         }
 
         const agentDetails = agents.map(agent => ({
@@ -6778,162 +7819,192 @@ export default {
             canOpenParlays: true,
             canRoundRobin: true,
             canPropBuilder: agent.sports_rate !== undefined,
-            canCrash: false
+            canCrash: false,
           },
           commissionRates: {
             inet: agent.inet_head_count_rate || 0,
             casino: agent.live_casino_rate || 0,
-            propBuilder: agent.sports_rate || 0
+            propBuilder: agent.sports_rate || 0,
           },
           status: 'active',
-          lastUpdated: agent.updated_at
+          lastUpdated: agent.updated_at,
         }));
 
         const validationSummary = {
           totalAgents: agents.length,
-          validAgents: agentDetails.filter(a => a.agent_id && a.permissions.canPlaceBets !== undefined).length,
-          dataQuality: Math.round((agentDetails.filter(a => a.agent_id && a.permissions.canPlaceBets !== undefined).length / agents.length) * 100)
+          validAgents: agentDetails.filter(
+            a => a.agent_id && a.permissions.canPlaceBets !== undefined
+          ).length,
+          dataQuality: Math.round(
+            (agentDetails.filter(a => a.agent_id && a.permissions.canPlaceBets !== undefined)
+              .length /
+              agents.length) *
+              100
+          ),
         };
 
-        return new Response(JSON.stringify({
-          success: true,
-          agents: agentDetails,
-          agentDetails,
-          validationSummary,
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            agents: agentDetails,
+            agentDetails,
+            validationSummary,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error: any) {
         console.error('Agent details debug error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Agent details debug failed',
-          message: error.message,
-          timestamp: new Date().toISOString()
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Agent details debug failed',
+            message: error.message,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
     if (url.pathname === '/api/debug/permissions-matrix/performance' && req.method === 'GET') {
       try {
         const startTime = Date.now();
-        
+
         // Simulate performance metrics
         const responseTimes = {
           average: 45,
           min: 12,
           max: 89,
-          p95: 67
+          p95: 67,
         };
 
         const throughput = {
           requestsPerSecond: 22.5,
           totalRequests: 150,
-          successfulRequests: 148
+          successfulRequests: 148,
         };
 
         const cacheStats = {
           hitRate: '94.2%',
           cacheSize: 45,
-          evictions: 2
+          evictions: 2,
         };
 
         const validationMetrics = {
           totalValidations: 1250,
           averageValidationTime: 23,
-          validationSuccessRate: '98.4%'
+          validationSuccessRate: '98.4%',
         };
 
         const endTime = Date.now();
         const actualResponseTime = endTime - startTime;
 
-        return new Response(JSON.stringify({
-          success: true,
-          responseTimes,
-          throughput,
-          cacheStats,
-          validationMetrics,
-          actualResponseTime: `${actualResponseTime}ms`,
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            responseTimes,
+            throughput,
+            cacheStats,
+            validationMetrics,
+            actualResponseTime: `${actualResponseTime}ms`,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error: any) {
         console.error('Performance debug error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Performance debug failed',
-          message: error.message,
-          timestamp: new Date().toISOString()
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Performance debug failed',
+            message: error.message,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
     if (url.pathname === '/api/debug/permissions-matrix/realtime' && req.method === 'GET') {
       try {
-        const configs = await env.DB.prepare(`
+        const configs = await env.DB.prepare(
+          `
           SELECT 
             id, agent_id, master_agent_id, 
             allow_place_bet, commission_percent, inet_head_count_rate, live_casino_rate, 
             max_wager, updated_at, commission_type, head_count_rate, min_wager, sports_rate
           FROM agent_configs
           ORDER BY agent_id
-        `).all();
+        `
+        ).all();
 
         const agents = configs.results || [];
-        
+
         if (agents.length === 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'No agent configs found',
-            timestamp: new Date().toISOString()
-          }), {
-            status: 404,
-            headers: { 'Content-Type': 'application/json' },
-          });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'No agent configs found',
+              timestamp: new Date().toISOString(),
+            }),
+            {
+              status: 404,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
         }
 
         const liveMetrics = {
           totalAgents: agents.length,
           activeAgents: agents.length,
-          lastUpdate: new Date().toISOString()
+          lastUpdate: new Date().toISOString(),
         };
 
         const activeValidations = [
           { id: 'val-1', status: 'running', progress: 85 },
-          { id: 'val-2', status: 'completed', progress: 100 }
+          { id: 'val-2', status: 'completed', progress: 100 },
         ];
 
         const systemStatus = 'operational';
 
-        return new Response(JSON.stringify({
-          success: true,
-          liveMetrics,
-          activeValidations,
-          systemStatus,
-          lastUpdate: new Date().toISOString(),
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            liveMetrics,
+            activeValidations,
+            systemStatus,
+            lastUpdate: new Date().toISOString(),
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error: any) {
         console.error('Real-time status debug error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Real-time status debug failed',
-          message: error.message,
-          timestamp: new Date().toISOString()
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Real-time status debug failed',
+            message: error.message,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -6944,75 +8015,85 @@ export default {
         const checks: any[] = [];
         let overallStatus = 'OK';
         let criticalIssues = 0;
-        
+
         // 1. Database Connectivity Check
         try {
-          const dbTest = await env.DB.prepare('SELECT COUNT(*) as count FROM agent_configs').first();
+          const dbTest = await env.DB.prepare(
+            'SELECT COUNT(*) as count FROM agent_configs'
+          ).first();
           const dbHealthy = !!dbTest;
-          checks.push({ 
-            name: 'Database Connectivity', 
+          checks.push({
+            name: 'Database Connectivity',
             status: dbHealthy ? 'OK' : 'ERROR',
-            details: dbHealthy ? 'Connected to D1 database' : 'Database connection failed'
+            details: dbHealthy ? 'Connected to D1 database' : 'Database connection failed',
           });
           if (!dbHealthy) {
             overallStatus = 'ERROR';
             criticalIssues++;
           }
         } catch (error: any) {
-          checks.push({ 
-            name: 'Database Connectivity', 
+          checks.push({
+            name: 'Database Connectivity',
             status: 'ERROR',
-            error: error.message 
+            error: error.message,
           });
           overallStatus = 'ERROR';
           criticalIssues++;
         }
-        
+
         // 2. Agent Configs API Check
         try {
           // Use direct database check instead of internal API call
-          const agentConfigsTest = await env.DB.prepare('SELECT COUNT(*) as count FROM agent_configs').first();
+          const agentConfigsTest = await env.DB.prepare(
+            'SELECT COUNT(*) as count FROM agent_configs'
+          ).first();
           const agentConfigsHealthy = !!agentConfigsTest;
-          checks.push({ 
-            name: 'Agent Configs API', 
+          checks.push({
+            name: 'Agent Configs API',
             status: agentConfigsHealthy ? 'OK' : 'ERROR',
-            details: agentConfigsHealthy ? 'Database accessible, agent configs available' : 'Database connection failed'
+            details: agentConfigsHealthy
+              ? 'Database accessible, agent configs available'
+              : 'Database connection failed',
           });
           if (!agentConfigsHealthy) {
             overallStatus = 'ERROR';
             criticalIssues++;
           }
         } catch (error: any) {
-          checks.push({ 
-            name: 'Agent Configs API', 
+          checks.push({
+            name: 'Agent Configs API',
             status: 'ERROR',
-            error: error.message 
+            error: error.message,
           });
           overallStatus = 'ERROR';
           criticalIssues++;
         }
-        
+
         // 3. 🔐 NEW: Permissions Structure & Data Health Check
         try {
           // Direct database check instead of internal API call
-          const permissionsConfigs = await env.DB.prepare(`
+          const permissionsConfigs = await env.DB.prepare(
+            `
             SELECT agent_id, allow_place_bet, inet_head_count_rate, live_casino_rate
             FROM agent_configs LIMIT 5
-          `).all();
-          
+          `
+          ).all();
+
           if (permissionsConfigs.results && permissionsConfigs.results.length > 0) {
             const agents = permissionsConfigs.results;
-            const validAgents = agents.filter(a => a.agent_id && a.allow_place_bet !== undefined).length;
+            const validAgents = agents.filter(
+              a => a.agent_id && a.allow_place_bet !== undefined
+            ).length;
             const healthScore = Math.round((validAgents / agents.length) * 100);
             const status = healthScore >= 90 ? 'OK' : healthScore >= 70 ? 'WARNING' : 'ERROR';
-            
-            checks.push({ 
-              name: 'Permissions Structure & Data', 
+
+            checks.push({
+              name: 'Permissions Structure & Data',
               status,
               healthScore,
-              details: `Valid agents: ${validAgents}/${agents.length}`
+              details: `Valid agents: ${validAgents}/${agents.length}`,
             });
-            
+
             if (status === 'ERROR' || healthScore < 50) {
               overallStatus = 'ERROR';
               criticalIssues++;
@@ -7020,29 +8101,30 @@ export default {
               overallStatus = 'WARNING';
             }
           } else {
-            checks.push({ 
-              name: 'Permissions Structure & Data', 
+            checks.push({
+              name: 'Permissions Structure & Data',
               status: 'ERROR',
-              error: 'No agent configs found in database' 
+              error: 'No agent configs found in database',
             });
             overallStatus = 'ERROR';
             criticalIssues++;
           }
         } catch (error: any) {
-          checks.push({ 
-            name: 'Permissions Structure & Data', 
+          checks.push({
+            name: 'Permissions Structure & Data',
             status: 'ERROR',
-            error: error.message 
+            error: error.message,
           });
           overallStatus = 'ERROR';
           criticalIssues++;
         }
-        
+
         // 4. 🔐 NEW: Permissions Matrix Integrity Check
         try {
           // Direct database check instead of internal API call
           // Enhanced Matrix Health Integration - Fetch comprehensive agent configurations
-          const matrixConfigs = await env.DB.prepare(`
+          const matrixConfigs = await env.DB.prepare(
+            `
             SELECT 
               ac.agent_id,
               ac.permissions,
@@ -7057,28 +8139,35 @@ export default {
             GROUP BY ac.agent_id, ac.permissions, ac.commission_rates, ac.status, ac.created_at, ac.updated_at
             ORDER BY ac.updated_at DESC
             LIMIT 10
-          `).all();
-          
+          `
+          ).all();
+
           if (matrixConfigs.results && matrixConfigs.results.length > 0) {
             const agents = matrixConfigs.results;
             const totalPermissions = 5; // canPlaceBets, canModifyInfo, canChangeAccounts, canOpenParlays, canRoundRobin
             const totalCells = agents.length * totalPermissions;
             const validCells = agents.reduce((sum, agent) => {
-              return sum + (agent.agent_id ? 1 : 0) + (agent.allow_place_bet !== undefined ? 1 : 0) + 
-                     (agent.inet_head_count_rate !== undefined ? 1 : 0) + (agent.live_casino_rate !== undefined ? 1 : 0) +
-                     (agent.sports_rate !== undefined ? 1 : 0);
+              return (
+                sum +
+                (agent.agent_id ? 1 : 0) +
+                (agent.allow_place_bet !== undefined ? 1 : 0) +
+                (agent.inet_head_count_rate !== undefined ? 1 : 0) +
+                (agent.live_casino_rate !== undefined ? 1 : 0) +
+                (agent.sports_rate !== undefined ? 1 : 0)
+              );
             }, 0);
-            
+
             const matrixHealthScore = Math.round((validCells / totalCells) * 100);
-            const status = matrixHealthScore >= 90 ? 'OK' : matrixHealthScore >= 70 ? 'WARNING' : 'ERROR';
-            
-            checks.push({ 
-              name: 'Permissions Matrix Integrity', 
+            const status =
+              matrixHealthScore >= 90 ? 'OK' : matrixHealthScore >= 70 ? 'WARNING' : 'ERROR';
+
+            checks.push({
+              name: 'Permissions Matrix Integrity',
               status,
               healthScore: matrixHealthScore,
-              details: `Matrix cells: ${validCells}/${totalCells}`
+              details: `Matrix cells: ${validCells}/${totalCells}`,
             });
-            
+
             if (status === 'ERROR' || matrixHealthScore < 50) {
               overallStatus = 'ERROR';
               criticalIssues++;
@@ -7086,59 +8175,61 @@ export default {
               overallStatus = 'WARNING';
             }
           } else {
-            checks.push({ 
-              name: 'Permissions Matrix Integrity', 
+            checks.push({
+              name: 'Permissions Matrix Integrity',
               status: 'ERROR',
-              error: 'No agent configs found for matrix validation' 
+              error: 'No agent configs found for matrix validation',
             });
             overallStatus = 'ERROR';
             criticalIssues++;
           }
         } catch (error: any) {
-          checks.push({ 
-            name: 'Permissions Matrix Integrity', 
+          checks.push({
+            name: 'Permissions Matrix Integrity',
             status: 'ERROR',
-            error: error.message 
+            error: error.message,
           });
           overallStatus = 'ERROR';
           criticalIssues++;
         }
-        
+
         // 5. Live Data Stream Check
         try {
           // Check if the live endpoint exists by testing a simple database query
-          const liveTest = await env.DB.prepare('SELECT COUNT(*) as count FROM wagers WHERE settlement_status = "pending"').first();
+          const liveTest = await env.DB.prepare(
+            'SELECT COUNT(*) as count FROM wagers WHERE settlement_status = "pending"'
+          ).first();
           const liveDataAvailable = !!liveTest;
-          
+
           if (liveDataAvailable) {
-            checks.push({ 
-              name: 'Live Data Stream', 
+            checks.push({
+              name: 'Live Data Stream',
               status: 'OK',
-              details: 'Pending wagers data available for live updates' 
+              details: 'Pending wagers data available for live updates',
             });
           } else {
-            checks.push({ 
-              name: 'Live Data Stream', 
+            checks.push({
+              name: 'Live Data Stream',
               status: 'WARNING',
-              error: 'No pending wagers found for live data' 
+              error: 'No pending wagers found for live data',
             });
             if (overallStatus === 'OK') overallStatus = 'WARNING';
           }
         } catch (error: any) {
-          checks.push({ 
-            name: 'Live Data Stream', 
+          checks.push({
+            name: 'Live Data Stream',
             status: 'ERROR',
-            error: error.message 
+            error: error.message,
           });
           overallStatus = 'ERROR';
           criticalIssues++;
         }
-        
+
         const totalTime = Date.now() - startTime;
         const healthyComponents = checks.filter(c => c.status === 'OK').length;
         const totalComponents = checks.length;
         const systemHealthScore = Math.round((healthyComponents / totalComponents) * 100);
-        
+
         // 🔍 DEBUG: Enhanced console output for system health
         console.log('\n🏥 SYSTEM HEALTH CHECK RESULTS:');
         console.log('='.repeat(50));
@@ -7147,65 +8238,78 @@ export default {
         console.log(`Response Time: ${totalTime}ms`);
         console.log(`Critical Issues: ${criticalIssues}`);
         console.log(`Components: ${healthyComponents}/${totalComponents} healthy`);
-        
+
         console.log('\n📊 Component Status:');
-        console.table(checks.map(check => ({
-          name: check.name,
-          status: check.status,
-          details: check.details || check.error || 'N/A'
-        })));
-        
+        console.table(
+          checks.map(check => ({
+            name: check.name,
+            status: check.status,
+            details: check.details || check.error || 'N/A',
+          }))
+        );
+
         console.log('='.repeat(50));
 
-        return new Response(JSON.stringify({
-          success: true,
-          timestamp: new Date().toISOString(),
-          status: overallStatus,
-          system_health_score: systemHealthScore,
-          response_time: totalTime,
-          critical_issues: criticalIssues,
-          checks,
-          summary: {
-            healthy: healthyComponents,
-            total: totalComponents,
+        return new Response(
+          JSON.stringify({
+            success: true,
+            timestamp: new Date().toISOString(),
             status: overallStatus,
-            recommendations: overallStatus === 'ERROR' ? [
-              '🚨 IMMEDIATE ACTION REQUIRED:',
-              '1. Investigate critical failures above',
-              '2. Check worker logs: wrangler tail --format=pretty',
-              '3. Verify database connectivity',
-              '4. Review permissions system health'
-            ] : overallStatus === 'WARNING' ? [
-              '⚠️ ATTENTION REQUIRED:',
-              '1. Review warnings above',
-              '2. Monitor system performance',
-              '3. Check permissions matrix integrity'
-            ] : [
-              '✅ All system components are healthy',
-              'Continue monitoring for any changes'
-            ]
+            system_health_score: systemHealthScore,
+            response_time: totalTime,
+            critical_issues: criticalIssues,
+            checks,
+            summary: {
+              healthy: healthyComponents,
+              total: totalComponents,
+              status: overallStatus,
+              recommendations:
+                overallStatus === 'ERROR'
+                  ? [
+                      '🚨 IMMEDIATE ACTION REQUIRED:',
+                      '1. Investigate critical failures above',
+                      '2. Check worker logs: wrangler tail --format=pretty',
+                      '3. Verify database connectivity',
+                      '4. Review permissions system health',
+                    ]
+                  : overallStatus === 'WARNING'
+                    ? [
+                        '⚠️ ATTENTION REQUIRED:',
+                        '1. Review warnings above',
+                        '2. Monitor system performance',
+                        '3. Check permissions matrix integrity',
+                      ]
+                    : [
+                        '✅ All system components are healthy',
+                        'Continue monitoring for any changes',
+                      ],
+            },
+          }),
+          {
+            status: overallStatus === 'ERROR' ? 500 : 200,
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          status: overallStatus === 'ERROR' ? 500 : 200,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error: any) {
         console.error('System health check error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'System health check failed',
-          message: error.message,
-          timestamp: new Date().toISOString()
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'System health check failed',
+            message: error.message,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
     // VERSION MANAGEMENT API ENDPOINTS
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
     // Initialize version management service
     const versionService = new VersionManagementService(env);
@@ -7215,17 +8319,24 @@ export default {
     if (url.pathname === '/api/version/current' && req.method === 'GET') {
       try {
         const versionInfo = await versionService.getCurrentVersion();
-        return createApiResponse({
-          success: true,
-          version: versionInfo
-        }, 200, true);
+        return createApiResponse(
+          {
+            success: true,
+            version: versionInfo,
+          },
+          200,
+          true
+        );
       } catch (error: any) {
         console.error('Version info error:', error);
-        return createApiResponse({
-          success: false,
-          error: 'Failed to get version information',
-          message: error.message
-        }, 500);
+        return createApiResponse(
+          {
+            success: false,
+            error: 'Failed to get version information',
+            message: error.message,
+          },
+          500
+        );
       }
     }
 
@@ -7233,29 +8344,38 @@ export default {
     if (url.pathname === '/api/version/increment' && req.method === 'POST') {
       try {
         const { type } = await req.json();
-        
+
         if (!type || !['patch', 'minor', 'major', 'prerelease'].includes(type)) {
-          return createApiResponse({
-            success: false,
-            error: 'Invalid version type. Must be: patch, minor, major, or prerelease'
-          }, 400);
+          return createApiResponse(
+            {
+              success: false,
+              error: 'Invalid version type. Must be: patch, minor, major, or prerelease',
+            },
+            400
+          );
         }
 
         const newVersion = await versionService.incrementVersion(type as any);
-        
-        return createApiResponse({
-          success: true,
-          message: `Version incremented to ${newVersion}`,
-          newVersion,
-          type
-        }, 200);
+
+        return createApiResponse(
+          {
+            success: true,
+            message: `Version incremented to ${newVersion}`,
+            newVersion,
+            type,
+          },
+          200
+        );
       } catch (error: any) {
         console.error('Version increment error:', error);
-        return createApiResponse({
-          success: false,
-          error: 'Failed to increment version',
-          message: error.message
-        }, 500);
+        return createApiResponse(
+          {
+            success: false,
+            error: 'Failed to increment version',
+            message: error.message,
+          },
+          500
+        );
       }
     }
 
@@ -7264,19 +8384,26 @@ export default {
       try {
         const limit = parseInt(url.searchParams.get('limit') || '10');
         const history = await versionService.getVersionHistory(limit);
-        
-        return createApiResponse({
-          success: true,
-          history,
-          total: history.length
-        }, 200, true);
+
+        return createApiResponse(
+          {
+            success: true,
+            history,
+            total: history.length,
+          },
+          200,
+          true
+        );
       } catch (error: any) {
         console.error('Version history error:', error);
-        return createApiResponse({
-          success: false,
-          error: 'Failed to get version history',
-          message: error.message
-        }, 500);
+        return createApiResponse(
+          {
+            success: false,
+            error: 'Failed to get version history',
+            message: error.message,
+          },
+          500
+        );
       }
     }
 
@@ -7284,18 +8411,25 @@ export default {
     if (url.pathname === '/api/version/metrics' && req.method === 'GET') {
       try {
         const metrics = await versionService.getBuildMetrics();
-        
-        return createApiResponse({
-          success: true,
-          metrics
-        }, 200, true);
+
+        return createApiResponse(
+          {
+            success: true,
+            metrics,
+          },
+          200,
+          true
+        );
       } catch (error: any) {
         console.error('Build metrics error:', error);
-        return createApiResponse({
-          success: false,
-          error: 'Failed to get build metrics',
-          message: error.message
-        }, 500);
+        return createApiResponse(
+          {
+            success: false,
+            error: 'Failed to get build metrics',
+            message: error.message,
+          },
+          500
+        );
       }
     }
 
@@ -7304,18 +8438,24 @@ export default {
       try {
         const metrics = await req.json();
         await versionService.updateBuildMetrics(metrics);
-        
-        return createApiResponse({
-          success: true,
-          message: 'Build metrics updated successfully'
-        }, 200);
+
+        return createApiResponse(
+          {
+            success: true,
+            message: 'Build metrics updated successfully',
+          },
+          200
+        );
       } catch (error: any) {
         console.error('Update metrics error:', error);
-        return createApiResponse({
-          success: false,
-          error: 'Failed to update build metrics',
-          message: error.message
-        }, 500);
+        return createApiResponse(
+          {
+            success: false,
+            error: 'Failed to update build metrics',
+            message: error.message,
+          },
+          500
+        );
       }
     }
 
@@ -7324,18 +8464,25 @@ export default {
       try {
         const environment = url.searchParams.get('environment');
         const status = await versionService.getDeploymentStatus(environment || undefined);
-        
-        return createApiResponse({
-          success: true,
-          status
-        }, 200, true);
+
+        return createApiResponse(
+          {
+            success: true,
+            status,
+          },
+          200,
+          true
+        );
       } catch (error: any) {
         console.error('Deployment status error:', error);
-        return createApiResponse({
-          success: false,
-          error: 'Failed to get deployment status',
-          message: error.message
-        }, 500);
+        return createApiResponse(
+          {
+            success: false,
+            error: 'Failed to get deployment status',
+            message: error.message,
+          },
+          500
+        );
       }
     }
 
@@ -7343,34 +8490,46 @@ export default {
     if (url.pathname === '/api/version/rollback' && req.method === 'POST') {
       try {
         const { versionNumber } = await req.json();
-        
+
         if (!versionNumber) {
-          return createApiResponse({
-            success: false,
-            error: 'Version number is required'
-          }, 400);
+          return createApiResponse(
+            {
+              success: false,
+              error: 'Version number is required',
+            },
+            400
+          );
         }
 
         const success = await versionService.rollbackToVersion(versionNumber);
-        
+
         if (success) {
-          return createApiResponse({
-            success: true,
-            message: `Successfully rolled back to version ${versionNumber}`
-          }, 200);
+          return createApiResponse(
+            {
+              success: true,
+              message: `Successfully rolled back to version ${versionNumber}`,
+            },
+            200
+          );
         } else {
-          return createApiResponse({
-            success: false,
-            error: 'Rollback failed'
-          }, 500);
+          return createApiResponse(
+            {
+              success: false,
+              error: 'Rollback failed',
+            },
+            500
+          );
         }
       } catch (error: any) {
         console.error('Rollback error:', error);
-        return createApiResponse({
-          success: false,
-          error: 'Failed to rollback version',
-          message: error.message
-        }, 500);
+        return createApiResponse(
+          {
+            success: false,
+            error: 'Failed to rollback version',
+            message: error.message,
+          },
+          500
+        );
       }
     }
 
@@ -7379,8 +8538,11 @@ export default {
       try {
         const fromVersion = url.searchParams.get('from');
         const toVersion = url.searchParams.get('to');
-        const changelog = await versionService.generateChangelog(fromVersion || undefined, toVersion || undefined);
-        
+        const changelog = await versionService.generateChangelog(
+          fromVersion || undefined,
+          toVersion || undefined
+        );
+
         return new Response(changelog, {
           status: 200,
           headers: {
@@ -7388,15 +8550,18 @@ export default {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          }
+          },
         });
       } catch (error: any) {
         console.error('Changelog generation error:', error);
-        return createApiResponse({
-          success: false,
-          error: 'Failed to generate changelog',
-          message: error.message
-        }, 500);
+        return createApiResponse(
+          {
+            success: false,
+            error: 'Failed to generate changelog',
+            message: error.message,
+          },
+          500
+        );
       }
     }
 
@@ -7404,35 +8569,44 @@ export default {
     if (url.pathname === '/api/version/validate' && req.method === 'POST') {
       try {
         const { version } = await req.json();
-        
+
         if (!version) {
-          return createApiResponse({
-            success: false,
-            error: 'Version string is required'
-          }, 400);
+          return createApiResponse(
+            {
+              success: false,
+              error: 'Version string is required',
+            },
+            400
+          );
         }
 
         const isValid = await versionService.validateVersionFormat(version);
-        
-        return createApiResponse({
-          success: true,
-          version,
-          isValid,
-          message: isValid ? 'Valid version format' : 'Invalid version format'
-        }, 200);
+
+        return createApiResponse(
+          {
+            success: true,
+            version,
+            isValid,
+            message: isValid ? 'Valid version format' : 'Invalid version format',
+          },
+          200
+        );
       } catch (error: any) {
         console.error('Version validation error:', error);
-        return createApiResponse({
-          success: false,
-          error: 'Failed to validate version format',
-          message: error.message
-        }, 500);
+        return createApiResponse(
+          {
+            success: false,
+            error: 'Failed to validate version format',
+            message: error.message,
+          },
+          500
+        );
       }
     }
 
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
     // END VERSION MANAGEMENT API ENDPOINTS
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
     // Bulk import customers from CSV/JSON
     if (url.pathname === '/api/admin/import-customers' && req.method === 'POST') {
@@ -7441,13 +8615,16 @@ export default {
         const data = JSON.parse(body);
 
         if (!data.customers || !Array.isArray(data.customers)) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Invalid data format. Expected: {"customers": [...]}'
-          }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-          });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Invalid data format. Expected: {"customers": [...]}',
+            }),
+            {
+              status: 400,
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
         }
 
         let imported = 0;
@@ -7455,22 +8632,26 @@ export default {
 
         for (const customer of data.customers) {
           try {
-            await env.DB.prepare(`
+            await env.DB.prepare(
+              `
               INSERT OR REPLACE INTO players
               (customer_id, name, password, phone, settle, balance, pending, last_ticket, last_login, active)
               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `).bind(
-              customer.customer_id,
-              customer.name || '',
-              customer.password || '',
-              customer.phone || '',
-              customer.settle || 0,
-              customer.balance || 0,
-              customer.pending || 0,
-              customer.last_ticket || null,
-              customer.last_login || null,
-              customer.active !== false ? 1 : 0
-            ).run();
+            `
+            )
+              .bind(
+                customer.customer_id,
+                customer.name || '',
+                customer.password || '',
+                customer.phone || '',
+                customer.settle || 0,
+                customer.balance || 0,
+                customer.pending || 0,
+                customer.last_ticket || null,
+                customer.last_login || null,
+                customer.active !== false ? 1 : 0
+              )
+              .run();
             imported++;
           } catch (error) {
             console.error('Error importing customer:', customer.customer_id, error);
@@ -7478,25 +8659,31 @@ export default {
           }
         }
 
-        return new Response(JSON.stringify({
-          success: true,
-          imported,
-          errors,
-          total: data.customers.length,
-          message: `Successfully imported ${imported} customers with ${errors} errors`
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            imported,
+            errors,
+            total: data.customers.length,
+            message: `Successfully imported ${imported} customers with ${errors} errors`,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Error in bulk import:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Import failed',
-          message: error.message
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Import failed',
+            message: error.message,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -7517,19 +8704,23 @@ export default {
           const customers = api.processFire22Customers(authResult.data);
           for (const customer of customers) {
             try {
-              await env.DB.prepare(`
+              await env.DB.prepare(
+                `
                 INSERT OR REPLACE INTO players
                 (customer_id, name, password, phone, balance, active, last_login)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-              `).bind(
-                customer.customer_id,
-                (customer as any).name || '',
-                customer.password,
-                customer.phone,
-                customer.balance,
-                customer.active ? 1 : 0,
-                customer.last_activity
-              ).run();
+              `
+              )
+                .bind(
+                  customer.customer_id,
+                  (customer as any).name || '',
+                  customer.password,
+                  customer.phone,
+                  customer.balance,
+                  customer.active ? 1 : 0,
+                  customer.last_activity
+                )
+                .run();
               syncedCustomers++;
             } catch (error) {
               console.error('Error syncing customer:', error);
@@ -7541,21 +8732,25 @@ export default {
           // Process and sync wager data
           for (const wager of wagersResult.data.wagers || []) {
             try {
-              await env.DB.prepare(`
+              await env.DB.prepare(
+                `
                 INSERT OR REPLACE INTO wagers
                 (wager_number, customer_id, agent_id, wager_type, amount_wagered, to_win_amount, description, status, vip)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-              `).bind(
-                wager.WagerNumber,
-                wager.CustomerID,
-                wager.AgentID,
-                wager.WagerType,
-                wager.AmountWagered,
-                wager.ToWinAmount,
-                wager.ShortDesc,
-                wager.Status,
-                wager.VIP === "1" ? 1 : 0
-              ).run();
+              `
+              )
+                .bind(
+                  wager.WagerNumber,
+                  wager.CustomerID,
+                  wager.AgentID,
+                  wager.WagerType,
+                  wager.AmountWagered,
+                  wager.ToWinAmount,
+                  wager.ShortDesc,
+                  wager.Status,
+                  wager.VIP === '1' ? 1 : 0
+                )
+                .run();
               syncedWagers++;
             } catch (error) {
               console.error('Error syncing wager:', error);
@@ -7563,43 +8758,52 @@ export default {
           }
         }
 
-        return new Response(JSON.stringify({
-          success: true,
-          fire22Connected: !!(authResult && authResult.success),
-          syncedCustomers,
-          syncedWagers,
-          message: `Synced ${syncedCustomers} customers and ${syncedWagers} wagers from Fire22`
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            fire22Connected: !!(authResult && authResult.success),
+            syncedCustomers,
+            syncedWagers,
+            message: `Synced ${syncedCustomers} customers and ${syncedWagers} wagers from Fire22`,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Error syncing Fire22 data:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Sync failed',
-          message: error.message
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Sync failed',
+            message: error.message,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
     // Settings and configuration
     if (url.pathname === '/api/manager/getSettings') {
       try {
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            settings: {
-              refreshInterval: 5000,
-              alertThreshold: 10000,
-              maxWagers: 100
-            }
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              settings: {
+                refreshInterval: 5000,
+                alertThreshold: 10000,
+                maxWagers: 100,
+              },
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Error in getSettings:', error);
         return new Response(JSON.stringify({ success: false, error: 'Failed to fetch settings' }), {
@@ -7616,7 +8820,7 @@ export default {
         const params = new URL(req.url).searchParams;
         const agentID = params.get('agentID') || '';
         const limit = parseInt(params.get('limit') || '50');
-        
+
         let query = `
           SELECT 
             wager_number, customer_id, agent_id, amount_wagered, to_win_amount,
@@ -7624,37 +8828,45 @@ export default {
           FROM wagers
           WHERE 1=1
         `;
-        
+
         const bindings: any[] = [];
-        
+
         if (agentID) {
           query += ' AND agent_id = ?';
           bindings.push(agentID);
         }
-        
+
         query += ' ORDER BY created_at DESC LIMIT ?';
         bindings.push(limit);
-        
-        const wagers = await env.DB.prepare(query).bind(...bindings).all();
-        
-        return new Response(JSON.stringify({
-          success: true,
-          wagers: wagers.results || [],
-          total: (wagers.results || []).length,
-          source: 'd1_database'
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+
+        const wagers = await env.DB.prepare(query)
+          .bind(...bindings)
+          .all();
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            wagers: wagers.results || [],
+            total: (wagers.results || []).length,
+            source: 'd1_database',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Bets endpoint error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch wagers',
-          message: error.message
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch wagers',
+            message: error.message,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -7662,41 +8874,49 @@ export default {
     if (url.pathname === '/api/agents/hierarchy' && req.method === 'GET') {
       try {
         // Get agent hierarchy from agent_configs table
-        const agents = await env.DB.prepare(`
+        const agents = await env.DB.prepare(
+          `
           SELECT 
             agent_id, master_agent_id, allow_place_bet, 
             inet_head_count_rate, live_casino_rate
           FROM agent_configs
           ORDER BY agent_id
-        `).all();
-        
+        `
+        ).all();
+
         const hierarchy = (agents.results || []).map(agent => ({
           agent_id: agent.agent_id,
           master_agent: agent.master_agent_id || 'ROOT',
           can_place_bets: agent.allow_place_bet === 1,
           internet_rate: agent.inet_head_count_rate || 0,
           casino_rate: agent.live_casino_rate || 0,
-          status: 'active' // Default status since column doesn't exist
+          status: 'active', // Default status since column doesn't exist
         }));
-        
-        return new Response(JSON.stringify({
-          success: true,
-          agents: hierarchy,
-          total: hierarchy.length,
-          source: 'd1_database'
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            agents: hierarchy,
+            total: hierarchy.length,
+            source: 'd1_database',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Agent hierarchy error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch agent hierarchy',
-          message: error.message
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch agent hierarchy',
+            message: error.message,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
     }
 
@@ -7706,16 +8926,20 @@ export default {
       try {
         const params = new URL(req.url).searchParams;
         const agentID = params.get('agentID') || '';
-        
+
         if (!agentID) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'agentID parameter required'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'agentID parameter required',
+            }),
+            { status: 400 }
+          );
         }
-        
+
         // Get agent performance data
-        const kpiData = await env.DB.prepare(`
+        const kpiData = await env.DB.prepare(
+          `
           SELECT 
             COUNT(*) as total_wagers,
             SUM(amount_wagered) as total_volume,
@@ -7723,29 +8947,38 @@ export default {
             AVG(amount_wagered) as avg_wager_size
           FROM wagers
           WHERE agent_id = ? AND created_at >= datetime('now', '-7 days')
-        `).bind(agentID).first();
-        
-        return new Response(JSON.stringify({
-          success: true,
-          agentID,
-          kpi: {
-            totalWagers: kpiData?.total_wagers || 0,
-            totalVolume: kpiData?.total_volume || 0,
-            totalRisk: kpiData?.total_risk || 0,
-            avgWagerSize: kpiData?.avg_wager_size || 0
-          },
-          period: '7 days',
-          source: 'd1_database'
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        `
+        )
+          .bind(agentID)
+          .first();
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            agentID,
+            kpi: {
+              totalWagers: kpiData?.total_wagers || 0,
+              totalVolume: kpiData?.total_volume || 0,
+              totalRisk: kpiData?.total_risk || 0,
+              avgWagerSize: kpiData?.avg_wager_size || 0,
+            },
+            period: '7 days',
+            source: 'd1_database',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Agent KPI error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch agent KPI',
-          message: error.message
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch agent KPI',
+            message: error.message,
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -7754,38 +8987,51 @@ export default {
       try {
         const params = new URL(req.url).searchParams;
         const agentID = params.get('agentID') || '';
-        
+
         if (!agentID) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'agentID parameter required'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'agentID parameter required',
+            }),
+            { status: 400 }
+          );
         }
-        
-        const customers = await env.DB.prepare(`
+
+        const customers = await env.DB.prepare(
+          `
           SELECT 
             customer_id, name, balance, active, created_at
           FROM players
           WHERE agent_id = ?
           ORDER BY balance DESC
-        `).bind(agentID).all();
-        
-        return new Response(JSON.stringify({
-          success: true,
-          agentID,
-          customers: customers.results || [],
-          total: (customers.results || []).length,
-          source: 'd1_database'
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        `
+        )
+          .bind(agentID)
+          .all();
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            agentID,
+            customers: customers.results || [],
+            total: (customers.results || []).length,
+            source: 'd1_database',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Customers by agent error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch customers by agent',
-          message: error.message
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch customers by agent',
+            message: error.message,
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -7794,15 +9040,19 @@ export default {
       try {
         const params = new URL(req.url).searchParams;
         const agentID = params.get('agentID') || '';
-        
+
         if (!agentID) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'agentID parameter required'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'agentID parameter required',
+            }),
+            { status: 400 }
+          );
         }
-        
-        const wagers = await env.DB.prepare(`
+
+        const wagers = await env.DB.prepare(
+          `
           SELECT 
             wager_number, customer_id, amount_wagered, to_win_amount,
             description, status, settlement_status, created_at
@@ -7810,24 +9060,33 @@ export default {
           WHERE agent_id = ?
           ORDER BY created_at DESC
           LIMIT 100
-        `).bind(agentID).all();
-        
-        return new Response(JSON.stringify({
-          success: true,
-          agentID,
-          wagers: wagers.results || [],
-          total: (wagers.results || []).length,
-          source: 'd1_database'
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        `
+        )
+          .bind(agentID)
+          .all();
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            agentID,
+            wagers: wagers.results || [],
+            total: (wagers.results || []).length,
+            source: 'd1_database',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Wagers by agent error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch wagers by agent',
-          message: error.message
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch wagers by agent',
+            message: error.message,
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -7836,7 +9095,7 @@ export default {
       try {
         const params = new URL(req.url).searchParams;
         const agentID = params.get('agentID') || '';
-        
+
         let pendingQuery = `
           SELECT 
             w.wager_number, w.customer_id, w.amount_wagered, w.to_win_amount,
@@ -7845,34 +9104,42 @@ export default {
           LEFT JOIN players p ON w.customer_id = p.customer_id
           WHERE w.settlement_status = 'pending'
         `;
-        
+
         const bindings: any[] = [];
-        
+
         if (agentID) {
           pendingQuery += ' AND w.agent_id = ?';
           bindings.push(agentID);
         }
-        
+
         pendingQuery += ' ORDER BY w.created_at DESC LIMIT 50';
-        
-        const pendingWagers = await env.DB.prepare(pendingQuery).bind(...bindings).all();
-        
-        return new Response(JSON.stringify({
-          success: true,
-          agentID: agentID || 'ALL',
-          pendingWagers: pendingWagers.results || [],
-          total: (pendingWagers.results || []).length,
-          source: 'd1_database'
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+
+        const pendingWagers = await env.DB.prepare(pendingQuery)
+          .bind(...bindings)
+          .all();
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            agentID: agentID || 'ALL',
+            pendingWagers: pendingWagers.results || [],
+            total: (pendingWagers.results || []).length,
+            source: 'd1_database',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Pending wagers error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch pending wagers',
-          message: error.message
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch pending wagers',
+            message: error.message,
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -7881,21 +9148,27 @@ export default {
     if (url.pathname === '/api/sync/fire22-customers' && req.method === 'POST') {
       try {
         // This would normally sync from Fire22, but for now return success
-        return new Response(JSON.stringify({
-          success: true,
-          message: 'Fire22 customer sync endpoint available',
-          synced: 0,
-          source: 'endpoint_placeholder'
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: 'Fire22 customer sync endpoint available',
+            synced: 0,
+            source: 'endpoint_placeholder',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Fire22 customer sync error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Fire22 customer sync failed',
-          message: error.message
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Fire22 customer sync failed',
+            message: error.message,
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -7903,22 +9176,28 @@ export default {
     if (url.pathname === '/api/sync/background' && req.method === 'POST') {
       try {
         const { operation } = await req.json();
-        
-        return new Response(JSON.stringify({
-          success: true,
-          message: 'Background sync triggered',
-          operation: operation || 'unknown',
-          source: 'endpoint_placeholder'
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: 'Background sync triggered',
+            operation: operation || 'unknown',
+            source: 'endpoint_placeholder',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Background sync error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Background sync failed',
-          message: error.message
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Background sync failed',
+            message: error.message,
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -7927,20 +9206,26 @@ export default {
     if (url.pathname === '/api/debug/cache-stats' && req.method === 'GET') {
       try {
         const stats = cache.getStats();
-        return new Response(JSON.stringify({
-          success: true,
-          cacheStats: stats,
-          source: 'real_cache_system'
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            cacheStats: stats,
+            source: 'real_cache_system',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Cache stats error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch cache stats',
-          message: error.message
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch cache stats',
+            message: error.message,
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -7948,21 +9233,27 @@ export default {
     if (url.pathname === '/api/admin/debug/cache-stats' && req.method === 'GET') {
       try {
         const stats = cache.getStats();
-        return new Response(JSON.stringify({
-          success: true,
-          cacheStats: stats,
-          source: 'admin_debug_endpoint',
-          adminAccess: true
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            cacheStats: stats,
+            source: 'admin_debug_endpoint',
+            adminAccess: true,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Admin cache stats error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch admin cache stats',
-          message: error.message
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch admin cache stats',
+            message: error.message,
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -7970,21 +9261,27 @@ export default {
     if (url.pathname === '/api/debug/cache-stats' && req.method === 'GET') {
       try {
         const stats = cache.getStats();
-        return new Response(JSON.stringify({
-          success: true,
-          cacheStats: stats,
-          source: 'public_debug_endpoint',
-          adminAccess: false
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            cacheStats: stats,
+            source: 'public_debug_endpoint',
+            adminAccess: false,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Public cache stats error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch cache stats',
-          message: error.message
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch cache stats',
+            message: error.message,
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -7995,7 +9292,7 @@ export default {
         const params = new URL(req.url).searchParams;
         const agentID = params.get('agentID') || 'BLAKEPPH';
         const week = params.get('week') || '0';
-        
+
         // Get weekly data from database
         const weeklyQuery = `
           SELECT
@@ -8019,7 +9316,7 @@ export default {
           handle: row.handle || 0,
           win: row.win || 0,
           volume: row.volume || 0,
-          bets: row.bets || 0
+          bets: row.bets || 0,
         }));
 
         // Fill missing days with zeros
@@ -8028,32 +9325,38 @@ export default {
           return existing || { day, handle: 0, win: 0, volume: 0, bets: 0 };
         });
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            agentID: agentID,
-            weeklyFigures: allDays,
-            totalHandle: allDays.reduce((sum, day) => sum + day.handle, 0),
-            totalWin: allDays.reduce((sum, day) => sum + day.win, 0),
-            totalVolume: allDays.reduce((sum, day) => sum + day.volume, 0),
-            totalBets: allDays.reduce((sum, day) => sum + day.bets, 0)
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              agentID: agentID,
+              weeklyFigures: allDays,
+              totalHandle: allDays.reduce((sum, day) => sum + day.handle, 0),
+              totalWin: allDays.reduce((sum, day) => sum + day.win, 0),
+              totalVolume: allDays.reduce((sum, day) => sum + day.volume, 0),
+              totalBets: allDays.reduce((sum, day) => sum + day.bets, 0),
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Weekly figures error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch weekly figures',
-          message: error.message
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch weekly figures',
+            message: error.message,
+          }),
+          { status: 500 }
+        );
       }
     }
 
-    // ========================================
+    // !==!==!==!==!==!==!====
     // QUEUE SYSTEM ENDPOINTS
-    // ========================================
+    // !==!==!==!==!==!==!====
 
     // Initialize queue system
     if (url.pathname === '/api/queue/init' && req.method === 'POST') {
@@ -8063,7 +9366,7 @@ export default {
       try {
         // Create queue system instance
         const queueSystem = new WithdrawalQueueSystem(env);
-        
+
         // Initialize database tables if they don't exist
         await env.DB.exec(`
           CREATE TABLE IF NOT EXISTS queue_items (
@@ -8096,18 +9399,24 @@ export default {
           )
         `);
 
-        return new Response(JSON.stringify({
-          success: true,
-          message: 'Queue system initialized successfully'
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: 'Queue system initialized successfully',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Queue initialization error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to initialize queue system'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to initialize queue system',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -8117,25 +9426,36 @@ export default {
       if (authResult instanceof Response) return authResult;
 
       try {
-        const { customerId, amount, paymentType, paymentDetails, priority, notes } = await req.json();
+        const { customerId, amount, paymentType, paymentDetails, priority, notes } =
+          await req.json();
 
         if (!customerId || !amount || amount <= 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Invalid customerId or amount'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Invalid customerId or amount',
+            }),
+            { status: 400 }
+          );
         }
 
         // Check customer balance
-        const customer = await env.DB.prepare(`
+        const customer = await env.DB.prepare(
+          `
           SELECT balance FROM players WHERE customer_id = ?
-        `).bind(customerId).first();
+        `
+        )
+          .bind(customerId)
+          .first();
 
         if (!customer || customer.balance < amount) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Insufficient funds'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Insufficient funds',
+            }),
+            { status: 400 }
+          );
         }
 
         // Add to queue
@@ -8147,27 +9467,33 @@ export default {
           paymentType: paymentType || 'bank_transfer',
           paymentDetails: paymentDetails || '',
           priority: priority || 1,
-          notes
+          notes,
         });
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: { 
-            queueId, 
-            customerId, 
-            amount, 
-            paymentType: paymentType || 'bank_transfer',
-            status: 'queued'
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              queueId,
+              customerId,
+              amount,
+              paymentType: paymentType || 'bank_transfer',
+              status: 'queued',
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Add to queue error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to add withdrawal to queue'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to add withdrawal to queue',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -8177,13 +9503,17 @@ export default {
       if (authResult instanceof Response) return authResult;
 
       try {
-        const { customerId, amount, paymentType, paymentDetails, priority, notes } = await req.json();
+        const { customerId, amount, paymentType, paymentDetails, priority, notes } =
+          await req.json();
 
         if (!customerId || !amount || amount <= 0) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Invalid customerId or amount'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Invalid customerId or amount',
+            }),
+            { status: 400 }
+          );
         }
 
         // Add to queue
@@ -8194,27 +9524,33 @@ export default {
           paymentType: paymentType || 'bank_transfer',
           paymentDetails: paymentDetails || '',
           priority: priority || 1,
-          notes
+          notes,
         });
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: { 
-            queueId, 
-            customerId, 
-            amount, 
-            paymentType: paymentType || 'bank_transfer',
-            status: 'queued'
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              queueId,
+              customerId,
+              amount,
+              paymentType: paymentType || 'bank_transfer',
+              status: 'queued',
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Add deposit to queue error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to add deposit to queue'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to add deposit to queue',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -8227,18 +9563,24 @@ export default {
         const queueSystem = new WithdrawalQueueSystem(env);
         const stats = queueSystem.getQueueStats();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: stats
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: stats,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Get queue stats error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to get queue statistics'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to get queue statistics',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -8255,22 +9597,28 @@ export default {
         const queueSystem = new WithdrawalQueueSystem(env);
         const items = queueSystem.getQueueItems(status, type);
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            items,
-            total: items.length,
-            filters: { status, type }
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              items,
+              total: items.length,
+              filters: { status, type },
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Get queue items error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to get queue items'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to get queue items',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -8280,7 +9628,8 @@ export default {
       if (authResult instanceof Response) return authResult;
 
       try {
-        const result = await env.DB.prepare(`
+        const result = await env.DB.prepare(
+          `
           SELECT 
             w.id as withdrawal_id,
             w.customer_id as withdrawal_customer,
@@ -8315,23 +9664,30 @@ export default {
             AND w.amount <= d.amount
             AND w.payment_type = d.payment_type
           ORDER BY match_score DESC, w.created_at ASC
-        `).all();
+        `
+        ).all();
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: {
-            opportunities: result.results || [],
-            total: (result.results || []).length
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              opportunities: result.results || [],
+              total: (result.results || []).length,
+            },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
           }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        );
       } catch (error) {
         console.error('Get matching opportunities error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to get matching opportunities'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to get matching opportunities',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -8344,18 +9700,24 @@ export default {
         const queueSystem = new WithdrawalQueueSystem(env);
         await queueSystem.processMatchedItems();
 
-        return new Response(JSON.stringify({
-          success: true,
-          message: 'Queue processing completed'
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: 'Queue processing completed',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Process queue error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to process queue'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to process queue',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -8368,27 +9730,36 @@ export default {
         const { matchId, notes } = await req.json();
 
         if (!matchId) {
-          return new Response(JSON.stringify({
-            success: false,
-            error: 'Match ID required'
-          }), { status: 400 });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: 'Match ID required',
+            }),
+            { status: 400 }
+          );
         }
 
         const queueSystem = new WithdrawalQueueSystem(env);
         const success = await queueSystem.completeMatch(matchId, notes);
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: { matchId, completed: success }
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: { matchId, completed: success },
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Complete match error:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to complete match'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to complete match',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -8399,17 +9770,20 @@ export default {
         const { MatrixHealthChecker } = await import('../scripts/matrix-health');
         const checker = new MatrixHealthChecker();
         const health = await checker.checkMatrixHealth();
-        
+
         return new Response(JSON.stringify(health), {
           headers: { 'Content-Type': 'application/json' },
         });
       } catch (error) {
         console.error('Error checking matrix health:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to check matrix health',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to check matrix health',
+            message: error instanceof Error ? error.message : 'Unknown error',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -8418,17 +9792,20 @@ export default {
         const { MatrixHealthChecker } = await import('../scripts/matrix-health');
         const checker = new MatrixHealthChecker();
         const validation = await checker.validatePermissionsMatrix();
-        
+
         return new Response(JSON.stringify(validation), {
           headers: { 'Content-Type': 'application/json' },
         });
       } catch (error) {
         console.error('Error validating permissions matrix:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to validate permissions matrix',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to validate permissions matrix',
+            message: error instanceof Error ? error.message : 'Unknown error',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -8437,17 +9814,20 @@ export default {
         const { MatrixHealthChecker } = await import('../scripts/matrix-health');
         const checker = new MatrixHealthChecker();
         const repair = await checker.repairMatrixIssues();
-        
+
         return new Response(JSON.stringify(repair), {
           headers: { 'Content-Type': 'application/json' },
         });
       } catch (error) {
         console.error('Error repairing matrix issues:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to repair matrix issues',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to repair matrix issues',
+            message: error instanceof Error ? error.message : 'Unknown error',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -8456,23 +9836,29 @@ export default {
         const { MatrixHealthChecker } = await import('../scripts/matrix-health');
         const checker = new MatrixHealthChecker();
         const status = await checker.checkMatrixHealth();
-        
-        return new Response(JSON.stringify({
-          success: true,
-          health_score: status.matrix_health_score,
-          status: status.status,
-          matrix_stats: status.matrix_stats,
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            health_score: status.matrix_health_score,
+            status: status.status,
+            matrix_stats: status.matrix_stats,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Error getting matrix status:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to get matrix status',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to get matrix status',
+            message: error instanceof Error ? error.message : 'Unknown error',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -8482,23 +9868,29 @@ export default {
         const checker = new MatrixHealthChecker();
         const limit = parseInt(url.searchParams.get('limit') || '10');
         const history = checker.getMatrixHealthHistory(limit);
-        
-        return new Response(JSON.stringify({
-          success: true,
-          data: history,
-          total: history.length,
-          limit: limit,
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: history,
+            total: history.length,
+            limit: limit,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Error getting matrix history:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to get matrix history',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to get matrix history',
+            message: error instanceof Error ? error.message : 'Unknown error',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -8506,7 +9898,8 @@ export default {
     if (url.pathname === '/api/matrix/configs' && req.method === 'GET') {
       try {
         // Enhanced Matrix Health Integration - Fetch comprehensive agent configurations
-        const matrixConfigs = await env.DB.prepare(`
+        const matrixConfigs = await env.DB.prepare(
+          `
           SELECT 
             ac.agent_id,
             ac.permissions,
@@ -8521,7 +9914,8 @@ export default {
           GROUP BY ac.agent_id, ac.permissions, ac.commission_rates, ac.status, ac.created_at, ac.updated_at
           ORDER BY ac.updated_at DESC
           LIMIT 10
-        `).all();
+        `
+        ).all();
 
         // Calculate matrix health metrics for these configs
         const healthMetrics = {
@@ -8541,27 +9935,41 @@ export default {
               return false;
             }
           }).length,
-          total_customers: matrixConfigs.reduce((sum: number, config: any) => sum + (config.customer_count || 0), 0),
-          avg_customers_per_agent: matrixConfigs.length > 0 ? 
-            matrixConfigs.reduce((sum: number, config: any) => sum + (config.customer_count || 0), 0) / matrixConfigs.length : 0
+          total_customers: matrixConfigs.reduce(
+            (sum: number, config: any) => sum + (config.customer_count || 0),
+            0
+          ),
+          avg_customers_per_agent:
+            matrixConfigs.length > 0
+              ? matrixConfigs.reduce(
+                  (sum: number, config: any) => sum + (config.customer_count || 0),
+                  0
+                ) / matrixConfigs.length
+              : 0,
         };
 
-        return new Response(JSON.stringify({
-          success: true,
-          data: matrixConfigs,
-          health_metrics: healthMetrics,
-          matrix_health_score: calculateMatrixHealthScore(healthMetrics),
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: matrixConfigs,
+            health_metrics: healthMetrics,
+            matrix_health_score: calculateMatrixHealthScore(healthMetrics),
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Error fetching matrix configs:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to fetch matrix configs',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to fetch matrix configs',
+            message: error instanceof Error ? error.message : 'Unknown error',
+          }),
+          { status: 500 }
+        );
       }
     }
 
@@ -8572,7 +9980,7 @@ export default {
         const { MatrixHealthChecker } = await import('../scripts/matrix-health');
         const checker = new MatrixHealthChecker();
         const health = await checker.checkMatrixHealth();
-        
+
         // Enhanced scoring with additional metrics
         const enhancedScore = {
           base_score: health.matrix_health_score,
@@ -8580,47 +9988,51 @@ export default {
           permission_coverage: await calculatePermissionCoverage(env),
           customer_distribution: await calculateCustomerDistribution(env),
           overall_score: 0,
-          recommendations: []
+          recommendations: [],
         };
 
         // Calculate overall enhanced score
         enhancedScore.overall_score = Math.round(
-          (enhancedScore.base_score * 0.4) +
-          (enhancedScore.config_completeness * 0.3) +
-          (enhancedScore.permission_coverage * 0.2) +
-          (enhancedScore.customer_distribution * 0.1)
+          enhancedScore.base_score * 0.4 +
+            enhancedScore.config_completeness * 0.3 +
+            enhancedScore.permission_coverage * 0.2 +
+            enhancedScore.customer_distribution * 0.1
         );
 
         // Generate recommendations
         enhancedScore.recommendations = generateMatrixRecommendations(enhancedScore);
 
-        return new Response(JSON.stringify({
-          success: true,
-          score: enhancedScore,
-          timestamp: new Date().toISOString()
-        }), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return new Response(
+          JSON.stringify({
+            success: true,
+            score: enhancedScore,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       } catch (error) {
         console.error('Error calculating matrix health score:', error);
-        return new Response(JSON.stringify({
-          success: false,
-          error: 'Failed to calculate matrix health score',
-          message: error instanceof Error ? error.message : 'Unknown error'
-        }), { status: 500 });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Failed to calculate matrix health score',
+            message: error instanceof Error ? error.message : 'Unknown error',
+          }),
+          { status: 500 }
+        );
       }
     }
-
-
 
     // Default response
     return new Response('Not Found', { status: 404 });
   },
 };
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // HIERARCHY SYSTEM SUMMARY & MATRIX COMPLETION
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 //
 // 🏗️  ARCHITECTURE COMPLETION STATUS: 100%
 // ┌─────────────────────────────────────────────────────────────────────────┐
@@ -8686,4 +10098,4 @@ export default {
 // └─────────────────────────────────────────────────────────────────────────┘
 //
 // 🎉  HIERARCHY SYSTEM COMPLETE - FIRE22 DASHBOARD WORKER READY!
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===

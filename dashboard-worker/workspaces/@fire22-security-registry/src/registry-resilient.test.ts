@@ -2,11 +2,11 @@
 
 /**
  * Fire22 Registry Resilient Test Suite
- * 
+ *
  * Production-ready tests with proper error handling, timeouts, and retries
  */
 
-import { expect, test, describe, beforeAll, afterAll } from "bun:test";
+import { expect, test, describe, beforeAll, afterAll } from 'bun:test';
 
 // Test environment configuration
 const TEST_REGISTRY_URL = 'https://fire22-security-registry.nolarose1968-806.workers.dev';
@@ -29,40 +29,45 @@ class ResilientRegistryClient {
   private authToken: string;
   private timeout: number;
   private maxRetries: number;
-  
-  constructor(baseUrl: string, authToken: string, timeout = REQUEST_TIMEOUT, maxRetries = MAX_RETRIES) {
+
+  constructor(
+    baseUrl: string,
+    authToken: string,
+    timeout = REQUEST_TIMEOUT,
+    maxRetries = MAX_RETRIES
+  ) {
     this.baseUrl = baseUrl;
     this.authToken = authToken;
     this.timeout = timeout;
     this.maxRetries = maxRetries;
   }
-  
+
   async request(path: string, options: RequestInit = {}): Promise<TestResponse> {
     const url = `${this.baseUrl}${path}`;
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${this.authToken}`,
+      Authorization: `Bearer ${this.authToken}`,
       'User-Agent': 'Fire22-Registry-Tests/1.0',
-      ...options.headers
+      ...options.headers,
     };
-    
+
     console.log(`🔧 Testing ${options.method || 'GET'} ${path}`);
-    
+
     let lastError: Error | null = null;
-    
+
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-        
-        const response = await fetch(url, { 
-          ...options, 
+
+        const response = await fetch(url, {
+          ...options,
           headers,
-          signal: controller.signal 
+          signal: controller.signal,
         });
-        
+
         clearTimeout(timeoutId);
-        
+
         return {
           ok: response.ok,
           status: response.status,
@@ -75,22 +80,23 @@ class ResilientRegistryClient {
               return { error: 'Failed to parse JSON', raw: await response.text() };
             }
           },
-          text: () => response.text()
+          text: () => response.text(),
         };
-        
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
-        
+
         if (attempt < this.maxRetries) {
           const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
-          console.warn(`  ⚠️  Attempt ${attempt} failed, retrying in ${delay}ms: ${lastError.message}`);
+          console.warn(
+            `  ⚠️  Attempt ${attempt} failed, retrying in ${delay}ms: ${lastError.message}`
+          );
           await new Promise(resolve => setTimeout(resolve, delay));
         } else {
           console.error(`  ❌ All ${this.maxRetries} attempts failed: ${lastError.message}`);
         }
       }
     }
-    
+
     // Return error response if all attempts failed
     return {
       ok: false,
@@ -99,38 +105,40 @@ class ResilientRegistryClient {
       headers: new Headers(),
       json: async () => ({ error: 'network_error', message: lastError?.message }),
       text: async () => lastError?.message || 'Unknown error',
-      error: lastError?.message
+      error: lastError?.message,
     };
   }
-  
+
   async healthCheck(): Promise<TestResponse> {
     return await this.request('/health');
   }
-  
+
   async getStats(): Promise<TestResponse> {
     return await this.request('/-/stats');
   }
-  
+
   async searchPackages(query: string, limit = 20, offset = 0): Promise<TestResponse> {
-    return await this.request(`/-/search?q=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`);
+    return await this.request(
+      `/-/search?q=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`
+    );
   }
-  
+
   async publishPackage(packageName: string, packageData: any): Promise<TestResponse> {
     return await this.request(`/${packageName}`, {
       method: 'PUT',
-      body: JSON.stringify(packageData)
+      body: JSON.stringify(packageData),
     });
   }
-  
+
   async getPackage(packageName: string): Promise<TestResponse> {
     return await this.request(`/${packageName}`);
   }
-  
+
   async downloadPackage(packageName: string, version: string): Promise<TestResponse> {
     const path = `/${packageName}/-/${packageName.replace('@', '').replace('/', '-')}-${version}.tgz`;
     return await this.request(path);
   }
-  
+
   // Test connectivity with simple health check
   async testConnectivity(): Promise<boolean> {
     try {
@@ -165,204 +173,203 @@ function expectNetworkOrSuccess(response: TestResponse, expectedStatus?: number)
   }
 }
 
-describe("Fire22 Registry Resilient Tests", () => {
-  
+describe('Fire22 Registry Resilient Tests', () => {
   let hasConnectivity = false;
-  
+
   beforeAll(async () => {
     console.log('\n🚀 Fire22 Registry Resilient Test Suite');
     console.log(`🎯 Registry URL: ${TEST_REGISTRY_URL}`);
     console.log(`⏱️  Timeout: ${REQUEST_TIMEOUT}ms`);
     console.log(`🔄 Max retries: ${MAX_RETRIES}`);
     console.log('━'.repeat(60));
-    
+
     // Test connectivity first
     console.log('🌐 Testing network connectivity...');
     hasConnectivity = await client.testConnectivity();
-    
+
     if (hasConnectivity) {
       console.log('✅ Network connectivity confirmed');
     } else {
       console.log('⚠️  No network connectivity - tests will be limited');
     }
   });
-  
-  describe("🌐 Network and Connectivity", () => {
-    test("can establish network connection", async () => {
+
+  describe('🌐 Network and Connectivity', () => {
+    test('can establish network connection', async () => {
       const response = await client.healthCheck();
-      
-      if (skipIfNoConnectivity("connectivity test", response)) {
+
+      if (skipIfNoConnectivity('connectivity test', response)) {
         return; // Skip test if no connectivity
       }
-      
+
       expect(response.ok).toBe(true);
       console.log('✅ Network connection established');
     });
   });
-  
-  describe("🏥 Health and Monitoring", () => {
-    test("health check returns comprehensive status", async () => {
+
+  describe('🏥 Health and Monitoring', () => {
+    test('health check returns comprehensive status', async () => {
       const response = await client.healthCheck();
-      
-      if (skipIfNoConnectivity("health check", response)) {
+
+      if (skipIfNoConnectivity('health check', response)) {
         return;
       }
-      
+
       expectNetworkOrSuccess(response, 200);
-      
+
       if (response.ok) {
         const health = await response.json();
         expect(health).toHaveProperty('status');
         expect(health).toHaveProperty('service');
         expect(health).toHaveProperty('version');
         expect(health.version).toBe('2.0.0'); // Production version
-        
+
         console.log('✅ Health status:', health.status);
         console.log('🏷️  Registry version:', health.version);
         console.log('🔧 Environment:', health.environment);
       }
     });
-    
-    test("stats endpoint returns monitoring data", async () => {
+
+    test('stats endpoint returns monitoring data', async () => {
       const response = await client.getStats();
-      
-      if (skipIfNoConnectivity("stats endpoint", response)) {
+
+      if (skipIfNoConnectivity('stats endpoint', response)) {
         return;
       }
-      
+
       expectNetworkOrSuccess(response, 200);
-      
+
       if (response.ok) {
         const stats = await response.json();
         expect(stats).toHaveProperty('totalPackages');
         expect(stats).toHaveProperty('health');
         expect(stats).toHaveProperty('circuitBreakers');
         expect(typeof stats.totalPackages).toBe('number');
-        
+
         console.log('📈 Total packages:', stats.totalPackages);
         console.log('🔄 Circuit breakers:', Object.keys(stats.circuitBreakers));
         console.log('💾 Health services:', Object.keys(stats.health));
       }
     });
   });
-  
-  describe("🔒 Error Handling and Resilience", () => {
-    test("handles authentication errors with proper error codes", async () => {
+
+  describe('🔒 Error Handling and Resilience', () => {
+    test('handles authentication errors with proper error codes', async () => {
       const unauthenticatedClient = new ResilientRegistryClient(TEST_REGISTRY_URL, '');
-      
+
       const response = await unauthenticatedClient.publishPackage('@fire22/test-pkg', {
         name: '@fire22/test-pkg',
-        version: '1.0.0'
+        version: '1.0.0',
       });
-      
-      if (skipIfNoConnectivity("authentication test", response)) {
+
+      if (skipIfNoConnectivity('authentication test', response)) {
         return;
       }
-      
+
       // Should get either auth error or validation error
       const allowedAuthStatuses = [400, 401, 403];
       expect(allowedAuthStatuses).toContain(response.status);
-      
+
       if (response.status > 0) {
         const error = await response.json();
         expect(error).toHaveProperty('error');
         expect(error).toHaveProperty('code');
-        
+
         console.log('🔐 Error code:', error.code);
         console.log('📋 Error type:', error.error);
       }
     });
-    
-    test("handles invalid JSON with proper error response", async () => {
+
+    test('handles invalid JSON with proper error response', async () => {
       const response = await client.request('/@fire22/malformed-test', {
         method: 'PUT',
         body: '{"invalid": json malformed',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
-      
-      if (skipIfNoConnectivity("invalid JSON test", response)) {
+
+      if (skipIfNoConnectivity('invalid JSON test', response)) {
         return;
       }
-      
+
       expect(response.status).toBe(400);
-      
+
       if (response.status === 400) {
         const error = await response.json();
         expect(error.error).toContain('validation');
         console.log('🔧 JSON validation working:', error.code);
       }
     });
-    
-    test("CORS headers are present", async () => {
+
+    test('CORS headers are present', async () => {
       const response = await client.healthCheck();
-      
-      if (skipIfNoConnectivity("CORS test", response)) {
+
+      if (skipIfNoConnectivity('CORS test', response)) {
         return;
       }
-      
+
       if (response.ok) {
         expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
         console.log('🌐 CORS headers verified');
       }
     });
-    
-    test("handles preflight requests", async () => {
+
+    test('handles preflight requests', async () => {
       const response = await client.request('/health', { method: 'OPTIONS' });
-      
-      if (skipIfNoConnectivity("preflight test", response)) {
+
+      if (skipIfNoConnectivity('preflight test', response)) {
         return;
       }
-      
+
       expect(response.status).toBe(200);
       console.log('✈️ Preflight requests handled');
     });
   });
-  
-  describe("📦 Package Operations", () => {
+
+  describe('📦 Package Operations', () => {
     const testPackage = {
       name: '@fire22/resilient-test-package',
       version: '1.0.0',
       description: 'Resilient test package',
-      keywords: ['test', 'fire22', 'resilient']
+      keywords: ['test', 'fire22', 'resilient'],
     };
-    
-    test("package publishing (if connectivity available)", async () => {
+
+    test('package publishing (if connectivity available)', async () => {
       const response = await client.publishPackage(testPackage.name, testPackage);
-      
-      if (skipIfNoConnectivity("package publish", response)) {
+
+      if (skipIfNoConnectivity('package publish', response)) {
         return;
       }
-      
+
       // Accept various responses - auth might fail in test environment
       const allowedPublishStatuses = [200, 201, 400, 401, 403];
       expect(allowedPublishStatuses).toContain(response.status);
-      
+
       const result = await response.json();
-      
+
       // Successful responses might not have 'error' property
       if (response.ok) {
         expect(result).toHaveProperty('ok');
       } else {
         expect(result).toHaveProperty('error');
       }
-      
+
       if (response.ok) {
         console.log('📦 Package published:', result.id);
       } else {
         console.log('📦 Publish blocked (expected):', result.error);
       }
     });
-    
-    test("package retrieval handles not found", async () => {
+
+    test('package retrieval handles not found', async () => {
       const response = await client.getPackage('@fire22/definitely-nonexistent');
-      
-      if (skipIfNoConnectivity("package get", response)) {
+
+      if (skipIfNoConnectivity('package get', response)) {
         return;
       }
-      
+
       const allowedGetStatuses = [200, 400, 404, 503];
       expect(allowedGetStatuses).toContain(response.status);
-      
+
       if (response.status === 404) {
         const error = await response.json();
         expect(error.error).toBe('not_found');
@@ -370,17 +377,17 @@ describe("Fire22 Registry Resilient Tests", () => {
       }
     });
   });
-  
-  describe("🔍 Search Functionality", () => {
-    test("search returns formatted results", async () => {
+
+  describe('🔍 Search Functionality', () => {
+    test('search returns formatted results', async () => {
       const response = await client.searchPackages('fire22');
-      
-      if (skipIfNoConnectivity("search test", response)) {
+
+      if (skipIfNoConnectivity('search test', response)) {
         return;
       }
-      
+
       expectNetworkOrSuccess(response, 200);
-      
+
       if (response.ok) {
         const results = await response.json();
         expect(results).toHaveProperty('objects');
@@ -388,68 +395,72 @@ describe("Fire22 Registry Resilient Tests", () => {
         console.log(`🔍 Search returned ${results.objects.length} results`);
       }
     });
-    
-    test("search handles special characters", async () => {
+
+    test('search handles special characters', async () => {
       const response = await client.searchPackages('@#$%');
-      
-      if (skipIfNoConnectivity("special character search", response)) {
+
+      if (skipIfNoConnectivity('special character search', response)) {
         return;
       }
-      
+
       expectNetworkOrSuccess(response, 200);
       console.log('🔤 Special characters handled in search');
     });
   });
-  
-  describe("⚡ Performance and Reliability", () => {
-    test("responses include monitoring headers", async () => {
+
+  describe('⚡ Performance and Reliability', () => {
+    test('responses include monitoring headers', async () => {
       const response = await client.healthCheck();
-      
-      if (skipIfNoConnectivity("monitoring headers test", response)) {
+
+      if (skipIfNoConnectivity('monitoring headers test', response)) {
         return;
       }
-      
+
       if (response.ok) {
         const registryName = response.headers.get('X-Registry-Name');
         const registryVersion = response.headers.get('X-Registry-Version');
         const requestId = response.headers.get('X-Request-ID');
-        
+
         expect(registryName).toContain('Fire22');
         expect(registryVersion).toBe('2.0.0');
         expect(requestId).toBeTruthy();
-        
+
         console.log('📊 Monitoring headers verified');
         console.log(`🏷️  Version: ${registryVersion}`);
       }
     });
-    
-    test("health check responds within timeout", async () => {
+
+    test('health check responds within timeout', async () => {
       const startTime = performance.now();
       const response = await client.healthCheck();
       const duration = performance.now() - startTime;
-      
-      if (!skipIfNoConnectivity("response time test", response)) {
+
+      if (!skipIfNoConnectivity('response time test', response)) {
         expect(duration).toBeLessThan(REQUEST_TIMEOUT);
         console.log(`⚡ Response time: ${Math.round(duration)}ms`);
       }
     });
   });
-  
-  describe("🔄 Concurrent Operations", () => {
-    test("handles multiple concurrent requests", async () => {
+
+  describe('🔄 Concurrent Operations', () => {
+    test('handles multiple concurrent requests', async () => {
       const concurrency = 5; // Reduced for reliability
-      const requests = Array(concurrency).fill(null).map(() => client.healthCheck());
-      
+      const requests = Array(concurrency)
+        .fill(null)
+        .map(() => client.healthCheck());
+
       const startTime = performance.now();
       const responses = await Promise.all(requests);
       const duration = performance.now() - startTime;
-      
+
       const successfulResponses = responses.filter(r => r.ok).length;
       const networkErrors = responses.filter(r => r.error).length;
-      
-      console.log(`🔄 ${concurrency} concurrent requests: ${successfulResponses} successful, ${networkErrors} network errors`);
+
+      console.log(
+        `🔄 ${concurrency} concurrent requests: ${successfulResponses} successful, ${networkErrors} network errors`
+      );
       console.log(`⏱️  Total time: ${Math.round(duration)}ms`);
-      
+
       // At least some requests should work if we have connectivity
       if (hasConnectivity) {
         expect(successfulResponses).toBeGreaterThan(0);
@@ -458,23 +469,23 @@ describe("Fire22 Registry Resilient Tests", () => {
   });
 });
 
-describe("🧪 Production Environment Validation", () => {
-  test("production configuration is active", async () => {
+describe('🧪 Production Environment Validation', () => {
+  test('production configuration is active', async () => {
     const response = await client.healthCheck();
-    
-    if (skipIfNoConnectivity("production config test", response)) {
+
+    if (skipIfNoConnectivity('production config test', response)) {
       return;
     }
-    
+
     if (response.ok) {
       const health = await response.json();
-      
+
       // Verify production settings
       expect(health.version).toBe('2.0.0');
       expect(health.service).toContain('Production');
       expect(health.environment.securityScanning).toBe(true);
       expect(health.environment.fallbackMode).toBe(true);
-      
+
       console.log('✅ Production configuration verified');
       console.log('🔒 Security scanning:', health.environment.securityScanning);
       console.log('🛡️  Fallback mode:', health.environment.fallbackMode);

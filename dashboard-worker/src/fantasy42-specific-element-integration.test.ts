@@ -3,7 +3,10 @@
  */
 
 import { describe, test, expect, beforeEach, afterEach, mock } from 'bun:test';
-import { Fantasy42SpecificElementManager, createSpecificElementManager } from '../core/integrations/fantasy42-specific-element-integration';
+import {
+  Fantasy42SpecificElementManager,
+  createSpecificElementManager,
+} from '../core/integrations/fantasy42-specific-element-integration';
 import { XPathElementHandler } from '../core/ui/xpath-element-handler';
 
 // Mock the Fantasy42AgentClient
@@ -29,7 +32,7 @@ const createMockElement = (tagName: string = 'div', options: any = {}) => {
     getAttribute: mock(() => ''),
     querySelector: mock(() => null),
     querySelectorAll: mock(() => []),
-    ...options
+    ...options,
   };
   return element;
 };
@@ -43,8 +46,8 @@ const mockDocument = {
       return {
         singleNodeValue: createMockElement('div', {
           textContent: 'Target element content',
-          id: 'target-element'
-        })
+          id: 'target-element',
+        }),
       };
     }
     return { singleNodeValue: null };
@@ -52,14 +55,14 @@ const mockDocument = {
   createElement: mock((tag: string) => createMockElement(tag)),
   head: createMockElement('head'),
   addEventListener: mock(() => {}),
-  removeEventListener: mock(() => {})
+  removeEventListener: mock(() => {}),
 };
 
 // Setup global mocks
 global.document = mockDocument as any;
 global.window = {
   addEventListener: mock(() => {}),
-  removeEventListener: mock(() => {})
+  removeEventListener: mock(() => {}),
 } as any;
 
 describe('Fantasy42SpecificElementManager', () => {
@@ -70,12 +73,12 @@ describe('Fantasy42SpecificElementManager', () => {
   beforeEach(() => {
     client = new MockFantasy42AgentClient({
       baseURL: 'https://api.test.com',
-      token: 'test-token'
+      token: 'test-token',
     });
 
     mockElement = createMockElement('div', {
       textContent: 'Test content',
-      id: 'test-element'
+      id: 'test-element',
     });
 
     // Reset mocks
@@ -91,12 +94,12 @@ describe('Fantasy42SpecificElementManager', () => {
   describe('Initialization', () => {
     test('should initialize successfully when element is found', async () => {
       mockDocument.evaluate.mockReturnValue({
-        singleNodeValue: mockElement
+        singleNodeValue: mockElement,
       });
 
       manager = new Fantasy42SpecificElementManager(client, {
         xpath: '/html/body/div[3]/div[5]/div/div[4]/div[7]/div',
-        action: 'read'
+        action: 'read',
       });
 
       const result = await manager.initialize();
@@ -108,12 +111,12 @@ describe('Fantasy42SpecificElementManager', () => {
 
     test('should handle element not found gracefully', async () => {
       mockDocument.evaluate.mockReturnValue({
-        singleNodeValue: null
+        singleNodeValue: null,
       });
 
       manager = new Fantasy42SpecificElementManager(client, {
         xpath: '/html/body/div[3]/div[5]/div/div[4]/div[7]/div',
-        action: 'read'
+        action: 'read',
       });
 
       const result = await manager.initialize();
@@ -125,14 +128,14 @@ describe('Fantasy42SpecificElementManager', () => {
 
     test('should setup auto-update when enabled', async () => {
       mockDocument.evaluate.mockReturnValue({
-        singleNodeValue: mockElement
+        singleNodeValue: mockElement,
       });
 
       manager = new Fantasy42SpecificElementManager(client, {
         xpath: '/html/body/div[3]/div[5]/div/div[4]/div[7]/div',
         action: 'read',
         autoUpdate: true,
-        updateInterval: 1000
+        updateInterval: 1000,
       });
 
       const result = await manager.initialize();
@@ -145,12 +148,12 @@ describe('Fantasy42SpecificElementManager', () => {
   describe('Data Operations', () => {
     beforeEach(async () => {
       mockDocument.evaluate.mockReturnValue({
-        singleNodeValue: mockElement
+        singleNodeValue: mockElement,
       });
 
       manager = new Fantasy42SpecificElementManager(client, {
         xpath: '/html/body/div[3]/div[5]/div/div[4]/div[7]/div',
-        action: 'read'
+        action: 'read',
       });
 
       await manager.initialize();
@@ -178,8 +181,8 @@ describe('Fantasy42SpecificElementManager', () => {
         content: 'Structured content',
         attributes: {
           'data-test': 'value',
-          'class': 'test-class'
-        }
+          class: 'test-class',
+        },
       };
 
       const result = manager.writeElementData(structuredData);
@@ -194,14 +197,14 @@ describe('Fantasy42SpecificElementManager', () => {
       manager = new Fantasy42SpecificElementManager(client, {
         xpath: '/html/body/div[3]/div[5]/div/div[4]/div[7]/div',
         action: 'read',
-        autoUpdate: false
+        autoUpdate: false,
       });
 
       await manager.initialize();
 
       manager.updateConfig({
         autoUpdate: true,
-        updateInterval: 2000
+        updateInterval: 2000,
       });
 
       // Configuration should be updated
@@ -213,13 +216,13 @@ describe('Fantasy42SpecificElementManager', () => {
       const onElementFound = mock(() => {});
 
       mockDocument.evaluate.mockReturnValue({
-        singleNodeValue: mockElement
+        singleNodeValue: mockElement,
       });
 
       manager = new Fantasy42SpecificElementManager(client, {
         xpath: '/html/body/div[3]/div[5]/div/div[4]/div[7]/div',
         action: 'read',
-        onElementFound
+        onElementFound,
       });
 
       await manager.initialize();
@@ -231,13 +234,13 @@ describe('Fantasy42SpecificElementManager', () => {
       const onDataChange = mock(() => {});
 
       mockDocument.evaluate.mockReturnValue({
-        singleNodeValue: mockElement
+        singleNodeValue: mockElement,
       });
 
       manager = new Fantasy42SpecificElementManager(client, {
         xpath: '/html/body/div[3]/div[5]/div/div[4]/div[7]/div',
         action: 'update',
-        onDataChange
+        onDataChange,
       });
 
       await manager.initialize();
@@ -254,13 +257,13 @@ describe('Fantasy42SpecificElementManager', () => {
   describe('Cleanup', () => {
     test('should cleanup resources properly', async () => {
       mockDocument.evaluate.mockReturnValue({
-        singleNodeValue: mockElement
+        singleNodeValue: mockElement,
       });
 
       manager = new Fantasy42SpecificElementManager(client, {
         xpath: '/html/body/div[3]/div[5]/div/div[4]/div[7]/div',
         action: 'read',
-        autoUpdate: true
+        autoUpdate: true,
       });
 
       await manager.initialize();

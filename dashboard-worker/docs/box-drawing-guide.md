@@ -3,6 +3,7 @@
 ## Smooth Unicode Box Drawing Characters
 
 ### Character Reference
+
 ```
 ╭ = Top-left corner (smooth)
 ╮ = Top-right corner (smooth)
@@ -20,6 +21,7 @@
 ## Example: Project Structure with Smooth Boxes
 
 ### Before (Sharp Corners)
+
 ```
 +-- dashboard-worker/
 |   +-- src/
@@ -31,6 +33,7 @@
 ```
 
 ### After (Smooth Corners)
+
 ```
 ╭── dashboard-worker/
 │   ╭── src/
@@ -44,6 +47,7 @@
 ## File Tree Examples
 
 ### Simple File Tree
+
 ```
 dashboard-worker/
 ├── 📄 .env.example
@@ -58,6 +62,7 @@ dashboard-worker/
 ```
 
 ### Complex Nested Structure
+
 ```
 ╭─ Fire22 Dashboard Worker
 │
@@ -91,6 +96,7 @@ dashboard-worker/
 ## Box Diagrams
 
 ### API Flow Diagram
+
 ```
 ╭─────────────────╮
 │   Client App    │
@@ -114,6 +120,7 @@ dashboard-worker/
 ```
 
 ### Component Architecture
+
 ```
 ╭──────────────────────────────────────╮
 │         Fire22 Dashboard             │
@@ -285,9 +292,12 @@ dashboard-worker/
 
 ## Summary
 
-Using smooth box-drawing characters creates a more professional and visually appealing documentation. The characters flow better and create a modern, clean aesthetic that's easier on the eyes than sharp ASCII corners.
+Using smooth box-drawing characters creates a more professional and visually
+appealing documentation. The characters flow better and create a modern, clean
+aesthetic that's easier on the eyes than sharp ASCII corners.
 
 ### Quick Reference
+
 - Replace `+--` with `╭──`
 - Replace `+` corners with `╭╮╰╯`
 - Use `├` instead of `|--` for branches

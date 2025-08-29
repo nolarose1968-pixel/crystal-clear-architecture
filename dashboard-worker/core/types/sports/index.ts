@@ -5,11 +5,41 @@
 
 import type { BaseEntity, RiskLevel, VIPTier, Status } from '../shared/common';
 
-export type SportType = 'football' | 'basketball' | 'baseball' | 'soccer' | 'tennis' | 'golf' | 'racing' | 'esports' | 'other';
+export type SportType =
+  | 'football'
+  | 'basketball'
+  | 'baseball'
+  | 'soccer'
+  | 'tennis'
+  | 'golf'
+  | 'racing'
+  | 'esports'
+  | 'other';
 
-export type LeagueType = 'NFL' | 'NBA' | 'MLB' | 'NHL' | 'EPL' | 'La Liga' | 'Serie A' | 'Bundesliga' | 'Champions League' | 'ATP' | 'WTA' | 'PGA' | 'Formula 1' | 'NASCAR' | 'other';
+export type LeagueType =
+  | 'NFL'
+  | 'NBA'
+  | 'MLB'
+  | 'NHL'
+  | 'EPL'
+  | 'La Liga'
+  | 'Serie A'
+  | 'Bundesliga'
+  | 'Champions League'
+  | 'ATP'
+  | 'WTA'
+  | 'PGA'
+  | 'Formula 1'
+  | 'NASCAR'
+  | 'other';
 
-export type EventStatus = 'scheduled' | 'live' | 'completed' | 'cancelled' | 'postponed' | 'suspended';
+export type EventStatus =
+  | 'scheduled'
+  | 'live'
+  | 'completed'
+  | 'cancelled'
+  | 'postponed'
+  | 'suspended';
 
 export type BetType =
   | 'moneyline'

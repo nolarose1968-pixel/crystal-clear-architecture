@@ -2,7 +2,7 @@
 
 /**
  * 🏗️ Fire22 Workspace Manager
- * 
+ *
  * Unified management for all workspace packages
  */
 
@@ -27,7 +27,7 @@ export class WorkspaceManager {
       version: '1.0.0',
       description: 'Environment configuration and validation',
       hasTests: true,
-      hasDist: true
+      hasDist: true,
     },
     {
       name: '@fire22/middleware',
@@ -35,7 +35,7 @@ export class WorkspaceManager {
       version: '1.0.0',
       description: 'Request handling and error formatting',
       hasTests: true,
-      hasDist: true
+      hasDist: true,
     },
     {
       name: '@fire22/testing-framework',
@@ -43,7 +43,7 @@ export class WorkspaceManager {
       version: '1.0.0',
       description: 'Comprehensive testing utilities',
       hasTests: true,
-      hasDist: true
+      hasDist: true,
     },
     {
       name: '@fire22/wager-system',
@@ -51,7 +51,7 @@ export class WorkspaceManager {
       version: '1.0.0',
       description: 'Financial calculations and risk management',
       hasTests: true,
-      hasDist: true
+      hasDist: true,
     },
     {
       name: '@fire22/benchmark-suite',
@@ -59,7 +59,7 @@ export class WorkspaceManager {
       version: '1.0.0',
       description: 'High-precision performance benchmarking',
       hasTests: false,
-      hasDist: false
+      hasDist: false,
     },
     {
       name: '@fire22/memory-profiler',
@@ -67,7 +67,7 @@ export class WorkspaceManager {
       version: '1.0.0',
       description: 'Memory profiling with bun:jsc',
       hasTests: false,
-      hasDist: false
+      hasDist: false,
     },
     {
       name: '@fire22/micro-benchmarks',
@@ -75,7 +75,7 @@ export class WorkspaceManager {
       version: '1.0.0',
       description: 'Precision microbenchmarking',
       hasTests: false,
-      hasDist: false
+      hasDist: false,
     },
     {
       name: '@fire22/load-testing',
@@ -83,7 +83,7 @@ export class WorkspaceManager {
       version: '1.0.0',
       description: 'HTTP endpoint load testing',
       hasTests: false,
-      hasDist: false
+      hasDist: false,
     },
     {
       name: '@fire22/benchmark-formatter',
@@ -91,8 +91,8 @@ export class WorkspaceManager {
       version: '1.0.0',
       description: 'Beautiful benchmark output formatting',
       hasTests: false,
-      hasDist: false
-    }
+      hasDist: false,
+    },
   ];
 
   /**
@@ -100,17 +100,17 @@ export class WorkspaceManager {
    */
   async listPackages(): Promise<void> {
     console.log('📦 Dashboard Worker Packages');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
     console.log();
 
     for (const pkg of this.packages) {
       const exists = existsSync(join(process.cwd(), pkg.path));
       const status = exists ? '✅' : '❌';
-      
+
       console.log(`${status} ${pkg.name} v${pkg.version}`);
       console.log(`   📁 ${pkg.path}`);
       console.log(`   📝 ${pkg.description}`);
-      
+
       if (exists) {
         const features = [];
         if (pkg.hasTests) features.push('tests');
@@ -128,7 +128,7 @@ export class WorkspaceManager {
    */
   async buildAll(): Promise<void> {
     console.log('🏗️  Building All Packages');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
 
     for (const pkg of this.packages) {
       const pkgPath = join(process.cwd(), pkg.path);
@@ -152,7 +152,7 @@ export class WorkspaceManager {
    */
   async testAll(): Promise<void> {
     console.log('🧪 Testing All Packages');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
 
     for (const pkg of this.packages.filter(p => p.hasTests)) {
       const pkgPath = join(process.cwd(), pkg.path);
@@ -176,7 +176,7 @@ export class WorkspaceManager {
    */
   async linkAll(): Promise<void> {
     console.log('🔗 Linking All Packages');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
 
     // First, register each package
     for (const pkg of this.packages) {
@@ -203,17 +203,17 @@ export class WorkspaceManager {
    */
   async updateWorkspaceProtocol(): Promise<void> {
     console.log('🔄 Updating Workspace Protocol');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
 
     for (const pkg of this.packages) {
       const pkgPath = join(process.cwd(), pkg.path, 'package.json');
       if (!existsSync(pkgPath)) continue;
 
       console.log(`\n📦 Updating ${pkg.name}...`);
-      
+
       // Read package.json
       const packageJson = await Bun.file(pkgPath).json();
-      
+
       // Update dependencies to use workspace protocol
       if (packageJson.dependencies) {
         for (const dep of Object.keys(packageJson.dependencies)) {
@@ -236,14 +236,14 @@ export class WorkspaceManager {
    */
   async cleanAll(): Promise<void> {
     console.log('🧹 Cleaning All Packages');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
 
     for (const pkg of this.packages) {
       const pkgPath = join(process.cwd(), pkg.path);
       if (!existsSync(pkgPath)) continue;
 
       console.log(`\n🧹 Cleaning ${pkg.name}...`);
-      
+
       // Remove dist directory
       const distPath = join(pkgPath, 'dist');
       if (existsSync(distPath)) {
@@ -267,7 +267,7 @@ export class WorkspaceManager {
    */
   async installAll(options: { production?: boolean; frozen?: boolean } = {}): Promise<void> {
     console.log('📦 Installing Dependencies');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
 
     const args = ['install'];
     if (options.production) args.push('--production');
@@ -294,7 +294,7 @@ export class WorkspaceManager {
    */
   async createDependencyGraph(): Promise<void> {
     console.log('📊 Dependency Graph');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
     console.log();
 
     const graph: Record<string, string[]> = {};
@@ -338,7 +338,7 @@ export class WorkspaceManager {
    */
   async runScript(script: string): Promise<void> {
     console.log(`🚀 Running Script: ${script}`);
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
 
     for (const pkg of this.packages) {
       const pkgPath = join(process.cwd(), pkg.path);
@@ -359,7 +359,7 @@ export class WorkspaceManager {
    */
   async versionBump(type: 'patch' | 'minor' | 'major' = 'patch'): Promise<void> {
     console.log(`📝 Version Bump: ${type}`);
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
 
     for (const pkg of this.packages) {
       const pkgPath = join(process.cwd(), pkg.path);
@@ -405,7 +405,7 @@ if (import.meta.main) {
     case 'install':
       await manager.installAll({
         production: args.includes('--production'),
-        frozen: args.includes('--frozen-lockfile')
+        frozen: args.includes('--frozen-lockfile'),
       });
       break;
 
@@ -424,13 +424,13 @@ if (import.meta.main) {
       break;
 
     case 'version':
-      await manager.versionBump(args[0] as any || 'patch');
+      await manager.versionBump((args[0] as any) || 'patch');
       break;
 
     default:
       console.log(`
 🏗️  Fire22 Workspace Manager
-============================
+!==!==!==!==!===
 
 COMMANDS:
   list              List all workspace packages

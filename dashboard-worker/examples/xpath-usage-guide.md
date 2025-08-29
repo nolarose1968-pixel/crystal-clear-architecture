@@ -2,7 +2,9 @@
 
 ## Overview
 
-You've provided the XPath `/html/body/div[3]/div[5]/div/div[4]/div[7]/div` for integration into your Fantasy42 dashboard system. This guide shows you how to use this XPath with your existing infrastructure.
+You've provided the XPath `/html/body/div[3]/div[5]/div/div[4]/div[7]/div` for
+integration into your Fantasy42 dashboard system. This guide shows you how to
+use this XPath with your existing infrastructure.
 
 ## Quick Start
 
@@ -15,7 +17,7 @@ import { Fantasy42AgentClient } from '../src/api/fantasy42-agent-client';
 // Create client
 const client = new Fantasy42AgentClient({
   baseURL: 'https://api.fantasy42.com',
-  token: 'your-token'
+  token: 'your-token',
 });
 
 // Create and initialize
@@ -30,7 +32,10 @@ const data = manager.getCurrentData();
 ### 2. Direct XPath Handler
 
 ```typescript
-import { findSpecificElement, handleSpecificElement } from '../core/ui/xpath-element-handler';
+import {
+  findSpecificElement,
+  handleSpecificElement,
+} from '../core/ui/xpath-element-handler';
 
 // Find the element
 const element = findSpecificElement();
@@ -74,10 +79,10 @@ const customManager = new Fantasy42SpecificElementManager(client, {
     console.log('Data changed:', newData);
     // Handle your data change logic
   },
-  onElementFound: (element) => {
+  onElementFound: element => {
     console.log('Element found:', element.tagName);
     // Setup additional handlers
-  }
+  },
 });
 
 await customManager.initialize();
@@ -91,12 +96,14 @@ import { XPathElementHandler } from '../core/ui/xpath-element-handler';
 const handler = XPathElementHandler.getInstance();
 
 // Direct element finding
-const element = handler.findElementByXPath('/html/body/div[3]/div[5]/div/div[4]/div[7]/div');
+const element = handler.findElementByXPath(
+  '/html/body/div[3]/div[5]/div/div[4]/div[7]/div'
+);
 
 // Direct element handling
 const result = await handler.handleXPathElement({
   xpath: '/html/body/div[3]/div[5]/div/div[4]/div[7]/div',
-  action: 'read'
+  action: 'read',
 });
 ```
 
@@ -140,8 +147,8 @@ manager.writeElementData({
   content: 'New content',
   attributes: {
     'data-status': 'updated',
-    'class': 'highlight'
-  }
+    class: 'highlight',
+  },
 });
 ```
 
@@ -151,12 +158,12 @@ manager.writeElementData({
 const interactiveManager = new Fantasy42SpecificElementManager(client, {
   xpath: '/html/body/div[3]/div[5]/div/div[4]/div[7]/div',
   action: 'click',
-  onElementFound: (element) => {
+  onElementFound: element => {
     // Add custom click handler
     element.addEventListener('dblclick', () => {
       console.log('Double-clicked!');
     });
-  }
+  },
 });
 
 await interactiveManager.initialize();
@@ -168,13 +175,14 @@ When you read data from your XPath element, you'll get:
 
 ```typescript
 interface ElementData {
-  content: string;           // Text content of the element
-  attributes: {              // All element attributes
-    [key: string]: string
+  content: string; // Text content of the element
+  attributes: {
+    // All element attributes
+    [key: string]: string;
   };
-  children: ElementData[];   // Child elements (simplified)
-  timestamp: string;         // When data was extracted
-  xpath: string;            // Your XPath for reference
+  children: ElementData[]; // Child elements (simplified)
+  timestamp: string; // When data was extracted
+  xpath: string; // Your XPath for reference
 }
 ```
 
@@ -189,10 +197,7 @@ import { Fantasy42CustomerInfo } from '../core/integrations/fantasy42-customer-i
 const customerInfo = new Fantasy42CustomerInfo(/* config */);
 const elementManager = createSpecificElementManager(client);
 
-await Promise.all([
-  customerInfo.initialize(),
-  elementManager.initialize()
-]);
+await Promise.all([customerInfo.initialize(), elementManager.initialize()]);
 
 // Now both systems are monitoring their respective elements
 ```
@@ -210,7 +215,7 @@ const actionHandlers = {
     manager.initialize().then(() => {
       console.log('Specific element monitoring started');
     });
-  }
+  },
 };
 ```
 
@@ -265,7 +270,8 @@ if (manager) {
 2. **Timing issues**: Element might load after your script runs
 3. **Dynamic content**: Element might be created by JavaScript
 
-**Solution**: Use the integration manager which includes automatic retry and DOM watching.
+**Solution**: Use the integration manager which includes automatic retry and DOM
+watching.
 
 ### Data Not Updating
 
@@ -308,4 +314,6 @@ If you encounter issues:
 4. Review the README documentation
 5. Check API connectivity and permissions
 
-Your XPath `/html/body/div[3]/div[5]/div/div[4]/div[7]/div` is now fully integrated into your Fantasy42 system with comprehensive monitoring, data extraction, and interaction capabilities! 🎯
+Your XPath `/html/body/div[3]/div[5]/div/div[4]/div[7]/div` is now fully
+integrated into your Fantasy42 system with comprehensive monitoring, data
+extraction, and interaction capabilities! 🎯

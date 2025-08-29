@@ -2,50 +2,50 @@
 
 /**
  * 🔐 Enhanced Secure Configuration Manager for Fire22 Dashboard
- * 
+ *
  * Integrates Bun.secrets with existing Fire22 security infrastructure
  * Provides secure credential management for Telegram bots and dashboard
  * Extends existing security-core package functionality
  */
 
-import { secrets } from "bun";
-import { Fire22SecureCredentialManager } from "./bun-secrets-demo";
-import { SecureEnvironmentManager } from "./secure-env-manager";
+import { secrets } from 'bun';
+import { Fire22SecureCredentialManager } from './bun-secrets-demo';
+import { SecureEnvironmentManager } from './secure-env-manager';
 
 export interface EnhancedSecureConfig {
   // Telegram Bot Configuration
   BOT_TOKEN: string;
   CASHIER_BOT_TOKEN: string;
   ADMIN_BOT_TOKEN?: string;
-  
+
   // Dashboard Authentication
   ADMIN_USERNAME: string;
   ADMIN_PASSWORD: string;
   JWT_SECRET: string;
-  
+
   // API Security
   FIRE22_API_TOKEN: string;
   WEBHOOK_SECRET: string;
-  
+
   // Database Security
   DATABASE_URL: string;
   DATABASE_PASSWORD: string;
-  
+
   // External Service Tokens
   STRIPE_SECRET_KEY?: string;
   SENDGRID_API_KEY?: string;
   CLOUDFLARE_API_TOKEN?: string;
-  
+
   // Monitoring and Security
   SECURITY_WEBHOOK_URL?: string;
   AUDIT_LOG_ENDPOINT?: string;
 }
 
 export class EnhancedConfigManager {
-  private readonly serviceName = "fire22-dashboard-enhanced";
+  private readonly serviceName = 'fire22-dashboard-enhanced';
   private credManager = new Fire22SecureCredentialManager();
   private envManager = new SecureEnvironmentManager();
-  
+
   /**
    * Enhanced credential setup with validation and security checks
    */
@@ -63,7 +63,7 @@ export class EnhancedConfigManager {
     const results = {
       stored: 0,
       failed: 0,
-      skipped: 0
+      skipped: 0,
     };
 
     for (const [key, value] of Object.entries(config)) {
@@ -76,14 +76,14 @@ export class EnhancedConfigManager {
       try {
         // Enhanced validation based on credential type
         const validationResult = await this.validateCredential(key, value);
-        
+
         if (validationResult.valid) {
           await secrets.set({
             service: this.serviceName,
             name: key,
             value: value.toString(),
           });
-          
+
           console.log(`✅ Securely stored ${key} (${validationResult.type})`);
           results.stored++;
         } else {
@@ -105,7 +105,10 @@ export class EnhancedConfigManager {
   /**
    * Enhanced credential validation with security policies
    */
-  private async validateCredential(key: string, value: string): Promise<{
+  private async validateCredential(
+    key: string,
+    value: string
+  ): Promise<{
     valid: boolean;
     type: string;
     reason?: string;
@@ -116,7 +119,7 @@ export class EnhancedConfigManager {
         return {
           valid: false,
           type: 'telegram-bot-token',
-          reason: 'Invalid Telegram bot token format'
+          reason: 'Invalid Telegram bot token format',
         };
       }
       return { valid: true, type: 'telegram-bot-token' };
@@ -128,7 +131,7 @@ export class EnhancedConfigManager {
         return {
           valid: false,
           type: 'jwt-secret',
-          reason: 'JWT secret must be at least 32 characters long'
+          reason: 'JWT secret must be at least 32 characters long',
         };
       }
       return { valid: true, type: 'jwt-secret' };
@@ -140,7 +143,7 @@ export class EnhancedConfigManager {
         return {
           valid: false,
           type: 'database-url',
-          reason: 'Invalid PostgreSQL connection string format'
+          reason: 'Invalid PostgreSQL connection string format',
         };
       }
       return { valid: true, type: 'database-url' };
@@ -152,7 +155,7 @@ export class EnhancedConfigManager {
         return {
           valid: false,
           type: 'api-token',
-          reason: 'Invalid Fire22 API token format'
+          reason: 'Invalid Fire22 API token format',
         };
       }
       return { valid: true, type: 'api-token' };
@@ -164,7 +167,7 @@ export class EnhancedConfigManager {
         return {
           valid: false,
           type: 'password',
-          reason: 'Password must be at least 8 characters long'
+          reason: 'Password must be at least 8 characters long',
         };
       }
       return { valid: true, type: 'password' };
@@ -179,14 +182,24 @@ export class EnhancedConfigManager {
    */
   async getEnhancedConfig(): Promise<Partial<EnhancedSecureConfig>> {
     console.log('🔍 Retrieving enhanced configuration...\n');
-    
+
     const config: Partial<EnhancedSecureConfig> = {};
     const keys: (keyof EnhancedSecureConfig)[] = [
-      'BOT_TOKEN', 'CASHIER_BOT_TOKEN', 'ADMIN_BOT_TOKEN',
-      'ADMIN_USERNAME', 'ADMIN_PASSWORD', 'JWT_SECRET',
-      'FIRE22_API_TOKEN', 'WEBHOOK_SECRET', 'DATABASE_URL',
-      'DATABASE_PASSWORD', 'STRIPE_SECRET_KEY', 'SENDGRID_API_KEY',
-      'CLOUDFLARE_API_TOKEN', 'SECURITY_WEBHOOK_URL', 'AUDIT_LOG_ENDPOINT'
+      'BOT_TOKEN',
+      'CASHIER_BOT_TOKEN',
+      'ADMIN_BOT_TOKEN',
+      'ADMIN_USERNAME',
+      'ADMIN_PASSWORD',
+      'JWT_SECRET',
+      'FIRE22_API_TOKEN',
+      'WEBHOOK_SECRET',
+      'DATABASE_URL',
+      'DATABASE_PASSWORD',
+      'STRIPE_SECRET_KEY',
+      'SENDGRID_API_KEY',
+      'CLOUDFLARE_API_TOKEN',
+      'SECURITY_WEBHOOK_URL',
+      'AUDIT_LOG_ENDPOINT',
     ];
 
     for (const key of keys) {
@@ -233,20 +246,26 @@ export class EnhancedConfigManager {
    */
   async auditEnhancedSecurity(): Promise<void> {
     console.log('🛡️  Enhanced Security Audit\n');
-    
+
     const auditResults = {
       enhancedStorage: 0,
       fallbackStorage: 0,
       environmentVars: 0,
       missing: 0,
-      securityIssues: 0
+      securityIssues: 0,
     };
 
     const keys: (keyof EnhancedSecureConfig)[] = [
-      'BOT_TOKEN', 'CASHIER_BOT_TOKEN', 'ADMIN_BOT_TOKEN',
-      'ADMIN_USERNAME', 'ADMIN_PASSWORD', 'JWT_SECRET',
-      'FIRE22_API_TOKEN', 'WEBHOOK_SECRET', 'DATABASE_URL',
-      'DATABASE_PASSWORD'
+      'BOT_TOKEN',
+      'CASHIER_BOT_TOKEN',
+      'ADMIN_BOT_TOKEN',
+      'ADMIN_USERNAME',
+      'ADMIN_PASSWORD',
+      'JWT_SECRET',
+      'FIRE22_API_TOKEN',
+      'WEBHOOK_SECRET',
+      'DATABASE_URL',
+      'DATABASE_PASSWORD',
     ];
 
     console.log('🔍 Auditing credential storage across all backends...\n');
@@ -319,7 +338,9 @@ export class EnhancedConfigManager {
 
     if (auditResults.securityIssues > 0) {
       console.log('\n⚠️  Security Warnings:');
-      console.log(`   • Move ${auditResults.securityIssues} credentials from environment to secure storage`);
+      console.log(
+        `   • Move ${auditResults.securityIssues} credentials from environment to secure storage`
+      );
     }
 
     if (auditResults.enhancedStorage === keys.length) {
@@ -332,12 +353,18 @@ export class EnhancedConfigManager {
    */
   async migrateToEnhancedStorage(): Promise<void> {
     console.log('🔄 Migrating to Enhanced Security Storage\n');
-    
+
     const keys: (keyof EnhancedSecureConfig)[] = [
-      'BOT_TOKEN', 'CASHIER_BOT_TOKEN', 'ADMIN_BOT_TOKEN',
-      'ADMIN_USERNAME', 'ADMIN_PASSWORD', 'JWT_SECRET',
-      'FIRE22_API_TOKEN', 'WEBHOOK_SECRET', 'DATABASE_URL',
-      'DATABASE_PASSWORD'
+      'BOT_TOKEN',
+      'CASHIER_BOT_TOKEN',
+      'ADMIN_BOT_TOKEN',
+      'ADMIN_USERNAME',
+      'ADMIN_PASSWORD',
+      'JWT_SECRET',
+      'FIRE22_API_TOKEN',
+      'WEBHOOK_SECRET',
+      'DATABASE_URL',
+      'DATABASE_PASSWORD',
     ];
 
     let migrated = 0;
@@ -358,7 +385,7 @@ export class EnhancedConfigManager {
 
         // Try to get from fallback storage
         let value = await this.credManager.getCredential(key.toLowerCase());
-        
+
         // Try environment variables as last resort
         if (!value) {
           value = process.env[key];
@@ -406,13 +433,23 @@ export class EnhancedConfigManager {
    */
   async clearEnhancedConfig(): Promise<void> {
     console.log('🗑️  Clearing Enhanced Security Configuration\n');
-    
+
     const keys: (keyof EnhancedSecureConfig)[] = [
-      'BOT_TOKEN', 'CASHIER_BOT_TOKEN', 'ADMIN_BOT_TOKEN',
-      'ADMIN_USERNAME', 'ADMIN_PASSWORD', 'JWT_SECRET',
-      'FIRE22_API_TOKEN', 'WEBHOOK_SECRET', 'DATABASE_URL',
-      'DATABASE_PASSWORD', 'STRIPE_SECRET_KEY', 'SENDGRID_API_KEY',
-      'CLOUDFLARE_API_TOKEN', 'SECURITY_WEBHOOK_URL', 'AUDIT_LOG_ENDPOINT'
+      'BOT_TOKEN',
+      'CASHIER_BOT_TOKEN',
+      'ADMIN_BOT_TOKEN',
+      'ADMIN_USERNAME',
+      'ADMIN_PASSWORD',
+      'JWT_SECRET',
+      'FIRE22_API_TOKEN',
+      'WEBHOOK_SECRET',
+      'DATABASE_URL',
+      'DATABASE_PASSWORD',
+      'STRIPE_SECRET_KEY',
+      'SENDGRID_API_KEY',
+      'CLOUDFLARE_API_TOKEN',
+      'SECURITY_WEBHOOK_URL',
+      'AUDIT_LOG_ENDPOINT',
     ];
 
     let deleted = 0;
@@ -452,34 +489,34 @@ if (import.meta.main) {
       console.log('🔐 Enhanced Security Configuration Setup');
       console.log('Please provide credentials interactively or via environment variables');
       break;
-      
+
     case 'get':
-      enhancedConfigManager.getEnhancedConfig()
+      enhancedConfigManager
+        .getEnhancedConfig()
         .then(config => {
           console.log('\n📋 Current Configuration:');
           Object.entries(config).forEach(([key, value]) => {
-            const masked = value ? `${value.substring(0, 4)}...${value.substring(value.length - 4)}` : 'undefined';
+            const masked = value
+              ? `${value.substring(0, 4)}...${value.substring(value.length - 4)}`
+              : 'undefined';
             console.log(`   ${key}: ${masked}`);
           });
         })
         .catch(console.error);
       break;
-      
+
     case 'audit':
-      enhancedConfigManager.auditEnhancedSecurity()
-        .catch(console.error);
+      enhancedConfigManager.auditEnhancedSecurity().catch(console.error);
       break;
-      
+
     case 'migrate':
-      enhancedConfigManager.migrateToEnhancedStorage()
-        .catch(console.error);
+      enhancedConfigManager.migrateToEnhancedStorage().catch(console.error);
       break;
-      
+
     case 'clear':
-      enhancedConfigManager.clearEnhancedConfig()
-        .catch(console.error);
+      enhancedConfigManager.clearEnhancedConfig().catch(console.error);
       break;
-      
+
     case 'help':
     default:
       console.log(`

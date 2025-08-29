@@ -17,466 +17,478 @@ import * as schemas from '@fire22/validator/schemas';
 const router = Router({ base: '/other' });
 
 // /api/reports/settlement-history (from index.ts:2872)
-router.get('//api/reports/settlement-history',
-  authorize(["authenticated"]),
+router.get(
+  '//api/reports/settlement-history',
+  authorize(['authenticated']),
   otherController.apiReportsSettlementHistory
 );
 
 // /api/customers/telegram (from index.ts:3343)
-router.put('//api/customers/telegram',
-  authorize(["authenticated"]),
+router.put(
+  '//api/customers/telegram',
+  authorize(['authenticated']),
   otherController.apiCustomersTelegram
 );
 
 // /api/wagers/manual (from index.ts:3403)
-router.post('//api/wagers/manual',
-  authorize(["authenticated"]),
-  otherController.apiWagersManual
-);
+router.post('//api/wagers/manual', authorize(['authenticated']), otherController.apiWagersManual);
 
 // /api/risk/exposure (from index.ts:3474)
-router.get('//api/risk/exposure',
-  authorize(["authenticated"]),
-  otherController.apiRiskExposure
-);
+router.get('//api/risk/exposure', authorize(['authenticated']), otherController.apiRiskExposure);
 
 // /api/live (from index.ts:3848)
-router.get('//api/live',
-  authorize(["authenticated"]),
-  otherController.apiLive
-);
+router.get('//api/live', authorize(['authenticated']), otherController.apiLive);
 
 // /api/analytics/daily (from index.ts:4313)
-router.get('//api/analytics/daily',
-  authorize(["authenticated"]),
+router.get(
+  '//api/analytics/daily',
+  authorize(['authenticated']),
   otherController.apiAnalyticsDaily
 );
 
 // /api/analytics/hourly (from index.ts:4343)
-router.get('//api/analytics/hourly',
-  authorize(["authenticated"]),
+router.get(
+  '//api/analytics/hourly',
+  authorize(['authenticated']),
   otherController.apiAnalyticsHourly
 );
 
 // /api/search (from index.ts:4372)
-router.get('//api/search',
-  authorize(["authenticated"]),
-  otherController.apiSearch
-);
+router.get('//api/search', authorize(['authenticated']), otherController.apiSearch);
 
 // /api/bulk-approve (from index.ts:4428)
-router.post('//api/bulk-approve',
-  authorize(["authenticated"]),
-  otherController.apiBulkApprove
-);
+router.post('//api/bulk-approve', authorize(['authenticated']), otherController.apiBulkApprove);
 
 // /api/bulk-reject (from index.ts:4466)
-router.post('//api/bulk-reject',
-  authorize(["authenticated"]),
-  otherController.apiBulkReject
-);
+router.post('//api/bulk-reject', authorize(['authenticated']), otherController.apiBulkReject);
 
 // /api/reports/profit-loss (from index.ts:4654)
-router.get('//api/reports/profit-loss',
-  authorize(["authenticated"]),
+router.get(
+  '//api/reports/profit-loss',
+  authorize(['authenticated']),
   otherController.apiReportsProfitLoss
 );
 
 // /api/reports/customer-activity (from index.ts:4721)
-router.get('//api/reports/customer-activity',
-  authorize(["authenticated"]),
+router.get(
+  '//api/reports/customer-activity',
+  authorize(['authenticated']),
   otherController.apiReportsCustomerActivity
 );
 
 // /api/live-casino/dashboard-data (from index.ts:5212)
-router.get('//api/live-casino/dashboard-data',
-  authorize(["authenticated"]),
+router.get(
+  '//api/live-casino/dashboard-data',
+  authorize(['authenticated']),
   otherController.apiLiveCasinoDashboardData
 );
 
 // /api/fire22/customers (from index.ts:5692)
-router.get('//api/fire22/customers',
-  authorize(["authenticated"]),
+router.get(
+  '//api/fire22/customers',
+  authorize(['authenticated']),
   otherController.apiFire22Customers
 );
 
 // /api/fire22/wagers (from index.ts:5720)
-router.get('//api/fire22/wagers',
-  authorize(["authenticated"]),
-  otherController.apiFire22Wagers
-);
+router.get('//api/fire22/wagers', authorize(['authenticated']), otherController.apiFire22Wagers);
 
 // /api/fire22/kpis (from index.ts:5747)
-router.get('//api/fire22/kpis',
-  authorize(["authenticated"]),
-  otherController.apiFire22Kpis
-);
+router.get('//api/fire22/kpis', authorize(['authenticated']), otherController.apiFire22Kpis);
 
 // /api/fire22/agent-performance (from index.ts:5774)
-router.get('//api/fire22/agent-performance',
-  authorize(["authenticated"]),
+router.get(
+  '//api/fire22/agent-performance',
+  authorize(['authenticated']),
   otherController.apiFire22AgentPerformance
 );
 
 // /api/customer-config (from index.ts:5801)
-router.get('//api/customer-config',
-  authorize(["authenticated"]),
+router.get(
+  '//api/customer-config',
+  authorize(['authenticated']),
   otherController.apiCustomerConfig
 );
 
 // /api/customer-config (from index.ts:5851)
-router.post('//api/customer-config',
-  authorize(["authenticated"]),
+router.post(
+  '//api/customer-config',
+  authorize(['authenticated']),
   otherController.apiCustomerConfig
 );
 
 // /api/customer-config/list (from index.ts:5901)
-router.get('//api/customer-config/list',
-  authorize(["authenticated"]),
+router.get(
+  '//api/customer-config/list',
+  authorize(['authenticated']),
   otherController.apiCustomerConfigList
 );
 
 // /api/customer-config/update (from index.ts:5942)
-router.put('//api/customer-config/update',
-  authorize(["authenticated"]),
+router.put(
+  '//api/customer-config/update',
+  authorize(['authenticated']),
   otherController.apiCustomerConfigUpdate
 );
 
 // /api/live-metrics (from index.ts:6019)
-router.get('//api/live-metrics',
-  authorize(["authenticated"]),
-  otherController.apiLiveMetrics
-);
+router.get('//api/live-metrics', authorize(['authenticated']), otherController.apiLiveMetrics);
 
 // /api/customers (from index.ts:6057)
-router.get('//api/customers',
-  authorize(["authenticated"]),
-  otherController.apiCustomers
-);
+router.get('//api/customers', authorize(['authenticated']), otherController.apiCustomers);
 
 // /api/debug/permissions-matrix (from index.ts:6594)
-router.get('//api/debug/permissions-matrix',
-  authorize(["authenticated"]),
+router.get(
+  '//api/debug/permissions-matrix',
+  authorize(['authenticated']),
   otherController.apiDebugPermissionsMatrix
 );
 
 // /api/debug/permissions-matrix/validation (from index.ts:6670)
-router.get('//api/debug/permissions-matrix/validation',
-  authorize(["authenticated"]),
+router.get(
+  '//api/debug/permissions-matrix/validation',
+  authorize(['authenticated']),
   otherController.apiDebugPermissionsMatrixValidation
 );
 
 // /api/debug/permissions-matrix/agents (from index.ts:6746)
-router.get('//api/debug/permissions-matrix/agents',
-  authorize(["authenticated"]),
+router.get(
+  '//api/debug/permissions-matrix/agents',
+  authorize(['authenticated']),
   otherController.apiDebugPermissionsMatrixAgents
 );
 
 // /api/debug/permissions-matrix/performance (from index.ts:6819)
-router.get('//api/debug/permissions-matrix/performance',
-  authorize(["authenticated"]),
+router.get(
+  '//api/debug/permissions-matrix/performance',
+  authorize(['authenticated']),
   otherController.apiDebugPermissionsMatrixPerformance
 );
 
 // /api/debug/permissions-matrix/realtime (from index.ts:6877)
-router.get('//api/debug/permissions-matrix/realtime',
-  authorize(["authenticated"]),
+router.get(
+  '//api/debug/permissions-matrix/realtime',
+  authorize(['authenticated']),
   otherController.apiDebugPermissionsMatrixRealtime
 );
 
 // /api/version/current (from index.ts:7213)
-router.get('//api/version/current',
-  authorize(["authenticated"]),
+router.get(
+  '//api/version/current',
+  authorize(['authenticated']),
   otherController.apiVersionCurrent
 );
 
 // /api/version/increment (from index.ts:7231)
-router.post('//api/version/increment',
-  authorize(["authenticated"]),
+router.post(
+  '//api/version/increment',
+  authorize(['authenticated']),
   otherController.apiVersionIncrement
 );
 
 // /api/version/history (from index.ts:7261)
-router.get('//api/version/history',
-  authorize(["authenticated"]),
+router.get(
+  '//api/version/history',
+  authorize(['authenticated']),
   otherController.apiVersionHistory
 );
 
 // /api/version/metrics (from index.ts:7282)
-router.get('//api/version/metrics',
-  authorize(["authenticated"]),
+router.get(
+  '//api/version/metrics',
+  authorize(['authenticated']),
   otherController.apiVersionMetrics
 );
 
 // /api/version/metrics (from index.ts:7301)
-router.put('//api/version/metrics',
-  authorize(["authenticated"]),
+router.put(
+  '//api/version/metrics',
+  authorize(['authenticated']),
   otherController.apiVersionMetrics
 );
 
 // /api/version/deployment (from index.ts:7321)
-router.get('//api/version/deployment',
-  authorize(["authenticated"]),
+router.get(
+  '//api/version/deployment',
+  authorize(['authenticated']),
   otherController.apiVersionDeployment
 );
 
 // /api/version/rollback (from index.ts:7341)
-router.post('//api/version/rollback',
-  authorize(["authenticated"]),
+router.post(
+  '//api/version/rollback',
+  authorize(['authenticated']),
   otherController.apiVersionRollback
 );
 
 // /api/version/changelog (from index.ts:7376)
-router.get('//api/version/changelog',
-  authorize(["authenticated"]),
+router.get(
+  '//api/version/changelog',
+  authorize(['authenticated']),
   otherController.apiVersionChangelog
 );
 
 // /api/version/validate (from index.ts:7402)
-router.post('//api/version/validate',
-  authorize(["authenticated"]),
+router.post(
+  '//api/version/validate',
+  authorize(['authenticated']),
   otherController.apiVersionValidate
 );
 
 // /api/bets (from index.ts:7612)
-router.get('//api/bets',
-  authorize(["authenticated"]),
-  otherController.apiBets
-);
+router.get('//api/bets', authorize(['authenticated']), otherController.apiBets);
 
 // /api/agents/hierarchy (from index.ts:7660)
-router.get('//api/agents/hierarchy',
-  authorize(["authenticated"]),
+router.get(
+  '//api/agents/hierarchy',
+  authorize(['authenticated']),
   otherController.apiAgentsHierarchy
 );
 
 // /api/sync/fire22-customers (from index.ts:7879)
-router.post('//api/sync/fire22-customers',
-  authorize(["authenticated"]),
+router.post(
+  '//api/sync/fire22-customers',
+  authorize(['authenticated']),
   otherController.apiSyncFire22Customers
 );
 
 // /api/sync/background (from index.ts:7901)
-router.post('//api/sync/background',
-  authorize(["authenticated"]),
+router.post(
+  '//api/sync/background',
+  authorize(['authenticated']),
   otherController.apiSyncBackground
 );
 
 // /api/debug/cache-stats (from index.ts:7925)
-router.get('//api/debug/cache-stats',
-  authorize(["authenticated"]),
+router.get(
+  '//api/debug/cache-stats',
+  authorize(['authenticated']),
   otherController.apiDebugCacheStats
 );
 
 // /api/matrix/validate (from index.ts:8414)
-router.get('//api/matrix/validate',
-  authorize(["authenticated"]),
+router.get(
+  '//api/matrix/validate',
+  authorize(['authenticated']),
   otherController.apiMatrixValidate
 );
 
 // /api/matrix/repair (from index.ts:8433)
-router.post('//api/matrix/repair',
-  authorize(["authenticated"]),
-  otherController.apiMatrixRepair
-);
+router.post('//api/matrix/repair', authorize(['authenticated']), otherController.apiMatrixRepair);
 
 // /api/matrix/status (from index.ts:8452)
-router.get('//api/matrix/status',
-  authorize(["authenticated"]),
-  otherController.apiMatrixStatus
-);
+router.get('//api/matrix/status', authorize(['authenticated']), otherController.apiMatrixStatus);
 
 // /api/matrix/history (from index.ts:8477)
-router.get('//api/matrix/history',
-  authorize(["authenticated"]),
-  otherController.apiMatrixHistory
-);
+router.get('//api/matrix/history', authorize(['authenticated']), otherController.apiMatrixHistory);
 
 // /api/matrix/configs (from index.ts:8504)
-router.get('//api/matrix/configs',
-  authorize(["authenticated"]),
-  otherController.apiMatrixConfigs
-);
+router.get('//api/matrix/configs', authorize(['authenticated']), otherController.apiMatrixConfigs);
 
 // /api/matrix/score (from index.ts:8567)
-router.get('//api/matrix/score',
-  authorize(["authenticated"]),
-  otherController.apiMatrixScore
-);
+router.get('//api/matrix/score', authorize(['authenticated']), otherController.apiMatrixScore);
 
 // Collections endpoints - Enhanced Domain-Driven Implementation
-router.get('/collections/dashboard',
-  authorize(["collections.view", "settlements.view"]),
+router.get(
+  '/collections/dashboard',
+  authorize(['collections.view', 'settlements.view']),
   validate(schemas.GetLinesQuerySchema), // Using existing schema for now
   collectionsController.getCollectionsDashboard
 );
 
-router.get('/collections/pending-settlements',
-  authorize(["collections.view", "settlements.view"]),
+router.get(
+  '/collections/pending-settlements',
+  authorize(['collections.view', 'settlements.view']),
   validate(schemas.GetLinesQuerySchema), // Using existing schema for now
   collectionsController.getPendingSettlements
 );
 
-router.post('/collections/process-settlement',
-  authorize(["collections.process", "settlements.process"]),
+router.post(
+  '/collections/process-settlement',
+  authorize(['collections.process', 'settlements.process']),
   collectionsController.processSettlement
 );
 
 // New Domain-Driven Collection Endpoints
-router.get('/collections/:id',
-  authorize(["collections.view"]),
+router.get(
+  '/collections/:id',
+  authorize(['collections.view']),
   collectionsController.getCollectionDetail
 );
 
-router.get('/collections/settlements/history',
-  authorize(["settlements.view", "collections.view"]),
+router.get(
+  '/collections/settlements/history',
+  authorize(['settlements.view', 'collections.view']),
   collectionsController.getSettlementHistory
 );
 
-router.get('/collections/analytics/agent-performance',
-  authorize(["analytics.view", "collections.view"]),
+router.get(
+  '/collections/analytics/agent-performance',
+  authorize(['analytics.view', 'collections.view']),
   collectionsController.getAgentPerformance
 );
 
-router.get('/collections/health/system',
-  authorize(["system.health", "admin.view"]),
+router.get(
+  '/collections/health/system',
+  authorize(['system.health', 'admin.view']),
   collectionsController.getSystemHealth
 );
 
 // Alternative route for collections (direct access)
-router.get('/collections',
-  authorize(["collections.view", "settlements.view"]),
+router.get(
+  '/collections',
+  authorize(['collections.view', 'settlements.view']),
   validate(schemas.GetLinesQuerySchema), // Using existing schema for now
   collectionsController.getCollectionsDashboard
 );
 
 // Adjustments endpoints
-router.get('/adjustments/history',
-  authorize(["adjustments.view", "admin.adjustments"]),
+router.get(
+  '/adjustments/history',
+  authorize(['adjustments.view', 'admin.adjustments']),
   adjustmentController.getAdjustmentsHistory
 );
 
-router.post('/adjustments/create',
-  authorize(["adjustments.create", "admin.adjustments"]),
+router.post(
+  '/adjustments/create',
+  authorize(['adjustments.create', 'admin.adjustments']),
   adjustmentController.createAdjustment
 );
 
-router.post('/adjustments/approve',
-  authorize(["adjustments.approve", "admin.adjustments"]),
+router.post(
+  '/adjustments/approve',
+  authorize(['adjustments.approve', 'admin.adjustments']),
   adjustmentController.approveAdjustment
 );
 
-router.get('/adjustments/types',
-  authorize(["adjustments.view"]),
+router.get(
+  '/adjustments/types',
+  authorize(['adjustments.view']),
   adjustmentController.getAdjustmentTypes
 );
 
 // Alternative route for adjustments (direct access)
-router.get('/adjustments',
-  authorize(["adjustments.view", "admin.adjustments"]),
+router.get(
+  '/adjustments',
+  authorize(['adjustments.view', 'admin.adjustments']),
   adjustmentController.getAdjustmentsHistory
 );
 
 // Distributions endpoints
-router.get('/distributions/overview',
-  authorize(["distributions.view", "financial.view"]),
+router.get(
+  '/distributions/overview',
+  authorize(['distributions.view', 'financial.view']),
   distributionsController.getDistributionsOverview
 );
 
-router.get('/distributions/history',
-  authorize(["distributions.view", "financial.view"]),
+router.get(
+  '/distributions/history',
+  authorize(['distributions.view', 'financial.view']),
   distributionsController.getDistributionHistory
 );
 
-router.post('/distributions/payment',
-  authorize(["distributions.process", "financial.process"]),
+router.post(
+  '/distributions/payment',
+  authorize(['distributions.process', 'financial.process']),
   distributionsController.processDistributionPayment
 );
 
-router.get('/distributions/settings',
-  authorize(["distributions.view"]),
+router.get(
+  '/distributions/settings',
+  authorize(['distributions.view']),
   distributionsController.getDistributionSettings
 );
 
-router.get('/distributions/analytics',
-  authorize(["distributions.view", "analytics.view"]),
+router.get(
+  '/distributions/analytics',
+  authorize(['distributions.view', 'analytics.view']),
   distributionsController.getDistributionAnalytics
 );
 
 // Alternative route for distributions (direct access)
-router.get('/distributions',
-  authorize(["distributions.view", "financial.view"]),
+router.get(
+  '/distributions',
+  authorize(['distributions.view', 'financial.view']),
   distributionsController.getDistributionsOverview
 );
 
 // Free play transactions endpoints
-router.get('/free-play/overview',
-  authorize(["free-play.view", "promotions.view"]),
+router.get(
+  '/free-play/overview',
+  authorize(['free-play.view', 'promotions.view']),
   freePlayController.getFreePlayOverview
 );
 
-router.get('/free-play/history',
-  authorize(["free-play.view", "promotions.view"]),
+router.get(
+  '/free-play/history',
+  authorize(['free-play.view', 'promotions.view']),
   freePlayController.getFreePlayHistory
 );
 
-router.post('/free-play/create',
-  authorize(["free-play.create", "promotions.manage"]),
+router.post(
+  '/free-play/create',
+  authorize(['free-play.create', 'promotions.manage']),
   freePlayController.createFreePlayTransaction
 );
 
-router.post('/free-play/redeem',
-  authorize(["free-play.redeem", "promotions.manage"]),
+router.post(
+  '/free-play/redeem',
+  authorize(['free-play.redeem', 'promotions.manage']),
   freePlayController.redeemFreePlayTransaction
 );
 
-router.get('/free-play/settings',
-  authorize(["free-play.view"]),
+router.get(
+  '/free-play/settings',
+  authorize(['free-play.view']),
   freePlayController.getFreePlaySettings
 );
 
-router.get('/free-play/analytics',
-  authorize(["free-play.view", "analytics.view"]),
+router.get(
+  '/free-play/analytics',
+  authorize(['free-play.view', 'analytics.view']),
   freePlayController.getFreePlayAnalytics
 );
 
 // Alternative route for free play (direct access)
-router.get('/free-play',
-  authorize(["free-play.view", "promotions.view"]),
+router.get(
+  '/free-play',
+  authorize(['free-play.view', 'promotions.view']),
   freePlayController.getFreePlayOverview
 );
 
 // Balances endpoints
-router.get('/balances/customer',
-  authorize(["balances.view", "customer.view"]),
+router.get(
+  '/balances/customer',
+  authorize(['balances.view', 'customer.view']),
   balanceController.getCustomerBalances
 );
 
-router.get('/balances/summary',
-  authorize(["balances.view", "admin.balances"]),
+router.get(
+  '/balances/summary',
+  authorize(['balances.view', 'admin.balances']),
   balanceController.getAllBalancesSummary
 );
 
-router.post('/balances/update',
-  authorize(["balances.update", "admin.balances"]),
+router.post(
+  '/balances/update',
+  authorize(['balances.update', 'admin.balances']),
   balanceController.updateCustomerBalance
 );
 
-router.get('/balances/settings',
-  authorize(["balances.view"]),
+router.get(
+  '/balances/settings',
+  authorize(['balances.view']),
   balanceController.getBalanceSettings
 );
 
 // Alternative route for balances (direct access)
-router.get('/balances',
-  authorize(["balances.view", "admin.balances"]),
+router.get(
+  '/balances',
+  authorize(['balances.view', 'admin.balances']),
   balanceController.getAllBalancesSummary
 );
 
 // /dashboard (from server.js:1079)
-router.get('//dashboard',
-  authorize(["authenticated"]),
-  otherController.dashboard
-);
+router.get('//dashboard', authorize(['authenticated']), otherController.dashboard);
 
 export const otherRoutes = router;

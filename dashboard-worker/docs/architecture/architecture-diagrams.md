@@ -1,7 +1,10 @@
 # 🏗️ **Crystal Clear Architecture: Visual Diagrams**
 
 ## **Overview**
-This document provides comprehensive visual representations of the domain-based architecture, showing the relationships between domains, data flows, and integration points.
+
+This document provides comprehensive visual representations of the domain-based
+architecture, showing the relationships between domains, data flows, and
+integration points.
 
 ---
 
@@ -482,6 +485,7 @@ graph TD
 ## **8. Domain-Specific Performance Metrics**
 
 ### **Collections Domain KPIs**
+
 ```mermaid
 gauge title Collections Domain Performance
 95%:Settlement Processing Time:<2s
@@ -491,6 +495,7 @@ gauge title Collections Domain Performance
 ```
 
 ### **Distributions Domain KPIs**
+
 ```mermaid
 gauge title Distributions Domain Performance
 90%:Payment Processing Time:<3s
@@ -500,6 +505,7 @@ gauge title Distributions Domain Performance
 ```
 
 ### **Free Play Domain KPIs**
+
 ```mermaid
 gauge title Free Play Domain Performance
 85%:Redemption Processing Time:<1s
@@ -512,15 +518,15 @@ gauge title Free Play Domain Performance
 
 ## **Legend & Key**
 
-| Symbol | Meaning |
-|--------|---------|
-| 🎯 | API Endpoints |
-| 🏗️ | Domain Controllers |
-| 💾 | Data Storage |
-| 🔗 | External Integrations |
-| 📊 | Analytics & Monitoring |
-| 🔒 | Security Components |
-| ☁️ | Cloud Infrastructure |
-| 📈 | Performance Metrics |
+| Symbol | Meaning                |
+| ------ | ---------------------- |
+| 🎯     | API Endpoints          |
+| 🏗️     | Domain Controllers     |
+| 💾     | Data Storage           |
+| 🔗     | External Integrations  |
+| 📊     | Analytics & Monitoring |
+| 🔒     | Security Components    |
+| ☁️     | Cloud Infrastructure   |
+| 📈     | Performance Metrics    |
 
 **For detailed API specifications, see the [API Reference](./api-reference.md)**

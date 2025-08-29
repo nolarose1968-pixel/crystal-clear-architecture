@@ -2,35 +2,41 @@
 
 ## IP Address: 172.56.24.136
 
-This IP address falls within the private IPv4 address range (172.16.0.0 - 172.31.255.255) as defined by RFC 1918.
+This IP address falls within the private IPv4 address range (172.16.0.0 -
+172.31.255.255) as defined by RFC 1918.
 
 ### Network Details
 
-| Property | Value |
-|----------|-------|
-| IP Address | 172.56.24.136 |
-| Type | Private IPv4 (Class B) |
+| Property      | Value                                        |
+| ------------- | -------------------------------------------- |
+| IP Address    | 172.56.24.136                                |
+| Type          | Private IPv4 (Class B)                       |
 | Network Class | Invalid private range (172.56.x.x is public) |
-| Binary | 10101100.00111000.00011000.10001000 |
-| Hexadecimal | 0xAC381888 |
+| Binary        | 10101100.00111000.00011000.10001000          |
+| Hexadecimal   | 0xAC381888                                   |
 
 ### Important Note
 
-The IP address `172.56.24.136` is actually in the **public IP address space**, not private. 
+The IP address `172.56.24.136` is actually in the **public IP address space**,
+not private.
 
 The private Class B range is:
+
 - **172.16.0.0 - 172.31.255.255** (Private)
 - **172.56.24.136** falls outside this range (Public)
 
 ### Usage Recommendations
 
 If this IP is intended for private network use:
+
 1. Consider using a valid private IP range:
+
    - Class A: 10.0.0.0 - 10.255.255.255
    - Class B: 172.16.0.0 - 172.31.255.255
    - Class C: 192.168.0.0 - 192.168.255.255
 
 2. For Fire22 Dashboard internal services:
+
    ```yaml
    # Recommended private IP configuration
    internal_services:
@@ -52,6 +58,7 @@ If this IP is intended for private network use:
 ### Security Considerations
 
 If `172.56.24.136` is being used:
+
 - ⚠️ This is a public IP address
 - Ensure proper firewall rules
 - Implement access control lists (ACLs)
@@ -61,6 +68,7 @@ If `172.56.24.136` is being used:
 ### Configuration Examples
 
 #### Nginx Proxy Configuration
+
 ```nginx
 upstream backend {
     server 172.16.24.136:3001;  # Use private range instead
@@ -77,6 +85,7 @@ server {
 ```
 
 #### Firewall Rules (iptables)
+
 ```bash
 # Allow specific IP access
 iptables -A INPUT -s 172.16.24.136 -p tcp --dport 3001 -j ACCEPT
@@ -86,6 +95,7 @@ iptables -A INPUT -d 172.16.24.136 -i eth0 -j DROP
 ```
 
 #### Docker Compose Configuration
+
 ```yaml
 version: '3.8'
 services:
@@ -95,7 +105,7 @@ services:
       internal:
         ipv4_address: 172.16.24.136
     ports:
-      - "3001:3001"
+      - '3001:3001'
 
 networks:
   internal:
@@ -108,6 +118,7 @@ networks:
 ### Network Diagnostics
 
 Test connectivity:
+
 ```bash
 # Ping test
 ping 172.56.24.136
@@ -136,14 +147,14 @@ export const networkConfig = {
   internal: {
     api: process.env.INTERNAL_API || '172.16.24.136',
     database: process.env.DATABASE_HOST || '172.16.24.137',
-    cache: process.env.CACHE_HOST || '172.16.24.138'
+    cache: process.env.CACHE_HOST || '172.16.24.138',
   },
-  
+
   // Public endpoints
   public: {
     dashboard: 'https://dashboard.fire22.ag',
-    api: 'https://api.fire22.ag'
-  }
+    api: 'https://api.fire22.ag',
+  },
 };
 ```
 

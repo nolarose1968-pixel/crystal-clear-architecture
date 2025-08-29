@@ -101,7 +101,7 @@ export class DatabaseService {
    * Check if database is connected
    */
   public isConnectedToDatabase(): boolean {
-    return this.isConnected && this.db !=== null;
+    return this.isConnected && this.db !== null;
   }
 
   /**

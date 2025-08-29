@@ -251,7 +251,9 @@ function generateContactMethods(employee: EmployeeData): string {
       </div>
 
       <div class="methods-grid">
-        ${methods.map(method => `
+        ${methods
+          .map(
+            method => `
           <div class="contact-method-card ${method.primary ? 'primary' : 'secondary'} ${method.category}">
             <div class="method-header">
               <div class="method-icon">${method.icon}</div>
@@ -281,7 +283,9 @@ function generateContactMethods(employee: EmployeeData): string {
 
             <div class="method-glow"></div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
 
       <div class="contact-tips">
@@ -902,7 +906,9 @@ function generateAdvancedContactForms(employee: EmployeeData): string {
             </form>
           </div>
 
-          ${employee.tier === 5 ? `
+          ${
+            employee.tier === 5
+              ? `
           <!-- VIP Support Form -->
           <div class="form-tab" id="vip-form">
             <div class="form-header vip-header">
@@ -990,7 +996,9 @@ function generateAdvancedContactForms(employee: EmployeeData): string {
               </div>
             </form>
           </div>
-          ` : ''}
+          `
+              : ''
+          }
         </div>
       </div>
     </div>
@@ -1349,7 +1357,9 @@ function generateBusinessHours(employee: EmployeeData): string {
       </div>
 
       <div class="hours-grid">
-        ${availableHours.map(hour => `
+        ${availableHours
+          .map(
+            hour => `
           <div class="hour-card ${hour.available ? 'available' : 'unavailable'}">
             <div class="hour-header">
               <div class="day-name">${hour.day}</div>
@@ -1360,16 +1370,22 @@ function generateBusinessHours(employee: EmployeeData): string {
             <div class="hour-details">
               <div class="hours-time">${hour.hours}</div>
               <div class="hours-description">
-                ${hour.available ?
-                  'Full support across all channels including live chat, phone, and email' :
-                  'Emergency support only for critical system issues'}
+                ${
+                  hour.available
+                    ? 'Full support across all channels including live chat, phone, and email'
+                    : 'Emergency support only for critical system issues'
+                }
               </div>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
 
-      ${employee.tier === 5 ? `
+      ${
+        employee.tier === 5
+          ? `
         <div class="vip-hours-notice">
           <div class="vip-notice-header">
             <div class="vip-notice-icon">👑</div>
@@ -1389,7 +1405,9 @@ function generateBusinessHours(employee: EmployeeData): string {
             </div>
           </div>
         </div>
-      ` : ''}
+      `
+          : ''
+      }
 
       <div class="response-guarantee">
         <div class="guarantee-header">
@@ -1424,7 +1442,6 @@ function generateBusinessHours(employee: EmployeeData): string {
     </div>
   `;
 }
-
 
 function getEnterpriseContactStyles(): string {
   return `/* Enterprise Contact Page Styles */
@@ -2875,4 +2892,3 @@ function getEnterpriseContactScripts(): string {
     document.head.appendChild(styleSheet);
   `;
 }
-

@@ -1,10 +1,10 @@
 /**
  * Build-Time Configuration System
- * 
+ *
  * This module provides build-time constants that are embedded during compilation
  * using Bun's --define flag. These constants are available at runtime and can be
  * used to configure the application behavior based on the build environment.
- * 
+ *
  * Features:
  * - Environment-specific configuration
  * - Build-time constants for performance
@@ -49,15 +49,15 @@ export const BUILD_TIME_CONFIG: BuildTimeConfig = {
     bytecode: process.env.BUILD_BYTECODE === 'true',
     sourcemap: process.env.BUILD_SOURCEMAP === 'true',
     minify: process.env.BUILD_MINIFY === 'true',
-    windows: process.env.BUILD_WINDOWS === 'true'
+    windows: process.env.BUILD_WINDOWS === 'true',
   },
   runtime: {
     port: parseInt(process.env.BUILD_PORT || '3000'),
     host: process.env.BUILD_HOST || 'localhost',
     optimize: process.env.BUILD_OPTIMIZE === 'true',
     monitor: process.env.BUILD_MONITOR === 'true',
-    demoMode: process.env.BUILD_DEMO_MODE === 'true'
-  }
+    demoMode: process.env.BUILD_DEMO_MODE === 'true',
+  },
 };
 
 /**
@@ -68,7 +68,7 @@ export const BUILD_TIME_CONFIG: BuildTimeConfig = {
 export function parseRuntimeArgs(): Record<string, any> {
   const execArgs = process.execArgv || [];
   const args: Record<string, any> = {};
-  
+
   for (const arg of execArgs) {
     if (arg.startsWith('--env=')) {
       args.environment = arg.split('=')[1];
@@ -92,7 +92,7 @@ export function parseRuntimeArgs(): Record<string, any> {
       args.memoryLimit = parseInt(arg.split('=')[1]);
     }
   }
-  
+
   return args;
 }
 
@@ -102,7 +102,7 @@ export function parseRuntimeArgs(): Record<string, any> {
  */
 export function getEffectiveConfig(): BuildTimeConfig {
   const runtimeArgs = parseRuntimeArgs();
-  
+
   return {
     ...BUILD_TIME_CONFIG,
     environment: runtimeArgs.environment || BUILD_TIME_CONFIG.environment,
@@ -116,10 +116,17 @@ export function getEffectiveConfig(): BuildTimeConfig {
       ...BUILD_TIME_CONFIG.runtime,
       port: runtimeArgs.port || BUILD_TIME_CONFIG.runtime.port,
       host: runtimeArgs.host || BUILD_TIME_CONFIG.runtime.host,
-      optimize: runtimeArgs.optimize !== undefined ? runtimeArgs.optimize : BUILD_TIME_CONFIG.runtime.optimize,
-      monitor: runtimeArgs.monitor !== undefined ? runtimeArgs.monitor : BUILD_TIME_CONFIG.runtime.monitor,
-      demoMode: runtimeArgs.demoMode !== undefined ? runtimeArgs.demoMode : BUILD_TIME_CONFIG.runtime.demoMode
-    }
+      optimize:
+        runtimeArgs.optimize !== undefined
+          ? runtimeArgs.optimize
+          : BUILD_TIME_CONFIG.runtime.optimize,
+      monitor:
+        runtimeArgs.monitor !== undefined ? runtimeArgs.monitor : BUILD_TIME_CONFIG.runtime.monitor,
+      demoMode:
+        runtimeArgs.demoMode !== undefined
+          ? runtimeArgs.demoMode
+          : BUILD_TIME_CONFIG.runtime.demoMode,
+    },
   };
 }
 
@@ -128,27 +135,27 @@ export function getEffectiveConfig(): BuildTimeConfig {
  */
 export function validateBuildConfig(): boolean {
   const config = getEffectiveConfig();
-  
+
   // Validate environment
   const validEnvironments = ['development', 'staging', 'production', 'demo'];
   if (!validEnvironments.includes(config.environment)) {
     console.error(`Invalid environment: ${config.environment}`);
     return false;
   }
-  
+
   // Validate port
   if (config.runtime.port < 1024 || config.runtime.port > 65535) {
     console.error(`Invalid port: ${config.runtime.port}`);
     return false;
   }
-  
+
   // Validate log level
   const validLogLevels = ['debug', 'info', 'warn', 'error'];
   if (!validLogLevels.includes(config.logLevel)) {
     console.error(`Invalid log level: ${config.logLevel}`);
     return false;
   }
-  
+
   return true;
 }
 
@@ -158,17 +165,15 @@ export function validateBuildConfig(): boolean {
 export function displayBuildInfo(): void {
   const config = getEffectiveConfig();
   const runtimeArgs = parseRuntimeArgs();
-  
-  
+
   if (Object.keys(runtimeArgs).length > 0) {
   }
-  
+
   if (config.features.bytecode) {
   }
-  
+
   if (config.features.windows) {
   }
-  
 }
 
 /**
@@ -176,7 +181,7 @@ export function displayBuildInfo(): void {
  */
 export function getEnvironmentConfig(env?: string): Partial<BuildTimeConfig> {
   const targetEnv = env || BUILD_TIME_CONFIG.environment;
-  
+
   const envConfigs: Record<string, Partial<BuildTimeConfig>> = {
     development: {
       debugMode: true,
@@ -186,8 +191,8 @@ export function getEnvironmentConfig(env?: string): Partial<BuildTimeConfig> {
         host: 'localhost',
         optimize: false,
         monitor: false,
-        demoMode: false
-      }
+        demoMode: false,
+      },
     },
     staging: {
       debugMode: false,
@@ -197,8 +202,8 @@ export function getEnvironmentConfig(env?: string): Partial<BuildTimeConfig> {
         host: '0.0.0.0',
         optimize: true,
         monitor: true,
-        demoMode: false
-      }
+        demoMode: false,
+      },
     },
     production: {
       debugMode: false,
@@ -208,8 +213,8 @@ export function getEnvironmentConfig(env?: string): Partial<BuildTimeConfig> {
         host: '0.0.0.0',
         optimize: true,
         monitor: true,
-        demoMode: false
-      }
+        demoMode: false,
+      },
     },
     demo: {
       debugMode: true,
@@ -219,11 +224,11 @@ export function getEnvironmentConfig(env?: string): Partial<BuildTimeConfig> {
         host: 'localhost',
         optimize: false,
         monitor: false,
-        demoMode: true
-      }
-    }
+        demoMode: true,
+      },
+    },
   };
-  
+
   return envConfigs[targetEnv] || {};
 }
 

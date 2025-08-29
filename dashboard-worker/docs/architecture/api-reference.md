@@ -1,19 +1,25 @@
 # 🔗 **Crystal Clear Architecture: API Reference**
 
 ## **Overview**
-This document provides comprehensive technical specifications for all domain APIs, including endpoints, request/response formats, authentication requirements, and error handling.
+
+This document provides comprehensive technical specifications for all domain
+APIs, including endpoints, request/response formats, authentication
+requirements, and error handling.
 
 ---
 
 ## **1. Collections Domain API**
 
 ### **Base URL**
+
 ```
 https://api.fire22.com/collections
 ```
 
 ### **Authentication**
+
 All endpoints require Bearer token authentication:
+
 ```
 Authorization: Bearer <jwt-token>
 ```
@@ -21,12 +27,15 @@ Authorization: Bearer <jwt-token>
 ### **Endpoints**
 
 #### **GET /collections/dashboard**
+
 Get collections dashboard data with key performance indicators.
 
 **Parameters:**
+
 - `period` (optional): `today`, `week`, `month` (default: `today`)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -67,15 +76,18 @@ Get collections dashboard data with key performance indicators.
 ```
 
 #### **GET /collections/pending-settlements**
+
 Retrieve paginated list of pending settlements.
 
 **Parameters:**
+
 - `page` (optional): Page number (default: 1)
 - `limit` (optional): Items per page (default: 20)
 - `priority` (optional): `high`, `medium`, `low`, `all` (default: `all`)
 - `customerId` (optional): Filter by customer ID
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -88,7 +100,7 @@ Retrieve paginated list of pending settlements.
         "wagerId": "WAGER_001",
         "event": "Chiefs vs Bills",
         "betType": "moneyline",
-        "stake": 100.00,
+        "stake": 100.0,
         "potentialPayout": 166.67,
         "priority": "high",
         "dueDate": "2025-01-26T17:00:00Z",
@@ -112,9 +124,11 @@ Retrieve paginated list of pending settlements.
 ```
 
 #### **POST /collections/process-settlement**
+
 Process a settlement payment.
 
 **Request Body:**
+
 ```json
 {
   "settlementId": "PEN_001",
@@ -126,6 +140,7 @@ Process a settlement payment.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -147,6 +162,7 @@ Process a settlement payment.
 ## **2. Distributions Domain API**
 
 ### **Base URL**
+
 ```
 https://api.fire22.com/distributions
 ```
@@ -154,38 +170,44 @@ https://api.fire22.com/distributions
 ### **Endpoints**
 
 #### **GET /distributions/overview**
+
 Get distribution overview and revenue breakdown.
 
 **Parameters:**
-- `period` (optional): `current_month`, `last_month`, `current_year`, `last_year`
+
+- `period` (optional): `current_month`, `last_month`, `current_year`,
+  `last_year`
 - `includeDetails` (optional): `true` to include recipients and transactions
 
 **Response:**
+
 ```json
 {
   "success": true,
   "data": {
-    "totalRevenue": 125000.00,
-    "totalDistributed": 87500.00,
+    "totalRevenue": 125000.0,
+    "totalDistributed": 87500.0,
     "distributionRate": 70.0,
     "breakdown": {
-      "affiliateCommissions": 25000.00,
-      "agentCommissions": 18750.00,
-      "partnerShares": 15000.00,
-      "referralBonuses": 8750.00
+      "affiliateCommissions": 25000.0,
+      "agentCommissions": 18750.0,
+      "partnerShares": 15000.0,
+      "referralBonuses": 8750.0
     }
   }
 }
 ```
 
 #### **POST /distributions/payment**
+
 Process a distribution payment.
 
 **Request Body:**
+
 ```json
 {
   "recipientId": "AFF_001",
-  "amount": 6250.00,
+  "amount": 6250.0,
   "paymentMethod": "wire_transfer",
   "reference": "AFF_COM_202501",
   "notes": "Monthly affiliate commission",
@@ -194,13 +216,14 @@ Process a distribution payment.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
   "data": {
     "distributionId": "DIST_1234567890",
     "recipientId": "AFF_001",
-    "amount": 6250.00,
+    "amount": 6250.0,
     "status": "completed",
     "processedAt": "2025-01-26T16:00:00Z",
     "transactionId": "TXN_DIST_1234567890"
@@ -213,6 +236,7 @@ Process a distribution payment.
 ## **3. Free Play Domain API**
 
 ### **Base URL**
+
 ```
 https://api.fire22.com/free-play
 ```
@@ -220,39 +244,46 @@ https://api.fire22.com/free-play
 ### **Endpoints**
 
 #### **GET /free-play/overview**
+
 Get free play overview and statistics.
 
 **Parameters:**
-- `period` (optional): `current_month`, `last_month`, `current_year`, `last_year`
-- `includeDetails` (optional): `true` to include customer and transaction details
+
+- `period` (optional): `current_month`, `last_month`, `current_year`,
+  `last_year`
+- `includeDetails` (optional): `true` to include customer and transaction
+  details
 
 **Response:**
+
 ```json
 {
   "success": true,
   "data": {
-    "totalFreePlayIssued": 150000.00,
-    "totalFreePlayRedeemed": 87500.00,
-    "remainingFreePlay": 50000.00,
+    "totalFreePlayIssued": 150000.0,
+    "totalFreePlayRedeemed": 87500.0,
+    "remainingFreePlay": 50000.0,
     "redemptionRate": 58.3,
     "breakdown": {
-      "welcomeBonuses": 45000.00,
-      "depositMatchBonuses": 37500.00,
-      "freeBets": 25000.00
+      "welcomeBonuses": 45000.0,
+      "depositMatchBonuses": 37500.0,
+      "freeBets": 25000.0
     }
   }
 }
 ```
 
 #### **POST /free-play/create**
+
 Create a new free play transaction.
 
 **Request Body:**
+
 ```json
 {
   "customerId": "CUST_001",
   "type": "welcome_bonus",
-  "amount": 500.00,
+  "amount": 500.0,
   "description": "Welcome bonus for new customer",
   "wageringRequirement": 10,
   "expiresInDays": 30,
@@ -262,13 +293,14 @@ Create a new free play transaction.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
   "data": {
     "transactionId": "FP_1234567890",
     "customerId": "CUST_001",
-    "amount": 500.00,
+    "amount": 500.0,
     "status": "available",
     "issuedAt": "2025-01-26T17:00:00Z",
     "expiresAt": "2025-02-25T17:00:00Z"
@@ -277,28 +309,31 @@ Create a new free play transaction.
 ```
 
 #### **POST /free-play/redeem**
+
 Redeem a free play transaction.
 
 **Request Body:**
+
 ```json
 {
   "transactionId": "FP_1234567890",
   "customerId": "CUST_001",
-  "redemptionAmount": 250.00,
-  "wagerAmount": 2500.00,
+  "redemptionAmount": 250.0,
+  "wagerAmount": 2500.0,
   "processedBy": "Customer Service"
 }
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
   "data": {
     "transactionId": "FP_1234567890",
-    "originalAmount": 500.00,
-    "redemptionAmount": 250.00,
-    "remainingAmount": 250.00,
+    "originalAmount": 500.0,
+    "redemptionAmount": 250.0,
+    "remainingAmount": 250.0,
     "status": "partially_redeemed",
     "creditedTo": "CUST_001",
     "reference": "REDEEM_FP_1234567890_1234567890"
@@ -311,6 +346,7 @@ Redeem a free play transaction.
 ## **4. Balance Domain API**
 
 ### **Base URL**
+
 ```
 https://api.fire22.com/balances
 ```
@@ -318,13 +354,16 @@ https://api.fire22.com/balances
 ### **Endpoints**
 
 #### **GET /balances/customer**
+
 Get customer balance information.
 
 **Parameters:**
+
 - `customerId` (required): Customer identifier
 - `includeHistory` (optional): Include transaction history
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -333,8 +372,8 @@ Get customer balance information.
     "customerName": "John Doe",
     "currentBalance": 1250.75,
     "availableBalance": 1250.75,
-    "pendingWithdrawals": 0.00,
-    "creditLimit": 5000.00,
+    "pendingWithdrawals": 0.0,
+    "creditLimit": 5000.0,
     "accountStatus": "active",
     "lastUpdated": "2025-01-26T18:00:00Z"
   }
@@ -342,13 +381,15 @@ Get customer balance information.
 ```
 
 #### **POST /balances/update**
+
 Update customer balance.
 
 **Request Body:**
+
 ```json
 {
   "customerId": "CUST_001",
-  "amount": 500.00,
+  "amount": 500.0,
   "transactionType": "deposit",
   "description": "Bank deposit",
   "reference": "DEP_1234567890",
@@ -357,6 +398,7 @@ Update customer balance.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -364,7 +406,7 @@ Update customer balance.
     "customerId": "CUST_001",
     "previousBalance": 750.75,
     "newBalance": 1250.75,
-    "amount": 500.00,
+    "amount": 500.0,
     "transactionId": "BAL_1234567890",
     "timestamp": "2025-01-26T18:30:00Z"
   }
@@ -376,6 +418,7 @@ Update customer balance.
 ## **5. Adjustment Domain API**
 
 ### **Base URL**
+
 ```
 https://api.fire22.com/adjustments
 ```
@@ -383,9 +426,11 @@ https://api.fire22.com/adjustments
 ### **Endpoints**
 
 #### **GET /adjustments/history**
+
 Get adjustment history with filtering.
 
 **Parameters:**
+
 - `page` (optional): Page number (default: 1)
 - `limit` (optional): Items per page (default: 20)
 - `type` (optional): Filter by adjustment type
@@ -393,6 +438,7 @@ Get adjustment history with filtering.
 - `processedBy` (optional): Filter by processor
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -402,7 +448,7 @@ Get adjustment history with filtering.
         "id": "ADJ_001",
         "customerId": "CUST_001",
         "type": "balance_adjustment",
-        "amount": 150.00,
+        "amount": 150.0,
         "description": "Manual balance correction",
         "status": "completed",
         "processedBy": "Agent Smith",
@@ -420,14 +466,16 @@ Get adjustment history with filtering.
 ```
 
 #### **POST /adjustments/create**
+
 Create a new adjustment.
 
 **Request Body:**
+
 ```json
 {
   "customerId": "CUST_001",
   "type": "balance_adjustment",
-  "amount": 150.00,
+  "amount": 150.0,
   "description": "Manual balance correction for lost wager",
   "reason": "Customer reported lost wager not reflected",
   "notes": "Verified wager ID: WAGER_12345",
@@ -437,13 +485,14 @@ Create a new adjustment.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
   "data": {
     "adjustmentId": "ADJ_1234567890",
     "customerId": "CUST_001",
-    "amount": 150.00,
+    "amount": 150.0,
     "status": "pending_approval",
     "createdAt": "2025-01-26T19:00:00Z"
   }
@@ -451,9 +500,11 @@ Create a new adjustment.
 ```
 
 #### **POST /adjustments/approve**
+
 Approve a pending adjustment.
 
 **Request Body:**
+
 ```json
 {
   "adjustmentId": "ADJ_1234567890",
@@ -463,6 +514,7 @@ Approve a pending adjustment.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -480,18 +532,23 @@ Approve a pending adjustment.
 ## **6. Common API Patterns**
 
 ### **Authentication**
+
 All endpoints require JWT Bearer token authentication:
+
 ```
 Authorization: Bearer <jwt-token>
 ```
 
 ### **Rate Limiting**
+
 - Standard endpoints: 100 requests per minute
 - Bulk operations: 10 requests per minute
 - Real-time endpoints: 1000 requests per minute
 
 ### **Pagination**
+
 Standard pagination parameters:
+
 ```json
 {
   "page": 1,
@@ -504,7 +561,9 @@ Standard pagination parameters:
 ```
 
 ### **Filtering**
+
 Common filter parameters:
+
 ```json
 {
   "customerId": "CUST_001",
@@ -520,6 +579,7 @@ Common filter parameters:
 ## **7. Error Handling**
 
 ### **HTTP Status Codes**
+
 - `200` - Success
 - `201` - Created
 - `400` - Bad Request (validation error)
@@ -532,6 +592,7 @@ Common filter parameters:
 - `500` - Internal Server Error
 
 ### **Error Response Format**
+
 ```json
 {
   "success": false,
@@ -550,6 +611,7 @@ Common filter parameters:
 ```
 
 ### **Common Error Codes**
+
 - `VALIDATION_ERROR` - Input validation failed
 - `AUTHENTICATION_ERROR` - Invalid or missing credentials
 - `AUTHORIZATION_ERROR` - Insufficient permissions
@@ -563,6 +625,7 @@ Common filter parameters:
 ## **8. Webhooks & Real-time Updates**
 
 ### **Settlement Webhooks**
+
 ```json
 {
   "event": "settlement.processed",
@@ -578,13 +641,14 @@ Common filter parameters:
 ```
 
 ### **Distribution Webhooks**
+
 ```json
 {
   "event": "distribution.completed",
   "data": {
     "distributionId": "DIST_1234567890",
     "recipientId": "AFF_001",
-    "amount": 6250.00,
+    "amount": 6250.0,
     "paymentMethod": "wire_transfer",
     "completedAt": "2025-01-26T21:00:00Z"
   }
@@ -596,23 +660,25 @@ Common filter parameters:
 ## **9. SDK & Client Libraries**
 
 ### **Available SDKs**
+
 - **JavaScript/TypeScript**: `@fire22/api-client`
 - **Python**: `fire22-api-client`
 - **Java**: `fire22-api-client`
 - **Go**: `fire22-api-client`
 
 ### **Example Usage**
+
 ```javascript
 import { Fire22API } from '@fire22/api-client';
 
 const client = new Fire22API({
   apiKey: 'your-api-key',
-  baseURL: 'https://api.fire22.com'
+  baseURL: 'https://api.fire22.com',
 });
 
 // Get collections dashboard
 const dashboard = await client.collections.getDashboard({
-  period: 'today'
+  period: 'today',
 });
 
 // Process settlement
@@ -620,7 +686,7 @@ const result = await client.collections.processSettlement({
   settlementId: 'PEN_001',
   customerId: 'CUST_001',
   amount: 166.67,
-  processedBy: 'Agent Smith'
+  processedBy: 'Agent Smith',
 });
 ```
 
@@ -629,17 +695,21 @@ const result = await client.collections.processSettlement({
 ## **10. Testing & Development**
 
 ### **Sandbox Environment**
+
 ```
 https://sandbox-api.fire22.com
 ```
 
 ### **Test Data**
+
 Pre-populated test data available in sandbox:
+
 - Test customers: `CUST_TEST_001` through `CUST_TEST_100`
 - Test settlements: `PEN_TEST_001` through `PEN_TEST_050`
 - Test distributions: `DIST_TEST_001` through `DIST_TEST_030`
 
 ### **API Testing Tools**
+
 - **Postman Collection**: Available in `/docs/postman/`
 - **OpenAPI Specification**: Available at `/docs/openapi.json`
 - **GraphQL Playground**: Available at `/graphql`
@@ -649,20 +719,24 @@ Pre-populated test data available in sandbox:
 ## **11. Support & Documentation**
 
 ### **Developer Portal**
+
 - **Documentation**: https://developers.fire22.com
 - **API Status**: https://status.fire22.com
 - **Changelog**: https://changelog.fire22.com
 
 ### **Support Channels**
+
 - **Email**: api-support@fire22.com
 - **Slack**: #api-support
 - **GitHub Issues**: https://github.com/fire22/api-client/issues
 
 ### **Versioning**
+
 - **Current Version**: v2.1.0
 - **Sunset Policy**: 12 months notice for deprecated endpoints
 - **Breaking Changes**: Major version increments
 
 ---
 
-*This API reference is automatically updated with each deployment. For the latest specifications, see the [OpenAPI documentation](./openapi.json).* 
+_This API reference is automatically updated with each deployment. For the
+latest specifications, see the [OpenAPI documentation](./openapi.json)._

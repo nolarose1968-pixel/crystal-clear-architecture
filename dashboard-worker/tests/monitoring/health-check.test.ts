@@ -51,7 +51,7 @@ const expect = (actual: any) => ({
     if (actual === undefined || actual === null) {
       throw new Error('Expected value to be defined');
     }
-  }
+  },
 });
 
 describe('HealthMonitor', () => {
@@ -81,7 +81,7 @@ describe('HealthMonitor', () => {
   describe('checkComponent', () => {
     it('should check API component health', async () => {
       const health = await healthMonitor.checkComponent('api');
-      
+
       expect(health).toBeDefined();
       expect(health).toHaveProperty('status');
       expect(health).toHaveProperty('lastChecked');
@@ -90,7 +90,7 @@ describe('HealthMonitor', () => {
 
     it('should check database component health', async () => {
       const health = await healthMonitor.checkComponent('database');
-      
+
       expect(health).toBeDefined();
       expect(health).toHaveProperty('status');
       expect(health).toHaveProperty('lastChecked');
@@ -99,7 +99,7 @@ describe('HealthMonitor', () => {
 
     it('should check cache component health', async () => {
       const health = await healthMonitor.checkComponent('cache');
-      
+
       expect(health).toBeDefined();
       expect(health).toHaveProperty('status');
       expect(health).toHaveProperty('lastChecked');
@@ -108,7 +108,7 @@ describe('HealthMonitor', () => {
 
     it('should handle unknown component', async () => {
       const health = await healthMonitor.checkComponent('unknown');
-      
+
       expect(health).toBeDefined();
       expect(health.status).toBe('unhealthy');
       expect(health.message).toContain('Unknown component');
@@ -118,7 +118,7 @@ describe('HealthMonitor', () => {
   describe('getSystemHealth', () => {
     it('should return system health status', async () => {
       const health = await healthMonitor.getSystemHealth();
-      
+
       expect(health).toBeDefined();
       expect(health).toHaveProperty('status');
       expect(health).toHaveProperty('components');
@@ -131,7 +131,7 @@ describe('HealthMonitor', () => {
 
     it('should include component health details', async () => {
       const health = await healthMonitor.getSystemHealth();
-      
+
       for (const component of Object.values(health.components)) {
         expect(component).toHaveProperty('status');
         expect(component).toHaveProperty('lastChecked');
@@ -143,10 +143,10 @@ describe('HealthMonitor', () => {
   describe('periodicHealthCheck', () => {
     it('should start periodic health checks', async () => {
       await healthMonitor.startPeriodicChecks();
-      
+
       // Give it a moment to run
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       const health = await healthMonitor.getSystemHealth();
       expect(health).toBeDefined();
     });
@@ -154,9 +154,9 @@ describe('HealthMonitor', () => {
     it('should stop periodic health checks', async () => {
       await healthMonitor.startPeriodicChecks();
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       healthMonitor.stopPeriodicChecks();
-      
+
       // Verify it stopped by checking if it can still get health
       const health = await healthMonitor.getSystemHealth();
       expect(health).toBeDefined();
@@ -169,7 +169,7 @@ describe('HealthMonitor', () => {
       const originalCheck = healthMonitor['checkComponent'];
       healthMonitor['checkComponent'] = async (name: string) => ({
         status: 'healthy',
-        lastChecked: new Date().toISOString()
+        lastChecked: new Date().toISOString(),
       });
 
       const health = await healthMonitor.getSystemHealth();
@@ -184,7 +184,7 @@ describe('HealthMonitor', () => {
       const originalCheck = healthMonitor['checkComponent'];
       healthMonitor['checkComponent'] = async (name: string) => ({
         status: name === 'api' ? 'degraded' : 'healthy',
-        lastChecked: new Date().toISOString()
+        lastChecked: new Date().toISOString(),
       });
 
       const health = await healthMonitor.getSystemHealth();
@@ -199,7 +199,7 @@ describe('HealthMonitor', () => {
       const originalCheck = healthMonitor['checkComponent'];
       healthMonitor['checkComponent'] = async (name: string) => ({
         status: name === 'api' ? 'unhealthy' : 'healthy',
-        lastChecked: new Date().toISOString()
+        lastChecked: new Date().toISOString(),
       });
 
       const health = await healthMonitor.getSystemHealth();
@@ -228,15 +228,15 @@ describe('HealthUtils', () => {
 
     it('should handle health check requests', async () => {
       const handler = HealthUtils.createHealthCheckHandler(healthMonitor);
-      
+
       const request = new Request('http://localhost/health', {
-        method: 'GET'
+        method: 'GET',
       });
 
       const response = await handler(request);
       expect(response).toBeDefined();
       expect([200, 206, 503]).toContain(response.status);
-      
+
       const body = await response.json();
       expect(body).toHaveProperty('status');
       expect(body).toHaveProperty('components');
@@ -254,15 +254,15 @@ describe('HealthUtils', () => {
 
     it('should return ready when required components are healthy', async () => {
       const handler = HealthUtils.createReadinessHandler(healthMonitor, ['api']);
-      
+
       const request = new Request('http://localhost/ready', {
-        method: 'GET'
+        method: 'GET',
       });
 
       const response = await handler(request);
       expect(response).toBeDefined();
       expect([200, 503]).toContain(response.status);
-      
+
       const body = await response.json();
       expect(body).toHaveProperty('ready');
       expect(body).toHaveProperty('health');
@@ -279,15 +279,15 @@ describe('HealthUtils', () => {
 
     it('should return alive status', async () => {
       const handler = HealthUtils.createLivenessHandler();
-      
+
       const request = new Request('http://localhost/live', {
-        method: 'GET'
+        method: 'GET',
       });
 
       const response = await handler(request);
       expect(response).toBeDefined();
       expect(response.status).toBe(200);
-      
+
       const body = await response.json();
       expect(body).toHaveProperty('alive');
       expect(body).toHaveProperty('timestamp');
@@ -314,11 +314,15 @@ describe('HealthUtils', () => {
     it('should allow status quo', () => {
       expect(HealthUtils.validateStatusTransition('healthy', 'healthy', 'no change')).toBe(true);
       expect(HealthUtils.validateStatusTransition('degraded', 'degraded', 'no change')).toBe(true);
-      expect(HealthUtils.validateStatusTransition('unhealthy', 'unhealthy', 'no change')).toBe(true);
+      expect(HealthUtils.validateStatusTransition('unhealthy', 'unhealthy', 'no change')).toBe(
+        true
+      );
     });
 
     it('should prevent invalid transitions', () => {
-      expect(HealthUtils.validateStatusTransition('healthy', 'degraded', 'degradation')).toBe(false);
+      expect(HealthUtils.validateStatusTransition('healthy', 'degraded', 'degradation')).toBe(
+        false
+      );
       expect(HealthUtils.validateStatusTransition('degraded', 'unhealthy', 'failure')).toBe(false);
     });
   });
@@ -345,9 +349,9 @@ describe('HealthUtils', () => {
       const components = {
         api: { status: 'healthy' as const, lastChecked: new Date().toISOString() },
         database: { status: 'healthy' as const, lastChecked: new Date().toISOString() },
-        cache: { status: 'healthy' as const, lastChecked: new Date().toISOString() }
+        cache: { status: 'healthy' as const, lastChecked: new Date().toISOString() },
       };
-      
+
       const score = HealthUtils.calculateHealthScore(components);
       expect(score).toBe(100);
     });
@@ -356,9 +360,9 @@ describe('HealthUtils', () => {
       const components = {
         api: { status: 'healthy' as const, lastChecked: new Date().toISOString() },
         database: { status: 'degraded' as const, lastChecked: new Date().toISOString() },
-        cache: { status: 'unhealthy' as const, lastChecked: new Date().toISOString() }
+        cache: { status: 'unhealthy' as const, lastChecked: new Date().toISOString() },
       };
-      
+
       const score = HealthUtils.calculateHealthScore(components);
       expect(score).toBe(50); // (100 + 50 + 0) / 3 = 50
     });
@@ -366,9 +370,9 @@ describe('HealthUtils', () => {
     it('should calculate score for all degraded components', () => {
       const components = {
         api: { status: 'degraded' as const, lastChecked: new Date().toISOString() },
-        database: { status: 'degraded' as const, lastChecked: new Date().toISOString() }
+        database: { status: 'degraded' as const, lastChecked: new Date().toISOString() },
       };
-      
+
       const score = HealthUtils.calculateHealthScore(components);
       expect(score).toBe(50);
     });

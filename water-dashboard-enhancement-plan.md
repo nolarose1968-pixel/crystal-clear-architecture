@@ -44,11 +44,11 @@
             --text-secondary: #475569;
         }
 
-        body { 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
-            margin: 0; 
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
             background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 50%, var(--ocean-blue) 100%);
-            color: var(--text-primary); 
+            color: var(--text-primary);
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
@@ -164,11 +164,11 @@
         }
 
         /* Enhanced Header with Water Theme */
-        .header { 
+        .header {
             background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 50%, var(--ocean-blue) 100%);
-            padding: 1.5rem; 
-            display: flex; 
-            justify-content: space-between; 
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 20px rgba(0, 61, 122, 0.3);
             border-bottom: 3px solid var(--light-blue);
@@ -176,11 +176,11 @@
             z-index: 10;
         }
 
-        .kpi-card { 
+        .kpi-card {
             background: linear-gradient(135deg, rgba(0, 61, 122, 0.3) 0%, rgba(0, 86, 179, 0.3) 100%);
             backdrop-filter: blur(10px);
-            padding: 1.5rem; 
-            border-radius: 15px; 
+            padding: 1.5rem;
+            border-radius: 15px;
             text-align: center;
             border: 1px solid var(--primary-blue);
             box-shadow: 0 10px 30px rgba(0, 61, 122, 0.2);
@@ -210,9 +210,9 @@
             border-color: var(--light-blue);
         }
 
-        .kpi-value { 
-            font-size: 2.5rem; 
-            font-weight: 800; 
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 800;
             background: linear-gradient(135deg, var(--sky-blue), var(--light-blue));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -220,19 +220,19 @@
             text-shadow: 0 0 20px rgba(135, 206, 235, 0.3);
         }
 
-        .kpi-label { 
-            font-size: 0.9rem; 
-            color: var(--sky-blue); 
+        .kpi-label {
+            font-size: 0.9rem;
+            color: var(--sky-blue);
             font-weight: 500;
             margin-top: 0.5rem;
             text-shadow: 0 0 5px rgba(135, 206, 235, 0.3);
         }
 
         /* Enhanced Tab Navigation */
-        .tab-button { 
-            padding: 0.75rem 1.5rem; 
-            border-radius: 0.75rem; 
-            cursor: pointer; 
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 500;
             border: 1px solid transparent;
@@ -263,7 +263,7 @@
             transform: translateY(-2px);
         }
 
-        .tab-button.active { 
+        .tab-button.active {
             background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
             color: white;
             box-shadow: 0 4px 15px rgba(0, 119, 190, 0.4);
@@ -363,28 +363,28 @@
         }
 
         /* Status Badges */
-        .status-badge { 
-            padding: 0.5rem 1rem; 
-            border-radius: 0.75rem; 
-            font-size: 0.75rem; 
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
-        .status-active { 
+        .status-active {
             background: linear-gradient(135deg, var(--success-color), #059669);
             color: white;
             box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
         }
 
-        .status-restricted { 
+        .status-restricted {
             background: linear-gradient(135deg, var(--warning-color), #d97706);
             color: white;
             box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.3);
         }
 
-        .status-inactive { 
+        .status-inactive {
             background: linear-gradient(135deg, var(--error-color), #dc2626);
             color: white;
             box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3);
@@ -600,21 +600,21 @@
                 flex-direction: column;
                 gap: 20px;
             }
-            
+
             .kpi-card {
                 margin-bottom: 15px;
             }
-            
+
             .tab-button {
                 padding: 0.5rem 1rem;
                 font-size: 0.9rem;
             }
-            
+
             .input-area {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
             .prompt {
                 margin-bottom: 10px;
                 text-align: center;
@@ -721,6 +721,7 @@
             margin-right: 5px;
         }
     </style>
+
 </head>
 <body x-data="waterDashboard()" :data-theme="theme">
     <!-- Theme Toggle -->
@@ -735,19 +736,19 @@
     <div class="bubble" style="width: 15px; height: 15px; left: 30%; animation-duration: 12s; animation-delay: 2s;"></div>
     <div class="bubble" style="width: 25px; height: 25px; left: 60%; animation-duration: 18s; animation-delay: 4s;"></div>
     <div class="bubble" style="width: 10px; height: 10px; left: 80%; animation-duration: 10s; animation-delay: 1s;"></div>
-    
+
     <!-- Water Gradient Effect -->
     <div class="water-gradient"></div>
 
     <!-- Notification Container -->
-    <div x-show="notification.show" 
+    <div x-show="notification.show"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="transform translate-x-full opacity-0"
          x-transition:enter-end="transform translate-x-0 opacity-100"
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="transform translate-x-0 opacity-100"
          x-transition:leave-end="transform translate-x-full opacity-0"
-         class="notification" 
+         class="notification"
          :class="notification.type"
          x-text="notification.message">
     </div>
@@ -764,7 +765,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Navigation Links -->
             <nav class="hidden md:flex items-center space-x-6">
                 <a href="#" class="nav-link glow-text">📊 Dashboard</a>
@@ -772,7 +773,7 @@
                 <a href="#" class="nav-link glow-text">⚙️ Settings</a>
                 <a href="#" class="nav-link glow-text">🔧 Commands</a>
             </nav>
-            
+
             <!-- Status Information -->
             <div class="flex items-center space-x-6">
                 <div class="text-center">
@@ -902,7 +903,7 @@
                         <div class="description">Advanced system diagnostics and settings</div>
                     </div>
                 </div>
-                
+
                 <div class="input-area">
                     <span class="prompt">╭─[user@water-system]</span>
                     <input type="text" x-model="currentCommand" @input="updateSuggestions()" @keydown.enter="executeCommand()" @keydown.up="navigateHistory(-1)" @keydown.down="navigateHistory(1)" @keydown.tab="selectSuggestion($event)" @blur="hideSuggestions()" placeholder="Type your command here..." class="input-field flex-grow">
@@ -910,7 +911,7 @@
                         <span x-show="!executingCommand">Execute</span>
                         <span x-show="executingCommand" class="loading"></span>
                     </button>
-                    
+
                     <!-- Command Suggestions Dropdown -->
                     <div x-show="showSuggestions" @click.away="hideSuggestions()" class="suggestions-container">
                         <template x-for="suggestion in suggestions" :key="suggestion.name">
@@ -921,7 +922,7 @@
                         </template>
                     </div>
                 </div>
-                
+
                 <div class="output" x-text="commandOutput">
                     <div>╭─────────────────────────────────────────────────────╮</div>
                     <div>│  Welcome to the Enhanced Water Command Interface!   │</div>
@@ -944,7 +945,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="table-container water-border deep-water">
                     <h3 class="text-xl font-bold mb-4 px-6 pt-4 glow-text">Ocean Depth Metrics</h3>
                     <div class="p-6">
@@ -964,7 +965,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="table-container water-border mid-water">
                     <h3 class="text-xl font-bold mb-4 px-6 pt-4 glow-text">Pressure Analysis</h3>
                     <div class="p-6">
@@ -973,7 +974,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="table-container water-border deep-water">
                     <h3 class="text-xl font-bold mb-4 px-6 pt-4 glow-text">Quality Metrics</h3>
                     <div class="p-6">
@@ -1001,7 +1002,7 @@
                     <div class="kpi-value" x-text="getRandomValue(50, 100) + ' L/min'"></div>
                 </div>
             </div>
-            
+
             <div class="table-container water-border abyssal">
                 <h3 class="text-xl font-bold mb-4 px-6 pt-4 glow-text">System Diagnostics</h3>
                 <div class="p-6">
@@ -1097,7 +1098,7 @@
                     message: '',
                     type: 'info'
                 },
-                
+
                 // Theme Management
                 toggleTheme() {
                     this.theme = this.theme === 'dark' ? 'light' : 'dark';
@@ -1105,7 +1106,7 @@
                     document.body.setAttribute('data-theme', this.theme);
                     this.showNotification('Theme changed to ' + this.theme, 'info');
                 },
-                
+
                 // Notification System
                 showNotification(message, type = 'info') {
                     this.notification = { show: true, message, type };
@@ -1113,7 +1114,7 @@
                         this.notification.show = false;
                     }, 3000);
                 },
-                
+
                 // Alert Management
                 getAlertBorderColor(type) {
                     const colors = {
@@ -1124,7 +1125,7 @@
                     };
                     return colors[type] || 'border-gray-500';
                 },
-                
+
                 // Command Suggestions Methods
                 getCommandSuggestions(input) {
                     const commands = [
@@ -1152,23 +1153,23 @@
                         { name: 'export', description: 'Export data to file', category: 'utilities' },
                         { name: 'import', description: 'Import data from file', category: 'utilities' }
                     ];
-                    
+
                     if (!input.trim()) {
                         return commands.slice(0, 5); // Show first 5 commands if no input
                     }
-                    
+
                     const lowerInput = input.toLowerCase();
                     return commands
-                        .filter(cmd => cmd.name.toLowerCase().includes(lowerInput) || 
+                        .filter(cmd => cmd.name.toLowerCase().includes(lowerInput) ||
                                      cmd.description.toLowerCase().includes(lowerInput))
                         .slice(0, 5); // Limit to 5 suggestions
                 },
-                
+
                 updateSuggestions() {
                     this.suggestions = this.getCommandSuggestions(this.currentCommand);
                     this.showSuggestions = this.suggestions.length > 0 && this.currentCommand.length > 0;
                 },
-                
+
                 selectSuggestion(suggestion) {
                     this.currentCommand = suggestion.name;
                     this.showSuggestions = false;
@@ -1180,18 +1181,18 @@
                         }
                     });
                 },
-                
+
                 hideSuggestions() {
                     setTimeout(() => {
                         this.showSuggestions = false;
                     }, 200);
                 },
-                
+
                 // Depth Gauge Functions
                 applyDepthStyling(command) {
                     const commandLower = command.toLowerCase();
                     let depth, color, glow;
-                    
+
                     if (commandLower.includes('system') || commandLower.includes('info') || commandLower.includes('status') || commandLower.includes('version')) {
                         depth = 'Surface';
                         color = '#87ceeb'; // Sky blue
@@ -1213,10 +1214,10 @@
                         color = '#4da6ff'; // Default light blue
                         glow = '0 0 5px rgba(77, 166, 255, 0.5)';
                     }
-                    
+
                     return { depth, color, glow };
                 },
-                
+
                 updateDepthGauge(command) {
                     const style = this.applyDepthStyling(command);
                     const gauge = document.createElement('div');
@@ -1235,7 +1236,7 @@
                         z-index: 50;
                     `;
                     gauge.textContent = `Depth: ${style.depth}`;
-                    
+
                     // Remove existing gauge
                     document.querySelectorAll('.depth-gauge').forEach(el => el.remove());
                     const commandInterface = document.querySelector('.command-interface');
@@ -1243,7 +1244,7 @@
                         commandInterface.appendChild(gauge);
                     }
                 },
-                
+
                 init() {
                     console.log('Enhanced Water Dashboard initialized');
                     this.setupKeyboardShortcuts();
@@ -1252,7 +1253,7 @@
                     this.startRealTimeUpdates();
                     this.checkConnectionStatus();
                 },
-                
+
                 setupKeyboardShortcuts() {
                     document.addEventListener('keydown', (e) => {
                         if (e.ctrlKey && e.key === 'k') {
@@ -1273,7 +1274,7 @@
                         }
                     });
                 },
-                
+
                 saveSettings() {
                     const settings = {
                         theme: this.theme,
@@ -1286,7 +1287,7 @@
                     };
                     localStorage.setItem('waterDashboardSettings', JSON.stringify(settings));
                 },
-                
+
                 async checkConnectionStatus() {
                     // Simulate connection check
                     setTimeout(() => {
@@ -1294,13 +1295,13 @@
                         this.showNotification('System connected successfully', 'success');
                     }, 2000);
                 },
-                
+
                 async fetchOverviewData() {
                     this.showNotification('Fetching data...', 'info');
-                    
+
                     // Simulate API call
                     await new Promise(resolve => setTimeout(resolve, 1000));
-                    
+
                     this.overviewData = {
                         totalAgents: getRandomValue(50, 100),
                         activeAgents: getRandomValue(40, 90),
@@ -1310,34 +1311,34 @@
                         memoryUsage: getRandomValue(30, 70),
                         networkLatency: getRandomValue(10, 150)
                     };
-                    
+
                     this.lastUpdated = new Date().toLocaleString();
                     this.showNotification('Data updated successfully', 'success');
                 },
-                
+
                 formatNumber(num) {
                     return new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(num);
                 },
-                
+
                 // Command Interface Methods
                 async executeCommand() {
                     if (!this.currentCommand.trim()) return;
-                    
+
                     this.executingCommand = true;
-                    
+
                     // Update depth gauge before executing command
                     this.updateDepthGauge(this.currentCommand);
-                    
+
                     // Add to command history
                     this.commandHistory.push(this.currentCommand);
                     this.historyIndex = this.commandHistory.length;
-                    
+
                     // Add user command to output
                     this.commandOutput += `\n╭─[user@water-system]$ ${this.currentCommand}`;
-                    
+
                     // Process commands using switch statement
                     let response = '';
-                    
+
                     switch(this.currentCommand.toLowerCase()) {
                         case 'system info':
                         case 'info':
@@ -1352,7 +1353,7 @@
                                        │  Connection: ${this.connectionStatus}        │
                                        ╰─────────────────────────────────────────────────╯`;
                             break;
-                            
+
                         case 'network':
                         case 'net':
                             response = `\n╭─ NETWORK ──────────────────────────────────────╮
@@ -1365,7 +1366,7 @@
                                        │  Latency: ${this.overviewData.networkLatency}ms │
                                        ╰─────────────────────────────────────────────────╯`;
                             break;
-                            
+
                         case 'processes':
                         case 'ps':
                             response = `\n╭─ PROCESSES ────────────────────────────────────╮
@@ -1377,13 +1378,13 @@
                                        │  6. Theme Engine: CPU ${getRandomValue(0, 1)}%, Memory ${getRandomValue(50, 100)}MB │
                                        ╰─────────────────────────────────────────────────╯`;
                             break;
-                            
+
                         case 'clear':
                             this.commandOutput = '';
                             this.showNotification('Terminal cleared', 'info');
                             this.executingCommand = false;
                             return;
-                            
+
                         case 'help':
                         case '?':
                             response = `\n╭─ AVAILABLE COMMANDS ──────────────────────────╮
@@ -1402,19 +1403,19 @@
                                        │  import     - Import data from file           │
                                        ╰─────────────────────────────────────────────────╯`;
                             break;
-                            
+
                         case 'date':
                             response = `\n╭─ DATE ────────────────────────────────────────╮
                                        │  Current date: ${new Date().toLocaleDateString()}  │
                                        ╰─────────────────────────────────────────────────────╯`;
                             break;
-                            
+
                         case 'time':
                             response = `\n╭─ TIME ────────────────────────────────────────╮
                                        │  Current time: ${new Date().toLocaleTimeString()}  │
                                        ╰─────────────────────────────────────────────────────╯`;
                             break;
-                            
+
                         case 'theme':
                             response = `\n╭─ THEME SETTINGS ──────────────────────────────╮
                                        │  Current theme: ${this.theme}                  │
@@ -1422,7 +1423,7 @@
                                        │  Use 'theme dark' or 'theme light' to change  │
                                        ╰─────────────────────────────────────────────────────╯`;
                             break;
-                            
+
                         case 'status':
                             response = `\n╭─ SYSTEM STATUS ───────────────────────────────╮
                                        │  Connection: ${this.connectionStatus}          │
@@ -1433,7 +1434,7 @@
                                        │  Last Update: ${this.lastUpdated}             │
                                        ╰─────────────────────────────────────────────────────╯`;
                             break;
-                            
+
                         case 'alerts':
                             response = `\n╭─ SYSTEM ALERTS ───────────────────────────────╮
                                        │  Total Alerts: ${this.alerts.length}          │
@@ -1442,23 +1443,23 @@
                                        │  Info: ${this.alerts.filter(a => a.type === 'info').length}      │
                                        ╰─────────────────────────────────────────────────────╯`;
                             break;
-                            
+
                         default:
                             response = `\n╭─ ERROR ───────────────────────────────────────────╮
                                        │  Command not found: ${this.currentCommand.padEnd(25)}      │
                                        │  Type 'help' for available commands.            │
                                        ╰───────────────────────────────────────────────────╯`;
                     }
-                    
+
                     this.commandOutput += response;
                     this.currentCommand = '';
                     this.executingCommand = false;
                     this.scrollToBottom();
                 },
-                
+
                 navigateHistory(direction) {
                     if (this.commandHistory.length === 0) return;
-                    
+
                     if (direction === -1 && this.historyIndex > 0) {
                         this.historyIndex--;
                         this.currentCommand = this.commandHistory[this.historyIndex];
@@ -1470,7 +1471,7 @@
                         this.currentCommand = '';
                     }
                 },
-                
+
                 scrollToBottom() {
                     setTimeout(() => {
                         const outputElement = document.querySelector('.output');
@@ -1479,7 +1480,7 @@
                         }
                     }, 0);
                 },
-                
+
                 initializeCharts() {
                     this.createWaterFlowChart();
                     this.createOceanDepthChart();
@@ -1487,7 +1488,7 @@
                     this.createPressureChart();
                     this.createQualityChart();
                 },
-                
+
                 createWaterFlowChart() {
                     const ctx = document.getElementById('waterFlowChart');
                     if (ctx) {
@@ -1526,7 +1527,7 @@
                         });
                     }
                 },
-                
+
                 createOceanDepthChart() {
                     const ctx = document.getElementById('oceanDepthChart');
                     if (ctx) {
@@ -1569,7 +1570,7 @@
                         });
                     }
                 },
-                
+
                 createTemperatureChart() {
                     const ctx = document.getElementById('temperatureChart');
                     if (ctx) {
@@ -1608,7 +1609,7 @@
                         });
                     }
                 },
-                
+
                 createPressureChart() {
                     const ctx = document.getElementById('pressureChart');
                     if (ctx) {
@@ -1637,7 +1638,7 @@
                         });
                     }
                 },
-                
+
                 createQualityChart() {
                     const ctx = document.getElementById('qualityChart');
                     if (ctx) {
@@ -1675,7 +1676,7 @@
                         });
                     }
                 },
-                
+
                 startRealTimeUpdates() {
                     setInterval(() => {
                         this.fetchOverviewData();
@@ -1683,16 +1684,16 @@
                 }
             };
         }
-        
+
         // Helper functions
         function getRandomValue(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
-        
+
         function generateRandomIP() {
             return `${getRandomValue(192, 223)}.${getRandomValue(0, 255)}.${getRandomValue(0, 255)}.${getRandomValue(1, 254)}`;
         }
-        
+
         function getCommandColor(command) {
             const colors = {
                 'system': '#4da6ff',    // Light blue - surface
@@ -1702,10 +1703,10 @@
                 'error': '#ff6666',     // Red for danger/warning
                 'success': '#00cc99'    // Teal for success
             };
-            
+
             return colors[command] || '#4da6ff';
         }
-        
+
         // Add ripple effect on click
         document.addEventListener('click', function(e) {
             if (e.target.closest('.command-interface') || e.target.closest('.kpi-card') || e.target.closest('.table-container')) {
@@ -1715,13 +1716,13 @@
                 ripple.style.left = e.offsetX - 10 + 'px';
                 ripple.style.top = e.offsetY - 10 + 'px';
                 e.target.closest('.command-interface, .kpi-card, .table-container').appendChild(ripple);
-                
+
                 setTimeout(() => {
                     ripple.remove();
                 }, 2000);
             }
         });
-        
+
         // Add color styling for command output
         const style = document.createElement('style');
         style.textContent = `
@@ -1755,15 +1756,15 @@
         `;
         document.head.appendChild(style);
     </script>
-    
+
     <!-- Enhanced Terminal-Style Footer -->
     <footer style="
-        margin-top: 60px; 
-        padding: 40px 20px; 
-        background: linear-gradient(135deg, rgba(0, 31, 63, 0.9) 0%, rgba(0, 61, 122, 0.9) 100%); 
-        color: #e2e8f0; 
-        font-family: 'SF Mono', 'Monaco', 'Fira Code', monospace; 
-        position: relative; 
+        margin-top: 60px;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, rgba(0, 31, 63, 0.9) 0%, rgba(0, 61, 122, 0.9) 100%);
+        color: #e2e8f0;
+        font-family: 'SF Mono', 'Monaco', 'Fira Code', monospace;
+        position: relative;
         text-align: center;
         border-top: 2px solid var(--light-blue);
         border-radius: 15px;
@@ -1772,13 +1773,13 @@
         <div style="color: var(--sky-blue); font-size: 14px; line-height: 1; overflow: hidden;">
             ╭────────────────────────────────────────────────────────────────────────╮
         </div>
-        
+
         <div style="padding: 30px 0;">
             <div style="font-size: 3rem; color: var(--sky-blue); text-shadow: 0 0 20px rgba(135, 206, 235, 0.5); animation: pulse-glow 2s ease-in-out infinite;">🌊</div>
             <h2 style="font-size: 2rem; color: var(--sky-blue); margin: 10px 0; font-weight: 700; letter-spacing: 2px; text-shadow: 0 0 10px rgba(135, 206, 235, 0.5);">Fire22 Water Dashboard v4</h2>
             <p style="color: rgba(255, 255, 255, 0.8); font-size: 1.1rem; font-style: italic;">Enhanced Deep Ocean Management & Analytics System</p>
         </div>
-        
+
         <div style="margin: 30px 0; padding: 20px 0; border-top: 1px solid var(--light-blue); border-bottom: 1px solid var(--light-blue);">
             <div style="color: var(--sky-blue); margin-bottom: 20px; font-size: 1.2px;">
                 ├─── Enhanced Water Management Features ───┤
@@ -1810,10 +1811,11 @@
                 </div>
             </div>
         </div>
-        
+
         <div style="color: var(--sky-blue); font-size: 14px; line-height: 1; overflow: hidden;">
             ╰────────────────────────────────────────────────────────────────────────╯
         </div>
     </footer>
+
 </body>
 </html>

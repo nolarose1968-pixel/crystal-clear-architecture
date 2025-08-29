@@ -11,9 +11,12 @@ import type {
   CustomerAction,
   CustomerInterfaceEvent,
   CustomerNotification,
-  DEFAULT_CUSTOMER_INTERFACE_OPTIONS
+  DEFAULT_CUSTOMER_INTERFACE_OPTIONS,
 } from './customer-interface-types';
-import { CustomerInformationService, CustomerProfile } from '../../services/customer-information-service';
+import {
+  CustomerInformationService,
+  CustomerProfile,
+} from '../../services/customer-information-service';
 import { FormManagementService } from '../../services/form-management-service';
 import { CashierService } from '../../services/cashier-service';
 
@@ -33,7 +36,7 @@ export class CustomerInterfaceCore extends EventEmitter {
     this.container = options.container;
     this.options = {
       ...DEFAULT_CUSTOMER_INTERFACE_OPTIONS,
-      ...options
+      ...options,
     };
 
     this.customerService = CustomerInformationService.getInstance();
@@ -73,7 +76,6 @@ export class CustomerInterfaceCore extends EventEmitter {
       console.log('✅ Customer Interface Core initialized successfully');
 
       this.emit('initialized', this.state);
-
     } catch (error) {
       console.error('❌ Failed to initialize Customer Interface Core:', error);
       this.emit('error', error);
@@ -99,14 +101,14 @@ export class CustomerInterfaceCore extends EventEmitter {
     this.emit('state-changed', {
       previous: previousState,
       current: this.state,
-      changes: updates
+      changes: updates,
     });
 
     // Log state change
     this.logEvent({
       type: 'view-changed',
       data: { from: previousState.currentView, to: this.state.currentView },
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   }
 
@@ -138,7 +140,7 @@ export class CustomerInterfaceCore extends EventEmitter {
     this.logEvent({
       type: 'view-changed',
       data: action,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
 
     // Emit action event for modules to handle
@@ -151,7 +153,7 @@ export class CustomerInterfaceCore extends EventEmitter {
   showNotification(notification: Omit<CustomerNotification, 'id'>): void {
     const fullNotification: CustomerNotification = {
       id: `notification_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      ...notification
+      ...notification,
     };
 
     this.emit('notification', fullNotification);
@@ -187,7 +189,7 @@ export class CustomerInterfaceCore extends EventEmitter {
         type: 'error',
         title: 'Refresh Failed',
         message: 'Failed to refresh customer data. Please try again.',
-        duration: 5000
+        duration: 5000,
       });
     } finally {
       this.setLoading(false);
@@ -239,31 +241,31 @@ export class CustomerInterfaceCore extends EventEmitter {
       totalPages: 1,
       isLoading: false,
       lastUpdated: new Date(),
-      hasUnsavedChanges: false
+      hasUnsavedChanges: false,
     };
   }
 
   private setupEventListeners(): void {
     // Listen for customer service events
-    this.customerService.on('customer-created', (customer) => {
+    this.customerService.on('customer-created', customer => {
       this.handleCustomerCreated(customer);
     });
 
-    this.customerService.on('customer-updated', (customer) => {
+    this.customerService.on('customer-updated', customer => {
       this.handleCustomerUpdated(customer);
     });
 
-    this.customerService.on('customer-updated-realtime', (customer) => {
+    this.customerService.on('customer-updated-realtime', customer => {
       this.handleCustomerUpdatedRealtime(customer);
     });
 
     // Listen for form service events
-    this.formService.on('form-validation-error', (errors) => {
+    this.formService.on('form-validation-error', errors => {
       this.handleFormValidationError(errors);
     });
 
     // Listen for cashier service events
-    this.cashierService.on('transaction-completed', (transaction) => {
+    this.cashierService.on('transaction-completed', transaction => {
       this.handleTransactionCompleted(transaction);
     });
 
@@ -296,7 +298,7 @@ export class CustomerInterfaceCore extends EventEmitter {
     this.logEvent({
       type: 'customer-updated',
       data: { action: 'created', customer },
-      timestamp: new Date()
+      timestamp: new Date(),
     });
     this.emit('customer-created', customer);
   }
@@ -306,7 +308,7 @@ export class CustomerInterfaceCore extends EventEmitter {
     this.logEvent({
       type: 'customer-updated',
       data: { action: 'updated', customer },
-      timestamp: new Date()
+      timestamp: new Date(),
     });
     this.emit('customer-updated', customer);
   }
@@ -322,7 +324,7 @@ export class CustomerInterfaceCore extends EventEmitter {
       type: 'error',
       title: 'Validation Error',
       message: 'Please correct the form errors and try again.',
-      duration: 5000
+      duration: 5000,
     });
   }
 

@@ -1692,3 +1692,32 @@ try {
                 const options = { method };
                 
                 if (body && (method === 'POST' || method === 'PUT')) {
+                    options.headers = { 'Content-Type': 'application/json' };
+                    options.body = body;
+                }
+
+                const response = await fetch(endpoint, options);
+                result = await response.json();
+
+                if (resultDiv) {
+                    resultDiv.innerHTML = `<pre>${JSON.stringify(result, null, 2)}</pre>`;
+                }
+
+                logActivity('api', `Custom request completed: ${response.status}`, 'success');
+            } catch (error) {
+                console.error('Custom request failed:', error);
+                logActivity('api', `Custom request failed: ${error.message}`, 'error');
+                if (resultDiv) {
+                    resultDiv.innerHTML = `<div style="color: red;">Error: ${error.message}</div>`;
+                }
+            }
+        };
+
+        // Initialize the test suite
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Enhanced Authentication Test Suite initialized');
+            logActivity('system', 'Test suite initialized', 'info');
+        });
+    </script>
+</body>
+</html>

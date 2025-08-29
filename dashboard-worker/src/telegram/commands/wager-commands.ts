@@ -3,11 +3,7 @@
  * Handles betting-related commands and wager management
  */
 
-import type {
-  CommandContext,
-  CommandResult,
-  TelegramCommand
-} from '../core/telegram-types';
+import type { CommandContext, CommandResult, TelegramCommand } from '../core/telegram-types';
 
 export class WagerCommands {
   private commands: TelegramCommand[] = [
@@ -16,36 +12,36 @@ export class WagerCommands {
       description: 'View your recent wagers',
       usage: '/wagers [limit]',
       requiresAuth: true,
-      examples: ['/wagers', '/wagers 10']
+      examples: ['/wagers', '/wagers 10'],
     },
     {
       name: 'vip',
       description: 'Access VIP features and benefits',
       usage: '/vip',
       requiresAuth: true,
-      examples: ['/vip']
+      examples: ['/vip'],
     },
     {
       name: 'groups',
       description: 'Join betting groups and communities',
       usage: '/groups',
       requiresAuth: true,
-      examples: ['/groups']
+      examples: ['/groups'],
     },
     {
       name: 'affiliate',
       description: 'Access affiliate program',
       usage: '/affiliate',
       requiresAuth: true,
-      examples: ['/affiliate']
+      examples: ['/affiliate'],
     },
     {
       name: 'commission',
       description: 'View commission earnings',
       usage: '/commission',
       requiresAuth: true,
-      examples: ['/commission']
-    }
+      examples: ['/commission'],
+    },
   ];
 
   /**
@@ -63,7 +59,7 @@ export class WagerCommands {
       if (!context.isAuthenticated) {
         return {
           success: false,
-          error: 'Please register your account first using /register'
+          error: 'Please register your account first using /register',
         };
       }
 
@@ -73,28 +69,40 @@ export class WagerCommands {
       if (wagers.length === 0) {
         return {
           success: true,
-          response: '📭 No recent wagers found. Ready to place your first bet?\n\nUse /casino for casino games or check live sports odds!'
+          response:
+            '📭 No recent wagers found. Ready to place your first bet?\n\nUse /casino for casino games or check live sports odds!',
         };
       }
 
-      const wagersList = wagers.map((wager, index) => {
-        const statusEmoji = {
-          'won': '✅',
-          'lost': '❌',
-          'pending': '⏳',
-          'cancelled': '🚫'
-        }[wager.status] || '❓';
+      const wagersList = wagers
+        .map((wager, index) => {
+          const statusEmoji =
+            {
+              won: '✅',
+              lost: '❌',
+              pending: '⏳',
+              cancelled: '🚫',
+            }[wager.status] || '❓';
 
-        const profit = wager.status === 'won' ? `+$${wager.profit.toFixed(2)}` :
-                     wager.status === 'lost' ? `-$${wager.amount.toFixed(2)}` : 'Pending';
+          const profit =
+            wager.status === 'won'
+              ? `+$${wager.profit.toFixed(2)}`
+              : wager.status === 'lost'
+                ? `-$${wager.amount.toFixed(2)}`
+                : 'Pending';
 
-        return `${index + 1}. ${statusEmoji} ${wager.event}\n` +
-               `   💰 $${wager.amount.toFixed(2)} → ${profit}\n` +
-               `   📅 ${new Date(wager.date).toLocaleDateString()}\n`;
-      }).join('\n');
+          return (
+            `${index + 1}. ${statusEmoji} ${wager.event}\n` +
+            `   💰 $${wager.amount.toFixed(2)} → ${profit}\n` +
+            `   📅 ${new Date(wager.date).toLocaleDateString()}\n`
+          );
+        })
+        .join('\n');
 
       const totalAmount = wagers.reduce((sum, w) => sum + w.amount, 0);
-      const wonAmount = wagers.filter(w => w.status === 'won').reduce((sum, w) => sum + w.profit, 0);
+      const wonAmount = wagers
+        .filter(w => w.status === 'won')
+        .reduce((sum, w) => sum + w.profit, 0);
 
       const summaryMessage = `
 🎯 Your Recent Wagers
@@ -115,13 +123,13 @@ ${wagersList}
 
       return {
         success: true,
-        response: summaryMessage
+        response: summaryMessage,
       };
     } catch (error) {
       console.error('Error handling wagers command:', error);
       return {
         success: false,
-        error: 'Failed to retrieve wager information'
+        error: 'Failed to retrieve wager information',
       };
     }
   }
@@ -134,7 +142,7 @@ ${wagersList}
       if (!context.isAuthenticated) {
         return {
           success: false,
-          error: 'Please register your account first using /register'
+          error: 'Please register your account first using /register',
         };
       }
 
@@ -173,7 +181,7 @@ Questions? Contact our VIP concierge team.
 
         return {
           success: true,
-          response: nonVipMessage
+          response: nonVipMessage,
         };
       }
 
@@ -205,13 +213,13 @@ Contact your personal VIP concierge or use our 24/7 priority support line.
 
       return {
         success: true,
-        response: vipMessage
+        response: vipMessage,
       };
     } catch (error) {
       console.error('Error handling VIP command:', error);
       return {
         success: false,
-        error: 'Failed to retrieve VIP information'
+        error: 'Failed to retrieve VIP information',
       };
     }
   }
@@ -224,7 +232,7 @@ Contact your personal VIP concierge or use our 24/7 priority support line.
       if (!context.isAuthenticated) {
         return {
           success: false,
-          error: 'Please register your account first using /register'
+          error: 'Please register your account first using /register',
         };
       }
 
@@ -235,13 +243,17 @@ Contact your personal VIP concierge or use our 24/7 priority support line.
 
 Join exclusive betting communities and connect with fellow bettors!
 
-${groups.map((group, index) => `
+${groups
+  .map(
+    (group, index) => `
 ${index + 1}. ${group.emoji} ${group.name}
    ${group.description}
    👥 ${group.members} members
    📊 Win Rate: ${(group.avgWinRate * 100).toFixed(1)}%
    ${group.isJoined ? '✅ Joined' : `🔗 /join_group_${group.id}`}
-`).join('\n')}
+`
+  )
+  .join('\n')}
 
 🎯 Popular Groups:
 • NFL Sunday Squad - Weekly NFL discussions
@@ -262,13 +274,13 @@ ${index + 1}. ${group.emoji} ${group.name}
 
       return {
         success: true,
-        response: groupsMessage
+        response: groupsMessage,
       };
     } catch (error) {
       console.error('Error handling groups command:', error);
       return {
         success: false,
-        error: 'Failed to retrieve groups information'
+        error: 'Failed to retrieve groups information',
       };
     }
   }
@@ -281,7 +293,7 @@ ${index + 1}. ${group.emoji} ${group.name}
       if (!context.isAuthenticated) {
         return {
           success: false,
-          error: 'Please register your account first using /register'
+          error: 'Please register your account first using /register',
         };
       }
 
@@ -292,7 +304,9 @@ ${index + 1}. ${group.emoji} ${group.name}
 
 Earn commission by referring friends and fellow bettors!
 
-${affiliateInfo.isActive ? `
+${
+  affiliateInfo.isActive
+    ? `
 🎉 You're an active affiliate!
 
 📊 Your Stats:
@@ -312,7 +326,8 @@ ${affiliateInfo.isActive ? `
 
 📈 Recent Activity:
 ${affiliateInfo.recentActivity.map(activity => `• ${activity}`).join('\n')}
-` : `
+`
+    : `
 🚀 Join Our Affiliate Program!
 
 Earn money by bringing friends to Fire22!
@@ -330,7 +345,8 @@ Earn money by bringing friends to Fire22!
 
 📞 Ready to start earning?
 Contact our affiliate team or use /register to get started!
-`}
+`
+}
 
 🔗 Your Referral Link: https://fire22.com/ref/${affiliateInfo.referralCode || 'YOUR_CODE'}
 
@@ -339,13 +355,13 @@ Contact our affiliate team or use /register to get started!
 
       return {
         success: true,
-        response: affiliateMessage
+        response: affiliateMessage,
       };
     } catch (error) {
       console.error('Error handling affiliate command:', error);
       return {
         success: false,
-        error: 'Failed to retrieve affiliate information'
+        error: 'Failed to retrieve affiliate information',
       };
     }
   }
@@ -358,7 +374,7 @@ Contact our affiliate team or use /register to get started!
       if (!context.isAuthenticated) {
         return {
           success: false,
-          error: 'Please register your account first using /register'
+          error: 'Please register your account first using /register',
         };
       }
 
@@ -367,13 +383,17 @@ Contact our affiliate team or use /register to get started!
       if (commissions.length === 0) {
         return {
           success: true,
-          response: '📊 Commission History\n\nNo commission earnings yet. Start referring friends to earn!\n\nUse /affiliate to learn more about our affiliate program.'
+          response:
+            '📊 Commission History\n\nNo commission earnings yet. Start referring friends to earn!\n\nUse /affiliate to learn more about our affiliate program.',
         };
       }
 
-      const commissionList = commissions.map((comm, index) =>
-        `${index + 1}. 💰 $${comm.amount.toFixed(2)} - ${comm.description}\n   📅 ${new Date(comm.date).toLocaleDateString()}`
-      ).join('\n');
+      const commissionList = commissions
+        .map(
+          (comm, index) =>
+            `${index + 1}. 💰 $${comm.amount.toFixed(2)} - ${comm.description}\n   📅 ${new Date(comm.date).toLocaleDateString()}`
+        )
+        .join('\n');
 
       const totalCommission = commissions.reduce((sum, comm) => sum + comm.amount, 0);
       const thisMonth = commissions
@@ -410,27 +430,32 @@ Questions? Contact affiliate support!
 
       return {
         success: true,
-        response: commissionMessage
+        response: commissionMessage,
       };
     } catch (error) {
       console.error('Error handling commission command:', error);
       return {
         success: false,
-        error: 'Failed to retrieve commission information'
+        error: 'Failed to retrieve commission information',
       };
     }
   }
 
   // Private helper methods
 
-  private async getUserWagers(userId: number, limit: number): Promise<Array<{
-    id: string;
-    event: string;
-    amount: number;
-    profit: number;
-    status: string;
-    date: string;
-  }>> {
+  private async getUserWagers(
+    userId: number,
+    limit: number
+  ): Promise<
+    Array<{
+      id: string;
+      event: string;
+      amount: number;
+      profit: number;
+      status: string;
+      date: string;
+    }>
+  > {
     // Simulate wager history
     return [
       {
@@ -439,7 +464,7 @@ Questions? Contact affiliate support!
         amount: 100,
         profit: 167,
         status: 'won',
-        date: '2024-01-25T13:30:00Z'
+        date: '2024-01-25T13:30:00Z',
       },
       {
         id: 'WAG002',
@@ -447,7 +472,7 @@ Questions? Contact affiliate support!
         amount: 50,
         profit: -50,
         status: 'lost',
-        date: '2024-01-24T20:00:00Z'
+        date: '2024-01-24T20:00:00Z',
       },
       {
         id: 'WAG003',
@@ -455,8 +480,8 @@ Questions? Contact affiliate support!
         amount: 75,
         profit: 0,
         status: 'pending',
-        date: '2024-01-26T16:25:00Z'
-      }
+        date: '2024-01-26T16:25:00Z',
+      },
     ].slice(0, limit);
   }
 
@@ -480,39 +505,38 @@ Questions? Contact affiliate support!
 
     return {
       isVIP,
-      tier: isVIP ? ['bronze', 'silver', 'gold', 'platinum'][Math.floor(Math.random() * 4)] : undefined,
+      tier: isVIP
+        ? ['bronze', 'silver', 'gold', 'platinum'][Math.floor(Math.random() * 4)]
+        : undefined,
       exclusiveOddsCount: isVIP ? Math.floor(Math.random() * 20) + 5 : 0,
       monthlyBonus: isVIP ? Math.random() * 500 + 100 : 0,
       maxBetLimit: isVIP ? 10000 : 1000,
-      achievements: isVIP ? [
-        'First Win Streak',
-        'High Roller Status',
-        'Consistent Profit',
-        'Sports Expert'
-      ] : [],
-      promotions: isVIP ? [
-        'VIP Weekend Bonus',
-        'Exclusive Tournament Access',
-        'Priority Support Line'
-      ] : [],
+      achievements: isVIP
+        ? ['First Win Streak', 'High Roller Status', 'Consistent Profit', 'Sports Expert']
+        : [],
+      promotions: isVIP
+        ? ['VIP Weekend Bonus', 'Exclusive Tournament Access', 'Priority Support Line']
+        : [],
       stats: {
         wagersPlaced: Math.floor(Math.random() * 200) + 20,
         avgBalance: Math.random() * 5000 + 1000,
         winRate: Math.random() * 0.3 + 0.5,
-        monthlyDeposits: Math.random() * 10000 + 1000
-      }
+        monthlyDeposits: Math.random() * 10000 + 1000,
+      },
     };
   }
 
-  private async getAvailableGroups(userId: number): Promise<Array<{
-    id: string;
-    name: string;
-    description: string;
-    emoji: string;
-    members: number;
-    avgWinRate: number;
-    isJoined: boolean;
-  }>> {
+  private async getAvailableGroups(userId: number): Promise<
+    Array<{
+      id: string;
+      name: string;
+      description: string;
+      emoji: string;
+      members: number;
+      avgWinRate: number;
+      isJoined: boolean;
+    }>
+  > {
     // Simulate available groups
     return [
       {
@@ -522,7 +546,7 @@ Questions? Contact affiliate support!
         emoji: '🏈',
         members: 1247,
         avgWinRate: 0.58,
-        isJoined: Math.random() > 0.5
+        isJoined: Math.random() > 0.5,
       },
       {
         id: 'nba_nights',
@@ -531,7 +555,7 @@ Questions? Contact affiliate support!
         emoji: '🏀',
         members: 892,
         avgWinRate: 0.62,
-        isJoined: Math.random() > 0.5
+        isJoined: Math.random() > 0.5,
       },
       {
         id: 'soccer_syndicate',
@@ -540,8 +564,8 @@ Questions? Contact affiliate support!
         emoji: '⚽',
         members: 2156,
         avgWinRate: 0.55,
-        isJoined: Math.random() > 0.5
-      }
+        isJoined: Math.random() > 0.5,
+      },
     ];
   }
 
@@ -566,28 +590,37 @@ Questions? Contact affiliate support!
       activeReferrals: isActive ? Math.floor(Math.random() * 30) + 2 : 0,
       totalCommission: isActive ? Math.random() * 2500 + 500 : 0,
       monthlyCommission: isActive ? Math.random() * 300 + 50 : 0,
-      tier: isActive ? ['Bronze', 'Silver', 'Gold', 'Platinum'][Math.floor(Math.random() * 4)] : 'Inactive',
-      commissionRate: isActive ? [0.15, 0.20, 0.25, 0.30][Math.floor(Math.random() * 4)] : 0,
-      recentActivity: isActive ? [
-        'Referral bonus: $25.00',
-        'New signup: john_doe',
-        'Commission payout: $150.00',
-        'Tier upgrade bonus: $50.00'
-      ] : []
+      tier: isActive
+        ? ['Bronze', 'Silver', 'Gold', 'Platinum'][Math.floor(Math.random() * 4)]
+        : 'Inactive',
+      commissionRate: isActive ? [0.15, 0.2, 0.25, 0.3][Math.floor(Math.random() * 4)] : 0,
+      recentActivity: isActive
+        ? [
+            'Referral bonus: $25.00',
+            'New signup: john_doe',
+            'Commission payout: $150.00',
+            'Tier upgrade bonus: $50.00',
+          ]
+        : [],
     };
   }
 
-  private async getCommissionHistory(userId: number, limit: number): Promise<Array<{
-    amount: number;
-    description: string;
-    date: string;
-  }>> {
+  private async getCommissionHistory(
+    userId: number,
+    limit: number
+  ): Promise<
+    Array<{
+      amount: number;
+      description: string;
+      date: string;
+    }>
+  > {
     // Simulate commission history
     return [
-      { amount: 25.50, description: 'Referral bonus - New signup', date: '2024-01-25T10:30:00Z' },
+      { amount: 25.5, description: 'Referral bonus - New signup', date: '2024-01-25T10:30:00Z' },
       { amount: 15.75, description: 'Commission - Sports bet', date: '2024-01-24T14:20:00Z' },
-      { amount: 42.00, description: 'Tier upgrade bonus', date: '2024-01-20T09:15:00Z' },
-      { amount: 8.25, description: 'Commission - Casino bet', date: '2024-01-18T16:45:00Z' }
+      { amount: 42.0, description: 'Tier upgrade bonus', date: '2024-01-20T09:15:00Z' },
+      { amount: 8.25, description: 'Commission - Casino bet', date: '2024-01-18T16:45:00Z' },
     ].slice(0, limit);
   }
 

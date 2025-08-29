@@ -10,7 +10,7 @@ import type {
   ApiResponse,
   PaginationParams,
   DateRangeParams,
-  FilterParams
+  FilterParams,
 } from '../../../../core/types/controllers';
 
 /**
@@ -31,7 +31,7 @@ export async function getAdjustmentHistory(
         customerId: 'CUST_001',
         agentId: 'AGENT_001',
         adjustmentType: 'bonus_credit',
-        amount: 50.00,
+        amount: 50.0,
         reason: 'Loyalty bonus',
         description: 'Monthly loyalty bonus for active customer',
         status: 'approved',
@@ -45,7 +45,7 @@ export async function getAdjustmentHistory(
         updatedAt: new Date('2025-01-24T10:35:00Z'),
         isActive: true,
         createdBy: 'system',
-        updatedBy: 'system'
+        updatedBy: 'system',
       },
       {
         id: 'adj_002',
@@ -53,7 +53,7 @@ export async function getAdjustmentHistory(
         customerId: 'CUST_002',
         agentId: 'AGENT_002',
         adjustmentType: 'account_correction',
-        amount: -25.00,
+        amount: -25.0,
         reason: 'Processing error correction',
         description: 'Correcting duplicate charge from wager processing',
         status: 'pending',
@@ -63,8 +63,8 @@ export async function getAdjustmentHistory(
         updatedAt: new Date('2025-01-25T14:00:00Z'),
         isActive: true,
         createdBy: 'system',
-        updatedBy: 'system'
-      }
+        updatedBy: 'system',
+      },
     ];
 
     // Apply filters
@@ -79,15 +79,11 @@ export async function getAdjustmentHistory(
     }
 
     if (dateFrom) {
-      filteredAdjustments = filteredAdjustments.filter(a =>
-        a.createdAt >= dateFrom
-      );
+      filteredAdjustments = filteredAdjustments.filter(a => a.createdAt >= dateFrom);
     }
 
     if (dateTo) {
-      filteredAdjustments = filteredAdjustments.filter(a =>
-        a.createdAt <= dateTo
-      );
+      filteredAdjustments = filteredAdjustments.filter(a => a.createdAt <= dateTo);
     }
 
     // Sort by creation date (newest first)
@@ -109,11 +105,12 @@ export async function getAdjustmentHistory(
       data: {
         adjustments: paginatedAdjustments,
         pendingCount: mockAdjustments.filter(a => a.status === 'pending').length,
-        approvedToday: mockAdjustments.filter(a =>
-          a.status === 'approved' &&
-          a.approvedAt &&
-          a.approvedAt.toDateString() === new Date().toDateString()
-        ).length
+        approvedToday: mockAdjustments.filter(
+          a =>
+            a.status === 'approved' &&
+            a.approvedAt &&
+            a.approvedAt.toDateString() === new Date().toDateString()
+        ).length,
       },
       metadata: {
         timestamp: new Date(),
@@ -123,16 +120,15 @@ export async function getAdjustmentHistory(
           page,
           limit,
           total,
-          totalPages
-        }
-      }
+          totalPages,
+        },
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     const errorResponse: ApiResponse = {
       status: 'error',
@@ -141,13 +137,13 @@ export async function getAdjustmentHistory(
       metadata: {
         timestamp: new Date(),
         requestId: `adjustment_history_error_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
@@ -169,7 +165,11 @@ export async function createAdjustment(
 ): Promise<Response> {
   try {
     // Validate adjustment data
-    if (!adjustmentData.customerId || !adjustmentData.adjustmentType || adjustmentData.amount === 0) {
+    if (
+      !adjustmentData.customerId ||
+      !adjustmentData.adjustmentType ||
+      adjustmentData.amount === 0
+    ) {
       const errorResponse: ApiResponse = {
         status: 'error',
         message: 'Invalid adjustment data',
@@ -177,13 +177,13 @@ export async function createAdjustment(
         metadata: {
           timestamp: new Date(),
           requestId: `create_adjustment_error_${Date.now()}`,
-          processingTime: 0
-        }
+          processingTime: 0,
+        },
       };
 
       return new Response(JSON.stringify(errorResponse), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
     }
 
@@ -207,7 +207,7 @@ export async function createAdjustment(
       updatedAt: new Date(),
       isActive: true,
       createdBy: 'system',
-      updatedBy: 'system'
+      updatedBy: 'system',
     };
 
     const response: ApiResponse<AdjustmentRecord> = {
@@ -219,15 +219,14 @@ export async function createAdjustment(
       metadata: {
         timestamp: new Date(),
         requestId: `create_adjustment_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 201,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     const errorResponse: ApiResponse = {
       status: 'error',
@@ -236,13 +235,13 @@ export async function createAdjustment(
       metadata: {
         timestamp: new Date(),
         requestId: `create_adjustment_error_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
@@ -264,7 +263,7 @@ export async function approveAdjustment(
       customerId: 'CUST_001',
       agentId: 'AGENT_001',
       adjustmentType: 'bonus_credit',
-      amount: 50.00,
+      amount: 50.0,
       reason: 'Loyalty bonus',
       description: 'Monthly loyalty bonus',
       status: action === 'approve' ? 'approved' : 'rejected',
@@ -277,7 +276,7 @@ export async function approveAdjustment(
       updatedAt: new Date(),
       isActive: true,
       createdBy: 'system',
-      updatedBy: 'system'
+      updatedBy: 'system',
     };
 
     const response: ApiResponse<AdjustmentRecord> = {
@@ -287,15 +286,14 @@ export async function approveAdjustment(
       metadata: {
         timestamp: new Date(),
         requestId: `approve_adjustment_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     const errorResponse: ApiResponse = {
       status: 'error',
@@ -304,13 +302,13 @@ export async function approveAdjustment(
       metadata: {
         timestamp: new Date(),
         requestId: `approve_adjustment_error_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
@@ -331,7 +329,7 @@ export async function getAdjustmentTypes(request: ControllerRequest): Promise<Re
         minAmount: 1,
         active: true,
         createdBy: 'system',
-        createdAt: new Date('2025-01-01')
+        createdAt: new Date('2025-01-01'),
       },
       {
         id: 'account_correction',
@@ -343,7 +341,7 @@ export async function getAdjustmentTypes(request: ControllerRequest): Promise<Re
         minAmount: -5000,
         active: true,
         createdBy: 'system',
-        createdAt: new Date('2025-01-01')
+        createdAt: new Date('2025-01-01'),
       },
       {
         id: 'loyalty_reward',
@@ -355,7 +353,7 @@ export async function getAdjustmentTypes(request: ControllerRequest): Promise<Re
         minAmount: 10,
         active: true,
         createdBy: 'system',
-        createdAt: new Date('2025-01-01')
+        createdAt: new Date('2025-01-01'),
       },
       {
         id: 'vip_upgrade_bonus',
@@ -367,8 +365,8 @@ export async function getAdjustmentTypes(request: ControllerRequest): Promise<Re
         minAmount: 100,
         active: true,
         createdBy: 'system',
-        createdAt: new Date('2025-01-01')
-      }
+        createdAt: new Date('2025-01-01'),
+      },
     ];
 
     const response: ApiResponse<AdjustmentType[]> = {
@@ -378,15 +376,14 @@ export async function getAdjustmentTypes(request: ControllerRequest): Promise<Re
       metadata: {
         timestamp: new Date(),
         requestId: `adjustment_types_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     const errorResponse: ApiResponse = {
       status: 'error',
@@ -395,13 +392,13 @@ export async function getAdjustmentTypes(request: ControllerRequest): Promise<Re
       metadata: {
         timestamp: new Date(),
         requestId: `adjustment_types_error_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
@@ -409,7 +406,10 @@ export async function getAdjustmentTypes(request: ControllerRequest): Promise<Re
 /**
  * Get adjustment statistics
  */
-export async function getAdjustmentStats(request: ControllerRequest, params: DateRangeParams): Promise<Response> {
+export async function getAdjustmentStats(
+  request: ControllerRequest,
+  params: DateRangeParams
+): Promise<Response> {
   try {
     // Mock statistics
     const mockStats = {
@@ -417,15 +417,15 @@ export async function getAdjustmentStats(request: ControllerRequest, params: Dat
       pendingCount: 12,
       approvedCount: 118,
       rejectedCount: 15,
-      totalAmount: 45670.50,
+      totalAmount: 45670.5,
       averageAmount: 315.66,
       adjustmentsByType: {
         bonus_credit: 45,
         account_correction: 32,
-        loyalty_reward: 68
+        loyalty_reward: 68,
       },
       approvalRate: 88.7,
-      averageProcessingTime: 2.4 // hours
+      averageProcessingTime: 2.4, // hours
     };
 
     const response: ApiResponse<typeof mockStats> = {
@@ -435,15 +435,14 @@ export async function getAdjustmentStats(request: ControllerRequest, params: Dat
       metadata: {
         timestamp: new Date(),
         requestId: `adjustment_stats_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     const errorResponse: ApiResponse = {
       status: 'error',
@@ -452,13 +451,13 @@ export async function getAdjustmentStats(request: ControllerRequest, params: Dat
       metadata: {
         timestamp: new Date(),
         requestId: `adjustment_stats_error_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }

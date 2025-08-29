@@ -1,17 +1,19 @@
 # 🔑 Communications Department Access Credentials Template
+
 **FIRE22 SECURE EMAIL SYSTEM**
 
 ---
 
 **DEPARTMENT**: Communications Department  
 **EMAIL DOMAIN**: communications@fire22.com  
-**SECURITY TIER**: TIER_2_HIGH  
+**SECURITY TIER**: TIER_2_HIGH
 
 ---
 
 ## 👤 **USER ACCESS TEMPLATE**
 
 ### **Primary Department Head**
+
 - **Name**: Sarah Martinez
 - **Email**: sarah.martinez@communications.fire22
 - **Role**: Department Administrator
@@ -39,6 +41,7 @@
 ## 🔐 **SECURITY CONFIGURATION**
 
 ### **Authentication Requirements**
+
 - **Multi-Factor Authentication**: REQUIRED
 - **Password Policy**: 12+ characters, complexity required
 - **Session Timeout**: 8 hours
@@ -46,6 +49,7 @@
 - **Password Rotation**: Every 90 days
 
 ### **Access Permissions**
+
 - **Email Access**: Department-specific inbox
 - **Audit Logs**: Read-only access to own actions
 - **Backup Access**: Restore own emails only

@@ -115,7 +115,7 @@ export class ExcelExportService extends EventEmitter {
           Title: options.metadata.title,
           Author: options.metadata.author,
           CreatedDate: new Date(options.metadata.created),
-          Subject: options.metadata.description || 'Fire22 Data Export'
+          Subject: options.metadata.description || 'Fire22 Data Export',
         };
       }
 
@@ -129,7 +129,8 @@ export class ExcelExportService extends EventEmitter {
       }
 
       // Generate filename
-      const filename = options.filename || `fire22-export-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      const filename =
+        options.filename || `fire22-export-${new Date().toISOString().slice(0, 10)}.xlsx`;
 
       // Write file
       XLSX.writeFile(wb, filename);
@@ -139,12 +140,11 @@ export class ExcelExportService extends EventEmitter {
         filename,
         fileSize: this.estimateFileSize(options.sheets),
         sheets: options.sheets.length,
-        rows: totalRows
+        rows: totalRows,
       };
 
       this.emit('export-completed', result);
       return result;
-
     } catch (error) {
       const errorResult: ExportResult = {
         success: false,
@@ -152,7 +152,7 @@ export class ExcelExportService extends EventEmitter {
         fileSize: 0,
         sheets: 0,
         rows: 0,
-        error: error.message
+        error: error.message,
       };
 
       this.emit('export-error', errorResult);
@@ -172,9 +172,12 @@ export class ExcelExportService extends EventEmitter {
     if (sheet.columns && sheet.columns.length > 0) {
       // Add headers
       const headers = sheet.columns.map(col => col.header);
-      worksheetData = [headers, ...sheet.data.map(row =>
-        sheet.columns!.map(col => this.formatCellValue(row[col.key], col))
-      )];
+      worksheetData = [
+        headers,
+        ...sheet.data.map(row =>
+          sheet.columns!.map(col => this.formatCellValue(row[col.key], col))
+        ),
+      ];
     }
 
     // Create worksheet
@@ -183,7 +186,7 @@ export class ExcelExportService extends EventEmitter {
     // Apply column widths
     if (sheet.columns) {
       ws['!cols'] = sheet.columns.map(col => ({
-        wch: col.width || this.calculateColumnWidth(col.header)
+        wch: col.width || this.calculateColumnWidth(col.header),
       }));
     }
 
@@ -277,21 +280,24 @@ export class ExcelExportService extends EventEmitter {
     // Rough estimation: ~100 bytes per cell
     let totalCells = 0;
     sheets.forEach(sheet => {
-      totalCells += sheet.data.length * (sheet.columns?.length || Object.keys(sheet.data[0] || {}).length);
+      totalCells +=
+        sheet.data.length * (sheet.columns?.length || Object.keys(sheet.data[0] || {}).length);
     });
     return totalCells * 100;
   }
 
-  // ===== PREDEFINED EXPORT TEMPLATES =====
+  // !== PREDEFINED EXPORT TEMPLATES !==
 
   /**
    * Export Agent Management Data
    */
-  async exportAgentData(options: {
-    includeHierarchy?: boolean;
-    includePerformance?: boolean;
-    dateRange?: { start: string; end: string };
-  } = {}): Promise<ExportResult> {
+  async exportAgentData(
+    options: {
+      includeHierarchy?: boolean;
+      includePerformance?: boolean;
+      dateRange?: { start: string; end: string };
+    } = {}
+  ): Promise<ExportResult> {
     const sheets: ExcelSheet[] = [];
 
     try {
@@ -308,11 +314,11 @@ export class ExcelExportService extends EventEmitter {
           { key: 'agent_type', header: 'Type', width: 12 },
           { key: 'status', header: 'Status', width: 10 },
           { key: 'total_customers', header: 'Customers', width: 10, type: 'number' },
-          { key: 'performance_score', header: 'Performance', width: 12, type: 'number' }
+          { key: 'performance_score', header: 'Performance', width: 12, type: 'number' },
         ],
         formatting: {
-          headerStyle: { font: { bold: true }, fill: { fgColor: { rgb: 'FFE6E6FA' } } }
-        }
+          headerStyle: { font: { bold: true }, fill: { fgColor: { rgb: 'FFE6E6FA' } } },
+        },
       });
 
       // Performance Data Sheet
@@ -327,8 +333,8 @@ export class ExcelExportService extends EventEmitter {
             { key: 'agent_id', header: 'Agent ID', width: 15 },
             { key: 'total_commission', header: 'Commission', width: 12, type: 'currency' },
             { key: 'performance_score', header: 'Score', width: 8, type: 'number' },
-            { key: 'last_activity', header: 'Last Activity', width: 15, type: 'date' }
-          ]
+            { key: 'last_activity', header: 'Last Activity', width: 15, type: 'date' },
+          ],
         });
       }
 
@@ -339,10 +345,9 @@ export class ExcelExportService extends EventEmitter {
           title: 'Fire22 Agent Management Report',
           author: 'Fire22 System',
           created: new Date().toISOString(),
-          description: 'Comprehensive agent data and performance metrics'
-        }
+          description: 'Comprehensive agent data and performance metrics',
+        },
       });
-
     } catch (error) {
       throw new Error(`Failed to export agent data: ${error.message}`);
     }
@@ -351,44 +356,49 @@ export class ExcelExportService extends EventEmitter {
   /**
    * Export Customer Data
    */
-  async exportCustomerData(options: {
-    status?: string;
-    agentId?: string;
-    dateRange?: { start: string; end: string };
-  } = {}): Promise<ExportResult> {
+  async exportCustomerData(
+    options: {
+      status?: string;
+      agentId?: string;
+      dateRange?: { start: string; end: string };
+    } = {}
+  ): Promise<ExportResult> {
     try {
       const response = await fetch('/api/customers');
       const customers = await response.json();
 
-      const filteredCustomers = customers.results ?
-        customers.results.filter((c: any) => {
-          if (options.status && c.status !== options.status) return false;
-          if (options.agentId && c.agent_id !== options.agentId) return false;
-          return true;
-        }) : customers;
+      const filteredCustomers = customers.results
+        ? customers.results.filter((c: any) => {
+            if (options.status && c.status !== options.status) return false;
+            if (options.agentId && c.agent_id !== options.agentId) return false;
+            return true;
+          })
+        : customers;
 
-      const sheets: ExcelSheet[] = [{
-        name: 'Customer Data',
-        data: filteredCustomers,
-        columns: [
-          { key: 'customer_id', header: 'Customer ID', width: 15 },
-          { key: 'name', header: 'Name', width: 20 },
-          { key: 'balance', header: 'Balance', width: 12, type: 'currency' },
-          { key: 'status', header: 'Status', width: 10 },
-          { key: 'agent_id', header: 'Agent ID', width: 15 },
-          { key: 'tier', header: 'Tier', width: 10 },
-          { key: 'last_login', header: 'Last Login', width: 15, type: 'date' }
-        ],
-        formatting: {
-          headerStyle: { font: { bold: true }, fill: { fgColor: { rgb: 'FFE6F3FF' } } },
-          conditionalFormatting: [
-            {
-              condition: (value: any) => value === 'active',
-              style: { fill: { fgColor: { rgb: 'FFD4EDDA' } } }
-            }
-          ]
-        }
-      }];
+      const sheets: ExcelSheet[] = [
+        {
+          name: 'Customer Data',
+          data: filteredCustomers,
+          columns: [
+            { key: 'customer_id', header: 'Customer ID', width: 15 },
+            { key: 'name', header: 'Name', width: 20 },
+            { key: 'balance', header: 'Balance', width: 12, type: 'currency' },
+            { key: 'status', header: 'Status', width: 10 },
+            { key: 'agent_id', header: 'Agent ID', width: 15 },
+            { key: 'tier', header: 'Tier', width: 10 },
+            { key: 'last_login', header: 'Last Login', width: 15, type: 'date' },
+          ],
+          formatting: {
+            headerStyle: { font: { bold: true }, fill: { fgColor: { rgb: 'FFE6F3FF' } } },
+            conditionalFormatting: [
+              {
+                condition: (value: any) => value === 'active',
+                style: { fill: { fgColor: { rgb: 'FFD4EDDA' } } },
+              },
+            ],
+          },
+        },
+      ];
 
       return await this.exportToExcel({
         filename: `fire22-customers-${new Date().toISOString().slice(0, 10)}.xlsx`,
@@ -397,10 +407,9 @@ export class ExcelExportService extends EventEmitter {
           title: 'Fire22 Customer Report',
           author: 'Fire22 System',
           created: new Date().toISOString(),
-          description: 'Customer data and account information'
-        }
+          description: 'Customer data and account information',
+        },
       });
-
     } catch (error) {
       throw new Error(`Failed to export customer data: ${error.message}`);
     }
@@ -409,31 +418,35 @@ export class ExcelExportService extends EventEmitter {
   /**
    * Export Betting Activity Data
    */
-  async exportBettingData(options: {
-    dateRange?: { start: string; end: string };
-    agentId?: string;
-    includePending?: boolean;
-  } = {}): Promise<ExportResult> {
+  async exportBettingData(
+    options: {
+      dateRange?: { start: string; end: string };
+      agentId?: string;
+      includePending?: boolean;
+    } = {}
+  ): Promise<ExportResult> {
     try {
       const response = await fetch('/api/betting/ticker');
       const bettingData = await response.json();
 
-      const sheets: ExcelSheet[] = [{
-        name: 'Betting Activity',
-        data: bettingData.results || bettingData,
-        columns: [
-          { key: 'betId', header: 'Bet ID', width: 15 },
-          { key: 'customerId', header: 'Customer ID', width: 15 },
-          { key: 'agentId', header: 'Agent ID', width: 15 },
-          { key: 'amount', header: 'Amount', width: 12, type: 'currency' },
-          { key: 'odds', header: 'Odds', width: 10 },
-          { key: 'status', header: 'Status', width: 10 },
-          { key: 'timestamp', header: 'Timestamp', width: 15, type: 'date' }
-        ],
-        formatting: {
-          headerStyle: { font: { bold: true }, fill: { fgColor: { rgb: 'FFFFF0E6' } } }
-        }
-      }];
+      const sheets: ExcelSheet[] = [
+        {
+          name: 'Betting Activity',
+          data: bettingData.results || bettingData,
+          columns: [
+            { key: 'betId', header: 'Bet ID', width: 15 },
+            { key: 'customerId', header: 'Customer ID', width: 15 },
+            { key: 'agentId', header: 'Agent ID', width: 15 },
+            { key: 'amount', header: 'Amount', width: 12, type: 'currency' },
+            { key: 'odds', header: 'Odds', width: 10 },
+            { key: 'status', header: 'Status', width: 10 },
+            { key: 'timestamp', header: 'Timestamp', width: 15, type: 'date' },
+          ],
+          formatting: {
+            headerStyle: { font: { bold: true }, fill: { fgColor: { rgb: 'FFFFF0E6' } } },
+          },
+        },
+      ];
 
       return await this.exportToExcel({
         filename: `fire22-betting-${new Date().toISOString().slice(0, 10)}.xlsx`,
@@ -442,10 +455,9 @@ export class ExcelExportService extends EventEmitter {
           title: 'Fire22 Betting Activity Report',
           author: 'Fire22 System',
           created: new Date().toISOString(),
-          description: 'Betting activity and transaction data'
-        }
+          description: 'Betting activity and transaction data',
+        },
       });
-
     } catch (error) {
       throw new Error(`Failed to export betting data: ${error.message}`);
     }
@@ -462,7 +474,7 @@ export class ExcelExportService extends EventEmitter {
       const [agentData, customerData, bettingData] = await Promise.all([
         this.fetchAgentSummary(),
         this.fetchCustomerSummary(),
-        this.fetchBettingSummary()
+        this.fetchBettingSummary(),
       ]);
 
       // System Overview Sheet
@@ -472,16 +484,20 @@ export class ExcelExportService extends EventEmitter {
           { metric: 'Total Agents', value: agentData.totalAgents, category: 'Agents' },
           { metric: 'Active Agents', value: agentData.activeAgents, category: 'Agents' },
           { metric: 'Total Customers', value: customerData.totalCustomers, category: 'Customers' },
-          { metric: 'Active Customers', value: customerData.activeCustomers, category: 'Customers' },
+          {
+            metric: 'Active Customers',
+            value: customerData.activeCustomers,
+            category: 'Customers',
+          },
           { metric: 'Daily Volume', value: bettingData.dailyVolume, category: 'Betting' },
           { metric: 'Active Bets', value: bettingData.activeBets, category: 'Betting' },
-          { metric: 'Win Rate', value: bettingData.winRate, category: 'Betting' }
+          { metric: 'Win Rate', value: bettingData.winRate, category: 'Betting' },
         ],
         columns: [
           { key: 'category', header: 'Category', width: 15 },
           { key: 'metric', header: 'Metric', width: 20 },
-          { key: 'value', header: 'Value', width: 15 }
-        ]
+          { key: 'value', header: 'Value', width: 15 },
+        ],
       });
 
       // Add detailed sheets
@@ -496,10 +512,9 @@ export class ExcelExportService extends EventEmitter {
           title: 'Fire22 Complete System Report',
           author: 'Fire22 System',
           created: new Date().toISOString(),
-          description: 'Comprehensive system data and analytics report'
-        }
+          description: 'Comprehensive system data and analytics report',
+        },
       });
-
     } catch (error) {
       throw new Error(`Failed to export system report: ${error.message}`);
     }
@@ -557,11 +572,12 @@ export async function exportAnalyticsData(format: string = 'excel'): Promise<voi
 
     if (result.success) {
       console.log(`✅ Export completed: ${result.filename}`);
-      alert(`📊 Export Complete!\n\n📁 File: ${result.filename}\n📊 Sheets: ${result.sheets}\n📈 Rows: ${result.rows}\n💾 Size: ${Math.round(result.fileSize / 1024)}KB`);
+      alert(
+        `📊 Export Complete!\n\n📁 File: ${result.filename}\n📊 Sheets: ${result.sheets}\n📈 Rows: ${result.rows}\n💾 Size: ${Math.round(result.fileSize / 1024)}KB`
+      );
     } else {
       throw new Error(result.error || 'Export failed');
     }
-
   } catch (error) {
     console.error('Export failed:', error);
     alert(`❌ Export Failed\n\n${error.message}`);

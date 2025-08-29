@@ -1,7 +1,7 @@
 // Fire22 Dashboard Worker - Real-time Task Updates with Server-Sent Events
 // Live task updates for collaborative task management
 
-import { SQL } from "bun";
+import { SQL } from 'bun';
 import { Env } from '../types/env';
 import { getDatabase } from '../database/connection';
 import { TaskResponse } from './tasks-enhanced';
@@ -14,7 +14,13 @@ import { TaskResponse } from './tasks-enhanced';
  */
 
 export interface TaskEvent {
-  type: 'task_created' | 'task_updated' | 'task_deleted' | 'task_assigned' | 'task_progress' | 'task_comment';
+  type:
+    | 'task_created'
+    | 'task_updated'
+    | 'task_deleted'
+    | 'task_assigned'
+    | 'task_progress'
+    | 'task_comment';
   taskUuid: string;
   task?: TaskResponse;
   changes?: Record<string, { from: any; to: any }>;
@@ -35,11 +41,14 @@ export interface TaskEventFilter {
 
 export class TaskEventService {
   private db: SQL;
-  private activeConnections = new Map<string, {
-    controller: ReadableStreamDefaultController;
-    filters: TaskEventFilter;
-    lastHeartbeat: Date;
-  }>();
+  private activeConnections = new Map<
+    string,
+    {
+      controller: ReadableStreamDefaultController;
+      filters: TaskEventFilter;
+      lastHeartbeat: Date;
+    }
+  >();
 
   constructor(db: SQL) {
     this.db = db;
@@ -51,27 +60,29 @@ export class TaskEventService {
    */
   createEventStream(filters: TaskEventFilter = {}): ReadableStream {
     const connectionId = `task-events-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
+
     return new ReadableStream({
-      start: (controller) => {
+      start: controller => {
         console.log(`📡 New task event stream connection: ${connectionId}`);
-        
+
         // Store connection
         this.activeConnections.set(connectionId, {
           controller,
           filters,
-          lastHeartbeat: new Date()
+          lastHeartbeat: new Date(),
         });
 
         // Send initial connection message
-        controller.enqueue(this.formatSSEMessage({
-          type: 'connection',
-          data: {
-            connectionId,
-            filters,
-            timestamp: new Date().toISOString()
-          }
-        }));
+        controller.enqueue(
+          this.formatSSEMessage({
+            type: 'connection',
+            data: {
+              connectionId,
+              filters,
+              timestamp: new Date().toISOString(),
+            },
+          })
+        );
 
         // Send initial task stats
         this.sendInitialStats(controller, filters);
@@ -80,7 +91,7 @@ export class TaskEventService {
       cancel: () => {
         console.log(`🔌 Task event stream disconnected: ${connectionId}`);
         this.activeConnections.delete(connectionId);
-      }
+      },
     });
   }
 
@@ -90,7 +101,7 @@ export class TaskEventService {
   async broadcastTaskEvent(event: TaskEvent): Promise<void> {
     const message = this.formatSSEMessage({
       type: 'task_event',
-      data: event
+      data: event,
     });
 
     const disconnectedConnections: string[] = [];
@@ -113,7 +124,9 @@ export class TaskEventService {
       this.activeConnections.delete(id);
     });
 
-    console.log(`📤 Broadcasted ${event.type} event to ${this.activeConnections.size} active connections`);
+    console.log(
+      `📤 Broadcasted ${event.type} event to ${this.activeConnections.size} active connections`
+    );
   }
 
   /**
@@ -124,8 +137,8 @@ export class TaskEventService {
       type: 'heartbeat',
       data: {
         timestamp: new Date().toISOString(),
-        activeConnections: this.activeConnections.size
-      }
+        activeConnections: this.activeConnections.size,
+      },
     });
 
     const disconnectedConnections: string[] = [];
@@ -156,12 +169,15 @@ export class TaskEventService {
         id,
         filters: conn.filters,
         lastHeartbeat: conn.lastHeartbeat,
-        age: Date.now() - conn.lastHeartbeat.getTime()
-      }))
+        age: Date.now() - conn.lastHeartbeat.getTime(),
+      })),
     };
   }
 
-  private async sendInitialStats(controller: ReadableStreamDefaultController, filters: TaskEventFilter): Promise<void> {
+  private async sendInitialStats(
+    controller: ReadableStreamDefaultController,
+    filters: TaskEventFilter
+  ): Promise<void> {
     try {
       // Get quick task stats
       let departmentFilter = '';
@@ -185,21 +201,22 @@ export class TaskEventService {
         ORDER BY count DESC
       `;
 
-      const stats = await this.db.query(statsQuery, params) as any[];
+      const stats = (await this.db.query(statsQuery, params)) as any[];
 
-      controller.enqueue(this.formatSSEMessage({
-        type: 'initial_stats',
-        data: {
-          timestamp: new Date().toISOString(),
-          stats: stats.map(row => ({
-            department: row.department_name,
-            status: row.status,
-            priority: row.priority,
-            count: row.count
-          }))
-        }
-      }));
-
+      controller.enqueue(
+        this.formatSSEMessage({
+          type: 'initial_stats',
+          data: {
+            timestamp: new Date().toISOString(),
+            stats: stats.map(row => ({
+              department: row.department_name,
+              status: row.status,
+              priority: row.priority,
+              count: row.count,
+            })),
+          },
+        })
+      );
     } catch (error) {
       console.error('Error sending initial stats:', error);
     }
@@ -258,7 +275,9 @@ export class TaskEventService {
       });
 
       if (staleConnections.length > 0) {
-        console.log(`🧹 Cleaned up ${staleConnections.length} stale connections, ${this.activeConnections.size} remain active`);
+        console.log(
+          `🧹 Cleaned up ${staleConnections.length} stale connections, ${this.activeConnections.size} remain active`
+        );
       }
     }, 300000);
   }
@@ -276,15 +295,15 @@ export function getTaskEventService(db: Database): TaskEventService {
 
 // Helper function to trigger events from other services
 export async function emitTaskEvent(
-  db: SQL, 
+  db: SQL,
   event: Omit<TaskEvent, 'timestamp'>,
   env: Env
 ): Promise<void> {
   const eventService = getTaskEventService(db);
-  
+
   await eventService.broadcastTaskEvent({
     ...event,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 }
 
@@ -319,26 +338,28 @@ export async function handleTaskEventsSSE(request: Request, env: Env): Promise<R
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Cache-Control',
-        'Access-Control-Expose-Headers': 'Content-Type'
-      }
+        'Access-Control-Expose-Headers': 'Content-Type',
+      },
     });
-
   } catch (error) {
     console.error('Task Events SSE Error:', error);
-    
-    return new Response(JSON.stringify({
-      success: false,
-      error: error instanceof Error ? error.message : 'Internal server error'
-    }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : 'Internal server error',
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
       }
-    });
+    );
   }
 }
 
@@ -351,28 +372,33 @@ export async function handleTaskEventsStats(request: Request, env: Env): Promise
 
     const stats = eventService.getConnectionStats();
 
-    return new Response(JSON.stringify({
-      success: true,
-      ...stats
-    }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+    return new Response(
+      JSON.stringify({
+        success: true,
+        ...stats,
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
       }
-    });
-
+    );
   } catch (error) {
     console.error('Task Events Stats Error:', error);
-    
-    return new Response(JSON.stringify({
-      success: false,
-      error: error instanceof Error ? error.message : 'Internal server error'
-    }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : 'Internal server error',
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
       }
-    });
+    );
   }
 }

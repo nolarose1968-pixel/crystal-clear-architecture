@@ -16,7 +16,7 @@ const SRC_DIR = './src';
 const LINK_PATTERNS = [
   /href=["']([^"']+)["']/g,
   /src=["']([^"']+)["']/g,
-  /url\(["']?([^"')]+)["']?\)/g
+  /url\(["']?([^"')]+)["']?\)/g,
 ];
 
 // Ignore patterns
@@ -36,7 +36,7 @@ class LinkValidator {
       valid: 0,
       broken: 0,
       warnings: 0,
-      files: {}
+      files: {},
     };
   }
 
@@ -44,16 +44,16 @@ class LinkValidator {
     try {
       const content = await readFile(filePath, 'utf-8');
       const fileName = filePath.replace('./docs/', '');
-      
+
       this.results.files[fileName] = {
         links: [],
         broken: [],
-        warnings: []
+        warnings: [],
       };
 
       // Extract all links
       const links = new Set();
-      
+
       for (const pattern of LINK_PATTERNS) {
         let match;
         while ((match = pattern.exec(content)) !== null) {
@@ -68,11 +68,11 @@ class LinkValidator {
       for (const link of links) {
         this.results.total++;
         const validation = await this.validateLink(link, filePath);
-        
+
         this.results.files[fileName].links.push({
           url: link,
           status: validation.status,
-          message: validation.message
+          message: validation.message,
         });
 
         if (validation.status === 'valid') {
@@ -85,7 +85,6 @@ class LinkValidator {
           this.results.files[fileName].warnings.push(link);
         }
       }
-
     } catch (error) {
       console.error(`Error processing ${filePath}:`, error.message);
     }
@@ -109,7 +108,6 @@ class LinkValidator {
 
       // Handle other cases
       return { status: 'warning', message: 'Unhandled URL format' };
-
     } catch (error) {
       return { status: 'broken', message: error.message };
     }
@@ -172,11 +170,11 @@ class LinkValidator {
 
   async scanDirectory(dir) {
     const entries = await readdir(dir);
-    
+
     for (const entry of entries) {
       const fullPath = join(dir, entry);
       const stats = await stat(fullPath);
-      
+
       if (stats.isDirectory()) {
         await this.scanDirectory(fullPath);
       } else if (extname(entry) === '.html') {
@@ -187,12 +185,12 @@ class LinkValidator {
 
   generateReport() {
     console.log('\n🔗 Fire22 Link Validation Report');
-    console.log('================================');
+    console.log('!==!==!==!==!==!==');
     console.log(`📊 Total Links: ${this.results.total}`);
     console.log(`✅ Valid: ${this.results.valid}`);
     console.log(`❌ Broken: ${this.results.broken}`);
     console.log(`⚠️  Warnings: ${this.results.warnings}`);
-    
+
     const successRate = ((this.results.valid / this.results.total) * 100).toFixed(1);
     console.log(`📈 Success Rate: ${successRate}%`);
 
@@ -223,13 +221,13 @@ class LinkValidator {
 // Main execution
 async function main() {
   console.log('🔍 Starting link validation...');
-  
+
   const validator = new LinkValidator();
-  
+
   try {
     await validator.scanDirectory(DOCS_DIR);
     const results = validator.generateReport();
-    
+
     // Exit with error code if there are broken links
     if (results.broken > 0) {
       console.log('\n💥 Validation failed due to broken links!');
@@ -238,7 +236,6 @@ async function main() {
       console.log('\n✅ All links validated successfully!');
       process.exit(0);
     }
-    
   } catch (error) {
     console.error('❌ Validation failed:', error);
     process.exit(1);

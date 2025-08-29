@@ -10,7 +10,7 @@ import {
   SettlementSummary,
   SettlementResult,
   PaginatedResult,
-  CollectionFilters
+  CollectionFilters,
 } from '../models';
 import { Logger } from './Logger';
 
@@ -61,7 +61,7 @@ export class SettlementProcessor {
             processedAt: new Date(),
             fee: 0,
             netAmount: 0,
-            errorMessage: error instanceof Error ? error.message : 'Unknown error'
+            errorMessage: error instanceof Error ? error.message : 'Unknown error',
           });
         }
       }
@@ -72,7 +72,7 @@ export class SettlementProcessor {
         failed,
         totalAmount,
         estimatedFees: totalFees,
-        processingResults
+        processingResults,
       };
 
       Logger.info('Settlement processing completed', result);
@@ -110,8 +110,8 @@ export class SettlementProcessor {
         errorMessage: success ? undefined : 'Payment processing failed',
         metadata: {
           processingTime: Math.random() * 1000 + 500,
-          paymentMethod: settlement.paymentMethod || 'bank_transfer'
-        }
+          paymentMethod: settlement.paymentMethod || 'bank_transfer',
+        },
       };
 
       if (success) {
@@ -136,7 +136,7 @@ export class SettlementProcessor {
 
       // Fee structure: 2.9% + $0.30
       const percentageFee = amount * 0.029;
-      const fixedFee = 0.30;
+      const fixedFee = 0.3;
       const totalFee = percentageFee + fixedFee;
 
       Logger.debug(`Fee calculation: ${percentageFee} + ${fixedFee} = ${totalFee}`);
@@ -158,7 +158,7 @@ export class SettlementProcessor {
       dateFrom.setDate(dateFrom.getDate() - days);
 
       const result = await this.getAll({
-        dateFrom
+        dateFrom,
       });
 
       Logger.info(`Retrieved ${result.data.length} settlements from last ${days} days`);
@@ -200,7 +200,11 @@ export class SettlementProcessor {
   /**
    * Get all settlements with optional filtering
    */
-  static async getAll(filters?: SettlementFilters, page: number = 1, limit: number = 50): Promise<PaginatedResult<Settlement>> {
+  static async getAll(
+    filters?: SettlementFilters,
+    page: number = 1,
+    limit: number = 50
+  ): Promise<PaginatedResult<Settlement>> {
     try {
       Logger.info('Fetching all settlements', { filters, page, limit });
 
@@ -216,7 +220,9 @@ export class SettlementProcessor {
           filteredSettlements = filteredSettlements.filter(s => s.agentId === filters.agentId);
         }
         if (filters.merchantId) {
-          filteredSettlements = filteredSettlements.filter(s => s.merchantId === filters.merchantId);
+          filteredSettlements = filteredSettlements.filter(
+            s => s.merchantId === filters.merchantId
+          );
         }
         if (filters.dateFrom) {
           filteredSettlements = filteredSettlements.filter(s => s.createdAt >= filters.dateFrom!);
@@ -234,7 +240,9 @@ export class SettlementProcessor {
           filteredSettlements = filteredSettlements.filter(s => s.currency === filters.currency);
         }
         if (filters.collectionId) {
-          filteredSettlements = filteredSettlements.filter(s => s.collectionId === filters.collectionId);
+          filteredSettlements = filteredSettlements.filter(
+            s => s.collectionId === filters.collectionId
+          );
         }
       }
 
@@ -253,8 +261,8 @@ export class SettlementProcessor {
           total,
           totalPages,
           hasNext: page < totalPages,
-          hasPrev: page > 1
-        }
+          hasPrev: page > 1,
+        },
       };
 
       Logger.info(`Retrieved ${paginatedData.length} settlements (page ${page}/${totalPages})`);
@@ -280,39 +288,51 @@ export class SettlementProcessor {
       const totalFees = settlements.reduce((sum, s) => sum + s.processingFee, 0);
       const netAmount = totalAmount - totalFees;
 
-      const pendingSettlements = settlements.filter(s => s.status === SettlementStatus.PENDING).length;
+      const pendingSettlements = settlements.filter(
+        s => s.status === SettlementStatus.PENDING
+      ).length;
       const pendingAmount = settlements
         .filter(s => s.status === SettlementStatus.PENDING)
         .reduce((sum, s) => sum + s.amount, 0);
 
-      const processingSettlements = settlements.filter(s => s.status === SettlementStatus.PROCESSING).length;
+      const processingSettlements = settlements.filter(
+        s => s.status === SettlementStatus.PROCESSING
+      ).length;
       const processingAmount = settlements
         .filter(s => s.status === SettlementStatus.PROCESSING)
         .reduce((sum, s) => sum + s.amount, 0);
 
-      const completedSettlements = settlements.filter(s => s.status === SettlementStatus.COMPLETED).length;
+      const completedSettlements = settlements.filter(
+        s => s.status === SettlementStatus.COMPLETED
+      ).length;
       const completedAmount = settlements
         .filter(s => s.status === SettlementStatus.COMPLETED)
         .reduce((sum, s) => sum + s.amount, 0);
 
-      const failedSettlements = settlements.filter(s => s.status === SettlementStatus.FAILED).length;
+      const failedSettlements = settlements.filter(
+        s => s.status === SettlementStatus.FAILED
+      ).length;
       const failedAmount = settlements
         .filter(s => s.status === SettlementStatus.FAILED)
         .reduce((sum, s) => sum + s.amount, 0);
 
       // Calculate success rate
-      const successRate = totalSettlements > 0 ? (completedSettlements / totalSettlements) * 100 : 0;
+      const successRate =
+        totalSettlements > 0 ? (completedSettlements / totalSettlements) * 100 : 0;
 
       // Calculate average processing time
-      const completedWithTime = settlements.filter(s =>
-        s.status === SettlementStatus.COMPLETED && s.processedAt && s.completedAt
+      const completedWithTime = settlements.filter(
+        s => s.status === SettlementStatus.COMPLETED && s.processedAt && s.completedAt
       );
-      const averageProcessingTime = completedWithTime.length > 0
-        ? completedWithTime.reduce((sum, s) => {
-            const processingTime = s.completedAt!.getTime() - s.createdAt.getTime();
-            return sum + processingTime;
-          }, 0) / completedWithTime.length / (1000 * 60 * 60) // Convert to hours
-        : undefined;
+      const averageProcessingTime =
+        completedWithTime.length > 0
+          ? completedWithTime.reduce((sum, s) => {
+              const processingTime = s.completedAt!.getTime() - s.createdAt.getTime();
+              return sum + processingTime;
+            }, 0) /
+            completedWithTime.length /
+            (1000 * 60 * 60) // Convert to hours
+          : undefined;
 
       // Calculate fee percentage
       const feePercentage = totalAmount > 0 ? (totalFees / totalAmount) * 100 : 0;
@@ -332,7 +352,7 @@ export class SettlementProcessor {
         failedAmount,
         averageProcessingTime,
         successRate,
-        feePercentage
+        feePercentage,
       };
 
       Logger.info('Settlement summary calculated', summary);
@@ -351,11 +371,11 @@ export class SettlementProcessor {
       {
         id: 'settle_001',
         collectionId: 'coll_001',
-        amount: 1500.00,
+        amount: 1500.0,
         currency: 'USD',
         status: SettlementStatus.COMPLETED,
-        processingFee: 43.50,
-        netAmount: 1456.50,
+        processingFee: 43.5,
+        netAmount: 1456.5,
         createdAt: new Date('2024-01-15T10:00:00Z'),
         processedAt: new Date('2024-01-16T14:30:00Z'),
         completedAt: new Date('2024-01-16T14:35:00Z'),
@@ -365,12 +385,12 @@ export class SettlementProcessor {
         merchantName: 'TechCorp Inc',
         transactionId: 'txn_1642343400000_settle_001',
         paymentMethod: 'bank_transfer',
-        notes: 'VIP customer - expedited processing'
+        notes: 'VIP customer - expedited processing',
       },
       {
         id: 'settle_002',
         collectionId: 'coll_002',
-        amount: 2500.50,
+        amount: 2500.5,
         currency: 'USD',
         status: SettlementStatus.PENDING,
         processingFee: 72.76,
@@ -381,16 +401,16 @@ export class SettlementProcessor {
         merchantId: 'merch_456',
         merchantName: 'RetailPlus',
         paymentMethod: 'wire_transfer',
-        notes: 'Monthly subscription payment'
+        notes: 'Monthly subscription payment',
       },
       {
         id: 'settle_003',
         collectionId: 'coll_004',
-        amount: 3200.00,
+        amount: 3200.0,
         currency: 'USD',
         status: SettlementStatus.COMPLETED,
-        processingFee: 92.80,
-        netAmount: 3107.20,
+        processingFee: 92.8,
+        netAmount: 3107.2,
         createdAt: new Date('2024-01-13T11:30:00Z'),
         processedAt: new Date('2024-01-13T16:20:00Z'),
         completedAt: new Date('2024-01-13T16:25:00Z'),
@@ -400,7 +420,7 @@ export class SettlementProcessor {
         merchantName: 'BulkSupplies Ltd',
         transactionId: 'txn_1642081200000_settle_003',
         paymentMethod: 'ach',
-        notes: 'Bulk order settlement'
+        notes: 'Bulk order settlement',
       },
       {
         id: 'settle_004',
@@ -409,7 +429,7 @@ export class SettlementProcessor {
         currency: 'USD',
         status: SettlementStatus.FAILED,
         processingFee: 12.35,
-        netAmount: 413.40,
+        netAmount: 413.4,
         createdAt: new Date('2024-01-17T08:00:00Z'),
         processedAt: new Date('2024-01-17T10:15:00Z'),
         agentId: 'agent_456',
@@ -418,8 +438,8 @@ export class SettlementProcessor {
         merchantName: 'RetailPlus',
         paymentMethod: 'check',
         failureReason: 'Insufficient funds',
-        notes: 'Payment returned - insufficient funds'
-      }
+        notes: 'Payment returned - insufficient funds',
+      },
     ];
   }
 }

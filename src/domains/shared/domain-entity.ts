@@ -3,7 +3,7 @@
  * Foundation for all domain entities in the Crystal Clear Architecture
  */
 
-import { DomainEvents, BaseDomainEvent } from './events/domain-events';
+import { DomainEvents, BaseDomainEvent } from "./events/domain-events";
 
 export abstract class DomainEntity {
   protected readonly id: string;
@@ -70,7 +70,7 @@ export class DomainError extends Error {
 
   constructor(message: string, code: string, context?: Record<string, any>) {
     super(message);
-    this.name = 'DomainError';
+    this.name = "DomainError";
     this.code = code;
     this.context = context;
   }
@@ -81,7 +81,7 @@ export class DomainError extends Error {
       message: this.message,
       code: this.code,
       context: this.context,
-      stack: this.stack
+      stack: this.stack,
     };
   }
 }

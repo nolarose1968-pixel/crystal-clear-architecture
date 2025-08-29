@@ -6,10 +6,13 @@
  * in our internal domain format.
  */
 
-import { DomainEntity } from '../../shared/domain-entity';
-import { ExternalAccount } from '../adapters/fantasy402-adapter';
-import { DomainError } from '../../shared/domain-entity';
-import { Money } from '../../shared/value-object';
+import {
+  DomainEntity,
+  DomainError,
+} from "/Users/nolarose/ff/src/domains/shared/domain-entity";
+import type { ExternalAccount } from "../adapters/fantasy402-adapter";
+import { Money } from "/Users/nolarose/ff/src/domains/collections/entities/payment";
+import { v5 as uuidv5 } from "uuid";
 
 export class FantasyAccount extends DomainEntity {
   private constructor(
@@ -23,17 +26,17 @@ export class FantasyAccount extends DomainEntity {
     private lastActivity: Date,
     private metadata: Record<string, any> = {},
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
   ) {
     super(id, createdAt, updatedAt);
   }
 
   static fromExternalData(data: ExternalAccount): FantasyAccount {
     const now = new Date();
-    const currency = 'USD'; // Assuming USD as default, could be made configurable
+    const currency = "USD"; // Assuming USD as default, could be made configurable
 
     return new FantasyAccount(
-      crypto.randomUUID(),
+      uuidv5(data.customerID, uuidv5.URL),
       data.customerID,
       Money.create(data.currentBalance, currency),
       Money.create(data.availableBalance, currency),
@@ -43,7 +46,7 @@ export class FantasyAccount extends DomainEntity {
       new Date(data.lastActivity),
       data.metadata || {},
       now,
-      now
+      now,
     );
   }
 
@@ -51,7 +54,7 @@ export class FantasyAccount extends DomainEntity {
   updateBalances(
     currentBalance: number,
     availableBalance: number,
-    pendingWagerBalance: number
+    pendingWagerBalance: number,
   ): void {
     const currency = this.currentBalance.getCurrency();
 
@@ -64,7 +67,10 @@ export class FantasyAccount extends DomainEntity {
 
   credit(amount: number, reason: string): void {
     if (!this.isActive) {
-      throw new DomainError('Cannot credit inactive account', 'ACCOUNT_INACTIVE');
+      throw new DomainError(
+        "Cannot credit inactive account",
+        "ACCOUNT_INACTIVE",
+      );
     }
 
     const currency = this.currentBalance.getCurrency();
@@ -74,10 +80,10 @@ export class FantasyAccount extends DomainEntity {
     this.availableBalance = this.availableBalance.add(creditAmount);
     this.lastActivity = new Date();
 
-    this.addMetadata('last_credit', {
+    this.addMetadata("last_credit", {
       amount,
       reason,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     this.markAsModified();
@@ -85,30 +91,36 @@ export class FantasyAccount extends DomainEntity {
 
   debit(amount: number, reason: string): void {
     if (!this.isActive) {
-      throw new DomainError('Cannot debit inactive account', 'ACCOUNT_INACTIVE');
+      throw new DomainError(
+        "Cannot debit inactive account",
+        "ACCOUNT_INACTIVE",
+      );
     }
 
     const currency = this.currentBalance.getCurrency();
     const debitAmount = Money.create(amount, currency);
 
     if (this.availableBalance.getAmount() < amount) {
-      throw new DomainError('Insufficient available balance', 'INSUFFICIENT_FUNDS');
+      throw new DomainError(
+        "Insufficient available balance",
+        "INSUFFICIENT_FUNDS",
+      );
     }
 
     this.currentBalance = Money.create(
       this.currentBalance.getAmount() - amount,
-      currency
+      currency,
     );
     this.availableBalance = Money.create(
       this.availableBalance.getAmount() - amount,
-      currency
+      currency,
     );
     this.lastActivity = new Date();
 
-    this.addMetadata('last_debit', {
+    this.addMetadata("last_debit", {
       amount,
       reason,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     this.markAsModified();
@@ -126,20 +138,26 @@ export class FantasyAccount extends DomainEntity {
 
   addPendingWager(amount: number): void {
     if (!this.isActive) {
-      throw new DomainError('Cannot add pending wager to inactive account', 'ACCOUNT_INACTIVE');
+      throw new DomainError(
+        "Cannot add pending wager to inactive account",
+        "ACCOUNT_INACTIVE",
+      );
     }
 
     const currency = this.currentBalance.getCurrency();
     const wagerAmount = Money.create(amount, currency);
 
     if (this.availableBalance.getAmount() < amount) {
-      throw new DomainError('Insufficient available balance for wager', 'INSUFFICIENT_FUNDS');
+      throw new DomainError(
+        "Insufficient available balance for wager",
+        "INSUFFICIENT_FUNDS",
+      );
     }
 
     this.pendingWagerBalance = this.pendingWagerBalance.add(wagerAmount);
     this.availableBalance = Money.create(
       this.availableBalance.getAmount() - amount,
-      currency
+      currency,
     );
 
     this.markAsModified();
@@ -150,13 +168,16 @@ export class FantasyAccount extends DomainEntity {
     const settleAmount = Money.create(amount, currency);
 
     if (this.pendingWagerBalance.getAmount() < amount) {
-      throw new DomainError('Pending wager amount exceeds available pending balance', 'INVALID_SETTLEMENT');
+      throw new DomainError(
+        "Pending wager amount exceeds available pending balance",
+        "INVALID_SETTLEMENT",
+      );
     }
 
     // Remove from pending
     this.pendingWagerBalance = Money.create(
       this.pendingWagerBalance.getAmount() - amount,
-      currency
+      currency,
     );
 
     if (isWin) {
@@ -176,14 +197,30 @@ export class FantasyAccount extends DomainEntity {
   }
 
   // Getters
-  getAgentId(): string { return this.agentId; }
-  getCurrentBalance(): Money { return this.currentBalance; }
-  getAvailableBalance(): Money { return this.availableBalance; }
-  getPendingWagerBalance(): Money { return this.pendingWagerBalance; }
-  getCreditLimit(): Money { return this.creditLimit; }
-  getIsActive(): boolean { return this.isActive; }
-  getLastActivity(): Date { return this.lastActivity; }
-  getMetadata(): Record<string, any> { return { ...this.metadata }; }
+  getAgentId(): string {
+    return this.agentId;
+  }
+  getCurrentBalance(): Money {
+    return this.currentBalance;
+  }
+  getAvailableBalance(): Money {
+    return this.availableBalance;
+  }
+  getPendingWagerBalance(): Money {
+    return this.pendingWagerBalance;
+  }
+  getCreditLimit(): Money {
+    return this.creditLimit;
+  }
+  getIsActive(): boolean {
+    return this.isActive;
+  }
+  getLastActivity(): Date {
+    return this.lastActivity;
+  }
+  getMetadata(): Record<string, any> {
+    return { ...this.metadata };
+  }
 
   // Business rules
   hasSufficientFunds(amount: number): boolean {
@@ -194,7 +231,9 @@ export class FantasyAccount extends DomainEntity {
     const creditLimit = this.creditLimit.getAmount();
     if (creditLimit === 0) return 0;
 
-    return ((creditLimit - this.availableBalance.getAmount()) / creditLimit) * 100;
+    return (
+      ((creditLimit - this.availableBalance.getAmount()) / creditLimit) * 100
+    );
   }
 
   isNearCreditLimit(thresholdPercent: number = 90): boolean {
@@ -227,7 +266,7 @@ export class FantasyAccount extends DomainEntity {
       creditLimit: this.creditLimit.getAmount(),
       utilizationPercent: this.getUtilizationPercentage(),
       isActive: this.isActive,
-      lastActivity: this.lastActivity
+      lastActivity: this.lastActivity,
     };
   }
 
@@ -237,25 +276,25 @@ export class FantasyAccount extends DomainEntity {
       agentId: this.agentId,
       currentBalance: {
         amount: this.currentBalance.getAmount(),
-        currency: this.currentBalance.getCurrency()
+        currency: this.currentBalance.getCurrency(),
       },
       availableBalance: {
         amount: this.availableBalance.getAmount(),
-        currency: this.availableBalance.getCurrency()
+        currency: this.availableBalance.getCurrency(),
       },
       pendingWagerBalance: {
         amount: this.pendingWagerBalance.getAmount(),
-        currency: this.pendingWagerBalance.getCurrency()
+        currency: this.pendingWagerBalance.getCurrency(),
       },
       creditLimit: {
         amount: this.creditLimit.getAmount(),
-        currency: this.creditLimit.getCurrency()
+        currency: this.creditLimit.getCurrency(),
       },
       isActive: this.isActive,
       lastActivity: this.lastActivity.toISOString(),
       metadata: this.metadata,
       createdAt: this.getCreatedAt().toISOString(),
-      updatedAt: this.getUpdatedAt().toISOString()
+      updatedAt: this.getUpdatedAt().toISOString(),
     };
   }
 }

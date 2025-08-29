@@ -1,0 +1,49 @@
+# Fire22 Project Configuration
+# Example TOML file demonstrating Bun's native import support
+
+name = "Fire22 Enterprise System"
+version = "2.0.0-architecture"
+description = "Domain-Driven Design implementation with Bun runtime"
+
+[author]
+name = "Fire22 Team"
+email = "team@fire22.com"
+organization = "Fire22 Enterprise"
+
+[project]
+architecture = "Domain-Driven Design"
+runtime = "Bun v1.x"
+framework = "Crystal Clear Architecture"
+domains = ["collections", "balance", "wager", "settlement", "vip", "user-management"]
+
+[environment]
+production = false
+debug = true
+log_level = "warn"
+timezone = "UTC"
+
+[features]
+security_scanner = true
+telemetry = false
+auto_install = true
+coverage_reporting = true
+
+[dependencies]
+bun = "^1.0.0"
+typescript = "^5.0.0"
+semver = "^7.0.0"
+
+[[domains]]
+name = "collections"
+version = "1.0.0"
+description = "Domain collection management"
+
+[[domains]]
+name = "balance"
+version = "1.0.0"
+description = "Account balance management"
+
+[[domains]]
+name = "wager"
+version = "1.0.0"
+description = "Wager processing and validation"

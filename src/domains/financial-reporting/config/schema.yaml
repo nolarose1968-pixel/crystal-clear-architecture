@@ -1,0 +1,287 @@
+tables:
+  odds_movements:
+    columns:
+      - name: id
+        type: uuid
+        primary: true
+      - name: event_id
+        type: string
+        length: 100
+        indexed: true
+      - name: market_id
+        type: string
+        length: 100
+        indexed: true
+      - name: selection_id
+        type: string
+        length: 100
+        indexed: true
+      - name: odds_type
+        type: enum
+        values: [decimal, american, fractional]
+      - name: previous_odds
+        type: decimal
+        precision: 10
+        scale: 3
+      - name: current_odds
+        type: decimal
+        precision: 10
+        scale: 3
+      - name: movement_type
+        type: enum
+        values: [increase, decrease, no_change]
+      - name: movement_percentage
+        type: decimal
+        precision: 8
+        scale: 4
+      - name: timestamp
+        type: timestamp
+      - name: source
+        type: string
+        length: 100
+      - name: metadata
+        type: json
+      - name: created_at
+        type: timestamp
+        default: CURRENT_TIMESTAMP
+
+  bet_timing_analysis:
+    columns:
+      - name: id
+        type: uuid
+        primary: true
+      - name: bet_id
+        type: string
+        length: 100
+        unique: true
+        indexed: true
+      - name: customer_id
+        type: string
+        length: 100
+        indexed: true
+      - name: event_id
+        type: string
+        length: 100
+        indexed: true
+      - name: market_id
+        type: string
+        length: 100
+        indexed: true
+      - name: selection_id
+        type: string
+        length: 100
+        indexed: true
+      - name: bet_amount
+        type: decimal
+        precision: 18
+        scale: 2
+      - name: bet_odds
+        type: decimal
+        precision: 10
+        scale: 3
+      - name: bet_timestamp
+        type: timestamp
+        indexed: true
+      - name: timing_category
+        type: enum
+        values: [early, mid, late, peak]
+      - name: odds_position
+        type: enum
+        values: [favorable, unfavorable, neutral]
+      - name: potential_savings
+        type: decimal
+        precision: 18
+        scale: 2
+        default: 0
+      - name: risk_assessment
+        type: enum
+        values: [low, medium, high]
+      - name: odds_movements_count
+        type: integer
+        default: 0
+      - name: analysis_timestamp
+        type: timestamp
+      - name: metadata
+        type: json
+      - name: created_at
+        type: timestamp
+        default: CURRENT_TIMESTAMP
+
+  events:
+    columns:
+      - name: id
+        type: uuid
+        primary: true
+      - name: event_name
+        type: string
+        length: 255
+      - name: start_time
+        type: timestamp
+        indexed: true
+      - name: sport
+        type: string
+        length: 100
+      - name: created_at
+        type: timestamp
+        default: CURRENT_TIMESTAMP
+
+  customers:
+    columns:
+      - name: id
+        type: uuid
+        primary: true
+      - name: username
+        type: string
+        length: 100
+        unique: true
+      - name: email
+        type: string
+        length: 255
+        unique: true
+      - name: status
+        type: enum
+        values: [ACTIVE, SUSPENDED, CLOSED]
+        default: ACTIVE
+      - name: currency
+        type: string
+        length: 3
+        default: USD
+      - name: created_at
+        type: timestamp
+        default: CURRENT_TIMESTAMP
+      - name: updated_at
+        type: timestamp
+        default: CURRENT_TIMESTAMP
+
+  accounts:
+    columns:
+      - name: id
+        type: uuid
+        primary: true
+      - name: account_type
+        type: string
+        length: 50
+      - name: customer_id
+        type: uuid
+        foreign_key: customers(id)
+        indexed: true
+      - name: current_balance
+        type: decimal
+        precision: 18
+        scale: 2
+        default: 0
+      - name: is_active
+        type: boolean
+        default: true
+      - name: created_at
+        type: timestamp
+        default: CURRENT_TIMESTAMP
+
+  ledger_entries:
+    columns:
+      - name: id
+        type: uuid
+        primary: true
+      - name: account_id
+        type: uuid
+        foreign_key: accounts(id)
+        indexed: true
+      - name: customer_id
+        type: uuid
+        foreign_key: customers(id)
+        indexed: true
+      - name: amount
+        type: decimal
+        precision: 18
+        scale: 2
+      - name: currency
+        type: string
+        length: 3
+      - name: type
+        type: enum
+        values: [BET, WIN, DEPOSIT, WITHDRAWAL, ADJUSTMENT]
+      - name: description
+        type: string
+        length: 500
+      - name: reference_id
+        type: string
+        length: 100
+        indexed: true
+      - name: status
+        type: enum
+        values: [pending, posted, voided]
+        default: posted
+      - name: entry_date
+        type: date
+        indexed: true
+      - name: created_at
+        type: timestamp
+        default: CURRENT_TIMESTAMP
+
+indexes:
+  - table: odds_movements
+    columns: [event_id, market_id, selection_id]
+    name: idx_odds_movements_composite
+  - table: bet_timing_analysis
+    columns: [customer_id, bet_timestamp]
+    name: idx_bet_timing_customer_time
+  - table: ledger_entries
+    columns: [customer_id, entry_date, type]
+    name: idx_ledger_customer_date_type
+
+views:
+  odds_movement_summary:
+    query: |
+      SELECT
+        event_id,
+        market_id,
+        selection_id,
+        COUNT(*) as total_movements,
+        AVG(movement_percentage) as avg_movement_percentage,
+        MAX(ABS(movement_percentage)) as max_movement_percentage,
+        SUM(CASE WHEN ABS(movement_percentage) >= 2.0 THEN 1 ELSE 0 END) as significant_movements,
+        MIN(timestamp) as first_movement,
+        MAX(timestamp) as last_movement,
+        COUNT(DISTINCT DATE(timestamp)) as active_days
+      FROM odds_movements
+      GROUP BY event_id, market_id, selection_id
+
+  bet_timing_impact:
+    query: |
+      SELECT
+        bta.*,
+        oms.total_movements,
+        oms.avg_movement_percentage,
+        oms.significant_movements,
+        CASE
+          WHEN bta.timing_category = 'peak' AND ABS(oms.avg_movement_percentage) > 5 THEN 'high_risk'
+          WHEN bta.odds_position = 'unfavorable' AND oms.significant_movements > 3 THEN 'high_risk'
+          WHEN bta.potential_savings > bta.bet_amount * 0.1 THEN 'opportunity_missed'
+          ELSE 'normal'
+        END as risk_category
+      FROM bet_timing_analysis bta
+      LEFT JOIN odds_movement_summary oms ON
+        bta.event_id = oms.event_id AND
+        bta.market_id = oms.market_id AND
+        bta.selection_id = oms.selection_id
+
+  odds_movement_financial_impact:
+    query: |
+      SELECT
+        om.event_id,
+        om.market_id,
+        DATE(om.timestamp) as movement_date,
+        COUNT(*) as movements_count,
+        AVG(om.movement_percentage) as avg_movement,
+        SUM(bta.potential_savings) as total_potential_savings,
+        SUM(CASE WHEN bta.odds_position = 'favorable' THEN bta.potential_savings ELSE 0 END) as favorable_savings,
+        SUM(CASE WHEN bta.odds_position = 'unfavorable' THEN bta.potential_savings ELSE 0 END) as unfavorable_cost,
+        COUNT(CASE WHEN bta.risk_assessment = 'high' THEN 1 END) as high_risk_bets
+      FROM odds_movements om
+      LEFT JOIN bet_timing_analysis bta ON
+        om.event_id = bta.event_id AND
+        om.market_id = bta.market_id AND
+        om.selection_id = bta.selection_id AND
+        DATE(om.timestamp) = DATE(bta.bet_timestamp)
+      WHERE bta.bet_timestamp > om.timestamp
+      GROUP BY om.event_id, om.market_id, DATE(om.timestamp)

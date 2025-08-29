@@ -61,7 +61,7 @@ export class EnhancedLogger {
           default:
             this.logger.info(message, meta);
         }
-      }
+      },
     };
   }
 
@@ -84,10 +84,10 @@ export class EnhancedLogger {
    */
   error(message: string, error?: any, meta?: any): void {
     if (error instanceof Error) {
-      this.logger.error(message, { 
-        error: error.message, 
+      this.logger.error(message, {
+        error: error.message,
         stack: error.stack,
-        ...meta 
+        ...meta,
       });
     } else {
       this.logger.error(message, { error, ...meta });
@@ -123,22 +123,22 @@ export class EnhancedLogger {
    * Logs an API request
    */
   logApiRequest(
-    method: string, 
-    url: string, 
-    statusCode: number, 
-    responseTime: number, 
+    method: string,
+    url: string,
+    statusCode: number,
+    responseTime: number,
     userId?: string,
     meta?: any
   ): void {
     const level = statusCode >= 400 ? 'error' : 'info';
-    
+
     this.logger.log(level, 'API Request', {
       method,
       url,
       statusCode,
       responseTime,
       userId,
-      ...meta
+      ...meta,
     });
   }
 
@@ -152,8 +152,7 @@ export class EnhancedLogger {
     details?: Record<string, any>,
     userId?: string
   ): void {
-    const level = severity === 'critical' ? 'error' : 
-                 severity === 'high' ? 'warn' : 'info';
+    const level = severity === 'critical' ? 'error' : severity === 'high' ? 'warn' : 'info';
 
     this.logger.log(level, `Security Event: ${type}`, {
       type,
@@ -161,7 +160,7 @@ export class EnhancedLogger {
       message,
       details,
       userId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -179,7 +178,7 @@ export class EnhancedLogger {
       value,
       unit,
       ...meta,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -192,15 +191,14 @@ export class EnhancedLogger {
     message?: string,
     metrics?: any
   ): void {
-    const level = status === 'unhealthy' ? 'error' : 
-                 status === 'degraded' ? 'warn' : 'info';
+    const level = status === 'unhealthy' ? 'error' : status === 'degraded' ? 'warn' : 'info';
 
     this.logger.log(level, `Health Check: ${component}`, {
       component,
       status,
       message,
       metrics,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -224,7 +222,7 @@ export class EnhancedLogger {
       duration,
       error: error instanceof Error ? error.message : error,
       ...meta,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -252,7 +250,7 @@ export class EnhancedLogger {
       success,
       error: error instanceof Error ? error.message : error,
       ...meta,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -274,7 +272,7 @@ export class EnhancedLogger {
       resource,
       success,
       details,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -289,25 +287,20 @@ export class EnhancedLogger {
     this.logger.log(level, `System Event: ${event}`, {
       event,
       ...details,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
   /**
    * Logs a configuration change
    */
-  logConfigurationChange(
-    key: string,
-    oldValue: any,
-    newValue: any,
-    changedBy?: string
-  ): void {
+  logConfigurationChange(key: string, oldValue: any, newValue: any, changedBy?: string): void {
     this.logger.info('Configuration Change', {
       key,
       oldValue,
       newValue,
       changedBy,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -329,7 +322,7 @@ export class EnhancedLogger {
       environment,
       success,
       ...details,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -349,7 +342,7 @@ export class EnhancedLogger {
       userId,
       limit,
       remaining,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -369,7 +362,7 @@ export class EnhancedLogger {
       success,
       ttl,
       size,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -389,7 +382,7 @@ export class EnhancedLogger {
       rule,
       message,
       userId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -411,7 +404,7 @@ export class EnhancedLogger {
       duration,
       result,
       error: error instanceof Error ? error.message : error,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -435,7 +428,7 @@ export class EnhancedLogger {
       deliveryId,
       error: error instanceof Error ? error.message : error,
       payload: payload ? '[REDACTED]' : undefined, // Don't log full payload in production
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -461,7 +454,7 @@ export class EnhancedLogger {
     return this.child({
       requestId,
       method,
-      url
+      url,
     });
   }
 
@@ -470,7 +463,7 @@ export class EnhancedLogger {
    */
   forUser(userId: string): EnhancedLogger {
     return this.child({
-      userId
+      userId,
     });
   }
 
@@ -479,7 +472,7 @@ export class EnhancedLogger {
    */
   forComponent(component: string): EnhancedLogger {
     return this.child({
-      component
+      component,
     });
   }
 }

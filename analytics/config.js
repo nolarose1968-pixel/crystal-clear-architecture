@@ -36,9 +36,17 @@ window.FANTASY402_CONFIG = {
   cacheEnabled: true,
   cacheExpiryMinutes: 30,
 
-  // Security Settings
+  // Enhanced Security Settings
   enableEncryption: true,
   validateCertificates: true,
+  enableSecurityScanning: true,
+  securityScanInterval: 300000, // 5 minutes
+  enableDataAnonymization: true,
+  enableAuditLogging: true,
+  maxFailedAttempts: 5,
+  sessionTimeout: 3600000, // 1 hour
+  enableIPWhitelist: false,
+  trustedOrigins: ["https://fire22.com", "https://api.fire22.com"],
 
   // Analytics Settings
   enableAdvancedAnalytics: true,
@@ -140,9 +148,86 @@ window.NOTIFICATION_CONFIG = {
       icon: "ℹ️",
       color: "#06b6d4",
     },
+    security: {
+      duration: 6000,
+      icon: "🛡️",
+      color: "#7c3aed",
+    },
   },
   position: "bottom-right",
   maxNotifications: 5,
+};
+
+// Security Scanner Configuration
+window.SECURITY_CONFIG = {
+  enabled: true,
+  scanInterval: 300000, // 5 minutes
+  thresholds: {
+    maxFailedRequests: 10,
+    maxSuspiciousActivity: 5,
+    maxDataExfiltration: 3,
+    sessionAnomalyThreshold: 0.8,
+  },
+  monitoring: {
+    enableRealTimeAlerts: true,
+    enableAuditLogging: true,
+    enableAnomalyDetection: true,
+    enableDataValidation: true,
+  },
+  policies: {
+    requireHttps: true,
+    validateOrigins: true,
+    checkSessionIntegrity: true,
+    encryptSensitiveData: true,
+    auditAllAccess: true,
+  },
+  exceptions: [
+    {
+      rule: "development-mode",
+      condition: "process.env.NODE_ENV === 'development'",
+      action: "reduce_security_checks"
+    }
+  ],
+};
+
+// Threat Detection Configuration
+window.THREAT_CONFIG = {
+  enabled: true,
+  detectionRules: {
+    sqlInjection: {
+      enabled: true,
+      patterns: ["union select", "drop table", "script>", "<script"],
+      severity: "high"
+    },
+    xssAttack: {
+      enabled: true,
+      patterns: ["<script", "javascript:", "onerror=", "onload="],
+      severity: "high"
+    },
+    dataExfiltration: {
+      enabled: true,
+      patterns: ["password", "ssn", "credit_card"],
+      severity: "critical"
+    },
+    bruteForce: {
+      enabled: true,
+      maxAttempts: 5,
+      timeWindow: 300000, // 5 minutes
+      severity: "medium"
+    },
+    sessionHijacking: {
+      enabled: true,
+      checkSessionIntegrity: true,
+      validateUserAgent: true,
+      severity: "high"
+    }
+  },
+  responseActions: {
+    log: true,
+    alert: true,
+    block: false, // Set to true for production
+    notify: true
+  }
 };
 
 // Export configuration for use in other modules
@@ -152,5 +237,7 @@ if (typeof module !== "undefined" && module.exports) {
     HEALTH_CHECK_CONFIG: window.HEALTH_CHECK_CONFIG,
     CHART_CONFIG: window.CHART_CONFIG,
     NOTIFICATION_CONFIG: window.NOTIFICATION_CONFIG,
+    SECURITY_CONFIG: window.SECURITY_CONFIG,
+    THREAT_CONFIG: window.THREAT_CONFIG,
   };
 }

@@ -3,7 +3,7 @@
 /**
  * 🏢 Fire22 Department Security Onboarding System
  * OPERATION: SECURE-COMM-22 - Department Integration
- * 
+ *
  * @version 1.0.0
  * @classification CONFIDENTIAL - FIRE22 INTERNAL
  * @team Special Operations
@@ -16,12 +16,12 @@ interface Department {
   id: string;
   name: string;
   email: string;
-  securityTier: 'TIER_1_MAXIMUM' | 'TIER_2_HIGH' | 'TIER_3_MEDIUM';
+  securityTier: "TIER_1_MAXIMUM" | "TIER_2_HIGH" | "TIER_3_MEDIUM";
   securityLevel: string;
   head: string;
   headEmail: string;
   teamMembers: string[];
-  onboardingStatus: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+  onboardingStatus: "PENDING" | "IN_PROGRESS" | "COMPLETED";
 }
 
 interface OnboardingStep {
@@ -30,7 +30,7 @@ interface OnboardingStep {
   description: string;
   required: boolean;
   estimatedTime: number; // minutes
-  responsible: 'DEPARTMENT' | 'SPECIAL_OPS' | 'BOTH';
+  responsible: "DEPARTMENT" | "SPECIAL_OPS" | "BOTH";
 }
 
 class DepartmentSecurityOnboarding {
@@ -46,9 +46,9 @@ class DepartmentSecurityOnboarding {
    * 🚀 Start department security onboarding process
    */
   async startOnboarding(): Promise<void> {
-    console.log('🏢 FIRE22 DEPARTMENT SECURITY ONBOARDING');
-    console.log('========================================');
-    console.log(`📅 Date: ${new Date().toISOString().split('T')[0]}`);
+    console.log("🏢 FIRE22 DEPARTMENT SECURITY ONBOARDING");
+    console.log("!==!==!==!==!==!==!====");
+    console.log(`📅 Date: ${new Date().toISOString().split("T")[0]}`);
     console.log(`⏰ Time: ${new Date().toLocaleTimeString()}`);
     console.log(`🎯 Operation: SECURE-COMM-22\n`);
 
@@ -63,35 +63,48 @@ class DepartmentSecurityOnboarding {
     // Create security training materials
     await this.createSecurityTrainingMaterials();
 
-    console.log('\n✅ DEPARTMENT ONBOARDING INITIATED');
-    console.log('📧 Onboarding packages sent to all department heads');
-    console.log('📋 Training materials prepared');
-    console.log('📅 Onboarding schedule generated');
+    console.log("\n✅ DEPARTMENT ONBOARDING INITIATED");
+    console.log("📧 Onboarding packages sent to all department heads");
+    console.log("📋 Training materials prepared");
+    console.log("📅 Onboarding schedule generated");
   }
 
   /**
    * 📦 Create onboarding package for specific department
    */
-  private async createDepartmentOnboardingPackage(department: Department): Promise<void> {
+  private async createDepartmentOnboardingPackage(
+    department: Department,
+  ): Promise<void> {
     console.log(`📦 Creating onboarding package for ${department.name}...`);
 
-    const packageDir = join(process.cwd(), 'communications', 'onboarding', department.id);
-    
+    const packageDir = join(
+      process.cwd(),
+      "communications",
+      "onboarding",
+      department.id,
+    );
+
     if (!existsSync(packageDir)) {
       mkdirSync(packageDir, { recursive: true });
     }
 
     // Create department-specific onboarding guide
     const onboardingGuide = this.generateDepartmentOnboardingGuide(department);
-    writeFileSync(join(packageDir, 'security-onboarding-guide.md'), onboardingGuide);
+    writeFileSync(
+      join(packageDir, "security-onboarding-guide.md"),
+      onboardingGuide,
+    );
 
     // Create security checklist
     const securityChecklist = this.generateSecurityChecklist(department);
-    writeFileSync(join(packageDir, 'security-checklist.md'), securityChecklist);
+    writeFileSync(join(packageDir, "security-checklist.md"), securityChecklist);
 
     // Create access credentials template
     const credentialsTemplate = this.generateCredentialsTemplate(department);
-    writeFileSync(join(packageDir, 'access-credentials-template.md'), credentialsTemplate);
+    writeFileSync(
+      join(packageDir, "access-credentials-template.md"),
+      credentialsTemplate,
+    );
 
     console.log(`  ✅ ${department.name} onboarding package created`);
   }
@@ -360,13 +373,17 @@ Compliance Officer: ____________________ Date: _________`;
 - **Security Clearance**: ${department.securityLevel}
 
 ### **Team Members**
-${department.teamMembers.map(member => `
+${department.teamMembers
+  .map(
+    (member) => `
 - **Name**: ${member}
 - **Email**: [TO BE ASSIGNED]
 - **Role**: Department User
 - **Permissions**: Standard department access
 - **MFA Required**: Yes
-- **Security Clearance**: Standard`).join('')}
+- **Security Clearance**: Standard`,
+  )
+  .join("")}
 
 ---
 
@@ -408,7 +425,7 @@ ${department.teamMembers.map(member => `
    * 📅 Generate master onboarding schedule
    */
   private async generateOnboardingSchedule(): Promise<void> {
-    console.log('📅 Generating master onboarding schedule...');
+    console.log("📅 Generating master onboarding schedule...");
 
     const schedule = `# 📅 Fire22 Department Security Onboarding Schedule
 **OPERATION: SECURE-COMM-22**
@@ -419,21 +436,21 @@ ${department.teamMembers.map(member => `
 
 ### **Phase 1: Tier 1 Departments (Maximum Security) - Weeks 1-2**
 ${this.departments
-  .filter(d => d.securityTier === 'TIER_1_MAXIMUM')
-  .map(d => `- **${d.name}**: ${d.head} (${d.headEmail})`)
-  .join('\n')}
+  .filter((d) => d.securityTier === "TIER_1_MAXIMUM")
+  .map((d) => `- **${d.name}**: ${d.head} (${d.headEmail})`)
+  .join("\n")}
 
 ### **Phase 2: Tier 2 Departments (High Security) - Weeks 3-4**
 ${this.departments
-  .filter(d => d.securityTier === 'TIER_2_HIGH')
-  .map(d => `- **${d.name}**: ${d.head} (${d.headEmail})`)
-  .join('\n')}
+  .filter((d) => d.securityTier === "TIER_2_HIGH")
+  .map((d) => `- **${d.name}**: ${d.head} (${d.headEmail})`)
+  .join("\n")}
 
 ### **Phase 3: Tier 3 Departments (Medium Security) - Weeks 5-6**
 ${this.departments
-  .filter(d => d.securityTier === 'TIER_3_MEDIUM')
-  .map(d => `- **${d.name}**: ${d.head} (${d.headEmail})`)
-  .join('\n')}
+  .filter((d) => d.securityTier === "TIER_3_MEDIUM")
+  .map((d) => `- **${d.name}**: ${d.head} (${d.headEmail})`)
+  .join("\n")}
 
 ---
 
@@ -484,17 +501,22 @@ ${this.departments
 **TOTAL USERS**: ~50-75 (estimated)  
 **CLASSIFICATION**: CONFIDENTIAL - FIRE22 INTERNAL`;
 
-    const schedulePath = join(process.cwd(), 'communications', 'onboarding', 'master-onboarding-schedule.md');
+    const schedulePath = join(
+      process.cwd(),
+      "communications",
+      "onboarding",
+      "master-onboarding-schedule.md",
+    );
     writeFileSync(schedulePath, schedule);
 
-    console.log('  ✅ Master onboarding schedule generated');
+    console.log("  ✅ Master onboarding schedule generated");
   }
 
   /**
    * 📚 Create security training materials
    */
   private async createSecurityTrainingMaterials(): Promise<void> {
-    console.log('📚 Creating security training materials...');
+    console.log("📚 Creating security training materials...");
 
     const trainingMaterial = `# 📚 Fire22 Security Training Materials
 **CLOUDFLARE DURABLE OBJECTS EMAIL SECURITY**
@@ -578,10 +600,15 @@ This comprehensive training program ensures all Fire22 department members unders
 **REFRESHER TRAINING**: Annual requirement  
 **CLASSIFICATION**: CONFIDENTIAL - FIRE22 INTERNAL`;
 
-    const trainingPath = join(process.cwd(), 'communications', 'onboarding', 'security-training-materials.md');
+    const trainingPath = join(
+      process.cwd(),
+      "communications",
+      "onboarding",
+      "security-training-materials.md",
+    );
     writeFileSync(trainingPath, trainingMaterial);
 
-    console.log('  ✅ Security training materials created');
+    console.log("  ✅ Security training materials created");
   }
 
   // Helper methods
@@ -589,182 +616,190 @@ This comprehensive training program ensures all Fire22 department members unders
     this.departments = [
       // Tier 1 - Maximum Security
       {
-        id: 'exec',
-        name: 'Executive Management',
-        email: 'exec@fire22.com',
-        securityTier: 'TIER_1_MAXIMUM',
-        securityLevel: 'TOP_SECRET',
-        head: 'William Harris',
-        headEmail: 'william.harris@exec.fire22',
-        teamMembers: ['Sarah Wilson', 'Michael Johnson'],
-        onboardingStatus: 'PENDING'
+        id: "exec",
+        name: "Executive Management",
+        email: "exec@fire22.com",
+        securityTier: "TIER_1_MAXIMUM",
+        securityLevel: "TOP_SECRET",
+        head: "William Harris",
+        headEmail: "william.harris@exec.fire22",
+        teamMembers: ["Sarah Wilson", "Michael Johnson"],
+        onboardingStatus: "PENDING",
       },
       {
-        id: 'finance',
-        name: 'Finance Department',
-        email: 'finance@fire22.com',
-        securityTier: 'TIER_1_MAXIMUM',
-        securityLevel: 'CONFIDENTIAL_FINANCIAL',
-        head: 'John Smith',
-        headEmail: 'john.smith@finance.fire22',
-        teamMembers: ['Sarah Johnson', 'Mike Chen', 'Anna Lee'],
-        onboardingStatus: 'PENDING'
+        id: "finance",
+        name: "Finance Department",
+        email: "finance@fire22.com",
+        securityTier: "TIER_1_MAXIMUM",
+        securityLevel: "CONFIDENTIAL_FINANCIAL",
+        head: "John Smith",
+        headEmail: "john.smith@finance.fire22",
+        teamMembers: ["Sarah Johnson", "Mike Chen", "Anna Lee"],
+        onboardingStatus: "PENDING",
       },
       {
-        id: 'compliance',
-        name: 'Compliance & Legal',
-        email: 'compliance@fire22.com',
-        securityTier: 'TIER_1_MAXIMUM',
-        securityLevel: 'CONFIDENTIAL_LEGAL',
-        head: 'Robert Brown',
-        headEmail: 'robert.brown@compliance.fire22',
-        teamMembers: ['Lisa Davis'],
-        onboardingStatus: 'PENDING'
+        id: "compliance",
+        name: "Compliance & Legal",
+        email: "compliance@fire22.com",
+        securityTier: "TIER_1_MAXIMUM",
+        securityLevel: "CONFIDENTIAL_LEGAL",
+        head: "Robert Brown",
+        headEmail: "robert.brown@compliance.fire22",
+        teamMembers: ["Lisa Davis"],
+        onboardingStatus: "PENDING",
       },
-      
+
       // Tier 2 - High Security
       {
-        id: 'support',
-        name: 'Customer Support',
-        email: 'support@fire22.com',
-        securityTier: 'TIER_2_HIGH',
-        securityLevel: 'CONFIDENTIAL_CUSTOMER',
-        head: 'Jessica Martinez',
-        headEmail: 'jessica.martinez@support.fire22',
-        teamMembers: ['David Wilson', 'Emily Chen', 'James Rodriguez'],
-        onboardingStatus: 'PENDING'
+        id: "support",
+        name: "Customer Support",
+        email: "support@fire22.com",
+        securityTier: "TIER_2_HIGH",
+        securityLevel: "CONFIDENTIAL_CUSTOMER",
+        head: "Jessica Martinez",
+        headEmail: "jessica.martinez@support.fire22",
+        teamMembers: ["David Wilson", "Emily Chen", "James Rodriguez"],
+        onboardingStatus: "PENDING",
       },
       {
-        id: 'operations',
-        name: 'Operations Department',
-        email: 'operations@fire22.com',
-        securityTier: 'TIER_2_HIGH',
-        securityLevel: 'CONFIDENTIAL_OPERATIONAL',
-        head: 'Michael Johnson',
-        headEmail: 'michael.johnson@operations.fire22',
-        teamMembers: ['Jennifer Lee', 'Carlos Martinez'],
-        onboardingStatus: 'PENDING'
+        id: "operations",
+        name: "Operations Department",
+        email: "operations@fire22.com",
+        securityTier: "TIER_2_HIGH",
+        securityLevel: "CONFIDENTIAL_OPERATIONAL",
+        head: "Michael Johnson",
+        headEmail: "michael.johnson@operations.fire22",
+        teamMembers: ["Jennifer Lee", "Carlos Martinez"],
+        onboardingStatus: "PENDING",
       },
       {
-        id: 'communications',
-        name: 'Communications Department',
-        email: 'communications@fire22.com',
-        securityTier: 'TIER_2_HIGH',
-        securityLevel: 'CONFIDENTIAL_CORPORATE',
-        head: 'Sarah Martinez',
-        headEmail: 'sarah.martinez@communications.fire22',
-        teamMembers: ['Alex Chen', 'Jordan Taylor'],
-        onboardingStatus: 'PENDING'
+        id: "communications",
+        name: "Communications Department",
+        email: "communications@fire22.com",
+        securityTier: "TIER_2_HIGH",
+        securityLevel: "CONFIDENTIAL_CORPORATE",
+        head: "Sarah Martinez",
+        headEmail: "sarah.martinez@communications.fire22",
+        teamMembers: ["Alex Chen", "Jordan Taylor"],
+        onboardingStatus: "PENDING",
       },
       {
-        id: 'technology',
-        name: 'Technology Department',
-        email: 'tech@fire22.com',
-        securityTier: 'TIER_2_HIGH',
-        securityLevel: 'CONFIDENTIAL_TECHNICAL',
-        head: 'Alex Rodriguez',
-        headEmail: 'alex.rodriguez@technology.fire22',
-        teamMembers: ['Maria Garcia', 'Chris Anderson'],
-        onboardingStatus: 'PENDING'
+        id: "technology",
+        name: "Technology Department",
+        email: "tech@fire22.com",
+        securityTier: "TIER_2_HIGH",
+        securityLevel: "CONFIDENTIAL_TECHNICAL",
+        head: "Alex Rodriguez",
+        headEmail: "alex.rodriguez@technology.fire22",
+        teamMembers: ["Maria Garcia", "Chris Anderson"],
+        onboardingStatus: "PENDING",
       },
-      
+
       // Tier 3 - Medium Security
       {
-        id: 'marketing',
-        name: 'Marketing Department',
-        email: 'marketing@fire22.com',
-        securityTier: 'TIER_3_MEDIUM',
-        securityLevel: 'INTERNAL',
-        head: 'Emily Davis',
-        headEmail: 'emily.davis@marketing.fire22',
-        teamMembers: ['James Wilson', 'Michelle Rodriguez'],
-        onboardingStatus: 'PENDING'
+        id: "marketing",
+        name: "Marketing Department",
+        email: "marketing@fire22.com",
+        securityTier: "TIER_3_MEDIUM",
+        securityLevel: "INTERNAL",
+        head: "Emily Davis",
+        headEmail: "emily.davis@marketing.fire22",
+        teamMembers: ["James Wilson", "Michelle Rodriguez"],
+        onboardingStatus: "PENDING",
       },
       {
-        id: 'design',
-        name: 'Design Team',
-        email: 'design@fire22.com',
-        securityTier: 'TIER_3_MEDIUM',
-        securityLevel: 'INTERNAL',
-        head: 'Isabella Martinez',
-        headEmail: 'isabella.martinez@design.fire22',
-        teamMembers: ['Ethan Cooper', 'Sophia Chen'],
-        onboardingStatus: 'PENDING'
+        id: "design",
+        name: "Design Team",
+        email: "design@fire22.com",
+        securityTier: "TIER_3_MEDIUM",
+        securityLevel: "INTERNAL",
+        head: "Isabella Martinez",
+        headEmail: "isabella.martinez@design.fire22",
+        teamMembers: ["Ethan Cooper", "Sophia Chen"],
+        onboardingStatus: "PENDING",
       },
       {
-        id: 'contributors',
-        name: 'Team Contributors',
-        email: 'team@fire22.com',
-        securityTier: 'TIER_3_MEDIUM',
-        securityLevel: 'INTERNAL',
-        head: 'Chris Anderson',
-        headEmail: 'chris.anderson@team.fire22',
-        teamMembers: ['Taylor Johnson', 'Alex Kim'],
-        onboardingStatus: 'PENDING'
-      }
+        id: "contributors",
+        name: "Team Contributors",
+        email: "team@fire22.com",
+        securityTier: "TIER_3_MEDIUM",
+        securityLevel: "INTERNAL",
+        head: "Chris Anderson",
+        headEmail: "chris.anderson@team.fire22",
+        teamMembers: ["Taylor Johnson", "Alex Kim"],
+        onboardingStatus: "PENDING",
+      },
     ];
   }
 
   private initializeOnboardingSteps(): void {
     this.onboardingSteps = [
       {
-        id: 'security-briefing',
-        title: 'Security Briefing',
-        description: 'Comprehensive security overview and threat landscape',
+        id: "security-briefing",
+        title: "Security Briefing",
+        description: "Comprehensive security overview and threat landscape",
         required: true,
         estimatedTime: 60,
-        responsible: 'SPECIAL_OPS'
+        responsible: "SPECIAL_OPS",
       },
       {
-        id: 'system-training',
-        title: 'System Training',
-        description: 'Hands-on training with the new email security system',
+        id: "system-training",
+        title: "System Training",
+        description: "Hands-on training with the new email security system",
         required: true,
         estimatedTime: 90,
-        responsible: 'BOTH'
+        responsible: "BOTH",
       },
       {
-        id: 'compliance-training',
-        title: 'Compliance Training',
-        description: 'Regulatory compliance and audit requirements',
+        id: "compliance-training",
+        title: "Compliance Training",
+        description: "Regulatory compliance and audit requirements",
         required: true,
         estimatedTime: 45,
-        responsible: 'SPECIAL_OPS'
+        responsible: "SPECIAL_OPS",
       },
       {
-        id: 'access-setup',
-        title: 'Access Setup',
-        description: 'Configure user accounts and permissions',
+        id: "access-setup",
+        title: "Access Setup",
+        description: "Configure user accounts and permissions",
         required: true,
         estimatedTime: 30,
-        responsible: 'BOTH'
+        responsible: "BOTH",
       },
       {
-        id: 'testing-validation',
-        title: 'Testing & Validation',
-        description: 'Validate system functionality and user competency',
+        id: "testing-validation",
+        title: "Testing & Validation",
+        description: "Validate system functionality and user competency",
         required: true,
         estimatedTime: 60,
-        responsible: 'BOTH'
-      }
+        responsible: "BOTH",
+      },
     ];
   }
 
   private getBackupFrequency(tier: string): string {
     switch (tier) {
-      case 'TIER_1_MAXIMUM': return 'Real-time backup';
-      case 'TIER_2_HIGH': return '5-10 minute backup intervals';
-      case 'TIER_3_MEDIUM': return '15 minute backup intervals';
-      default: return 'Standard backup';
+      case "TIER_1_MAXIMUM":
+        return "Real-time backup";
+      case "TIER_2_HIGH":
+        return "5-10 minute backup intervals";
+      case "TIER_3_MEDIUM":
+        return "15 minute backup intervals";
+      default:
+        return "Standard backup";
     }
   }
 
   private getRetentionPeriod(tier: string): string {
     switch (tier) {
-      case 'TIER_1_MAXIMUM': return '7-10 years';
-      case 'TIER_2_HIGH': return '3-5 years';
-      case 'TIER_3_MEDIUM': return '2 years';
-      default: return 'Standard retention';
+      case "TIER_1_MAXIMUM":
+        return "7-10 years";
+      case "TIER_2_HIGH":
+        return "3-5 years";
+      case "TIER_3_MEDIUM":
+        return "2 years";
+      default:
+        return "Standard retention";
     }
   }
 }
@@ -774,22 +809,21 @@ async function main() {
   try {
     const onboarding = new DepartmentSecurityOnboarding();
     await onboarding.startOnboarding();
-    
-    console.log('\n🎉 DEPARTMENT SECURITY ONBOARDING INITIATED!');
-    console.log('============================================');
-    console.log('✅ 10 department onboarding packages created');
-    console.log('✅ Master onboarding schedule generated');
-    console.log('✅ Security training materials prepared');
-    console.log('✅ All department heads will receive onboarding packages');
-    
-    console.log('\n📋 Next Steps:');
-    console.log('1. Send onboarding packages to department heads');
-    console.log('2. Schedule initial security briefings');
-    console.log('3. Begin Tier 1 department onboarding');
-    console.log('4. Monitor onboarding progress');
-    
+
+    console.log("\n🎉 DEPARTMENT SECURITY ONBOARDING INITIATED!");
+    console.log("!==!==!==!==!==!==!==!===");
+    console.log("✅ 10 department onboarding packages created");
+    console.log("✅ Master onboarding schedule generated");
+    console.log("✅ Security training materials prepared");
+    console.log("✅ All department heads will receive onboarding packages");
+
+    console.log("\n📋 Next Steps:");
+    console.log("1. Send onboarding packages to department heads");
+    console.log("2. Schedule initial security briefings");
+    console.log("3. Begin Tier 1 department onboarding");
+    console.log("4. Monitor onboarding progress");
   } catch (error) {
-    console.error('❌ Department onboarding initiation failed:', error);
+    console.error("❌ Department onboarding initiation failed:", error);
     process.exit(1);
   }
 }

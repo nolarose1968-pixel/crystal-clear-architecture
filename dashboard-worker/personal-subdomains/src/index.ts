@@ -7,7 +7,22 @@ import type { Env, EmployeeData } from './types';
 
 type ExecutionContext = any;
 import { CONFIG } from './config';
-import { Logger, RateLimiter, createErrorResponse, createSuccessResponse, generateRequestId, isValidSubdomain, CacheManager, HttpCache, Compression, ApiResponseFormatter, ApiMiddleware, ApiAnalytics, BatchProcessor, ApiVersioning } from './utils';
+import {
+  Logger,
+  RateLimiter,
+  createErrorResponse,
+  createSuccessResponse,
+  generateRequestId,
+  isValidSubdomain,
+  CacheManager,
+  HttpCache,
+  Compression,
+  ApiResponseFormatter,
+  ApiMiddleware,
+  ApiAnalytics,
+  BatchProcessor,
+  ApiVersioning,
+} from './utils';
 import { generate404Page } from './components';
 import {
   generateProfilePage,
@@ -27,7 +42,7 @@ export default {
     // Periodic cleanup - run on ~10% of requests to avoid excessive cleanup
     if (Math.random() < 0.1) {
       ctx.waitUntil(
-        new Promise<void>((resolve) => {
+        new Promise<void>(resolve => {
           setTimeout(() => {
             // Clean up rate limiter
             RateLimiter.cleanup();
@@ -47,8 +62,17 @@ export default {
 
     try {
       // Rate limiting check
-      if (!RateLimiter.checkLimit(request.headers.get('CF-Connecting-IP') || 'unknown', 100, 60 * 1000)) {
-        Logger.warn('Rate limit exceeded', { requestId, ip: request.headers.get('CF-Connecting-IP') });
+      if (
+        !RateLimiter.checkLimit(
+          request.headers.get('CF-Connecting-IP') || 'unknown',
+          100,
+          60 * 1000
+        )
+      ) {
+        Logger.warn('Rate limit exceeded', {
+          requestId,
+          ip: request.headers.get('CF-Connecting-IP'),
+        });
         return createErrorResponse('Rate limit exceeded. Please try again later.', 429);
       }
 
@@ -66,7 +90,10 @@ export default {
       const subdomain = hostname.replace(`.${CONFIG.DOMAIN}`, '');
 
       // Validate subdomain format
-      if (subdomain !== CONFIG.DOMAIN.replace('.sportsfire.co', '') && !isValidSubdomain(subdomain)) {
+      if (
+        subdomain !== CONFIG.DOMAIN.replace('.sportsfire.co', '') &&
+        !isValidSubdomain(subdomain)
+      ) {
         Logger.warn('Invalid subdomain format', { requestId, subdomain });
         return createErrorResponse('Invalid subdomain format', 400);
       }
@@ -78,7 +105,6 @@ export default {
 
       // Handle employee subdomain requests
       return this.handleEmployeeSubdomain(request, env, subdomain, url.pathname, requestId);
-
     } catch (error) {
       const duration = Date.now() - startTime;
       Logger.error('Unhandled error in fetch', {
@@ -133,14 +159,17 @@ export default {
         try {
           employee = JSON.parse(employeeData);
         } catch (parseError) {
-          Logger.error('Failed to parse employee data', { requestId, subdomain, error: parseError });
+          Logger.error('Failed to parse employee data', {
+            requestId,
+            subdomain,
+            error: parseError,
+          });
           return createErrorResponse('Invalid employee data format', 500);
         }
       }
 
       // Route to appropriate handler
       return this.routeEmployeeRequest(employee, env, pathname, subdomain, requestId);
-
     } catch (error) {
       Logger.error('Error handling employee subdomain', {
         requestId,
@@ -175,12 +204,12 @@ export default {
         'customer-management',
         'performance-analytics',
         'premium-scheduling',
-        'advanced-tools'
+        'advanced-tools',
       ],
       manager: 'CEO',
       directReports: ['VIP Support Team'],
       hireDate: '2023-01-15',
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   },
 
@@ -213,26 +242,53 @@ export default {
     switch (pathname) {
       case '/':
       case '/profile':
-        response = this.renderProfilePage(employee, cacheConfig.PROFILE, securityHeaders, requestId);
+        response = this.renderProfilePage(
+          employee,
+          cacheConfig.PROFILE,
+          securityHeaders,
+          requestId
+        );
         break;
 
       case '/schedule':
-        response = this.renderSchedulePage(employee, cacheConfig.SCHEDULE, securityHeaders, requestId);
+        response = this.renderSchedulePage(
+          employee,
+          cacheConfig.SCHEDULE,
+          securityHeaders,
+          requestId
+        );
         break;
 
       case '/tools':
-        response = this.renderToolsPage(employee, cacheConfig.TOOLS, securityHeaders, pathname, requestId);
+        response = this.renderToolsPage(
+          employee,
+          cacheConfig.TOOLS,
+          securityHeaders,
+          pathname,
+          requestId
+        );
         break;
 
       case '/dashboard':
-        response = this.renderDashboardPage(employee, cacheConfig.DASHBOARD, securityHeaders, requestId);
+        response = this.renderDashboardPage(
+          employee,
+          cacheConfig.DASHBOARD,
+          securityHeaders,
+          requestId
+        );
         break;
 
       case '/api':
       case '/api/health':
       case '/api/status':
       case '/api/analytics':
-        response = this.renderApiPage(employee, cacheConfig.API, securityHeaders, pathname, requestId);
+        response = this.renderApiPage(
+          employee,
+          cacheConfig.API,
+          securityHeaders,
+          pathname,
+          requestId
+        );
         break;
 
       case '/api/monitoring':
@@ -240,7 +296,12 @@ export default {
         break;
 
       case '/contact':
-        response = this.renderContactPage(employee, cacheConfig.CONTACT, securityHeaders, requestId);
+        response = this.renderContactPage(
+          employee,
+          cacheConfig.CONTACT,
+          securityHeaders,
+          requestId
+        );
         break;
 
       case '/debug':
@@ -250,9 +311,21 @@ export default {
       default:
         // Handle tools and API sub-paths
         if (pathname.startsWith('/tools/')) {
-          response = this.renderToolsPage(employee, cacheConfig.TOOLS, securityHeaders, pathname, requestId);
+          response = this.renderToolsPage(
+            employee,
+            cacheConfig.TOOLS,
+            securityHeaders,
+            pathname,
+            requestId
+          );
         } else if (pathname.startsWith('/api/')) {
-          response = this.renderApiPage(employee, cacheConfig.API, securityHeaders, pathname, requestId);
+          response = this.renderApiPage(
+            employee,
+            cacheConfig.API,
+            securityHeaders,
+            pathname,
+            requestId
+          );
         } else {
           response = this.create404Response(subdomain, requestId);
         }
@@ -284,7 +357,12 @@ export default {
   },
 
   // Render methods using new template system
-  renderProfilePage(employee: EmployeeData, cacheConfig: any, securityHeaders: any, requestId: string): Response {
+  renderProfilePage(
+    employee: EmployeeData,
+    cacheConfig: any,
+    securityHeaders: any,
+    requestId: string
+  ): Response {
     const html = generateProfilePage(employee);
     return new Response(html, {
       headers: {
@@ -296,7 +374,12 @@ export default {
     });
   },
 
-  renderSchedulePage(employee: EmployeeData, cacheConfig: any, securityHeaders: any, requestId: string): Response {
+  renderSchedulePage(
+    employee: EmployeeData,
+    cacheConfig: any,
+    securityHeaders: any,
+    requestId: string
+  ): Response {
     if (!employee.features.includes('premium-scheduling')) {
       return createErrorResponse('Scheduling not available for this user', 403);
     }
@@ -312,7 +395,13 @@ export default {
     });
   },
 
-  renderToolsPage(employee: EmployeeData, cacheConfig: any, securityHeaders: any, pathname: string, requestId: string): Response {
+  renderToolsPage(
+    employee: EmployeeData,
+    cacheConfig: any,
+    securityHeaders: any,
+    pathname: string,
+    requestId: string
+  ): Response {
     const html = generateToolsPage(employee, pathname);
     return new Response(html, {
       headers: {
@@ -324,7 +413,12 @@ export default {
     });
   },
 
-  renderContactPage(employee: EmployeeData, cacheConfig: any, securityHeaders: any, requestId: string): Response {
+  renderContactPage(
+    employee: EmployeeData,
+    cacheConfig: any,
+    securityHeaders: any,
+    requestId: string
+  ): Response {
     const html = generateContactPage(employee);
     return new Response(html, {
       headers: {
@@ -336,7 +430,12 @@ export default {
     });
   },
 
-  renderDashboardPage(employee: EmployeeData, cacheConfig: any, securityHeaders: any, requestId: string): Response {
+  renderDashboardPage(
+    employee: EmployeeData,
+    cacheConfig: any,
+    securityHeaders: any,
+    requestId: string
+  ): Response {
     const html = generateDashboardPage(employee);
     return new Response(html, {
       headers: {
@@ -348,7 +447,13 @@ export default {
     });
   },
 
-  renderApiPage(employee: EmployeeData, cacheConfig: any, securityHeaders: any, pathname: string, requestId: string): Response {
+  renderApiPage(
+    employee: EmployeeData,
+    cacheConfig: any,
+    securityHeaders: any,
+    pathname: string,
+    requestId: string
+  ): Response {
     // For API endpoints, return JSON responses instead of HTML
     if (pathname.startsWith('/api/')) {
       return this.handleApiEndpoint(employee, pathname, requestId);
@@ -467,11 +572,10 @@ export default {
         responseTime,
         response.status,
         undefined, // userAgent could be passed from request
-        undefined  // ip could be passed from request
+        undefined // ip could be passed from request
       );
 
       return response;
-
     } catch (error) {
       // Track failed requests
       const responseTime = Date.now() - startTime;
@@ -487,8 +591,8 @@ export default {
         details: {
           endpoint: pathname,
           timestamp: new Date().toISOString(),
-          suggestion: 'Please check the API documentation or contact support'
-        }
+          suggestion: 'Please check the API documentation or contact support',
+        },
       });
     }
   },
@@ -548,20 +652,20 @@ export default {
         errorRate: globalStats.errorRate,
         uptime: Math.round(globalStats.uptime / (1000 * 60)), // minutes
         peakHour: globalStats.peakHourFormatted,
-        peakRequests: globalStats.peakRequests
+        peakRequests: globalStats.peakRequests,
       },
       endpoints: {
         top: topEndpoints,
         slowest: slowestEndpoints,
-        failing: failingEndpoints
+        failing: failingEndpoints,
       },
       performance: {
         uptime: '99.9%',
         errorRate: `${globalStats.errorRate.toFixed(2)}%`,
         avgResponseTime: `${globalStats.averageResponseTime}ms`,
-        totalEndpoints: ApiAnalytics.getAllEndpointStats().length
+        totalEndpoints: ApiAnalytics.getAllEndpointStats().length,
       },
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
 
     return ApiResponseFormatter.formatSuccess(analyticsData, { requestId });
@@ -583,15 +687,15 @@ export default {
         alertsCount: 0,
         criticalAlerts: 0,
         warningAlerts: 0,
-        systemHealth: 'healthy'
+        systemHealth: 'healthy',
       },
       endpoints: {
         alerts: '/api/monitoring/alerts',
         health: '/api/monitoring/health-check',
         test: '/api/monitoring/test-alert',
-        responseTimes: '/api/monitoring/response-times'
+        responseTimes: '/api/monitoring/response-times',
       },
-      message: 'Fire22 Agent Monitoring API - Personal Subdomain Version'
+      message: 'Fire22 Agent Monitoring API - Personal Subdomain Version',
     };
 
     return ApiResponseFormatter.formatSuccess(monitoringData, { requestId });
@@ -632,30 +736,30 @@ export default {
           path: '/tools/contacts',
           description: 'Manage business contacts and relationships',
           tier: 1,
-          status: 'active'
+          status: 'active',
         },
         {
           name: 'Schedule Management',
           path: '/tools/schedule',
           description: 'Calendar and appointment management',
           tier: 3,
-          status: employee.features.includes('premium-scheduling') ? 'active' : 'locked'
+          status: employee.features.includes('premium-scheduling') ? 'active' : 'locked',
         },
         {
           name: 'Analytics Dashboard',
           path: '/tools/analytics',
           description: 'Performance metrics and analytics',
           tier: 2,
-          status: 'active'
+          status: 'active',
         },
         {
           name: 'VIP Management',
           path: '/tools/vip',
           description: 'High-value client relationship management',
           tier: 5,
-          status: employee.features.includes('vip-escalation') ? 'active' : 'locked'
-        }
-      ]
+          status: employee.features.includes('vip-escalation') ? 'active' : 'locked',
+        },
+      ],
     };
 
     return ApiResponseFormatter.formatSuccess(toolsData, { requestId });
@@ -671,24 +775,24 @@ export default {
           name: 'John Smith',
           company: 'Sports Analytics Inc',
           lastContact: '2024-01-28T10:30:00Z',
-          type: 'client'
+          type: 'client',
         },
         {
           id: 'contact_002',
           name: 'Sarah Johnson',
           company: 'Betting Solutions Ltd',
           lastContact: '2024-01-27T15:45:00Z',
-          type: 'partner'
+          type: 'partner',
         },
         {
           id: 'contact_003',
           name: 'Mike Wilson',
           company: 'Fantasy Sports Pro',
           lastContact: '2024-01-26T09:15:00Z',
-          type: 'vendor'
-        }
+          type: 'vendor',
+        },
       ],
-      categories: ['clients', 'partners', 'vendors', 'internal']
+      categories: ['clients', 'partners', 'vendors', 'internal'],
     };
 
     return ApiResponseFormatter.formatSuccess(contactsData, { requestId });
@@ -699,7 +803,7 @@ export default {
       return ApiResponseFormatter.formatError('Schedule access not available for this tier', 403, {
         requestId,
         code: 'INSUFFICIENT_TIER',
-        details: { requiredTier: 3, currentTier: employee.tier }
+        details: { requiredTier: 3, currentTier: employee.tier },
       });
     }
 
@@ -713,7 +817,7 @@ export default {
           date: '2024-01-30T14:00:00Z',
           duration: 60,
           type: 'meeting',
-          attendees: ['Client A', 'Client B']
+          attendees: ['Client A', 'Client B'],
         },
         {
           id: 'appt_002',
@@ -721,16 +825,16 @@ export default {
           date: '2024-01-31T09:00:00Z',
           duration: 30,
           type: 'internal',
-          attendees: ['Team']
-        }
+          attendees: ['Team'],
+        },
       ],
       availability: {
         monday: ['09:00', '17:00'],
         tuesday: ['09:00', '17:00'],
         wednesday: ['09:00', '17:00'],
         thursday: ['09:00', '17:00'],
-        friday: ['09:00', '17:00']
-      }
+        friday: ['09:00', '17:00'],
+      },
     };
 
     return ApiResponseFormatter.formatSuccess(scheduleData, { requestId });
@@ -742,7 +846,7 @@ export default {
       return ApiResponseFormatter.formatError('Cache management not available for this tier', 403, {
         requestId,
         code: 'INSUFFICIENT_PRIVILEGES',
-        details: { requiredTier: 4, currentTier: employee.tier }
+        details: { requiredTier: 4, currentTier: employee.tier },
       });
     }
 
@@ -754,7 +858,7 @@ export default {
       previousStats: cacheStats,
       newStats: CacheManager.getStats(),
       timestamp: new Date().toISOString(),
-      clearedBy: employee.name
+      clearedBy: employee.name,
     };
 
     Logger.info('Cache cleared via API', { requestId, employee: employee.id, cacheStats });
@@ -768,7 +872,7 @@ export default {
       return ApiResponseFormatter.formatError('Log access not available for this tier', 403, {
         requestId,
         code: 'INSUFFICIENT_PRIVILEGES',
-        details: { requiredTier: 4, currentTier: employee.tier }
+        details: { requiredTier: 4, currentTier: employee.tier },
       });
     }
 
@@ -781,25 +885,25 @@ export default {
           level: 'info',
           message: 'API request processed',
           requestId: 'req_12345',
-          endpoint: '/api/health'
+          endpoint: '/api/health',
         },
         {
           timestamp: new Date(Date.now() - 600000).toISOString(),
           level: 'warn',
           message: 'Rate limit approached',
           requestId: 'req_12346',
-          endpoint: '/api/analytics'
+          endpoint: '/api/analytics',
         },
         {
           timestamp: new Date(Date.now() - 900000).toISOString(),
           level: 'info',
           message: 'Cache hit',
           requestId: 'req_12347',
-          endpoint: '/api/profile'
-        }
+          endpoint: '/api/profile',
+        },
       ],
       retention: '90 days',
-      totalEntries: Math.floor(Math.random() * 10000) + 5000
+      totalEntries: Math.floor(Math.random() * 10000) + 5000,
     };
 
     return ApiResponseFormatter.formatSuccess(logsData, { requestId });
@@ -815,185 +919,185 @@ export default {
           method: 'GET',
           description: 'System health check',
           authentication: 'none',
-          tier: 1
+          tier: 1,
         },
         {
           path: '/api/status',
           method: 'GET',
           description: 'Employee status and configuration',
           authentication: 'none',
-          tier: 1
+          tier: 1,
         },
         {
           path: '/api/analytics',
           method: 'GET',
           description: 'Usage analytics and metrics',
           authentication: 'none',
-          tier: 1
+          tier: 1,
         },
         {
           path: '/api/monitoring',
           method: 'GET',
           description: 'System monitoring data',
           authentication: 'none',
-          tier: 1
+          tier: 1,
         },
         {
           path: '/api/profile',
           method: 'GET',
           description: 'Employee profile data',
           authentication: 'none',
-          tier: 1
+          tier: 1,
         },
         {
           path: '/api/tools',
           method: 'GET',
           description: 'Available tools and features',
           authentication: 'none',
-          tier: 1
+          tier: 1,
         },
         {
           path: '/api/contacts',
           method: 'GET',
           description: 'Contact management data',
           authentication: 'none',
-          tier: 1
+          tier: 1,
         },
         {
           path: '/api/schedule',
           method: 'GET',
           description: 'Schedule and calendar data',
           authentication: 'none',
-          tier: 3
+          tier: 3,
         },
         {
           path: '/api/cache/clear',
           method: 'POST',
           description: 'Clear system cache',
           authentication: 'required',
-          tier: 4
+          tier: 4,
         },
         {
           path: '/api/logs',
           method: 'GET',
           description: 'System logs and activity',
           authentication: 'required',
-          tier: 4
+          tier: 4,
         },
         {
           path: '/api/endpoints',
           method: 'GET',
           description: 'API endpoint documentation',
           authentication: 'none',
-          tier: 1
+          tier: 1,
         },
         {
           path: '/api/batch',
           method: 'GET',
           description: 'Batch operations information',
           authentication: 'none',
-          tier: 1
+          tier: 1,
         },
         {
           path: '/api/versions',
           method: 'GET',
           description: 'API versioning information',
           authentication: 'none',
-          tier: 1
+          tier: 1,
         },
         {
           path: '/api/dashboard',
           method: 'GET',
           description: 'Sportsbook admin dashboard overview',
           authentication: 'none',
-          tier: 1
+          tier: 1,
         },
         {
           path: '/api/messaging',
           method: 'GET',
           description: 'Internal messaging and communications',
           authentication: 'none',
-          tier: 1
+          tier: 1,
         },
         {
           path: '/api/weekly-figures',
           method: 'GET',
           description: 'Weekly performance and financial figures',
           authentication: 'none',
-          tier: 3
+          tier: 3,
         },
         {
           path: '/api/pending',
           method: 'GET',
           description: 'Pending approvals and reviews',
           authentication: 'none',
-          tier: 1
+          tier: 1,
         },
         {
           path: '/api/customer-admin',
           method: 'GET',
           description: 'Customer management and administration',
           authentication: 'none',
-          tier: 2
+          tier: 2,
         },
         {
           path: '/api/agent-admin',
           method: 'GET',
           description: 'Agent hierarchy and management',
           authentication: 'none',
-          tier: 4
+          tier: 4,
         },
         {
           path: '/api/game-admin',
           method: 'GET',
           description: 'Game and odds management',
           authentication: 'none',
-          tier: 2
+          tier: 2,
         },
         {
           path: '/api/cashier',
           method: 'GET',
           description: 'Transaction and cashier management',
           authentication: 'none',
-          tier: 2
+          tier: 2,
         },
         {
           path: '/api/reporting',
           method: 'GET',
           description: 'Business intelligence and reporting',
           authentication: 'none',
-          tier: 2
+          tier: 2,
         },
         {
           path: '/api/admin-tools',
           method: 'GET',
           description: 'Administrative tools and utilities',
           authentication: 'none',
-          tier: 3
+          tier: 3,
         },
         {
           path: '/api/billing',
           method: 'GET',
           description: 'Agent billing and commission management',
           authentication: 'none',
-          tier: 3
+          tier: 3,
         },
         {
           path: '/api/rules',
           method: 'GET',
           description: 'System rules and compliance',
           authentication: 'none',
-          tier: 1
+          tier: 1,
         },
         {
           path: '/api/settings',
           method: 'GET',
           description: 'System configuration and settings',
           authentication: 'none',
-          tier: 4
-        }
+          tier: 4,
+        },
       ],
-      documentation: `https://${employee.id}.${CONFIG.DOMAIN}/api/docs`
+      documentation: `https://${employee.id}.${CONFIG.DOMAIN}/api/docs`,
     };
 
     return ApiResponseFormatter.formatSuccess(endpointsData, { requestId });
@@ -1026,7 +1130,7 @@ export default {
       '/api/admin-tools',
       '/api/billing',
       '/api/rules',
-      '/api/settings'
+      '/api/settings',
     ];
 
     return ApiResponseFormatter.formatError('API endpoint not found', 404, {
@@ -1036,8 +1140,8 @@ export default {
         requestedEndpoint: pathname,
         availableEndpoints: availableEndpoints,
         suggestion: 'Check the /api/endpoints for available API endpoints',
-        documentation: 'Visit /api/docs for complete API documentation'
-      }
+        documentation: 'Visit /api/docs for complete API documentation',
+      },
     });
   },
 
@@ -1047,33 +1151,29 @@ export default {
       const batchData = {
         maxBatchSize: 10,
         supportedOperations: ['GET'],
-        endpoints: [
-          '/api/health',
-          '/api/profile',
-          '/api/status',
-          '/api/tools',
-          '/api/contacts'
-        ],
+        endpoints: ['/api/health', '/api/profile', '/api/status', '/api/tools', '/api/contacts'],
         example: {
           requests: [
             {
               id: 'health_check',
               method: 'GET',
-              path: '/api/health'
+              path: '/api/health',
             },
             {
               id: 'profile_data',
               method: 'GET',
-              path: '/api/profile'
-            }
-          ]
-        }
+              path: '/api/profile',
+            },
+          ],
+        },
       };
 
       return ApiResponseFormatter.formatSuccess(batchData, { requestId });
     } catch (error) {
       Logger.error('Error in batch endpoint', { requestId, error });
-      return ApiResponseFormatter.formatError('Failed to process batch request', 500, { requestId });
+      return ApiResponseFormatter.formatError('Failed to process batch request', 500, {
+        requestId,
+      });
     }
   },
 
@@ -1085,8 +1185,8 @@ export default {
       usage: {
         recommended: 'Use current version for new integrations',
         migration: 'Check version history for breaking changes',
-        deprecation: 'Deprecated versions will be removed in 6 months'
-      }
+        deprecation: 'Deprecated versions will be removed in 6 months',
+      },
     };
 
     return ApiResponseFormatter.formatSuccess(versionData, { requestId });
@@ -1105,7 +1205,7 @@ export default {
         pendingItems: Math.floor(Math.random() * 50) + 10,
         todaysRevenue: Math.floor(Math.random() * 50000) + 10000,
         weeklyGrowth: Math.floor(Math.random() * 20) + 5,
-        systemHealth: 'excellent'
+        systemHealth: 'excellent',
       },
       recentActivity: [
         {
@@ -1113,37 +1213,37 @@ export default {
           type: 'customer_registration',
           description: 'New customer registered',
           timestamp: new Date(Date.now() - 300000).toISOString(),
-          status: 'completed'
+          status: 'completed',
         },
         {
           id: 'act_002',
           type: 'transaction',
           description: 'Large bet placed',
           timestamp: new Date(Date.now() - 600000).toISOString(),
-          status: 'pending'
+          status: 'pending',
         },
         {
           id: 'act_003',
           type: 'agent_action',
           description: 'Agent commission processed',
           timestamp: new Date(Date.now() - 900000).toISOString(),
-          status: 'completed'
-        }
+          status: 'completed',
+        },
       ],
       alerts: [
         {
           id: 'alert_001',
           type: 'warning',
           message: 'High betting volume detected',
-          priority: 'medium'
+          priority: 'medium',
         },
         {
           id: 'alert_002',
           type: 'info',
           message: 'System maintenance scheduled',
-          priority: 'low'
-        }
-      ]
+          priority: 'low',
+        },
+      ],
     };
 
     return ApiResponseFormatter.formatSuccess(dashboardData, { requestId });
@@ -1153,7 +1253,7 @@ export default {
     if (!employee.features.includes('messaging')) {
       return ApiResponseFormatter.formatError('Messaging access not available', 403, {
         requestId,
-        code: 'FEATURE_NOT_AVAILABLE'
+        code: 'FEATURE_NOT_AVAILABLE',
       });
     }
 
@@ -1168,7 +1268,7 @@ export default {
           lastMessage: 'Commission report ready for review',
           timestamp: new Date(Date.now() - 1800000).toISOString(),
           unread: 3,
-          type: 'agent'
+          type: 'agent',
         },
         {
           id: 'conv_002',
@@ -1176,7 +1276,7 @@ export default {
           lastMessage: 'VIP customer issue resolved',
           timestamp: new Date(Date.now() - 3600000).toISOString(),
           unread: 0,
-          type: 'support'
+          type: 'support',
         },
         {
           id: 'conv_003',
@@ -1184,15 +1284,10 @@ export default {
           lastMessage: 'Weekly maintenance completed',
           timestamp: new Date(Date.now() - 7200000).toISOString(),
           unread: 1,
-          type: 'admin'
-        }
+          type: 'admin',
+        },
       ],
-      quickActions: [
-        'New Message',
-        'Bulk Send',
-        'Templates',
-        'Archive Old'
-      ]
+      quickActions: ['New Message', 'Bulk Send', 'Templates', 'Archive Old'],
     };
 
     return ApiResponseFormatter.formatSuccess(messagingData, { requestId });
@@ -1202,7 +1297,7 @@ export default {
     if (employee.tier < 3) {
       return ApiResponseFormatter.formatError('Weekly figures access requires Tier 3+', 403, {
         requestId,
-        code: 'INSUFFICIENT_TIER'
+        code: 'INSUFFICIENT_TIER',
       });
     }
 
@@ -1210,7 +1305,7 @@ export default {
       employee: employee.name,
       period: {
         start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        end: new Date().toISOString().split('T')[0]
+        end: new Date().toISOString().split('T')[0],
       },
       figures: {
         totalRevenue: Math.floor(Math.random() * 200000) + 50000,
@@ -1219,18 +1314,18 @@ export default {
         losingBets: Math.floor(Math.random() * 2500) + 500,
         averageBetSize: Math.floor(Math.random() * 500) + 100,
         customerRetention: Math.floor(Math.random() * 20) + 75,
-        agentPerformance: Math.floor(Math.random() * 30) + 70
+        agentPerformance: Math.floor(Math.random() * 30) + 70,
       },
       trends: {
         revenueChange: Math.floor(Math.random() * 40) - 20,
         customerGrowth: Math.floor(Math.random() * 20) + 5,
-        betVolumeChange: Math.floor(Math.random() * 30) - 10
+        betVolumeChange: Math.floor(Math.random() * 30) - 10,
       },
       topPerformers: [
         { name: 'Agent Johnson', revenue: 45000, growth: 15 },
         { name: 'Agent Williams', revenue: 38000, growth: 22 },
-        { name: 'Agent Brown', revenue: 32000, growth: 8 }
-      ]
+        { name: 'Agent Brown', revenue: 32000, growth: 8 },
+      ],
     };
 
     return ApiResponseFormatter.formatSuccess(weeklyData, { requestId });
@@ -1245,7 +1340,7 @@ export default {
         reviews: Math.floor(Math.random() * 20) + 3,
         escalations: Math.floor(Math.random() * 15) + 2,
         disputes: Math.floor(Math.random() * 10) + 1,
-        maintenance: Math.floor(Math.random() * 25) + 5
+        maintenance: Math.floor(Math.random() * 25) + 5,
       },
       items: [
         {
@@ -1255,7 +1350,7 @@ export default {
           priority: 'high',
           age: '2 hours',
           requester: 'Agent Smith',
-          amount: 5000
+          amount: 5000,
         },
         {
           id: 'pend_002',
@@ -1264,7 +1359,7 @@ export default {
           priority: 'medium',
           age: '4 hours',
           requester: 'System',
-          amount: null
+          amount: null,
         },
         {
           id: 'pend_003',
@@ -1273,15 +1368,10 @@ export default {
           priority: 'high',
           age: '1 hour',
           requester: 'Customer Support',
-          amount: null
-        }
+          amount: null,
+        },
       ],
-      actions: [
-        'Approve All',
-        'Bulk Review',
-        'Escalate Critical',
-        'Export List'
-      ]
+      actions: ['Approve All', 'Bulk Review', 'Escalate Critical', 'Export List'],
     };
 
     return ApiResponseFormatter.formatSuccess(pendingData, { requestId });
@@ -1291,7 +1381,7 @@ export default {
     if (!employee.features.includes('customer-management')) {
       return ApiResponseFormatter.formatError('Customer admin access not available', 403, {
         requestId,
-        code: 'FEATURE_NOT_AVAILABLE'
+        code: 'FEATURE_NOT_AVAILABLE',
       });
     }
 
@@ -1305,7 +1395,7 @@ export default {
         bronze: Math.floor(Math.random() * 20000) + 5000,
         silver: Math.floor(Math.random() * 15000) + 3000,
         gold: Math.floor(Math.random() * 10000) + 2000,
-        platinum: Math.floor(Math.random() * 5000) + 1000
+        platinum: Math.floor(Math.random() * 5000) + 1000,
       },
       recentCustomers: [
         {
@@ -1316,7 +1406,7 @@ export default {
           joinDate: new Date(Date.now() - 86400000).toISOString(),
           lastBet: new Date(Date.now() - 3600000).toISOString(),
           totalBets: 45,
-          totalWagered: 25000
+          totalWagered: 25000,
         },
         {
           id: 'cust_002',
@@ -1326,16 +1416,10 @@ export default {
           joinDate: new Date(Date.now() - 172800000).toISOString(),
           lastBet: new Date(Date.now() - 7200000).toISOString(),
           totalBets: 123,
-          totalWagered: 75000
-        }
+          totalWagered: 75000,
+        },
       ],
-      actions: [
-        'Add Customer',
-        'Bulk Import',
-        'Export Data',
-        'Tier Management',
-        'Risk Assessment'
-      ]
+      actions: ['Add Customer', 'Bulk Import', 'Export Data', 'Tier Management', 'Risk Assessment'],
     };
 
     return ApiResponseFormatter.formatSuccess(customerData, { requestId });
@@ -1345,7 +1429,7 @@ export default {
     if (employee.tier < 4) {
       return ApiResponseFormatter.formatError('Agent admin access requires Tier 4+', 403, {
         requestId,
-        code: 'INSUFFICIENT_PRIVILEGES'
+        code: 'INSUFFICIENT_PRIVILEGES',
       });
     }
 
@@ -1357,13 +1441,13 @@ export default {
         level1: Math.floor(Math.random() * 50) + 10,
         level2: Math.floor(Math.random() * 200) + 50,
         level3: Math.floor(Math.random() * 400) + 100,
-        level4: Math.floor(Math.random() * 350) + 75
+        level4: Math.floor(Math.random() * 350) + 75,
       },
       performance: {
         topAgent: 'Agent Johnson',
         topRevenue: 125000,
         averageCommission: 8.5,
-        totalCommissions: 450000
+        totalCommissions: 450000,
       },
       recentActivity: [
         {
@@ -1371,23 +1455,23 @@ export default {
           name: 'Agent Smith',
           action: 'Commission processed',
           amount: 2500,
-          timestamp: new Date(Date.now() - 1800000).toISOString()
+          timestamp: new Date(Date.now() - 1800000).toISOString(),
         },
         {
           id: 'agent_002',
           name: 'Agent Johnson',
           action: 'New sub-agent added',
           amount: null,
-          timestamp: new Date(Date.now() - 3600000).toISOString()
-        }
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+        },
       ],
       actions: [
         'Add Agent',
         'Commission Management',
         'Performance Reports',
         'Hierarchy Management',
-        'Agent Training'
-      ]
+        'Agent Training',
+      ],
     };
 
     return ApiResponseFormatter.formatSuccess(agentData, { requestId });
@@ -1397,7 +1481,7 @@ export default {
     if (!employee.features.includes('game-management')) {
       return ApiResponseFormatter.formatError('Game admin access not available', 403, {
         requestId,
-        code: 'FEATURE_NOT_AVAILABLE'
+        code: 'FEATURE_NOT_AVAILABLE',
       });
     }
 
@@ -1413,7 +1497,7 @@ export default {
         soccer: Math.floor(Math.random() * 120) + 60,
         tennis: Math.floor(Math.random() * 60) + 30,
         golf: Math.floor(Math.random() * 40) + 20,
-        other: Math.floor(Math.random() * 50) + 25
+        other: Math.floor(Math.random() * 50) + 25,
       },
       popularGames: [
         {
@@ -1422,7 +1506,7 @@ export default {
           teams: 'Chiefs vs Eagles',
           totalBets: 2500,
           totalWagered: 125000,
-          startTime: new Date(Date.now() + 3600000).toISOString()
+          startTime: new Date(Date.now() + 3600000).toISOString(),
         },
         {
           id: 'game_002',
@@ -1430,22 +1514,16 @@ export default {
           teams: 'Lakers vs Warriors',
           totalBets: 1800,
           totalWagered: 90000,
-          startTime: new Date(Date.now() + 7200000).toISOString()
-        }
+          startTime: new Date(Date.now() + 7200000).toISOString(),
+        },
       ],
       systemStatus: {
         oddsUpdate: 'real-time',
         lineManagement: 'active',
         autoLock: 'enabled',
-        riskManagement: 'active'
+        riskManagement: 'active',
       },
-      actions: [
-        'Add Game',
-        'Update Odds',
-        'Manage Lines',
-        'Game Settings',
-        'Risk Controls'
-      ]
+      actions: ['Add Game', 'Update Odds', 'Manage Lines', 'Game Settings', 'Risk Controls'],
     };
 
     return ApiResponseFormatter.formatSuccess(gameData, { requestId });
@@ -1455,7 +1533,7 @@ export default {
     if (!employee.features.includes('cashier')) {
       return ApiResponseFormatter.formatError('Cashier access not available', 403, {
         requestId,
-        code: 'FEATURE_NOT_AVAILABLE'
+        code: 'FEATURE_NOT_AVAILABLE',
       });
     }
 
@@ -1467,20 +1545,20 @@ export default {
       categories: {
         deposits: {
           count: Math.floor(Math.random() * 300) + 50,
-          amount: Math.floor(Math.random() * 150000) + 25000
+          amount: Math.floor(Math.random() * 150000) + 25000,
         },
         withdrawals: {
           count: Math.floor(Math.random() * 200) + 30,
-          amount: Math.floor(Math.random() * 100000) + 15000
+          amount: Math.floor(Math.random() * 100000) + 15000,
         },
         transfers: {
           count: Math.floor(Math.random() * 150) + 25,
-          amount: Math.floor(Math.random() * 75000) + 10000
+          amount: Math.floor(Math.random() * 75000) + 10000,
         },
         adjustments: {
           count: Math.floor(Math.random() * 50) + 5,
-          amount: Math.floor(Math.random() * 25000) + 5000
-        }
+          amount: Math.floor(Math.random() * 25000) + 5000,
+        },
       },
       recentTransactions: [
         {
@@ -1490,7 +1568,7 @@ export default {
           amount: 1000,
           method: 'credit_card',
           status: 'completed',
-          timestamp: new Date(Date.now() - 300000).toISOString()
+          timestamp: new Date(Date.now() - 300000).toISOString(),
         },
         {
           id: 'txn_002',
@@ -1499,16 +1577,16 @@ export default {
           amount: 500,
           method: 'bank_transfer',
           status: 'pending',
-          timestamp: new Date(Date.now() - 600000).toISOString()
-        }
+          timestamp: new Date(Date.now() - 600000).toISOString(),
+        },
       ],
       actions: [
         'Process Deposit',
         'Process Withdrawal',
         'Transfer Funds',
         'Adjust Balance',
-        'Transaction History'
-      ]
+        'Transaction History',
+      ],
     };
 
     return ApiResponseFormatter.formatSuccess(cashierData, { requestId });
@@ -1518,7 +1596,7 @@ export default {
     if (employee.tier < 2) {
       return ApiResponseFormatter.formatError('Reporting access requires Tier 2+', 403, {
         requestId,
-        code: 'INSUFFICIENT_TIER'
+        code: 'INSUFFICIENT_TIER',
       });
     }
 
@@ -1531,7 +1609,7 @@ export default {
           description: 'Detailed agent commission and performance metrics',
           category: 'agents',
           lastRun: new Date(Date.now() - 86400000).toISOString(),
-          frequency: 'daily'
+          frequency: 'daily',
         },
         {
           id: 'analysis',
@@ -1539,7 +1617,7 @@ export default {
           description: 'Comprehensive business intelligence and trends',
           category: 'business',
           lastRun: new Date(Date.now() - 172800000).toISOString(),
-          frequency: 'weekly'
+          frequency: 'weekly',
         },
         {
           id: 'ip_tracker',
@@ -1547,7 +1625,7 @@ export default {
           description: 'Customer IP address tracking and analysis',
           category: 'security',
           lastRun: new Date(Date.now() - 3600000).toISOString(),
-          frequency: 'real-time'
+          frequency: 'real-time',
         },
         {
           id: 'transaction_history',
@@ -1555,7 +1633,7 @@ export default {
           description: 'Complete transaction history and audit trail',
           category: 'transactions',
           lastRun: new Date(Date.now() - 1800000).toISOString(),
-          frequency: 'real-time'
+          frequency: 'real-time',
         },
         {
           id: 'settled_figure',
@@ -1563,22 +1641,22 @@ export default {
           description: 'Settled bets and collections management',
           category: 'collections',
           lastRun: new Date(Date.now() - 7200000).toISOString(),
-          frequency: 'hourly'
-        }
+          frequency: 'hourly',
+        },
       ],
       quickStats: {
         reportsGenerated: Math.floor(Math.random() * 1000) + 500,
         dataPoints: Math.floor(Math.random() * 1000000) + 500000,
         storageUsed: `${Math.floor(Math.random() * 50) + 10}GB`,
-        lastBackup: new Date(Date.now() - 86400000).toISOString()
+        lastBackup: new Date(Date.now() - 86400000).toISOString(),
       },
       actions: [
         'Generate Report',
         'Schedule Reports',
         'Export Data',
         'Custom Reports',
-        'Report Templates'
-      ]
+        'Report Templates',
+      ],
     };
 
     return ApiResponseFormatter.formatSuccess(reportingData, { requestId });
@@ -1588,7 +1666,7 @@ export default {
     if (!employee.features.includes('admin-tools')) {
       return ApiResponseFormatter.formatError('Admin tools access not available', 403, {
         requestId,
-        code: 'FEATURE_NOT_AVAILABLE'
+        code: 'FEATURE_NOT_AVAILABLE',
       });
     }
 
@@ -1601,7 +1679,7 @@ export default {
           description: 'Real-time bet monitoring and tracking',
           category: 'monitoring',
           status: 'active',
-          usage: Math.floor(Math.random() * 1000) + 500
+          usage: Math.floor(Math.random() * 1000) + 500,
         },
         {
           id: 'ticketwriter',
@@ -1609,7 +1687,7 @@ export default {
           description: 'Advanced ticket creation and management',
           category: 'operations',
           status: 'active',
-          usage: Math.floor(Math.random() * 800) + 300
+          usage: Math.floor(Math.random() * 800) + 300,
         },
         {
           id: 'sportsbook_lines',
@@ -1617,7 +1695,7 @@ export default {
           description: 'Live odds and line management',
           category: 'trading',
           status: 'active',
-          usage: Math.floor(Math.random() * 1200) + 600
+          usage: Math.floor(Math.random() * 1200) + 600,
         },
         {
           id: 'scores',
@@ -1625,38 +1703,38 @@ export default {
           description: 'Real-time game scores and updates',
           category: 'monitoring',
           status: 'active',
-          usage: Math.floor(Math.random() * 2000) + 1000
-        }
+          usage: Math.floor(Math.random() * 2000) + 1000,
+        },
       ],
       systemTools: [
         'Database Maintenance',
         'Cache Management',
         'Log Rotation',
-        'Backup Operations'
+        'Backup Operations',
       ],
       integrations: [
         {
           name: '3rd Party APIs',
           status: 'connected',
-          lastSync: new Date(Date.now() - 300000).toISOString()
+          lastSync: new Date(Date.now() - 300000).toISOString(),
         },
         {
           name: 'Payment Processors',
           status: 'active',
-          lastSync: new Date(Date.now() - 600000).toISOString()
+          lastSync: new Date(Date.now() - 600000).toISOString(),
         },
         {
           name: 'Data Feeds',
           status: 'connected',
-          lastSync: new Date(Date.now() - 120000).toISOString()
-        }
+          lastSync: new Date(Date.now() - 120000).toISOString(),
+        },
       ],
       actions: [
         'Run Diagnostics',
         'System Maintenance',
         'Integration Testing',
-        'Performance Optimization'
-      ]
+        'Performance Optimization',
+      ],
     };
 
     return ApiResponseFormatter.formatSuccess(toolsData, { requestId });
@@ -1666,7 +1744,7 @@ export default {
     if (employee.tier < 3) {
       return ApiResponseFormatter.formatError('Billing access requires Tier 3+', 403, {
         requestId,
-        code: 'INSUFFICIENT_TIER'
+        code: 'INSUFFICIENT_TIER',
       });
     }
 
@@ -1677,7 +1755,7 @@ export default {
       agents: {
         total: Math.floor(Math.random() * 1000) + 200,
         active: Math.floor(Math.random() * 800) + 150,
-        commissionsPaid: Math.floor(Math.random() * 150000) + 50000
+        commissionsPaid: Math.floor(Math.random() * 150000) + 50000,
       },
       invoices: [
         {
@@ -1686,7 +1764,7 @@ export default {
           amount: 12500,
           status: 'paid',
           dueDate: new Date(Date.now() - 86400000).toISOString(),
-          paidDate: new Date(Date.now() - 172800000).toISOString()
+          paidDate: new Date(Date.now() - 172800000).toISOString(),
         },
         {
           id: 'inv_002',
@@ -1694,22 +1772,22 @@ export default {
           amount: 8750,
           status: 'pending',
           dueDate: new Date(Date.now() + 86400000).toISOString(),
-          paidDate: null
-        }
+          paidDate: null,
+        },
       ],
       revenueBreakdown: {
         sportsBetting: Math.floor(Math.random() * 600000) + 200000,
         casino: Math.floor(Math.random() * 400000) + 150000,
         poker: Math.floor(Math.random() * 200000) + 50000,
-        other: Math.floor(Math.random() * 100000) + 25000
+        other: Math.floor(Math.random() * 100000) + 25000,
       },
       actions: [
         'Generate Invoice',
         'Process Payment',
         'Revenue Reports',
         'Commission Calculator',
-        'Billing History'
-      ]
+        'Billing History',
+      ],
     };
 
     return ApiResponseFormatter.formatSuccess(billingData, { requestId });
@@ -1724,7 +1802,7 @@ export default {
         customer: Math.floor(Math.random() * 40) + 10,
         agent: Math.floor(Math.random() * 30) + 8,
         operational: Math.floor(Math.random() * 60) + 20,
-        compliance: Math.floor(Math.random() * 20) + 5
+        compliance: Math.floor(Math.random() * 20) + 5,
       },
       recentRules: [
         {
@@ -1733,7 +1811,7 @@ export default {
           category: 'betting',
           status: 'active',
           created: new Date(Date.now() - 86400000).toISOString(),
-          author: 'Compliance Officer'
+          author: 'Compliance Officer',
         },
         {
           id: 'rule_002',
@@ -1741,21 +1819,15 @@ export default {
           category: 'agent',
           status: 'draft',
           created: new Date(Date.now() - 172800000).toISOString(),
-          author: 'Management'
-        }
+          author: 'Management',
+        },
       ],
       compliance: {
         lastAudit: new Date(Date.now() - 2592000000).toISOString(),
         status: 'compliant',
-        nextAudit: new Date(Date.now() + 2592000000).toISOString()
+        nextAudit: new Date(Date.now() + 2592000000).toISOString(),
       },
-      actions: [
-        'Create Rule',
-        'Edit Rules',
-        'Rule Templates',
-        'Compliance Audit',
-        'Rule History'
-      ]
+      actions: ['Create Rule', 'Edit Rules', 'Rule Templates', 'Compliance Audit', 'Rule History'],
     };
 
     return ApiResponseFormatter.formatSuccess(rulesData, { requestId });
@@ -1765,7 +1837,7 @@ export default {
     if (employee.tier < 4) {
       return ApiResponseFormatter.formatError('Settings access requires Tier 4+', 403, {
         requestId,
-        code: 'INSUFFICIENT_PRIVILEGES'
+        code: 'INSUFFICIENT_PRIVILEGES',
       });
     }
 
@@ -1775,51 +1847,51 @@ export default {
         timezone: 'America/New_York',
         currency: 'USD',
         language: 'en',
-        theme: 'dark'
+        theme: 'dark',
       },
       features: {
         realTimeUpdates: true,
         emailNotifications: true,
         smsAlerts: false,
         autoBackup: true,
-        maintenanceMode: false
+        maintenanceMode: false,
       },
       limits: {
         maxBetAmount: 10000,
         maxDailyBets: 100,
         maxConcurrentSessions: 5,
-        rateLimitPerMinute: 60
+        rateLimitPerMinute: 60,
       },
       integrations: [
         {
           name: 'Payment Processor',
           status: 'active',
-          config: 'configured'
+          config: 'configured',
         },
         {
           name: 'Odds Provider',
           status: 'active',
-          config: 'configured'
+          config: 'configured',
         },
         {
           name: 'SMS Service',
           status: 'inactive',
-          config: 'not_configured'
-        }
+          config: 'not_configured',
+        },
       ],
       security: {
         twoFactorAuth: true,
         sessionTimeout: 30,
         passwordPolicy: 'strong',
-        ipWhitelist: false
+        ipWhitelist: false,
       },
       actions: [
         'Save Settings',
         'Reset to Defaults',
         'Export Configuration',
         'System Backup',
-        'Maintenance Mode'
-      ]
+        'Maintenance Mode',
+      ],
     };
 
     return ApiResponseFormatter.formatSuccess(settingsData, { requestId });
@@ -1835,7 +1907,7 @@ export default {
       kv_key_expected: `employee:${subdomain}`,
       timestamp: new Date().toISOString(),
       requestId: requestId,
-      note: 'This is a debug endpoint to check subdomain processing'
+      note: 'This is a debug endpoint to check subdomain processing',
     };
 
     return new Response(JSON.stringify(debugInfo, null, 2), {
@@ -1843,7 +1915,7 @@ export default {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache',
         'X-Request-ID': requestId,
-      }
+      },
     });
   },
 

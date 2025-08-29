@@ -65,5 +65,10 @@
     "domain": "benchmarking",
     "workspace": "fire22-benchmarking-suite",
     "updatedAt": "2025-08-27T05:43:39.373Z"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture.git",
+    "directory": "fire22-benchmarking-suite/packages/micro-benchmarks"
   }
 }

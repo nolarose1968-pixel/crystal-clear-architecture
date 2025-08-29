@@ -1,9 +1,12 @@
 # Code Standards & Formatting Guide
 
 ## Overview
-This document outlines the coding standards and formatting conventions for the Fantasy42 Dashboard Worker project.
+
+This document outlines the coding standards and formatting conventions for the
+Fantasy42 Dashboard Worker project.
 
 ## General Principles
+
 - **Consistency**: Code should be consistent across the entire codebase
 - **Readability**: Code should be easy to read and understand
 - **Maintainability**: Code should be easy to maintain and modify
@@ -12,12 +15,14 @@ This document outlines the coding standards and formatting conventions for the F
 ## TypeScript/JavaScript Standards
 
 ### File Organization
+
 - One class/interface per file (except utilities)
 - Related functions grouped in logical modules
 - Clear separation of concerns
 - Consistent import/export patterns
 
 ### Naming Conventions
+
 - **Files**: kebab-case (e.g., `fantasy42-integration.ts`)
 - **Classes**: PascalCase (e.g., `Fantasy42Integration`)
 - **Functions/Methods**: camelCase (e.g., `getCustomerInfo`)
@@ -25,6 +30,7 @@ This document outlines the coding standards and formatting conventions for the F
 - **Variables**: camelCase (e.g., `customerData`)
 
 ### Code Style
+
 - **Indentation**: 2 spaces (not tabs)
 - **Line Length**: Maximum 120 characters
 - **Braces**: Same line for functions, new line for classes
@@ -32,12 +38,14 @@ This document outlines the coding standards and formatting conventions for the F
 - **Semicolons**: Always use semicolons
 
 ### Error Handling
+
 - Use try-catch for async operations
 - Provide meaningful error messages
 - Log errors appropriately (not excessive console.log)
 - Handle edge cases gracefully
 
 ### Performance Guidelines
+
 - Avoid unnecessary loops and computations
 - Use efficient data structures
 - Minimize API calls and database queries
@@ -47,12 +55,14 @@ This document outlines the coding standards and formatting conventions for the F
 ## Documentation Standards
 
 ### Code Comments
+
 - Use JSDoc for public APIs
 - Explain complex logic, not obvious code
 - Keep comments up-to-date with code changes
 - Use TODO/FIXME sparingly and with action items
 
 ### File Headers
+
 ```typescript
 /**
  * Brief description of the file's purpose
@@ -63,12 +73,14 @@ This document outlines the coding standards and formatting conventions for the F
 ## Import/Export Standards
 
 ### Import Order
+
 1. Node.js built-ins
 2. External libraries
 3. Internal modules (utilities, types, etc.)
 4. Relative imports
 
 ### Import Style
+
 ```typescript
 // Good
 import { User } from '../types/user';
@@ -81,6 +93,7 @@ import * as Utils from '../utils';
 ## Anti-Patterns to Avoid
 
 ### Excessive Logging
+
 ```typescript
 // ❌ Bad - Excessive debug logging
 console.log('Starting function...');
@@ -95,11 +108,13 @@ if (process.env.NODE_ENV === 'development') {
 ```
 
 ### Large Files
+
 - Break down files over 1000 lines into smaller modules
 - Separate concerns into different files
 - Use index files for clean exports
 
 ### Redundant Code
+
 - Extract common functionality into utilities
 - Use inheritance/composition appropriately
 - Avoid duplicate implementations
@@ -107,6 +122,7 @@ if (process.env.NODE_ENV === 'development') {
 ## Code Quality Checklist
 
 ### Before Commit
+
 - [ ] No console.log statements (except essential errors)
 - [ ] Consistent formatting (2-space indentation)
 - [ ] No TODO comments without action items
@@ -117,6 +133,7 @@ if (process.env.NODE_ENV === 'development') {
 - [ ] Tests pass (if applicable)
 
 ### Performance Review
+
 - [ ] No unnecessary computations
 - [ ] Efficient algorithms used
 - [ ] Memory leaks prevented
@@ -126,11 +143,13 @@ if (process.env.NODE_ENV === 'development') {
 ## Tools & Automation
 
 ### Recommended Extensions
+
 - Prettier (code formatting)
 - ESLint (code linting)
 - TypeScript Importer (auto-imports)
 
 ### Scripts
+
 ```bash
 # Format code
 bun run format

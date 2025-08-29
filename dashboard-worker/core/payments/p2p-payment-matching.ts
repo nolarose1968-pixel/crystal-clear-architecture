@@ -11,10 +11,10 @@ export interface P2PPaymentRequest {
   amount: number;
   currency: string;
   paymentDetails: {
-    username?: string;      // Venmo, Cash App, PayPal username
-    phoneNumber?: string;   // Zelle phone number
-    email?: string;         // PayPal email, Zelle email
-    fullName?: string;      // Full name for verification
+    username?: string; // Venmo, Cash App, PayPal username
+    phoneNumber?: string; // Zelle phone number
+    email?: string; // PayPal email, Zelle email
+    fullName?: string; // Full name for verification
   };
   status: 'pending' | 'matched' | 'in_progress' | 'completed' | 'cancelled' | 'expired';
   createdAt: string;
@@ -41,11 +41,18 @@ export interface P2PMatch {
   paymentMethod: P2PPaymentRequest['paymentMethod'];
   amount: number;
   currency: string;
-  status: 'pending' | 'payment_sent' | 'payment_received' | 'verified' | 'completed' | 'disputed' | 'cancelled';
+  status:
+    | 'pending'
+    | 'payment_sent'
+    | 'payment_received'
+    | 'verified'
+    | 'completed'
+    | 'disputed'
+    | 'cancelled';
   escrowAmount: number;
   verificationCode: string;
   createdAt: string;
-  paymentDeadline: string;  // When payment should be sent
+  paymentDeadline: string; // When payment should be sent
   verificationDeadline: string; // When verification should be completed
   paymentSentAt?: string;
   paymentReceivedAt?: string;
@@ -74,12 +81,15 @@ export interface P2PStats {
   totalVolume: number;
   disputesCount: number;
   disputesResolved: number;
-  paymentMethodStats: Record<string, {
-    requests: number;
-    matches: number;
-    successRate: number;
-    averageAmount: number;
-  }>;
+  paymentMethodStats: Record<
+    string,
+    {
+      requests: number;
+      matches: number;
+      successRate: number;
+      averageAmount: number;
+    }
+  >;
   hourlyActivity: Record<string, number>;
   queueDepth: Record<string, { deposits: number; withdrawals: number }>;
 }
@@ -127,7 +137,7 @@ export class P2PPaymentMatching {
       verificationCode: this.generateVerificationCode(),
       telegramChatId,
       priority,
-      notes: this.generateRequestNotes(type, paymentMethod, amount)
+      notes: this.generateRequestNotes(type, paymentMethod, amount),
     };
 
     this.requests.set(request.id, request);
@@ -177,7 +187,7 @@ export class P2PPaymentMatching {
       verificationCode: this.generateVerificationCode(),
       createdAt: new Date().toISOString(),
       paymentDeadline: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes
-      verificationDeadline: new Date(Date.now() + 60 * 60 * 1000).toISOString() // 1 hour
+      verificationDeadline: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour
     };
 
     // Update request statuses
@@ -186,7 +196,7 @@ export class P2PPaymentMatching {
     depositRequest.matchedWith = {
       requestId: withdrawalRequest.id,
       customerId: withdrawalRequest.customerId,
-      matchedAt: match.createdAt
+      matchedAt: match.createdAt,
     };
 
     withdrawalRequest.status = 'matched';
@@ -194,7 +204,7 @@ export class P2PPaymentMatching {
     withdrawalRequest.matchedWith = {
       requestId: depositRequest.id,
       customerId: depositRequest.customerId,
-      matchedAt: match.createdAt
+      matchedAt: match.createdAt,
     };
 
     this.matches.set(match.id, match);
@@ -299,13 +309,20 @@ export class P2PPaymentMatching {
   /**
    * Create dispute for match
    */
-  async createDispute(matchId: string, initiatedByCustomerId: string, reason: string): Promise<void> {
+  async createDispute(
+    matchId: string,
+    initiatedByCustomerId: string,
+    reason: string
+  ): Promise<void> {
     const match = this.matches.get(matchId);
     if (!match) {
       throw new Error('Match not found');
     }
 
-    if (initiatedByCustomerId !== match.depositCustomerId && initiatedByCustomerId !== match.withdrawalCustomerId) {
+    if (
+      initiatedByCustomerId !== match.depositCustomerId &&
+      initiatedByCustomerId !== match.withdrawalCustomerId
+    ) {
       throw new Error('Only match participants can create disputes');
     }
 
@@ -328,10 +345,9 @@ export class P2PPaymentMatching {
     if (!queue) return [];
 
     return queue.withdrawalQueue
-      .filter(req =>
-        req.status === 'pending' &&
-        req.amount === amount &&
-        new Date(req.expiresAt) > new Date()
+      .filter(
+        req =>
+          req.status === 'pending' && req.amount === amount && new Date(req.expiresAt) > new Date()
       )
       .sort((a, b) => {
         // Sort by priority and creation time
@@ -357,9 +373,8 @@ export class P2PPaymentMatching {
    */
   getCustomerMatches(customerId: string): P2PMatch[] {
     return Array.from(this.matches.values())
-      .filter(match =>
-        match.depositCustomerId === customerId ||
-        match.withdrawalCustomerId === customerId
+      .filter(
+        match => match.depositCustomerId === customerId || match.withdrawalCustomerId === customerId
       )
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
@@ -376,7 +391,7 @@ export class P2PPaymentMatching {
         withdrawals: queue.withdrawalQueue.filter(req => req.status === 'pending').length,
         matches: Array.from(this.matches.values()).filter(
           match => match.paymentMethod === method && match.status === 'completed'
-        ).length
+        ).length,
       };
     }
 
@@ -386,7 +401,12 @@ export class P2PPaymentMatching {
   // Private helper methods
   private initializeQueues(): void {
     const paymentMethods: P2PPaymentRequest['paymentMethod'][] = [
-      'venmo', 'cashapp', 'paypal', 'zelle', 'apple_pay', 'google_pay'
+      'venmo',
+      'cashapp',
+      'paypal',
+      'zelle',
+      'apple_pay',
+      'google_pay',
     ];
 
     for (const method of paymentMethods) {
@@ -395,7 +415,7 @@ export class P2PPaymentMatching {
         depositQueue: [],
         withdrawalQueue: [],
         totalMatched: 0,
-        averageMatchTime: 0
+        averageMatchTime: 0,
       });
     }
   }
@@ -412,7 +432,7 @@ export class P2PPaymentMatching {
       disputesResolved: 0,
       paymentMethodStats: {},
       hourlyActivity: {},
-      queueDepth: {}
+      queueDepth: {},
     };
   }
 
@@ -454,7 +474,6 @@ export class P2PPaymentMatching {
           // Update average match time
           const matchTime = Date.now() - new Date(deposit.createdAt).getTime();
           queue.averageMatchTime = (queue.averageMatchTime + matchTime) / 2;
-
         } catch (error) {
           console.error(`Failed to match requests ${deposit.id} and ${withdrawal.id}:`, error);
         }
@@ -495,7 +514,7 @@ export class P2PPaymentMatching {
       paypal: { min: 1, max: 10000 },
       zelle: { min: 1, max: 2500 },
       apple_pay: { min: 1, max: 10000 },
-      google_pay: { min: 1, max: 10000 }
+      google_pay: { min: 1, max: 10000 },
     };
 
     const limit = limits[method];
@@ -511,7 +530,9 @@ export class P2PPaymentMatching {
     // 3. Update internal balances
     // 4. Send confirmation notifications
 
-    console.log(`Processing completed match ${match.id}: ${match.amount} via ${match.paymentMethod}`);
+    console.log(
+      `Processing completed match ${match.id}: ${match.amount} via ${match.paymentMethod}`
+    );
   }
 
   private async sendMatchNotifications(match: P2PMatch): Promise<void> {
@@ -564,34 +585,38 @@ export class P2PPaymentMatching {
    */
   getStats(): P2PStats {
     const totalRequests = this.requests.size;
-    const activeRequests = Array.from(this.requests.values())
-      .filter(req => req.status === 'pending' || req.status === 'matched').length;
-    const completedMatches = Array.from(this.matches.values())
-      .filter(match => match.status === 'completed').length;
+    const activeRequests = Array.from(this.requests.values()).filter(
+      req => req.status === 'pending' || req.status === 'matched'
+    ).length;
+    const completedMatches = Array.from(this.matches.values()).filter(
+      match => match.status === 'completed'
+    ).length;
     const successRate = totalRequests > 0 ? completedMatches / totalRequests : 0;
 
     const totalVolume = Array.from(this.matches.values())
       .filter(match => match.status === 'completed')
       .reduce((sum, match) => sum + match.amount, 0);
 
-    const disputesCount = Array.from(this.matches.values())
-      .filter(match => match.status === 'disputed').length;
+    const disputesCount = Array.from(this.matches.values()).filter(
+      match => match.status === 'disputed'
+    ).length;
 
     // Calculate payment method stats
     const paymentMethodStats: Record<string, any> = {};
     for (const method of ['venmo', 'cashapp', 'paypal', 'zelle', 'apple_pay', 'google_pay']) {
-      const methodMatches = Array.from(this.matches.values())
-        .filter(match => match.paymentMethod === method);
+      const methodMatches = Array.from(this.matches.values()).filter(
+        match => match.paymentMethod === method
+      );
 
       const completed = methodMatches.filter(m => m.status === 'completed');
       const totalAmount = completed.reduce((sum, m) => sum + m.amount, 0);
 
       paymentMethodStats[method] = {
-        requests: Array.from(this.requests.values())
-          .filter(req => req.paymentMethod === method).length,
+        requests: Array.from(this.requests.values()).filter(req => req.paymentMethod === method)
+          .length,
         matches: methodMatches.length,
         successRate: methodMatches.length > 0 ? completed.length / methodMatches.length : 0,
-        averageAmount: completed.length > 0 ? totalAmount / completed.length : 0
+        averageAmount: completed.length > 0 ? totalAmount / completed.length : 0,
       };
     }
 
@@ -600,7 +625,7 @@ export class P2PPaymentMatching {
     for (const [method, queue] of this.queues) {
       queueDepth[method] = {
         deposits: queue.depositQueue.filter(req => req.status === 'pending').length,
-        withdrawals: queue.withdrawalQueue.filter(req => req.status === 'pending').length
+        withdrawals: queue.withdrawalQueue.filter(req => req.status === 'pending').length,
       };
     }
 
@@ -615,7 +640,7 @@ export class P2PPaymentMatching {
       disputesResolved: disputesCount * 0.9, // Assume 90% resolution rate
       paymentMethodStats,
       hourlyActivity: {}, // Would be populated with hourly data
-      queueDepth
+      queueDepth,
     };
   }
 

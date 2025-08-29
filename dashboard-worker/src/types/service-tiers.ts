@@ -6,14 +6,14 @@
 export enum ServiceTier {
   TIER_1 = 1,
   TIER_2 = 2,
-  TIER_3 = 3
+  TIER_3 = 3,
 }
 
 export interface ServiceTierConfig {
   tier: ServiceTier;
   name: string;
   description: string;
-  
+
   // Requirements to achieve this tier
   requirements: {
     minLifetimeVolume: number;
@@ -25,7 +25,7 @@ export interface ServiceTierConfig {
     requiresReferrals?: number;
     excludedCustomerTypes?: string[];
   };
-  
+
   // Service Level Benefits
   benefits: {
     // Response Times
@@ -33,14 +33,14 @@ export interface ServiceTierConfig {
     supportResponseTimeMinutes: number; // for SLA tracking
     priorityQueue: boolean;
     dedicatedSupport: boolean;
-    
+
     // Transaction Benefits
     feeDiscountPercentage: number; // Additional discount on all fees
     higherLimits: boolean;
     limitMultiplier: number; // Multiply base limits by this
     fastTrackApproval: boolean;
     skipManualReview: boolean;
-    
+
     // Features & Access
     betaFeatureAccess: boolean;
     customPaymentMethods: boolean;
@@ -48,7 +48,7 @@ export interface ServiceTierConfig {
     apiAccess: boolean;
     whiteGloveService: boolean;
     personalAccountManager: boolean;
-    
+
     // Communication
     telegram: {
       privateSupportGroup: boolean;
@@ -56,7 +56,7 @@ export interface ServiceTierConfig {
       priorityNotifications: boolean;
       customNotifications: boolean;
     };
-    
+
     // Rewards & Recognition
     monthlyBonus: number; // Fixed bonus amount
     loyaltyPointsMultiplier: number;
@@ -64,7 +64,7 @@ export interface ServiceTierConfig {
     birthdayRewards: boolean;
     anniversaryRewards: boolean;
   };
-  
+
   // Visual Identity
   display: {
     badge: string;
@@ -72,7 +72,7 @@ export interface ServiceTierConfig {
     icon: string;
     backgroundGradient: string;
   };
-  
+
   // SLA Commitments
   sla: {
     uptime: number; // 99.9%
@@ -81,7 +81,7 @@ export interface ServiceTierConfig {
     issueResolutionTime: number; // hours
     escalationTime: number; // minutes
   };
-  
+
   // Metadata
   isActive: boolean;
   createdAt: Date;
@@ -92,10 +92,10 @@ export interface ServiceTierConfig {
 export interface CustomerServiceProfile {
   customerId: string;
   currentTier: ServiceTier;
-  
+
   // Tier History
   tierHistory: TierHistoryEntry[];
-  
+
   // Current Period Metrics (for tier calculation)
   currentPeriod: {
     startDate: Date;
@@ -107,7 +107,7 @@ export interface CustomerServiceProfile {
     referralCount: number;
     lastTierReview: Date;
   };
-  
+
   // Service Quality Metrics
   serviceMetrics: {
     averageResponseTime: number; // minutes
@@ -117,7 +117,7 @@ export interface CustomerServiceProfile {
     complimentsReceived: number;
     complaintsReceived: number;
   };
-  
+
   // Benefits Utilization
   benefitsUsed: {
     feeDiscountUsed: number; // total amount saved
@@ -126,7 +126,7 @@ export interface CustomerServiceProfile {
     betaFeaturesAccessed: string[];
     personalManagerInteractions: number;
   };
-  
+
   // Next Tier Progress
   nextTierProgress: {
     targetTier: ServiceTier | null;
@@ -136,7 +136,7 @@ export interface CustomerServiceProfile {
     missingRequirements: string[];
     estimatedUpgradeDate: Date | null;
   };
-  
+
   // Metadata
   createdAt: Date;
   updatedAt: Date;
@@ -166,23 +166,23 @@ export interface TierUpgradeNotification {
 export interface TierBusinessRules {
   // Automatic tier review frequency
   reviewFrequencyDays: number;
-  
+
   // Grace periods before downgrade
   downgradePeriods: {
     [ServiceTier.TIER_3]: number; // days
     [ServiceTier.TIER_2]: number;
     [ServiceTier.TIER_1]: number;
   };
-  
+
   // Override rules
   manualOverrideAllowed: boolean;
   manualOverrideRequiresApproval: boolean;
   manualOverrideMaxTier: ServiceTier;
-  
+
   // Suspension rules
   suspendTierOnRisk: boolean;
   suspendTierOnComplaints: number; // threshold
-  
+
   // Special promotions
   promotionalTierUpgrades: {
     enabled: boolean;

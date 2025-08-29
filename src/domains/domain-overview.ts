@@ -6,12 +6,12 @@
  * that form the foundation of the Crystal Clear Architecture.
  */
 
-import { CollectionsController } from './collections/collections.controller';
-import { BalanceController } from './balance/balance.controller';
-import { Fantasy402Gateway } from './external/fantasy402/gateway/fantasy402-gateway';
-import { DomainOrchestrator } from './shared/domain-orchestrator';
-import { EventWorkflows } from './shared/events/event-workflows';
-import { DomainEvents } from './shared/events/domain-events';
+import { CollectionsController } from "./collections/collections.controller";
+import { BalanceController } from "./balance/balance.controller";
+import { Fantasy402Gateway } from "./external/fantasy402/gateway/fantasy402-gateway";
+import { DomainOrchestrator } from "./shared/domain-orchestrator";
+import { EventWorkflows } from "./shared/events/event-workflows";
+import { DomainEvents } from "./shared/events/domain-events";
 
 export interface DomainMetrics {
   name: string;
@@ -38,22 +38,22 @@ export interface ArchitectureMetrics {
  */
 export class CollectionsDomain {
   static readonly METRICS: DomainMetrics = {
-    name: 'Collections',
+    name: "Collections",
     files: 8,
     linesOfCode: 1250,
     endpoints: 12,
-    reliability: '99.9%',
-    performance: '70-80% boost',
+    reliability: "99.9%",
+    performance: "70-80% boost",
     features: [
-      'Real-time settlement processing',
-      'Payment gateway integration',
-      'Audit trail management',
-      'Regulatory compliance',
-      'Risk assessment',
-      'Transaction validation',
-      'Multi-currency support',
-      'Fraud detection'
-    ]
+      "Real-time settlement processing",
+      "Payment gateway integration",
+      "Audit trail management",
+      "Regulatory compliance",
+      "Risk assessment",
+      "Transaction validation",
+      "Multi-currency support",
+      "Fraud detection",
+    ],
   };
 
   static readonly DESCRIPTION = `
@@ -95,8 +95,8 @@ TECHNICAL FEATURES:
     return {
       activePayments: 0,
       processedToday: 0,
-      successRate: '99.9%',
-      averageProcessingTime: '<100ms'
+      successRate: "99.9%",
+      averageProcessingTime: "<100ms",
     };
   }
 }
@@ -107,22 +107,22 @@ TECHNICAL FEATURES:
  */
 export class BalanceDomain {
   static readonly METRICS: DomainMetrics = {
-    name: 'Balance',
+    name: "Balance",
     files: 7,
     linesOfCode: 980,
     endpoints: 10,
-    reliability: '99.9%',
-    performance: '75% boost',
+    reliability: "99.9%",
+    performance: "75% boost",
     features: [
-      'Real-time balance updates',
-      'Account validation',
-      'Transaction history',
-      'Balance reconciliation',
-      'Threshold monitoring',
-      'Multi-currency accounts',
-      'Account freezing/unfreezing',
-      'Balance synchronization'
-    ]
+      "Real-time balance updates",
+      "Account validation",
+      "Transaction history",
+      "Balance reconciliation",
+      "Threshold monitoring",
+      "Multi-currency accounts",
+      "Account freezing/unfreezing",
+      "Balance synchronization",
+    ],
   };
 
   static readonly DESCRIPTION = `
@@ -165,7 +165,7 @@ TECHNICAL FEATURES:
       activeAccounts: 0,
       totalBalance: 0,
       lowBalanceAlerts: 0,
-      frozenAccounts: 0
+      frozenAccounts: 0,
     };
   }
 }
@@ -176,22 +176,22 @@ TECHNICAL FEATURES:
  */
 export class DistributionsDomain {
   static readonly METRICS: DomainMetrics = {
-    name: 'Distributions',
+    name: "Distributions",
     files: 0, // Not yet implemented
     linesOfCode: 0,
     endpoints: 0,
-    reliability: 'Planned',
-    performance: 'Planned',
+    reliability: "Planned",
+    performance: "Planned",
     features: [
-      'Multi-tier commission structures',
-      'Automated payout processing',
-      'Revenue analytics',
-      'Tax compliance tracking',
-      'Commission reconciliation',
-      'Payout scheduling',
-      'Agent hierarchy management',
-      'Performance-based bonuses'
-    ]
+      "Multi-tier commission structures",
+      "Automated payout processing",
+      "Revenue analytics",
+      "Tax compliance tracking",
+      "Commission reconciliation",
+      "Payout scheduling",
+      "Agent hierarchy management",
+      "Performance-based bonuses",
+    ],
   };
 
   static readonly DESCRIPTION = `
@@ -230,22 +230,22 @@ TECHNICAL ARCHITECTURE:
  */
 export class FreePlayDomain {
   static readonly METRICS: DomainMetrics = {
-    name: 'Free Play',
+    name: "Free Play",
     files: 0, // Not yet implemented
     linesOfCode: 0,
     endpoints: 0,
-    reliability: 'Planned',
-    performance: 'Planned',
+    reliability: "Planned",
+    performance: "Planned",
     features: [
-      'Bonus lifecycle management',
-      'Wagering requirement tracking',
-      'Promotional campaigns',
-      'Fraud detection',
-      'Bonus expiration handling',
-      'Progressive bonus unlocks',
-      'Campaign analytics',
-      'Player engagement tracking'
-    ]
+      "Bonus lifecycle management",
+      "Wagering requirement tracking",
+      "Promotional campaigns",
+      "Fraud detection",
+      "Bonus expiration handling",
+      "Progressive bonus unlocks",
+      "Campaign analytics",
+      "Player engagement tracking",
+    ],
   };
 
   static readonly DESCRIPTION = `
@@ -284,22 +284,22 @@ TECHNICAL ARCHITECTURE:
  */
 export class AdjustmentDomain {
   static readonly METRICS: DomainMetrics = {
-    name: 'Adjustment',
+    name: "Adjustment",
     files: 0, // Not yet implemented
     linesOfCode: 0,
     endpoints: 0,
-    reliability: 'Planned',
-    performance: 'Planned',
+    reliability: "Planned",
+    performance: "Planned",
     features: [
-      'Transaction corrections',
-      'Audit logging',
-      'Approval workflows',
-      'Compliance reporting',
-      'Adjustment reversals',
-      'Bulk adjustments',
-      'Reason code tracking',
-      'Regulatory reporting'
-    ]
+      "Transaction corrections",
+      "Audit logging",
+      "Approval workflows",
+      "Compliance reporting",
+      "Adjustment reversals",
+      "Bulk adjustments",
+      "Reason code tracking",
+      "Regulatory reporting",
+    ],
   };
 
   static readonly DESCRIPTION = `
@@ -337,19 +337,26 @@ TECHNICAL ARCHITECTURE:
  */
 export class CrystalClearArchitecture {
   static readonly OVERVIEW = {
-    name: 'Crystal Clear Architecture',
-    description: 'Enterprise Domain-Driven Reference Implementation for Modern Dashboard Systems',
-    version: '1.0.0',
-    domains: ['Collections', 'Balance', 'Distributions', 'Free Play', 'Adjustment']
+    name: "Crystal Clear Architecture",
+    description:
+      "Enterprise Domain-Driven Reference Implementation for Modern Dashboard Systems",
+    version: "1.0.0",
+    domains: [
+      "Collections",
+      "Balance",
+      "Distributions",
+      "Free Play",
+      "Adjustment",
+    ],
   };
 
   static readonly METRICS: ArchitectureMetrics = {
     totalFiles: 110,
     totalLinesOfCode: 45000,
     totalDomains: 11, // Including shared infrastructure
-    systemReliability: '99.9%',
-    performanceBoost: '70-80%',
-    butterflyEffectSolved: true
+    systemReliability: "99.9%",
+    performanceBoost: "70-80%",
+    butterflyEffectSolved: true,
   };
 
   static readonly CAPABILITIES = {
@@ -358,7 +365,7 @@ export class CrystalClearArchitecture {
     realTimePerformance: true,
     eventDrivenArchitecture: true,
     scalableDeployment: true,
-    comprehensiveDocumentation: true
+    comprehensiveDocumentation: true,
   };
 
   static getDomainMetrics(): DomainMetrics[] {
@@ -367,28 +374,28 @@ export class CrystalClearArchitecture {
       BalanceDomain.METRICS,
       DistributionsDomain.METRICS,
       FreePlayDomain.METRICS,
-      AdjustmentDomain.METRICS
+      AdjustmentDomain.METRICS,
     ];
   }
 
   static async getSystemHealth(): Promise<{
-    overall: 'healthy' | 'degraded' | 'unhealthy';
-    domains: Record<string, 'healthy' | 'degraded' | 'unhealthy'>;
+    overall: "healthy" | "degraded" | "unhealthy";
+    domains: Record<string, "healthy" | "degraded" | "unhealthy">;
     eventsProcessed: number;
     activeProcesses: number;
   }> {
     // Implementation would check actual system health
     return {
-      overall: 'healthy',
+      overall: "healthy",
       domains: {
-        collections: 'healthy',
-        balance: 'healthy',
-        distributions: 'healthy', // planned
-        freeplay: 'healthy', // planned
-        adjustment: 'healthy' // planned
+        collections: "healthy",
+        balance: "healthy",
+        distributions: "healthy", // planned
+        freeplay: "healthy", // planned
+        adjustment: "healthy", // planned
       },
       eventsProcessed: 0,
-      activeProcesses: 0
+      activeProcesses: 0,
     };
   }
 
@@ -403,15 +410,15 @@ Enterprise Domain-Driven Reference Implementation for Modern Dashboard Systems
 • ${this.METRICS.totalDomains} Domain Modules
 • ${this.METRICS.systemReliability} System Reliability
 • ${this.METRICS.performanceBoost} Performance Boost
-• Butterfly Effect: ${this.METRICS.butterflyEffectSolved ? 'SOLVED' : 'PRESENT'}
+• Butterfly Effect: ${this.METRICS.butterflyEffectSolved ? "SOLVED" : "PRESENT"}
 
 🚀 ENTERPRISE CAPABILITIES:
-• Domain-Agnostic Modules: ${this.CAPABILITIES.domainAgnosticModules ? '✅' : '❌'}
-• Enterprise-Grade Security: ${this.CAPABILITIES.enterpriseGradeSecurity ? '✅' : '❌'}
-• Real-Time Performance: ${this.CAPABILITIES.realTimePerformance ? '✅' : '❌'}
-• Event-Driven Architecture: ${this.CAPABILITIES.eventDrivenArchitecture ? '✅' : '❌'}
-• Scalable Deployment: ${this.CAPABILITIES.scalableDeployment ? '✅' : '❌'}
-• Comprehensive Documentation: ${this.CAPABILITIES.comprehensiveDocumentation ? '✅' : '❌'}
+• Domain-Agnostic Modules: ${this.CAPABILITIES.domainAgnosticModules ? "✅" : "❌"}
+• Enterprise-Grade Security: ${this.CAPABILITIES.enterpriseGradeSecurity ? "✅" : "❌"}
+• Real-Time Performance: ${this.CAPABILITIES.realTimePerformance ? "✅" : "❌"}
+• Event-Driven Architecture: ${this.CAPABILITIES.eventDrivenArchitecture ? "✅" : "❌"}
+• Scalable Deployment: ${this.CAPABILITIES.scalableDeployment ? "✅" : "❌"}
+• Comprehensive Documentation: ${this.CAPABILITIES.comprehensiveDocumentation ? "✅" : "❌"}
 
 🏛️ FIVE CORE BUSINESS DOMAINS:
 
@@ -456,7 +463,7 @@ export {
   DistributionsDomain,
   FreePlayDomain,
   AdjustmentDomain,
-  CrystalClearArchitecture
+  CrystalClearArchitecture,
 };
 
 // Main architecture initialization
@@ -466,16 +473,16 @@ export async function initializeCrystalClearArchitecture(): Promise<{
   events: DomainEvents;
   gateway: Fantasy402Gateway;
 }> {
-  console.log('🚀 Initializing Crystal Clear Domain-Driven Architecture...');
+  console.log("🚀 Initializing Crystal Clear Domain-Driven Architecture...");
 
   // Initialize external gateway
   const gateway = new Fantasy402Gateway({
-    baseUrl: 'https://fantasy402.com',
-    apiUrl: 'https://fantasy402.com/cloud/api',
-    username: process.env.FANTASY402_USERNAME || '',
-    password: process.env.FANTASY402_PASSWORD || '',
+    baseUrl: "https://fantasy402.com",
+    apiUrl: "https://fantasy402.com/cloud/api",
+    username: process.env.FANTASY402_USERNAME || "",
+    password: process.env.FANTASY402_PASSWORD || "",
     requestTimeout: 30000,
-    retryAttempts: 3
+    retryAttempts: 3,
   });
 
   await gateway.initialize();
@@ -488,7 +495,7 @@ export async function initializeCrystalClearArchitecture(): Promise<{
   const orchestrator = new DomainOrchestrator(
     balanceController,
     collectionsController,
-    gateway
+    gateway,
   );
 
   // Initialize workflows
@@ -496,20 +503,24 @@ export async function initializeCrystalClearArchitecture(): Promise<{
     orchestrator,
     balanceController,
     collectionsController,
-    gateway
+    gateway,
   );
 
   const events = DomainEvents.getInstance();
 
-  console.log('✅ Crystal Clear Architecture initialized successfully');
-  console.log(`📊 ${CrystalClearArchitecture.METRICS.totalDomains} domains ready`);
-  console.log(`⚡ ${CrystalClearArchitecture.METRICS.performanceBoost} performance boost achieved`);
+  console.log("✅ Crystal Clear Architecture initialized successfully");
+  console.log(
+    `📊 ${CrystalClearArchitecture.METRICS.totalDomains} domains ready`,
+  );
+  console.log(
+    `⚡ ${CrystalClearArchitecture.METRICS.performanceBoost} performance boost achieved`,
+  );
   console.log(`🦋 Butterfly Effect: SOLVED`);
 
   return {
     orchestrator,
     workflows,
     events,
-    gateway
+    gateway,
   };
 }

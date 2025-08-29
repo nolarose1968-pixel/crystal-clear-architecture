@@ -11,7 +11,7 @@ import type {
   CustomerInterfaceOptions,
   CustomerView,
   CustomerProfile,
-  CustomerAction
+  CustomerAction,
 } from './core/customer-interface-types';
 
 export * from './core/customer-interface-types';
@@ -80,7 +80,9 @@ export class CustomerInformationInterface extends EventEmitter {
           </div>
 
           <!-- Search Bar -->
-          ${this.options.enableSearch ? `
+          ${
+            this.options.enableSearch
+              ? `
             <div class="search-bar">
               <div class="search-input-group">
                 <input type="text" id="customer-search" placeholder="Search customers..." class="search-input">
@@ -93,7 +95,9 @@ export class CustomerInformationInterface extends EventEmitter {
                 <button class="btn btn-link" data-action="clear-search">Clear</button>
               </div>
             </div>
-          ` : ''}
+          `
+              : ''
+          }
         </div>
 
         <!-- Main Content Area -->
@@ -289,11 +293,15 @@ export class CustomerInformationInterface extends EventEmitter {
             <button class="btn btn-warning" data-action="bulk-status-update">
               <i class="icon-edit"></i> Update Status
             </button>
-            ${this.options.enableDelete ? `
+            ${
+              this.options.enableDelete
+                ? `
               <button class="btn btn-danger" data-action="bulk-delete">
                 <i class="icon-trash"></i> Delete
               </button>
-            ` : ''}
+            `
+                : ''
+            }
           </div>
         </div>
       </div>
@@ -320,9 +328,11 @@ export class CustomerInformationInterface extends EventEmitter {
     const interfaceElement = this.container.querySelector('#customer-interface');
 
     if (interfaceElement) {
-      interfaceElement.addEventListener('click', (event) => {
+      interfaceElement.addEventListener('click', event => {
         const target = event.target as HTMLElement;
-        const action = target.getAttribute('data-action') || target.closest('[data-action]')?.getAttribute('data-action');
+        const action =
+          target.getAttribute('data-action') ||
+          target.closest('[data-action]')?.getAttribute('data-action');
 
         if (action) {
           this.handleAction(action, target, event);
@@ -332,7 +342,7 @@ export class CustomerInformationInterface extends EventEmitter {
       // Search input handling
       const searchInput = interfaceElement.querySelector('#customer-search') as HTMLInputElement;
       if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
+        searchInput.addEventListener('input', e => {
           this.handleSearchInput((e.target as HTMLInputElement).value);
         });
       }
@@ -344,10 +354,10 @@ export class CustomerInformationInterface extends EventEmitter {
    */
   private setupEventForwarding(): void {
     // Forward core events
-    this.core.on('state-changed', (data) => this.emit('state-changed', data));
-    this.core.on('customer-selected', (customer) => this.emit('customer-selected', customer));
-    this.core.on('view-changed', (view) => this.emit('view-changed', view));
-    this.core.on('notification', (notification) => this.showNotification(notification));
+    this.core.on('state-changed', data => this.emit('state-changed', data));
+    this.core.on('customer-selected', customer => this.emit('customer-selected', customer));
+    this.core.on('view-changed', view => this.emit('view-changed', view));
+    this.core.on('notification', notification => this.showNotification(notification));
 
     // Forward search events
     // (Search module would emit events here)
@@ -508,6 +518,8 @@ export class CustomerInformationInterface extends EventEmitter {
 }
 
 // Export factory function
-export function createCustomerInformationInterface(options: CustomerInterfaceOptions): CustomerInformationInterface {
+export function createCustomerInformationInterface(
+  options: CustomerInterfaceOptions
+): CustomerInformationInterface {
   return new CustomerInformationInterface(options);
 }

@@ -52,12 +52,7 @@ export interface CustomerPreferences {
 /**
  * Customer status enumeration
  */
-export type CustomerStatus =
-  | 'active'
-  | 'inactive'
-  | 'suspended'
-  | 'pending'
-  | 'blocked';
+export type CustomerStatus = 'active' | 'inactive' | 'suspended' | 'pending' | 'blocked';
 
 /**
  * Customer activity interface

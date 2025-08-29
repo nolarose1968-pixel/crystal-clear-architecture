@@ -140,7 +140,7 @@ export class P2PQueueAPIEnhanced {
     this.patternSystem = patternSystem || null;
     this.performanceMetrics = new Map();
     this.patternCache = new Map();
-    
+
     // Initialize optimization configuration
     this.optimizationConfig = {
       patterns: {
@@ -148,37 +148,39 @@ export class P2PQueueAPIEnhanced {
         useCaching: true,
         useParallelProcessing: true,
         usePredictiveMatching: true,
-        useRiskAnalysis: true
+        useRiskAnalysis: true,
       },
       thresholds: {
         maxProcessingTime: 5000,
         minMatchScore: 75,
         maxQueueSize: 1000,
-        maxConcurrentMatches: 50
+        maxConcurrentMatches: 50,
       },
       strategies: {
         matchOptimization: 'balanced',
         queueOptimization: 'smart',
-        riskOptimization: 'moderate'
-      }
+        riskOptimization: 'moderate',
+      },
     };
   }
 
   /**
    * Enhanced withdrawal addition with pattern processing
    */
-  async addWithdrawalToQueue(withdrawal: Omit<P2PQueueItemEnhanced, 'id' | 'createdAt' | 'status'>): Promise<string> {
+  async addWithdrawalToQueue(
+    withdrawal: Omit<P2PQueueItemEnhanced, 'id' | 'createdAt' | 'status'>
+  ): Promise<string> {
     const startTime = performance.now();
-    
+
     try {
       // Apply pattern-based validation
       if (this.patternSystem) {
         const validationResult = await this.patternSystem.applyPattern('SECURE', {
           operation: 'withdrawal_validation',
           data: withdrawal,
-          riskProfile: withdrawal.matchingCriteria?.riskProfile || 'medium'
+          riskProfile: withdrawal.matchingCriteria?.riskProfile || 'medium',
         });
-        
+
         if (!validationResult.success) {
           throw new Error(`Pattern validation failed: ${validationResult.error}`);
         }
@@ -200,7 +202,7 @@ export class P2PQueueAPIEnhanced {
         paymentType: optimizedWithdrawal.paymentType,
         paymentDetails: optimizedWithdrawal.paymentDetails,
         priority: optimizedWithdrawal.priority || 1,
-        notes: optimizedWithdrawal.notes
+        notes: optimizedWithdrawal.notes,
       });
 
       // Store enhanced metadata
@@ -214,7 +216,7 @@ export class P2PQueueAPIEnhanced {
       // Send Telegram notification if configured
       if (withdrawal.telegramGroupId || withdrawal.telegramChatId) {
         await this.notifyTelegram('withdrawal_added', withdrawal);
-        
+
         // Check for immediate match opportunities with pattern optimization
         await this.checkForImmediateMatchesOptimized(withdrawal);
       }
@@ -235,18 +237,20 @@ export class P2PQueueAPIEnhanced {
   /**
    * Enhanced deposit addition with pattern processing
    */
-  async addDepositToQueue(deposit: Omit<P2PQueueItemEnhanced, 'id' | 'createdAt' | 'status' | 'type'>): Promise<string> {
+  async addDepositToQueue(
+    deposit: Omit<P2PQueueItemEnhanced, 'id' | 'createdAt' | 'status' | 'type'>
+  ): Promise<string> {
     const startTime = performance.now();
-    
+
     try {
       // Apply pattern-based validation
       if (this.patternSystem) {
         const validationResult = await this.patternSystem.applyPattern('SECURE', {
           operation: 'deposit_validation',
           data: deposit,
-          riskProfile: deposit.matchingCriteria?.riskProfile || 'medium'
+          riskProfile: deposit.matchingCriteria?.riskProfile || 'medium',
         });
-        
+
         if (!validationResult.success) {
           throw new Error(`Pattern validation failed: ${validationResult.error}`);
         }
@@ -267,7 +271,7 @@ export class P2PQueueAPIEnhanced {
         paymentType: optimizedDeposit.paymentType,
         paymentDetails: optimizedDeposit.paymentDetails,
         priority: optimizedDeposit.priority || 1,
-        notes: optimizedDeposit.notes
+        notes: optimizedDeposit.notes,
       });
 
       // Store enhanced metadata
@@ -281,7 +285,7 @@ export class P2PQueueAPIEnhanced {
       // Send Telegram notification if configured
       if (deposit.telegramGroupId || deposit.telegramChatId) {
         await this.notifyTelegram('deposit_added', deposit);
-        
+
         // Check for immediate match opportunities with pattern optimization
         await this.checkForImmediateMatchesOptimized(deposit);
       }
@@ -302,7 +306,10 @@ export class P2PQueueAPIEnhanced {
   /**
    * Apply pattern-based optimizations to queue items
    */
-  private async applyOptimizationPatterns(item: Partial<P2PQueueItemEnhanced>, type: 'withdrawal' | 'deposit'): Promise<Partial<P2PQueueItemEnhanced>> {
+  private async applyOptimizationPatterns(
+    item: Partial<P2PQueueItemEnhanced>,
+    type: 'withdrawal' | 'deposit'
+  ): Promise<Partial<P2PQueueItemEnhanced>> {
     const optimized = { ...item };
 
     if (this.patternSystem) {
@@ -311,17 +318,20 @@ export class P2PQueueAPIEnhanced {
         const streamResult = await this.patternSystem.applyPattern('STREAM', {
           operation: 'large_amount_processing',
           amount: item.amount,
-          type: type
+          type: type,
         });
-        
+
         if (streamResult.success) {
           optimized.patternMetadata = {
             ...optimized.patternMetadata,
-            processingPatterns: [...(optimized.patternMetadata?.processingPatterns || []), 'STREAM'],
+            processingPatterns: [
+              ...(optimized.patternMetadata?.processingPatterns || []),
+              'STREAM',
+            ],
             optimizationFlags: {
               ...optimized.patternMetadata?.optimizationFlags,
-              useStreaming: true
-            }
+              useStreaming: true,
+            },
           };
         }
       }
@@ -330,19 +340,20 @@ export class P2PQueueAPIEnhanced {
       if (this.optimizationConfig.patterns.useCaching && item.paymentType) {
         const cacheKey = `payment_type_${item.paymentType}`;
         const cachedResult = this.patternCache.get(cacheKey);
-        
+
         if (cachedResult) {
           optimized.patternMetadata = {
             ...optimized.patternMetadata,
             processingPatterns: [...(optimized.patternMetadata?.processingPatterns || []), 'CACHE'],
             optimizationFlags: {
               ...optimized.patternMetadata?.optimizationFlags,
-              useCaching: true
+              useCaching: true,
             },
             performanceMetrics: {
               ...optimized.patternMetadata?.performanceMetrics,
-              patternCacheHits: (optimized.patternMetadata?.performanceMetrics?.patternCacheHits || 0) + 1
-            }
+              patternCacheHits:
+                (optimized.patternMetadata?.performanceMetrics?.patternCacheHits || 0) + 1,
+            },
           };
         }
       }
@@ -353,13 +364,13 @@ export class P2PQueueAPIEnhanced {
           operation: 'risk_assessment',
           amount: item.amount,
           paymentType: item.paymentType,
-          customerId: item.customerId
+          customerId: item.customerId,
         });
-        
+
         if (riskResult.success) {
           optimized.matchingCriteria = {
             ...optimized.matchingCriteria,
-            riskProfile: riskResult.riskProfile || 'medium'
+            riskProfile: riskResult.riskProfile || 'medium',
           };
         }
       }
@@ -371,7 +382,9 @@ export class P2PQueueAPIEnhanced {
   /**
    * Enhanced immediate match checking with pattern optimization
    */
-  private async checkForImmediateMatchesOptimized(item: Partial<P2PQueueItemEnhanced>): Promise<void> {
+  private async checkForImmediateMatchesOptimized(
+    item: Partial<P2PQueueItemEnhanced>
+  ): Promise<void> {
     try {
       if (this.patternSystem) {
         // Apply timing pattern for performance measurement
@@ -384,7 +397,7 @@ export class P2PQueueAPIEnhanced {
           const analysisResult = await this.patternSystem.applyPattern('TABULAR', {
             operation: 'match_analysis',
             data: timingResult.result,
-            patterns: item.patternMetadata?.processingPatterns || []
+            patterns: item.patternMetadata?.processingPatterns || [],
           });
 
           // Cache the analysis result
@@ -404,18 +417,25 @@ export class P2PQueueAPIEnhanced {
   /**
    * Store enhanced metadata for queue items
    */
-  private async storeEnhancedMetadata(queueItemId: string, item: Partial<P2PQueueItemEnhanced>): Promise<void> {
+  private async storeEnhancedMetadata(
+    queueItemId: string,
+    item: Partial<P2PQueueItemEnhanced>
+  ): Promise<void> {
     try {
       if (item.patternMetadata || item.matchingCriteria) {
-        await this.env.DB.prepare(`
+        await this.env.DB.prepare(
+          `
           INSERT OR REPLACE INTO enhanced_metadata (
             queue_item_id, pattern_metadata, matching_criteria, created_at
           ) VALUES (?, ?, ?, datetime('now'))
-        `).bind(
-          queueItemId,
-          JSON.stringify(item.patternMetadata || {}),
-          JSON.stringify(item.matchingCriteria || {})
-        ).run();
+        `
+        )
+          .bind(
+            queueItemId,
+            JSON.stringify(item.patternMetadata || {}),
+            JSON.stringify(item.matchingCriteria || {})
+          )
+          .run();
       }
     } catch (error) {
       console.error('Failed to store enhanced metadata:', error);
@@ -431,11 +451,11 @@ export class P2PQueueAPIEnhanced {
       duration,
       success,
       timestamp: Date.now(),
-      patternSystem: this.patternSystem ? 'enabled' : 'disabled'
+      patternSystem: this.patternSystem ? 'enabled' : 'disabled',
     };
 
     this.performanceMetrics.set(`${operation}_${Date.now()}`, metric);
-    
+
     // Keep only last 1000 metrics
     if (this.performanceMetrics.size > 1000) {
       const keys = Array.from(this.performanceMetrics.keys());
@@ -449,10 +469,10 @@ export class P2PQueueAPIEnhanced {
   async getEnhancedQueueStats(): Promise<P2PQueueStats> {
     try {
       const baseStats = await this.getQueueStats();
-      
+
       // Calculate pattern-based metrics
       const patternMetrics = this.calculatePatternMetrics();
-      
+
       // Get pattern system health if available
       let patternHealth = null;
       if (this.patternSystem) {
@@ -471,8 +491,8 @@ export class P2PQueueAPIEnhanced {
           patternSuccessRate: this.calculateSuccessRate(),
           cacheHitRate: this.calculateCacheHitRate(),
           optimizationImpact: this.calculateOptimizationImpact(),
-          patternSystemHealth: patternHealth
-        }
+          patternSystemHealth: patternHealth,
+        },
       };
     } catch (error) {
       console.error('Failed to get enhanced queue stats:', error);
@@ -485,22 +505,22 @@ export class P2PQueueAPIEnhanced {
    */
   private calculatePatternMetrics(): any {
     const metrics = Array.from(this.performanceMetrics.values());
-    
+
     if (metrics.length === 0) {
       return {
         totalExecutions: 0,
         averageExecutionTime: 0,
-        successRate: 0
+        successRate: 0,
       };
     }
 
     const successfulMetrics = metrics.filter(m => m.success);
     const totalTime = metrics.reduce((sum, m) => sum + m.duration, 0);
-    
+
     return {
       totalExecutions: metrics.length,
       averageExecutionTime: totalTime / metrics.length,
-      successRate: (successfulMetrics.length / metrics.length) * 100
+      successRate: (successfulMetrics.length / metrics.length) * 100,
     };
   }
 
@@ -510,7 +530,7 @@ export class P2PQueueAPIEnhanced {
   private calculateAverageExecutionTime(): number {
     const metrics = Array.from(this.performanceMetrics.values());
     if (metrics.length === 0) return 0;
-    
+
     const totalTime = metrics.reduce((sum, m) => sum + m.duration, 0);
     return totalTime / metrics.length;
   }
@@ -521,7 +541,7 @@ export class P2PQueueAPIEnhanced {
   private calculateSuccessRate(): number {
     const metrics = Array.from(this.performanceMetrics.values());
     if (metrics.length === 0) return 0;
-    
+
     const successfulMetrics = metrics.filter(m => m.success);
     return (successfulMetrics.length / metrics.length) * 100;
   }
@@ -532,7 +552,7 @@ export class P2PQueueAPIEnhanced {
   private calculateCacheHitRate(): number {
     const metrics = Array.from(this.performanceMetrics.values());
     if (metrics.length === 0) return 0;
-    
+
     // This would need to be implemented based on actual cache usage
     return 0;
   }
@@ -543,13 +563,13 @@ export class P2PQueueAPIEnhanced {
   private calculateOptimizationImpact(): number {
     const metrics = Array.from(this.performanceMetrics.values());
     if (metrics.length === 0) return 0;
-    
+
     // Calculate improvement over baseline
     const baselineTime = 100; // Assume 100ms baseline
     const averageTime = this.calculateAverageExecutionTime();
-    
+
     if (averageTime === 0) return 0;
-    
+
     return ((baselineTime - averageTime) / baselineTime) * 100;
   }
 
@@ -566,7 +586,7 @@ export class P2PQueueAPIEnhanced {
   updateOptimizationConfig(config: Partial<P2POptimizationConfig>): void {
     this.optimizationConfig = {
       ...this.optimizationConfig,
-      ...config
+      ...config,
     };
   }
 
@@ -582,7 +602,7 @@ export class P2PQueueAPIEnhanced {
       const [performanceStats, metrics, health] = await Promise.all([
         this.patternSystem.getPerformanceStats(),
         this.patternSystem.getMetrics(),
-        this.patternSystem.getHealthStatus()
+        this.patternSystem.getHealthStatus(),
       ]);
 
       return {
@@ -590,7 +610,7 @@ export class P2PQueueAPIEnhanced {
         metrics,
         health,
         queueMetrics: this.calculatePatternMetrics(),
-        optimizationConfig: this.optimizationConfig
+        optimizationConfig: this.optimizationConfig,
       };
     } catch (error) {
       console.error('Failed to get pattern system metrics:', error);
@@ -605,21 +625,28 @@ export class P2PQueueAPIEnhanced {
   /**
    * Store Telegram data for queue item
    */
-  private async storeTelegramData(queueItemId: string, item: Partial<P2PQueueItemEnhanced>): Promise<void> {
+  private async storeTelegramData(
+    queueItemId: string,
+    item: Partial<P2PQueueItemEnhanced>
+  ): Promise<void> {
     try {
-      await this.env.DB.prepare(`
+      await this.env.DB.prepare(
+        `
         INSERT OR REPLACE INTO telegram_data (
           queue_item_id, telegram_group_id, telegram_chat_id, 
           telegram_channel, telegram_username, telegram_id, created_at
         ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
-      `).bind(
-        queueItemId,
-        item.telegramGroupId || null,
-        item.telegramChatId || null,
-        item.telegramChannel || null,
-        item.telegramUsername || null,
-        item.telegramId || null
-      ).run();
+      `
+      )
+        .bind(
+          queueItemId,
+          item.telegramGroupId || null,
+          item.telegramChatId || null,
+          item.telegramChannel || null,
+          item.telegramUsername || null,
+          item.telegramId || null
+        )
+        .run();
     } catch (error) {
       console.error('Failed to store Telegram data:', error);
     }
@@ -646,45 +673,52 @@ export class P2PQueueAPIEnhanced {
 
       switch (event) {
         case 'withdrawal_added':
-          message = `🎯 **New Withdrawal Added to P2P Queue**\n\n` +
-                   `💰 **Amount:** $${item.amount}\n` +
-                   `💳 **Payment Type:** ${item.paymentType}\n` +
-                   `📝 **Details:** ${item.paymentDetails}\n` +
-                   `⏰ **Priority:** ${item.priority}\n` +
-                   `🆔 **Customer:** ${item.customerId}\n\n` +
-                   `_Waiting for deposit match..._`;
-          
+          message =
+            `🎯 **New Withdrawal Added to P2P Queue**\n\n` +
+            `💰 **Amount:** $${item.amount}\n` +
+            `💳 **Payment Type:** ${item.paymentType}\n` +
+            `📝 **Details:** ${item.paymentDetails}\n` +
+            `⏰ **Priority:** ${item.priority}\n` +
+            `🆔 **Customer:** ${item.customerId}\n\n` +
+            `_Waiting for deposit match..._`;
+
           keyboard = {
-            inline_keyboard: [[
-              { text: '🔍 View Match Opportunities', callback_data: 'p2p_matches' },
-              { text: '📊 Queue Status', callback_data: 'p2p_status' }
-            ]]
+            inline_keyboard: [
+              [
+                { text: '🔍 View Match Opportunities', callback_data: 'p2p_matches' },
+                { text: '📊 Queue Status', callback_data: 'p2p_status' },
+              ],
+            ],
           };
           break;
 
         case 'deposit_added':
-          message = `💸 **New Deposit Added to P2P Queue**\n\n` +
-                   `💰 **Amount:** $${item.amount}\n` +
-                   `💳 **Payment Type:** ${item.paymentType}\n` +
-                   `📝 **Details:** ${item.paymentDetails}\n` +
-                   `⏰ **Priority:** ${item.priority}\n` +
-                   `🆔 **Customer:** ${item.customerId}\n\n` +
-                   `_Looking for withdrawal match..._`;
-          
+          message =
+            `💸 **New Deposit Added to P2P Queue**\n\n` +
+            `💰 **Amount:** $${item.amount}\n` +
+            `💳 **Payment Type:** ${item.paymentType}\n` +
+            `📝 **Details:** ${item.paymentDetails}\n` +
+            `⏰ **Priority:** ${item.priority}\n` +
+            `🆔 **Customer:** ${item.customerId}\n\n` +
+            `_Looking for withdrawal match..._`;
+
           keyboard = {
-            inline_keyboard: [[
-              { text: '🔍 View Match Opportunities', callback_data: 'p2p_matches' },
-              { text: '📊 Queue Status', callback_data: 'p2p_status' }
-            ]]
+            inline_keyboard: [
+              [
+                { text: '🔍 View Match Opportunities', callback_data: 'p2p_matches' },
+                { text: '📊 Queue Status', callback_data: 'p2p_status' },
+              ],
+            ],
           };
           break;
 
         default:
-          message = `📢 **P2P Queue Update**\n\n` +
-                   `💰 **Amount:** $${item.amount}\n` +
-                   `💳 **Payment Type:** ${item.paymentType}\n` +
-                   `📝 **Event:** ${event}\n\n` +
-                   `_Check queue status for details_`;
+          message =
+            `📢 **P2P Queue Update**\n\n` +
+            `💰 **Amount:** $${item.amount}\n` +
+            `💳 **Payment Type:** ${item.paymentType}\n` +
+            `📝 **Event:** ${event}\n\n` +
+            `_Check queue status for details_`;
       }
 
       // Send message with keyboard if available
@@ -693,18 +727,20 @@ export class P2PQueueAPIEnhanced {
           chat_id: chatId,
           text: message,
           parse_mode: 'Markdown',
-          reply_markup: keyboard
+          reply_markup: keyboard,
         });
       } else {
         await telegramBot.sendMessage({
           chat_id: chatId,
           text: message,
-          parse_mode: 'Markdown'
+          parse_mode: 'Markdown',
         });
       }
-
     } catch (error) {
-      console.error('Failed to send Telegram notification:', error instanceof Error ? error.message : String(error));
+      console.error(
+        'Failed to send Telegram notification:',
+        error instanceof Error ? error.message : String(error)
+      );
     }
   }
 
@@ -730,25 +766,27 @@ export class P2PQueueAPIEnhanced {
       averageWaitTime: 0,
       processingRate: 0,
       successRate: 0,
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     };
   }
 
   /**
    * Get P2P queue items with filtering
    */
-  async getQueueItems(filters: {
-    type?: 'withdrawal' | 'deposit';
-    paymentType?: string;
-    minAmount?: number;
-    maxAmount?: number;
-    telegramGroupId?: string;
-    telegramChatId?: string;
-    telegramChannel?: string;
-    status?: string;
-    customerId?: string;
-    usePatternOptimization?: boolean;
-  } = {}): Promise<P2PQueueItemEnhanced[]> {
+  async getQueueItems(
+    filters: {
+      type?: 'withdrawal' | 'deposit';
+      paymentType?: string;
+      minAmount?: number;
+      maxAmount?: number;
+      telegramGroupId?: string;
+      telegramChatId?: string;
+      telegramChannel?: string;
+      status?: string;
+      customerId?: string;
+      usePatternOptimization?: boolean;
+    } = {}
+  ): Promise<P2PQueueItemEnhanced[]> {
     try {
       let sql = `
         SELECT 
@@ -765,7 +803,7 @@ export class P2PQueueAPIEnhanced {
         LEFT JOIN enhanced_metadata em ON qi.id = em.queue_item_id
         WHERE 1=1
       `;
-      
+
       const params: any[] = [];
       let paramIndex = 1;
 
@@ -816,8 +854,10 @@ export class P2PQueueAPIEnhanced {
 
       sql += ` ORDER BY qi.created_at ASC`;
 
-      const result = await this.env.DB.prepare(sql).bind(...params).all();
-      
+      const result = await this.env.DB.prepare(sql)
+        .bind(...params)
+        .all();
+
       return result.results.map(row => ({
         id: row.id,
         type: row.type,
@@ -836,7 +876,7 @@ export class P2PQueueAPIEnhanced {
         telegramUsername: row.telegramUsername || undefined,
         telegramId: row.telegramId || undefined,
         patternMetadata: row.patternMetadata ? JSON.parse(row.patternMetadata) : undefined,
-        matchingCriteria: row.matchingCriteria ? JSON.parse(row.matchingCriteria) : undefined
+        matchingCriteria: row.matchingCriteria ? JSON.parse(row.matchingCriteria) : undefined,
       }));
     } catch (error) {
       console.error('Failed to get queue items:', error);

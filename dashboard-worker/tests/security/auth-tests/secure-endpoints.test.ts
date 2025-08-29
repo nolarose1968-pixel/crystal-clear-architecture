@@ -13,63 +13,63 @@ console.log(`
 `);
 
 const ENDPOINTS = [
-  { 
+  {
     url: 'http://localhost:3001/api/manager/getWeeklyFigureByAgentLite',
     method: 'POST',
     body: { agentID: 'BLAKEPPH', week: '0' },
-    description: 'Weekly Figures Lite'
+    description: 'Weekly Figures Lite',
   },
   {
     url: 'http://localhost:3001/api/manager/getAgentPerformance',
-    method: 'POST', 
+    method: 'POST',
     body: { agentID: 'BLAKEPPH', type: 'A' },
-    description: 'Agent Performance'
+    description: 'Agent Performance',
   },
   {
     url: 'http://localhost:3001/api/fire22/player-info/TEST001',
     method: 'GET',
-    description: 'Player Info (requires auth)'
+    description: 'Player Info (requires auth)',
   },
   {
     url: 'http://localhost:3001/api/fire22/transactions',
     method: 'POST',
     body: { playerID: 'TEST001' },
-    description: 'Transactions (requires auth)'
+    description: 'Transactions (requires auth)',
   },
   {
     url: 'http://localhost:3001/api/fire22/crypto-info',
     method: 'GET',
-    description: 'Crypto Info (requires auth)'
+    description: 'Crypto Info (requires auth)',
   },
   {
     url: 'http://localhost:3001/api/fire22/mail',
     method: 'POST',
     body: { subject: 'Test', message: 'Test message' },
-    description: 'Mail (requires auth)'
-  }
+    description: 'Mail (requires auth)',
+  },
 ];
 
 async function testEndpoint(endpoint: any) {
   console.log(`\n📍 Testing: ${endpoint.description}`);
   console.log(`   ${endpoint.method} ${endpoint.url}`);
-  
+
   try {
     const options: RequestInit = {
       method: endpoint.method,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer test-jwt-token-123',
-        'X-Request-ID': crypto.randomUUID()
-      }
+        Authorization: 'Bearer test-jwt-token-123',
+        'X-Request-ID': crypto.randomUUID(),
+      },
     };
-    
+
     if (endpoint.body && endpoint.method === 'POST') {
       options.body = JSON.stringify(endpoint.body);
     }
-    
+
     const response = await fetch(endpoint.url, options);
     const responseData = await response.text();
-    
+
     if (response.ok) {
       console.log(`   ✅ Status: ${response.status}`);
       try {
@@ -91,23 +91,23 @@ async function testEndpoint(endpoint: any) {
 
 async function testSecureClient() {
   console.log(`\n\n🔐 Testing Secure Fire22 Client Integration\n`);
-  
+
   const client = new SecureFire22Client();
-  
+
   // Test initialization
   console.log('1. Initializing secure client...');
   const initialized = await client.initialize();
-  
+
   if (initialized) {
     console.log('   ✅ Client initialized with credentials');
-    
+
     // Test connection
     console.log('2. Testing API connection...');
     const connected = await client.testConnection();
-    
+
     if (connected) {
       console.log('   ✅ API connection successful');
-      
+
       // Test weekly figures
       console.log('3. Testing weekly figures endpoint...');
       try {
@@ -139,25 +139,25 @@ async function checkServerRunning() {
 async function main() {
   // Check if server is running
   const serverRunning = await checkServerRunning();
-  
+
   if (!serverRunning) {
     console.log('⚠️ Server not running. Start it with: bun run dev-server');
     console.log('\nTesting secure client only...');
     await testSecureClient();
     return;
   }
-  
+
   // Test all endpoints
   console.log('\n🚀 Testing API Endpoints\n');
   for (const endpoint of ENDPOINTS) {
     await testEndpoint(endpoint);
   }
-  
+
   // Test secure client
   await testSecureClient();
-  
+
   console.log(`\n\n✨ Test suite complete!\n`);
-  
+
   console.log(`
 📋 Summary:
 - Weekly Figures Lite: Working (no auth required) 

@@ -4,11 +4,11 @@
  * Ensures proper integration of design tokens, components, and themes
  */
 
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
-import { DesignTeamIntegrationService } from "./design-team-integration";
-import { TaskEnhancedService } from "./tasks-enhanced";
-import { getDatabase } from "../database/connection";
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { join } from 'path';
+import { DesignTeamIntegrationService } from './design-team-integration';
+import { TaskEnhancedService } from './tasks-enhanced';
+import { getDatabase } from '../database/connection';
 
 export interface DesignSystemConfig {
   version: string;
@@ -37,7 +37,7 @@ export class DesignSystemBuildIntegration {
     const db = await getDatabase(process.env);
     this.designService = new DesignTeamIntegrationService(db);
     this.taskService = new TaskEnhancedService(db);
-    
+
     // Initialize design team integration
     await this.designService.initializeDesignIntegration();
   }
@@ -51,7 +51,7 @@ export class DesignSystemBuildIntegration {
     try {
       // Task 1: Design System Audit
       const auditTask = await this.taskService.createTask({
-        title: "Audit current design system integration in build process",
+        title: 'Audit current design system integration in build process',
         description: `Review how the Fire22 Dashboard Pages Build System currently handles design assets and identify gaps in design system integration.
 
 Current Issues Identified:
@@ -70,19 +70,19 @@ Deliverables:
 - Gap analysis document
 - Integration plan
 - Updated build system architecture`,
-        priority: "high",
-        status: "planning",
+        priority: 'high',
+        status: 'planning',
         progress: 0,
-        departmentId: "design",
-        assigneeId: "isabella-martinez",
-        reporterId: "system",
+        departmentId: 'design',
+        assigneeId: 'isabella-martinez',
+        reporterId: 'system',
         estimatedHours: 8,
-        tags: ["design-system", "build-integration", "audit"]
+        tags: ['design-system', 'build-integration', 'audit'],
       });
 
       // Task 2: Design Token Integration
       const tokenTask = await this.taskService.createTask({
-        title: "Integrate design tokens into build system",
+        title: 'Integrate design tokens into build system',
         description: `Update the Fire22 Dashboard Pages Build System to use design tokens instead of hardcoded values.
 
 Technical Requirements:
@@ -100,19 +100,19 @@ Expected Outcome:
 - Consistent design language across all generated pages
 - Automatic theme support (light/dark mode)
 - Maintainable color system`,
-        priority: "high",
-        status: "planning",
+        priority: 'high',
+        status: 'planning',
         progress: 0,
-        departmentId: "design",
-        assigneeId: "ethan-cooper",
-        reporterId: "isabella-martinez",
+        departmentId: 'design',
+        assigneeId: 'ethan-cooper',
+        reporterId: 'isabella-martinez',
         estimatedHours: 12,
-        tags: ["design-tokens", "css-integration", "build-system"]
+        tags: ['design-tokens', 'css-integration', 'build-system'],
       });
 
       // Task 3: Component Library Integration
       const componentTask = await this.taskService.createTask({
-        title: "Integrate component library into page generation",
+        title: 'Integrate component library into page generation',
         description: `Update the build system to use the existing component library instead of generating basic HTML.
 
 Component Integration Plan:
@@ -131,19 +131,19 @@ Technical Implementation:
 - Update generateRootIndex() to use component classes
 - Create reusable HTML templates
 - Implement proper CSS bundling`,
-        priority: "medium",
-        status: "planning",
+        priority: 'medium',
+        status: 'planning',
         progress: 0,
-        departmentId: "technology",
-        assigneeId: "john-doe",
-        reporterId: "ethan-cooper",
+        departmentId: 'technology',
+        assigneeId: 'john-doe',
+        reporterId: 'ethan-cooper',
         estimatedHours: 16,
-        tags: ["components", "html-generation", "css-architecture"]
+        tags: ['components', 'html-generation', 'css-architecture'],
       });
 
       // Task 4: Visual Configurator Integration
       const configuratorTask = await this.taskService.createTask({
-        title: "Integrate visual configurator for theme customization",
+        title: 'Integrate visual configurator for theme customization',
         description: `Integrate the existing visual configurator tool into the build process for dynamic theme generation.
 
 Integration Points:
@@ -161,19 +161,19 @@ Technical Requirements:
 - Bun-based color utilities integration
 - CSS custom property generation
 - Theme validation and testing`,
-        priority: "medium",
-        status: "planning",
+        priority: 'medium',
+        status: 'planning',
         progress: 0,
-        departmentId: "design",
-        assigneeId: "isabella-martinez",
-        reporterId: "system",
+        departmentId: 'design',
+        assigneeId: 'isabella-martinez',
+        reporterId: 'system',
         estimatedHours: 10,
-        tags: ["visual-configurator", "theme-generation", "tooling"]
+        tags: ['visual-configurator', 'theme-generation', 'tooling'],
       });
 
       // Task 5: Design System Documentation
       const docsTask = await this.taskService.createTask({
-        title: "Create design system integration documentation",
+        title: 'Create design system integration documentation',
         description: `Document the integrated design system for developers and maintainers.
 
 Documentation Scope:
@@ -189,26 +189,32 @@ Deliverables:
 - Component library reference
 - Theme customization tutorial
 - Troubleshooting guide`,
-        priority: "medium",
-        status: "planning",
+        priority: 'medium',
+        status: 'planning',
         progress: 0,
-        departmentId: "design",
-        assigneeId: "ethan-cooper",
-        reporterId: "isabella-martinez",
+        departmentId: 'design',
+        assigneeId: 'ethan-cooper',
+        reporterId: 'isabella-martinez',
         estimatedHours: 6,
-        tags: ["documentation", "developer-experience", "design-system"]
+        tags: ['documentation', 'developer-experience', 'design-system'],
       });
 
-      if (auditTask.success && tokenTask.success && componentTask.success && configuratorTask.success && docsTask.success) {
+      if (
+        auditTask.success &&
+        tokenTask.success &&
+        componentTask.success &&
+        configuratorTask.success &&
+        docsTask.success
+      ) {
         console.log('✅ Design system coordination tasks created successfully');
-        
+
         // Create cross-references between tasks
         await this.createTaskDependencies([
           auditTask.data!.uuid,
           tokenTask.data!.uuid,
           componentTask.data!.uuid,
           configuratorTask.data!.uuid,
-          docsTask.data!.uuid
+          docsTask.data!.uuid,
         ]);
 
         return {
@@ -219,9 +225,9 @@ Deliverables:
               tokenTask.data!,
               componentTask.data!,
               configuratorTask.data!,
-              docsTask.data!
-            ]
-          }
+              docsTask.data!,
+            ],
+          },
         };
       }
 
@@ -229,18 +235,17 @@ Deliverables:
         success: false,
         error: {
           code: 'TASK_CREATION_FAILED',
-          message: 'Failed to create one or more coordination tasks'
-        }
+          message: 'Failed to create one or more coordination tasks',
+        },
       };
-
     } catch (error) {
       console.error('❌ Error creating design system coordination tasks:', error);
       return {
         success: false,
         error: {
           code: 'INTERNAL_ERROR',
-          message: 'Internal server error'
-        }
+          message: 'Internal server error',
+        },
       };
     }
   }
@@ -255,33 +260,35 @@ Deliverables:
       buildSystemStatus: this.analyzeBuildSystem(),
       designSystemAssets: this.analyzeDesignSystemAssets(),
       integrationGaps: [] as string[],
-      recommendations: [] as string[]
+      recommendations: [] as string[],
     };
 
     // Identify integration gaps
     if (!analysis.buildSystemStatus.usesDesignTokens) {
-      analysis.integrationGaps.push("Build system uses hardcoded styles instead of design tokens");
-      analysis.recommendations.push("Integrate CSS custom properties from theme-system.css");
+      analysis.integrationGaps.push('Build system uses hardcoded styles instead of design tokens');
+      analysis.recommendations.push('Integrate CSS custom properties from theme-system.css');
     }
 
     if (!analysis.buildSystemStatus.usesComponentLibrary) {
       analysis.integrationGaps.push("Generated HTML doesn't use component library");
-      analysis.recommendations.push("Replace inline styles with component classes from src/styles/components/");
+      analysis.recommendations.push(
+        'Replace inline styles with component classes from src/styles/components/'
+      );
     }
 
     if (!analysis.buildSystemStatus.supportsThemes) {
-      analysis.integrationGaps.push("No theme system integration");
-      analysis.recommendations.push("Integrate OKLCH color system and dark/light mode support");
+      analysis.integrationGaps.push('No theme system integration');
+      analysis.recommendations.push('Integrate OKLCH color system and dark/light mode support');
     }
 
     if (!analysis.designSystemAssets.hasColorUtils) {
-      analysis.integrationGaps.push("Color utilities not integrated into build process");
-      analysis.recommendations.push("Use color-utils.ts for dynamic color generation");
+      analysis.integrationGaps.push('Color utilities not integrated into build process');
+      analysis.recommendations.push('Use color-utils.ts for dynamic color generation');
     }
 
     return {
       success: true,
-      data: analysis
+      data: analysis,
     };
   }
 
@@ -318,11 +325,11 @@ Assets for Review:
       assets: [
         'scripts/build-pages.ts',
         'packages/shared-styles/theme-system.css',
-        'packages/shared-styles/tools/visual-configurator.html'
+        'packages/shared-styles/tools/visual-configurator.html',
       ],
       deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 1 week
       requesterId: 'system',
-      specificReviewer: 'isabella-martinez'
+      specificReviewer: 'isabella-martinez',
     });
 
     return reviewRequest;
@@ -331,13 +338,13 @@ Assets for Review:
   // Private helper methods
   private analyzeBuildSystem() {
     const buildSystemPath = join(process.cwd(), 'scripts', 'build-pages.ts');
-    
+
     if (!existsSync(buildSystemPath)) {
       return {
         exists: false,
         usesDesignTokens: false,
         usesComponentLibrary: false,
-        supportsThemes: false
+        supportsThemes: false,
       };
     }
 
@@ -345,11 +352,14 @@ Assets for Review:
 
     return {
       exists: true,
-      usesDesignTokens: buildSystemContent.includes('var(--') || buildSystemContent.includes('CSS.supports'),
-      usesComponentLibrary: buildSystemContent.includes('component') && buildSystemContent.includes('class='),
-      supportsThemes: buildSystemContent.includes('theme') || buildSystemContent.includes('dark-mode'),
+      usesDesignTokens:
+        buildSystemContent.includes('var(--') || buildSystemContent.includes('CSS.supports'),
+      usesComponentLibrary:
+        buildSystemContent.includes('component') && buildSystemContent.includes('class='),
+      supportsThemes:
+        buildSystemContent.includes('theme') || buildSystemContent.includes('dark-mode'),
       hasInlineStyles: buildSystemContent.includes('style="'),
-      usesHardcodedColors: /color:\s*#[0-9a-fA-F]{6}/.test(buildSystemContent)
+      usesHardcodedColors: /color:\s*#[0-9a-fA-F]{6}/.test(buildSystemContent),
     };
   }
 
@@ -357,9 +367,11 @@ Assets for Review:
     return {
       hasThemeSystem: existsSync(join(this.designSystemDir, 'theme-system.css')),
       hasColorUtils: existsSync(join(this.designSystemDir, 'tools', 'color-utils.ts')),
-      hasVisualConfigurator: existsSync(join(this.designSystemDir, 'tools', 'visual-configurator.html')),
+      hasVisualConfigurator: existsSync(
+        join(this.designSystemDir, 'tools', 'visual-configurator.html')
+      ),
       hasComponentStyles: existsSync(join(this.srcDir, 'styles', 'components')),
-      hasDesignTokens: existsSync(join(this.srcDir, 'styles', 'base', 'variables.css'))
+      hasDesignTokens: existsSync(join(this.srcDir, 'styles', 'base', 'variables.css')),
     };
   }
 
@@ -369,7 +381,7 @@ Assets for Review:
       await this.taskService.addComment(taskUuids[i + 1], {
         content: `📋 Depends on: ${taskUuids[i]}`,
         type: 'dependency',
-        userId: 'system'
+        userId: 'system',
       });
     }
 
@@ -385,7 +397,7 @@ This is part of a coordinated effort to integrate the Fire22 design system with 
       await this.taskService.addComment(uuid, {
         content: projectComment,
         type: 'project_overview',
-        userId: 'system'
+        userId: 'system',
       });
     }
   }

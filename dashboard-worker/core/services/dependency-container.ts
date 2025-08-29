@@ -109,7 +109,7 @@ export class DependencyContainer {
   getHealthStatus(): Record<string, any> {
     const status: Record<string, any> = {
       timestamp: new Date().toISOString(),
-      services: {}
+      services: {},
     };
 
     for (const [name, service] of this.services) {

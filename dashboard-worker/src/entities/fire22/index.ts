@@ -15,5 +15,5 @@ export type {
   CustomerStatus,
   KYCStatus,
   AgentType,
-  AgentStatus
+  AgentStatus,
 } from '../../types/fire22/entities';

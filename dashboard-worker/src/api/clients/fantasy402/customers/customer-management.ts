@@ -19,7 +19,7 @@ export class Fantasy402CustomerManagement {
         offset: 0,
         status: 'active',
         includeBalances: true,
-        includeLastActivity: true
+        includeLastActivity: true,
       };
 
       const response = await this.core.rawRequest('/agent/customers', 'POST', requestData);
@@ -41,7 +41,7 @@ export class Fantasy402CustomerManagement {
   async getInfoPlayer(playerID: string): Promise<any> {
     try {
       const response = await this.core.rawRequest('/agent/info-player', 'POST', {
-        playerID
+        playerID,
       });
 
       if (response.success) {
@@ -67,7 +67,7 @@ export class Fantasy402CustomerManagement {
       const requestData = {
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
-        limit: 1000
+        limit: 1000,
       };
 
       const response = await this.core.rawRequest('/agent/new-users', 'POST', requestData);
@@ -118,13 +118,17 @@ export class Fantasy402CustomerManagement {
     offset?: number;
   }): Promise<{ customers: any[]; totalCount: number; hasMore: boolean }> {
     try {
-      const response = await this.core.rawRequest('/agent/search-customers', 'POST', searchCriteria);
+      const response = await this.core.rawRequest(
+        '/agent/search-customers',
+        'POST',
+        searchCriteria
+      );
 
       if (response.success) {
         return {
           customers: response.data.customers || [],
           totalCount: response.data.totalCount || 0,
-          hasMore: response.data.hasMore || false
+          hasMore: response.data.hasMore || false,
         };
       } else {
         throw new Error('Failed to search customers');
@@ -147,10 +151,14 @@ export class Fantasy402CustomerManagement {
       const requestData = {
         customerID,
         startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0]
+        endDate: endDate.toISOString().split('T')[0],
       };
 
-      const response = await this.core.rawRequest('/agent/customer-activity-summary', 'POST', requestData);
+      const response = await this.core.rawRequest(
+        '/agent/customer-activity-summary',
+        'POST',
+        requestData
+      );
 
       if (response.success) {
         return response.data.summary;
@@ -175,7 +183,7 @@ export class Fantasy402CustomerManagement {
   }> {
     try {
       const response = await this.core.rawRequest('/agent/customer-risk-profile', 'POST', {
-        customerID
+        customerID,
       });
 
       if (response.success) {
@@ -184,7 +192,7 @@ export class Fantasy402CustomerManagement {
           riskScore: response.data.riskScore || 0,
           flags: response.data.flags || [],
           lastAssessment: response.data.lastAssessment || '',
-          recommendedActions: response.data.recommendedActions || []
+          recommendedActions: response.data.recommendedActions || [],
         };
       } else {
         throw new Error('Failed to get customer risk profile');
@@ -198,17 +206,25 @@ export class Fantasy402CustomerManagement {
   /**
    * Update customer status
    */
-  async updateCustomerStatus(customerID: string, status: 'active' | 'suspended' | 'inactive', reason?: string): Promise<boolean> {
+  async updateCustomerStatus(
+    customerID: string,
+    status: 'active' | 'suspended' | 'inactive',
+    reason?: string
+  ): Promise<boolean> {
     try {
       const requestData = {
         customerID,
         status,
         reason: reason || 'Administrative update',
         updatedBy: this.core.getAgentPermissions()?.agentID,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
-      const response = await this.core.rawRequest('/agent/update-customer-status', 'POST', requestData);
+      const response = await this.core.rawRequest(
+        '/agent/update-customer-status',
+        'POST',
+        requestData
+      );
 
       return response.success;
     } catch (error) {
@@ -220,11 +236,13 @@ export class Fantasy402CustomerManagement {
   /**
    * Get customer statistics
    */
-  async getCustomerStatistics(options: {
-    period?: 'daily' | 'weekly' | 'monthly';
-    agentID?: string;
-    status?: string;
-  } = {}): Promise<{
+  async getCustomerStatistics(
+    options: {
+      period?: 'daily' | 'weekly' | 'monthly';
+      agentID?: string;
+      status?: string;
+    } = {}
+  ): Promise<{
     totalCustomers: number;
     activeCustomers: number;
     newCustomers: number;
@@ -240,7 +258,7 @@ export class Fantasy402CustomerManagement {
           activeCustomers: response.data.activeCustomers || 0,
           newCustomers: response.data.newCustomers || 0,
           averageBalance: response.data.averageBalance || 0,
-          topSpenders: response.data.topSpenders || []
+          topSpenders: response.data.topSpenders || [],
         };
       } else {
         throw new Error('Failed to get customer statistics');

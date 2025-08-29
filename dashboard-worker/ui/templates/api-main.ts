@@ -4,15 +4,19 @@
  */
 
 import type { EmployeeData } from '../../personal-subdomains/src/types';
-import { generateHtmlHead, generateHeader, generateFooter } from '../../personal-subdomains/src/components';
+import {
+  generateHtmlHead,
+  generateHeader,
+  generateFooter,
+} from '../../personal-subdomains/src/components';
 import { generateApiDashboardPage } from './api-dashboard';
 import { generateApiEndpointsPage } from './api-endpoints';
 import { generateApiMonitoringPage } from './api-monitoring';
 import { generateApiLogsPage } from './api-logs';
 import { generateApiSecurityPage } from './api-security';
 
-export function generateApiPage(employee: EmployeeData, pathname?: string): string {
-  const content = generateApiContent(employee, pathname);
+export async function generateApiPage(employee: EmployeeData, pathname?: string): Promise<string> {
+  const content = await generateApiContent(employee, pathname);
 
   const html = `
     ${generateHtmlHead(
@@ -31,7 +35,7 @@ export function generateApiPage(employee: EmployeeData, pathname?: string): stri
   return html;
 }
 
-function generateApiContent(employee: EmployeeData, pathname?: string): string {
+async function generateApiContent(employee: EmployeeData, pathname?: string): Promise<string> {
   // Route to appropriate template based on pathname
   if (pathname === '/api/endpoints') {
     return generateApiEndpointsPage(employee).match(/<main[^>]*>(.*?)<\/main>/s)?.[1] || '';
@@ -40,14 +44,23 @@ function generateApiContent(employee: EmployeeData, pathname?: string): string {
   } else if (pathname === '/api/logs') {
     return generateApiLogsPage(employee).match(/<main[^>]*>(.*?)<\/main>/s)?.[1] || '';
   } else if (pathname === '/api/security') {
-    return generateApiSecurityPage(employee).match(/<main[^>]*>(.*?)<\/main>/s)?.[1] || '';
-  } else if (pathname?.startsWith('/api/dashboard') || pathname?.startsWith('/api/messaging') ||
-             pathname?.startsWith('/api/weekly-figures') || pathname?.startsWith('/api/pending') ||
-             pathname?.startsWith('/api/customer-admin') || pathname?.startsWith('/api/agent-admin') ||
-             pathname?.startsWith('/api/game-admin') || pathname?.startsWith('/api/cashier') ||
-             pathname?.startsWith('/api/reporting') || pathname?.startsWith('/api/admin-tools') ||
-             pathname?.startsWith('/api/billing') || pathname?.startsWith('/api/rules') ||
-             pathname?.startsWith('/api/settings')) {
+    const securityPage = await generateApiSecurityPage(employee);
+    return securityPage.match(/<main[^>]*>(.*?)<\/main>/s)?.[1] || '';
+  } else if (
+    pathname?.startsWith('/api/dashboard') ||
+    pathname?.startsWith('/api/messaging') ||
+    pathname?.startsWith('/api/weekly-figures') ||
+    pathname?.startsWith('/api/pending') ||
+    pathname?.startsWith('/api/customer-admin') ||
+    pathname?.startsWith('/api/agent-admin') ||
+    pathname?.startsWith('/api/game-admin') ||
+    pathname?.startsWith('/api/cashier') ||
+    pathname?.startsWith('/api/reporting') ||
+    pathname?.startsWith('/api/admin-tools') ||
+    pathname?.startsWith('/api/billing') ||
+    pathname?.startsWith('/api/rules') ||
+    pathname?.startsWith('/api/settings')
+  ) {
     // Route sportsbook admin endpoints to dashboard for now
     return generateApiDashboardPage(employee).match(/<main[^>]*>(.*?)<\/main>/s)?.[1] || '';
   } else {

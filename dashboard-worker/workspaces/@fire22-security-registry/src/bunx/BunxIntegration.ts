@@ -1,6 +1,6 @@
 /**
  * Bunx Integration for Fire22 Security Registry
- * 
+ *
  * Seamless integration with bun's package execution system
  */
 
@@ -21,7 +21,7 @@ export interface BunxSecurityReport {
 
 export class BunxIntegration {
   private config: BunxConfig;
-  
+
   constructor(config: Partial<BunxConfig> = {}) {
     this.config = {
       enabled: true,
@@ -34,10 +34,10 @@ export class BunxIntegration {
         security: {
           scanning: true,
           audit: true,
-          strict: false
-        }
+          strict: false,
+        },
       },
-      ...config
+      ...config,
     };
   }
 
@@ -48,19 +48,18 @@ export class BunxIntegration {
     try {
       // Configure bun to use Fire22 registry for @fire22 packages
       await this.configureBunRegistry();
-      
+
       // Setup security scanning hooks
       if (this.config.securityChecks) {
         await this.setupSecurityHooks();
       }
-      
+
       // Install global packages
       if (this.config.globalPackages.length > 0) {
         await this.installGlobalPackages();
       }
-      
+
       console.log('✅ Bunx integration with Fire22 security configured');
-      
     } catch (error) {
       throw new Error(`Bunx setup failed: ${error.message}`);
     }
@@ -69,21 +68,24 @@ export class BunxIntegration {
   /**
    * Execute package with security validation
    */
-  async execute(packageName: string, args: string[] = [], options: { validate?: boolean } = {}): Promise<void> {
+  async execute(
+    packageName: string,
+    args: string[] = [],
+    options: { validate?: boolean } = {}
+  ): Promise<void> {
     try {
       // Validate package security if enabled
       if (options.validate !== false && this.config.securityChecks) {
         await this.validatePackageSecurity(packageName);
       }
-      
+
       // Execute package using bun
       const command = `bunx ${packageName} ${args.join(' ')}`;
       const proc = Bun.spawn(command.split(' '), {
-        stdio: ['inherit', 'inherit', 'inherit']
+        stdio: ['inherit', 'inherit', 'inherit'],
       });
-      
+
       await proc.exited;
-      
     } catch (error) {
       throw new Error(`Package execution failed: ${error.message}`);
     }
@@ -96,30 +98,29 @@ export class BunxIntegration {
     try {
       // Check if package is already installed
       const isInstalled = await this.isGloballyInstalled(packageName);
-      
+
       if (isInstalled && !options.force) {
         console.log(`Package ${packageName} is already installed globally`);
         return;
       }
-      
+
       // Validate package security
       if (this.config.securityChecks) {
         await this.validatePackageSecurity(packageName);
       }
-      
+
       // Install package globally
       const proc = Bun.spawn(['bun', 'install', '-g', packageName], {
-        stdio: ['inherit', 'inherit', 'inherit']
+        stdio: ['inherit', 'inherit', 'inherit'],
       });
-      
+
       await proc.exited;
-      
+
       // Add to tracked packages
       if (!this.config.globalPackages.includes(packageName)) {
         this.config.globalPackages.push(packageName);
         await this.saveConfig();
       }
-      
     } catch (error) {
       throw new Error(`Global installation failed: ${error.message}`);
     }
@@ -133,24 +134,23 @@ export class BunxIntegration {
       const globalPackages = await this.getGlobalPackages();
       const packageReports = [];
       let totalVulnerabilities = 0;
-      
+
       for (const packageName of globalPackages) {
         const report = await this.scanPackage(packageName);
         packageReports.push(report);
         totalVulnerabilities += report.vulnerabilities;
       }
-      
+
       const overallScore = this.calculateOverallScore(packageReports);
       const recommendations = this.generateRecommendations(packageReports);
-      
+
       return {
         totalPackages: globalPackages.length,
         vulnerablePackages: packageReports.filter(p => p.vulnerabilities > 0).length,
         overallScore,
         recommendations,
-        packages: packageReports
+        packages: packageReports,
       };
-      
     } catch (error) {
       throw new Error(`Global package scan failed: ${error.message}`);
     }
@@ -161,7 +161,7 @@ export class BunxIntegration {
    */
   async updateGlobalPackages(options: { dryRun?: boolean } = {}): Promise<void> {
     const globalPackages = await this.getGlobalPackages();
-    
+
     for (const packageName of globalPackages) {
       try {
         if (options.dryRun) {
@@ -182,15 +182,14 @@ export class BunxIntegration {
   async removeGlobal(packageName: string): Promise<void> {
     try {
       const proc = Bun.spawn(['bun', 'remove', '-g', packageName], {
-        stdio: ['inherit', 'inherit', 'inherit']
+        stdio: ['inherit', 'inherit', 'inherit'],
       });
-      
+
       await proc.exited;
-      
+
       // Remove from tracked packages
       this.config.globalPackages = this.config.globalPackages.filter(p => p !== packageName);
       await this.saveConfig();
-      
     } catch (error) {
       throw new Error(`Failed to remove global package: ${error.message}`);
     }
@@ -201,7 +200,7 @@ export class BunxIntegration {
    */
   private async configureBunRegistry(): Promise<void> {
     const bunfigPath = `${process.env.HOME}/.bunfig.toml`;
-    
+
     const registryConfig = `
 # Fire22 Registry Configuration
 [install]
@@ -220,10 +219,12 @@ print = "yarn"
 audit = true
 scan = true
 `;
-    
+
     try {
-      const existingConfig = await Bun.file(bunfigPath).text().catch(() => '');
-      
+      const existingConfig = await Bun.file(bunfigPath)
+        .text()
+        .catch(() => '');
+
       if (!existingConfig.includes('@fire22')) {
         await Bun.write(bunfigPath, existingConfig + registryConfig);
         console.log('✅ Fire22 registry configured in ~/.bunfig.toml');
@@ -254,16 +255,16 @@ console.log('🔍 Validating package security...');
 // For now, just log the validation
 console.log('✅ Package security validated');
 `;
-    
+
     const hookPath = `${process.env.HOME}/.fire22/bunx-security-hook.js`;
-    
+
     try {
       await Bun.write(hookPath, hookScript);
-      
+
       // Make hook executable
       const proc = Bun.spawn(['chmod', '+x', hookPath]);
       await proc.exited;
-      
+
       console.log('✅ Security hooks configured');
     } catch (error) {
       console.warn(`Warning: Could not setup security hooks: ${error.message}`);
@@ -289,9 +290,9 @@ console.log('✅ Package security validated');
   private async isGloballyInstalled(packageName: string): Promise<boolean> {
     try {
       const proc = Bun.spawn(['which', packageName], {
-        stdio: ['pipe', 'pipe', 'pipe']
+        stdio: ['pipe', 'pipe', 'pipe'],
       });
-      
+
       await proc.exited;
       return proc.exitCode === 0;
     } catch {
@@ -315,15 +316,14 @@ console.log('✅ Package security validated');
     try {
       // This would integrate with SecurityScanner
       // For now, simulate validation
-      
+
       const isSecure = Math.random() > 0.1; // 90% chance of being secure
-      
+
       if (!isSecure) {
         throw new Error(`Security validation failed for ${packageName}`);
       }
-      
+
       console.log(`✅ Package ${packageName} passed security validation`);
-      
     } catch (error) {
       if (this.config.registry.security.strict) {
         throw error;
@@ -336,18 +336,20 @@ console.log('✅ Package security validated');
   /**
    * Scan individual package for vulnerabilities
    */
-  private async scanPackage(packageName: string): Promise<{ name: string; version: string; vulnerabilities: number; score: number }> {
+  private async scanPackage(
+    packageName: string
+  ): Promise<{ name: string; version: string; vulnerabilities: number; score: number }> {
     // This would use the SecurityScanner
     // For now, simulate scanning
-    
+
     const vulnerabilities = Math.floor(Math.random() * 3); // 0-2 vulnerabilities
-    const score = Math.max(0, 100 - (vulnerabilities * 25));
-    
+    const score = Math.max(0, 100 - vulnerabilities * 25);
+
     return {
       name: packageName,
       version: '1.0.0', // Would get actual version
       vulnerabilities,
-      score
+      score,
     };
   }
 
@@ -356,7 +358,7 @@ console.log('✅ Package security validated');
    */
   private calculateOverallScore(packages: { score: number }[]): number {
     if (packages.length === 0) return 100;
-    
+
     const totalScore = packages.reduce((sum, pkg) => sum + pkg.score, 0);
     return Math.round(totalScore / packages.length);
   }
@@ -364,29 +366,31 @@ console.log('✅ Package security validated');
   /**
    * Generate security recommendations
    */
-  private generateRecommendations(packages: { name: string; vulnerabilities: number; score: number }[]): string[] {
+  private generateRecommendations(
+    packages: { name: string; vulnerabilities: number; score: number }[]
+  ): string[] {
     const recommendations: string[] = [];
-    
+
     const vulnerablePackages = packages.filter(p => p.vulnerabilities > 0);
-    
+
     if (vulnerablePackages.length === 0) {
       recommendations.push('✅ All global packages are secure');
       recommendations.push('Continue monitoring for security updates');
     } else {
       recommendations.push(`🔧 Update ${vulnerablePackages.length} vulnerable packages`);
-      
+
       vulnerablePackages.forEach(pkg => {
         recommendations.push(`  • Update ${pkg.name} (${pkg.vulnerabilities} vulnerabilities)`);
       });
-      
+
       recommendations.push('🔄 Run "fire22-security bunx:scan" regularly');
     }
-    
+
     const lowScorePackages = packages.filter(p => p.score < 70);
     if (lowScorePackages.length > 0) {
       recommendations.push('⚠️  Consider alternatives for low-scoring packages');
     }
-    
+
     return recommendations;
   }
 
@@ -395,7 +399,7 @@ console.log('✅ Package security validated');
    */
   private async saveConfig(): Promise<void> {
     const configPath = `${process.env.HOME}/.fire22/bunx-config.json`;
-    
+
     try {
       await Bun.write(configPath, JSON.stringify(this.config, null, 2));
     } catch (error) {

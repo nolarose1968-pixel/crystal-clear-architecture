@@ -3,7 +3,7 @@
  * Domain-Driven Design Implementation
  */
 
-import { ValueObject } from '../../shared/value-object';
+import { ValueObject } from "../../shared/value-object";
 
 export class BalanceLimits extends ValueObject {
   private constructor(
@@ -12,7 +12,7 @@ export class BalanceLimits extends ValueObject {
     private readonly warningThreshold: number,
     private readonly criticalThreshold: number,
     private readonly dailyChangeLimit: number,
-    private readonly weeklyChangeLimit: number
+    private readonly weeklyChangeLimit: number,
   ) {
     super();
     this.validateLimits();
@@ -32,51 +32,66 @@ export class BalanceLimits extends ValueObject {
       limits.warningThreshold,
       limits.criticalThreshold,
       limits.dailyChangeLimit,
-      limits.weeklyChangeLimit
+      limits.weeklyChangeLimit,
     );
   }
 
   static default(): BalanceLimits {
     return new BalanceLimits(
-      -10000,  // Allow negative balance up to $10K
+      -10000, // Allow negative balance up to $10K
       1000000, // Max balance $1M
-      1000,    // Warning below $1K
-      100,     // Critical below $100
-      50000,   // Max daily change $50K
-      200000   // Max weekly change $200K
+      1000, // Warning below $1K
+      100, // Critical below $100
+      50000, // Max daily change $50K
+      200000, // Max weekly change $200K
     );
   }
 
   private validateLimits(): void {
     if (this.minBalance >= this.maxBalance) {
-      throw new Error('Minimum balance must be less than maximum balance');
+      throw new Error("Minimum balance must be less than maximum balance");
     }
     if (this.warningThreshold <= this.criticalThreshold) {
-      throw new Error('Warning threshold must be greater than critical threshold');
+      throw new Error(
+        "Warning threshold must be greater than critical threshold",
+      );
     }
   }
 
   // Getters
-  getMinBalance(): number { return this.minBalance; }
-  getMaxBalance(): number { return this.maxBalance; }
-  getWarningThreshold(): number { return this.warningThreshold; }
-  getCriticalThreshold(): number { return this.criticalThreshold; }
-  getDailyChangeLimit(): number { return this.dailyChangeLimit; }
-  getWeeklyChangeLimit(): number { return this.weeklyChangeLimit; }
+  getMinBalance(): number {
+    return this.minBalance;
+  }
+  getMaxBalance(): number {
+    return this.maxBalance;
+  }
+  getWarningThreshold(): number {
+    return this.warningThreshold;
+  }
+  getCriticalThreshold(): number {
+    return this.criticalThreshold;
+  }
+  getDailyChangeLimit(): number {
+    return this.dailyChangeLimit;
+  }
+  getWeeklyChangeLimit(): number {
+    return this.weeklyChangeLimit;
+  }
 
   // Business logic
   isWithinLimits(balance: number): boolean {
     return balance >= this.minBalance && balance <= this.maxBalance;
   }
 
-  getThresholdStatus(balance: number): 'normal' | 'warning' | 'critical' {
-    if (balance <= this.criticalThreshold) return 'critical';
-    if (balance <= this.warningThreshold) return 'warning';
-    return 'normal';
+  getThresholdStatus(balance: number): "normal" | "warning" | "critical" {
+    if (balance <= this.criticalThreshold) return "critical";
+    if (balance <= this.warningThreshold) return "warning";
+    return "normal";
   }
 
-  canChangeBy(amount: number, period: 'daily' | 'weekly'): boolean {
-    const limit = period === 'daily' ? this.dailyChangeLimit : this.weeklyChangeLimit;
+  canChangeBy(amount: number, period: "daily" | "weekly"): boolean {
+    const limit =
+      period === "daily" ? this.dailyChangeLimit : this.weeklyChangeLimit;
     return Math.abs(amount) <= limit;
   }
 

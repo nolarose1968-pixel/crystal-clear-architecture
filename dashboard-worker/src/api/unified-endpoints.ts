@@ -48,28 +48,28 @@ export class UnifiedAPIHandler {
       switch (path) {
         case '/api/auth/login':
           return await this.handleLogin(body, systemController);
-        
+
         case '/api/user/profile':
           return await this.handleGetProfile(user, systemController);
-        
+
         case '/api/user/balance':
           return await this.handleGetBalance(user, systemController);
-        
+
         case '/api/wagers/list':
           return await this.handleGetWagers(user, body, systemController);
-        
+
         case '/api/wagers/place':
           return await this.handlePlaceWager(user, body, systemController);
-        
+
         case '/api/agents/list':
           return await this.handleGetAgents(user, systemController);
-        
+
         case '/api/agents/performance':
           return await this.handleGetAgentPerformance(user, body, systemController);
-        
+
         case '/api/system/status':
           return await this.handleGetSystemStatus(systemController);
-        
+
         case '/api/notifications/send':
           return await this.handleSendNotification(user, body, systemController);
 
@@ -97,14 +97,14 @@ export class UnifiedAPIHandler {
         default:
           return {
             success: false,
-            error: 'Endpoint not found'
+            error: 'Endpoint not found',
           };
       }
     } catch (error) {
       console.error('Unified API error:', error);
       return {
         success: false,
-        error: 'Internal server error'
+        error: 'Internal server error',
       };
     }
   }
@@ -112,7 +112,10 @@ export class UnifiedAPIHandler {
   /**
    * Handle login
    */
-  private async handleLogin(body: any, systemController: Fire22SystemController): Promise<UnifiedAPIResponse> {
+  private async handleLogin(
+    body: any,
+    systemController: Fire22SystemController
+  ): Promise<UnifiedAPIResponse> {
     const { username, password } = body;
 
     // Validate credentials (simplified for demo)
@@ -120,14 +123,14 @@ export class UnifiedAPIHandler {
       const user = {
         id: 'admin',
         username: 'admin',
-        isAdmin: true
+        isAdmin: true,
       };
 
       // Broadcast login event
       await systemController.broadcastSystemEvent('user:login', {
         username: user.username,
         isAdmin: user.isAdmin,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       return {
@@ -135,33 +138,40 @@ export class UnifiedAPIHandler {
         data: {
           user,
           token: 'demo-jwt-token', // In production, generate real JWT
-          message: 'Login successful'
-        }
+          message: 'Login successful',
+        },
       };
     }
 
     return {
       success: false,
-      error: 'Invalid credentials'
+      error: 'Invalid credentials',
     };
   }
 
   /**
    * Handle get user profile
    */
-  private async handleGetProfile(user: any, systemController: Fire22SystemController): Promise<UnifiedAPIResponse> {
+  private async handleGetProfile(
+    user: any,
+    systemController: Fire22SystemController
+  ): Promise<UnifiedAPIResponse> {
     if (!user) {
       return { success: false, error: 'Authentication required' };
     }
 
     try {
       // Get user profile from database
-      const profile = await this.env.DB.prepare(`
+      const profile = await this.env.DB.prepare(
+        `
         SELECT customer_id, username, first_name, last_name, email, 
                account_type, status, balance, credit_limit
         FROM players 
         WHERE customer_id = ?
-      `).bind(user.id).first();
+      `
+      )
+        .bind(user.id)
+        .first();
 
       return {
         success: true,
@@ -172,14 +182,14 @@ export class UnifiedAPIHandler {
           last_name: 'User',
           account_type: 'admin',
           status: 'active',
-          balance: 1000.00,
-          credit_limit: 5000.00
-        }
+          balance: 1000.0,
+          credit_limit: 5000.0,
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error: 'Failed to fetch profile'
+        error: 'Failed to fetch profile',
       };
     }
   }
@@ -187,31 +197,38 @@ export class UnifiedAPIHandler {
   /**
    * Handle get user balance
    */
-  private async handleGetBalance(user: any, systemController: Fire22SystemController): Promise<UnifiedAPIResponse> {
+  private async handleGetBalance(
+    user: any,
+    systemController: Fire22SystemController
+  ): Promise<UnifiedAPIResponse> {
     if (!user) {
       return { success: false, error: 'Authentication required' };
     }
 
     try {
-      const balance = await this.env.DB.prepare(`
+      const balance = await this.env.DB.prepare(
+        `
         SELECT balance, credit_limit, outstanding_balance
         FROM players 
         WHERE customer_id = ?
-      `).bind(user.id).first();
+      `
+      )
+        .bind(user.id)
+        .first();
 
       return {
         success: true,
         data: balance || {
-          balance: 1000.00,
-          credit_limit: 5000.00,
-          outstanding_balance: 0.00,
-          available_credit: 5000.00
-        }
+          balance: 1000.0,
+          credit_limit: 5000.0,
+          outstanding_balance: 0.0,
+          available_credit: 5000.0,
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error: 'Failed to fetch balance'
+        error: 'Failed to fetch balance',
       };
     }
   }
@@ -219,34 +236,42 @@ export class UnifiedAPIHandler {
   /**
    * Handle get wagers
    */
-  private async handleGetWagers(user: any, body: any, systemController: Fire22SystemController): Promise<UnifiedAPIResponse> {
+  private async handleGetWagers(
+    user: any,
+    body: any,
+    systemController: Fire22SystemController
+  ): Promise<UnifiedAPIResponse> {
     if (!user) {
       return { success: false, error: 'Authentication required' };
     }
 
     try {
       const { limit = 10, offset = 0 } = body || {};
-      
-      const wagers = await this.env.DB.prepare(`
+
+      const wagers = await this.env.DB.prepare(
+        `
         SELECT bet_id, customer_id, selection, stake, odds, 
                potential_win, status, placed_at
         FROM bets 
         WHERE customer_id = ?
         ORDER BY placed_at DESC
         LIMIT ? OFFSET ?
-      `).bind(user.id, limit, offset).all();
+      `
+      )
+        .bind(user.id, limit, offset)
+        .all();
 
       return {
         success: true,
         data: {
           wagers: wagers.results || [],
-          total: wagers.results?.length || 0
-        }
+          total: wagers.results?.length || 0,
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error: 'Failed to fetch wagers'
+        error: 'Failed to fetch wagers',
       };
     }
   }
@@ -254,7 +279,11 @@ export class UnifiedAPIHandler {
   /**
    * Handle place wager
    */
-  private async handlePlaceWager(user: any, body: any, systemController: Fire22SystemController): Promise<UnifiedAPIResponse> {
+  private async handlePlaceWager(
+    user: any,
+    body: any,
+    systemController: Fire22SystemController
+  ): Promise<UnifiedAPIResponse> {
     if (!user) {
       return { success: false, error: 'Authentication required' };
     }
@@ -264,10 +293,14 @@ export class UnifiedAPIHandler {
       const potential_win = stake * odds;
 
       // Insert wager (simplified)
-      const result = await this.env.DB.prepare(`
+      const result = await this.env.DB.prepare(
+        `
         INSERT INTO bets (customer_id, selection, stake, odds, potential_win, status, placed_at)
         VALUES (?, ?, ?, ?, ?, 'pending', datetime('now'))
-      `).bind(user.id, selection, stake, odds, potential_win).run();
+      `
+      )
+        .bind(user.id, selection, stake, odds, potential_win)
+        .run();
 
       // Broadcast wager event
       await systemController.broadcastSystemEvent('wager:placed', {
@@ -277,20 +310,20 @@ export class UnifiedAPIHandler {
         selection,
         odds,
         potential_win,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       return {
         success: true,
         data: {
           bet_id: result.meta?.last_row_id,
-          message: 'Wager placed successfully'
-        }
+          message: 'Wager placed successfully',
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error: 'Failed to place wager'
+        error: 'Failed to place wager',
       };
     }
   }
@@ -298,29 +331,34 @@ export class UnifiedAPIHandler {
   /**
    * Handle get agents (admin only)
    */
-  private async handleGetAgents(user: any, systemController: Fire22SystemController): Promise<UnifiedAPIResponse> {
+  private async handleGetAgents(
+    user: any,
+    systemController: Fire22SystemController
+  ): Promise<UnifiedAPIResponse> {
     if (!user?.isAdmin) {
       return { success: false, error: 'Admin access required' };
     }
 
     try {
-      const agents = await this.env.DB.prepare(`
+      const agents = await this.env.DB.prepare(
+        `
         SELECT agent_id, agent_name, master_agent_id, status, 
                internet_rate, casino_rate, sports_rate
         FROM agents 
         ORDER BY agent_name
-      `).all();
+      `
+      ).all();
 
       return {
         success: true,
         data: {
-          agents: agents.results || []
-        }
+          agents: agents.results || [],
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error: 'Failed to fetch agents'
+        error: 'Failed to fetch agents',
       };
     }
   }
@@ -328,7 +366,11 @@ export class UnifiedAPIHandler {
   /**
    * Handle get agent performance (admin only)
    */
-  private async handleGetAgentPerformance(user: any, body: any, systemController: Fire22SystemController): Promise<UnifiedAPIResponse> {
+  private async handleGetAgentPerformance(
+    user: any,
+    body: any,
+    systemController: Fire22SystemController
+  ): Promise<UnifiedAPIResponse> {
     if (!user?.isAdmin) {
       return { success: false, error: 'Admin access required' };
     }
@@ -340,7 +382,7 @@ export class UnifiedAPIHandler {
       const fire22Response = await this.callFire22API('/Manager/getAgentPerformance', {
         agentID: agentId,
         agentOwner: agentId,
-        agentSite: 1
+        agentSite: 1,
       });
 
       if (fire22Response.success) {
@@ -350,8 +392,8 @@ export class UnifiedAPIHandler {
             agentId,
             period,
             performance: fire22Response.data,
-            timestamp: new Date().toISOString()
-          }
+            timestamp: new Date().toISOString(),
+          },
         };
       } else {
         // Fallback to mock data
@@ -362,18 +404,18 @@ export class UnifiedAPIHandler {
           totalWagers: 150,
           commission: 2500,
           winRate: 0.65,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         };
 
         return {
           success: true,
-          data: performance
+          data: performance,
         };
       }
     } catch (error) {
       return {
         success: false,
-        error: 'Failed to fetch agent performance'
+        error: 'Failed to fetch agent performance',
       };
     }
   }
@@ -381,7 +423,10 @@ export class UnifiedAPIHandler {
   /**
    * Call Fire22 API
    */
-  private async callFire22API(endpoint: string, data: any): Promise<{ success: boolean; data?: any; error?: string }> {
+  private async callFire22API(
+    endpoint: string,
+    data: any
+  ): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
       const fire22BaseUrl = this.env.FIRE22_API_BASE_URL || 'https://fire22.ag/cloud/api';
       const fire22Token = this.env.FIRE22_TOKEN;
@@ -393,15 +438,15 @@ export class UnifiedAPIHandler {
 
       // Import Fire22Config for proper headers
       const { Fire22Config } = await import('../config/fire22-config');
-      
+
       const response = await fetch(`${fire22BaseUrl}${endpoint}`, {
         method: 'POST',
         headers: {
           ...Fire22Config.getDefaultHeaders(),
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${fire22Token}`,
+          Authorization: `Bearer ${fire22Token}`,
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
 
       if (response.ok) {
@@ -419,46 +464,52 @@ export class UnifiedAPIHandler {
   /**
    * Handle get system status
    */
-  private async handleGetSystemStatus(systemController: Fire22SystemController): Promise<UnifiedAPIResponse> {
+  private async handleGetSystemStatus(
+    systemController: Fire22SystemController
+  ): Promise<UnifiedAPIResponse> {
     const status = systemController.getSystemStatus();
-    
+
     return {
       success: true,
       data: {
         ...status,
         timestamp: new Date().toISOString(),
-        version: '3.0.8'
-      }
+        version: '3.0.8',
+      },
     };
   }
 
   /**
    * Handle send notification (admin only)
    */
-  private async handleSendNotification(user: any, body: any, systemController: Fire22SystemController): Promise<UnifiedAPIResponse> {
+  private async handleSendNotification(
+    user: any,
+    body: any,
+    systemController: Fire22SystemController
+  ): Promise<UnifiedAPIResponse> {
     if (!user?.isAdmin) {
       return { success: false, error: 'Admin access required' };
     }
 
     try {
       const { message, target = 'all' } = body;
-      
+
       // Broadcast notification
       await systemController.broadcastSystemEvent('system:alert', {
         message,
         target,
         sender: user.username,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       return {
         success: true,
-        message: 'Notification sent successfully'
+        message: 'Notification sent successfully',
       };
     } catch (error) {
       return {
         success: false,
-        error: 'Failed to send notification'
+        error: 'Failed to send notification',
       };
     }
   }
@@ -466,7 +517,11 @@ export class UnifiedAPIHandler {
   /**
    * Handle get player info from Fire22
    */
-  private async handleGetPlayerInfo(user: any, body: any, systemController: Fire22SystemController): Promise<UnifiedAPIResponse> {
+  private async handleGetPlayerInfo(
+    user: any,
+    body: any,
+    systemController: Fire22SystemController
+  ): Promise<UnifiedAPIResponse> {
     if (!user?.isAdmin) {
       return { success: false, error: 'Admin access required' };
     }
@@ -478,12 +533,12 @@ export class UnifiedAPIHandler {
         playerID: playerId,
         agentID: agentId,
         agentOwner: agentId,
-        agentSite: 1
+        agentSite: 1,
       });
 
-      return fire22Response.success ?
-        { success: true, data: fire22Response.data } :
-        { success: false, error: 'Failed to fetch player info' };
+      return fire22Response.success
+        ? { success: true, data: fire22Response.data }
+        : { success: false, error: 'Failed to fetch player info' };
     } catch (error) {
       return { success: false, error: 'Failed to fetch player info' };
     }
@@ -492,7 +547,11 @@ export class UnifiedAPIHandler {
   /**
    * Handle get transactions from Fire22
    */
-  private async handleGetTransactions(user: any, body: any, systemController: Fire22SystemController): Promise<UnifiedAPIResponse> {
+  private async handleGetTransactions(
+    user: any,
+    body: any,
+    systemController: Fire22SystemController
+  ): Promise<UnifiedAPIResponse> {
     if (!user?.isAdmin) {
       return { success: false, error: 'Admin access required' };
     }
@@ -505,12 +564,12 @@ export class UnifiedAPIHandler {
         agentID: agentId,
         agentOwner: agentId,
         agentSite: 1,
-        limit
+        limit,
       });
 
-      return fire22Response.success ?
-        { success: true, data: fire22Response.data } :
-        { success: false, error: 'Failed to fetch transactions' };
+      return fire22Response.success
+        ? { success: true, data: fire22Response.data }
+        : { success: false, error: 'Failed to fetch transactions' };
     } catch (error) {
       return { success: false, error: 'Failed to fetch transactions' };
     }
@@ -519,7 +578,11 @@ export class UnifiedAPIHandler {
   /**
    * Handle get crypto info from Fire22
    */
-  private async handleGetCryptoInfo(user: any, body: any, systemController: Fire22SystemController): Promise<UnifiedAPIResponse> {
+  private async handleGetCryptoInfo(
+    user: any,
+    body: any,
+    systemController: Fire22SystemController
+  ): Promise<UnifiedAPIResponse> {
     if (!user?.isAdmin) {
       return { success: false, error: 'Admin access required' };
     }
@@ -530,12 +593,12 @@ export class UnifiedAPIHandler {
       const fire22Response = await this.callFire22API('/Manager/getCryptoInfo', {
         agentID: agentId,
         agentOwner: agentId,
-        agentSite: 1
+        agentSite: 1,
       });
 
-      return fire22Response.success ?
-        { success: true, data: fire22Response.data } :
-        { success: false, error: 'Failed to fetch crypto info' };
+      return fire22Response.success
+        ? { success: true, data: fire22Response.data }
+        : { success: false, error: 'Failed to fetch crypto info' };
     } catch (error) {
       return { success: false, error: 'Failed to fetch crypto info' };
     }
@@ -544,7 +607,11 @@ export class UnifiedAPIHandler {
   /**
    * Handle get teaser profile from Fire22
    */
-  private async handleGetTeaserProfile(user: any, body: any, systemController: Fire22SystemController): Promise<UnifiedAPIResponse> {
+  private async handleGetTeaserProfile(
+    user: any,
+    body: any,
+    systemController: Fire22SystemController
+  ): Promise<UnifiedAPIResponse> {
     if (!user?.isAdmin) {
       return { success: false, error: 'Admin access required' };
     }
@@ -556,12 +623,12 @@ export class UnifiedAPIHandler {
         playerID: playerId,
         agentID: agentId,
         agentOwner: agentId,
-        agentSite: 1
+        agentSite: 1,
       });
 
-      return fire22Response.success ?
-        { success: true, data: fire22Response.data } :
-        { success: false, error: 'Failed to fetch teaser profile' };
+      return fire22Response.success
+        ? { success: true, data: fire22Response.data }
+        : { success: false, error: 'Failed to fetch teaser profile' };
     } catch (error) {
       return { success: false, error: 'Failed to fetch teaser profile' };
     }
@@ -570,7 +637,11 @@ export class UnifiedAPIHandler {
   /**
    * Handle get mail from Fire22
    */
-  private async handleGetMail(user: any, body: any, systemController: Fire22SystemController): Promise<UnifiedAPIResponse> {
+  private async handleGetMail(
+    user: any,
+    body: any,
+    systemController: Fire22SystemController
+  ): Promise<UnifiedAPIResponse> {
     if (!user?.isAdmin) {
       return { success: false, error: 'Admin access required' };
     }
@@ -581,12 +652,12 @@ export class UnifiedAPIHandler {
       const fire22Response = await this.callFire22API('/Manager/getMail', {
         agentID: agentId,
         agentOwner: agentId,
-        agentSite: 1
+        agentSite: 1,
       });
 
-      return fire22Response.success ?
-        { success: true, data: fire22Response.data } :
-        { success: false, error: 'Failed to fetch mail' };
+      return fire22Response.success
+        ? { success: true, data: fire22Response.data }
+        : { success: false, error: 'Failed to fetch mail' };
     } catch (error) {
       return { success: false, error: 'Failed to fetch mail' };
     }

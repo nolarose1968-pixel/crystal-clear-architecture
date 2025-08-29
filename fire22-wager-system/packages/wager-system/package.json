@@ -17,8 +17,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fire22/dashboard-worker",
-    "directory": "packages/wager-system"
+    "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture.git",
+    "directory": "fire22-wager-system/packages/wager-system"
   },
   "scripts": {
     "test:wager:unit": "bun test --test-name-pattern='wager.*unit'",

@@ -1,10 +1,10 @@
 /**
  * @fire22/security-scanner/types - TypeScript definitions
- * 
+ *
  * Complete type system for Bun Security Scanner API compliance
  */
 
-// ===== Bun Security Scanner API Types =====
+// !== Bun Security Scanner API Types !==
 
 export interface ScanRequest {
   packages: Array<{
@@ -42,7 +42,7 @@ export interface SecurityAdvisory {
   metadata?: Record<string, any>;
 }
 
-// ===== Threat Feed Types =====
+// !== Threat Feed Types !==
 
 export interface ThreatFeedItem {
   package: string;
@@ -56,7 +56,7 @@ export interface ThreatFeedItem {
   lastModified?: string;
 }
 
-export type ThreatCategory = 
+export type ThreatCategory =
   | 'backdoor'
   | 'botnet'
   | 'malware'
@@ -74,7 +74,7 @@ export interface ThreatFeed {
   items: ThreatFeedItem[];
 }
 
-// ===== Fire22 Specific Types =====
+// !== Fire22 Specific Types !==
 
 export interface Fire22SecurityPolicy {
   name: string;
@@ -94,7 +94,7 @@ export interface Fire22ScanContext {
   trustedScopes: string[];
 }
 
-// ===== Vulnerability Database Types =====
+// !== Vulnerability Database Types !==
 
 export interface VulnerabilityRecord {
   package: string;
@@ -114,7 +114,7 @@ export interface VulnerabilityDatabase {
   vulnerabilities: VulnerabilityRecord[];
 }
 
-// ===== Scanner Configuration Types =====
+// !== Scanner Configuration Types !==
 
 export interface ScannerConfig {
   threatFeed: {
@@ -142,7 +142,7 @@ export interface ScannerConfig {
   };
 }
 
-// ===== Analytics and Reporting Types =====
+// !== Analytics and Reporting Types !==
 
 export interface ScanStatistics {
   totalScans: number;
@@ -167,7 +167,7 @@ export interface ScanReport {
   };
 }
 
-// ===== Error Types =====
+// !== Error Types !==
 
 export class ScannerError extends Error {
   constructor(
@@ -195,7 +195,7 @@ export class ValidationError extends ScannerError {
   }
 }
 
-// ===== Integration Types =====
+// !== Integration Types !==
 
 export interface Fire22Integration {
   workspaceConfig: Fire22ScanContext;
@@ -207,7 +207,7 @@ export interface Fire22Integration {
   };
 }
 
-// ===== Test Types =====
+// !== Test Types !==
 
 export interface MockThreatFeedItem extends ThreatFeedItem {
   testOnly?: boolean;

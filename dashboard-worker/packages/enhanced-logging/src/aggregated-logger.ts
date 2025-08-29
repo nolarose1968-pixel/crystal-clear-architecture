@@ -10,7 +10,7 @@ export class AggregatedLogger {
   private baseLogger: Fire22Logger;
   private auditLogger: LKeyAuditLogger;
   private config: LoggerConfig;
-  
+
   constructor(config: Partial<LoggerConfig> = {}) {
     this.config = {
       level: LogLevel.INFO,
@@ -27,44 +27,44 @@ export class AggregatedLogger {
       maxLogFileSize: 100 * 1024 * 1024,
       logRotation: true,
       retentionDays: 30,
-      ...config
+      ...config,
     };
-    
+
     this.baseLogger = new Fire22Logger(this.config);
     this.auditLogger = new LKeyAuditLogger({
       ...this.config,
-      filePath: this.config.filePath?.replace('.log', '-audit.log')
+      filePath: this.config.filePath?.replace('.log', '-audit.log'),
     });
   }
-  
-  // ============================================
+
+  // !==!==!==!==!==!==!==!===
   // STANDARD LOGGING METHODS
-  // ============================================
-  
+  // !==!==!==!==!==!==!==!===
+
   public debug(message: string, context?: LogContext, metadata?: Record<string, any>): void {
     this.baseLogger.debug(message, context, metadata);
   }
-  
+
   public info(message: string, context?: LogContext, metadata?: Record<string, any>): void {
     this.baseLogger.info(message, context, metadata);
   }
-  
+
   public warn(message: string, context?: LogContext, metadata?: Record<string, any>): void {
     this.baseLogger.warn(message, context, metadata);
   }
-  
+
   public error(message: string, context?: LogContext, metadata?: Record<string, any>): void {
     this.baseLogger.error(message, context, metadata);
   }
-  
+
   public critical(message: string, context?: LogContext, metadata?: Record<string, any>): void {
     this.baseLogger.critical(message, context, metadata);
   }
-  
-  // ============================================
+
+  // !==!==!==!==!==!==!==!===
   // L-KEY INTEGRATED LOGGING
-  // ============================================
-  
+  // !==!==!==!==!==!==!==!===
+
   /**
    * Log with L-Key context
    */
@@ -77,18 +77,14 @@ export class AggregatedLogger {
     metadata?: Record<string, any>
   ): void {
     this.baseLogger.logWithLKey(level, message, lKey, entityId, context, metadata);
-    
+
     // Also log to audit trail
-    this.auditLogger.logLKeyAction(
-      'LOG_WITH_LKEY',
-      lKey,
-      'GENERAL',
-      entityId,
-      context,
-      { ...metadata, logLevel: LogLevel[level] }
-    );
+    this.auditLogger.logLKeyAction('LOG_WITH_LKEY', lKey, 'GENERAL', entityId, context, {
+      ...metadata,
+      logLevel: LogLevel[level],
+    });
   }
-  
+
   /**
    * Enhanced transaction logging with L-Key integration
    */
@@ -116,19 +112,19 @@ export class AggregatedLogger {
       ...context,
       lKey: transactionLKey,
       entityId: transactionId,
-      component: 'transaction-processor'
+      component: 'transaction-processor',
     };
-    
+
     const metadata = {
       transactionType,
       transactionLKey,
       action,
-      ...details
+      ...details,
     };
-    
+
     // Log to base logger
     this.baseLogger.logTransaction(transactionId, action, metadata, enhancedContext);
-    
+
     // Log to L-Key audit logger
     this.auditLogger.logLKeyAction(
       action,
@@ -138,7 +134,7 @@ export class AggregatedLogger {
       enhancedContext,
       metadata
     );
-    
+
     // Log flow sequence if provided
     if (details.flowSequence) {
       this.auditLogger.logLKeyFlow(
@@ -150,7 +146,7 @@ export class AggregatedLogger {
       );
     }
   }
-  
+
   /**
    * Enhanced OTC order logging
    */
@@ -178,23 +174,19 @@ export class AggregatedLogger {
       ...context,
       lKey: orderLKey,
       entityId: orderId,
-      component: 'otc-matching-engine'
+      component: 'otc-matching-engine',
     };
-    
+
     const metadata = {
       orderType,
       orderLKey,
       action,
-      ...details
+      ...details,
     };
-    
+
     // Log to base logger
-    this.info(
-      `🏛️ OTC Order ${action}: ${orderId} (${orderType})`,
-      enhancedContext,
-      metadata
-    );
-    
+    this.info(`🏛️ OTC Order ${action}: ${orderId} (${orderType})`, enhancedContext, metadata);
+
     // Log to L-Key audit logger
     this.auditLogger.logLKeyAction(
       action,
@@ -204,7 +196,7 @@ export class AggregatedLogger {
       enhancedContext,
       metadata
     );
-    
+
     // Log audit trail if provided
     if (details.auditTrail) {
       this.auditLogger.logLKeyFlow(
@@ -216,7 +208,7 @@ export class AggregatedLogger {
       );
     }
   }
-  
+
   /**
    * Enhanced customer logging
    */
@@ -240,23 +232,19 @@ export class AggregatedLogger {
       ...context,
       lKey: customerLKey,
       entityId: customerId,
-      component: 'customer-manager'
+      component: 'customer-manager',
     };
-    
+
     const metadata = {
       customerType,
       customerLKey,
       action,
-      ...details
+      ...details,
     };
-    
+
     // Log to base logger
-    this.info(
-      `👤 Customer ${action}: ${customerId} (${customerType})`,
-      enhancedContext,
-      metadata
-    );
-    
+    this.info(`👤 Customer ${action}: ${customerId} (${customerType})`, enhancedContext, metadata);
+
     // Log to L-Key audit logger
     this.auditLogger.logLKeyAction(
       action,
@@ -267,7 +255,7 @@ export class AggregatedLogger {
       metadata
     );
   }
-  
+
   /**
    * Enhanced security logging with L-Key context
    */
@@ -287,27 +275,32 @@ export class AggregatedLogger {
     },
     context: LogContext = {}
   ): void {
-    const level = severity === 'CRITICAL' ? LogLevel.CRITICAL :
-                 severity === 'HIGH' ? LogLevel.ERROR :
-                 severity === 'MEDIUM' ? LogLevel.WARN : LogLevel.INFO;
-    
+    const level =
+      severity === 'CRITICAL'
+        ? LogLevel.CRITICAL
+        : severity === 'HIGH'
+          ? LogLevel.ERROR
+          : severity === 'MEDIUM'
+            ? LogLevel.WARN
+            : LogLevel.INFO;
+
     const enhancedContext = {
       ...context,
       lKey,
       entityId,
-      component: 'security-monitor'
+      component: 'security-monitor',
     };
-    
+
     const metadata = {
       securityEvent: event,
       severity,
       lKey,
-      ...details
+      ...details,
     };
-    
+
     // Log to base logger
     this.baseLogger.logSecurity(event, severity, metadata, enhancedContext);
-    
+
     // Log to L-Key audit logger
     this.auditLogger.logLKeyAction(
       `SECURITY_${event.toUpperCase()}`,
@@ -318,7 +311,7 @@ export class AggregatedLogger {
       metadata
     );
   }
-  
+
   /**
    * Performance logging with L-Key context
    */
@@ -340,25 +333,22 @@ export class AggregatedLogger {
       ...context,
       lKey,
       entityId,
-      component: 'performance-monitor'
+      component: 'performance-monitor',
     };
-    
+
     const metadata = {
       operation,
       duration,
       lKey,
-      ...details
+      ...details,
     };
-    
+
     // Log to base logger
-    this.info(
-      `⚡ Performance: ${operation} completed in ${duration}ms`,
-      enhancedContext,
-      metadata
-    );
-    
+    this.info(`⚡ Performance: ${operation} completed in ${duration}ms`, enhancedContext, metadata);
+
     // Log to L-Key audit logger if duration exceeds threshold
-    if (duration > 1000) { // Log slow operations to audit
+    if (duration > 1000) {
+      // Log slow operations to audit
       this.auditLogger.logLKeyAction(
         'SLOW_OPERATION',
         lKey,
@@ -369,11 +359,11 @@ export class AggregatedLogger {
       );
     }
   }
-  
-  // ============================================
+
+  // !==!==!==!==!==!==!==!===
   // SPECIALIZED LOGGING METHODS
-  // ============================================
-  
+  // !==!==!==!==!==!==!==!===
+
   /**
    * Log entity mapping creation
    */
@@ -386,7 +376,7 @@ export class AggregatedLogger {
   ): void {
     this.auditLogger.logEntityMapping(entityType, entityId, lKey, mappingDetails, context);
   }
-  
+
   /**
    * Log L-Key validation
    */
@@ -398,7 +388,7 @@ export class AggregatedLogger {
   ): void {
     this.auditLogger.logLKeyValidation(lKey, isValid, validationErrors, context);
   }
-  
+
   /**
    * Log fee calculation
    */
@@ -421,15 +411,18 @@ export class AggregatedLogger {
         ...context,
         lKey,
         entityId: transactionId,
-        component: 'fee-calculator'
+        component: 'fee-calculator',
       },
       {
         feeCalculation: feeDetails,
         savings: feeDetails.baseFee - feeDetails.totalFee,
-        savingsPercentage: ((feeDetails.baseFee - feeDetails.totalFee) / feeDetails.baseFee * 100).toFixed(2)
+        savingsPercentage: (
+          ((feeDetails.baseFee - feeDetails.totalFee) / feeDetails.baseFee) *
+          100
+        ).toFixed(2),
       }
     );
-    
+
     this.auditLogger.logLKeyAction(
       'FEE_CALCULATED',
       lKey,
@@ -439,52 +432,42 @@ export class AggregatedLogger {
       { feeDetails }
     );
   }
-  
+
   /**
    * Performance timing helper
    */
   public time(label: string, lKey?: string, entityId?: string, context?: LogContext): () => void {
     const startTime = Bun.nanoseconds();
-    
+
     return () => {
       const duration = (Bun.nanoseconds() - startTime) / 1_000_000; // Convert to milliseconds
-      
+
       if (lKey && entityId) {
-        this.logPerformance(
-          label,
-          duration,
-          lKey,
-          entityId,
-          {},
-          context
-        );
+        this.logPerformance(label, duration, lKey, entityId, {}, context);
       } else {
         this.info(`⏱️ ${label}`, context, { duration, unit: 'ms' });
       }
     };
   }
-  
-  // ============================================
+
+  // !==!==!==!==!==!==!==!===
   // REPORTING AND ANALYTICS
-  // ============================================
-  
+  // !==!==!==!==!==!==!==!===
+
   /**
    * Generate comprehensive audit report
    */
-  public generateAuditReport(
-    startDate?: Date,
-    endDate?: Date
-  ): AuditReport {
+  public generateAuditReport(startDate?: Date, endDate?: Date): AuditReport {
     return this.auditLogger.generateAuditReport(startDate, endDate);
   }
-  
+
   /**
    * Get L-Key usage statistics
    */
   public getLKeyUsageStats(startDate?: Date, endDate?: Date) {
     return this.auditLogger.getLKeyUsageStats(startDate, endDate);
   }
-  
+
   /**
    * Export audit data
    */
@@ -495,49 +478,46 @@ export class AggregatedLogger {
   ): string {
     return this.auditLogger.exportAuditEntries(startDate, endDate, format);
   }
-  
+
   /**
    * Get logger metrics
    */
   public getMetrics() {
     return this.baseLogger.getMetrics();
   }
-  
+
   /**
    * Get audit entry count
    */
   public getAuditEntryCount(): number {
     return this.auditLogger.getAuditEntryCount();
   }
-  
-  // ============================================
+
+  // !==!==!==!==!==!==!==!===
   // LIFECYCLE MANAGEMENT
-  // ============================================
-  
+  // !==!==!==!==!==!==!==!===
+
   /**
    * Flush all loggers
    */
   public async flush(): Promise<void> {
-    await Promise.all([
-      this.baseLogger.flush(),
-      this.auditLogger.flush()
-    ]);
+    await Promise.all([this.baseLogger.flush(), this.auditLogger.flush()]);
   }
-  
+
   /**
    * Reset metrics
    */
   public resetMetrics(): void {
     this.baseLogger.resetMetrics();
   }
-  
+
   /**
    * Clear audit entries
    */
   public clearAuditEntries(): void {
     this.auditLogger.clearAuditEntries();
   }
-  
+
   /**
    * Destroy all loggers
    */

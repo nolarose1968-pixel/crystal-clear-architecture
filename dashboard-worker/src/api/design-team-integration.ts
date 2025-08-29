@@ -4,9 +4,9 @@
  * for proper design system integration and collaborative workflows
  */
 
-import { SQL } from "bun";
-import { TaskService } from "./tasks-enhanced";
-import { TaskEventService } from "./task-events";
+import { SQL } from 'bun';
+import { TaskService } from './tasks-enhanced';
+import { TaskEventService } from './task-events';
 
 export interface DesignReviewRequest {
   taskUuid: string;
@@ -46,9 +46,9 @@ export class DesignTeamIntegrationService {
   private eventService: TaskEventService;
 
   // Design team member IDs
-  private readonly DESIGN_DIRECTOR = "isabella-martinez";
-  private readonly UX_DESIGNER = "ethan-cooper";
-  private readonly DESIGN_DEPARTMENT = "design";
+  private readonly DESIGN_DIRECTOR = 'isabella-martinez';
+  private readonly UX_DESIGNER = 'ethan-cooper';
+  private readonly DESIGN_DEPARTMENT = 'design';
 
   constructor(db: SQL) {
     this.db = db;
@@ -77,7 +77,7 @@ export class DesignTeamIntegrationService {
         assigneeId,
         reporterId: request.requesterId,
         dueDate: request.deadline,
-        tags: ['design-review', request.reviewType, 'collaboration']
+        tags: ['design-review', request.reviewType, 'collaboration'],
       });
 
       if (reviewTask.success) {
@@ -85,7 +85,7 @@ export class DesignTeamIntegrationService {
         await this.taskService.addComment(request.taskUuid, {
           content: `🎨 Design review requested: ${reviewTask.data!.uuid}\nReview Type: ${request.reviewType}\nAssigned to: ${assigneeId}`,
           type: 'design_review_request',
-          userId: request.requesterId
+          userId: request.requesterId,
         });
 
         // Store design review metadata
@@ -98,7 +98,7 @@ export class DesignTeamIntegrationService {
           task: reviewTask.data!,
           user: { id: request.requesterId, name: 'System' },
           timestamp: new Date().toISOString(),
-          departmentId: this.DESIGN_DEPARTMENT
+          departmentId: this.DESIGN_DEPARTMENT,
         });
 
         return {
@@ -106,8 +106,8 @@ export class DesignTeamIntegrationService {
           data: {
             reviewTaskUuid: reviewTask.data!.uuid,
             assignedTo: assigneeId,
-            message: `Design review request created and assigned to ${assigneeId}`
-          }
+            message: `Design review request created and assigned to ${assigneeId}`,
+          },
         };
       }
 
@@ -115,18 +115,17 @@ export class DesignTeamIntegrationService {
         success: false,
         error: {
           code: 'REVIEW_CREATION_FAILED',
-          message: 'Failed to create design review task'
-        }
+          message: 'Failed to create design review task',
+        },
       };
-
     } catch (error) {
       console.error('❌ Error creating design review request:', error);
       return {
         success: false,
         error: {
           code: 'INTERNAL_ERROR',
-          message: 'Internal server error'
-        }
+          message: 'Internal server error',
+        },
       };
     }
   }
@@ -154,7 +153,7 @@ export class DesignTeamIntegrationService {
       await this.taskService.addComment(asset.taskUuid, {
         content: `🎨 New design asset uploaded: ${asset.title}\nType: ${asset.type}\nVersion: ${asset.version}\nURL: ${asset.url}`,
         type: 'design_asset',
-        userId: asset.uploadedBy
+        userId: asset.uploadedBy,
       });
 
       return {
@@ -162,18 +161,17 @@ export class DesignTeamIntegrationService {
         data: {
           id: assetId,
           ...asset,
-          uploadedAt
-        }
+          uploadedAt,
+        },
       };
-
     } catch (error) {
       console.error('❌ Error uploading design asset:', error);
       return {
         success: false,
         error: {
           code: 'ASSET_UPLOAD_FAILED',
-          message: 'Failed to upload design asset'
-        }
+          message: 'Failed to upload design asset',
+        },
       };
     }
   }
@@ -191,17 +189,16 @@ export class DesignTeamIntegrationService {
 
       return {
         success: true,
-        data: assets
+        data: assets,
       };
-
     } catch (error) {
       console.error('❌ Error fetching design assets:', error);
       return {
         success: false,
         error: {
           code: 'ASSETS_FETCH_FAILED',
-          message: 'Failed to fetch design assets'
-        }
+          message: 'Failed to fetch design assets',
+        },
       };
     }
   }
@@ -218,7 +215,7 @@ export class DesignTeamIntegrationService {
         await this.taskService.addComment(taskUuid, {
           content: `🔄 Design System Update: ${update.component} v${update.version}\n\nChanges:\n${update.changes.map(c => `• ${c}`).join('\n')}\n\n${update.migrationGuide ? `Migration Guide: ${update.migrationGuide}` : 'No migration required.'}`,
           type: 'design_system_update',
-          userId: update.updatedBy
+          userId: update.updatedBy,
         });
       }
 
@@ -236,18 +233,17 @@ export class DesignTeamIntegrationService {
       return {
         success: true,
         data: {
-          message: `Design system update processed for ${update.affectedTasks.length} tasks`
-        }
+          message: `Design system update processed for ${update.affectedTasks.length} tasks`,
+        },
       };
-
     } catch (error) {
       console.error('❌ Error processing design system update:', error);
       return {
         success: false,
         error: {
           code: 'UPDATE_PROCESSING_FAILED',
-          message: 'Failed to process design system update'
-        }
+          message: 'Failed to process design system update',
+        },
       };
     }
   }
@@ -266,29 +262,28 @@ export class DesignTeamIntegrationService {
           team: [
             {
               id: this.DESIGN_DIRECTOR,
-              name: "Isabella Martinez",
-              role: "Design Director",
-              ...isabellaWorkload
+              name: 'Isabella Martinez',
+              role: 'Design Director',
+              ...isabellaWorkload,
             },
             {
               id: this.UX_DESIGNER,
-              name: "Ethan Cooper",
-              role: "UI/UX Designer",
-              ...ethanWorkload
-            }
+              name: 'Ethan Cooper',
+              role: 'UI/UX Designer',
+              ...ethanWorkload,
+            },
           ],
-          recommendations: this.generateAssignmentRecommendations(isabellaWorkload, ethanWorkload)
-        }
+          recommendations: this.generateAssignmentRecommendations(isabellaWorkload, ethanWorkload),
+        },
       };
-
     } catch (error) {
       console.error('❌ Error fetching design team workload:', error);
       return {
         success: false,
         error: {
           code: 'WORKLOAD_FETCH_FAILED',
-          message: 'Failed to fetch design team workload'
-        }
+          message: 'Failed to fetch design team workload',
+        },
       };
     }
   }
@@ -343,15 +338,14 @@ export class DesignTeamIntegrationService {
 
       console.log('✅ Design team integration tables initialized');
       return { success: true };
-
     } catch (error) {
       console.error('❌ Error initializing design integration:', error);
       return {
         success: false,
         error: {
           code: 'INITIALIZATION_FAILED',
-          message: 'Failed to initialize design team integration'
-        }
+          message: 'Failed to initialize design team integration',
+        },
       };
     }
   }
@@ -391,20 +385,21 @@ export class DesignTeamIntegrationService {
   private async getDesignerWorkload(designerId: string) {
     const activeTasks = await this.taskService.getTasks({
       assigneeId: designerId,
-      status: 'active'
+      status: 'active',
     });
 
     const inProgressTasks = await this.taskService.getTasks({
       assigneeId: designerId,
-      status: 'in-progress'
+      status: 'in-progress',
     });
 
-    const totalActive = (activeTasks.success ? activeTasks.data!.pagination.total : 0) +
-                       (inProgressTasks.success ? inProgressTasks.data!.pagination.total : 0);
+    const totalActive =
+      (activeTasks.success ? activeTasks.data!.pagination.total : 0) +
+      (inProgressTasks.success ? inProgressTasks.data!.pagination.total : 0);
 
     return {
       activeTasks: totalActive,
-      availability: totalActive < 5 ? 'available' : totalActive < 10 ? 'busy' : 'overloaded'
+      availability: totalActive < 5 ? 'available' : totalActive < 10 ? 'busy' : 'overloaded',
     };
   }
 
@@ -412,15 +407,22 @@ export class DesignTeamIntegrationService {
     const recommendations = [];
 
     if (isabellaWorkload.availability === 'available') {
-      recommendations.push("Isabella Martinez is available for strategic design work and design system reviews");
+      recommendations.push(
+        'Isabella Martinez is available for strategic design work and design system reviews'
+      );
     }
 
     if (ethanWorkload.availability === 'available') {
-      recommendations.push("Ethan Cooper is available for UI/UX design and accessibility reviews");
+      recommendations.push('Ethan Cooper is available for UI/UX design and accessibility reviews');
     }
 
-    if (isabellaWorkload.availability === 'overloaded' && ethanWorkload.availability === 'overloaded') {
-      recommendations.push("Both designers are overloaded. Consider extending deadlines or redistributing work.");
+    if (
+      isabellaWorkload.availability === 'overloaded' &&
+      ethanWorkload.availability === 'overloaded'
+    ) {
+      recommendations.push(
+        'Both designers are overloaded. Consider extending deadlines or redistributing work.'
+      );
     }
 
     return recommendations;

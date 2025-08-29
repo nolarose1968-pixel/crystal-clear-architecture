@@ -105,16 +105,19 @@ async function createKVNamespaces(config: CloudflareConfig) {
   // Create PERSONAL_SITES namespace
   console.log('Creating PERSONAL_SITES KV namespace...');
   try {
-    const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/storage/kv/namespaces`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title: 'personal_sites_kv_namespace'
-      }),
-    });
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/storage/kv/namespaces`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: 'personal_sites_kv_namespace',
+        }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -131,7 +134,6 @@ async function createKVNamespaces(config: CloudflareConfig) {
       `id = "${personalSitesId}"`
     );
     await Bun.file('wrangler.toml').write(wranglerConfig);
-
   } catch (error) {
     console.log(`⚠️ PERSONAL_SITES namespace may already exist: ${error.message}`);
   }
@@ -139,16 +141,19 @@ async function createKVNamespaces(config: CloudflareConfig) {
   // Create EMPLOYEE_DATA namespace
   console.log('Creating EMPLOYEE_DATA KV namespace...');
   try {
-    const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/storage/kv/namespaces`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title: 'employee_data_kv_namespace'
-      }),
-    });
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/storage/kv/namespaces`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: 'employee_data_kv_namespace',
+        }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -165,7 +170,6 @@ async function createKVNamespaces(config: CloudflareConfig) {
       `id = "${employeeDataId}"`
     );
     await Bun.file('wrangler.toml').write(wranglerConfig);
-
   } catch (error) {
     console.log(`⚠️ EMPLOYEE_DATA namespace may already exist: ${error.message}`);
   }
@@ -185,7 +189,6 @@ async function deployWorker(config: CloudflareConfig) {
     // Get the deployed worker URL
     const proc = await $`wrangler tail --format json`.quiet();
     console.log('✅ Worker logs accessible');
-
   } catch (error) {
     console.log(`❌ Worker deployment failed: ${error.message}`);
     console.log('Please check your wrangler.toml configuration and try again.');
@@ -225,7 +228,7 @@ async function seedEmployeeData(config: CloudflareConfig) {
         {
           method: 'PUT',
           headers: {
-            'Authorization': `Bearer ${apiToken}`,
+            Authorization: `Bearer ${apiToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(employee),
@@ -247,7 +250,7 @@ async function seedEmployeeData(config: CloudflareConfig) {
           `https://api.cloudflare.com/client/v4/accounts/${accountId}/storage/kv/namespaces/${namespaceId}/values/${encodeURIComponent(key)}`,
           {
             headers: {
-              'Authorization': `Bearer ${apiToken}`,
+              Authorization: `Bearer ${apiToken}`,
             },
           }
         );
@@ -259,7 +262,6 @@ async function seedEmployeeData(config: CloudflareConfig) {
           }
         }
       }
-
     } catch (error) {
       console.log(`❌ Failed to seed data for ${employee.name}: ${error.message}`);
     }
@@ -279,7 +281,7 @@ async function configureDNS(config: CloudflareConfig) {
       `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records?type=CNAME&name=*.fire22.workers.dev`,
       {
         headers: {
-          'Authorization': `Bearer ${apiToken}`,
+          Authorization: `Bearer ${apiToken}`,
         },
       }
     );
@@ -297,27 +299,29 @@ async function configureDNS(config: CloudflareConfig) {
 
   // Create wildcard CNAME record
   try {
-    const response = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        type: 'CNAME',
-        name: '*.fire22.workers.dev',
-        content: 'fire22.workers.dev',
-        ttl: 1, // Auto TTL
-        proxied: true, // Enable Cloudflare proxy
-      }),
-    });
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'CNAME',
+          name: '*.fire22.workers.dev',
+          content: 'fire22.workers.dev',
+          ttl: 1, // Auto TTL
+          proxied: true, // Enable Cloudflare proxy
+        }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
     console.log('✅ Wildcard DNS record created successfully');
-
   } catch (error) {
     console.log(`❌ Failed to create wildcard DNS record: ${error.message}`);
     console.log('You may need to create this manually in the Cloudflare dashboard.');

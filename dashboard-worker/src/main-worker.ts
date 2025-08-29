@@ -35,8 +35,6 @@ export class MainWorker {
     return Date.now() - this.startTime;
   }
 
-
-
   public async processRequest(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
@@ -50,8 +48,8 @@ export class MainWorker {
           'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
           'Access-Control-Allow-Credentials': 'true',
-          'Access-Control-Max-Age': '86400'
-        }
+          'Access-Control-Max-Age': '86400',
+        },
       });
     }
 
@@ -67,15 +65,15 @@ export class MainWorker {
         monitoring: {
           enabled: true,
           uptime: Math.floor(this.getUptime() / 1000),
-          status: 'operational'
-        }
+          status: 'operational',
+        },
       };
 
       return new Response(JSON.stringify(response, null, 2), {
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
+          'Access-Control-Allow-Origin': '*',
+        },
       });
     }
 
@@ -86,24 +84,27 @@ export class MainWorker {
       return new Response(faviconSvg, {
         headers: {
           'Content-Type': 'image/svg+xml',
-          'Cache-Control': 'public, max-age=31536000'
-        }
+          'Cache-Control': 'public, max-age=31536000',
+        },
       });
     }
 
     // Handle generic /health path
     if (path === '/health') {
-      return new Response(JSON.stringify({
-        status: 'healthy',
-        message: 'Dashboard Worker is running',
-        timestamp: new Date().toISOString(),
-        uptime: Math.floor(this.getUptime() / 1000) + ' seconds'
-      }), {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
+      return new Response(
+        JSON.stringify({
+          status: 'healthy',
+          message: 'Dashboard Worker is running',
+          timestamp: new Date().toISOString(),
+          uptime: Math.floor(this.getUptime() / 1000) + ' seconds',
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
         }
-      });
+      );
     }
 
     // Handle dashboard API endpoints
@@ -125,7 +126,7 @@ export class MainWorker {
               canPlaceBet: true,
               internetRate: 5.0,
               casinoRate: 3.0,
-              lastUpdated: new Date().toISOString()
+              lastUpdated: new Date().toISOString(),
             },
             {
               id: 'TEST001',
@@ -134,17 +135,17 @@ export class MainWorker {
               canPlaceBet: true,
               internetRate: 3.0,
               casinoRate: 2.0,
-              lastUpdated: new Date().toISOString()
-            }
+              lastUpdated: new Date().toISOString(),
+            },
           ],
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         };
 
         return new Response(JSON.stringify(agentData), {
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
+            'Access-Control-Allow-Origin': '*',
+          },
         });
       }
     }
@@ -1225,26 +1226,28 @@ export class MainWorker {
       return new Response(html, {
         headers: {
           'Content-Type': 'text/html',
-          'Access-Control-Allow-Origin': '*'
-        }
+          'Access-Control-Allow-Origin': '*',
+        },
       });
     }
 
     // Default response for unhandled routes
-    return new Response(JSON.stringify({
-      error: 'Not Found',
-      message: `Endpoint ${path} not found`,
-      availableEndpoints: ['/health', '/api/health', '/favicon.ico', '/'],
-      timestamp: new Date().toISOString()
-    }), {
-      status: 404,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+    return new Response(
+      JSON.stringify({
+        error: 'Not Found',
+        message: `Endpoint ${path} not found`,
+        availableEndpoints: ['/health', '/api/health', '/favicon.ico', '/'],
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        status: 404,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
       }
-    });
+    );
   }
-
 }
 
 // Cloudflare Worker export
@@ -1252,7 +1255,7 @@ export default {
   async fetch(request: Request, env: any, ctx: any): Promise<Response> {
     const worker = new MainWorker();
     return await worker.processRequest(request);
-  }
+  },
 };
 
 // Optional: Export an instance for direct use if a singleton pattern is desired

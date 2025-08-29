@@ -6,33 +6,36 @@
  * in our internal domain format.
  */
 
-import { DomainEntity } from '../../shared/domain-entity';
-import { ExternalAgent } from '../adapters/fantasy402-adapter';
-import { DomainError } from '../../shared/domain-entity';
+import {
+  DomainEntity,
+  DomainError,
+} from "/Users/nolarose/ff/src/domains/shared/domain-entity";
+import type { ExternalAgent } from "../adapters/fantasy402-adapter";
+import { v5 as uuidv5 } from "uuid";
 
-export type AgentType = 'master' | 'sub_agent' | 'retail';
-export type AgentStatus = 'active' | 'inactive' | 'suspended';
+export type AgentType = "master" | "sub_agent" | "retail";
+export type AgentStatus = "active" | "inactive" | "suspended";
 
 export class FantasyAgent extends DomainEntity {
   private constructor(
     id: string,
+    createdAt: Date,
+    updatedAt: Date,
     private readonly externalId: string,
     private readonly customerId: string,
-    private readonly masterAgentId?: string,
     private readonly office: string,
     private readonly store: string,
     private agentType: AgentType,
     private status: AgentStatus,
-    private readonly permissions: {
+    private permissions: {
       canManageLines: boolean;
       canAddAccounts: boolean;
       canDeleteBets: boolean;
       canViewReports: boolean;
       canAccessBilling: boolean;
     },
+    private readonly masterAgentId?: string,
     private metadata: Record<string, any> = {},
-    createdAt: Date,
-    updatedAt: Date
   ) {
     super(id, createdAt, updatedAt);
   }
@@ -40,45 +43,71 @@ export class FantasyAgent extends DomainEntity {
   static fromExternalData(data: ExternalAgent): FantasyAgent {
     const now = new Date();
 
+    // Generate deterministic ID based on external ID for idempotent imports
+    const id = uuidv5(data.agentID, uuidv5.URL);
+
     return new FantasyAgent(
-      crypto.randomUUID(),
+      id,
+      now,
+      now,
       data.agentID,
       data.customerID,
-      data.masterAgentID || undefined,
       data.office,
       data.store,
       this.mapExternalAgentType(data.agentType),
-      data.active ? 'active' : 'inactive',
+      data.active ? "active" : "inactive",
       data.permissions,
+      data.masterAgentID || undefined,
       data.metadata || {},
-      now,
-      now
     );
+  }
+
+  private static generateDeterministicId(externalId: string): string {
+    // Use SHA-256 hash of external ID + namespace for deterministic UUID-like ID
+    const namespace = "fantasy-agent";
+    const input = `${namespace}:${externalId}`;
+    const hash = new Bun.CryptoHasher("sha256");
+    hash.update(input);
+    const hashBytes = hash.digest();
+
+    // Convert first 16 bytes to UUID format
+    const bytes = new Uint8Array(hashBytes.slice(0, 16));
+    // Set version (4) and variant bits for UUID v4 format
+    bytes[6] = (bytes[6] & 0x0f) | 0x40; // Version 4
+    bytes[8] = (bytes[8] & 0x3f) | 0x80; // Variant 10
+
+    // Format as UUID string
+    const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0"));
+    return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10, 16).join("")}`;
   }
 
   private static mapExternalAgentType(externalType: string): AgentType {
     const typeMap: Record<string, AgentType> = {
-      'master': 'master',
-      'sub': 'sub_agent',
-      'retail': 'retail',
-      'agent': 'sub_agent'
+      master: "master",
+      sub: "sub_agent",
+      retail: "retail",
+      agent: "sub_agent",
     };
 
-    return typeMap[externalType.toLowerCase()] || 'sub_agent';
+    const normalizedType = externalType.toLowerCase();
+    const mappedType = typeMap[normalizedType];
+
+    // Always return a valid AgentType
+    return mappedType || "sub_agent";
   }
 
   // Business methods
   updateStatus(newStatus: AgentStatus): void {
-    if (this.status === 'suspended' && newStatus === 'active') {
+    if (this.status === "suspended" && newStatus === "active") {
       // Log reactivation
-      this.addMetadata('reactivated_at', new Date().toISOString());
+      this.addMetadata("reactivated_at", new Date().toISOString());
     }
 
     this.status = newStatus;
     this.markAsModified();
   }
 
-  updatePermissions(permissions: Partial<FantasyAgent['permissions']>): void {
+  updatePermissions(permissions: Partial<FantasyAgent["permissions"]>): void {
     this.permissions = { ...this.permissions, ...permissions };
     this.markAsModified();
   }
@@ -89,31 +118,49 @@ export class FantasyAgent extends DomainEntity {
   }
 
   // Getters
-  getExternalId(): string { return this.externalId; }
-  getCustomerId(): string { return this.customerId; }
-  getMasterAgentId(): string | undefined { return this.masterAgentId; }
-  getOffice(): string { return this.office; }
-  getStore(): string { return this.store; }
-  getAgentType(): AgentType { return this.agentType; }
-  getStatus(): AgentStatus { return this.status; }
-  getPermissions(): FantasyAgent['permissions'] { return { ...this.permissions }; }
-  getMetadata(): Record<string, any> { return { ...this.metadata }; }
+  getExternalId(): string {
+    return this.externalId;
+  }
+  getCustomerId(): string {
+    return this.customerId;
+  }
+  getMasterAgentId(): string | undefined {
+    return this.masterAgentId;
+  }
+  getOffice(): string {
+    return this.office;
+  }
+  getStore(): string {
+    return this.store;
+  }
+  getAgentType(): AgentType {
+    return this.agentType;
+  }
+  getStatus(): AgentStatus {
+    return this.status;
+  }
+  getPermissions(): FantasyAgent["permissions"] {
+    return { ...this.permissions };
+  }
+  getMetadata(): Record<string, any> {
+    return { ...this.metadata };
+  }
 
   // Business rules
   isActive(): boolean {
-    return this.status === 'active';
+    return this.status === "active";
   }
 
   isSuspended(): boolean {
-    return this.status === 'suspended';
+    return this.status === "suspended";
   }
 
   isMasterAgent(): boolean {
-    return this.agentType === 'master';
+    return this.agentType === "master";
   }
 
   isSubAgent(): boolean {
-    return this.agentType === 'sub_agent';
+    return this.agentType === "sub_agent";
   }
 
   canManageLines(): boolean {
@@ -136,7 +183,7 @@ export class FantasyAgent extends DomainEntity {
     return this.permissions.canAccessBilling && this.isActive();
   }
 
-  hasPermission(permission: keyof FantasyAgent['permissions']): boolean {
+  hasPermission(permission: keyof FantasyAgent["permissions"]): boolean {
     return this.permissions[permission] && this.isActive();
   }
 
@@ -153,7 +200,8 @@ export class FantasyAgent extends DomainEntity {
   canManageAgent(otherAgent: FantasyAgent): boolean {
     if (!this.canManageLines()) return false;
     if (this.isMasterAgent()) return true;
-    if (this.isSubAgent() && otherAgent.getAgentType() === 'retail') return true;
+    if (this.isSubAgent() && otherAgent.getAgentType() === "retail")
+      return true;
     return false;
   }
 
@@ -170,7 +218,7 @@ export class FantasyAgent extends DomainEntity {
       permissions: this.permissions,
       metadata: this.metadata,
       createdAt: this.getCreatedAt().toISOString(),
-      updatedAt: this.getUpdatedAt().toISOString()
+      updatedAt: this.getUpdatedAt().toISOString(),
     };
   }
 }

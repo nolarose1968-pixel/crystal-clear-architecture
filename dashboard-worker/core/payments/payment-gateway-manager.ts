@@ -44,16 +44,16 @@ export interface PaymentGatewayConfig {
     supportedCurrencies: string[];
     exchangeRateApi: string;
     walletProviders: {
-      coinbase: { enabled: boolean; apiKey: string; secretKey: string; };
-      binance: { enabled: boolean; apiKey: string; secretKey: string; };
-      kraken: { enabled: boolean; apiKey: string; secretKey: string; };
+      coinbase: { enabled: boolean; apiKey: string; secretKey: string };
+      binance: { enabled: boolean; apiKey: string; secretKey: string };
+      kraken: { enabled: boolean; apiKey: string; secretKey: string };
     };
   };
   banking: {
     enabled: boolean;
-    plaid: { enabled: boolean; clientId: string; secretKey: string; };
-    stripeTreasury: { enabled: boolean; apiKey: string; };
-    dwolla: { enabled: boolean; key: string; secret: string; };
+    plaid: { enabled: boolean; clientId: string; secretKey: string };
+    stripeTreasury: { enabled: boolean; apiKey: string };
+    dwolla: { enabled: boolean; key: string; secret: string };
   };
 }
 
@@ -106,9 +106,9 @@ export interface GatewayCapabilities {
   supportsRefunds: boolean;
   supportedCurrencies: string[];
   processingFees: {
-    deposit: { fixed: number; percentage: number; };
-    withdrawal: { fixed: number; percentage: number; };
-    refund: { fixed: number; percentage: number; };
+    deposit: { fixed: number; percentage: number };
+    withdrawal: { fixed: number; percentage: number };
+    refund: { fixed: number; percentage: number };
   };
   settlementTime: string; // e.g., 'instant', '1-2 business days'
   riskLevel: 'low' | 'medium' | 'high';
@@ -139,10 +139,14 @@ export class PaymentGatewayManager {
         supportsRecurring: true,
         supportsRefunds: true,
         supportedCurrencies: this.config.stripe.supportedCurrencies,
-        processingFees: { deposit: { fixed: 0.30, percentage: 0.029 }, withdrawal: { fixed: 0, percentage: 0 }, refund: { fixed: 0, percentage: 0 } },
+        processingFees: {
+          deposit: { fixed: 0.3, percentage: 0.029 },
+          withdrawal: { fixed: 0, percentage: 0 },
+          refund: { fixed: 0, percentage: 0 },
+        },
         settlementTime: '2 business days',
         riskLevel: 'low',
-        complianceRequirements: ['PCI DSS', 'SCA']
+        complianceRequirements: ['PCI DSS', 'SCA'],
       });
     }
 
@@ -155,10 +159,14 @@ export class PaymentGatewayManager {
         supportsRecurring: true,
         supportsRefunds: true,
         supportedCurrencies: this.config.paypal.supportedCurrencies,
-        processingFees: { deposit: { fixed: 0.49, percentage: 0.0349 }, withdrawal: { fixed: 0, percentage: 0 }, refund: { fixed: 0, percentage: 0 } },
+        processingFees: {
+          deposit: { fixed: 0.49, percentage: 0.0349 },
+          withdrawal: { fixed: 0, percentage: 0 },
+          refund: { fixed: 0, percentage: 0 },
+        },
         settlementTime: 'instant',
         riskLevel: 'low',
-        complianceRequirements: ['PCI DSS']
+        complianceRequirements: ['PCI DSS'],
       });
     }
 
@@ -171,10 +179,14 @@ export class PaymentGatewayManager {
         supportsRecurring: false,
         supportsRefunds: true,
         supportedCurrencies: ['USD', 'CAD'],
-        processingFees: { deposit: { fixed: 0, percentage: 0.026 }, withdrawal: { fixed: 0, percentage: 0 }, refund: { fixed: 0, percentage: 0 } },
+        processingFees: {
+          deposit: { fixed: 0, percentage: 0.026 },
+          withdrawal: { fixed: 0, percentage: 0 },
+          refund: { fixed: 0, percentage: 0 },
+        },
         settlementTime: '1 business day',
         riskLevel: 'medium',
-        complianceRequirements: ['PCI DSS']
+        complianceRequirements: ['PCI DSS'],
       });
     }
 
@@ -187,10 +199,14 @@ export class PaymentGatewayManager {
         supportsRecurring: true,
         supportsRefunds: true,
         supportedCurrencies: ['USD', 'EUR', 'GBP', 'AUD'],
-        processingFees: { deposit: { fixed: 0.30, percentage: 0.029 }, withdrawal: { fixed: 0, percentage: 0 }, refund: { fixed: 0, percentage: 0 } },
+        processingFees: {
+          deposit: { fixed: 0.3, percentage: 0.029 },
+          withdrawal: { fixed: 0, percentage: 0 },
+          refund: { fixed: 0, percentage: 0 },
+        },
         settlementTime: '2 business days',
         riskLevel: 'low',
-        complianceRequirements: ['PCI DSS', 'SCA']
+        complianceRequirements: ['PCI DSS', 'SCA'],
       });
     }
 
@@ -203,10 +219,14 @@ export class PaymentGatewayManager {
         supportsRecurring: true,
         supportsRefunds: true,
         supportedCurrencies: ['USD', 'EUR', 'GBP', 'AUD', 'CAD', 'JPY'],
-        processingFees: { deposit: { fixed: 0.25, percentage: 0.029 }, withdrawal: { fixed: 0, percentage: 0 }, refund: { fixed: 0, percentage: 0 } },
+        processingFees: {
+          deposit: { fixed: 0.25, percentage: 0.029 },
+          withdrawal: { fixed: 0, percentage: 0 },
+          refund: { fixed: 0, percentage: 0 },
+        },
         settlementTime: '2 business days',
         riskLevel: 'low',
-        complianceRequirements: ['PCI DSS', 'SCA']
+        complianceRequirements: ['PCI DSS', 'SCA'],
       });
     }
 
@@ -219,10 +239,14 @@ export class PaymentGatewayManager {
         supportsRecurring: false,
         supportsRefunds: true,
         supportedCurrencies: this.config.crypto.supportedCurrencies,
-        processingFees: { deposit: { fixed: 0, percentage: 0.01 }, withdrawal: { fixed: 0, percentage: 0.01 }, refund: { fixed: 0, percentage: 0 } },
+        processingFees: {
+          deposit: { fixed: 0, percentage: 0.01 },
+          withdrawal: { fixed: 0, percentage: 0.01 },
+          refund: { fixed: 0, percentage: 0 },
+        },
         settlementTime: 'instant',
         riskLevel: 'high',
-        complianceRequirements: ['AML', 'KYC', 'Travel Rule']
+        complianceRequirements: ['AML', 'KYC', 'Travel Rule'],
       });
     }
 
@@ -235,10 +259,14 @@ export class PaymentGatewayManager {
         supportsRecurring: true,
         supportsRefunds: false,
         supportedCurrencies: ['USD', 'EUR', 'GBP'],
-        processingFees: { deposit: { fixed: 0, percentage: 0 }, withdrawal: { fixed: 0, percentage: 0 }, refund: { fixed: 0, percentage: 0 } },
+        processingFees: {
+          deposit: { fixed: 0, percentage: 0 },
+          withdrawal: { fixed: 0, percentage: 0 },
+          refund: { fixed: 0, percentage: 0 },
+        },
         settlementTime: '1-3 business days',
         riskLevel: 'low',
-        complianceRequirements: ['AML', 'KYC', 'OFAC']
+        complianceRequirements: ['AML', 'KYC', 'OFAC'],
       });
     }
   }
@@ -275,7 +303,7 @@ export class PaymentGatewayManager {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       riskScore: await this.calculateRiskScore(customerId, amount, type),
-      complianceFlags: []
+      complianceFlags: [],
     };
 
     // Create gateway-specific intent
@@ -342,7 +370,7 @@ export class PaymentGatewayManager {
       isVerified: false,
       status: 'active',
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     // Create gateway-specific payment method
@@ -368,7 +396,11 @@ export class PaymentGatewayManager {
   /**
    * Get available gateways for transaction
    */
-  getAvailableGateways(amount: number, currency: string, type: PaymentIntent['type']): GatewayCapabilities[] {
+  getAvailableGateways(
+    amount: number,
+    currency: string,
+    type: PaymentIntent['type']
+  ): GatewayCapabilities[] {
     return Array.from(this.activeGateways.values()).filter(gateway => {
       // Check currency support
       if (!gateway.supportedCurrencies.includes(currency)) {
@@ -394,7 +426,11 @@ export class PaymentGatewayManager {
   /**
    * Select optimal gateway
    */
-  private selectOptimalGateway(amount: number, currency: string, type: PaymentIntent['type']): string | null {
+  private selectOptimalGateway(
+    amount: number,
+    currency: string,
+    type: PaymentIntent['type']
+  ): string | null {
     const available = this.getAvailableGateways(amount, currency, type);
 
     if (available.length === 0) {
@@ -402,24 +438,27 @@ export class PaymentGatewayManager {
     }
 
     // Prioritize by risk level, then fees, then settlement time
-    return available
-      .sort((a, b) => {
-        // Risk level priority
-        const riskOrder = { low: 0, medium: 1, high: 2 };
-        const riskDiff = riskOrder[a.riskLevel] - riskOrder[b.riskLevel];
-        if (riskDiff !== 0) return riskDiff;
+    return available.sort((a, b) => {
+      // Risk level priority
+      const riskOrder = { low: 0, medium: 1, high: 2 };
+      const riskDiff = riskOrder[a.riskLevel] - riskOrder[b.riskLevel];
+      if (riskDiff !== 0) return riskDiff;
 
-        // Fee comparison
-        const feeA = a.processingFees.deposit.percentage * amount + a.processingFees.deposit.fixed;
-        const feeB = b.processingFees.deposit.percentage * amount + b.processingFees.deposit.fixed;
-        return feeA - feeB;
-      })[0].gateway;
+      // Fee comparison
+      const feeA = a.processingFees.deposit.percentage * amount + a.processingFees.deposit.fixed;
+      const feeB = b.processingFees.deposit.percentage * amount + b.processingFees.deposit.fixed;
+      return feeA - feeB;
+    })[0].gateway;
   }
 
   /**
    * Calculate risk score for transaction
    */
-  private async calculateRiskScore(customerId: string, amount: number, type: PaymentIntent['type']): Promise<number> {
+  private async calculateRiskScore(
+    customerId: string,
+    amount: number,
+    type: PaymentIntent['type']
+  ): Promise<number> {
     let score = 0;
 
     // Amount-based risk
@@ -460,7 +499,9 @@ export class PaymentGatewayManager {
   /**
    * Process gateway-specific payment
    */
-  private async processGatewayPayment(intent: PaymentIntent): Promise<{ success: boolean; gatewayIntentId?: string; error?: string }> {
+  private async processGatewayPayment(
+    intent: PaymentIntent
+  ): Promise<{ success: boolean; gatewayIntentId?: string; error?: string }> {
     switch (intent.gateway) {
       case 'stripe':
         return await this.processStripePayment(intent);
@@ -490,7 +531,9 @@ export class PaymentGatewayManager {
   /**
    * Process Stripe payment
    */
-  private async processStripePayment(intent: PaymentIntent): Promise<{ success: boolean; gatewayIntentId?: string; error?: string }> {
+  private async processStripePayment(
+    intent: PaymentIntent
+  ): Promise<{ success: boolean; gatewayIntentId?: string; error?: string }> {
     // In real implementation, would confirm Stripe payment
     console.log(`Processing Stripe payment for intent ${intent.id}`);
 
@@ -498,7 +541,7 @@ export class PaymentGatewayManager {
     return {
       success: Math.random() > 0.05, // 95% success rate
       gatewayIntentId: `pi_stripe_${intent.id}`,
-      error: Math.random() > 0.05 ? undefined : 'Card declined'
+      error: Math.random() > 0.05 ? undefined : 'Card declined',
     };
   }
 
@@ -516,13 +559,15 @@ export class PaymentGatewayManager {
   /**
    * Process PayPal payment
    */
-  private async processPayPalPayment(intent: PaymentIntent): Promise<{ success: boolean; gatewayIntentId?: string; error?: string }> {
+  private async processPayPalPayment(
+    intent: PaymentIntent
+  ): Promise<{ success: boolean; gatewayIntentId?: string; error?: string }> {
     console.log(`Processing PayPal payment for intent ${intent.id}`);
 
     return {
       success: Math.random() > 0.03, // 97% success rate
       gatewayIntentId: `paypal_${intent.id}`,
-      error: Math.random() > 0.03 ? undefined : 'Payment failed'
+      error: Math.random() > 0.03 ? undefined : 'Payment failed',
     };
   }
 
@@ -540,13 +585,15 @@ export class PaymentGatewayManager {
   /**
    * Process crypto payment
    */
-  private async processCryptoPayment(intent: PaymentIntent): Promise<{ success: boolean; gatewayIntentId?: string; error?: string }> {
+  private async processCryptoPayment(
+    intent: PaymentIntent
+  ): Promise<{ success: boolean; gatewayIntentId?: string; error?: string }> {
     console.log(`Processing crypto payment for intent ${intent.id}`);
 
     return {
-      success: Math.random() > 0.10, // 90% success rate
+      success: Math.random() > 0.1, // 90% success rate
       gatewayIntentId: `crypto_${intent.id}`,
-      error: Math.random() > 0.10 ? undefined : 'Transaction failed'
+      error: Math.random() > 0.1 ? undefined : 'Transaction failed',
     };
   }
 
@@ -564,13 +611,15 @@ export class PaymentGatewayManager {
   /**
    * Process banking payment
    */
-  private async processBankingPayment(intent: PaymentIntent): Promise<{ success: boolean; gatewayIntentId?: string; error?: string }> {
+  private async processBankingPayment(
+    intent: PaymentIntent
+  ): Promise<{ success: boolean; gatewayIntentId?: string; error?: string }> {
     console.log(`Processing banking payment for intent ${intent.id}`);
 
     return {
       success: Math.random() > 0.02, // 98% success rate
       gatewayIntentId: `bank_${intent.id}`,
-      error: Math.random() > 0.02 ? undefined : 'Bank transfer failed'
+      error: Math.random() > 0.02 ? undefined : 'Bank transfer failed',
     };
   }
 

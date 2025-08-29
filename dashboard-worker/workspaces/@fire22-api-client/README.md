@@ -4,9 +4,12 @@ Fire22 API integration and data management
 
 ## Workspace Isolation with Bun
 
-This workspace uses **Bun's isolated installs** for strict dependency isolation. Each workspace gets complete isolation while maintaining efficient development linking.
+This workspace uses **Bun's isolated installs** for strict dependency isolation.
+Each workspace gets complete isolation while maintaining efficient development
+linking.
 
 ### 🔗 Linked Mode (Development)
+
 - Uses `workspace:*` dependencies
 - Bun isolated installs prevent phantom dependencies
 - Hot reloading and fast development
@@ -15,6 +18,7 @@ This workspace uses **Bun's isolated installs** for strict dependency isolation.
 - Deploy: `bun run deploy:linked`
 
 ### 📦 Standalone Mode (Production)
+
 - Resolved dependencies (no workspace references)
 - Optimized and minified builds
 - Independent deployment
@@ -46,13 +50,14 @@ bun run lint               # Lint code
 
 ## Dependencies
 
-- `@fire22/core-dashboard`: workspace:*
+- `@fire22/core-dashboard`: workspace:\*
 
 ## Bun Isolated Installs
 
 This workspace uses Bun's isolated install strategy which:
 
-- **Prevents phantom dependencies** — Packages cannot access undeclared dependencies
+- **Prevents phantom dependencies** — Packages cannot access undeclared
+  dependencies
 - **Ensures deterministic builds** — Same dependency tree every time
 - **Provides workspace isolation** — No cross-contamination between packages
 - **Optimizes performance** — Uses symlinks and efficient storage
@@ -71,8 +76,10 @@ node_modules/
 
 ## Architecture
 
-- **Isolation**: Each workspace is completely independent with Bun isolated installs
+- **Isolation**: Each workspace is completely independent with Bun isolated
+  installs
 - **Linking**: Development mode uses workspace references with isolation
 - **Deployment**: Production uses resolved dependencies with isolation
 - **Testing**: Isolated test environment prevents phantom dependencies
-- **Building**: Separate build outputs for each mode with strict dependency resolution
+- **Building**: Separate build outputs for each mode with strict dependency
+  resolution

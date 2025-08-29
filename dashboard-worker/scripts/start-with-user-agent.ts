@@ -2,7 +2,7 @@
 
 /**
  * 🚀 Fire22 Dashboard Starter with User-Agent
- * 
+ *
  * Ensures proper user-agent is set for all Fire22 API connections
  */
 
@@ -31,7 +31,7 @@ switch (environment) {
 console.log('🚀 Starting Fire22 Dashboard');
 console.log(`📱 User-Agent: ${userAgent}`);
 console.log(`🌍 Environment: ${environment}`);
-console.log('=' .repeat(60));
+console.log('='.repeat(60));
 
 // Set environment variables
 process.env.FIRE22_USER_AGENT = userAgent;

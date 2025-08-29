@@ -10,6 +10,9 @@ Enterprise-grade analytics dashboard with Fantasy402 integration, real-time data
 - **ROI Calculator**: Investment analysis with scenario saving and payback calculations
 - **Mobile Responsive**: Optimized for all devices with touch gestures
 - **Glass Morphism Design**: Modern UI with backdrop blur and smooth animations
+- **Performance Monitoring**: Real-time API performance tracking and optimization
+- **Load Testing Suite**: Comprehensive benchmarking and stress testing tools
+- **Security Integration**: Built-in security monitoring and threat detection
 
 ## 🛠️ Troubleshooting Initialization Issues
 
@@ -100,6 +103,137 @@ If you're experiencing network-related issues:
 - Disable VPN if active
 - Check firewall settings
 
+## 🚀 Performance Monitoring Suite
+
+### Overview
+The analytics dashboard now includes comprehensive performance monitoring and load testing capabilities.
+
+### Available Tools
+
+#### 1. Performance Monitor (`performance-monitor.js`)
+Real-time performance monitoring with automated health checks, metrics collection, and performance analytics.
+
+**Features:**
+- Real-time response time monitoring
+- Throughput and error rate tracking
+- Memory usage and heap monitoring
+- Automated health checks
+- Performance trend analysis
+- Customizable alert thresholds
+
+#### 2. Performance Dashboard (`performance-dashboard.html`)
+Interactive dashboard for real-time performance monitoring and visualization.
+
+**Features:**
+- Live metrics display with charts
+- Configurable monitoring parameters
+- Historical performance data
+- Alert notifications
+- Data export capabilities
+
+#### 3. Load Testing Suite (`performance-benchmark.js`)
+Comprehensive load testing and benchmarking tools with predefined scenarios.
+
+**Predefined Scenarios:**
+- **🚭 Smoke Test**: Quick validation (10s, 2 concurrent)
+- **📈 Load Test**: Standard testing (60s, 10 concurrent)
+- **💪 Stress Test**: High-load testing (30s, 50 concurrent)
+- **⚡ Spike Test**: Traffic spike simulation
+- **🏃 Endurance Test**: Long-duration stability (5min, 5 concurrent)
+
+#### 4. Performance Test Dashboard (`performance-test-dashboard.html`)
+Complete load testing interface with real-time results and comprehensive reporting.
+
+**Features:**
+- Scenario selection and configuration
+- Real-time test progress monitoring
+- Comprehensive results analysis
+- System resource tracking
+- Automated performance recommendations
+
+### Quick Start
+
+#### Performance Monitoring
+```bash
+# Open performance monitor
+open analytics/performance-dashboard.html
+
+# Start monitoring your API
+# Configure target URL and parameters
+# View real-time metrics and charts
+```
+
+#### Load Testing
+```bash
+# Open load testing dashboard
+open analytics/performance-test-dashboard.html
+
+# Select a test scenario
+# Configure test parameters
+# Run tests and analyze results
+```
+
+### Configuration
+
+#### Performance Monitor Setup
+```javascript
+const monitor = new AnalyticsPerformanceMonitor({
+  targetUrl: 'https://your-api.com/health',
+  sampleSize: 100,
+  interval: 30000,
+  enableHeapMonitoring: true
+});
+```
+
+#### Benchmark Configuration
+```javascript
+const benchmark = new PerformanceBenchmark({
+  targetUrl: 'https://your-api.com/api',
+  duration: 60000,
+  concurrency: 10,
+  rampUpTime: 5000
+});
+```
+
+### Key Metrics Monitored
+
+#### Response Time Metrics
+- Average, minimum, maximum response times
+- P95 and P99 percentile response times
+- Response time distribution
+
+#### Throughput Metrics
+- Requests per second (RPS)
+- Peak throughput
+- Total requests processed
+
+#### Error Analysis
+- Error rate percentage
+- Error distribution by type
+- Error trend analysis
+
+#### System Resources
+- Memory usage and trends
+- Heap size monitoring
+- Garbage collection tracking
+
+### Performance Recommendations
+
+The system provides automated recommendations for:
+- **Database Optimization**: Query and indexing improvements
+- **Caching Strategies**: Response and data caching
+- **Load Balancing**: Traffic distribution optimization
+- **Resource Scaling**: Auto-scaling recommendations
+- **Code Optimization**: Performance bottleneck fixes
+
+### Security Integration
+
+Built-in security features include:
+- **Threat Detection**: SQL injection, XSS, data exfiltration monitoring
+- **Access Control**: API key validation and rate limiting
+- **Audit Logging**: Comprehensive security event tracking
+- **Data Encryption**: Secure data transmission and storage
+
 ### 6. Browser Compatibility
 
 **Supported Browsers**:
@@ -129,13 +263,19 @@ If the dashboard is slow to load:
 
 ```
 analytics/
-├── index.html              # Main dashboard page
-├── analytics.js            # Core JavaScript functionality
-├── analytics.css           # Styling and animations
-├── config.js              # Configuration settings
-├── fantasy402-config.json # Fantasy402 API configuration
-├── test-initialization.html # Diagnostic test page
-└── README.md              # This file
+├── index.html                      # Main dashboard page
+├── analytics.js                    # Core JavaScript functionality
+├── analytics.css                   # Styling and animations
+├── config.js                       # Configuration settings
+├── fantasy402-config.json         # Fantasy402 API configuration
+├── test-initialization.html       # Diagnostic test page
+├── performance-monitor.js         # Performance monitoring engine
+├── performance-dashboard.html     # Real-time monitoring dashboard
+├── performance-benchmark.js       # Load testing and benchmarking
+├── performance-test-dashboard.html # Load testing interface
+├── security.js                    # Security monitoring (enhanced)
+├── PERFORMANCE-README.md          # Performance tools documentation
+└── README.md                      # This file
 ```
 
 ## 🔧 Configuration
@@ -227,6 +367,20 @@ If issues persist after following the troubleshooting steps:
 
 ---
 
-**Status**: ✅ Analytics Dashboard with comprehensive error handling and diagnostics
-**Version**: 1.0.0
+**Status**: 🚀 **Enhanced Analytics Dashboard with Performance Monitoring & Security**
+**Version**: 2.0.0
 **Last Updated**: $(date)
+
+### 🎯 New Capabilities Added:
+- ✅ **Real-time Performance Monitoring**: Live API metrics and health checks
+- ✅ **Load Testing Suite**: Comprehensive benchmarking with 5 predefined scenarios
+- ✅ **Interactive Dashboards**: Real-time visualization of performance data
+- ✅ **Security Integration**: Enhanced security monitoring and threat detection
+- ✅ **Automated Recommendations**: AI-powered performance optimization suggestions
+- ✅ **Export & Reporting**: JSON/CSV export with comprehensive analytics
+
+### 🚀 Ready for Production Use:
+- **Performance Monitoring**: 24/7 API health and performance tracking
+- **Load Testing**: Enterprise-grade stress testing and benchmarking
+- **Security Monitoring**: Real-time threat detection and response
+- **Analytics Integration**: Seamless integration with existing dashboard

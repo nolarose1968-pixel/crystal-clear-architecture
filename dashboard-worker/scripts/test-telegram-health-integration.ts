@@ -32,7 +32,7 @@ class TelegramHealthIntegrationTester {
    */
   async runAllTests(): Promise<void> {
     console.log('🧪 Testing Telegram Health Check Integration');
-    console.log('==========================================\n');
+    console.log('!==!==!==!==!==!==!==!==\n');
 
     await this.testHealthMonitorIntegration();
     await this.testWorkflowStepIntegration();
@@ -74,15 +74,14 @@ class TelegramHealthIntegrationTester {
         test: 'HealthMonitor Integration',
         status: 'pass',
         message: 'HealthMonitor properly integrated and functional',
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       });
-
     } catch (error) {
       this.results.push({
         test: 'HealthMonitor Integration',
         status: 'fail',
         message: `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       });
     }
   }
@@ -115,7 +114,10 @@ class TelegramHealthIntegrationTester {
         throw new Error('System check step has wrong ID');
       }
 
-      if (componentCheckStep.permissions && !componentCheckStep.permissions.includes('ops_analyst')) {
+      if (
+        componentCheckStep.permissions &&
+        !componentCheckStep.permissions.includes('ops_analyst')
+      ) {
         throw new Error('Component check step missing required permissions');
       }
 
@@ -123,15 +125,14 @@ class TelegramHealthIntegrationTester {
         test: 'Workflow Step Integration',
         status: 'pass',
         message: 'Workflow steps properly defined and integrated',
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       });
-
     } catch (error) {
       this.results.push({
         test: 'Workflow Step Integration',
         status: 'fail',
         message: `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       });
     }
   }
@@ -167,15 +168,14 @@ class TelegramHealthIntegrationTester {
         test: 'Command Handler Integration',
         status: 'pass',
         message: 'Command handler properly integrated with required methods',
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       });
-
     } catch (error) {
       this.results.push({
         test: 'Command Handler Integration',
         status: 'fail',
         message: `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       });
     }
   }
@@ -208,15 +208,14 @@ class TelegramHealthIntegrationTester {
         test: 'Callback Handler Integration',
         status: 'pass',
         message: 'Callback handlers properly integrated in workflow orchestrator',
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       });
-
     } catch (error) {
       this.results.push({
         test: 'Callback Handler Integration',
         status: 'fail',
         message: `Failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       });
     }
   }
@@ -226,7 +225,7 @@ class TelegramHealthIntegrationTester {
    */
   private printResults(): void {
     console.log('\n📊 Test Results Summary');
-    console.log('=======================');
+    console.log('!==!==!==!====');
 
     const passed = this.results.filter(r => r.status === 'pass').length;
     const failed = this.results.filter(r => r.status === 'fail').length;
@@ -238,22 +237,25 @@ class TelegramHealthIntegrationTester {
 
     if (failed > 0) {
       console.log('\n❌ Failed Tests:');
-      this.results.filter(r => r.status === 'fail').forEach(result => {
-        console.log(`  • ${result.test}: ${result.message}`);
-      });
+      this.results
+        .filter(r => r.status === 'fail')
+        .forEach(result => {
+          console.log(`  • ${result.test}: ${result.message}`);
+        });
     }
 
     console.log('\n📋 Detailed Results:');
     this.results.forEach(result => {
-      const icon = result.status === 'pass' ? '✅' :
-                  result.status === 'fail' ? '❌' : '⏭️';
+      const icon = result.status === 'pass' ? '✅' : result.status === 'fail' ? '❌' : '⏭️';
       const duration = result.duration ? ` (${result.duration}ms)` : '';
       console.log(`${icon} ${result.test}${duration}: ${result.message}`);
     });
 
     // Overall result
     if (failed === 0) {
-      console.log('\n🎉 All integration tests passed! Telegram health check integration is working correctly.');
+      console.log(
+        '\n🎉 All integration tests passed! Telegram health check integration is working correctly.'
+      );
     } else {
       console.log(`\n⚠️ ${failed} test(s) failed. Please check the integration.`);
       process.exit(1);
@@ -279,7 +281,9 @@ class TelegramHealthIntegrationTester {
         break;
       default:
         console.error(`Unknown test: ${testName}`);
-        console.log('Available tests: health-monitor, workflow-steps, command-handler, callback-handler');
+        console.log(
+          'Available tests: health-monitor, workflow-steps, command-handler, callback-handler'
+        );
         return;
     }
 

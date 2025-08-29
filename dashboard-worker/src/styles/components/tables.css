@@ -116,9 +116,15 @@
 }
 
 /* Table Cell Alignments */
-.table .text-left { text-align: left; }
-.table .text-center { text-align: center; }
-.table .text-right { text-align: right; }
+.table .text-left {
+  text-align: left;
+}
+.table .text-center {
+  text-align: center;
+}
+.table .text-right {
+  text-align: right;
+}
 
 /* Table Status Cells */
 .table-status {
@@ -296,17 +302,17 @@
   .table {
     font-size: var(--font-size-xs);
   }
-  
+
   .table th,
   .table td {
     padding: var(--space-sm);
   }
-  
+
   .table-container__header {
     flex-direction: column;
     gap: var(--space-md);
   }
-  
+
   .table-pagination {
     flex-direction: column;
     gap: var(--space-md);
@@ -315,5 +321,7 @@
 
 /* Table Animations */
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

@@ -1,8 +1,8 @@
 # GitHub Pages Configuration
-title: "Crystal Clear Architecture"
-description: "Enterprise-grade dashboard system for Fire22 sports betting platform with domain-driven architecture"
-url: "https://fire22.github.io/dashboard-worker"
-baseurl: "/dashboard-worker"
+title: 'Crystal Clear Architecture'
+description: 'Enterprise-grade dashboard system for Fire22 sports betting platform with domain-driven architecture'
+url: 'https://fire22.github.io/dashboard-worker'
+baseurl: '/dashboard-worker'
 
 # Build settings
 markdown: kramdown

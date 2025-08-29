@@ -24,7 +24,7 @@ export class HealthMonitor {
       this.componentHealth.set(component, {
         status: 'healthy',
         lastChecked: new Date().toISOString(),
-        message: 'Component initialized'
+        message: 'Component initialized',
       });
     });
   }
@@ -41,7 +41,7 @@ export class HealthMonitor {
 
     try {
       let health: ComponentHealth;
-      
+
       switch (name) {
         case 'database':
           health = await this.checkDatabaseHealth();
@@ -64,18 +64,18 @@ export class HealthMonitor {
 
       this.componentHealth.set(name, health);
       this.lastHealthCheck = Date.now();
-      
+
       return health;
     } catch (error) {
       const errorHealth: ComponentHealth = {
         status: 'unhealthy',
         message: error instanceof Error ? error.message : 'Health check failed',
-        lastChecked: new Date().toISOString()
+        lastChecked: new Date().toISOString(),
       };
 
       this.componentHealth.set(name, errorHealth);
       this.lastHealthCheck = Date.now();
-      
+
       return errorHealth;
     }
   }
@@ -85,11 +85,11 @@ export class HealthMonitor {
    * @returns Promise that resolves to HealthStatus
    */
   async getSystemHealth(): Promise<HealthStatus> {
-    const healthPromises = this.components.map(component => 
+    const healthPromises = this.components.map(component =>
       this.checkComponent(component).catch(error => ({
         status: 'unhealthy' as const,
         message: error instanceof Error ? error.message : 'Health check failed',
-        lastChecked: new Date().toISOString()
+        lastChecked: new Date().toISOString(),
       }))
     );
 
@@ -101,11 +101,11 @@ export class HealthMonitor {
     });
 
     const overallStatus = this.calculateOverallStatus(components);
-    
+
     return {
       status: overallStatus,
       components,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }
 
@@ -140,13 +140,13 @@ export class HealthMonitor {
     // In a real implementation, this would check actual database connectivity
     // For now, we'll simulate a health check
     const startTime = Date.now();
-    
+
     try {
       // Simulate database query
       await new Promise(resolve => setTimeout(resolve, 10));
-      
+
       const responseTime = Date.now() - startTime;
-      
+
       return {
         status: responseTime < 100 ? 'healthy' : 'degraded',
         message: `Database connection healthy (${responseTime}ms)`,
@@ -156,14 +156,14 @@ export class HealthMonitor {
           cpuUsage: Math.random() * 30 + 10,
           memoryUsage: Math.random() * 40 + 20,
           activeConnections: Math.floor(Math.random() * 50) + 10,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       };
     } catch (error) {
       return {
         status: 'unhealthy',
         message: error instanceof Error ? error.message : 'Database connection failed',
-        lastChecked: new Date().toISOString()
+        lastChecked: new Date().toISOString(),
       };
     }
   }
@@ -174,13 +174,13 @@ export class HealthMonitor {
    */
   private async checkAPIHealth(): Promise<ComponentHealth> {
     const startTime = Date.now();
-    
+
     try {
       // Simulate API health check
       await new Promise(resolve => setTimeout(resolve, 20));
-      
+
       const responseTime = Date.now() - startTime;
-      
+
       return {
         status: responseTime < 200 ? 'healthy' : 'degraded',
         message: `API endpoints responding (${responseTime}ms)`,
@@ -190,14 +190,14 @@ export class HealthMonitor {
           cpuUsage: Math.random() * 25 + 15,
           memoryUsage: Math.random() * 35 + 25,
           activeConnections: Math.floor(Math.random() * 100) + 20,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       };
     } catch (error) {
       return {
         status: 'unhealthy',
         message: error instanceof Error ? error.message : 'API health check failed',
-        lastChecked: new Date().toISOString()
+        lastChecked: new Date().toISOString(),
       };
     }
   }
@@ -208,13 +208,13 @@ export class HealthMonitor {
    */
   private async checkCacheHealth(): Promise<ComponentHealth> {
     const startTime = Date.now();
-    
+
     try {
       // Simulate cache check
       await new Promise(resolve => setTimeout(resolve, 5));
-      
+
       const responseTime = Date.now() - startTime;
-      
+
       return {
         status: responseTime < 50 ? 'healthy' : 'degraded',
         message: `Cache operations fast (${responseTime}ms)`,
@@ -224,14 +224,14 @@ export class HealthMonitor {
           cpuUsage: Math.random() * 15 + 5,
           memoryUsage: Math.random() * 20 + 10,
           activeConnections: Math.floor(Math.random() * 30) + 5,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       };
     } catch (error) {
       return {
         status: 'unhealthy',
         message: error instanceof Error ? error.message : 'Cache health check failed',
-        lastChecked: new Date().toISOString()
+        lastChecked: new Date().toISOString(),
       };
     }
   }
@@ -242,13 +242,13 @@ export class HealthMonitor {
    */
   private async checkAuthHealth(): Promise<ComponentHealth> {
     const startTime = Date.now();
-    
+
     try {
       // Simulate auth check
       await new Promise(resolve => setTimeout(resolve, 15));
-      
+
       const responseTime = Date.now() - startTime;
-      
+
       return {
         status: responseTime < 150 ? 'healthy' : 'degraded',
         message: `Authentication service operational (${responseTime}ms)`,
@@ -258,14 +258,14 @@ export class HealthMonitor {
           cpuUsage: Math.random() * 20 + 10,
           memoryUsage: Math.random() * 30 + 15,
           activeConnections: Math.floor(Math.random() * 40) + 8,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       };
     } catch (error) {
       return {
         status: 'unhealthy',
         message: error instanceof Error ? error.message : 'Authentication health check failed',
-        lastChecked: new Date().toISOString()
+        lastChecked: new Date().toISOString(),
       };
     }
   }
@@ -276,13 +276,13 @@ export class HealthMonitor {
    */
   private async checkMonitoringHealth(): Promise<ComponentHealth> {
     const startTime = Date.now();
-    
+
     try {
       // Simulate monitoring check
       await new Promise(resolve => setTimeout(resolve, 8));
-      
+
       const responseTime = Date.now() - startTime;
-      
+
       return {
         status: responseTime < 30 ? 'healthy' : 'degraded',
         message: `Monitoring system collecting metrics (${responseTime}ms)`,
@@ -292,14 +292,14 @@ export class HealthMonitor {
           cpuUsage: Math.random() * 10 + 5,
           memoryUsage: Math.random() * 15 + 8,
           activeConnections: Math.floor(Math.random() * 20) + 3,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       };
     } catch (error) {
       return {
         status: 'unhealthy',
         message: error instanceof Error ? error.message : 'Monitoring health check failed',
-        lastChecked: new Date().toISOString()
+        lastChecked: new Date().toISOString(),
       };
     }
   }
@@ -311,13 +311,13 @@ export class HealthMonitor {
    */
   private async checkGenericComponentHealth(name: string): Promise<ComponentHealth> {
     const startTime = Date.now();
-    
+
     try {
       // Simulate generic component check
       await new Promise(resolve => setTimeout(resolve, Math.random() * 50 + 10));
-      
+
       const responseTime = Date.now() - startTime;
-      
+
       return {
         status: responseTime < 100 ? 'healthy' : 'degraded',
         message: `${name} component operational (${responseTime}ms)`,
@@ -327,14 +327,14 @@ export class HealthMonitor {
           cpuUsage: Math.random() * 20 + 10,
           memoryUsage: Math.random() * 25 + 15,
           activeConnections: Math.floor(Math.random() * 35) + 5,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       };
     } catch (error) {
       return {
         status: 'unhealthy',
         message: error instanceof Error ? error.message : `${name} health check failed`,
-        lastChecked: new Date().toISOString()
+        lastChecked: new Date().toISOString(),
       };
     }
   }
@@ -344,17 +344,19 @@ export class HealthMonitor {
    * @param components Component health records
    * @returns Overall health status
    */
-  private calculateOverallStatus(components: Record<string, ComponentHealth>): 'healthy' | 'degraded' | 'unhealthy' {
+  private calculateOverallStatus(
+    components: Record<string, ComponentHealth>
+  ): 'healthy' | 'degraded' | 'unhealthy' {
     const statuses = Object.values(components).map(c => c.status);
-    
+
     if (statuses.includes('unhealthy')) {
       return 'unhealthy';
     }
-    
+
     if (statuses.includes('degraded')) {
       return 'degraded';
     }
-    
+
     return 'healthy';
   }
 
@@ -384,7 +386,7 @@ export class HealthMonitor {
       this.componentHealth.set(name, {
         status: 'healthy',
         lastChecked: new Date().toISOString(),
-        message: 'Component added'
+        message: 'Component added',
       });
     }
   }
@@ -424,27 +426,29 @@ export class HealthUtils {
     return async (request: Request): Promise<Response> => {
       try {
         const health = await healthMonitor.getSystemHealth();
-        
+
         return new Response(JSON.stringify(health, null, 2), {
-          status: health.status === 'healthy' ? 200 : 
-                  health.status === 'degraded' ? 206 : 503,
+          status: health.status === 'healthy' ? 200 : health.status === 'degraded' ? 206 : 503,
           headers: {
             'Content-Type': 'application/json',
             'Cache-Control': 'no-cache',
-            'X-Health-Status': health.status
-          }
+            'X-Health-Status': health.status,
+          },
         });
       } catch (error) {
-        return new Response(JSON.stringify({
-          status: 'unhealthy',
-          error: error instanceof Error ? error.message : 'Health check failed',
-          lastUpdated: new Date().toISOString()
-        }), {
-          status: 503,
-          headers: {
-            'Content-Type': 'application/json'
+        return new Response(
+          JSON.stringify({
+            status: 'unhealthy',
+            error: error instanceof Error ? error.message : 'Health check failed',
+            lastUpdated: new Date().toISOString(),
+          }),
+          {
+            status: 503,
+            headers: {
+              'Content-Type': 'application/json',
+            },
           }
-        });
+        );
       }
     };
   }
@@ -459,32 +463,38 @@ export class HealthUtils {
     return async (request: Request): Promise<Response> => {
       try {
         const health = await healthMonitor.getSystemHealth();
-        
-        const isReady = requiredComponents.every(component => 
-          health.components[component]?.status === 'healthy'
+
+        const isReady = requiredComponents.every(
+          component => health.components[component]?.status === 'healthy'
         );
-        
-        return new Response(JSON.stringify({
-          ready: isReady,
-          health,
-          timestamp: new Date().toISOString()
-        }), {
-          status: isReady ? 200 : 503,
-          headers: {
-            'Content-Type': 'application/json'
+
+        return new Response(
+          JSON.stringify({
+            ready: isReady,
+            health,
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            status: isReady ? 200 : 503,
+            headers: {
+              'Content-Type': 'application/json',
+            },
           }
-        });
+        );
       } catch (error) {
-        return new Response(JSON.stringify({
-          ready: false,
-          error: error instanceof Error ? error.message : 'Readiness check failed',
-          timestamp: new Date().toISOString()
-        }), {
-          status: 503,
-          headers: {
-            'Content-Type': 'application/json'
+        return new Response(
+          JSON.stringify({
+            ready: false,
+            error: error instanceof Error ? error.message : 'Readiness check failed',
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            status: 503,
+            headers: {
+              'Content-Type': 'application/json',
+            },
           }
-        });
+        );
       }
     };
   }
@@ -495,16 +505,19 @@ export class HealthUtils {
    */
   static createLivenessHandler() {
     return async (request: Request): Promise<Response> => {
-      return new Response(JSON.stringify({
-        alive: true,
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime ? process.uptime() : Date.now()
-      }), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json'
+      return new Response(
+        JSON.stringify({
+          alive: true,
+          timestamp: new Date().toISOString(),
+          uptime: process.uptime ? process.uptime() : Date.now(),
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
-      });
+      );
     };
   }
 
@@ -524,22 +537,22 @@ export class HealthUtils {
     if (toStatus === 'unhealthy') {
       return true;
     }
-    
+
     // Allow recovery from unhealthy to degraded or healthy
     if (fromStatus === 'unhealthy' && (toStatus === 'degraded' || toStatus === 'healthy')) {
       return true;
     }
-    
+
     // Allow improvement from degraded to healthy
     if (fromStatus === 'degraded' && toStatus === 'healthy') {
       return true;
     }
-    
+
     // Allow status quo
     if (fromStatus === toStatus) {
       return true;
     }
-    
+
     return false;
   }
 
@@ -552,9 +565,9 @@ export class HealthUtils {
     const statusMap = {
       healthy: '✅ Healthy',
       degraded: '⚠️ Degraded',
-      unhealthy: '❌ Unhealthy'
+      unhealthy: '❌ Unhealthy',
     };
-    
+
     return statusMap[status];
   }
 
@@ -566,13 +579,15 @@ export class HealthUtils {
   static calculateHealthScore(components: Record<string, ComponentHealth>): number {
     const totalComponents = Object.keys(components).length;
     if (totalComponents === 0) return 0;
-    
+
     const healthyComponents = Object.values(components).filter(c => c.status === 'healthy').length;
-    const degradedComponents = Object.values(components).filter(c => c.status === 'degraded').length;
-    
+    const degradedComponents = Object.values(components).filter(
+      c => c.status === 'degraded'
+    ).length;
+
     // Score calculation: healthy = 100 points, degraded = 50 points, unhealthy = 0 points
     const score = (healthyComponents * 100 + degradedComponents * 50) / totalComponents;
-    
+
     return Math.round(score);
   }
 }

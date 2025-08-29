@@ -2,11 +2,11 @@ name: 🚀 Deploy Docs Worker
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'docs/**'
-      - 'docs-worker/**'
-      - '.github/workflows/deploy-docs-worker.yml'
+      - "docs/**"
+      - "docs-worker/**"
+      - ".github/workflows/deploy-docs-worker.yml"
   workflow_dispatch:
 
 permissions:
@@ -25,8 +25,8 @@ jobs:
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: "18"
+          cache: "npm"
           cache-dependency-path: docs-worker/package-lock.json
 
       - name: 📦 Install dependencies

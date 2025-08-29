@@ -12,6 +12,7 @@ class AdvancedAnalyticsDashboard {
     this.fantasy402Client = null;
     this.refreshCycle = 0;
     this.streamingInterval = null;
+    this.securityMonitor = null;
 
     this.initialize();
   }
@@ -53,6 +54,9 @@ class AdvancedAnalyticsDashboard {
         this.updateIntegrationStatus();
       }, 30000); // Update every 30 seconds
 
+      // Setup security monitoring
+      this.setupSecurityMonitoring();
+
       // Setup event listeners
       this.setupEventListeners();
 
@@ -75,11 +79,232 @@ class AdvancedAnalyticsDashboard {
       chartjs: typeof Chart !== "undefined",
       websocket: typeof ReconnectingWebSocket !== "undefined",
       domElements: this.checkRequiredElementsHealth(),
+      security: this.checkSecurityHealth(),
       timestamp: new Date().toISOString(),
     };
 
     console.table(health);
     return health;
+  }
+
+  // Security monitoring setup
+  setupSecurityMonitoring() {
+    console.log("🛡️ Setting up security monitoring...");
+
+    // Initialize security monitor if available
+    if (window.analyticsSecurityMonitor) {
+      this.securityMonitor = window.analyticsSecurityMonitor;
+      console.log("✅ Security monitor connected");
+
+      // Setup security event listeners
+      this.setupSecurityEventListeners();
+
+      // Add security status to integration status
+      this.updateSecurityStatus();
+    } else {
+      console.warn("⚠️ Security monitor not available");
+    }
+  }
+
+  // Setup security event listeners
+  setupSecurityEventListeners() {
+    // Listen for security events
+    document.addEventListener('security-threat', (e) => {
+      const threat = e.detail;
+      this.handleSecurityThreat(threat);
+    });
+
+    document.addEventListener('security-alert', (e) => {
+      const alert = e.detail;
+      this.handleSecurityAlert(alert);
+    });
+  }
+
+  // Handle security threats
+  handleSecurityThreat(threat) {
+    console.warn("🚨 Security threat detected:", threat);
+
+    // Show security notification
+    this.showSecurityNotification(threat);
+
+    // Log security event
+    this.logSecurityEvent(threat);
+
+    // Update security status
+    this.updateSecurityStatus();
+  }
+
+  // Handle security alerts
+  handleSecurityAlert(alert) {
+    console.log("🔔 Security alert:", alert);
+    this.showSecurityNotification(alert);
+  }
+
+  // Show security notification
+  showSecurityNotification(notification) {
+    const severityColors = {
+      low: '#f59e0b',
+      medium: '#ef4444',
+      high: '#dc2626',
+      critical: '#7f1d1d'
+    };
+
+    // Use existing notification system if available
+    if (window.showNotification) {
+      window.showNotification({
+        type: 'security',
+        title: 'Security Alert',
+        message: notification.details || notification.message,
+        duration: 8000
+      });
+    } else {
+      // Fallback notification
+      const notificationDiv = document.createElement('div');
+      notificationDiv.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: ${severityColors[notification.severity] || '#7c3aed'};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        z-index: 10000;
+        max-width: 400px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      `;
+
+      notificationDiv.innerHTML = `
+        <strong>🛡️ Security Alert</strong><br>
+        <small>${notification.type ? notification.type.toUpperCase().replace('_', ' ') : 'SECURITY EVENT'}</small><br>
+        ${notification.details || notification.message}
+      `;
+
+      document.body.appendChild(notificationDiv);
+
+      setTimeout(() => {
+        if (notificationDiv.parentNode) {
+          notificationDiv.parentNode.removeChild(notificationDiv);
+        }
+      }, 8000);
+    }
+  }
+
+  // Log security events
+  logSecurityEvent(event) {
+    const securityLog = {
+      timestamp: new Date().toISOString(),
+      type: 'security_event',
+      event: event,
+      sessionId: this.securityMonitor ? this.securityMonitor.sessionId : 'unknown',
+      url: window.location.href,
+      userAgent: navigator.userAgent
+    };
+
+    // Store in local storage for persistence
+    try {
+      const existingLogs = JSON.parse(localStorage.getItem('analytics_security_logs') || '[]');
+      existingLogs.push(securityLog);
+
+      // Keep only last 100 entries
+      if (existingLogs.length > 100) {
+        existingLogs.splice(0, existingLogs.length - 100);
+      }
+
+      localStorage.setItem('analytics_security_logs', JSON.stringify(existingLogs));
+    } catch (error) {
+      console.error('Failed to log security event:', error);
+    }
+  }
+
+  // Update security status
+  updateSecurityStatus() {
+    if (!this.securityMonitor) return;
+
+    const securityStatus = document.getElementById('security-status');
+    if (securityStatus) {
+      const report = this.securityMonitor.getSecurityReport();
+      const threatCount = report.threats.length;
+
+      securityStatus.innerHTML = `
+        <span class="status-indicator ${threatCount > 0 ? 'warning' : 'good'}">
+          ${threatCount > 0 ? '⚠️' : '🛡️'}
+        </span>
+        Security: ${threatCount > 0 ? `${threatCount} threats` : 'Clean'}
+      `;
+    }
+  }
+
+  // Check security health
+  checkSecurityHealth() {
+    if (!window.SECURITY_CONFIG) {
+      return { enabled: false, message: 'Security config not loaded' };
+    }
+
+    return {
+      enabled: window.SECURITY_CONFIG.enabled,
+      monitor: !!window.analyticsSecurityMonitor,
+      threats: window.analyticsSecurityMonitor ? window.analyticsSecurityMonitor.threats.length : 0,
+      sessionActive: true,
+      lastCheck: new Date().toISOString()
+    };
+  }
+
+  // Pause real-time updates for security
+  pauseRealTimeUpdates() {
+    console.log("⏸️ Pausing real-time updates for security");
+
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+      this.updateInterval = null;
+    }
+
+    if (this.streamingInterval) {
+      clearInterval(this.streamingInterval);
+      this.streamingInterval = null;
+    }
+
+    // Update UI to show paused state
+    const statusElement = document.getElementById('realtime-status');
+    if (statusElement) {
+      statusElement.innerHTML = '<span style="color: #f59e0b;">⏸️ Paused (Security)</span>';
+    }
+  }
+
+  // Resume real-time updates
+  resumeRealTimeUpdates() {
+    console.log("▶️ Resuming real-time updates");
+
+    this.setupRealTimeUpdates();
+
+    // Update UI to show active state
+    const statusElement = document.getElementById('realtime-status');
+    if (statusElement) {
+      statusElement.innerHTML = '<span style="color: #10b981;">🟢 Active</span>';
+    }
+  }
+
+  // Get security report
+  getSecurityReport() {
+    if (!this.securityMonitor) {
+      return { error: 'Security monitor not available' };
+    }
+
+    return this.securityMonitor.getSecurityReport();
+  }
+
+  // Clear security logs
+  clearSecurityLogs() {
+    try {
+      localStorage.removeItem('analytics_security_logs');
+      console.log("🧹 Security logs cleared");
+
+      if (this.securityMonitor && this.securityMonitor.auditLog) {
+        this.securityMonitor.auditLog = [];
+      }
+    } catch (error) {
+      console.error('Failed to clear security logs:', error);
+    }
   }
 
   checkRequiredElementsHealth() {

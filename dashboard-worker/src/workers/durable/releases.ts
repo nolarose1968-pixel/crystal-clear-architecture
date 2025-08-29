@@ -68,31 +68,31 @@ export class ReleaseManager {
       switch (path) {
         case '/api/releases/current':
           return this.getCurrentRelease();
-        
+
         case '/api/releases/history':
           return this.getReleaseHistory(url);
-        
+
         case '/api/releases/publish':
           return this.publishRelease(request);
-        
+
         case '/api/releases/rollback':
           return this.rollbackRelease(request);
-        
+
         case '/api/releases/metrics':
           return this.getReleaseMetrics(url);
-        
+
         case '/api/releases/compare':
           return this.compareReleases(url);
-        
+
         case '/api/releases/changelog':
           return this.generateChangelog(url);
-        
+
         case '/api/releases/validate':
           return this.validateRelease(request);
-        
+
         case '/api/releases/schedule':
           return this.scheduleRelease(request);
-        
+
         default:
           return new Response('Not found', { status: 404 });
       }
@@ -110,11 +110,11 @@ export class ReleaseManager {
    */
   private async getCurrentRelease(): Promise<Response> {
     const current = await this.state.storage.get<Release>('current-release');
-    
+
     if (!current) {
       return Response.json({
         version: '0.0.0',
-        message: 'No release deployed yet'
+        message: 'No release deployed yet',
       });
     }
 
@@ -138,19 +138,17 @@ export class ReleaseManager {
     const releases = await this.state.storage.list<Release>({
       prefix: 'release-',
       limit,
-      start: `release-${offset}`
+      start: `release-${offset}`,
     });
 
     let history = Array.from(releases.entries()).map(([key, value]) => ({
       ...value,
-      key: key.replace('release-', '')
+      key: key.replace('release-', ''),
     }));
 
     // Apply filter if specified
     if (filter) {
-      history = history.filter(release => 
-        release.changes.some(change => change.type === filter)
-      );
+      history = history.filter(release => release.changes.some(change => change.type === filter));
     }
 
     // Sort by version (semantic versioning)
@@ -160,7 +158,7 @@ export class ReleaseManager {
       releases: history,
       total: releases.size,
       limit,
-      offset
+      offset,
     });
   }
 
@@ -169,7 +167,7 @@ export class ReleaseManager {
    */
   private async publishRelease(request: Request): Promise<Response> {
     const release: Release = await request.json();
-    
+
     // Validate release data
     const validation = this.validateReleaseData(release);
     if (!validation.valid) {
@@ -182,17 +180,14 @@ export class ReleaseManager {
     // Check version doesn't already exist
     const existing = await this.state.storage.get(`release-${release.version}`);
     if (existing) {
-      return Response.json(
-        { error: `Release ${release.version} already exists` },
-        { status: 409 }
-      );
+      return Response.json({ error: `Release ${release.version} already exists` }, { status: 409 });
     }
 
     // Add metadata
     release.timestamp = new Date().toISOString();
     release.deployment = {
       status: 'pending',
-      startTime: new Date().toISOString()
+      startTime: new Date().toISOString(),
     };
 
     // Store the release
@@ -208,7 +203,7 @@ export class ReleaseManager {
     // Broadcast to connected clients
     this.broadcast({
       type: 'release-published',
-      release
+      release,
     });
 
     // Schedule deployment
@@ -217,7 +212,7 @@ export class ReleaseManager {
     return Response.json({
       success: true,
       release,
-      message: `Release ${release.version} published successfully`
+      message: `Release ${release.version} published successfully`,
     });
   }
 
@@ -230,10 +225,7 @@ export class ReleaseManager {
     // Get the target release
     const targetRelease = await this.state.storage.get<Release>(`release-${version}`);
     if (!targetRelease) {
-      return Response.json(
-        { error: `Release ${version} not found` },
-        { status: 404 }
-      );
+      return Response.json({ error: `Release ${version} not found` }, { status: 404 });
     }
 
     // Store current as rolled-back
@@ -247,7 +239,7 @@ export class ReleaseManager {
     targetRelease.deployment = {
       status: 'success',
       startTime: new Date().toISOString(),
-      endTime: new Date().toISOString()
+      endTime: new Date().toISOString(),
     };
     await this.state.storage.put('current-release', targetRelease);
 
@@ -256,7 +248,7 @@ export class ReleaseManager {
       from: current?.version,
       to: version,
       reason,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     // Broadcast rollback
@@ -264,13 +256,13 @@ export class ReleaseManager {
       type: 'release-rolled-back',
       from: current?.version,
       to: version,
-      reason
+      reason,
     });
 
     return Response.json({
       success: true,
       message: `Rolled back to version ${version}`,
-      previousVersion: current?.version
+      previousVersion: current?.version,
     });
   }
 
@@ -279,16 +271,13 @@ export class ReleaseManager {
    */
   private async getReleaseMetrics(url: URL): Promise<Response> {
     const version = url.searchParams.get('version');
-    
+
     if (!version) {
-      return Response.json(
-        { error: 'Version parameter required' },
-        { status: 400 }
-      );
+      return Response.json({ error: 'Version parameter required' }, { status: 400 });
     }
 
     const metrics = await this.state.storage.get<ReleaseMetrics>(`metrics-${version}`);
-    
+
     if (!metrics) {
       return Response.json({
         version,
@@ -296,8 +285,8 @@ export class ReleaseManager {
           downloads: 0,
           activeInstalls: 0,
           errorRate: 0,
-          performanceScore: 100
-        }
+          performanceScore: 100,
+        },
       });
     }
 
@@ -312,20 +301,14 @@ export class ReleaseManager {
     const to = url.searchParams.get('to');
 
     if (!from || !to) {
-      return Response.json(
-        { error: 'Both from and to parameters required' },
-        { status: 400 }
-      );
+      return Response.json({ error: 'Both from and to parameters required' }, { status: 400 });
     }
 
     const fromRelease = await this.state.storage.get<Release>(`release-${from}`);
     const toRelease = await this.state.storage.get<Release>(`release-${to}`);
 
     if (!fromRelease || !toRelease) {
-      return Response.json(
-        { error: 'One or both releases not found' },
-        { status: 404 }
-      );
+      return Response.json({ error: 'One or both releases not found' }, { status: 404 });
     }
 
     // Calculate differences
@@ -333,20 +316,23 @@ export class ReleaseManager {
       from: from,
       to: to,
       changes: {
-        added: toRelease.changes.filter(change => 
-          !fromRelease.changes.some(c => c.description === change.description)
+        added: toRelease.changes.filter(
+          change => !fromRelease.changes.some(c => c.description === change.description)
         ),
-        removed: fromRelease.changes.filter(change => 
-          !toRelease.changes.some(c => c.description === change.description)
-        )
+        removed: fromRelease.changes.filter(
+          change => !toRelease.changes.some(c => c.description === change.description)
+        ),
       },
       buildSize: {
         from: fromRelease.build.size,
         to: toRelease.build.size,
         diff: toRelease.build.size - fromRelease.build.size,
-        percentage: ((toRelease.build.size - fromRelease.build.size) / fromRelease.build.size * 100).toFixed(2)
+        percentage: (
+          ((toRelease.build.size - fromRelease.build.size) / fromRelease.build.size) *
+          100
+        ).toFixed(2),
       },
-      timeDiff: new Date(toRelease.timestamp).getTime() - new Date(fromRelease.timestamp).getTime()
+      timeDiff: new Date(toRelease.timestamp).getTime() - new Date(fromRelease.timestamp).getTime(),
     };
 
     return Response.json(comparison);
@@ -361,7 +347,7 @@ export class ReleaseManager {
     const until = url.searchParams.get('until');
 
     const releases = await this.state.storage.list<Release>({
-      prefix: 'release-'
+      prefix: 'release-',
     });
 
     let releaseList = Array.from(releases.entries())
@@ -380,7 +366,7 @@ export class ReleaseManager {
 
     // Generate changelog based on format
     let changelog: string;
-    
+
     if (format === 'markdown') {
       changelog = this.generateMarkdownChangelog(releaseList);
     } else if (format === 'json') {
@@ -390,7 +376,7 @@ export class ReleaseManager {
     }
 
     return new Response(changelog, {
-      headers: { 'Content-Type': 'text/plain' }
+      headers: { 'Content-Type': 'text/plain' },
     });
   }
 
@@ -407,18 +393,18 @@ export class ReleaseManager {
         versionConflict: await this.checkVersionConflict(release.version),
         buildIntegrity: this.validateBuildInfo(release.build),
         changelogComplete: release.changes.length > 0,
-        requiredFields: this.checkRequiredFields(release)
+        requiredFields: this.checkRequiredFields(release),
       };
 
       return Response.json({
         valid: Object.values(checks).every(v => v === true),
-        checks
+        checks,
       });
     }
 
     return Response.json({
       valid: false,
-      issues: validation.issues
+      issues: validation.issues,
     });
   }
 
@@ -427,20 +413,17 @@ export class ReleaseManager {
    */
   private async scheduleRelease(request: Request): Promise<Response> {
     const { release, scheduledFor } = await request.json();
-    
+
     const scheduledTime = new Date(scheduledFor);
     if (scheduledTime <= new Date()) {
-      return Response.json(
-        { error: 'Scheduled time must be in the future' },
-        { status: 400 }
-      );
+      return Response.json({ error: 'Scheduled time must be in the future' }, { status: 400 });
     }
 
     // Store scheduled release
     await this.state.storage.put(`scheduled-${release.version}`, {
       release,
       scheduledFor,
-      status: 'pending'
+      status: 'pending',
     });
 
     // Set alarm for scheduled time
@@ -449,7 +432,7 @@ export class ReleaseManager {
     return Response.json({
       success: true,
       message: `Release ${release.version} scheduled for ${scheduledFor}`,
-      release
+      release,
     });
   }
 
@@ -459,27 +442,27 @@ export class ReleaseManager {
   async alarm(): Promise<void> {
     // Process scheduled releases
     const scheduled = await this.state.storage.list({
-      prefix: 'scheduled-'
+      prefix: 'scheduled-',
     });
 
     for (const [key, value] of scheduled) {
       const { release, scheduledFor, status } = value as any;
-      
+
       if (status === 'pending' && new Date(scheduledFor) <= new Date()) {
         // Publish the scheduled release
         await this.state.storage.put(`release-${release.version}`, release);
         await this.state.storage.put('current-release', release);
-        
+
         // Update scheduled status
         await this.state.storage.put(key, {
           ...value,
-          status: 'deployed'
+          status: 'deployed',
         });
 
         // Broadcast deployment
         this.broadcast({
           type: 'scheduled-release-deployed',
-          release
+          release,
         });
       }
     }
@@ -499,33 +482,37 @@ export class ReleaseManager {
       this.websockets.delete(server);
     });
 
-    server.addEventListener('message', async (event) => {
+    server.addEventListener('message', async event => {
       try {
         const message = JSON.parse(event.data as string);
-        
+
         switch (message.type) {
           case 'subscribe':
-            server.send(JSON.stringify({
-              type: 'subscribed',
-              currentVersion: await this.getCurrentReleaseVersion()
-            }));
+            server.send(
+              JSON.stringify({
+                type: 'subscribed',
+                currentVersion: await this.getCurrentReleaseVersion(),
+              })
+            );
             break;
-            
+
           case 'ping':
             server.send(JSON.stringify({ type: 'pong' }));
             break;
         }
       } catch (error) {
-        server.send(JSON.stringify({
-          type: 'error',
-          message: 'Invalid message format'
-        }));
+        server.send(
+          JSON.stringify({
+            type: 'error',
+            message: 'Invalid message format',
+          })
+        );
       }
     });
 
     return new Response(null, {
       status: 101,
-      webSocket: client
+      webSocket: client,
     });
   }
 
@@ -549,12 +536,12 @@ export class ReleaseManager {
   private compareVersions(a: string, b: string): number {
     const aParts = a.split('.').map(Number);
     const bParts = b.split('.').map(Number);
-    
+
     for (let i = 0; i < 3; i++) {
       if (aParts[i] > bParts[i]) return 1;
       if (aParts[i] < bParts[i]) return -1;
     }
-    
+
     return 0;
   }
 
@@ -582,7 +569,7 @@ export class ReleaseManager {
 
     return {
       valid: issues.length === 0,
-      issues: issues.length > 0 ? issues : undefined
+      issues: issues.length > 0 ? issues : undefined,
     };
   }
 
@@ -613,25 +600,28 @@ export class ReleaseManager {
    */
   private generateMarkdownChangelog(releases: Release[]): string {
     let changelog = '# Changelog\n\n';
-    
+
     for (const release of releases) {
       changelog += `## [${release.version}] - ${release.timestamp}\n\n`;
       changelog += `*Released by ${release.author}*\n\n`;
-      
-      const changesByType = release.changes.reduce((acc, change) => {
-        if (!acc[change.type]) acc[change.type] = [];
-        acc[change.type].push(change);
-        return acc;
-      }, {} as Record<string, Change[]>);
-      
+
+      const changesByType = release.changes.reduce(
+        (acc, change) => {
+          if (!acc[change.type]) acc[change.type] = [];
+          acc[change.type].push(change);
+          return acc;
+        },
+        {} as Record<string, Change[]>
+      );
+
       const typeHeaders = {
         feature: '### 🚀 Features',
         fix: '### 🐛 Fixes',
         enhancement: '### ✨ Enhancements',
         breaking: '### 💥 Breaking Changes',
-        security: '### 🔒 Security'
+        security: '### 🔒 Security',
       };
-      
+
       for (const [type, changes] of Object.entries(changesByType)) {
         changelog += `${typeHeaders[type] || `### ${type}`}\n\n`;
         for (const change of changes) {
@@ -643,7 +633,7 @@ export class ReleaseManager {
         changelog += '\n';
       }
     }
-    
+
     return changelog;
   }
 
@@ -651,18 +641,18 @@ export class ReleaseManager {
    * Helper: Generate text changelog
    */
   private generateTextChangelog(releases: Release[]): string {
-    let changelog = 'CHANGELOG\n=========\n\n';
-    
+    let changelog = 'CHANGELOG\n!=====\n\n';
+
     for (const release of releases) {
       changelog += `Version ${release.version} (${release.timestamp})\n`;
       changelog += '-'.repeat(40) + '\n';
-      
+
       for (const change of release.changes) {
         changelog += `  [${change.type.toUpperCase()}] ${change.description}\n`;
       }
       changelog += '\n';
     }
-    
+
     return changelog;
   }
 
@@ -683,10 +673,10 @@ export class ReleaseManager {
       release.deployment.status = 'success';
       release.deployment.endTime = new Date().toISOString();
       await this.state.storage.put(`release-${release.version}`, release);
-      
+
       this.broadcast({
         type: 'deployment-complete',
-        release
+        release,
       });
     }, 5000); // Simulate deployment time
   }
@@ -694,5 +684,5 @@ export class ReleaseManager {
 
 // Export namespace binding
 export default {
-  ReleaseManager
+  ReleaseManager,
 };

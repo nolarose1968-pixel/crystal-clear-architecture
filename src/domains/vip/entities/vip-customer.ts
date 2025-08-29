@@ -5,12 +5,16 @@
  * Represents a VIP customer with their tier, benefits, and management
  */
 
-import { DomainEntity } from '../../shared/domain-entity';
-import { VipTier, VipTierLevel } from '../value-objects/vip-tier';
-import { DomainError } from '../../shared/domain-entity';
+import { DomainEntity } from "../../shared/domain-entity";
+import { VipTier, VipTierLevel } from "../value-objects/vip-tier";
+import { DomainError } from "../../shared/domain-entity";
 
-export type VipStatus = 'active' | 'inactive' | 'suspended' | 'pending_review';
-export type VipQualificationStatus = 'qualified' | 'not_qualified' | 'pending' | 'expired';
+export type VipStatus = "active" | "inactive" | "suspended" | "pending_review";
+export type VipQualificationStatus =
+  | "qualified"
+  | "not_qualified"
+  | "pending"
+  | "expired";
 
 export interface VipCustomerStats {
   totalDeposits: number;
@@ -48,7 +52,7 @@ export class VipCustomer extends DomainEntity {
     private reviewHistory: VipReview[],
     private nextReviewDate?: Date,
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
   ) {
     super(id, createdAt, updatedAt);
   }
@@ -69,16 +73,16 @@ export class VipCustomer extends DomainEntity {
       birthdayNotifications: true,
       accountManagerUpdates: true,
       eventInvitations: true,
-      preferredLanguage: 'en',
-      preferredContactTime: 'business_hours'
+      preferredLanguage: "en",
+      preferredContactTime: "business_hours",
     };
 
     return new VipCustomer(
       crypto.randomUUID(),
       params.customerId,
       params.initialTier,
-      'active',
-      'qualified',
+      "active",
+      "qualified",
       params.stats,
       {
         monthlyCashbackEarned: 0,
@@ -86,7 +90,7 @@ export class VipCustomer extends DomainEntity {
         freeSpinsUsed: 0,
         birthdayBonusReceived: 0,
         exclusiveEventsAttended: 0,
-        personalizedOffersRedeemed: 0
+        personalizedOffersRedeemed: 0,
       },
       params.accountManagerId,
       { ...defaultPrefs, ...params.communicationPreferences },
@@ -94,18 +98,24 @@ export class VipCustomer extends DomainEntity {
       [],
       this.calculateNextReviewDate(now),
       now,
-      now
+      now,
     );
   }
 
   // Business methods
   upgradeTier(newTier: VipTier, reason: string, approvedBy: string): void {
     if (!this.currentTier.canUpgradeTo(newTier)) {
-      throw new DomainError('Cannot upgrade to lower or same tier', 'INVALID_TIER_UPGRADE');
+      throw new DomainError(
+        "Cannot upgrade to lower or same tier",
+        "INVALID_TIER_UPGRADE",
+      );
     }
 
     if (!this.isEligibleForTier(newTier)) {
-      throw new DomainError('Customer does not meet requirements for this tier', 'INSUFFICIENT_QUALIFICATION');
+      throw new DomainError(
+        "Customer does not meet requirements for this tier",
+        "INSUFFICIENT_QUALIFICATION",
+      );
     }
 
     const upgrade: VipTierUpgrade = {
@@ -115,7 +125,7 @@ export class VipCustomer extends DomainEntity {
       upgradeDate: new Date(),
       reason,
       approvedBy,
-      bonusAwarded: newTier.getUpgradeBonus()
+      bonusAwarded: newTier.getUpgradeBonus(),
     };
 
     this.upgradeHistory.push(upgrade);
@@ -130,7 +140,10 @@ export class VipCustomer extends DomainEntity {
 
   downgradeTier(newTier: VipTier, reason: string, approvedBy: string): void {
     if (!this.currentTier.canDowngradeTo(newTier)) {
-      throw new DomainError('Cannot downgrade to higher or same tier', 'INVALID_TIER_DOWNGRADE');
+      throw new DomainError(
+        "Cannot downgrade to higher or same tier",
+        "INVALID_TIER_DOWNGRADE",
+      );
     }
 
     const downgrade: VipTierUpgrade = {
@@ -140,7 +153,7 @@ export class VipCustomer extends DomainEntity {
       upgradeDate: new Date(),
       reason,
       approvedBy,
-      bonusAwarded: 0
+      bonusAwarded: 0,
     };
 
     this.upgradeHistory.push(downgrade);
@@ -151,16 +164,16 @@ export class VipCustomer extends DomainEntity {
   }
 
   suspend(reason: string, suspendedBy: string): void {
-    this.status = 'suspended';
+    this.status = "suspended";
 
     const review: VipReview = {
       id: crypto.randomUUID(),
-      reviewType: 'suspension',
+      reviewType: "suspension",
       reviewDate: new Date(),
       reviewerId: suspendedBy,
-      decision: 'suspended',
+      decision: "suspended",
       reason,
-      notes: `Account suspended: ${reason}`
+      notes: `Account suspended: ${reason}`,
     };
 
     this.reviewHistory.push(review);
@@ -168,20 +181,23 @@ export class VipCustomer extends DomainEntity {
   }
 
   reactivate(reactivatedBy: string): void {
-    if (this.status !== 'suspended') {
-      throw new DomainError('Only suspended accounts can be reactivated', 'INVALID_STATUS_TRANSITION');
+    if (this.status !== "suspended") {
+      throw new DomainError(
+        "Only suspended accounts can be reactivated",
+        "INVALID_STATUS_TRANSITION",
+      );
     }
 
-    this.status = 'active';
+    this.status = "active";
 
     const review: VipReview = {
       id: crypto.randomUUID(),
-      reviewType: 'reactivation',
+      reviewType: "reactivation",
       reviewDate: new Date(),
       reviewerId: reactivatedBy,
-      decision: 'reactivated',
-      reason: 'Account reactivation',
-      notes: 'Account reactivated from suspended status'
+      decision: "reactivated",
+      reason: "Account reactivation",
+      notes: "Account reactivated from suspended status",
     };
 
     this.reviewHistory.push(review);
@@ -205,13 +221,18 @@ export class VipCustomer extends DomainEntity {
   awardBirthdayBonus(): void {
     const birthdayBonus = this.currentTier.getBenefits().birthdayBonus;
     if (birthdayBonus > 0) {
-      this.trackBenefitUsage('birthdayBonusReceived', birthdayBonus);
+      this.trackBenefitUsage("birthdayBonusReceived", birthdayBonus);
       // Note: Actual bonus awarding would be handled by balance domain
     }
   }
 
-  updateCommunicationPreferences(preferences: Partial<VipCommunicationPreferences>): void {
-    this.communicationPreferences = { ...this.communicationPreferences, ...preferences };
+  updateCommunicationPreferences(
+    preferences: Partial<VipCommunicationPreferences>,
+  ): void {
+    this.communicationPreferences = {
+      ...this.communicationPreferences,
+      ...preferences,
+    };
     this.markAsModified();
   }
 
@@ -220,12 +241,12 @@ export class VipCustomer extends DomainEntity {
 
     const review: VipReview = {
       id: crypto.randomUUID(),
-      reviewType: 'manager_assignment',
+      reviewType: "manager_assignment",
       reviewDate: new Date(),
       reviewerId: assignedBy,
-      decision: 'assigned',
-      reason: 'Account manager assignment',
-      notes: `Assigned account manager: ${managerId}`
+      decision: "assigned",
+      reason: "Account manager assignment",
+      notes: `Assigned account manager: ${managerId}`,
     };
 
     this.reviewHistory.push(review);
@@ -239,16 +260,19 @@ export class VipCustomer extends DomainEntity {
 
   private updateQualificationStatus(): void {
     if (this.currentTier.meetsMaintenanceCriteria(this.stats)) {
-      this.qualificationStatus = 'qualified';
-    } else if (this.stats.activityScore < this.currentTier.getRequirements().accountActivityScore * 0.8) {
-      this.qualificationStatus = 'pending_review';
+      this.qualificationStatus = "qualified";
+    } else if (
+      this.stats.activityScore <
+      this.currentTier.getRequirements().accountActivityScore * 0.8
+    ) {
+      this.qualificationStatus = "pending_review";
     } else {
-      this.qualificationStatus = 'not_qualified';
+      this.qualificationStatus = "not_qualified";
     }
   }
 
   private awardUpgradeBonus(amount: number): void {
-    this.trackBenefitUsage('birthdayBonusReceived', amount);
+    this.trackBenefitUsage("birthdayBonusReceived", amount);
     // Note: Actual bonus awarding would be handled by balance domain
   }
 
@@ -259,25 +283,47 @@ export class VipCustomer extends DomainEntity {
   }
 
   // Getters
-  getCustomerId(): string { return this.customerId; }
-  getCurrentTier(): VipTier { return this.currentTier; }
-  getStatus(): VipStatus { return this.status; }
-  getQualificationStatus(): VipQualificationStatus { return this.qualificationStatus; }
-  getStats(): VipCustomerStats { return { ...this.stats }; }
-  getBenefitsTracking(): VipBenefitsTracking { return { ...this.benefitsTracking }; }
-  getAccountManagerId(): string | undefined { return this.accountManagerId; }
-  getCommunicationPreferences(): VipCommunicationPreferences { return { ...this.communicationPreferences }; }
-  getUpgradeHistory(): VipTierUpgrade[] { return [...this.upgradeHistory]; }
-  getReviewHistory(): VipReview[] { return [...this.reviewHistory]; }
-  getNextReviewDate(): Date | undefined { return this.nextReviewDate; }
+  getCustomerId(): string {
+    return this.customerId;
+  }
+  getCurrentTier(): VipTier {
+    return this.currentTier;
+  }
+  getStatus(): VipStatus {
+    return this.status;
+  }
+  getQualificationStatus(): VipQualificationStatus {
+    return this.qualificationStatus;
+  }
+  getStats(): VipCustomerStats {
+    return { ...this.stats };
+  }
+  getBenefitsTracking(): VipBenefitsTracking {
+    return { ...this.benefitsTracking };
+  }
+  getAccountManagerId(): string | undefined {
+    return this.accountManagerId;
+  }
+  getCommunicationPreferences(): VipCommunicationPreferences {
+    return { ...this.communicationPreferences };
+  }
+  getUpgradeHistory(): VipTierUpgrade[] {
+    return [...this.upgradeHistory];
+  }
+  getReviewHistory(): VipReview[] {
+    return [...this.reviewHistory];
+  }
+  getNextReviewDate(): Date | undefined {
+    return this.nextReviewDate;
+  }
 
   // Business rules
   isActive(): boolean {
-    return this.status === 'active';
+    return this.status === "active";
   }
 
   isQualified(): boolean {
-    return this.qualificationStatus === 'qualified' && this.isActive();
+    return this.qualificationStatus === "qualified" && this.isActive();
   }
 
   needsReview(): boolean {
@@ -289,7 +335,9 @@ export class VipCustomer extends DomainEntity {
   }
 
   getMonthlyCashback(): number {
-    return this.currentTier.calculateMonthlyCashback(this.stats.monthlyDeposits);
+    return this.currentTier.calculateMonthlyCashback(
+      this.stats.monthlyDeposits,
+    );
   }
 
   getEffectiveBalanceLimit(baseLimit: number): number {
@@ -302,7 +350,7 @@ export class VipCustomer extends DomainEntity {
       customerId: this.customerId,
       currentTier: {
         level: this.currentTier.getLevel(),
-        name: this.currentTier.getName()
+        name: this.currentTier.getName(),
       },
       status: this.status,
       qualificationStatus: this.qualificationStatus,
@@ -314,7 +362,7 @@ export class VipCustomer extends DomainEntity {
       reviewHistory: this.reviewHistory,
       nextReviewDate: this.nextReviewDate?.toISOString(),
       createdAt: this.getCreatedAt().toISOString(),
-      updatedAt: this.getUpdatedAt().toISOString()
+      updatedAt: this.getUpdatedAt().toISOString(),
     };
   }
 }
@@ -329,7 +377,7 @@ export interface VipCommunicationPreferences {
   accountManagerUpdates: boolean;
   eventInvitations: boolean;
   preferredLanguage: string;
-  preferredContactTime: 'anytime' | 'business_hours' | 'evenings';
+  preferredContactTime: "anytime" | "business_hours" | "evenings";
 }
 
 export interface VipTierUpgrade {
@@ -344,10 +392,22 @@ export interface VipTierUpgrade {
 
 export interface VipReview {
   id: string;
-  reviewType: 'annual' | 'upgrade' | 'downgrade' | 'suspension' | 'reactivation' | 'manager_assignment';
+  reviewType:
+    | "annual"
+    | "upgrade"
+    | "downgrade"
+    | "suspension"
+    | "reactivation"
+    | "manager_assignment";
   reviewDate: Date;
   reviewerId: string;
-  decision: 'approved' | 'denied' | 'suspended' | 'reactivated' | 'assigned' | 'maintained';
+  decision:
+    | "approved"
+    | "denied"
+    | "suspended"
+    | "reactivated"
+    | "assigned"
+    | "maintained";
   reason: string;
   notes?: string;
 }

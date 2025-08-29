@@ -2,7 +2,7 @@
  * 🌐 Enhanced User Agent Management System
  * Manages custom user agents for Fire22 API calls and external services
  * Compatible with Bun v1.01.04-alpha --user-agent runtime flag
- * 
+ *
  * Features:
  * - Custom user agent for Fire22 API calls
  * - User agent tracking and analytics
@@ -10,7 +10,7 @@
  * - Integration with Water Dashboard standards
  */
 
-import type { Fire22LKey, WebLogEntry } from "../src/types/water-dashboard-standards";
+import type { Fire22LKey, WebLogEntry } from '../src/types/water-dashboard-standards';
 
 // User agent configuration
 export interface UserAgentConfig {
@@ -57,12 +57,12 @@ export class EnhancedUserAgentManager {
 
   constructor(config?: Partial<UserAgentConfig>) {
     this.config = {
-      name: "WaterDashboard",
-      version: "2.1.0",
+      name: 'WaterDashboard',
+      version: '2.1.0',
       platform: process.platform,
-      features: ["Fire22Integration", "BunRuntime", "HMR", "RealTimeAnalytics"],
+      features: ['Fire22Integration', 'BunRuntime', 'HMR', 'RealTimeAnalytics'],
       buildDate: new Date(),
-      ...config
+      ...config,
     };
   }
 
@@ -97,7 +97,7 @@ export class EnhancedUserAgentManager {
     const userAgent = this.getEffectiveUserAgent();
     const startTime = Date.now();
     const callId = `ua_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     // Prepare headers with custom user agent
     const headers = new Headers(options.headers);
     headers.set('User-Agent', userAgent);
@@ -106,7 +106,7 @@ export class EnhancedUserAgentManager {
 
     const enhancedOptions: RequestInit = {
       ...options,
-      headers
+      headers,
     };
 
     let response: Response;
@@ -115,7 +115,7 @@ export class EnhancedUserAgentManager {
     try {
       response = await fetch(url, enhancedOptions);
       success = response.ok;
-      
+
       // Track the API call
       const apiCall: APICall = {
         id: callId,
@@ -125,14 +125,13 @@ export class EnhancedUserAgentManager {
         responseTime: Date.now() - startTime,
         statusCode: response.status,
         timestamp: new Date(),
-        success
+        success,
       };
 
       this.trackAPICall(apiCall);
       this.updateAnalytics(userAgent, apiCall);
 
       return response;
-      
     } catch (error) {
       // Track failed call
       const apiCall: APICall = {
@@ -143,12 +142,12 @@ export class EnhancedUserAgentManager {
         responseTime: Date.now() - startTime,
         statusCode: 0,
         timestamp: new Date(),
-        success: false
+        success: false,
       };
 
       this.trackAPICall(apiCall);
       this.updateAnalytics(userAgent, apiCall);
-      
+
       throw error;
     }
   }
@@ -156,22 +155,26 @@ export class EnhancedUserAgentManager {
   /**
    * Fire22-specific API call with L-key tracking
    */
-  async fetchFire22(endpoint: string, options: RequestInit = {}, lkeys?: Fire22LKey[]): Promise<Response> {
+  async fetchFire22(
+    endpoint: string,
+    options: RequestInit = {},
+    lkeys?: Fire22LKey[]
+  ): Promise<Response> {
     const fire22BaseUrl = process.env.FIRE22_API_BASE_URL || 'https://fire22.ag/cloud/api';
     const url = `${fire22BaseUrl}${endpoint}`;
-    
+
     // Add Fire22-specific headers
     const headers = new Headers(options.headers);
     headers.set('X-Fire22-Integration', 'WaterDashboard');
     headers.set('X-Fire22-Version', this.config.version);
-    
+
     if (lkeys && lkeys.length > 0) {
       headers.set('X-Fire22-LKeys', lkeys.join(','));
     }
 
     const response = await this.fetch(url, {
       ...options,
-      headers
+      headers,
     });
 
     // Update the last tracked call with L-key info
@@ -188,7 +191,7 @@ export class EnhancedUserAgentManager {
    */
   private trackAPICall(call: APICall): void {
     this.apiCalls.push(call);
-    
+
     // Maintain max history size
     if (this.apiCalls.length > this.maxCallHistory) {
       this.apiCalls.splice(0, this.apiCalls.length - this.maxCallHistory);
@@ -208,12 +211,12 @@ export class EnhancedUserAgentManager {
         avgResponseTime: 0,
         lastUsed: new Date(),
         endpoints: new Map(),
-        errors: new Map()
+        errors: new Map(),
       });
     }
 
     const analytics = this.analytics.get(userAgent)!;
-    
+
     // Update counts
     analytics.requestCount++;
     if (call.success) {
@@ -223,10 +226,9 @@ export class EnhancedUserAgentManager {
     }
 
     // Update response time (rolling average)
-    analytics.avgResponseTime = (
+    analytics.avgResponseTime =
       (analytics.avgResponseTime * (analytics.requestCount - 1) + call.responseTime) /
-      analytics.requestCount
-    );
+      analytics.requestCount;
 
     // Update last used
     analytics.lastUsed = call.timestamp;
@@ -269,9 +271,7 @@ export class EnhancedUserAgentManager {
    * Get Fire22-specific calls
    */
   getFire22Calls(limit = 20): APICall[] {
-    return this.apiCalls
-      .filter(call => call.endpoint.includes('fire22.ag'))
-      .slice(-limit);
+    return this.apiCalls.filter(call => call.endpoint.includes('fire22.ag')).slice(-limit);
   }
 
   /**
@@ -292,8 +292,10 @@ export class EnhancedUserAgentManager {
     const fire22Successful = fire22Calls.filter(call => call.success).length;
 
     // Calculate average response time
-    const avgResponseTime = totalCalls > 0 ? 
-      this.apiCalls.reduce((sum, call) => sum + call.responseTime, 0) / totalCalls : 0;
+    const avgResponseTime =
+      totalCalls > 0
+        ? this.apiCalls.reduce((sum, call) => sum + call.responseTime, 0) / totalCalls
+        : 0;
 
     // Top endpoints
     const endpointCounts = new Map<string, number>();
@@ -311,7 +313,7 @@ export class EnhancedUserAgentManager {
     const userAgents = this.getAllAnalytics().map(analytics => ({
       userAgent: analytics.userAgent,
       calls: analytics.requestCount,
-      successRate: analytics.requestCount > 0 ? analytics.successCount / analytics.requestCount : 0
+      successRate: analytics.requestCount > 0 ? analytics.successCount / analytics.requestCount : 0,
     }));
 
     return {
@@ -321,7 +323,7 @@ export class EnhancedUserAgentManager {
       fire22Calls: fire22Calls.length,
       fire22SuccessRate: fire22Calls.length > 0 ? fire22Successful / fire22Calls.length : 0,
       topEndpoints,
-      userAgents
+      userAgents,
     };
   }
 
@@ -342,7 +344,7 @@ export class EnhancedUserAgentManager {
       runtime: this.getRuntimeUserAgent(),
       analytics: this.getAllAnalytics(),
       performance: this.getPerformanceSummary(),
-      recentCalls: this.getRecentCalls(10)
+      recentCalls: this.getRecentCalls(10),
     };
   }
 
@@ -367,8 +369,8 @@ export class EnhancedUserAgentManager {
         endpoint: call.endpoint,
         method: call.method,
         responseTime: call.responseTime,
-        statusCode: call.statusCode
-      }
+        statusCode: call.statusCode,
+      },
     } as WebLogEntry;
   }
 
@@ -390,7 +392,7 @@ export function getCurrentUserAgentInfo() {
     custom: userAgentManager.getUserAgent(),
     runtime: userAgentManager.getRuntimeUserAgent(),
     effective: userAgentManager.getEffectiveUserAgent(),
-    analytics: userAgentManager.getAnalytics()
+    analytics: userAgentManager.getAnalytics(),
   };
 }
 

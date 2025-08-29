@@ -1,6 +1,6 @@
 /**
  * 🔐 Enhanced API Service with Fire22 Security Integration
- * 
+ *
  * Provides comprehensive API integration with:
  * - JWT token authentication
  * - Enhanced security headers
@@ -21,7 +21,7 @@ export interface APIConfig {
 }
 
 export interface SecurityHeaders {
-  'Authorization'?: string;
+  Authorization?: string;
   'X-API-Version': string;
   'X-Client-ID': string;
   'X-CSRF-Token'?: string;
@@ -53,7 +53,7 @@ export class EnhancedAPIService {
       timeout: 30000,
       retryAttempts: 3,
       securityLevel: 'enhanced',
-      ...config
+      ...config,
     };
 
     this.requestId = this.generateRequestId();
@@ -97,7 +97,7 @@ export class EnhancedAPIService {
       'X-Client-ID': this.config.clientId,
       'X-Fire22-Security': this.config.securityLevel,
       'X-Request-ID': this.requestId,
-      'User-Agent': 'Fire22-Dashboard/3.0.9 (Enhanced Security)'
+      'User-Agent': 'Fire22-Dashboard/3.0.9 (Enhanced Security)',
     };
 
     // Add JWT token if available
@@ -133,7 +133,7 @@ export class EnhancedAPIService {
   setAuthTokens(accessToken: string, refreshToken: string): void {
     this.token = accessToken;
     this.refreshToken = refreshToken;
-    this.tokenExpiry = Date.now() + (3600 * 1000); // 1 hour
+    this.tokenExpiry = Date.now() + 3600 * 1000; // 1 hour
 
     // Store in sessionStorage for persistence
     if (typeof sessionStorage !== 'undefined') {
@@ -141,7 +141,6 @@ export class EnhancedAPIService {
       sessionStorage.setItem('fire22_refresh_token', refreshToken);
       sessionStorage.setItem('fire22_token_expiry', this.tokenExpiry.toString());
     }
-
   }
 
   /**
@@ -163,7 +162,7 @@ export class EnhancedAPIService {
     try {
       const response = await this.request('/api/v1/auth/refresh', {
         method: 'POST',
-        body: JSON.stringify({ refresh_token: this.refreshToken })
+        body: JSON.stringify({ refresh_token: this.refreshToken }),
       });
 
       if (response.ok) {
@@ -195,7 +194,6 @@ export class EnhancedAPIService {
       sessionStorage.removeItem('fire22_refresh_token');
       sessionStorage.removeItem('fire22_token_expiry');
     }
-
   }
 
   /**
@@ -218,9 +216,9 @@ export class EnhancedAPIService {
       ...options,
       headers: {
         ...this.getSecurityHeaders(),
-        ...options.headers
+        ...options.headers,
       },
-      credentials: 'include'
+      credentials: 'include',
     };
 
     // Add request timeout
@@ -234,7 +232,7 @@ export class EnhancedAPIService {
         endpoint,
         method: options.method || 'GET',
         requestId,
-        securityLevel: this.config.securityLevel
+        securityLevel: this.config.securityLevel,
       });
 
       // Make request with retry logic
@@ -244,7 +242,7 @@ export class EnhancedAPIService {
       this.logSecurityAudit('request_success', {
         endpoint,
         status: response.status,
-        requestId
+        requestId,
       });
 
       return response;
@@ -253,7 +251,7 @@ export class EnhancedAPIService {
       this.logSecurityAudit('request_error', {
         endpoint,
         error: error.message,
-        requestId
+        requestId,
       });
 
       throw error;
@@ -264,8 +262,8 @@ export class EnhancedAPIService {
    * Make request with retry logic
    */
   private async makeRequestWithRetry(
-    url: string, 
-    config: RequestInit, 
+    url: string,
+    config: RequestInit,
     requestId: string
   ): Promise<Response> {
     let lastError: Error;
@@ -281,7 +279,7 @@ export class EnhancedAPIService {
             // Update authorization header
             config.headers = {
               ...config.headers,
-              'Authorization': `Bearer ${this.token}`
+              Authorization: `Bearer ${this.token}`,
             };
             continue;
           }
@@ -315,7 +313,7 @@ export class EnhancedAPIService {
   async login(credentials: { username: string; password: string }): Promise<Response> {
     const response = await this.request('/api/v1/auth/login', {
       method: 'POST',
-      body: JSON.stringify(credentials)
+      body: JSON.stringify(credentials),
     });
 
     if (response.ok) {
@@ -328,7 +326,7 @@ export class EnhancedAPIService {
 
   async logout(): Promise<Response> {
     const response = await this.request('/api/v1/auth/logout', {
-      method: 'POST'
+      method: 'POST',
     });
 
     if (response.ok) {
@@ -340,7 +338,7 @@ export class EnhancedAPIService {
 
   async verifyToken(): Promise<Response> {
     return this.request('/api/v1/auth/verify', {
-      method: 'GET'
+      method: 'GET',
     });
   }
 
@@ -351,8 +349,8 @@ export class EnhancedAPIService {
     return this.request(endpoint, {
       method: 'GET',
       headers: {
-        'Accept': 'application/json'
-      }
+        Accept: 'application/json',
+      },
     });
   }
 
@@ -360,9 +358,9 @@ export class EnhancedAPIService {
     return this.request(endpoint, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json'
+        Accept: 'application/json',
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
   }
 
@@ -370,15 +368,15 @@ export class EnhancedAPIService {
     return this.request(endpoint, {
       method: 'PUT',
       headers: {
-        'Accept': 'application/json'
+        Accept: 'application/json',
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
   }
 
   async deleteProtectedResource(endpoint: string): Promise<Response> {
     return this.request(endpoint, {
-      method: 'DELETE'
+      method: 'DELETE',
     });
   }
 
@@ -391,7 +389,7 @@ export class EnhancedAPIService {
       event,
       data,
       securityLevel: this.config.securityLevel,
-      clientId: this.config.clientId
+      clientId: this.config.clientId,
     };
 
     // Log to console in development
@@ -411,15 +409,15 @@ export class EnhancedAPIService {
     try {
       const config = await enhancedConfigManager.getEnhancedConfig();
       const auditEndpoint = config.AUDIT_LOG_ENDPOINT;
-      
+
       if (auditEndpoint) {
         await fetch(auditEndpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Fire22-Audit': 'true'
+            'X-Fire22-Audit': 'true',
           },
-          body: JSON.stringify(auditLog)
+          body: JSON.stringify(auditLog),
         });
       }
     } catch (error) {
@@ -440,7 +438,7 @@ export class EnhancedAPIService {
       authenticated: !!this.token,
       tokenExpired: this.isTokenExpired(),
       securityLevel: this.config.securityLevel,
-      clientId: this.config.clientId
+      clientId: this.config.clientId,
     };
   }
 
@@ -457,8 +455,6 @@ export const enhancedAPI = new EnhancedAPIService();
 
 // Run if called directly
 if (import.meta.main) {
-  
   // Show current configuration
   const status = enhancedAPI.getSecurityStatus();
-  
 }

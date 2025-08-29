@@ -10,7 +10,7 @@ import type {
   BalanceSettings,
   ApiResponse,
   PaginationParams,
-  FilterParams
+  FilterParams,
 } from '../../../../core/types/controllers';
 
 /**
@@ -30,8 +30,8 @@ export async function getCustomerBalances(
         customerId: 'CUST_001',
         currentBalance: 1250.75,
         availableBalance: 1200.75,
-        pendingWagers: 50.00,
-        creditLimit: 5000.00,
+        pendingWagers: 50.0,
+        creditLimit: 5000.0,
         lastUpdated: new Date('2025-01-25T10:30:00Z'),
         currency: 'USD',
         status: 'active',
@@ -40,7 +40,7 @@ export async function getCustomerBalances(
         updatedAt: new Date('2025-01-25T10:30:00Z'),
         isActive: true,
         createdBy: 'system',
-        updatedBy: 'system'
+        updatedBy: 'system',
       },
       {
         id: 'bal_002',
@@ -48,7 +48,7 @@ export async function getCustomerBalances(
         currentBalance: 350.25,
         availableBalance: 350.25,
         pendingWagers: 0,
-        creditLimit: 2000.00,
+        creditLimit: 2000.0,
         lastUpdated: new Date('2025-01-25T09:15:00Z'),
         currency: 'USD',
         status: 'active',
@@ -57,15 +57,15 @@ export async function getCustomerBalances(
         updatedAt: new Date('2025-01-25T09:15:00Z'),
         isActive: true,
         createdBy: 'system',
-        updatedBy: 'system'
+        updatedBy: 'system',
       },
       {
         id: 'bal_003',
         customerId: 'CUST_003',
-        currentBalance: -50.00,
-        availableBalance: -50.00,
+        currentBalance: -50.0,
+        availableBalance: -50.0,
         pendingWagers: 0,
-        creditLimit: 1000.00,
+        creditLimit: 1000.0,
         lastUpdated: new Date('2025-01-25T11:45:00Z'),
         currency: 'USD',
         status: 'active',
@@ -74,8 +74,8 @@ export async function getCustomerBalances(
         updatedAt: new Date('2025-01-25T11:45:00Z'),
         isActive: true,
         createdBy: 'system',
-        updatedBy: 'system'
-      }
+        updatedBy: 'system',
+      },
     ];
 
     // Apply filters
@@ -111,7 +111,7 @@ export async function getCustomerBalances(
       message: 'Customer balances retrieved successfully',
       data: {
         balances: paginatedBalances,
-        summary: calculateBalanceSummary(filteredBalances)
+        summary: calculateBalanceSummary(filteredBalances),
       },
       metadata: {
         timestamp: new Date(),
@@ -121,16 +121,15 @@ export async function getCustomerBalances(
           page,
           limit,
           total,
-          totalPages
-        }
-      }
+          totalPages,
+        },
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     const errorResponse: ApiResponse = {
       status: 'error',
@@ -139,13 +138,13 @@ export async function getCustomerBalances(
       metadata: {
         timestamp: new Date(),
         requestId: `customer_balances_error_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
@@ -159,7 +158,7 @@ export async function getAllBalancesSummary(request: ControllerRequest): Promise
     const mockSummary = {
       totalCustomers: 1250,
       activeCustomers: 1185,
-      totalBalance: 2456789.50,
+      totalBalance: 2456789.5,
       availableBalance: 2389456.75,
       pendingWagers: 67332.75,
       averageBalance: 1965.43,
@@ -169,21 +168,21 @@ export async function getAllBalancesSummary(request: ControllerRequest): Promise
         '100-500': 380,
         '500-1000': 295,
         '1000-5000': 285,
-        '5000+': 45
+        '5000+': 45,
       },
       negativeBalances: 23,
       creditUtilization: 67.8,
       topBalances: [
-        { customerId: 'CUST_001', balance: 50000.00, name: 'John Doe' },
-        { customerId: 'CUST_002', balance: 45000.00, name: 'Jane Smith' },
-        { customerId: 'CUST_003', balance: 42000.00, name: 'Bob Wilson' }
+        { customerId: 'CUST_001', balance: 50000.0, name: 'John Doe' },
+        { customerId: 'CUST_002', balance: 45000.0, name: 'Jane Smith' },
+        { customerId: 'CUST_003', balance: 42000.0, name: 'Bob Wilson' },
       ],
       recentActivity: {
-        deposits24h: 45670.50,
+        deposits24h: 45670.5,
         withdrawals24h: 38950.25,
         adjustments24h: 1250.75,
-        netChange24h: 6970.00
-      }
+        netChange24h: 6970.0,
+      },
     };
 
     const response: ApiResponse<typeof mockSummary> = {
@@ -193,15 +192,14 @@ export async function getAllBalancesSummary(request: ControllerRequest): Promise
       metadata: {
         timestamp: new Date(),
         requestId: `balance_summary_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     const errorResponse: ApiResponse = {
       status: 'error',
@@ -210,13 +208,13 @@ export async function getAllBalancesSummary(request: ControllerRequest): Promise
       metadata: {
         timestamp: new Date(),
         requestId: `balance_summary_error_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
@@ -244,18 +242,18 @@ export async function updateCustomerBalance(
         metadata: {
           timestamp: new Date(),
           requestId: `update_balance_error_${Date.now()}`,
-          processingTime: 0
-        }
+          processingTime: 0,
+        },
       };
 
       return new Response(JSON.stringify(errorResponse), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
     }
 
     // Mock current balance
-    const currentBalance = 1000.00;
+    const currentBalance = 1000.0;
     const newBalance = currentBalance + updateData.amount;
 
     // Create balance update record
@@ -273,7 +271,7 @@ export async function updateCustomerBalance(
       updatedAt: new Date(),
       isActive: true,
       createdBy: 'system',
-      updatedBy: 'system'
+      updatedBy: 'system',
     };
 
     const response: ApiResponse<BalanceUpdate> = {
@@ -283,15 +281,14 @@ export async function updateCustomerBalance(
       metadata: {
         timestamp: new Date(),
         requestId: `update_balance_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     const errorResponse: ApiResponse = {
       status: 'error',
@@ -300,13 +297,13 @@ export async function updateCustomerBalance(
       metadata: {
         timestamp: new Date(),
         requestId: `update_balance_error_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
@@ -317,13 +314,13 @@ export async function updateCustomerBalance(
 export async function getBalanceSettings(request: ControllerRequest): Promise<Response> {
   try {
     const mockSettings: BalanceSettings = {
-      minBalance: -1000.00,
-      maxBalance: 100000.00,
-      warningThreshold: 100.00,
-      criticalThreshold: 25.00,
-      requireApprovalThreshold: 5000.00,
+      minBalance: -1000.0,
+      maxBalance: 100000.0,
+      warningThreshold: 100.0,
+      criticalThreshold: 25.0,
+      requireApprovalThreshold: 5000.0,
       autoSettlementEnabled: true,
-      settlementDelayHours: 24
+      settlementDelayHours: 24,
     };
 
     const response: ApiResponse<BalanceSettings> = {
@@ -333,15 +330,14 @@ export async function getBalanceSettings(request: ControllerRequest): Promise<Re
       metadata: {
         timestamp: new Date(),
         requestId: `balance_settings_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     const errorResponse: ApiResponse = {
       status: 'error',
@@ -350,13 +346,13 @@ export async function getBalanceSettings(request: ControllerRequest): Promise<Re
       metadata: {
         timestamp: new Date(),
         requestId: `balance_settings_error_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
@@ -379,26 +375,26 @@ export async function updateBalanceSettings(
           metadata: {
             timestamp: new Date(),
             requestId: `update_balance_settings_error_${Date.now()}`,
-            processingTime: 0
-          }
+            processingTime: 0,
+          },
         };
 
         return new Response(JSON.stringify(errorResponse), {
           status: 400,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
         });
       }
     }
 
     const updatedSettings: BalanceSettings = {
-      minBalance: -1000.00,
-      maxBalance: 100000.00,
-      warningThreshold: 100.00,
-      criticalThreshold: 25.00,
-      requireApprovalThreshold: 5000.00,
+      minBalance: -1000.0,
+      maxBalance: 100000.0,
+      warningThreshold: 100.0,
+      criticalThreshold: 25.0,
+      requireApprovalThreshold: 5000.0,
       autoSettlementEnabled: true,
       settlementDelayHours: 24,
-      ...settings
+      ...settings,
     };
 
     const response: ApiResponse<BalanceSettings> = {
@@ -408,15 +404,14 @@ export async function updateBalanceSettings(
       metadata: {
         timestamp: new Date(),
         requestId: `update_balance_settings_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     const errorResponse: ApiResponse = {
       status: 'error',
@@ -425,13 +420,13 @@ export async function updateBalanceSettings(
       metadata: {
         timestamp: new Date(),
         requestId: `update_balance_settings_error_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
@@ -452,9 +447,9 @@ export async function getBalanceHistory(
       {
         id: 'hist_001',
         customerId,
-        previousBalance: 1000.00,
-        newBalance: 1050.00,
-        changeAmount: 50.00,
+        previousBalance: 1000.0,
+        newBalance: 1050.0,
+        changeAmount: 50.0,
         changeType: 'deposit',
         reference: 'DEP_001',
         performedBy: 'Agent Smith',
@@ -463,14 +458,14 @@ export async function getBalanceHistory(
         updatedAt: new Date('2025-01-25T10:00:00Z'),
         isActive: true,
         createdBy: 'system',
-        updatedBy: 'system'
+        updatedBy: 'system',
       },
       {
         id: 'hist_002',
         customerId,
-        previousBalance: 1050.00,
-        newBalance: 1000.00,
-        changeAmount: -50.00,
+        previousBalance: 1050.0,
+        newBalance: 1000.0,
+        changeAmount: -50.0,
         changeType: 'wager',
         reference: 'WAGER_001',
         performedBy: 'System',
@@ -479,8 +474,8 @@ export async function getBalanceHistory(
         updatedAt: new Date('2025-01-25T11:00:00Z'),
         isActive: true,
         createdBy: 'system',
-        updatedBy: 'system'
-      }
+        updatedBy: 'system',
+      },
     ];
 
     // Apply date filters
@@ -511,7 +506,7 @@ export async function getBalanceHistory(
       message: 'Balance history retrieved successfully',
       data: {
         history: paginatedHistory,
-        currentBalance: 1000.00 // Would get from actual balance
+        currentBalance: 1000.0, // Would get from actual balance
       },
       metadata: {
         timestamp: new Date(),
@@ -521,16 +516,15 @@ export async function getBalanceHistory(
           page,
           limit,
           total,
-          totalPages
-        }
-      }
+          totalPages,
+        },
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-
   } catch (error) {
     const errorResponse: ApiResponse = {
       status: 'error',
@@ -539,13 +533,13 @@ export async function getBalanceHistory(
       metadata: {
         timestamp: new Date(),
         requestId: `balance_history_error_${Date.now()}`,
-        processingTime: 0
-      }
+        processingTime: 0,
+      },
     };
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 }
@@ -560,6 +554,6 @@ function calculateBalanceSummary(balances: CustomerBalance[]) {
     totalCustomers: balances.length,
     totalBalance,
     averageBalance: balances.length > 0 ? totalBalance / balances.length : 0,
-    negativeBalances
+    negativeBalances,
   };
 }

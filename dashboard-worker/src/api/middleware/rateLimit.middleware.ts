@@ -1,6 +1,6 @@
 /**
  * Rate Limiting Middleware
- * 
+ *
  * Implements rate limiting with different strategies and storage backends
  */
 
@@ -44,56 +44,56 @@ interface RateLimitStore {
  */
 class MemoryStore implements RateLimitStore {
   private store = new Map<string, { info: RateLimitInfo; expiry: number }>();
-  
+
   async get(key: string): Promise<RateLimitInfo | null> {
     const record = this.store.get(key);
     if (!record) return null;
-    
+
     if (Date.now() > record.expiry) {
       this.store.delete(key);
       return null;
     }
-    
+
     return record.info;
   }
-  
+
   async set(key: string, info: RateLimitInfo, ttl: number): Promise<void> {
     this.store.set(key, {
       info,
-      expiry: Date.now() + ttl
+      expiry: Date.now() + ttl,
     });
   }
-  
+
   async increment(key: string, windowMs: number): Promise<RateLimitInfo> {
     const now = Date.now();
     const existing = await this.get(key);
-    
+
     if (existing) {
       const updated = {
         ...existing,
         totalHits: existing.totalHits + 1,
-        remainingTokens: Math.max(0, existing.remainingTokens - 1)
+        remainingTokens: Math.max(0, existing.remainingTokens - 1),
       };
-      
+
       await this.set(key, updated, windowMs);
       return updated;
     }
-    
+
     const newInfo: RateLimitInfo = {
       totalHits: 1,
       totalTokens: 1,
       remainingTokens: 0,
-      msBeforeNext: windowMs
+      msBeforeNext: windowMs,
     };
-    
+
     await this.set(key, newInfo, windowMs);
     return newInfo;
   }
-  
+
   async reset(key: string): Promise<void> {
     this.store.delete(key);
   }
-  
+
   // Cleanup expired entries
   cleanup(): void {
     const now = Date.now();
@@ -110,41 +110,41 @@ class MemoryStore implements RateLimitStore {
  */
 class CloudflareKVStore implements RateLimitStore {
   constructor(private kv: any) {}
-  
+
   async get(key: string): Promise<RateLimitInfo | null> {
     const value = await this.kv.get(key);
     return value ? JSON.parse(value) : null;
   }
-  
+
   async set(key: string, info: RateLimitInfo, ttl: number): Promise<void> {
     await this.kv.put(key, JSON.stringify(info), { expirationTtl: Math.floor(ttl / 1000) });
   }
-  
+
   async increment(key: string, windowMs: number): Promise<RateLimitInfo> {
     const existing = await this.get(key);
-    
+
     if (existing) {
       const updated = {
         ...existing,
         totalHits: existing.totalHits + 1,
-        remainingTokens: Math.max(0, existing.remainingTokens - 1)
+        remainingTokens: Math.max(0, existing.remainingTokens - 1),
       };
-      
+
       await this.set(key, updated, windowMs);
       return updated;
     }
-    
+
     const newInfo: RateLimitInfo = {
       totalHits: 1,
       totalTokens: 1,
       remainingTokens: 0,
-      msBeforeNext: windowMs
+      msBeforeNext: windowMs,
     };
-    
+
     await this.set(key, newInfo, windowMs);
     return newInfo;
   }
-  
+
   async reset(key: string): Promise<void> {
     await this.kv.delete(key);
   }
@@ -168,12 +168,12 @@ function defaultKeyGenerator(request: AuthenticatedRequest): string {
   if (userId) {
     return `user:${userId}`;
   }
-  
+
   // Try to get IP from various headers
   const forwarded = request.headers?.get?.('x-forwarded-for');
   const realIp = request.headers?.get?.('x-real-ip');
   const cfConnectingIp = request.headers?.get?.('cf-connecting-ip');
-  
+
   const ip = forwarded?.split(',')[0] || realIp || cfConnectingIp || 'unknown';
   return `ip:${ip}`;
 }
@@ -181,20 +181,23 @@ function defaultKeyGenerator(request: AuthenticatedRequest): string {
 /**
  * Get role-specific rate limits
  */
-function getRoleLimits(role: string, roleBasedLimits?: Record<string, { max: number; windowMs: number }>): { max: number; windowMs: number } {
+function getRoleLimits(
+  role: string,
+  roleBasedLimits?: Record<string, { max: number; windowMs: number }>
+): { max: number; windowMs: number } {
   if (!roleBasedLimits) {
     // Default limits by role
     const defaults: Record<string, { max: number; windowMs: number }> = {
-      admin: { max: 1000, windowMs: 60000 },    // 1000/min
-      manager: { max: 500, windowMs: 60000 },   // 500/min
-      agent: { max: 200, windowMs: 60000 },     // 200/min
-      customer: { max: 100, windowMs: 60000 },  // 100/min
-      public: { max: 20, windowMs: 60000 }      // 20/min
+      admin: { max: 1000, windowMs: 60000 }, // 1000/min
+      manager: { max: 500, windowMs: 60000 }, // 500/min
+      agent: { max: 200, windowMs: 60000 }, // 200/min
+      customer: { max: 100, windowMs: 60000 }, // 100/min
+      public: { max: 20, windowMs: 60000 }, // 20/min
     };
-    
+
     return defaults[role] || defaults.public;
   }
-  
+
   return roleBasedLimits[role] || roleBasedLimits.default || { max: 100, windowMs: 60000 };
 }
 
@@ -202,20 +205,23 @@ function getRoleLimits(role: string, roleBasedLimits?: Record<string, { max: num
  * Default response when rate limit is exceeded
  */
 function defaultLimitResponse(request: AuthenticatedRequest, retryAfter: number): Response {
-  return new Response(JSON.stringify({
-    error: 'Rate limit exceeded',
-    message: 'Too many requests, please try again later',
-    retryAfter: Math.ceil(retryAfter / 1000)
-  }), {
-    status: 429,
-    headers: {
-      'Content-Type': 'application/json',
-      'Retry-After': Math.ceil(retryAfter / 1000).toString(),
-      'X-RateLimit-Limit': '0',
-      'X-RateLimit-Remaining': '0',
-      'X-RateLimit-Reset': new Date(Date.now() + retryAfter).toISOString()
+  return new Response(
+    JSON.stringify({
+      error: 'Rate limit exceeded',
+      message: 'Too many requests, please try again later',
+      retryAfter: Math.ceil(retryAfter / 1000),
+    }),
+    {
+      status: 429,
+      headers: {
+        'Content-Type': 'application/json',
+        'Retry-After': Math.ceil(retryAfter / 1000).toString(),
+        'X-RateLimit-Limit': '0',
+        'X-RateLimit-Remaining': '0',
+        'X-RateLimit-Reset': new Date(Date.now() + retryAfter).toISOString(),
+      },
     }
-  });
+  );
 }
 
 /**
@@ -230,37 +236,37 @@ export function rateLimiter(options: RateLimitOptions = { max: 100, windowMs: 60
     skip,
     onLimitReached = defaultLimitResponse,
     standardHeaders = true,
-    store = memoryStore
+    store = memoryStore,
   } = options;
-  
+
   return async (request: AuthenticatedRequest): Promise<Response | void> => {
     try {
       // Skip rate limiting if specified
       if (skip && skip(request)) {
         return;
       }
-      
+
       // Generate rate limit key
       const key = keyGenerator(request);
-      
+
       // Get role-specific limits
       const userRole = request.user?.role || 'public';
-      const { max, windowMs } = roleBasedLimits ? 
-        getRoleLimits(userRole, roleBasedLimits) : 
-        { max: defaultMax, windowMs: defaultWindowMs };
-      
+      const { max, windowMs } = roleBasedLimits
+        ? getRoleLimits(userRole, roleBasedLimits)
+        : { max: defaultMax, windowMs: defaultWindowMs };
+
       // Get or create rate limit info
       const info = await store.increment(key, windowMs);
-      
+
       // Update remaining tokens based on max limit
       info.remainingTokens = Math.max(0, max - info.totalHits);
       info.totalTokens = max;
-      
+
       // Check if limit exceeded
       if (info.totalHits > max) {
         return onLimitReached(request, info.msBeforeNext);
       }
-      
+
       // Add rate limit headers if requested
       if (standardHeaders) {
         // Store headers on request for later use
@@ -268,15 +274,14 @@ export function rateLimiter(options: RateLimitOptions = { max: 100, windowMs: 60
           'X-RateLimit-Limit': max.toString(),
           'X-RateLimit-Remaining': info.remainingTokens.toString(),
           'X-RateLimit-Reset': new Date(Date.now() + info.msBeforeNext).toISOString(),
-          'X-RateLimit-Used': info.totalHits.toString()
+          'X-RateLimit-Used': info.totalHits.toString(),
         };
       }
-      
+
       return;
-      
     } catch (error: any) {
       console.error('Rate limiting error:', error);
-      
+
       // If rate limiting fails, don't block the request
       // This ensures availability over strict rate limiting
       return;
@@ -293,20 +298,20 @@ export const roleBasedRateLimits = {
     max: 1000,
     windowMs: 60000, // 1000 requests per minute
     roleBasedLimits: {
-      admin: { max: 1000, windowMs: 60000 }
-    }
+      admin: { max: 1000, windowMs: 60000 },
+    },
   }),
-  
+
   /** Moderate limits for managers */
   manager: rateLimiter({
     max: 500,
     windowMs: 60000, // 500 requests per minute
     roleBasedLimits: {
       admin: { max: 1000, windowMs: 60000 },
-      manager: { max: 500, windowMs: 60000 }
-    }
+      manager: { max: 500, windowMs: 60000 },
+    },
   }),
-  
+
   /** Standard limits for agents */
   agent: rateLimiter({
     max: 200,
@@ -314,10 +319,10 @@ export const roleBasedRateLimits = {
     roleBasedLimits: {
       admin: { max: 1000, windowMs: 60000 },
       manager: { max: 500, windowMs: 60000 },
-      agent: { max: 200, windowMs: 60000 }
-    }
+      agent: { max: 200, windowMs: 60000 },
+    },
   }),
-  
+
   /** Conservative limits for customers */
   customer: rateLimiter({
     max: 100,
@@ -326,18 +331,18 @@ export const roleBasedRateLimits = {
       admin: { max: 1000, windowMs: 60000 },
       manager: { max: 500, windowMs: 60000 },
       agent: { max: 200, windowMs: 60000 },
-      customer: { max: 100, windowMs: 60000 }
-    }
+      customer: { max: 100, windowMs: 60000 },
+    },
   }),
-  
+
   /** Strict limits for public endpoints */
   public: rateLimiter({
     max: 20,
     windowMs: 60000, // 20 requests per minute
     roleBasedLimits: {
-      public: { max: 20, windowMs: 60000 }
-    }
-  })
+      public: { max: 20, windowMs: 60000 },
+    },
+  }),
 };
 
 /**
@@ -348,37 +353,38 @@ export const endpointRateLimits = {
   login: rateLimiter({
     max: 5,
     windowMs: 300000, // 5 attempts per 5 minutes
-    keyGenerator: (request) => {
-      const ip = request.headers?.get?.('cf-connecting-ip') || 
-                 request.headers?.get?.('x-forwarded-for')?.split(',')[0] ||
-                 'unknown';
+    keyGenerator: request => {
+      const ip =
+        request.headers?.get?.('cf-connecting-ip') ||
+        request.headers?.get?.('x-forwarded-for')?.split(',')[0] ||
+        'unknown';
       return `login:${ip}`;
-    }
+    },
   }),
-  
+
   /** Password reset - strict */
   passwordReset: rateLimiter({
     max: 3,
     windowMs: 900000, // 3 attempts per 15 minutes
   }),
-  
+
   /** File uploads - moderate */
   upload: rateLimiter({
     max: 10,
     windowMs: 300000, // 10 uploads per 5 minutes
   }),
-  
+
   /** Search operations - moderate */
   search: rateLimiter({
     max: 50,
     windowMs: 60000, // 50 searches per minute
   }),
-  
+
   /** Report generation - strict */
   reports: rateLimiter({
     max: 10,
     windowMs: 300000, // 10 reports per 5 minutes
-  })
+  }),
 };
 
 /**
@@ -392,7 +398,7 @@ export function createCloudflareKVStore(kv: any): CloudflareKVStore {
  * Get rate limit status for a key
  */
 export async function getRateLimitStatus(
-  key: string, 
+  key: string,
   store: RateLimitStore = memoryStore
 ): Promise<RateLimitInfo | null> {
   return await store.get(key);
@@ -418,14 +424,14 @@ export function addRateLimitHeaders(response: Response, request: AuthenticatedRe
     for (const [key, value] of Object.entries(headers)) {
       newHeaders.set(key, value as string);
     }
-    
+
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
-      headers: newHeaders
+      headers: newHeaders,
     });
   }
-  
+
   return response;
 }
 

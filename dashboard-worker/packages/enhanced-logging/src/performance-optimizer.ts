@@ -2,7 +2,11 @@
  * Performance Optimizer - Actionable insights for system optimization
  */
 
-import { AdvancedAnalyticsLogger, AnalyticsLogEntry, CacheAnalysis } from './advanced-analytics-logger';
+import {
+  AdvancedAnalyticsLogger,
+  AnalyticsLogEntry,
+  CacheAnalysis,
+} from './advanced-analytics-logger';
 import { LogLevel, LogContext } from './types';
 
 // Performance Metrics Interface
@@ -89,21 +93,21 @@ export class PerformanceOptimizer {
   // Performance thresholds
   private thresholds = {
     responseTime: {
-      warning: 500,    // 500ms
-      critical: 2000   // 2 seconds
+      warning: 500, // 500ms
+      critical: 2000, // 2 seconds
     },
     errorRate: {
-      warning: 0.01,   // 1%
-      critical: 0.05   // 5%
+      warning: 0.01, // 1%
+      critical: 0.05, // 5%
     },
     cacheHitRate: {
-      warning: 0.85,   // 85%
-      critical: 0.70   // 70%
+      warning: 0.85, // 85%
+      critical: 0.7, // 70%
     },
     throughput: {
-      warning: 100,    // RPS
-      critical: 50     // RPS
-    }
+      warning: 100, // RPS
+      critical: 50, // RPS
+    },
   };
 
   constructor(analyticsLogger: AdvancedAnalyticsLogger) {
@@ -140,7 +144,7 @@ export class PerformanceOptimizer {
       currentMetrics,
       recommendations,
       alerts,
-      trends
+      trends,
     };
   }
 
@@ -171,9 +175,9 @@ export class PerformanceOptimizer {
             'Implement cache warming for hot keys',
             'Optimize cache key structure',
             'Increase cache size if necessary',
-            'Add cache monitoring alerts'
+            'Add cache monitoring alerts',
           ],
-          priority: stats.hitRate < 0.6 ? 'HIGH' : 'MEDIUM'
+          priority: stats.hitRate < 0.6 ? 'HIGH' : 'MEDIUM',
         });
       }
 
@@ -189,9 +193,9 @@ export class PerformanceOptimizer {
             'Optimize serialization/deserialization',
             'Consider cache locality improvements',
             'Implement connection pooling',
-            'Review cache infrastructure'
+            'Review cache infrastructure',
           ],
-          priority: stats.averageLatency > 100 ? 'HIGH' : 'MEDIUM'
+          priority: stats.averageLatency > 100 ? 'HIGH' : 'MEDIUM',
         });
       }
 
@@ -207,9 +211,9 @@ export class PerformanceOptimizer {
             'Compress cached data',
             'Remove unused cache entries',
             'Implement cache size monitoring',
-            'Consider cache partitioning'
+            'Consider cache partitioning',
           ],
-          priority: 'HIGH'
+          priority: 'HIGH',
         });
       }
     });
@@ -245,7 +249,7 @@ export class PerformanceOptimizer {
       if (!analysisMap.has(type)) {
         analysisMap.set(type, {
           failures: [],
-          totalImpact: 0
+          totalImpact: 0,
         });
       }
       const group = analysisMap.get(type);
@@ -256,10 +260,10 @@ export class PerformanceOptimizer {
     const results = [];
     analysisMap.forEach((group, failureType) => {
       const avgImpact = group.totalImpact / group.failures.length;
-      
+
       // Analyze root causes
       const rootCauses = this.analyzeRootCauses(group.failures);
-      
+
       results.push({
         failureType,
         frequency: group.failures.length,
@@ -267,11 +271,11 @@ export class PerformanceOptimizer {
         rootCauses,
         quickFixes: this.generateQuickFixes(failureType),
         longTermSolutions: this.generateLongTermSolutions(failureType),
-        monitoringImprovements: this.generateMonitoringImprovements(failureType)
+        monitoringImprovements: this.generateMonitoringImprovements(failureType),
       });
     });
 
-    return results.sort((a, b) => (b.frequency * b.averageImpact) - (a.frequency * a.averageImpact));
+    return results.sort((a, b) => b.frequency * b.averageImpact - a.frequency * a.averageImpact);
   }
 
   /**
@@ -318,16 +322,16 @@ export class PerformanceOptimizer {
         requestsPerSecond: currentMetrics.throughput.requestsPerSecond,
         averageResponseTime: currentMetrics.responseTime.average,
         errorRate: currentMetrics.errorRates.total,
-        cacheHitRate: currentMetrics.cachePerformance.overallHitRate
+        cacheHitRate: currentMetrics.cachePerformance.overallHitRate,
       },
       alerts: {
         critical: recentAlerts.filter(a => a.severity === 'CRITICAL').length,
         warning: recentAlerts.filter(a => a.severity === 'WARNING').length,
-        info: recentAlerts.filter(a => a.severity === 'INFO').length
+        info: recentAlerts.filter(a => a.severity === 'INFO').length,
       },
       topIssues: this.getTopIssues(),
       optimizationOpportunities: this.getTopOptimizations(),
-      systemHealth: this.calculateSystemHealth(currentMetrics)
+      systemHealth: this.calculateSystemHealth(currentMetrics),
     };
   }
 
@@ -349,14 +353,14 @@ export class PerformanceOptimizer {
       p50: this.percentile(responseTimes, 50),
       p95: this.percentile(responseTimes, 95),
       p99: this.percentile(responseTimes, 99),
-      average: responseTimes.reduce((sum, t) => sum + t, 0) / Math.max(responseTimes.length, 1)
+      average: responseTimes.reduce((sum, t) => sum + t, 0) / Math.max(responseTimes.length, 1),
     };
 
     // Calculate throughput
     const throughput = {
       requestsPerSecond: recentEntries.length / 60,
       transactionsPerSecond: recentEntries.filter(e => e.entityType === 'TRANSACTION').length / 60,
-      peakRPS: this.calculatePeakRPS(recentEntries)
+      peakRPS: this.calculatePeakRPS(recentEntries),
     };
 
     // Calculate error rates
@@ -364,7 +368,7 @@ export class PerformanceOptimizer {
     const errorRates = {
       total: errorEntries.length / Math.max(recentEntries.length, 1),
       byType: this.groupErrorsByType(errorEntries),
-      trend: this.calculateErrorTrend() as 'increasing' | 'decreasing' | 'stable'
+      trend: this.calculateErrorTrend() as 'increasing' | 'decreasing' | 'stable',
     };
 
     // Get cache performance
@@ -372,7 +376,7 @@ export class PerformanceOptimizer {
     const cachePerformance = {
       overallHitRate: this.calculateOverallHitRate(cacheAnalysis),
       byType: cacheAnalysis,
-      missReasons: this.analyzeCacheMissReasons(recentEntries)
+      missReasons: this.analyzeCacheMissReasons(recentEntries),
     };
 
     // Calculate resource utilization (simulated for demo)
@@ -380,7 +384,7 @@ export class PerformanceOptimizer {
       cpu: Math.random() * 100,
       memory: Math.random() * 100,
       disk: Math.random() * 100,
-      network: Math.random() * 100
+      network: Math.random() * 100,
     };
 
     return {
@@ -388,47 +392,50 @@ export class PerformanceOptimizer {
       throughput,
       errorRates,
       cachePerformance,
-      resourceUtilization
+      resourceUtilization,
     };
   }
 
-  private generateOptimizationRecommendations(metrics: PerformanceMetrics): OptimizationRecommendation[] {
+  private generateOptimizationRecommendations(
+    metrics: PerformanceMetrics
+  ): OptimizationRecommendation[] {
     const recommendations: OptimizationRecommendation[] = [];
 
     // Response time optimization
     if (metrics.responseTime.p95 > this.thresholds.responseTime.warning) {
       recommendations.push({
         id: `OPT_RESPONSE_TIME_${Date.now()}`,
-        priority: metrics.responseTime.p95 > this.thresholds.responseTime.critical ? 'CRITICAL' : 'HIGH',
+        priority:
+          metrics.responseTime.p95 > this.thresholds.responseTime.critical ? 'CRITICAL' : 'HIGH',
         category: 'CODE',
         title: 'Optimize Response Time Performance',
         description: `95th percentile response time of ${metrics.responseTime.p95.toFixed(0)}ms exceeds optimal performance`,
         currentState: {
           metric: 'P95 Response Time',
           value: metrics.responseTime.p95,
-          unit: 'ms'
+          unit: 'ms',
         },
         targetState: {
           metric: 'P95 Response Time',
           value: 200,
           unit: 'ms',
-          expectedImprovement: `${((metrics.responseTime.p95 - 200) / metrics.responseTime.p95 * 100).toFixed(1)}% reduction`
+          expectedImprovement: `${(((metrics.responseTime.p95 - 200) / metrics.responseTime.p95) * 100).toFixed(1)}% reduction`,
         },
         implementationSteps: [
           'Profile critical code paths',
           'Optimize database queries',
           'Implement response caching',
           'Add performance monitoring',
-          'Consider code optimization'
+          'Consider code optimization',
         ],
         estimatedEffort: 'MEDIUM',
         expectedBenefits: {
           performanceGain: '40-60% response time improvement',
           costSavings: '15-25% infrastructure cost reduction',
-          riskReduction: 'Reduced timeout-related failures'
+          riskReduction: 'Reduced timeout-related failures',
         },
         dependencies: ['Performance monitoring setup', 'Database optimization'],
-        validationMethods: ['Load testing', 'Performance monitoring', 'User experience metrics']
+        validationMethods: ['Load testing', 'Performance monitoring', 'User experience metrics'],
       });
     }
 
@@ -436,36 +443,39 @@ export class PerformanceOptimizer {
     if (metrics.cachePerformance.overallHitRate < this.thresholds.cacheHitRate.warning) {
       recommendations.push({
         id: `OPT_CACHE_HIT_RATE_${Date.now()}`,
-        priority: metrics.cachePerformance.overallHitRate < this.thresholds.cacheHitRate.critical ? 'CRITICAL' : 'HIGH',
+        priority:
+          metrics.cachePerformance.overallHitRate < this.thresholds.cacheHitRate.critical
+            ? 'CRITICAL'
+            : 'HIGH',
         category: 'CACHE',
         title: 'Improve Cache Hit Rate',
         description: `Overall cache hit rate of ${(metrics.cachePerformance.overallHitRate * 100).toFixed(1)}% is below optimal`,
         currentState: {
           metric: 'Cache Hit Rate',
           value: metrics.cachePerformance.overallHitRate * 100,
-          unit: '%'
+          unit: '%',
         },
         targetState: {
           metric: 'Cache Hit Rate',
           value: 92,
           unit: '%',
-          expectedImprovement: `${((0.92 - metrics.cachePerformance.overallHitRate) * 100).toFixed(1)}% improvement`
+          expectedImprovement: `${((0.92 - metrics.cachePerformance.overallHitRate) * 100).toFixed(1)}% improvement`,
         },
         implementationSteps: [
           'Analyze cache miss patterns',
           'Implement cache warming strategies',
           'Optimize cache key design',
           'Increase cache TTL where appropriate',
-          'Monitor cache performance'
+          'Monitor cache performance',
         ],
         estimatedEffort: 'MEDIUM',
         expectedBenefits: {
           performanceGain: '25-40% response time improvement',
           costSavings: '10-20% database load reduction',
-          riskReduction: 'Improved system resilience'
+          riskReduction: 'Improved system resilience',
         },
         dependencies: ['Cache monitoring', 'Performance analysis'],
-        validationMethods: ['Cache metrics monitoring', 'Response time analysis']
+        validationMethods: ['Cache metrics monitoring', 'Response time analysis'],
       });
     }
 
@@ -483,15 +493,20 @@ export class PerformanceOptimizer {
       alerts.push({
         id: `PERF_ALERT_ERROR_RATE_${Date.now()}`,
         timestamp: new Date(),
-        severity: metrics.errorRates.total > this.thresholds.errorRate.critical ? 'CRITICAL' : 'WARNING',
+        severity:
+          metrics.errorRates.total > this.thresholds.errorRate.critical ? 'CRITICAL' : 'WARNING',
         metric: 'Error Rate',
         currentValue: metrics.errorRates.total * 100,
         threshold: this.thresholds.errorRate.warning * 100,
         trend: metrics.errorRates.trend as any,
         affectedComponents: ['API', 'Transaction Processing'],
         automaticActions: ['Scale up instances', 'Enable circuit breaker'],
-        recommendedActions: ['Review recent deployments', 'Check system health', 'Validate dependencies'],
-        correlatedEvents: ['High response time', 'Database connectivity issues']
+        recommendedActions: [
+          'Review recent deployments',
+          'Check system health',
+          'Validate dependencies',
+        ],
+        correlatedEvents: ['High response time', 'Database connectivity issues'],
       });
     }
 
@@ -503,14 +518,14 @@ export class PerformanceOptimizer {
     setInterval(() => {
       const metrics = this.calculateCurrentMetrics();
       const alerts = this.generatePerformanceAlerts(metrics);
-      
+
       alerts.forEach(alert => {
         this.alertHistory.push(alert);
         if (alert.severity === 'CRITICAL') {
           console.error(`🚨 PERFORMANCE ALERT: ${alert.metric} - ${alert.currentValue}`, alert);
         }
       });
-      
+
       // Keep alert history manageable
       if (this.alertHistory.length > 1000) {
         this.alertHistory = this.alertHistory.slice(-500);
@@ -549,12 +564,12 @@ export class PerformanceOptimizer {
 
   private calculateErrorTrend(): string {
     if (this.performanceHistory.length < 2) return 'stable';
-    
+
     const current = this.performanceHistory[this.performanceHistory.length - 1].errorRates.total;
     const previous = this.performanceHistory[this.performanceHistory.length - 2].errorRates.total;
-    
+
     const change = (current - previous) / Math.max(previous, 0.001);
-    
+
     if (change > 0.1) return 'increasing';
     if (change < -0.1) return 'decreasing';
     return 'stable';
@@ -562,25 +577,27 @@ export class PerformanceOptimizer {
 
   private calculateOverallHitRate(cacheAnalysis: Map<string, CacheAnalysis>): number {
     if (cacheAnalysis.size === 0) return 0;
-    
+
     let totalHits = 0;
     let totalRequests = 0;
-    
+
     cacheAnalysis.forEach(stats => {
       const hits = stats.hitRate * stats.totalRequests;
       totalHits += hits;
       totalRequests += stats.totalRequests;
     });
-    
+
     return totalRequests > 0 ? totalHits / totalRequests : 0;
   }
 
   private analyzeCacheMissReasons(entries: any[]): Map<string, number> {
     const reasons = new Map<string, number>();
-    entries.filter(e => e.cacheHit === false).forEach(entry => {
-      const reason = entry.metadata?.missReason || 'UNKNOWN';
-      reasons.set(reason, (reasons.get(reason) || 0) + 1);
-    });
+    entries
+      .filter(e => e.cacheHit === false)
+      .forEach(entry => {
+        const reason = entry.metadata?.missReason || 'UNKNOWN';
+        reasons.set(reason, (reasons.get(reason) || 0) + 1);
+      });
     return reasons;
   }
 
@@ -598,69 +615,111 @@ export class PerformanceOptimizer {
     const trends = [];
 
     // Response time trend
-    const responseChange = (current.responseTime.average - previous.responseTime.average) / previous.responseTime.average * 100;
+    const responseChange =
+      ((current.responseTime.average - previous.responseTime.average) /
+        previous.responseTime.average) *
+      100;
     trends.push({
       metric: 'Response Time',
       direction: responseChange > 5 ? 'up' : responseChange < -5 ? 'down' : 'stable',
       changePercent: Math.abs(responseChange),
-      significance: Math.abs(responseChange) > 25 ? 'high' : Math.abs(responseChange) > 10 ? 'medium' : 'low'
+      significance:
+        Math.abs(responseChange) > 25 ? 'high' : Math.abs(responseChange) > 10 ? 'medium' : 'low',
     });
 
     // Error rate trend
-    const errorChange = (current.errorRates.total - previous.errorRates.total) / Math.max(previous.errorRates.total, 0.001) * 100;
+    const errorChange =
+      ((current.errorRates.total - previous.errorRates.total) /
+        Math.max(previous.errorRates.total, 0.001)) *
+      100;
     trends.push({
       metric: 'Error Rate',
       direction: errorChange > 10 ? 'up' : errorChange < -10 ? 'down' : 'stable',
       changePercent: Math.abs(errorChange),
-      significance: Math.abs(errorChange) > 50 ? 'high' : Math.abs(errorChange) > 20 ? 'medium' : 'low'
+      significance:
+        Math.abs(errorChange) > 50 ? 'high' : Math.abs(errorChange) > 20 ? 'medium' : 'low',
     });
 
     return trends;
   }
 
-  private analyzeRootCauses(failures: any[]): Array<{ cause: string; likelihood: number; prevention: string[]; }> {
+  private analyzeRootCauses(
+    failures: any[]
+  ): Array<{ cause: string; likelihood: number; prevention: string[] }> {
     // Simplified root cause analysis
     const causes = [
       {
         cause: 'Database connection timeout',
         likelihood: 0.3,
-        prevention: ['Implement connection pooling', 'Add database monitoring', 'Set appropriate timeouts']
+        prevention: [
+          'Implement connection pooling',
+          'Add database monitoring',
+          'Set appropriate timeouts',
+        ],
       },
       {
         cause: 'High memory usage',
         likelihood: 0.25,
-        prevention: ['Optimize memory usage', 'Implement garbage collection tuning', 'Add memory monitoring']
+        prevention: [
+          'Optimize memory usage',
+          'Implement garbage collection tuning',
+          'Add memory monitoring',
+        ],
       },
       {
         cause: 'External API failure',
         likelihood: 0.2,
-        prevention: ['Implement circuit breaker', 'Add retry logic', 'Use fallback mechanisms']
-      }
+        prevention: ['Implement circuit breaker', 'Add retry logic', 'Use fallback mechanisms'],
+      },
     ];
-    
+
     return causes.sort((a, b) => b.likelihood - a.likelihood);
   }
 
   private generateQuickFixes(failureType: string): string[] {
     const quickFixes: Record<string, string[]> = {
-      'DATABASE_TIMEOUT': ['Restart database connections', 'Clear connection pool', 'Scale database instances'],
-      'MEMORY_ERROR': ['Restart affected services', 'Clear caches', 'Trigger garbage collection'],
-      'API_FAILURE': ['Enable circuit breaker', 'Switch to fallback service', 'Retry failed requests'],
-      'NETWORK_ERROR': ['Check network connectivity', 'Restart network interfaces', 'Use alternative routes']
+      DATABASE_TIMEOUT: [
+        'Restart database connections',
+        'Clear connection pool',
+        'Scale database instances',
+      ],
+      MEMORY_ERROR: ['Restart affected services', 'Clear caches', 'Trigger garbage collection'],
+      API_FAILURE: [
+        'Enable circuit breaker',
+        'Switch to fallback service',
+        'Retry failed requests',
+      ],
+      NETWORK_ERROR: [
+        'Check network connectivity',
+        'Restart network interfaces',
+        'Use alternative routes',
+      ],
     };
-    
-    return quickFixes[failureType] || ['Restart affected service', 'Check system logs', 'Monitor system health'];
+
+    return (
+      quickFixes[failureType] || [
+        'Restart affected service',
+        'Check system logs',
+        'Monitor system health',
+      ]
+    );
   }
 
   private generateLongTermSolutions(failureType: string): string[] {
     const longTermSolutions: Record<string, string[]> = {
-      'DATABASE_TIMEOUT': ['Implement database clustering', 'Optimize queries', 'Add read replicas'],
-      'MEMORY_ERROR': ['Implement memory profiling', 'Optimize data structures', 'Add memory limits'],
-      'API_FAILURE': ['Implement service mesh', 'Add comprehensive monitoring', 'Design for failure'],
-      'NETWORK_ERROR': ['Implement redundant networks', 'Add network monitoring', 'Use CDN']
+      DATABASE_TIMEOUT: ['Implement database clustering', 'Optimize queries', 'Add read replicas'],
+      MEMORY_ERROR: ['Implement memory profiling', 'Optimize data structures', 'Add memory limits'],
+      API_FAILURE: ['Implement service mesh', 'Add comprehensive monitoring', 'Design for failure'],
+      NETWORK_ERROR: ['Implement redundant networks', 'Add network monitoring', 'Use CDN'],
     };
-    
-    return longTermSolutions[failureType] || ['Implement comprehensive monitoring', 'Add redundancy', 'Design for resilience'];
+
+    return (
+      longTermSolutions[failureType] || [
+        'Implement comprehensive monitoring',
+        'Add redundancy',
+        'Design for resilience',
+      ]
+    );
   }
 
   private generateMonitoringImprovements(failureType: string): string[] {
@@ -669,7 +728,7 @@ export class PerformanceOptimizer {
       'Implement distributed tracing',
       'Add business metrics monitoring',
       'Create custom dashboards',
-      'Implement anomaly detection'
+      'Implement anomaly detection',
     ];
   }
 
@@ -678,35 +737,43 @@ export class PerformanceOptimizer {
     return Math.floor(Math.random() * 1000) + 500;
   }
 
-  private getTopIssues(): Array<{ title: string; severity: string; count: number; trend: string; }> {
+  private getTopIssues(): Array<{ title: string; severity: string; count: number; trend: string }> {
     return [
       { title: 'Cache miss rate high', severity: 'WARNING', count: 45, trend: 'increasing' },
       { title: 'Database query timeout', severity: 'ERROR', count: 12, trend: 'stable' },
-      { title: 'API response time degraded', severity: 'WARNING', count: 23, trend: 'improving' }
+      { title: 'API response time degraded', severity: 'WARNING', count: 23, trend: 'improving' },
     ];
   }
 
-  private getTopOptimizations(): Array<{ title: string; impact: string; effort: string; roi: number; }> {
+  private getTopOptimizations(): Array<{
+    title: string;
+    impact: string;
+    effort: string;
+    roi: number;
+  }> {
     return [
       { title: 'Optimize cache strategy', impact: 'HIGH', effort: 'MEDIUM', roi: 8.5 },
       { title: 'Database query optimization', impact: 'MEDIUM', effort: 'LOW', roi: 6.2 },
-      { title: 'API response caching', impact: 'MEDIUM', effort: 'MEDIUM', roi: 4.8 }
+      { title: 'API response caching', impact: 'MEDIUM', effort: 'MEDIUM', roi: 4.8 },
     ];
   }
 
-  private calculateSystemHealth(metrics: PerformanceMetrics): { overall: number; components: Map<string, number>; } {
+  private calculateSystemHealth(metrics: PerformanceMetrics): {
+    overall: number;
+    components: Map<string, number>;
+  } {
     const components = new Map<string, number>();
-    
+
     // Calculate component health scores
     components.set('API', metrics.responseTime.average < 500 ? 95 : 70);
     components.set('Database', metrics.errorRates.total < 0.01 ? 90 : 60);
     components.set('Cache', metrics.cachePerformance.overallHitRate * 100);
     components.set('Network', 85); // Simulated
-    
+
     // Calculate overall health
     const scores = Array.from(components.values());
     const overall = scores.reduce((sum, score) => sum + score, 0) / scores.length;
-    
+
     return { overall, components };
   }
 }

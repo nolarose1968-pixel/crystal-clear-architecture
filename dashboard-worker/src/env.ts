@@ -7,22 +7,22 @@
 export function getEnvVar(key: string, defaultValue?: string): string {
   // In Cloudflare Workers, env variables come from the Env interface
   // In local development, Bun automatically loads .env files into process.env
-  
+
   // Try to get from process.env first (local development)
   if (typeof process !== 'undefined' && process.env && process.env[key]) {
     return process.env[key]!;
   }
-  
+
   // Try to get from Bun.env (Bun runtime)
   if (typeof Bun !== 'undefined' && Bun.env && Bun.env[key]) {
     return Bun.env[key]!;
   }
-  
+
   // Return default value if provided
   if (defaultValue !== undefined) {
     return defaultValue;
   }
-  
+
   // Throw error for required environment variables
   throw new Error(`Required environment variable ${key} is not set`);
 }
@@ -56,7 +56,7 @@ export function getEnvVarBoolean(key: string, defaultValue?: boolean): boolean {
 // Environment validation
 export function validateRequiredEnvVars(requiredVars: string[]): void {
   const missing: string[] = [];
-  
+
   for (const varName of requiredVars) {
     try {
       getEnvVar(varName);
@@ -64,7 +64,7 @@ export function validateRequiredEnvVars(requiredVars: string[]): void {
       missing.push(varName);
     }
   }
-  
+
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }
@@ -73,7 +73,7 @@ export function validateRequiredEnvVars(requiredVars: string[]): void {
 // Get all environment variables as a record
 export function getAllEnvVars(): Record<string, string> {
   const env: Record<string, string> = {};
-  
+
   // Get from process.env (local development)
   if (typeof process !== 'undefined' && process.env) {
     for (const [key, value] of Object.entries(process.env)) {
@@ -82,7 +82,7 @@ export function getAllEnvVars(): Record<string, string> {
       }
     }
   }
-  
+
   // Get from Bun.env (Bun runtime)
   if (typeof Bun !== 'undefined' && Bun.env) {
     for (const [key, value] of Object.entries(Bun.env)) {
@@ -91,7 +91,7 @@ export function getAllEnvVars(): Record<string, string> {
       }
     }
   }
-  
+
   return env;
 }
 

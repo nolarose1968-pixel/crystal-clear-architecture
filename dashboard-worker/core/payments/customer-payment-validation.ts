@@ -3,8 +3,14 @@
  * Validates payment methods against customer history and flags anomalies
  */
 
-import { CustomerDatabaseManagement, CustomerProfile } from '../customers/customer-database-management';
-import { DepositWithdrawalSystem, FinancialTransaction } from '../finance/deposit-withdrawal-system';
+import {
+  CustomerDatabaseManagement,
+  CustomerProfile,
+} from '../customers/customer-database-management';
+import {
+  DepositWithdrawalSystem,
+  FinancialTransaction,
+} from '../finance/deposit-withdrawal-system';
 import { P2PPaymentMatching, P2PPaymentRequest } from './p2p-payment-matching';
 
 export interface PaymentMethodHistory {
@@ -82,7 +88,12 @@ export interface PaymentValidationResult {
 export interface PaymentMethodAlert {
   id: string;
   customerId: string;
-  alertType: 'new_payment_method' | 'unusual_amount' | 'high_frequency' | 'suspicious_pattern' | 'account_issue';
+  alertType:
+    | 'new_payment_method'
+    | 'unusual_amount'
+    | 'high_frequency'
+    | 'suspicious_pattern'
+    | 'account_issue';
   paymentMethod: string;
   username?: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
@@ -180,12 +191,12 @@ export class CustomerPaymentValidation {
         historyCheck,
         consistencyCheck,
         frequencyCheck,
-        riskCheck
+        riskCheck,
       },
       recommendations,
       warnings,
       requiresApproval,
-      suggestedLimits
+      suggestedLimits,
     };
 
     // Create alerts for concerning patterns
@@ -227,10 +238,11 @@ export class CustomerPaymentValidation {
     const transactions = this.financialSystem.getCustomerTransactions(customerId);
 
     // Filter transactions by payment method
-    const methodTransactions = transactions.filter(t =>
-      t.paymentMethod === paymentMethod ||
-      (paymentMethod === 'venmo' && t.metadata?.paymentDetails?.username?.startsWith('@')) ||
-      (paymentMethod === 'cashapp' && t.metadata?.paymentDetails?.username?.startsWith('$'))
+    const methodTransactions = transactions.filter(
+      t =>
+        t.paymentMethod === paymentMethod ||
+        (paymentMethod === 'venmo' && t.metadata?.paymentDetails?.username?.startsWith('@')) ||
+        (paymentMethod === 'cashapp' && t.metadata?.paymentDetails?.username?.startsWith('$'))
     );
 
     const successfulTransactions = methodTransactions.filter(t => t.status === 'completed');
@@ -243,13 +255,15 @@ export class CustomerPaymentValidation {
     methodTransactions.forEach(transaction => {
       const paymentDetails = transaction.metadata?.paymentDetails;
       if (paymentDetails?.username) {
-        const existingAccount = verifiedAccounts.find(acc => acc.username === paymentDetails.username);
+        const existingAccount = verifiedAccounts.find(
+          acc => acc.username === paymentDetails.username
+        );
         if (!existingAccount) {
           verifiedAccounts.push({
             username: paymentDetails.username,
             verifiedAt: transaction.createdAt,
             verificationMethod: 'transaction',
-            isActive: true
+            isActive: true,
           });
         }
       }
@@ -260,7 +274,7 @@ export class CustomerPaymentValidation {
           date: transaction.createdAt,
           description: transaction.failureReason,
           severity: 'medium',
-          resolved: false
+          resolved: false,
         });
       }
     });
@@ -268,23 +282,30 @@ export class CustomerPaymentValidation {
     // Calculate metrics
     const totalTransactions = methodTransactions.length;
     const totalVolume = successfulTransactions.reduce((sum, t) => sum + t.amount, 0);
-    const successRate = totalTransactions > 0 ? successfulTransactions.length / totalTransactions : 0;
-    const averageAmount = successfulTransactions.length > 0 ?
-      totalVolume / successfulTransactions.length : 0;
+    const successRate =
+      totalTransactions > 0 ? successfulTransactions.length / totalTransactions : 0;
+    const averageAmount =
+      successfulTransactions.length > 0 ? totalVolume / successfulTransactions.length : 0;
 
     // Calculate frequency score (transactions per month)
     const customer = this.customerManager.getCustomerProfile(customerId);
-    const accountAgeMonths = customer ? this.calculateAccountAgeMonths(customer.accountInfo.registrationDate) : 1;
+    const accountAgeMonths = customer
+      ? this.calculateAccountAgeMonths(customer.accountInfo.registrationDate)
+      : 1;
     const frequencyScore = totalTransactions / Math.max(accountAgeMonths, 1);
 
     // Calculate reliability score
-    const reliabilityScore = Math.min(successRate * 100 - (issues.length * 10), 100);
+    const reliabilityScore = Math.min(successRate * 100 - issues.length * 10, 100);
 
     return {
       customerId,
       paymentMethod,
-      firstUsed: methodTransactions.length > 0 ? methodTransactions[0].createdAt : new Date().toISOString(),
-      lastUsed: methodTransactions.length > 0 ? methodTransactions[methodTransactions.length - 1].createdAt : new Date().toISOString(),
+      firstUsed:
+        methodTransactions.length > 0 ? methodTransactions[0].createdAt : new Date().toISOString(),
+      lastUsed:
+        methodTransactions.length > 0
+          ? methodTransactions[methodTransactions.length - 1].createdAt
+          : new Date().toISOString(),
       totalTransactions,
       totalVolume,
       successRate,
@@ -292,7 +313,7 @@ export class CustomerPaymentValidation {
       frequencyScore,
       reliabilityScore,
       verifiedAccounts,
-      issues
+      issues,
     };
   }
 
@@ -323,7 +344,7 @@ export class CustomerPaymentValidation {
       hasHistory,
       firstUsed: hasHistory ? history.firstUsed : undefined,
       totalTransactions: history.totalTransactions,
-      issues
+      issues,
     };
   }
 
@@ -338,7 +359,7 @@ export class CustomerPaymentValidation {
       return {
         passed: true, // No history to check against
         isConsistent: true,
-        amountDeviation: 0
+        amountDeviation: 0,
       };
     }
 
@@ -350,7 +371,7 @@ export class CustomerPaymentValidation {
       passed: isConsistent,
       isConsistent,
       usualAmount,
-      amountDeviation: deviation
+      amountDeviation: deviation,
     };
   }
 
@@ -362,7 +383,8 @@ export class CustomerPaymentValidation {
     customerId: string
   ): PaymentValidationResult['checks']['frequencyCheck'] {
     // Check recent transactions (last 24 hours)
-    const recentTransactions = this.financialSystem.getCustomerTransactions(customerId)
+    const recentTransactions = this.financialSystem
+      .getCustomerTransactions(customerId)
       .filter(t => {
         const transactionTime = new Date(t.createdAt);
         const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -373,13 +395,13 @@ export class CustomerPaymentValidation {
     const currentFrequency = recentTransactions.length;
 
     // Allow up to 3x usual frequency
-    const isNormalFrequency = currentFrequency <= (usualFrequency * 3);
+    const isNormalFrequency = currentFrequency <= usualFrequency * 3;
 
     return {
       passed: isNormalFrequency,
       isNormalFrequency,
       usualFrequency,
-      currentFrequency
+      currentFrequency,
     };
   }
 
@@ -429,7 +451,7 @@ export class CustomerPaymentValidation {
     return {
       passed,
       riskFactors,
-      riskScore: Math.min(riskScore, 100)
+      riskScore: Math.min(riskScore, 100),
     };
   }
 
@@ -477,19 +499,25 @@ export class CustomerPaymentValidation {
 
     if (!historyCheck.passed) {
       if (!historyCheck.hasHistory) {
-        recommendations.push('This is a new payment method. Consider starting with smaller amounts.');
+        recommendations.push(
+          'This is a new payment method. Consider starting with smaller amounts.'
+        );
         recommendations.push('Verify the payment method details before proceeding.');
       } else {
-        recommendations.push('This username hasn\'t been used before. Verify it\'s correct.');
+        recommendations.push("This username hasn't been used before. Verify it's correct.");
       }
     }
 
     if (!consistencyCheck.passed) {
-      recommendations.push(`Amount is ${Math.round(consistencyCheck.amountDeviation * 100)}% different from usual. Consider the reason for this change.`);
+      recommendations.push(
+        `Amount is ${Math.round(consistencyCheck.amountDeviation * 100)}% different from usual. Consider the reason for this change.`
+      );
     }
 
     if (!frequencyCheck.passed) {
-      recommendations.push('Higher than usual transaction frequency detected. Monitor for potential issues.');
+      recommendations.push(
+        'Higher than usual transaction frequency detected. Monitor for potential issues.'
+      );
     }
 
     if (riskLevel === 'high' || riskLevel === 'critical') {
@@ -534,9 +562,11 @@ export class CustomerPaymentValidation {
    * Check if approval is required
    */
   private requiresApproval(riskLevel: string, validationScore: number): boolean {
-    return riskLevel === 'critical' ||
-           (riskLevel === 'high' && validationScore < 50) ||
-           validationScore < 30;
+    return (
+      riskLevel === 'critical' ||
+      (riskLevel === 'high' && validationScore < 50) ||
+      validationScore < 30
+    );
   }
 
   /**
@@ -550,10 +580,18 @@ export class CustomerPaymentValidation {
 
     let multiplier = 1;
     switch (riskLevel) {
-      case 'low': multiplier = 3; break;
-      case 'medium': multiplier = 2; break;
-      case 'high': multiplier = 1.5; break;
-      case 'critical': multiplier = 1; break;
+      case 'low':
+        multiplier = 3;
+        break;
+      case 'medium':
+        multiplier = 2;
+        break;
+      case 'high':
+        multiplier = 1.5;
+        break;
+      case 'critical':
+        multiplier = 1;
+        break;
     }
 
     const maxAmount = Math.min(baseLimit * multiplier, 10000);
@@ -563,7 +601,7 @@ export class CustomerPaymentValidation {
     return {
       maxAmount,
       maxDaily,
-      maxMonthly
+      maxMonthly,
     };
   }
 
@@ -586,18 +624,21 @@ export class CustomerPaymentValidation {
           customerId: result.customerId,
           paymentMethod: result.paymentMethod,
           username: result.username,
-          validationScore: result.validationScore
+          validationScore: result.validationScore,
         },
         actions: [
           'Verify customer identity',
           'Monitor first transaction',
-          'Set appropriate limits'
-        ]
+          'Set appropriate limits',
+        ],
       });
     }
 
     // Unusual amount alert
-    if (!result.checks.consistencyCheck.passed && result.checks.consistencyCheck.amountDeviation > 1.5) {
+    if (
+      !result.checks.consistencyCheck.passed &&
+      result.checks.consistencyCheck.amountDeviation > 1.5
+    ) {
       alerts.push({
         alertType: 'unusual_amount',
         severity: 'low',
@@ -606,12 +647,9 @@ export class CustomerPaymentValidation {
           customerId: result.customerId,
           paymentMethod: result.paymentMethod,
           usualAmount: result.checks.consistencyCheck.usualAmount,
-          actualAmount: result.checks.consistencyCheck.amountDeviation
+          actualAmount: result.checks.consistencyCheck.amountDeviation,
         },
-        actions: [
-          'Verify transaction legitimacy',
-          'Contact customer if needed'
-        ]
+        actions: ['Verify transaction legitimacy', 'Contact customer if needed'],
       });
     }
 
@@ -625,12 +663,9 @@ export class CustomerPaymentValidation {
           customerId: result.customerId,
           paymentMethod: result.paymentMethod,
           usualFrequency: result.checks.frequencyCheck.usualFrequency,
-          currentFrequency: result.checks.frequencyCheck.currentFrequency
+          currentFrequency: result.checks.frequencyCheck.currentFrequency,
         },
-        actions: [
-          'Monitor for suspicious activity',
-          'Consider temporary limits'
-        ]
+        actions: ['Monitor for suspicious activity', 'Consider temporary limits'],
       });
     }
 
@@ -647,7 +682,7 @@ export class CustomerPaymentValidation {
         details: alertData.details!,
         status: 'active',
         createdAt: new Date().toISOString(),
-        actions: alertData.actions!
+        actions: alertData.actions!,
       };
 
       this.alerts.set(alert.id, alert);
@@ -676,7 +711,7 @@ export class CustomerPaymentValidation {
           username,
           verifiedAt: new Date().toISOString(),
           verificationMethod: 'transaction',
-          isActive: true
+          isActive: true,
         });
       }
 
@@ -744,19 +779,22 @@ export class CustomerPaymentValidation {
     const alerts = Array.from(this.alerts.values());
 
     const totalValidations = validations.length;
-    const averageScore = validations.length > 0
-      ? validations.reduce((sum, h) => sum + h.reliabilityScore, 0) / validations.length
-      : 0;
+    const averageScore =
+      validations.length > 0
+        ? validations.reduce((sum, h) => sum + h.reliabilityScore, 0) / validations.length
+        : 0;
 
     const highRiskValidations = validations.filter(h => h.reliabilityScore < 60).length;
-    const newPaymentMethodDetections = alerts.filter(a => a.alertType === 'new_payment_method').length;
+    const newPaymentMethodDetections = alerts.filter(
+      a => a.alertType === 'new_payment_method'
+    ).length;
 
     return {
       totalValidations,
       averageScore,
       alertsCreated: alerts.length,
       highRiskValidations,
-      newPaymentMethodDetections
+      newPaymentMethodDetections,
     };
   }
 }

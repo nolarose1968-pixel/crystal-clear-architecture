@@ -65,7 +65,7 @@ export class UserService extends BaseService {
       role: userData.role || 'user',
       createdAt: now,
       updatedAt: now,
-      isActive: true
+      isActive: true,
     };
 
     // Insert into database
@@ -73,7 +73,7 @@ export class UserService extends BaseService {
 
     return {
       id: userId.toString(),
-      ...user
+      ...user,
     };
   }
 
@@ -114,7 +114,7 @@ export class UserService extends BaseService {
     // Prepare update data
     const updatePayload: any = {
       ...updateData,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     // Remove undefined values
@@ -142,7 +142,7 @@ export class UserService extends BaseService {
 
     return await this.db.update('users', id, {
       isActive: false,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
   }
 
@@ -168,7 +168,9 @@ export class UserService extends BaseService {
     const [totalResult, activeResult, roleStats] = await Promise.all([
       this.db.query('SELECT COUNT(*) as count FROM users'),
       this.db.query('SELECT COUNT(*) as count FROM users WHERE isActive = true'),
-      this.db.query('SELECT role, COUNT(*) as count FROM users WHERE isActive = true GROUP BY role')
+      this.db.query(
+        'SELECT role, COUNT(*) as count FROM users WHERE isActive = true GROUP BY role'
+      ),
     ]);
 
     const byRole: Record<string, number> = {};
@@ -179,7 +181,7 @@ export class UserService extends BaseService {
     return {
       total: totalResult[0]?.count || 0,
       active: activeResult[0]?.count || 0,
-      byRole
+      byRole,
     };
   }
 
@@ -191,7 +193,7 @@ export class UserService extends BaseService {
       role: dbUser.role,
       createdAt: new Date(dbUser.createdAt),
       updatedAt: new Date(dbUser.updatedAt),
-      isActive: Boolean(dbUser.isActive)
+      isActive: Boolean(dbUser.isActive),
     };
   }
 }

@@ -3,7 +3,7 @@
 /**
  * 🚀 Fire22 Dashboard Enhanced Version Manager
  * Advanced semantic versioning with changelog generation and deployment integration
- * 
+ *
  * Usage:
  *   bun run version:manager status      # Show version status
  *   bun run version:manager bump patch  # Increment patch version
@@ -84,12 +84,12 @@ class EnhancedVersionManager {
       const packageJson = JSON.parse(readFileSync(this.packagePath, 'utf8'));
       const keys = path.split('.');
       let value: any = packageJson;
-      
+
       for (const key of keys) {
         value = value[key];
         if (value === undefined) return 'unknown';
       }
-      
+
       return typeof value === 'string' ? value : JSON.stringify(value);
     } catch (error) {
       return 'unknown';
@@ -98,11 +98,11 @@ class EnhancedVersionManager {
 
   async bumpVersion(type: 'patch' | 'minor' | 'major' | 'prerelease'): Promise<void> {
     console.log(`🚀 Bumping version (${type})...`);
-    
+
     try {
       // Check if this is a git repository
       const isGitRepo = await this.checkGitRepository();
-      
+
       if (isGitRepo) {
         // Run the appropriate version bump command
         const command = `bun run version:${type}`;
@@ -111,20 +111,19 @@ class EnhancedVersionManager {
         // Manual version bump for non-git repositories
         await this.manualVersionBump(type);
       }
-      
+
       // Get the new version
       const newVersion = await this.getCurrentVersion();
       console.log(`✅ Version bumped to ${newVersion}`);
-      
+
       // Update metadata
       await this.updateVersionMetadata(newVersion, type);
-      
+
       // Generate changelog entry
       await this.generateChangelogEntry(newVersion, type);
-      
+
       // Create release notes
       await this.createReleaseNotes(newVersion, type);
-      
     } catch (error) {
       console.error(`❌ Failed to bump version (${type}):`, error);
       throw error;
@@ -142,26 +141,28 @@ class EnhancedVersionManager {
 
   private async manualVersionBump(type: 'patch' | 'minor' | 'major' | 'prerelease'): Promise<void> {
     console.log(`📝 Manual version bump for non-git repository...`);
-    
+
     try {
       const packageJson = JSON.parse(readFileSync(this.packagePath, 'utf8'));
       const currentVersion = packageJson.version;
       const newVersion = this.calculateNextVersion(currentVersion, type);
-      
+
       // Update package.json version
       packageJson.version = newVersion;
       writeFileSync(this.packagePath, JSON.stringify(packageJson, null, 2));
-      
+
       console.log(`✅ Version updated: ${currentVersion} → ${newVersion}`);
-      
     } catch (error) {
       throw new Error(`Manual version bump failed: ${error.message}`);
     }
   }
 
-  private calculateNextVersion(currentVersion: string, type: 'patch' | 'minor' | 'major' | 'prerelease'): string {
+  private calculateNextVersion(
+    currentVersion: string,
+    type: 'patch' | 'minor' | 'major' | 'prerelease'
+  ): string {
     const [major, minor, patch] = currentVersion.split('.').map(Number);
-    
+
     switch (type) {
       case 'major':
         return `${major + 1}.0.0`;
@@ -179,33 +180,35 @@ class EnhancedVersionManager {
   private async updateVersionMetadata(version: string, type: string): Promise<void> {
     try {
       const packageJson = JSON.parse(readFileSync(this.packagePath, 'utf8'));
-      
+
       if (!packageJson.metadata) {
         packageJson.metadata = {};
       }
-      
+
       if (!packageJson.metadata.versioning) {
         packageJson.metadata.versioning = {};
       }
-      
+
       packageJson.metadata.versioning = {
         ...packageJson.metadata.versioning,
         lastRelease: packageJson.metadata.versioning?.current || 'unknown',
         current: version,
         lastUpdated: new Date().toISOString(),
         releaseType: type,
-        buildNumber: Date.now()
+        buildNumber: Date.now(),
       };
-      
+
       writeFileSync(this.packagePath, JSON.stringify(packageJson, null, 2));
       console.log(`✅ Updated version metadata`);
-      
     } catch (error) {
       console.error(`⚠️ Failed to update metadata: ${error.message}`);
     }
   }
 
-  async generateChangelogEntry(version: string, type: 'patch' | 'minor' | 'major' | 'prerelease'): Promise<void> {
+  async generateChangelogEntry(
+    version: string,
+    type: 'patch' | 'minor' | 'major' | 'prerelease'
+  ): Promise<void> {
     const entry: ChangelogEntry = {
       version,
       date: new Date().toISOString().split('T')[0],
@@ -214,7 +217,7 @@ class EnhancedVersionManager {
       breakingChanges: [],
       newFeatures: [],
       bugFixes: [],
-      securityUpdates: []
+      securityUpdates: [],
     };
 
     // Generate default changelog content based on type
@@ -242,7 +245,7 @@ class EnhancedVersionManager {
 
   private async addToChangelog(entry: ChangelogEntry): Promise<void> {
     let changelog = '';
-    
+
     if (existsSync(this.changelogPath)) {
       changelog = readFileSync(this.changelogPath, 'utf8');
     } else {
@@ -251,13 +254,13 @@ class EnhancedVersionManager {
 
     const entryContent = this.formatChangelogEntry(entry);
     const newChangelog = entryContent + '\n\n' + changelog;
-    
+
     writeFileSync(this.changelogPath, newChangelog);
   }
 
   private formatChangelogEntry(entry: ChangelogEntry): string {
     let content = `## [${entry.version}] - ${entry.date}\n\n`;
-    
+
     if (entry.breakingChanges.length > 0) {
       content += '### ⚠️ BREAKING CHANGES\n';
       entry.breakingChanges.forEach(change => {
@@ -265,7 +268,7 @@ class EnhancedVersionManager {
       });
       content += '\n';
     }
-    
+
     if (entry.newFeatures.length > 0) {
       content += '### ✨ New Features\n';
       entry.newFeatures.forEach(feature => {
@@ -273,7 +276,7 @@ class EnhancedVersionManager {
       });
       content += '\n';
     }
-    
+
     if (entry.bugFixes.length > 0) {
       content += '### 🐛 Bug Fixes\n';
       entry.bugFixes.forEach(fix => {
@@ -281,7 +284,7 @@ class EnhancedVersionManager {
       });
       content += '\n';
     }
-    
+
     if (entry.securityUpdates.length > 0) {
       content += '### 🔒 Security Updates\n';
       entry.securityUpdates.forEach(update => {
@@ -289,7 +292,7 @@ class EnhancedVersionManager {
       });
       content += '\n';
     }
-    
+
     if (entry.changes.length > 0) {
       content += '### 📝 Changes\n';
       entry.changes.forEach(change => {
@@ -297,7 +300,7 @@ class EnhancedVersionManager {
       });
       content += '\n';
     }
-    
+
     return content;
   }
 
@@ -333,7 +336,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 `;
   }
 
-  async createReleaseNotes(version: string, type: 'patch' | 'minor' | 'major' | 'prerelease'): Promise<void> {
+  async createReleaseNotes(
+    version: string,
+    type: 'patch' | 'minor' | 'major' | 'prerelease'
+  ): Promise<void> {
     const releaseInfo: ReleaseInfo = {
       version,
       type,
@@ -344,13 +350,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       breakingChanges: [],
       newFeatures: [],
       bugFixes: [],
-      securityUpdates: []
+      securityUpdates: [],
     };
 
     // Generate release notes content
     const releaseContent = this.generateReleaseNotes(releaseInfo);
     const releaseFile = `${this.releasesPath}/release-${version}.md`;
-    
+
     writeFileSync(releaseFile, releaseContent);
     console.log(`✅ Created release notes: ${releaseFile}`);
   }
@@ -454,17 +460,17 @@ ${release.securityUpdates.length > 0 ? release.securityUpdates.map(s => `- ${s}`
   async showStatus(): Promise<void> {
     const currentVersion = await this.getCurrentVersion();
     const metadata = await this.getMetadata('metadata.versioning');
-    
+
     console.log('🚀 Fire22 Dashboard Version Status\n');
     console.log(`Current Version: ${currentVersion}`);
     console.log(`Last Release: ${await this.getPreviousVersion()}`);
     console.log(`Build Number: ${Date.now()}`);
     console.log(`Build Date: ${new Date().toISOString()}`);
-    
+
     if (metadata !== 'unknown') {
       console.log(`\nVersion Metadata:\n${metadata}`);
     }
-    
+
     console.log('\nAvailable Commands:');
     console.log('  bun run version:manager status      # Show this status');
     console.log('  bun run version:manager bump patch  # Increment patch version');
@@ -477,44 +483,51 @@ ${release.securityUpdates.length > 0 ? release.securityUpdates.map(s => `- ${s}`
 
   async validateConfiguration(): Promise<void> {
     console.log('🔍 Validating version configuration...\n');
-    
+
     const checks = [
       { name: 'Package.json exists', check: () => existsSync(this.packagePath) },
-      { name: 'Version field present', check: async () => {
-        try {
-          const version = await this.getCurrentVersion();
-          return version && version !== 'unknown';
-        } catch {
-          return false;
-        }
-      }},
+      {
+        name: 'Version field present',
+        check: async () => {
+          try {
+            const version = await this.getCurrentVersion();
+            return version && version !== 'unknown';
+          } catch {
+            return false;
+          }
+        },
+      },
       { name: 'Changelog exists', check: () => existsSync(this.changelogPath) },
       { name: 'Releases directory exists', check: () => existsSync(this.releasesPath) },
-      { name: 'Version scripts available', check: async () => {
-        try {
-          const packageJson = JSON.parse(readFileSync(this.packagePath, 'utf8'));
-          return packageJson.scripts && (
-            packageJson.scripts['version:patch'] ||
-            packageJson.scripts['version:minor'] ||
-            packageJson.scripts['version:major']
-          );
-        } catch {
-          return false;
-        }
-      }}
+      {
+        name: 'Version scripts available',
+        check: async () => {
+          try {
+            const packageJson = JSON.parse(readFileSync(this.packagePath, 'utf8'));
+            return (
+              packageJson.scripts &&
+              (packageJson.scripts['version:patch'] ||
+                packageJson.scripts['version:minor'] ||
+                packageJson.scripts['version:major'])
+            );
+          } catch {
+            return false;
+          }
+        },
+      },
     ];
 
     let passedChecks = 0;
-    
+
     for (const check of checks) {
       const result = await check.check();
       const status = result ? '✅' : '❌';
       console.log(`${status} ${check.name}`);
       if (result) passedChecks++;
     }
-    
+
     console.log(`\nValidation Results: ${passedChecks}/${checks.length} checks passed`);
-    
+
     if (passedChecks === checks.length) {
       console.log('🎉 Version configuration is valid!');
     } else {
@@ -524,13 +537,13 @@ ${release.securityUpdates.length > 0 ? release.securityUpdates.map(s => `- ${s}`
 
   async initializeVersioning(): Promise<void> {
     console.log('🔧 Initializing enhanced versioning system...\n');
-    
+
     // Create changelog if it doesn't exist
     if (!existsSync(this.changelogPath)) {
       writeFileSync(this.changelogPath, this.getDefaultChangelog());
       console.log('✅ Created CHANGELOG.md');
     }
-    
+
     // Create .versionrc if it doesn't exist
     if (!existsSync(this.versionRcPath)) {
       const versionRc = {
@@ -544,26 +557,29 @@ ${release.securityUpdates.length > 0 ? release.securityUpdates.map(s => `- ${s}`
           { type: 'test', section: 'Tests' },
           { type: 'chore', section: 'Chores' },
           { type: 'breaking', section: 'Breaking Changes' },
-          { type: 'security', section: 'Security Updates' }
+          { type: 'security', section: 'Security Updates' },
         ],
         releaseCommitMessageFormat: 'chore(release): {{currentTag}}',
         issuePrefixes: ['#'],
-        commitUrlFormat: 'https://github.com/brendadeeznuts1111/fire22-dashboard-worker/commit/{{hash}}',
-        compareUrlFormat: 'https://github.com/brendadeeznuts1111/fire22-dashboard-worker/compare/{{previousTag}}...{{currentTag}}',
-        issueUrlFormat: 'https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues/{{id}}'
+        commitUrlFormat:
+          'https://github.com/brendadeeznuts1111/fire22-dashboard-worker/commit/{{hash}}',
+        compareUrlFormat:
+          'https://github.com/brendadeeznuts1111/fire22-dashboard-worker/compare/{{previousTag}}...{{currentTag}}',
+        issueUrlFormat:
+          'https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues/{{id}}',
       };
-      
+
       writeFileSync(this.versionRcPath, JSON.stringify(versionRc, null, 2));
       console.log('✅ Created .versionrc');
     }
-    
+
     // Ensure releases directory exists
     this.ensureReleasesDirectory();
     console.log('✅ Created releases directory');
-    
+
     // Update package.json scripts
     await this.updatePackageScripts();
-    
+
     console.log('\n🎉 Enhanced versioning system initialized!');
     console.log('📝 Run "bun run version:manager status" to see current status');
   }
@@ -571,25 +587,24 @@ ${release.securityUpdates.length > 0 ? release.securityUpdates.map(s => `- ${s}`
   private async updatePackageScripts(): Promise<void> {
     try {
       const packageJson = JSON.parse(readFileSync(this.packagePath, 'utf8'));
-      
+
       if (!packageJson.scripts) {
         packageJson.scripts = {};
       }
-      
+
       const versionScripts = {
         'version:patch': 'bun run scripts/version.ts patch',
         'version:minor': 'bun run scripts/version.ts minor',
         'version:major': 'bun run scripts/version.ts major',
         'version:show': 'bun run scripts/version.ts show',
         'version:init': 'bun run scripts/version.ts init',
-        'version:manager': 'bun run scripts/version-manager.ts'
+        'version:manager': 'bun run scripts/version-manager.ts',
       };
-      
+
       Object.assign(packageJson.scripts, versionScripts);
       writeFileSync(this.packagePath, JSON.stringify(packageJson, null, 2));
-      
+
       console.log('✅ Updated package.json scripts');
-      
     } catch (error) {
       console.error(`⚠️ Failed to update package.json: ${error.message}`);
     }
@@ -609,7 +624,7 @@ async function main() {
       case 'status':
         await manager.showStatus();
         break;
-        
+
       case 'bump':
         if (!subcommand || !['patch', 'minor', 'major', 'prerelease'].includes(subcommand)) {
           console.log('❌ Invalid bump type. Use: patch, minor, major, or prerelease');
@@ -617,25 +632,25 @@ async function main() {
         }
         await manager.bumpVersion(subcommand as any);
         break;
-        
+
       case 'changelog':
         const version = await manager.getCurrentVersion();
         await manager.generateChangelogEntry(version, 'patch');
         break;
-        
+
       case 'validate':
         await manager.validateConfiguration();
         break;
-        
+
       case 'release':
         const currentVersion = await manager.getCurrentVersion();
         await manager.createReleaseNotes(currentVersion, 'patch');
         break;
-        
+
       case 'init':
         await manager.initializeVersioning();
         break;
-        
+
       default:
         console.log('🚀 Fire22 Dashboard Enhanced Version Manager\n');
         console.log('Usage:');
@@ -654,7 +669,6 @@ async function main() {
         console.log('  bun run version:manager bump major  # 1.0.0 → 2.0.0');
         process.exit(1);
     }
-
   } catch (error) {
     console.error('❌ Version manager error:', error.message);
     process.exit(1);

@@ -37,7 +37,7 @@ function generateApiEndpointsContent(employee: EmployeeData): string {
     { name: 'Webhook', description: 'Real-time event notifications', icon: '🪝' },
     { name: 'WebSocket', description: 'Real-time bidirectional communication', icon: '🔌' },
     { name: 'gRPC', description: 'High-performance RPC framework', icon: '⚡' },
-    { name: 'SOAP', description: 'XML-based protocol for web services', icon: '📦' }
+    { name: 'SOAP', description: 'XML-based protocol for web services', icon: '📦' },
   ];
 
   return `
@@ -65,7 +65,9 @@ function generateApiEndpointsContent(employee: EmployeeData): string {
       <div class="endpoint-templates">
         <h2>📋 Endpoint Templates</h2>
         <div class="templates-grid">
-          ${endpointTemplates.map(template => `
+          ${endpointTemplates
+            .map(
+              template => `
             <div class="template-card" onclick="selectTemplate('${template.name}')">
               <div class="template-icon">${template.icon}</div>
               <div class="template-content">
@@ -74,7 +76,9 @@ function generateApiEndpointsContent(employee: EmployeeData): string {
               </div>
               <div class="template-arrow">→</div>
             </div>
-          `).join('')}
+          `
+            )
+            .join('')}
         </div>
       </div>
 

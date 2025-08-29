@@ -1,0 +1,137 @@
+{
+  "generatedAt": "2025-08-29T23:11:07.876Z",
+  "timeRange": {
+    "start": "2025-08-23T23:11:06.257Z",
+    "end": "2025-08-29T23:11:06.257Z"
+  },
+  "summary": {
+    "totalScans": 7,
+    "environments": [
+      "enterprise"
+    ],
+    "complianceRate": 0,
+    "averageRiskScore": 35
+  },
+  "trends": {
+    "issuesOverTime": [
+      {
+        "date": "2025-08-23",
+        "fatal": 1,
+        "warnings": 1
+      },
+      {
+        "date": "2025-08-24",
+        "fatal": 1,
+        "warnings": 1
+      },
+      {
+        "date": "2025-08-25",
+        "fatal": 1,
+        "warnings": 1
+      },
+      {
+        "date": "2025-08-26",
+        "fatal": 1,
+        "warnings": 1
+      },
+      {
+        "date": "2025-08-27",
+        "fatal": 1,
+        "warnings": 1
+      },
+      {
+        "date": "2025-08-28",
+        "fatal": 1,
+        "warnings": 1
+      },
+      {
+        "date": "2025-08-29",
+        "fatal": 1,
+        "warnings": 1
+      }
+    ],
+    "riskScoreTrend": [
+      {
+        "date": "2025-08-23",
+        "score": 35
+      },
+      {
+        "date": "2025-08-24",
+        "score": 35
+      },
+      {
+        "date": "2025-08-25",
+        "score": 35
+      },
+      {
+        "date": "2025-08-26",
+        "score": 35
+      },
+      {
+        "date": "2025-08-27",
+        "score": 35
+      },
+      {
+        "date": "2025-08-28",
+        "score": 35
+      },
+      {
+        "date": "2025-08-29",
+        "score": 35
+      }
+    ],
+    "packageHealth": {
+      "lodash": 0,
+      "axios": 0
+    }
+  },
+  "recommendations": [
+    "⚠️  IMPROVE COMPLIANCE: Review and fix security policy violations",
+    "🔴 CRITICAL ISSUES: Review recent fatal security findings",
+    "📦 UNHEALTHY PACKAGES: Consider replacing lodash, axios"
+  ],
+  "criticalIssues": [
+    {
+      "date": "2025-08-29",
+      "package": "lodash",
+      "issue": "CVE-2020-8203",
+      "severity": "fatal"
+    },
+    {
+      "date": "2025-08-28",
+      "package": "lodash",
+      "issue": "CVE-2020-8203",
+      "severity": "fatal"
+    },
+    {
+      "date": "2025-08-27",
+      "package": "lodash",
+      "issue": "CVE-2020-8203",
+      "severity": "fatal"
+    },
+    {
+      "date": "2025-08-26",
+      "package": "lodash",
+      "issue": "CVE-2020-8203",
+      "severity": "fatal"
+    },
+    {
+      "date": "2025-08-25",
+      "package": "lodash",
+      "issue": "CVE-2020-8203",
+      "severity": "fatal"
+    },
+    {
+      "date": "2025-08-24",
+      "package": "lodash",
+      "issue": "CVE-2020-8203",
+      "severity": "fatal"
+    },
+    {
+      "date": "2025-08-23",
+      "package": "lodash",
+      "issue": "CVE-2020-8203",
+      "severity": "fatal"
+    }
+  ]
+}

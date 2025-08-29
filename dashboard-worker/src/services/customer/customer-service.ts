@@ -4,13 +4,13 @@
  */
 
 import { databaseService } from '../database/connection';
-import type { 
-  Customer, 
-  CustomerAdminRequest, 
+import type {
+  Customer,
+  CustomerAdminRequest,
   CustomerAdminResponse,
   CreateCustomerRequest,
   CreateCustomerResponse,
-  CustomerSummary 
+  CustomerSummary,
 } from '../../types';
 import CONSTANTS from '../../config/constants.js';
 
@@ -109,7 +109,10 @@ export class CustomerService {
 
       // Calculate summary statistics
       const totalCustomers = customers.length;
-      const totalBalance = customers.reduce((sum, customer) => sum + (customer.TotalBalance || 0), 0);
+      const totalBalance = customers.reduce(
+        (sum, customer) => sum + (customer.TotalBalance || 0),
+        0
+      );
       const activeCustomers = customers.filter(c => c.Active === 'Y').length;
       const inactiveCustomers = totalCustomers - activeCustomers;
 
@@ -118,9 +121,8 @@ export class CustomerService {
         totalCustomers,
         totalBalance,
         activeCustomers,
-        inactiveCustomers
+        inactiveCustomers,
       };
-
     } catch (error) {
       console.error('Customer admin service error:', error);
       throw new Error(`Failed to get customer admin data: ${error}`);
@@ -132,7 +134,17 @@ export class CustomerService {
    */
   public async createCustomer(request: CreateCustomerRequest): Promise<CreateCustomerResponse> {
     try {
-      const { customerID, username, firstName, lastName, email, phone, agentID, initialBalance = 0, notes } = request;
+      const {
+        customerID,
+        username,
+        firstName,
+        lastName,
+        email,
+        phone,
+        agentID,
+        initialBalance = 0,
+        notes,
+      } = request;
 
       // Validate customer doesn't exist
       const existingCustomer = await databaseService.executeQuerySingle<{ customer_id: string }>(
@@ -163,8 +175,8 @@ export class CustomerService {
             INSERT INTO customers (customer_id, username, first_name, last_name, login)
             VALUES (?, ?, ?, ?, ?)
           `,
-          params: [customerID, username, firstName, lastName, customerID]
-        }
+          params: [customerID, username, firstName, lastName, customerID],
+        },
       ];
 
       // Add initial deposit if specified
@@ -174,7 +186,7 @@ export class CustomerService {
             INSERT INTO transactions (customer_id, amount, tran_type, short_desc, agent_id, entered_by)
             VALUES (?, ?, 'deposit', 'Initial deposit', ?, 'SYSTEM')
           `,
-          params: [customerID, initialBalance, agentID]
+          params: [customerID, initialBalance, agentID],
         });
       }
 
@@ -183,9 +195,8 @@ export class CustomerService {
       return {
         customerID,
         message: 'Customer created successfully',
-        balance: initialBalance
+        balance: initialBalance,
       };
-
     } catch (error) {
       console.error('Create customer service error:', error);
       throw new Error(`Failed to create customer: ${error}`);
@@ -214,7 +225,15 @@ export class CustomerService {
    */
   public async updateCustomer(customerID: string, updates: Partial<Customer>): Promise<boolean> {
     try {
-      const allowedFields = ['username', 'first_name', 'last_name', 'email', 'phone', 'status', 'notes'];
+      const allowedFields = [
+        'username',
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
+        'status',
+        'notes',
+      ];
       const updateFields: string[] = [];
       const params: any[] = [];
 
@@ -279,7 +298,7 @@ export class CustomerService {
           deposits: 0,
           withdrawals: 0,
           wagers: 0,
-          wins: 0
+          wins: 0,
         };
       }
 
@@ -294,7 +313,7 @@ export class CustomerService {
         deposits,
         withdrawals,
         wagers,
-        wins
+        wins,
       };
     } catch (error) {
       console.error('Get customer balance error:', error);
@@ -361,7 +380,7 @@ export class CustomerService {
       return {
         agentID,
         customers,
-        totalCustomers: customers.length
+        totalCustomers: customers.length,
       };
     } catch (error) {
       console.error('Get customer hierarchy error:', error);
@@ -394,7 +413,7 @@ export class CustomerService {
     return {
       successful,
       failed,
-      errors
+      errors,
     };
   }
 }

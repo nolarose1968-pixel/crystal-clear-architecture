@@ -60,7 +60,7 @@ export class Fantasy402AgentManagement {
         transactions: false,
         wagers: false,
         customers: false,
-        reports: false
+        reports: false,
       };
 
       // Test balance endpoint
@@ -152,7 +152,7 @@ export class Fantasy402AgentManagement {
       if (response.success) {
         return {
           agentID: response.data.agentID,
-          success: true
+          success: true,
         };
       } else {
         throw new Error('Failed to create sub-agent');
@@ -166,17 +166,20 @@ export class Fantasy402AgentManagement {
   /**
    * Update sub-agent permissions
    */
-  async updateSubAgentPermissions(agentID: string, permissions: {
-    canManageLines: boolean;
-    canAddAccounts: boolean;
-    canDeleteBets: boolean;
-    canViewReports: boolean;
-    canAccessBilling: boolean;
-  }): Promise<boolean> {
+  async updateSubAgentPermissions(
+    agentID: string,
+    permissions: {
+      canManageLines: boolean;
+      canAddAccounts: boolean;
+      canDeleteBets: boolean;
+      canViewReports: boolean;
+      canAccessBilling: boolean;
+    }
+  ): Promise<boolean> {
     try {
       const response = await this.core.rawRequest('/agent/update-sub-agent-permissions', 'POST', {
         agentID,
-        permissions
+        permissions,
       });
 
       return response.success;
@@ -208,11 +211,14 @@ export class Fantasy402AgentManagement {
   /**
    * Get agent performance metrics
    */
-  async getAgentPerformance(agentID: string, period: 'daily' | 'weekly' | 'monthly' = 'weekly'): Promise<any> {
+  async getAgentPerformance(
+    agentID: string,
+    period: 'daily' | 'weekly' | 'monthly' = 'weekly'
+  ): Promise<any> {
     try {
       const response = await this.core.rawRequest('/agent/performance', 'POST', {
         agentID,
-        period
+        period,
       });
 
       if (response.success) {

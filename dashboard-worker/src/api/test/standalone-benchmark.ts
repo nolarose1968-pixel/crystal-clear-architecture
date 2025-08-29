@@ -2,7 +2,7 @@
 
 /**
  * Standalone API Benchmark
- * 
+ *
  * Tests individual components without full API setup
  */
 
@@ -23,77 +23,71 @@ async function benchmark(
   for (let i = 0; i < 10; i++) {
     await fn();
   }
-  
+
   // Benchmark
   const start = performance.now();
   for (let i = 0; i < iterations; i++) {
     await fn();
   }
   const end = performance.now();
-  
+
   const totalTime = end - start;
-  
+
   return {
     name,
     operations: iterations,
     totalTime,
     opsPerSecond: iterations / (totalTime / 1000),
-    averageTime: totalTime / iterations
+    averageTime: totalTime / iterations,
   };
 }
 
-function printResult(result: BenchmarkResult) {
-}
+function printResult(result: BenchmarkResult) {}
 
 async function main() {
-  
   // Test 1: Schema validation (if available)
   try {
     const { z } = await import('zod');
-    
+
     const testSchema = z.object({
       username: z.string().min(1),
       password: z.string().min(1),
-      agentID: z.string().regex(/^[A-Z0-9]+$/)
+      agentID: z.string().regex(/^[A-Z0-9]+$/),
     });
-    
+
     const validData = {
       username: 'testuser',
       password: 'testpass',
-      agentID: 'AGENT001'
+      agentID: 'AGENT001',
     };
-    
+
     const schemaResult = await benchmark(
       'Zod Schema Validation',
       () => testSchema.parse(validData),
       5000
     );
     printResult(schemaResult);
-    
-  } catch (error) {
-  }
-  
+  } catch (error) {}
+
   // Test 2: JWT Token generation (if available)
   try {
     const jwt = await import('jsonwebtoken');
-    
+
     const payload = {
       sub: 'user123',
       role: 'manager',
       level: 4,
-      permissions: ['manager.*']
+      permissions: ['manager.*'],
     };
-    
+
     const jwtResult = await benchmark(
       'JWT Token Generation',
       () => jwt.sign(payload, 'test-secret', { expiresIn: '24h' }),
       1000
     );
     printResult(jwtResult);
-    
-  } catch (error) {
-  }
-  
+  } catch (error) {}
+
   // Test 3: Request parsing simulation
   const requestParsingResult = await benchmark(
     'Request Body Parsing',
@@ -101,14 +95,14 @@ async function main() {
       const mockBody = JSON.stringify({
         username: 'testuser',
         password: 'testpass',
-        agentID: 'AGENT001'
+        agentID: 'AGENT001',
       });
       return JSON.parse(mockBody);
     },
     10000
   );
   printResult(requestParsingResult);
-  
+
   // Test 4: Response generation
   const responseResult = await benchmark(
     'Response Generation',
@@ -118,20 +112,20 @@ async function main() {
         data: {
           user: {
             id: 'user123',
-            role: 'manager'
+            role: 'manager',
           },
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       };
       return new Response(JSON.stringify(responseData), {
         status: 200,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
     },
     5000
   );
   printResult(responseResult);
-  
+
   // Test 5: Route pattern matching simulation
   const routeMatchingResult = await benchmark(
     'Route Pattern Matching',
@@ -141,28 +135,28 @@ async function main() {
         { pattern: '/api/auth/login', handler: 'login' },
         { pattern: '/api/auth/logout', handler: 'logout' },
         { pattern: '/api/manager/getLiveWagers', handler: 'liveWagers' },
-        { pattern: '/api/admin/settle-wager', handler: 'settleWager' }
+        { pattern: '/api/admin/settle-wager', handler: 'settleWager' },
       ];
-      
+
       const testPath = '/api/manager/getLiveWagers';
       return routes.find(route => route.pattern === testPath);
     },
     10000
   );
   printResult(routeMatchingResult);
-  
+
   // Test 6: Permission checking simulation
   const permissionResult = await benchmark(
     'Permission Checking',
     () => {
       const userPermissions = ['manager.*', 'agent.view', 'customer.list'];
       const requiredPermission = 'manager.wager.view_live';
-      
+
       // Check direct match
       if (userPermissions.includes(requiredPermission)) {
         return true;
       }
-      
+
       // Check wildcard match
       const permissionParts = requiredPermission.split('.');
       for (let i = 1; i <= permissionParts.length; i++) {
@@ -171,13 +165,13 @@ async function main() {
           return true;
         }
       }
-      
+
       return false;
     },
     10000
   );
   printResult(permissionResult);
-  
+
   // Test 7: Rate limiting logic simulation
   const rateLimitResult = await benchmark(
     'Rate Limit Check',
@@ -187,23 +181,23 @@ async function main() {
       const maxRequests = 100;
       const lastResetTime = now - 30000; // 30 seconds ago
       const requestCount = 50;
-      
+
       // Check if window has passed
       if (now - lastResetTime >= windowMs) {
         return { allowed: true, remaining: maxRequests - 1 };
       }
-      
+
       // Check if at limit
       if (requestCount >= maxRequests) {
         return { allowed: false, remaining: 0 };
       }
-      
+
       return { allowed: true, remaining: maxRequests - requestCount - 1 };
     },
     10000
   );
   printResult(rateLimitResult);
-  
+
   // Test 8: Error handling
   const errorHandlingResult = await benchmark(
     'Error Response Generation',
@@ -213,18 +207,18 @@ async function main() {
         success: false,
         error: 'ValidationError',
         message: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      
+
       return new Response(JSON.stringify(errorResponse), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
     },
     5000
   );
   printResult(errorHandlingResult);
-  
+
   // Generate report
   const report = {
     timestamp: new Date().toISOString(),
@@ -232,7 +226,7 @@ async function main() {
       runtime: 'Bun',
       version: Bun.version,
       platform: process.platform,
-      arch: process.arch
+      arch: process.arch,
     },
     results: {
       'Schema Validation': '5k+ ops/sec',
@@ -242,17 +236,15 @@ async function main() {
       'Route Matching': '10k+ ops/sec',
       'Permission Checking': '10k+ ops/sec',
       'Rate Limiting': '10k+ ops/sec',
-      'Error Handling': '5k+ ops/sec'
+      'Error Handling': '5k+ ops/sec',
     },
     summary: {
       status: '✅ All components performing well',
       performance: 'Excellent - All operations >1k ops/sec',
-      recommendation: 'Ready for production load'
-    }
+      recommendation: 'Ready for production load',
+    },
   };
-  
-  
-  
+
   // Save results
   await Bun.write('standalone-benchmark-results.json', JSON.stringify(report, null, 2));
 }

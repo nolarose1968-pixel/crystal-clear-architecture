@@ -1,6 +1,8 @@
 # Commit Message Conventions
 
-This repository follows [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages.
+This repository follows
+[Conventional Commits](https://www.conventionalcommits.org/) specification for
+commit messages.
 
 ## Format
 
@@ -14,27 +16,28 @@ This repository follows [Conventional Commits](https://www.conventionalcommits.o
 
 ## Types
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `feat` | New feature | `feat(dashboard): add real-time metrics display` |
-| `fix` | Bug fix | `fix(api): resolve connection timeout issue` |
-| `docs` | Documentation changes | `docs(readme): update installation instructions` |
-| `style` | Code style changes | `style(core): format with prettier` |
-| `refactor` | Code refactoring | `refactor(pattern): simplify weaver logic` |
-| `perf` | Performance improvements | `perf(build): optimize bundle size` |
-| `test` | Test changes | `test(api): add integration tests` |
-| `build` | Build system changes | `build(deps): upgrade bun to 1.2.20` |
-| `ci` | CI/CD changes | `ci(github): add staging deployment` |
-| `chore` | Maintenance tasks | `chore(scripts): cleanup unused files` |
-| `revert` | Revert commits | `revert: feat(dashboard): add metrics` |
-| `security` | Security fixes | `security(auth): patch JWT vulnerability` |
-| `deps` | Dependency updates | `deps(core): update cloudflare workers` |
-| `release` | Release commits | `release: v3.0.9` |
-| `hotfix` | Critical fixes | `hotfix(api): emergency rate limit fix` |
+| Type       | Description              | Example                                          |
+| ---------- | ------------------------ | ------------------------------------------------ |
+| `feat`     | New feature              | `feat(dashboard): add real-time metrics display` |
+| `fix`      | Bug fix                  | `fix(api): resolve connection timeout issue`     |
+| `docs`     | Documentation changes    | `docs(readme): update installation instructions` |
+| `style`    | Code style changes       | `style(core): format with prettier`              |
+| `refactor` | Code refactoring         | `refactor(pattern): simplify weaver logic`       |
+| `perf`     | Performance improvements | `perf(build): optimize bundle size`              |
+| `test`     | Test changes             | `test(api): add integration tests`               |
+| `build`    | Build system changes     | `build(deps): upgrade bun to 1.2.20`             |
+| `ci`       | CI/CD changes            | `ci(github): add staging deployment`             |
+| `chore`    | Maintenance tasks        | `chore(scripts): cleanup unused files`           |
+| `revert`   | Revert commits           | `revert: feat(dashboard): add metrics`           |
+| `security` | Security fixes           | `security(auth): patch JWT vulnerability`        |
+| `deps`     | Dependency updates       | `deps(core): update cloudflare workers`          |
+| `release`  | Release commits          | `release: v3.0.9`                                |
+| `hotfix`   | Critical fixes           | `hotfix(api): emergency rate limit fix`          |
 
 ## Scopes
 
 ### Workspace Scopes
+
 - `core` - Core dashboard functionality
 - `pattern` - Pattern system
 - `api` - API client
@@ -43,6 +46,7 @@ This repository follows [Conventional Commits](https://www.conventionalcommits.o
 - `build` - Build system
 
 ### Component Scopes
+
 - `dashboard` - Dashboard UI
 - `worker` - Cloudflare Worker
 - `db` - Database
@@ -52,6 +56,7 @@ This repository follows [Conventional Commits](https://www.conventionalcommits.o
 - `p2p` - P2P functionality
 
 ### Infrastructure Scopes
+
 - `cf` - Cloudflare specific
 - `monitoring` - Monitoring
 - `logging` - Logging
@@ -59,6 +64,7 @@ This repository follows [Conventional Commits](https://www.conventionalcommits.o
 - `k8s` - Kubernetes
 
 ### Development Scopes
+
 - `lint` - Linting
 - `format` - Formatting
 - `deps` - Dependencies
@@ -69,12 +75,14 @@ This repository follows [Conventional Commits](https://www.conventionalcommits.o
 - `wiki` - Wiki
 
 ### Testing Scopes
+
 - `unit` - Unit tests
 - `integration` - Integration tests
 - `e2e` - End-to-end tests
 - `perf-test` - Performance tests
 
 ### CI/CD Scopes
+
 - `ci` - CI pipeline
 - `cd` - CD pipeline
 - `release` - Release process
@@ -83,6 +91,7 @@ This repository follows [Conventional Commits](https://www.conventionalcommits.o
 ## Examples
 
 ### Feature Addition
+
 ```
 feat(dashboard): add live wager tracking
 
@@ -95,6 +104,7 @@ Closes #123
 ```
 
 ### Bug Fix
+
 ```
 fix(api): handle rate limit errors gracefully
 
@@ -105,6 +115,7 @@ Fixes #456
 ```
 
 ### Breaking Change
+
 ```
 feat(api)!: update endpoint structure
 
@@ -116,6 +127,7 @@ Migration guide in docs/migration-v2.md
 ```
 
 ### Multiple Scopes
+
 ```
 refactor(core,pattern): consolidate utility functions
 
@@ -140,6 +152,7 @@ for better code reuse across all workspaces.
 ## Git Hooks
 
 Install commit linting:
+
 ```bash
 bun add -d @commitlint/cli @commitlint/config-conventional husky
 bun husky install
@@ -149,6 +162,7 @@ bun husky add .husky/commit-msg 'bunx commitlint --edit $1'
 ## Interactive Commits
 
 Use commitizen for interactive commits:
+
 ```bash
 bun add -d commitizen cz-conventional-changelog
 bun run commit  # Interactive commit prompt
@@ -157,6 +171,7 @@ bun run commit  # Interactive commit prompt
 ## Automated Changelog
 
 Commits following these conventions automatically generate:
+
 - CHANGELOG.md entries
 - Release notes
 - Version bumps (semantic versioning)

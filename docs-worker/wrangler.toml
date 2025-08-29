@@ -32,8 +32,9 @@ port = 8787
 local_protocol = "http"
 
 # Analytics and monitoring
-[analytics_engine_datasets]
-docs_requests = "docs_requests_dataset"
+[[analytics_engine_datasets]]
+binding = "docs_requests"
+dataset = "docs_requests_dataset"
 
 # Rate limiting (optional)
 # [rate_limiting]

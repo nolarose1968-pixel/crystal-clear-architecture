@@ -191,7 +191,15 @@ export interface PlayerNote {
   id: string;
   customerID: string;
   note: string;
-  category: 'general' | 'complaint' | 'praise' | 'warning' | 'suspension' | 'vip' | 'risk' | 'lottery';
+  category:
+    | 'general'
+    | 'complaint'
+    | 'praise'
+    | 'warning'
+    | 'suspension'
+    | 'vip'
+    | 'risk'
+    | 'lottery';
   createdBy: string;
   createdDate: string;
   lastModified: string;

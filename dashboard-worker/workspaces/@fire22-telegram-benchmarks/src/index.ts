@@ -2,15 +2,15 @@
 
 /**
  * 🎯 Fire22 Telegram System Benchmarks
- * 
+ *
  * Comprehensive performance testing for all Telegram integration components
  */
 
 import { Bun } from 'bun';
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 📊 BENCHMARK RUNNER
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 export interface BenchmarkResult {
   name: string;
@@ -40,9 +40,9 @@ export class BenchmarkRunner {
     if (config.testIterations) this.testIterations = config.testIterations;
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🎯 BENCHMARK EXECUTION
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   async benchmark(
     name: string,
@@ -51,12 +51,12 @@ export class BenchmarkRunner {
     iterations?: number
   ): Promise<BenchmarkResult> {
     const testRuns = iterations || this.testIterations;
-    
+
     // Warmup
     if (this.config.verbose) {
       console.log(`⏳ Warming up ${name}...`);
     }
-    
+
     for (let i = 0; i < this.warmupIterations; i++) {
       await fn();
     }
@@ -96,16 +96,16 @@ export class BenchmarkRunner {
       minTime,
       maxTime,
       throughput,
-      memoryUsed: memoryUsed > 0 ? memoryUsed : undefined
+      memoryUsed: memoryUsed > 0 ? memoryUsed : undefined,
     };
 
     this.results.push(result);
     return result;
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 REPORTING
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   formatResult(result: BenchmarkResult): string {
     const avgMs = result.averageTime / 1_000_000;
@@ -127,14 +127,14 @@ export class BenchmarkRunner {
 
   printResults(): void {
     console.log('\n🎯 BENCHMARK RESULTS\n' + '═'.repeat(50));
-    
+
     // Group by category
     const categories = new Set(this.results.map(r => r.category));
-    
+
     for (const category of categories) {
       const categoryResults = this.results.filter(r => r.category === category);
       console.log(`\n📁 ${category.toUpperCase()}`);
-      
+
       for (const result of categoryResults) {
         console.log(this.formatResult(result));
       }
@@ -145,14 +145,14 @@ export class BenchmarkRunner {
 
   private printSummary(): void {
     console.log('\n📈 SUMMARY\n' + '═'.repeat(50));
-    
+
     // Find best and worst performers
     const sorted = [...this.results].sort((a, b) => a.averageTime - b.averageTime);
-    
+
     if (sorted.length > 0) {
       console.log('\n🏆 Fastest:', sorted[0].name);
       console.log(`   ${(sorted[0].averageTime / 1_000_000).toFixed(3)} ms average`);
-      
+
       if (sorted.length > 1) {
         const slowest = sorted[sorted.length - 1];
         console.log('\n🐌 Slowest:', slowest.name);
@@ -163,7 +163,7 @@ export class BenchmarkRunner {
     // Total stats
     const totalTime = this.results.reduce((sum, r) => sum + r.totalTime, 0);
     const totalIterations = this.results.reduce((sum, r) => sum + r.iterations, 0);
-    
+
     console.log('\n📊 Total Statistics:');
     console.log(`   Tests Run: ${this.results.length}`);
     console.log(`   Total Iterations: ${totalIterations.toLocaleString()}`);
@@ -195,9 +195,9 @@ export class BenchmarkRunner {
   }
 }
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🚀 MAIN BENCHMARK SUITE
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 if (import.meta.main) {
   const runner = new BenchmarkRunner({ verbose: true });
@@ -234,7 +234,7 @@ Date: ${new Date().toISOString()}
 
   // Print results
   runner.printResults();
-  
+
   // Export results
   runner.exportJSON('benchmark-results.json');
 }

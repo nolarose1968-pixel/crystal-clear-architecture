@@ -10,6 +10,6 @@ Get real-time DNS cache statistics and performance metrics.
 
 Manual DNS cache refresh with timing information.
 
-## GET /api/fire22/dns-config  
+## GET /api/fire22/dns-config
 
 DNS configuration recommendations by environment.

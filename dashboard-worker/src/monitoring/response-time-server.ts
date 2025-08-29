@@ -1,4 +1,4 @@
-import { ResponseTimeMonitor } from "./response-time-distribution";
+import { ResponseTimeMonitor } from './response-time-distribution';
 
 /**
  * Fire22 Response Time Monitoring Server
@@ -13,26 +13,26 @@ function withResponseTimeTracking(handler: (req: Request) => Promise<Response> |
   return async (req: Request): Promise<Response> => {
     const url = new URL(req.url);
     const endpoint = `${req.method} ${url.pathname}`;
-    
+
     // Start timing with Bun's nanosecond precision
     const startTime = monitor.startTiming();
-    
+
     try {
       // Execute the handler
       const response = await handler(req);
-      
+
       // Record the response time
       const duration = monitor.endTiming(endpoint, startTime);
-      
+
       // Add response time header
       const headers = new Headers(response.headers);
-      headers.set("X-Response-Time", `${duration.toFixed(2)}ms`);
-      headers.set("X-Server-Timing", `total;dur=${duration.toFixed(2)}`);
-      
+      headers.set('X-Response-Time', `${duration.toFixed(2)}ms`);
+      headers.set('X-Server-Timing', `total;dur=${duration.toFixed(2)}`);
+
       return new Response(response.body, {
         status: response.status,
         statusText: response.statusText,
-        headers
+        headers,
       });
     } catch (error) {
       // Still record timing for errors
@@ -45,126 +45,130 @@ function withResponseTimeTracking(handler: (req: Request) => Promise<Response> |
 // Create server with response time monitoring
 const server = Bun.serve({
   port: 3004,
-  
+
   async fetch(req) {
     const url = new URL(req.url);
-    
+
     // Monitoring API endpoints
-    if (url.pathname === "/api/monitoring/response-times") {
+    if (url.pathname === '/api/monitoring/response-times') {
       return Response.json(monitor.getAllStats());
     }
-    
-    if (url.pathname === "/api/monitoring/endpoint" && url.searchParams.has("name")) {
-      const endpoint = url.searchParams.get("name")!;
+
+    if (url.pathname === '/api/monitoring/endpoint' && url.searchParams.has('name')) {
+      const endpoint = url.searchParams.get('name')!;
       const stats = monitor.getEndpointStats(endpoint);
-      return Response.json(stats || { error: "Endpoint not found" });
+      return Response.json(stats || { error: 'Endpoint not found' });
     }
-    
-    if (url.pathname === "/api/monitoring/alerts") {
-      const limit = parseInt(url.searchParams.get("limit") || "10");
+
+    if (url.pathname === '/api/monitoring/alerts') {
+      const limit = parseInt(url.searchParams.get('limit') || '10');
       return Response.json(monitor.getAlerts(limit));
     }
-    
-    if (url.pathname === "/api/monitoring/export") {
+
+    if (url.pathname === '/api/monitoring/export') {
       const stats = monitor.getAllStats();
       return Response.json({
         exported_at: new Date().toISOString(),
-        ...stats
+        ...stats,
       });
     }
-    
-    if (url.pathname === "/api/monitoring/clear" && req.method === "POST") {
+
+    if (url.pathname === '/api/monitoring/clear' && req.method === 'POST') {
       monitor.clear();
-      return Response.json({ message: "All data cleared" });
+      return Response.json({ message: 'All data cleared' });
     }
-    
-    if (url.pathname === "/api/monitoring/simulate" && req.method === "POST") {
-      const body = await req.json() as { endpoint: string; delay: number };
-      
+
+    if (url.pathname === '/api/monitoring/simulate' && req.method === 'POST') {
+      const body = (await req.json()) as { endpoint: string; delay: number };
+
       // Simulate delay
       await Bun.sleep(body.delay || Math.random() * 1000);
-      
+
       // Track simulated response
       const start = monitor.startTiming();
       await Bun.sleep(body.delay || 0);
       monitor.endTiming(body.endpoint, start);
-      
+
       return Response.json({ simulated: true, endpoint: body.endpoint });
     }
-    
+
     // Dashboard UI
-    if (url.pathname === "/" || url.pathname === "/dashboard") {
-      return new Response(Bun.file("./src/monitoring/response-time-dashboard.html"));
+    if (url.pathname === '/' || url.pathname === '/dashboard') {
+      return new Response(Bun.file('./src/monitoring/response-time-dashboard.html'));
     }
-    
+
     // Wrap actual API endpoints with monitoring
-    return withResponseTimeTracking(async (req) => {
+    return withResponseTimeTracking(async req => {
       const url = new URL(req.url);
-      
+
       // Simulate various Fire22 API endpoints with different response times
-      if (url.pathname === "/api/reviews/pending") {
+      if (url.pathname === '/api/reviews/pending') {
         await Bun.sleep(Math.random() * 50 + 10); // 10-60ms
         return Response.json({
           reviews: [
-            { id: "1", title: "Review 1", status: "pending" },
-            { id: "2", title: "Review 2", status: "pending" }
-          ]
+            { id: '1', title: 'Review 1', status: 'pending' },
+            { id: '2', title: 'Review 2', status: 'pending' },
+          ],
         });
       }
-      
-      if (url.pathname === "/api/reviews/stats") {
+
+      if (url.pathname === '/api/reviews/stats') {
         await Bun.sleep(Math.random() * 100 + 20); // 20-120ms
         return Response.json({
           total: 100,
           pending: 10,
           approved: 85,
-          rejected: 5
+          rejected: 5,
         });
       }
-      
-      if (url.pathname === "/api/metrics/dashboard") {
+
+      if (url.pathname === '/api/metrics/dashboard') {
         await Bun.sleep(Math.random() * 150 + 30); // 30-180ms
         return Response.json({
           performance_score: 96,
           security_checks: 15,
-          total_packages: 11
+          total_packages: 11,
         });
       }
-      
-      if (url.pathname === "/api/fire22/customers") {
+
+      if (url.pathname === '/api/fire22/customers') {
         await Bun.sleep(Math.random() * 200 + 100); // 100-300ms (slower endpoint)
         return Response.json({
-          customers: Array(100).fill(null).map((_, i) => ({
-            id: `customer_${i}`,
-            name: `Customer ${i}`,
-            balance: Math.random() * 10000
-          }))
+          customers: Array(100)
+            .fill(null)
+            .map((_, i) => ({
+              id: `customer_${i}`,
+              name: `Customer ${i}`,
+              balance: Math.random() * 10000,
+            })),
         });
       }
-      
-      if (url.pathname === "/api/manager/getLiveWagers") {
+
+      if (url.pathname === '/api/manager/getLiveWagers') {
         await Bun.sleep(Math.random() * 500 + 200); // 200-700ms (slowest endpoint)
         return Response.json({
-          wagers: Array(50).fill(null).map((_, i) => ({
-            id: `wager_${i}`,
-            amount: Math.random() * 1000,
-            status: "live"
-          }))
+          wagers: Array(50)
+            .fill(null)
+            .map((_, i) => ({
+              id: `wager_${i}`,
+              amount: Math.random() * 1000,
+              status: 'live',
+            })),
         });
       }
-      
-      if (url.pathname === "/health") {
+
+      if (url.pathname === '/health') {
         // Health check should be fast
         await Bun.sleep(Math.random() * 5 + 1); // 1-6ms
         return Response.json({
-          status: "healthy",
-          timestamp: Date.now()
+          status: 'healthy',
+          timestamp: Date.now(),
         });
       }
-      
-      return new Response("Not Found", { status: 404 });
+
+      return new Response('Not Found', { status: 404 });
     })(req);
-  }
+  },
 });
 
 console.log(`
@@ -202,29 +206,29 @@ Monitoring Endpoints:
 
 // Simulate some initial traffic for demo
 setTimeout(async () => {
-  console.log("\n🚀 Generating sample traffic...\n");
-  
+  console.log('\n🚀 Generating sample traffic...\n');
+
   const endpoints = [
-    "/health",
-    "/api/reviews/pending",
-    "/api/reviews/stats",
-    "/api/metrics/dashboard",
-    "/api/fire22/customers",
-    "/api/manager/getLiveWagers"
+    '/health',
+    '/api/reviews/pending',
+    '/api/reviews/stats',
+    '/api/metrics/dashboard',
+    '/api/fire22/customers',
+    '/api/manager/getLiveWagers',
   ];
-  
+
   for (let i = 0; i < 20; i++) {
     const endpoint = endpoints[Math.floor(Math.random() * endpoints.length)];
     fetch(`${server.url}${endpoint}`).catch(() => {});
     await Bun.sleep(100);
   }
-  
+
   // Show sample stats after traffic
   setTimeout(async () => {
     const response = await fetch(`${server.url}api/monitoring/response-times`);
     const stats = await response.json();
-    
-    console.log("📊 Sample Statistics:");
+
+    console.log('📊 Sample Statistics:');
     console.log(`├─ Total Requests: ${stats.summary.totalRequests}`);
     console.log(`├─ Average Response: ${stats.global.stats.mean.toFixed(2)}ms`);
     console.log(`├─ P95 Response: ${stats.global.stats.p95.toFixed(2)}ms`);

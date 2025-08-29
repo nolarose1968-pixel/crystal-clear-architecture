@@ -2,7 +2,7 @@
 
 /**
  * 🚀 Fire22 Workspace Orchestrator CLI
- * 
+ *
  * Unified command-line interface for comprehensive workspace orchestration:
  * - Workspace splitting and reunification
  * - Health monitoring and dashboard
@@ -10,7 +10,7 @@
  * - Multi-registry publishing
  * - Dependency resolution and updates
  * - Testing and quality assurance
- * 
+ *
  * @version 1.0.0
  * @author Fire22 Development Team
  * @see docs/BUILD-INDEX.md for usage guide
@@ -39,24 +39,24 @@ class WorkspaceOrchestratorCLI {
   private healthMonitor: WorkspaceHealthMonitor;
   private versionManager: MetadataVersionManager;
   private rootPath: string;
-  
+
   constructor() {
     this.rootPath = process.cwd();
     this.orchestrator = new WorkspaceOrchestrator(this.rootPath);
     this.versionManager = new MetadataVersionManager(this.rootPath);
-    
+
     // Use the existing WorkspaceHealthMonitor (the simpler one that works)
     this.healthMonitor = new WorkspaceHealthMonitor();
   }
-  
+
   async run(args: string[]): Promise<void> {
     const options = this.parseArgs(args);
-    
+
     if (options.help || !options.action) {
       this.showHelp();
       return;
     }
-    
+
     try {
       await this.executeAction(options);
     } catch (error) {
@@ -64,53 +64,53 @@ class WorkspaceOrchestratorCLI {
       process.exit(1);
     }
   }
-  
+
   private async executeAction(options: CLIOptions): Promise<void> {
     switch (options.action) {
       case 'status':
         await this.showWorkspaceStatus(options);
         break;
-        
+
       case 'health':
         await this.runHealthCheck(options);
         break;
-        
+
       case 'monitor':
         await this.startHealthMonitoring(options);
         break;
-        
+
       case 'dashboard':
         await this.generateDashboard(options);
         break;
-        
+
       case 'split':
         await this.splitWorkspaces(options);
         break;
-        
+
       case 'reunify':
         await this.reunifyWorkspaces(options);
         break;
-        
+
       case 'benchmark':
         await this.runBenchmarks(options);
         break;
-        
+
       case 'publish':
         await this.publishWorkspaces(options);
         break;
-        
+
       case 'test':
         await this.runTests(options);
         break;
-        
+
       case 'init':
         await this.initializeWorkspace(options);
         break;
-        
+
       case 'help':
         this.showHelp();
         break;
-        
+
       default:
         if (options.action) {
           console.error(`❌ Unknown action: ${options.action}`);
@@ -119,20 +119,20 @@ class WorkspaceOrchestratorCLI {
         process.exit(1);
     }
   }
-  
+
   /**
    * 📊 Show comprehensive workspace status
    */
   private async showWorkspaceStatus(options: CLIOptions): Promise<void> {
     console.log('🚀 Fire22 Workspace Orchestrator Status');
     console.log('='.repeat(60));
-    
+
     // Get workspace metadata
     const workspace = await this.versionManager.loadWorkspaceMetadata();
     console.log(`📦 Total packages: ${workspace.packages.size}`);
     console.log(`🏗️ Root version: ${workspace.rootVersion}`);
     console.log(`📅 Last updated: ${workspace.lastUpdate.toISOString()}`);
-    
+
     // Show package breakdown by domain
     const domainGroups = this.groupPackagesByDomain(workspace.packages);
     console.log('\n🏷️ Package Distribution:');
@@ -142,96 +142,96 @@ class WorkspaceOrchestratorCLI {
         packages.forEach(pkg => console.log(`    • ${pkg}`));
       }
     }
-    
+
     // Check workspace health using the existing health monitor
     console.log('\n🏥 Running workspace health check...');
     await this.healthMonitor.runHealthCheck();
-    
+
     // Show split workspace status
     console.log('\n🔄 Split Workspaces:');
     const splitWorkspaces = [
       { name: 'fire22-core-packages', path: '../fire22-core-packages' },
       { name: 'fire22-benchmarking-suite', path: '../fire22-benchmarking-suite' },
-      { name: 'fire22-wager-system', path: '../fire22-wager-system' }
+      { name: 'fire22-wager-system', path: '../fire22-wager-system' },
     ];
-    
+
     for (const ws of splitWorkspaces) {
       const exists = existsSync(join(this.rootPath, ws.path));
       const status = exists ? '✅ Created' : '❌ Not created';
       console.log(`  ${ws.name}: ${status}`);
     }
   }
-  
+
   /**
    * 🏥 Run comprehensive health check
    */
   private async runHealthCheck(options: CLIOptions): Promise<void> {
     console.log('🏥 Running comprehensive workspace health check...');
-    
+
     // Use the existing health monitor's method
     await this.healthMonitor.runHealthCheck();
   }
-  
+
   /**
    * 📈 Start real-time health monitoring
    */
   private async startHealthMonitoring(options: CLIOptions): Promise<void> {
     console.log('📈 Starting real-time workspace health monitoring...');
-    
+
     const interval = options.interval || 60000; // Default 1 minute
     console.log(`🔄 Check interval: ${interval / 1000}s`);
-    
+
     // Simple monitoring loop
     const monitoringLoop = async () => {
       console.log('\n' + '='.repeat(60));
       console.log('🔍 Health Check - ' + new Date().toLocaleString());
       console.log('='.repeat(60));
-      
+
       await this.healthMonitor.runHealthCheck();
-      
+
       if (options.dashboard) {
         await this.generateSimpleDashboard();
       }
-      
+
       console.log(`\n⏰ Next check in ${interval / 1000}s...`);
     };
-    
+
     // Initial check
     await monitoringLoop();
-    
+
     // Start monitoring
     const intervalId = setInterval(monitoringLoop, interval);
-    
+
     process.on('SIGINT', () => {
       console.log('\n🛑 Stopping health monitoring...');
       clearInterval(intervalId);
       process.exit(0);
     });
-    
+
     console.log('🔄 Monitoring started. Press Ctrl+C to stop.');
-    
+
     // Keep alive
     await new Promise(() => {}); // Run indefinitely
   }
-  
+
   /**
    * 📊 Generate interactive dashboard
    */
   private async generateDashboard(options: CLIOptions): Promise<void> {
     console.log('📊 Generating interactive workspace dashboard...');
-    
+
     await this.healthMonitor.runHealthCheck();
     await this.generateSimpleDashboard();
-    
+
     const dashboardPath = join(this.rootPath, 'workspace-health-dashboard.html');
     console.log(`✅ Dashboard available at: file://${dashboardPath}`);
-    
+
     if (options.monitor) {
       console.log('🔄 Starting dashboard auto-refresh...');
       await this.startHealthMonitoring({ ...options, dashboard: true });
     }
   }
-  
+
   /**
    * 📊 Generate simple dashboard
    */
@@ -327,29 +327,29 @@ class WorkspaceOrchestratorCLI {
     </script>
 </body>
 </html>`;
-    
+
     const dashboardPath = join(this.rootPath, 'workspace-health-dashboard.html');
     writeFileSync(dashboardPath, dashboardHtml);
   }
-  
+
   /**
    * 🔄 Split workspaces into domain repositories
    */
   private async splitWorkspaces(options: CLIOptions): Promise<void> {
     console.log('🔄 Splitting workspace into domain-specific repositories...');
-    
+
     const result = await this.orchestrator.splitWorkspace({
       dryRun: options.dryRun,
       verbose: options.verbose,
       createRepos: true,
-      preserveHistory: true
+      preserveHistory: true,
     });
-    
+
     console.log('\n📊 Split Results:');
     console.log(`✅ Created: ${result.summary.created}`);
     console.log(`🔄 Updated: ${result.summary.updated}`);
     console.log(`❌ Failed: ${result.summary.failed}`);
-    
+
     if (options.verbose) {
       for (const [workspace, info] of result.workspaces) {
         console.log(`\n${workspace}:`);
@@ -357,30 +357,30 @@ class WorkspaceOrchestratorCLI {
         console.log(`  Packages: ${info.packages.join(', ')}`);
       }
     }
-    
+
     if (result.summary.failed === 0) {
       console.log('\n✅ All workspaces split successfully!');
     }
   }
-  
+
   /**
    * 🔄 Reunify workspaces for development
    */
   private async reunifyWorkspaces(options: CLIOptions): Promise<void> {
     console.log('🔄 Reunifying workspaces for integrated development...');
-    
+
     const result = await this.orchestrator.reunifyWorkspaces({
       mode: 'development',
       updateDependencies: true,
       runTests: true,
-      verbose: options.verbose
+      verbose: options.verbose,
     });
-    
+
     console.log('\n📊 Reunification Results:');
     console.log(`📦 Dependencies updated: ${result.dependencies.size}`);
     console.log(`🧪 Tests: ${result.tests.passed} passed, ${result.tests.failed} failed`);
     console.log(`🎯 Status: ${result.status}`);
-    
+
     if (result.status === 'success') {
       console.log('✅ Workspaces reunified successfully!');
     } else if (result.status === 'partial') {
@@ -390,51 +390,51 @@ class WorkspaceOrchestratorCLI {
       process.exit(1);
     }
   }
-  
+
   /**
    * 📊 Run comprehensive benchmarks
    */
   private async runBenchmarks(options: CLIOptions): Promise<void> {
     console.log('📊 Running comprehensive workspace benchmarks...');
-    
+
     const result = await this.orchestrator.runBenchmarks({
       suites: ['package', 'integration', 'deployment', 'performance'],
       comparison: true,
       dashboard: options.dashboard,
       alerts: true,
-      verbose: options.verbose
+      verbose: options.verbose,
     });
-    
+
     console.log('\n📊 Benchmark Results:');
     console.log(`✅ Performance budgets passed: ${result.budgets.passed}`);
     console.log(`❌ Performance budgets failed: ${result.budgets.failed}`);
     console.log(`🎯 Overall status: ${result.status}`);
-    
+
     if (result.status === 'failed') {
       console.log('❌ Some performance budgets failed');
       process.exit(1);
     }
-    
+
     console.log('✅ All benchmarks completed successfully!');
   }
-  
+
   /**
    * 📦 Publish workspaces to registries
    */
   private async publishWorkspaces(options: CLIOptions): Promise<void> {
     console.log('📦 Publishing workspaces to registries...');
-    
+
     const result = await this.orchestrator.publishWorkspaces({
       workspaces: options.workspaces,
       strategy: 'stable',
       dryRun: options.dryRun,
-      verbose: options.verbose
+      verbose: options.verbose,
     });
-    
+
     console.log('\n📊 Publishing Results:');
     console.log(`✅ Successfully published: ${result.summary.success}`);
     console.log(`❌ Failed to publish: ${result.summary.failed}`);
-    
+
     if (result.summary.failed === 0) {
       console.log('✅ All workspaces published successfully!');
     } else {
@@ -442,64 +442,69 @@ class WorkspaceOrchestratorCLI {
       process.exit(1);
     }
   }
-  
+
   /**
    * 🧪 Run workspace tests
    */
   private async runTests(options: CLIOptions): Promise<void> {
     console.log('🧪 Running workspace test suites...');
-    
+
     // Import the test runner (would need to implement this)
     console.log('⚠️ Test runner integration coming soon...');
     console.log('Use `bun test` for now to run tests');
   }
-  
+
   /**
    * 🚀 Initialize new workspace setup
    */
   private async initializeWorkspace(options: CLIOptions): Promise<void> {
     console.log('🚀 Initializing Fire22 workspace orchestration...');
-    
+
     // Create necessary configuration files
     await this.createOrchestratorConfig();
-    
+
     // Run initial health check
     await this.healthMonitor.runHealthCheck();
-    
+
     // Generate initial dashboard
     await this.generateSimpleDashboard();
-    
+
     console.log('✅ Workspace orchestration initialized!');
     console.log('💡 Next steps:');
     console.log('  - Run `bun run workspace status` to see current state');
     console.log('  - Run `bun run workspace dashboard` to view the health dashboard');
     console.log('  - Run `bun run workspace monitor` to start real-time monitoring');
   }
-  
+
   /**
    * ⚙️ Create orchestrator configuration
    */
   private async createOrchestratorConfig(): Promise<void> {
     const configPath = join(this.rootPath, 'workspace-orchestrator.config.json');
-    
+
     if (existsSync(configPath)) {
       console.log('✅ Configuration already exists');
       return;
     }
-    
+
     const config = {
       workspaces: [
         {
           name: 'fire22-core-packages',
           description: 'Core Fire22 packages for shared functionality',
           domain: 'core',
-          packages: ['@fire22/core', '@fire22/env-manager', '@fire22/middleware', '@fire22/testing-framework'],
+          packages: [
+            '@fire22/core',
+            '@fire22/env-manager',
+            '@fire22/middleware',
+            '@fire22/testing-framework',
+          ],
           dependencies: [],
           registry: 'npm',
           repository: {
             url: 'https://github.com/fire22/fire22-core-packages',
-            directory: '../fire22-core-packages'
-          }
+            directory: '../fire22-core-packages',
+          },
         },
         {
           name: 'fire22-benchmarking-suite',
@@ -510,8 +515,8 @@ class WorkspaceOrchestratorCLI {
           registry: 'npm',
           repository: {
             url: 'https://github.com/fire22/fire22-benchmarking-suite',
-            directory: '../fire22-benchmarking-suite'
-          }
+            directory: '../fire22-benchmarking-suite',
+          },
         },
         {
           name: 'fire22-wager-system',
@@ -522,67 +527,67 @@ class WorkspaceOrchestratorCLI {
           registry: 'private',
           repository: {
             url: 'https://github.com/fire22/fire22-wager-system',
-            directory: '../fire22-wager-system'
-          }
-        }
+            directory: '../fire22-wager-system',
+          },
+        },
       ],
       publishing: {
         registries: {
           npm: {
             url: 'https://registry.npmjs.org/',
             token: process.env.NPM_TOKEN || '',
-            access: 'public'
+            access: 'public',
           },
           cloudflare: {
             url: 'https://registry.cloudflare.com/',
             token: process.env.CLOUDFLARE_API_TOKEN || '',
-            account_id: process.env.CLOUDFLARE_ACCOUNT_ID || ''
+            account_id: process.env.CLOUDFLARE_ACCOUNT_ID || '',
           },
           private: {
             url: 'https://registry.fire22.com/',
             token: process.env.FIRE22_REGISTRY_TOKEN || '',
-            access: 'restricted'
-          }
+            access: 'restricted',
+          },
         },
         publishingStrategy: {
           prerelease: ['alpha', 'beta', 'rc'],
           beta: ['beta', 'rc'],
-          stable: ['latest']
-        }
+          stable: ['latest'],
+        },
       },
       benchmarking: {
         suites: {
           package: ['unit', 'integration', 'performance'],
           integration: ['cross-package', 'end-to-end'],
           deployment: ['cold-start', 'memory-usage', 'bundle-size'],
-          performance: ['throughput', 'latency', 'resource-usage']
+          performance: ['throughput', 'latency', 'resource-usage'],
         },
         budgets: {
           buildTime: 30000, // 30 seconds
           bundleSize: 1048576, // 1MB
           memoryUsage: 134217728, // 128MB
-          cpuUsage: 80 // 80%
+          cpuUsage: 80, // 80%
         },
         reporting: {
           dashboard: true,
           alerts: true,
-          comparison: true
-        }
-      }
+          comparison: true,
+        },
+      },
     };
-    
+
     writeFileSync(configPath, JSON.stringify(config, null, 2));
     console.log(`✅ Created configuration: ${configPath}`);
   }
-  
+
   // === UTILITY METHODS ===
-  
+
   private groupPackagesByDomain(packages: Map<string, any>): Map<string, string[]> {
     const groups = new Map<string, string[]>();
-    
+
     for (const [name, pkg] of packages) {
       let domain = 'core';
-      
+
       if (name.includes('benchmark') || name.includes('testing') || name.includes('performance')) {
         domain = 'benchmarking';
       } else if (name.includes('wager')) {
@@ -590,16 +595,16 @@ class WorkspaceOrchestratorCLI {
       } else if (name.includes('worker') || name.includes('dashboard')) {
         domain = 'worker';
       }
-      
+
       if (!groups.has(domain)) {
         groups.set(domain, []);
       }
       groups.get(domain)!.push(name);
     }
-    
+
     return groups;
   }
-  
+
   private parseArgs(args: string[]): CLIOptions {
     try {
       const { values, positionals } = parseArgs({
@@ -611,14 +616,14 @@ class WorkspaceOrchestratorCLI {
           dashboard: { type: 'boolean', default: false },
           monitor: { type: 'boolean', default: false },
           interval: { type: 'string' },
-          help: { type: 'boolean', short: 'h', default: false }
+          help: { type: 'boolean', short: 'h', default: false },
         },
         strict: false,
-        allowPositionals: true
+        allowPositionals: true,
       });
-      
+
       const action = positionals[2] || (values.help ? 'help' : '');
-      
+
       return {
         action,
         workspaces: values.workspaces as string[],
@@ -627,14 +632,14 @@ class WorkspaceOrchestratorCLI {
         dashboard: values.dashboard,
         monitor: values.monitor,
         interval: values.interval ? parseInt(values.interval) : undefined,
-        help: values.help
+        help: values.help,
       };
     } catch (error) {
       console.error('❌ Invalid arguments:', error);
       return { action: 'help', help: true };
     }
   }
-  
+
   private showHelp(): void {
     console.log(`
 🚀 **Fire22 Workspace Orchestrator CLI**
@@ -692,7 +697,7 @@ EXAMPLES:
 if (import.meta.main) {
   const cli = new WorkspaceOrchestratorCLI();
   const args = process.argv.slice(2);
-  
+
   try {
     await cli.run(args);
   } catch (error) {

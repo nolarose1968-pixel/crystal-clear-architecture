@@ -36,7 +36,7 @@ export class Fire22SystemController {
       enableRealTimeUpdates: config.enableRealTimeUpdates ?? true,
       enableNotifications: config.enableNotifications ?? true,
       adminUsers: config.adminUsers ?? ['admin'],
-      environment: (env.NODE_ENV as any) ?? 'development'
+      environment: (env.NODE_ENV as any) ?? 'development',
     };
 
     this.status = {
@@ -44,7 +44,7 @@ export class Fire22SystemController {
       telegramBot: 'offline',
       database: 'disconnected',
       notifications: 'inactive',
-      realTimeUpdates: 'inactive'
+      realTimeUpdates: 'inactive',
     };
   }
 
@@ -53,7 +53,6 @@ export class Fire22SystemController {
    */
   async initialize(): Promise<boolean> {
     try {
-
       // Initialize database connection
       await this.initializeDatabase();
 
@@ -115,7 +114,6 @@ export class Fire22SystemController {
       this.status.telegramBot = 'disabled';
 
       // using fetch API instead of Deno imports
-
     } catch (error) {
       console.error('❌ Telegram bot initialization failed:', error);
       this.status.telegramBot = 'error';
@@ -168,11 +166,11 @@ export class Fire22SystemController {
     this.telegramBot.setAPIHandler(apiHandler, this.env);
 
     // Forward system events to Telegram bot
-    this.addEventListener('system:alert', async (data) => {
+    this.addEventListener('system:alert', async data => {
       await this.telegramBot?.notifyAdmins(`🚨 System Alert: ${data.message}`);
     });
 
-    this.addEventListener('user:login', async (data) => {
+    this.addEventListener('user:login', async data => {
       if (data.isAdmin) {
         await this.telegramBot?.notifyAdmins(`👤 Admin login: ${data.username}`);
       }
@@ -207,7 +205,6 @@ export class Fire22SystemController {
    * Handle user login events
    */
   private async handleUserLogin(data: any): Promise<void> {
-    
     // Send notification if Telegram bot is available
     if (this.telegramBot && data.telegramId) {
       await this.telegramBot.sendNotificationById(
@@ -221,11 +218,10 @@ export class Fire22SystemController {
    * Handle wager placed events
    */
   private async handleWagerPlaced(data: any): Promise<void> {
-    
     // Broadcast to dashboard
     await this.broadcastDataUpdate({
       type: 'wager',
-      data: data
+      data: data,
     });
 
     // Send Telegram notification
@@ -241,7 +237,6 @@ export class Fire22SystemController {
    * Handle balance changed events
    */
   private async handleBalanceChanged(data: any): Promise<void> {
-    
     // Send Telegram notification for significant changes
     if (this.telegramBot && data.telegramId && Math.abs(data.change) > 100) {
       await this.telegramBot.sendNotificationById(
@@ -255,7 +250,6 @@ export class Fire22SystemController {
    * Handle system alerts
    */
   private async handleSystemAlert(data: any): Promise<void> {
-    
     // Broadcast to all admin channels
     if (this.telegramBot) {
       await this.telegramBot.notifyAdmins(`🚨 ${data.message}`);
@@ -294,26 +288,27 @@ export class Fire22SystemController {
    * Shutdown system gracefully
    */
   async shutdown(): Promise<void> {
-    
     if (this.telegramBot) {
       await this.telegramBot.stop();
     }
-    
+
     this.status = {
       dashboard: 'offline',
       telegramBot: 'offline',
       database: 'disconnected',
       notifications: 'inactive',
-      realTimeUpdates: 'inactive'
+      realTimeUpdates: 'inactive',
     };
-    
   }
 }
 
 /**
  * Create and initialize the system controller
  */
-export async function createSystemController(env: Env, config?: Partial<SystemConfig>): Promise<Fire22SystemController> {
+export async function createSystemController(
+  env: Env,
+  config?: Partial<SystemConfig>
+): Promise<Fire22SystemController> {
   const controller = new Fire22SystemController(env, config);
   await controller.initialize();
   return controller;

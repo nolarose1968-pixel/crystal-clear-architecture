@@ -22,11 +22,7 @@
       "status": "healthy",
       "score": 100,
       "message": "Database is accessible and responsive",
-      "details": [
-        "SQLite database: OK",
-        "Query execution: OK",
-        "Connection handling: OK"
-      ],
+      "details": ["SQLite database: OK", "Query execution: OK", "Connection handling: OK"],
       "lastChecked": "2025-08-28T00:22:28.399Z",
       "responseTime": 9.160249999999998
     },
@@ -35,9 +31,7 @@
       "status": "healthy",
       "score": 85,
       "message": "Performance metrics within excellent range",
-      "details": [
-        "Performance monitoring completed"
-      ],
+      "details": ["Performance monitoring completed"],
       "lastChecked": "2025-08-28T00:22:28.404Z",
       "responseTime": 12.391458
     },
@@ -46,12 +40,7 @@
       "status": "warning",
       "score": 95,
       "message": "QA score: 95% (7/10 checks passed)",
-      "details": [
-        "Passed: 7 checks",
-        "Failed: 0 checks",
-        "Warnings: 1 checks",
-        "Duration: 0.0s"
-      ],
+      "details": ["Passed: 7 checks", "Failed: 0 checks", "Warnings: 1 checks", "Duration: 0.0s"],
       "lastChecked": "2025-08-28T00:22:28.429Z",
       "responseTime": 37.387
     },
@@ -121,14 +110,9 @@
       "wouldSucceed": true,
       "changes": {
         "files": [],
-        "configurations": [
-          "wrangler.toml",
-          ".env"
-        ],
+        "configurations": ["wrangler.toml", ".env"],
         "dependencies": [],
-        "services": [
-          "Cloudflare Workers"
-        ]
+        "services": ["Cloudflare Workers"]
       },
       "risks": {
         "level": "low",
@@ -144,37 +128,21 @@
         "Monitor health metrics post-deployment"
       ],
       "estimatedDuration": 180,
-      "prerequisites": [
-        "All tests passing",
-        "Build successful",
-        "Environment variables configured"
-      ]
+      "prerequisites": ["All tests passing", "Build successful", "Environment variables configured"]
     },
     {
       "operation": "Configuration",
       "success": true,
       "wouldSucceed": true,
       "changes": {
-        "files": [
-          "package.json",
-          "tsconfig.json",
-          "wrangler.toml",
-          ".env.example"
-        ],
-        "configurations": [
-          "package.json",
-          "tsconfig.json",
-          "wrangler.toml",
-          ".env.example"
-        ],
+        "files": ["package.json", "tsconfig.json", "wrangler.toml", ".env.example"],
+        "configurations": ["package.json", "tsconfig.json", "wrangler.toml", ".env.example"],
         "dependencies": [],
         "services": []
       },
       "risks": {
         "level": "low",
-        "factors": [
-          "Configuration changes are reversible"
-        ]
+        "factors": ["Configuration changes are reversible"]
       },
       "rollbackPlan": [
         "Backup current configurations",
@@ -193,14 +161,10 @@
       "success": true,
       "wouldSucceed": true,
       "changes": {
-        "files": [
-          "dashboard.db"
-        ],
+        "files": ["dashboard.db"],
         "configurations": [],
         "dependencies": [],
-        "services": [
-          "SQLite Database"
-        ]
+        "services": ["SQLite Database"]
       },
       "risks": {
         "level": "medium",
@@ -228,25 +192,14 @@
       "success": true,
       "wouldSucceed": true,
       "changes": {
-        "files": [
-          "package.json",
-          "bun.lockb"
-        ],
-        "configurations": [
-          "package.json"
-        ],
-        "dependencies": [
-          "To be determined by bun outdated"
-        ],
+        "files": ["package.json", "bun.lockb"],
+        "configurations": ["package.json"],
+        "dependencies": ["To be determined by bun outdated"],
         "services": []
       },
       "risks": {
         "level": "medium",
-        "factors": [
-          "Breaking changes in new versions",
-          "Compatibility issues",
-          "Build failures"
-        ]
+        "factors": ["Breaking changes in new versions", "Compatibility issues", "Build failures"]
       },
       "rollbackPlan": [
         "Backup current package.json and lockfile",

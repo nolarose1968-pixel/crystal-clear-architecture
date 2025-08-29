@@ -21,9 +21,7 @@
         "loc": 0,
         "coverage": null
       },
-      "issues": [
-        "Workspace is large ( 30M)"
-      ]
+      "issues": ["Workspace is large ( 30M)"]
     },
     {
       "name": "@fire22-api-client",
@@ -128,9 +126,7 @@
         "loc": 0,
         "coverage": null
       },
-      "issues": [
-        "Workspace is large ( 30M)"
-      ]
+      "issues": ["Workspace is large ( 30M)"]
     }
   ],
   "summary": {

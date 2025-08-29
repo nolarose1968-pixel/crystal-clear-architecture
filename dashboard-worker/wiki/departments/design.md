@@ -15,16 +15,23 @@
 ## Overview
 
 ### Mission Statement
-The Design Department drives creative excellence and user experience innovation, ensuring consistent, accessible, and engaging design across all Fire22 platforms and touchpoints.
+
+The Design Department drives creative excellence and user experience innovation,
+ensuring consistent, accessible, and engaging design across all Fire22 platforms
+and touchpoints.
 
 ### Core Objectives
-- **User-Centered Design**: Create intuitive and accessible experiences for all users
+
+- **User-Centered Design**: Create intuitive and accessible experiences for all
+  users
 - **Brand Consistency**: Maintain cohesive visual identity across all platforms
 - **Design System Leadership**: Develop and maintain scalable design standards
-- **Cross-Department Support**: Provide design expertise to all organizational units
+- **Cross-Department Support**: Provide design expertise to all organizational
+  units
 - **Innovation**: Drive creative solutions and emerging design trends
 
 ### Department Statistics
+
 - **Team Size**: 3 specialized designers
 - **Active Projects**: 12 concurrent design initiatives
 - **Design Quality Score**: 98% client and stakeholder satisfaction
@@ -36,34 +43,43 @@ The Design Department drives creative excellence and user experience innovation,
 ### Design Team
 
 #### **Isabella Martinez** - Design Director
+
 - **Experience**: 15+ years in UX/UI design and design leadership
-- **Specializations**: Design strategy, team leadership, design systems architecture
+- **Specializations**: Design strategy, team leadership, design systems
+  architecture
 - **Key Metrics**: 47 designs created, 98% client satisfaction
 - **Contact**: `isabella.martinez@design.fire22`
-- **Portfolio**: [portfolio.fire22.com/isabella-martinez](https://portfolio.fire22.com/isabella-martinez)
+- **Portfolio**:
+  [portfolio.fire22.com/isabella-martinez](https://portfolio.fire22.com/isabella-martinez)
 
 #### **Ethan Cooper** - UI/UX Designer
+
 - **Experience**: 8+ years in digital product design and user research
-- **Specializations**: User interface design, usability testing, interaction design
+- **Specializations**: User interface design, usability testing, interaction
+  design
 - **Key Metrics**: 32 interfaces designed, 95% usability score
 - **Contact**: `ethan.cooper@design.fire22`
-- **Portfolio**: [portfolio.fire22.com/ethan-cooper](https://portfolio.fire22.com/ethan-cooper)
+- **Portfolio**:
+  [portfolio.fire22.com/ethan-cooper](https://portfolio.fire22.com/ethan-cooper)
 
 #### **Maya Patel** - Visual Designer
+
 - **Experience**: 6+ years in brand design and visual communications
 - **Specializations**: Visual identity, brand assets, marketing design
 - **Key Metrics**: 28 visual assets created, 99% brand consistency
 - **Contact**: `maya.patel@design.fire22`
-- **Portfolio**: [portfolio.fire22.com/maya-patel](https://portfolio.fire22.com/maya-patel)
+- **Portfolio**:
+  [portfolio.fire22.com/maya-patel](https://portfolio.fire22.com/maya-patel)
 
 ## Design Systems
 
 ### Fire22 Design System
-**Package**: `@fire22/design-system`
-**Maintainer**: Isabella Martinez
+
+**Package**: `@fire22/design-system` **Maintainer**: Isabella Martinez
 **Version**: 2.1.4
 
 #### Core Components
+
 - **Typography**: Consistent font hierarchy and styling
 - **Color Palette**: Brand colors with accessibility compliance
 - **UI Components**: Reusable interface elements
@@ -72,23 +88,25 @@ The Design Department drives creative excellence and user experience innovation,
 - **Grid System**: Responsive layout framework
 
 #### Component Library
+
 ```typescript
 // Example design system usage
-import { 
-  Button, 
-  Card, 
-  Typography, 
+import {
+  Button,
+  Card,
+  Typography,
   Colors,
-  Spacing 
+  Spacing,
 } from '@fire22/design-system';
 ```
 
 ### Brand Guidelines
 
 #### Visual Identity Standards
-- **Primary Colors**: 
+
+- **Primary Colors**:
   - Fire22 Blue: `#6366f1`
-  - Fire22 Purple: `#8b5cf6`  
+  - Fire22 Purple: `#8b5cf6`
   - Fire22 Pink: `#ec4899`
   - Fire22 Cyan: `#06b6d4`
 - **Typography**: SF Pro Display (primary), SF Mono (code)
@@ -96,6 +114,7 @@ import {
 - **Photography**: Style guidelines and treatment standards
 
 #### Accessibility Standards
+
 - **WCAG 2.1 AA Compliance**: All designs meet accessibility requirements
 - **Color Contrast**: Minimum 4.5:1 ratio for normal text
 - **Focus States**: Clear keyboard navigation indicators
@@ -106,24 +125,28 @@ import {
 ### Design Process
 
 #### 1. Discovery & Research
+
 - **User Research**: Interviews, surveys, analytics analysis
 - **Stakeholder Alignment**: Requirements gathering and goal definition
 - **Competitive Analysis**: Market research and trend analysis
 - **Technical Constraints**: Development feasibility assessment
 
 #### 2. Ideation & Concepts
+
 - **Brainstorming Sessions**: Cross-functional creative workshops
 - **Concept Development**: Multiple design directions and explorations
 - **Stakeholder Review**: Concept presentation and feedback collection
 - **Direction Selection**: Collaborative decision-making process
 
 #### 3. Design Development
+
 - **Wireframing**: Low-fidelity layout and structure design
 - **Visual Design**: High-fidelity mockups and visual refinement
 - **Prototyping**: Interactive prototypes for user testing
 - **Design Review**: Internal quality assurance and feedback
 
 #### 4. Testing & Validation
+
 - **Usability Testing**: User feedback and behavior analysis
 - **Accessibility Testing**: Compliance verification and optimization
 - **Stakeholder Approval**: Final review and sign-off process
@@ -132,12 +155,14 @@ import {
 ### Project Management
 
 #### Design Sprint Methodology
+
 - **Week-long sprints** focused on specific design challenges
 - **Daily standup meetings** with design team and stakeholders
 - **Sprint reviews** with demonstrations and feedback sessions
 - **Retrospectives** for continuous process improvement
 
 #### Collaboration Tools
+
 - **Figma**: Primary design tool for collaboration and handoff
 - **Miro**: Ideation and workshop facilitation
 - **Notion**: Project documentation and resource management
@@ -148,18 +173,21 @@ import {
 ### Visual Consistency
 
 #### Logo and Brand Mark Usage
+
 - **Primary Logo**: Full color on light backgrounds
 - **Secondary Logo**: Monochrome versions for various applications
 - **Icon Mark**: Simplified version for small sizes and favicons
 - **Clear Space**: Minimum spacing requirements around logo
 
 #### Color Applications
+
 - **Primary Palette**: Main brand colors for key elements
 - **Secondary Palette**: Supporting colors for variety and hierarchy
 - **Neutral Palette**: Grays and blacks for text and backgrounds
 - **Semantic Colors**: Success, warning, error, and info colors
 
 #### Typography Hierarchy
+
 ```css
 /* Fire22 Typography System */
 --font-display: 'SF Pro Display', system-ui, sans-serif;
@@ -181,12 +209,14 @@ caption: 12px/16px, font-weight: 400
 ### Asset Management
 
 #### Digital Assets
+
 - **High-resolution logos** in multiple formats (SVG, PNG, JPG)
 - **Brand pattern library** for backgrounds and decorative elements
 - **Icon sets** in outlined and filled variations
 - **Photography library** with consistent style and treatment
 
 #### Template Library
+
 - **Presentation templates** for internal and external communications
 - **Document templates** for reports and official communications
 - **Social media templates** for consistent brand presence
@@ -197,24 +227,28 @@ caption: 12px/16px, font-weight: 400
 ### Department Design Support
 
 #### Technology Department
+
 - **UI/UX for dashboards** and internal tools
 - **Documentation design** for technical guides
 - **Developer experience** improvements
 - **System interface design** for optimal usability
 
 #### Marketing Department
+
 - **Campaign creative** development and execution
 - **Brand asset creation** for marketing materials
 - **Social media design** and content templates
 - **Website and landing page** design and optimization
 
 #### Communications Department
+
 - **Template design** for announcements and communications
 - **Presentation design** for stakeholder meetings
 - **Brand consistency** review and approval
 - **Visual communication** strategy and execution
 
 #### Finance Department
+
 - **Dashboard design** for financial reporting
 - **Chart and visualization** design for data presentation
 - **Report template** design for consistent formatting
@@ -223,17 +257,20 @@ caption: 12px/16px, font-weight: 400
 ### Communication Workflows
 
 #### Weekly Design Updates
-**To**: Communications team and relevant departments
-**Content**: Project progress, resource needs, milestone achievements
-**Format**: Visual progress reports with key metrics and insights
+
+**To**: Communications team and relevant departments **Content**: Project
+progress, resource needs, milestone achievements **Format**: Visual progress
+reports with key metrics and insights
 
 #### Design Review Process
+
 1. **Internal Review**: Design team critique and refinement
 2. **Stakeholder Review**: Department head and key stakeholder feedback
 3. **Communications Approval**: Brand consistency and messaging alignment
 4. **Final Approval**: Executive sign-off for major projects
 
 #### Asset Approval Workflow
+
 1. **Creation**: Designer creates initial concepts and variations
 2. **Brand Review**: Internal brand compliance verification
 3. **Department Review**: Relevant department feedback and approval
@@ -244,12 +281,15 @@ caption: 12px/16px, font-weight: 400
 ### Design Software
 
 #### Primary Tools
+
 - **Figma**: Collaborative design and prototyping platform
-- **Adobe Creative Suite**: Photoshop, Illustrator, InDesign for specialized tasks
+- **Adobe Creative Suite**: Photoshop, Illustrator, InDesign for specialized
+  tasks
 - **Sketch**: macOS-native design tool for UI work
 - **Principle**: Advanced prototyping for complex interactions
 
 #### Collaboration Tools
+
 - **Figma**: Real-time collaboration and developer handoff
 - **InVision**: Prototype sharing and stakeholder feedback
 - **Zeplin**: Design specification and asset delivery
@@ -258,12 +298,14 @@ caption: 12px/16px, font-weight: 400
 ### Resources & Assets
 
 #### Design Libraries
+
 - **Fire22 UI Kit**: Complete Figma component library
 - **Icon Library**: 200+ custom icons in multiple styles
 - **Illustration Library**: Brand-consistent illustration set
 - **Photography Guidelines**: Style guide and usage examples
 
 #### External Resources
+
 - **Unsplash**: Licensed photography for marketing materials
 - **Google Fonts**: Web font resources and pairings
 - **Dribbble**: Design inspiration and trend research
@@ -272,12 +314,14 @@ caption: 12px/16px, font-weight: 400
 ### Performance Metrics
 
 #### Design Quality Metrics
+
 - **Usability Score**: 95% average across all projects
 - **Brand Consistency**: 99% compliance rate
 - **Client Satisfaction**: 98% positive feedback
 - **Time to Completion**: 94% projects delivered on schedule
 
-#### Collaboration Metrics  
+#### Collaboration Metrics
+
 - **Cross-Department Projects**: 12 active collaborations
 - **Review Cycle Time**: Average 2.3 days per review cycle
 - **Asset Usage**: 89% template utilization across departments

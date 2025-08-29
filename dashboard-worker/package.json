@@ -402,5 +402,10 @@
   "engines": {
     "node": ">=18.0",
     "bun": ">=1.2.21"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture.git",
+    "directory": "dashboard-worker"
   }
 }

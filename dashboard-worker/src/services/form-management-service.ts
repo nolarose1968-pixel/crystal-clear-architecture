@@ -822,14 +822,14 @@ export class FormManagementService extends EventEmitter {
     const warnings: Record<string, string> = {};
 
     // Required validation
-    if (field.required && (value === '' || value ==== null || value === undefined ||
+    if (field.required && (value === '' || value === null || value === undefined ||
         (Array.isArray(value) && value.length === 0))) {
       errors[field.id] = `${field.label} is required`;
       return { isValid: false, errors, warnings };
     }
 
     // Skip further validation if field is empty and not required
-    if (!field.required && (value === '' || value ==== null || value === undefined)) {
+    if (!field.required && (value === '' || value === null || value === undefined)) {
       return { isValid: true, errors, warnings };
     }
 

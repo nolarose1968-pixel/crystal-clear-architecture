@@ -13,22 +13,25 @@ import { GetLinesQuerySchema } from '../schemas/index';
 const router = Router({ base: '/lines' });
 
 // Get betting lines for ticketwriter
-router.get('/place-bets',
-  authorize(["lines.read", "betting.view", "agent.*"]),
+router.get(
+  '/place-bets',
+  authorize(['lines.read', 'betting.view', 'agent.*']),
   validate(GetLinesQuerySchema),
   controller.getLines
 );
 
 // Get sportsbook lines
-router.get('/sportsbook',
-  authorize(["lines.read", "sportsbook.view"]),
+router.get(
+  '/sportsbook',
+  authorize(['lines.read', 'sportsbook.view']),
   validate(GetLinesQuerySchema),
   controller.getLines
 );
 
 // Get lines by sport
-router.get('/:sport',
-  authorize(["lines.read"]),
+router.get(
+  '/:sport',
+  authorize(['lines.read']),
   validate(GetLinesQuerySchema),
   controller.getLines
 );

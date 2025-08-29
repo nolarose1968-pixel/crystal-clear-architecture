@@ -152,7 +152,7 @@ export class AccountSearch extends EventEmitter {
         type: 'all', // Search both customers and agents
         limit: 10,
         sortBy: 'name',
-        sortOrder: 'asc'
+        sortOrder: 'asc',
       };
 
       const response = await this.searchAccounts(searchCriteria);
@@ -163,7 +163,6 @@ export class AccountSearch extends EventEmitter {
       } else {
         this.showError('Search failed: ' + response.error);
       }
-
     } catch (error) {
       console.error('Search error:', error);
       this.showError('Search failed: ' + error.message);
@@ -179,7 +178,7 @@ export class AccountSearch extends EventEmitter {
       // Parallel search for customers and agents
       const [customerResults, agentResults] = await Promise.all([
         this.searchCustomers(criteria),
-        this.searchAgents(criteria)
+        this.searchAgents(criteria),
       ]);
 
       // Combine and sort results
@@ -192,9 +191,8 @@ export class AccountSearch extends EventEmitter {
         results: allResults,
         totalCount: allResults.length,
         searchTime: Date.now() - startTime,
-        query: criteria.query
+        query: criteria.query,
       };
-
     } catch (error) {
       return {
         success: false,
@@ -202,7 +200,7 @@ export class AccountSearch extends EventEmitter {
         totalCount: 0,
         searchTime: Date.now() - startTime,
         query: criteria.query,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -217,8 +215,8 @@ export class AccountSearch extends EventEmitter {
         body: JSON.stringify({
           query: criteria.query,
           filters: criteria.filters,
-          limit: criteria.limit || 5
-        })
+          limit: criteria.limit || 5,
+        }),
       });
 
       if (!response.ok) {
@@ -238,9 +236,8 @@ export class AccountSearch extends EventEmitter {
         lastActivity: customer.last_login || customer.last_ticket,
         riskLevel: customer.risk_level,
         matchScore: this.calculateMatchScore(criteria.query, customer),
-        highlightedFields: this.highlightMatches(criteria.query, customer)
+        highlightedFields: this.highlightMatches(criteria.query, customer),
       }));
-
     } catch (error) {
       console.error('Customer search error:', error);
       return [];
@@ -257,8 +254,8 @@ export class AccountSearch extends EventEmitter {
         body: JSON.stringify({
           query: criteria.query,
           filters: criteria.filters,
-          limit: criteria.limit || 3
-        })
+          limit: criteria.limit || 3,
+        }),
       });
 
       if (!response.ok) {
@@ -275,9 +272,8 @@ export class AccountSearch extends EventEmitter {
         tier: agent.agent_type,
         lastActivity: agent.last_login_at,
         matchScore: this.calculateMatchScore(criteria.query, agent),
-        highlightedFields: this.highlightMatches(criteria.query, agent)
+        highlightedFields: this.highlightMatches(criteria.query, agent),
       }));
-
     } catch (error) {
       console.error('Agent search error:', error);
       return [];
@@ -317,10 +313,7 @@ export class AccountSearch extends EventEmitter {
     Object.keys(item).forEach(key => {
       const value = String(item[key] || '');
       if (value.toLowerCase().includes(queryLower)) {
-        highlighted[key] = value.replace(
-          new RegExp(`(${query})`, 'gi'),
-          '<mark>$1</mark>'
-        );
+        highlighted[key] = value.replace(new RegExp(`(${query})`, 'gi'), '<mark>$1</mark>');
       }
     });
 
@@ -497,7 +490,10 @@ export class AccountSearch extends EventEmitter {
 }
 
 // Utility functions
-export function initializeAccountSearch(searchInputId: string, resultsContainerId: string): AccountSearch {
+export function initializeAccountSearch(
+  searchInputId: string,
+  resultsContainerId: string
+): AccountSearch {
   const searchInput = document.getElementById(searchInputId) as HTMLInputElement;
   const resultsContainer = document.getElementById(resultsContainerId) as HTMLElement;
 

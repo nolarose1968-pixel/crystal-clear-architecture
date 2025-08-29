@@ -19,11 +19,7 @@
       "documentation": {
         "generate": true,
         "embed": true,
-        "formats": [
-          "html",
-          "md",
-          "json"
-        ]
+        "formats": ["html", "md", "json"]
       },
       "dependencies": {
         "analyze": true,

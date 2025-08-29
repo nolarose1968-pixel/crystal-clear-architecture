@@ -6,7 +6,7 @@
 // Core entity types
 export type {
   Fire22Customer,
-  Fire22Agent, 
+  Fire22Agent,
   Fire22Transaction,
   Fire22Bet,
   Fire22Bonus,
@@ -16,7 +16,7 @@ export type {
   Fire22AuditLog,
   Fire22CustomerMetrics,
   Fire22Entity,
-  Fire22EntityType
+  Fire22EntityType,
 } from './entities';
 
 // Enum types
@@ -34,14 +34,11 @@ export type {
   SportType,
   BonusType,
   BonusStatus,
-  OddsType
+  OddsType,
 } from './entities';
 
 // Constants
-export {
-  FIRE22_CONSTRAINTS,
-  FIRE22_BUSINESS_RULES
-} from './entities';
+export { FIRE22_CONSTRAINTS, FIRE22_BUSINESS_RULES } from './entities';
 
 // Default export
 export { default } from './entities';

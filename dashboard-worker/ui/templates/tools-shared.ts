@@ -19,7 +19,9 @@ export async function openToolManager(): Promise<void> {
   try {
     console.log('Opening tool manager...');
     // Implementation for opening tool manager
-    alert('🛠️ Tool Manager\\n\\nFeature coming soon!\\n\\n• Manage tool permissions\\n• Configure tool settings\\n• Monitor tool usage\\n• Update tool versions');
+    alert(
+      '🛠️ Tool Manager\\n\\nFeature coming soon!\\n\\n• Manage tool permissions\\n• Configure tool settings\\n• Monitor tool usage\\n• Update tool versions'
+    );
   } catch (error: any) {
     console.error('Error opening tool manager:', error);
     alert(`❌ Failed to open tool manager: ${error.message}`);
@@ -34,22 +36,22 @@ export async function getAvailableTools(): Promise<any[]> {
       name: 'Development Tools',
       category: 'development',
       status: 'active',
-      version: '1.0.0'
+      version: '1.0.0',
     },
     {
       id: 'analytics-tools',
       name: 'Analytics Tools',
       category: 'analytics',
       status: 'active',
-      version: '2.1.0'
+      version: '2.1.0',
     },
     {
       id: 'system-tools',
       name: 'System Tools',
       category: 'system',
       status: 'active',
-      version: '1.5.0'
-    }
+      version: '1.5.0',
+    },
   ];
 }
 

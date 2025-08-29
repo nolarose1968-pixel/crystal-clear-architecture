@@ -1,6 +1,6 @@
 /**
  * Admin Controller
- * 
+ *
  * Handles admin-level operations for Fire22 dashboard
  */
 
@@ -12,26 +12,29 @@ import { fire22Client } from '@fire22/validator';
  */
 export async function settleWager(request: ValidatedRequest): Promise<Response> {
   try {
-    const { wagerId, result } = request.validatedBody || await request.json();
-    
+    const { wagerId, result } = request.validatedBody || (await request.json());
+
     // TODO: Implement wager settlement logic
     const response = {
       success: true,
-      message: 'Wager settled successfully'
+      message: 'Wager settled successfully',
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to settle wager',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to settle wager',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -40,27 +43,30 @@ export async function settleWager(request: ValidatedRequest): Promise<Response> 
  */
 export async function bulkSettle(request: ValidatedRequest): Promise<Response> {
   try {
-    const { wagers } = request.validatedBody || await request.json();
-    
+    const { wagers } = request.validatedBody || (await request.json());
+
     // TODO: Implement bulk settlement logic
     const response = {
       success: true,
       settled: wagers?.length || 0,
-      message: 'Wagers settled successfully'
+      message: 'Wagers settled successfully',
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to bulk settle wagers',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to bulk settle wagers',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -74,22 +80,25 @@ export async function pendingSettlements(request: ValidatedRequest): Promise<Res
       success: true,
       data: {
         pending: [],
-        count: 0
-      }
+        count: 0,
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get pending settlements',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get pending settlements',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -98,26 +107,29 @@ export async function pendingSettlements(request: ValidatedRequest): Promise<Res
  */
 export async function voidWager(request: ValidatedRequest): Promise<Response> {
   try {
-    const { wagerId, reason } = request.validatedBody || await request.json();
-    
+    const { wagerId, reason } = request.validatedBody || (await request.json());
+
     // TODO: Implement wager void logic
     const response = {
       success: true,
-      message: 'Wager voided successfully'
+      message: 'Wager voided successfully',
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to void wager',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to void wager',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -126,27 +138,30 @@ export async function voidWager(request: ValidatedRequest): Promise<Response> {
  */
 export async function createCustomer(request: ValidatedRequest): Promise<Response> {
   try {
-    const customerData = request.validatedBody || await request.json();
-    
+    const customerData = request.validatedBody || (await request.json());
+
     // TODO: Implement customer creation logic
     const response = {
       success: true,
       customerId: 'CU' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-      message: 'Customer created successfully'
+      message: 'Customer created successfully',
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 201,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to create customer',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to create customer',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -155,27 +170,30 @@ export async function createCustomer(request: ValidatedRequest): Promise<Respons
  */
 export async function processDeposit(request: ValidatedRequest): Promise<Response> {
   try {
-    const { customerId, amount, method } = request.validatedBody || await request.json();
-    
+    const { customerId, amount, method } = request.validatedBody || (await request.json());
+
     // TODO: Implement deposit processing logic
     const response = {
       success: true,
       transactionId: 'TX' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-      message: 'Deposit processed successfully'
+      message: 'Deposit processed successfully',
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to process deposit',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to process deposit',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -189,22 +207,25 @@ export async function agentConfigsDashboard(request: ValidatedRequest): Promise<
       success: true,
       data: {
         configs: [],
-        count: 0
-      }
+        count: 0,
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get agent configs',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get agent configs',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -213,27 +234,30 @@ export async function agentConfigsDashboard(request: ValidatedRequest): Promise<
  */
 export async function importCustomers(request: ValidatedRequest): Promise<Response> {
   try {
-    const { customers } = request.validatedBody || await request.json();
-    
+    const { customers } = request.validatedBody || (await request.json());
+
     // TODO: Implement customer import logic
     const response = {
       success: true,
       imported: customers?.length || 0,
-      message: 'Customers imported successfully'
+      message: 'Customers imported successfully',
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to import customers',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to import customers',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -248,23 +272,26 @@ export async function syncFire22(request: ValidatedRequest): Promise<Response> {
       synced: {
         customers: 0,
         agents: 0,
-        transactions: 0
+        transactions: 0,
       },
-      message: 'Fire22 sync completed successfully'
+      message: 'Fire22 sync completed successfully',
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to sync Fire22 data',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to sync Fire22 data',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -280,24 +307,27 @@ export async function debugCacheStats(request: ValidatedRequest): Promise<Respon
         cache: {
           hits: 0,
           misses: 0,
-          size: 0
+          size: 0,
         },
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get cache stats',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get cache stats',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -323,7 +353,7 @@ export async function getRules(request: ValidatedRequest): Promise<Response> {
             severity: 'high',
             category: 'compliance',
             lastUpdated: '2024-01-15',
-            status: 'active'
+            status: 'active',
           },
           {
             id: 'BR002',
@@ -332,7 +362,7 @@ export async function getRules(request: ValidatedRequest): Promise<Response> {
             severity: 'medium',
             category: 'operations',
             lastUpdated: '2024-01-10',
-            status: 'active'
+            status: 'active',
           },
           {
             id: 'BR003',
@@ -341,9 +371,9 @@ export async function getRules(request: ValidatedRequest): Promise<Response> {
             severity: 'high',
             category: 'security',
             lastUpdated: '2024-01-08',
-            status: 'active'
-          }
-        ]
+            status: 'active',
+          },
+        ],
       },
       compliance: {
         title: 'Compliance Rules',
@@ -356,7 +386,7 @@ export async function getRules(request: ValidatedRequest): Promise<Response> {
             severity: 'critical',
             category: 'compliance',
             lastUpdated: '2024-01-12',
-            status: 'active'
+            status: 'active',
           },
           {
             id: 'CR002',
@@ -365,7 +395,7 @@ export async function getRules(request: ValidatedRequest): Promise<Response> {
             severity: 'high',
             category: 'compliance',
             lastUpdated: '2024-01-14',
-            status: 'active'
+            status: 'active',
           },
           {
             id: 'CR003',
@@ -374,9 +404,9 @@ export async function getRules(request: ValidatedRequest): Promise<Response> {
             severity: 'high',
             category: 'compliance',
             lastUpdated: '2024-01-11',
-            status: 'active'
-          }
-        ]
+            status: 'active',
+          },
+        ],
       },
       operational: {
         title: 'Operational Rules',
@@ -389,7 +419,7 @@ export async function getRules(request: ValidatedRequest): Promise<Response> {
             severity: 'medium',
             category: 'operations',
             lastUpdated: '2024-01-09',
-            status: 'active'
+            status: 'active',
           },
           {
             id: 'OR002',
@@ -398,7 +428,7 @@ export async function getRules(request: ValidatedRequest): Promise<Response> {
             severity: 'high',
             category: 'operations',
             lastUpdated: '2024-01-07',
-            status: 'active'
+            status: 'active',
           },
           {
             id: 'OR003',
@@ -407,9 +437,9 @@ export async function getRules(request: ValidatedRequest): Promise<Response> {
             severity: 'critical',
             category: 'security',
             lastUpdated: '2024-01-13',
-            status: 'active'
-          }
-        ]
+            status: 'active',
+          },
+        ],
       },
       security: {
         title: 'Security Rules',
@@ -422,7 +452,7 @@ export async function getRules(request: ValidatedRequest): Promise<Response> {
             severity: 'high',
             category: 'security',
             lastUpdated: '2024-01-06',
-            status: 'active'
+            status: 'active',
           },
           {
             id: 'SR002',
@@ -431,7 +461,7 @@ export async function getRules(request: ValidatedRequest): Promise<Response> {
             severity: 'critical',
             category: 'security',
             lastUpdated: '2024-01-05',
-            status: 'active'
+            status: 'active',
           },
           {
             id: 'SR003',
@@ -440,10 +470,10 @@ export async function getRules(request: ValidatedRequest): Promise<Response> {
             severity: 'high',
             category: 'security',
             lastUpdated: '2024-01-04',
-            status: 'active'
-          }
-        ]
-      }
+            status: 'active',
+          },
+        ],
+      },
     };
 
     // Filter by category if specified
@@ -457,15 +487,18 @@ export async function getRules(request: ValidatedRequest): Promise<Response> {
     if (format === 'summary') {
       responseData = {
         categories: Object.keys(filteredRules),
-        totalRules: Object.values(filteredRules).reduce((total, cat) => total + cat.rules.length, 0),
+        totalRules: Object.values(filteredRules).reduce(
+          (total, cat) => total + cat.rules.length,
+          0
+        ),
         lastUpdated: new Date().toISOString(),
         summary: Object.entries(filteredRules).map(([key, cat]) => ({
           category: key,
           title: cat.title,
           ruleCount: cat.rules.length,
           criticalRules: cat.rules.filter(r => r.severity === 'critical').length,
-          highRules: cat.rules.filter(r => r.severity === 'high').length
-        }))
+          highRules: cat.rules.filter(r => r.severity === 'high').length,
+        })),
       };
     } else {
       responseData = {
@@ -474,25 +507,31 @@ export async function getRules(request: ValidatedRequest): Promise<Response> {
           rules: filteredRules,
           metadata: {
             totalCategories: Object.keys(filteredRules).length,
-            totalRules: Object.values(filteredRules).reduce((total, cat) => total + cat.rules.length, 0),
+            totalRules: Object.values(filteredRules).reduce(
+              (total, cat) => total + cat.rules.length,
+              0
+            ),
             lastUpdated: new Date().toISOString(),
-            generatedBy: 'Fire22 Rule Engine v2.1'
-          }
-        }
+            generatedBy: 'Fire22 Rule Engine v2.1',
+          },
+        },
       };
     }
 
     return new Response(JSON.stringify(responseData), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get system rules',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get system rules',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }

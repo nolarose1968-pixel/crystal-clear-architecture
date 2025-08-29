@@ -13,7 +13,7 @@ const FIRE22_PASSWORD = process.env.FIRE22_PASSWORD;
 const FIRE22_AGENT_ID = process.env.FIRE22_AGENT_ID;
 
 console.log('🔥 Fire22 API Authentication Test');
-console.log('==================================');
+console.log('!==!==!==!==!==!====');
 console.log(`API URL: ${FIRE22_API_URL}`);
 console.log(`Username: ${FIRE22_USERNAME}`);
 console.log(`Agent ID: ${FIRE22_AGENT_ID}`);
@@ -29,30 +29,30 @@ async function testFire22Auth() {
     // Test 1: Try Basic Authentication
     console.log('📡 Test 1: Testing Basic Authentication...');
     const basicAuth = Buffer.from(`${FIRE22_USERNAME}:${FIRE22_PASSWORD}`).toString('base64');
-    
+
     const basicAuthResponse = await fetch(`${FIRE22_API_URL}/Manager/getCustomerList`, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${basicAuth}`,
+        Authorization: `Basic ${basicAuth}`,
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Fire22-Dashboard/3.0.9'
+        'User-Agent': 'Fire22-Dashboard/3.0.9',
       },
       body: new URLSearchParams({
         agentID: FIRE22_AGENT_ID || FIRE22_USERNAME || '',
         sessionID: '',
-        top: '10'
-      })
+        top: '10',
+      }),
     });
 
     console.log(`Response Status: ${basicAuthResponse.status}`);
     console.log(`Response Headers:`, Object.fromEntries(basicAuthResponse.headers.entries()));
-    
+
     const responseText = await basicAuthResponse.text();
     console.log(`Response Length: ${responseText.length} bytes`);
-    
+
     if (basicAuthResponse.ok) {
       console.log('✅ Basic Authentication successful!');
-      
+
       // Try to parse response
       try {
         const data = JSON.parse(responseText);
@@ -71,12 +71,12 @@ async function testFire22Auth() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Fire22-Dashboard/3.0.9'
+        'User-Agent': 'Fire22-Dashboard/3.0.9',
       },
       body: new URLSearchParams({
         agentID: FIRE22_AGENT_ID || FIRE22_USERNAME || '',
-        top: '10'
-      })
+        top: '10',
+      }),
     });
 
     console.log(`No-Auth Response Status: ${noAuthResponse.status}`);
@@ -89,43 +89,43 @@ async function testFire22Auth() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Fire22-Dashboard/3.0.9'
+        'User-Agent': 'Fire22-Dashboard/3.0.9',
       },
       body: new URLSearchParams({
         username: FIRE22_USERNAME || '',
         password: FIRE22_PASSWORD || '',
-        agentID: FIRE22_AGENT_ID || ''
-      })
+        agentID: FIRE22_AGENT_ID || '',
+      }),
     });
 
     console.log(`Login Response Status: ${loginResponse.status}`);
     const loginHeaders = Object.fromEntries(loginResponse.headers.entries());
     console.log(`Login Response Headers:`, loginHeaders);
-    
+
     // Check for session cookie
     const setCookie = loginResponse.headers.get('set-cookie');
     if (setCookie) {
       console.log('🍪 Session Cookie received:', setCookie.slice(0, 100));
-      
+
       // Test 4: Try authenticated request with session
       console.log('\n📡 Test 4: Testing with session cookie...');
       const sessionResponse = await fetch(`${FIRE22_API_URL}/Manager/getCustomerList`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Cookie': setCookie,
-          'User-Agent': 'Fire22-Dashboard/3.0.9'
+          Cookie: setCookie,
+          'User-Agent': 'Fire22-Dashboard/3.0.9',
         },
         body: new URLSearchParams({
           agentID: FIRE22_AGENT_ID || FIRE22_USERNAME || '',
-          top: '10'
-        })
+          top: '10',
+        }),
       });
 
       console.log(`Session Response Status: ${sessionResponse.status}`);
       const sessionText = await sessionResponse.text();
       console.log(`Session Response Length: ${sessionText.length} bytes`);
-      
+
       if (sessionResponse.ok) {
         console.log('✅ Session-based authentication successful!');
       }
@@ -136,15 +136,14 @@ async function testFire22Auth() {
     const simpleResponse = await fetch(`${FIRE22_API_URL}/Manager`, {
       method: 'GET',
       headers: {
-        'Authorization': `Basic ${basicAuth}`,
-        'User-Agent': 'Fire22-Dashboard/3.0.9'
-      }
+        Authorization: `Basic ${basicAuth}`,
+        'User-Agent': 'Fire22-Dashboard/3.0.9',
+      },
     });
 
     console.log(`Simple Response Status: ${simpleResponse.status}`);
     const simpleText = await simpleResponse.text();
     console.log(`Simple Response Length: ${simpleText.length} bytes`);
-
   } catch (error) {
     console.error('❌ Error testing Fire22 authentication:', error);
     if (error instanceof Error) {
@@ -155,9 +154,11 @@ async function testFire22Auth() {
 }
 
 // Run the test
-testFire22Auth().then(() => {
-  console.log('\n✅ Fire22 API authentication test complete');
-}).catch((error) => {
-  console.error('\n❌ Fire22 API authentication test failed:', error);
-  process.exit(1);
-});
+testFire22Auth()
+  .then(() => {
+    console.log('\n✅ Fire22 API authentication test complete');
+  })
+  .catch(error => {
+    console.error('\n❌ Fire22 API authentication test failed:', error);
+    process.exit(1);
+  });

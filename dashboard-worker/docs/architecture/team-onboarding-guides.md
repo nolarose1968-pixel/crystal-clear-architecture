@@ -1,18 +1,25 @@
 # 👥 **Team Onboarding Guides: Domain Expertise Development**
 
 ## **Overview**
-This comprehensive onboarding guide is designed to accelerate team members' understanding of their domain responsibilities within the Crystal Clear Architecture. Each domain section includes technical knowledge, business context, and practical workflows.
+
+This comprehensive onboarding guide is designed to accelerate team members'
+understanding of their domain responsibilities within the Crystal Clear
+Architecture. Each domain section includes technical knowledge, business
+context, and practical workflows.
 
 ---
 
 ## **1. Collections Domain Team Onboarding**
 
 ### **Domain Overview**
-**Purpose**: Manage settlement collections, payment processing, and customer payout workflows
-**Business Impact**: Directly affects customer satisfaction and cash flow management
-**Key Metrics**: Settlement processing time, customer satisfaction, overdue rates
+
+**Purpose**: Manage settlement collections, payment processing, and customer
+payout workflows **Business Impact**: Directly affects customer satisfaction and
+cash flow management **Key Metrics**: Settlement processing time, customer
+satisfaction, overdue rates
 
 ### **Technical Architecture**
+
 ```
 📁 controllers/collections/
 ├── collections.controller.ts      # Main controller logic
@@ -24,13 +31,16 @@ This comprehensive onboarding guide is designed to accelerate team members' unde
 ### **Core Responsibilities**
 
 #### **Settlement Processing**
+
 1. **Validate Settlement Requests**
+
    - Check customer eligibility
    - Verify wager outcomes
    - Calculate payout amounts
    - Apply business rules
 
 2. **Process Payments**
+
    - Initiate payment transactions
    - Handle different payment methods
    - Manage transaction states
@@ -45,6 +55,7 @@ This comprehensive onboarding guide is designed to accelerate team members' unde
 ### **Key Workflows**
 
 #### **Daily Operations**
+
 ```mermaid
 flowchart TD
     A[Check Pending Settlements] --> B{Overdue?}
@@ -59,6 +70,7 @@ flowchart TD
 ```
 
 #### **Escalation Procedures**
+
 - **Priority 1**: Overdue VIP settlements (>24 hours)
 - **Priority 2**: Technical payment failures
 - **Priority 3**: Customer disputes or corrections
@@ -66,18 +78,21 @@ flowchart TD
 ### **Essential Knowledge**
 
 #### **Business Rules**
+
 - Settlement windows (24-72 hours post-event)
 - Minimum payout thresholds ($10.00)
 - Maximum daily payout limits ($100,000)
 - Tax withholding requirements by jurisdiction
 
 #### **Technical Skills**
+
 - Payment gateway integrations
 - Transaction state management
 - Customer communication systems
 - Regulatory compliance frameworks
 
 ### **Getting Started Checklist**
+
 - [ ] Review settlement processing workflows
 - [ ] Complete payment gateway training
 - [ ] Shadow senior team member for 3 settlements
@@ -90,11 +105,14 @@ flowchart TD
 ## **2. Distributions Domain Team Onboarding**
 
 ### **Domain Overview**
-**Purpose**: Manage revenue distribution, commission payments, and partner payouts
-**Business Impact**: Critical for partner relationships and revenue sharing agreements
-**Key Metrics**: Payment accuracy, on-time delivery, partner satisfaction
+
+**Purpose**: Manage revenue distribution, commission payments, and partner
+payouts **Business Impact**: Critical for partner relationships and revenue
+sharing agreements **Key Metrics**: Payment accuracy, on-time delivery, partner
+satisfaction
 
 ### **Technical Architecture**
+
 ```
 📁 controllers/distributions/
 ├── distributions.controller.ts   # Distribution endpoints
@@ -106,13 +124,16 @@ flowchart TD
 ### **Core Responsibilities**
 
 #### **Revenue Distribution**
+
 1. **Calculate Commissions**
+
    - Apply tiered commission structures
    - Calculate performance bonuses
    - Handle multi-level distributions
    - Process referral payments
 
 2. **Payment Processing**
+
    - Execute bulk payments
    - Manage payment schedules
    - Handle international transfers
@@ -127,6 +148,7 @@ flowchart TD
 ### **Key Workflows**
 
 #### **Monthly Distribution Cycle**
+
 ```mermaid
 flowchart TD
     A[Revenue Calculation] --> B[Commission Tiers]
@@ -145,18 +167,21 @@ flowchart TD
 ### **Essential Knowledge**
 
 #### **Commission Structures**
+
 - Base commission rates (15-25%)
 - Performance multipliers (up to 2x)
 - Multi-level referral bonuses
 - Seasonal promotional rates
 
 #### **Payment Methods**
+
 - Wire transfers for large amounts
 - PayPal for international partners
 - Bank transfers for recurring payments
 - Cryptocurrency options (future)
 
 ### **Getting Started Checklist**
+
 - [ ] Study commission calculation formulas
 - [ ] Review partner agreement templates
 - [ ] Complete payment processing training
@@ -169,11 +194,13 @@ flowchart TD
 ## **3. Free Play Domain Team Onboarding**
 
 ### **Domain Overview**
+
 **Purpose**: Manage bonus programs, promotional campaigns, and customer rewards
 **Business Impact**: Drives customer acquisition, retention, and engagement
 **Key Metrics**: Redemption rates, customer lifetime value, campaign ROI
 
 ### **Technical Architecture**
+
 ```
 📁 controllers/free-play/
 ├── free-play.controller.ts       # Bonus endpoints
@@ -185,13 +212,16 @@ flowchart TD
 ### **Core Responsibilities**
 
 #### **Bonus Management**
+
 1. **Campaign Creation**
+
    - Design bonus structures
    - Set wagering requirements
    - Define eligibility criteria
    - Configure expiration rules
 
 2. **Redemption Processing**
+
    - Validate redemption requests
    - Calculate bonus amounts
    - Process wagering completions
@@ -206,6 +236,7 @@ flowchart TD
 ### **Key Workflows**
 
 #### **Bonus Lifecycle**
+
 ```mermaid
 stateDiagram-v2
     [*] --> Created
@@ -225,6 +256,7 @@ stateDiagram-v2
 ### **Essential Knowledge**
 
 #### **Bonus Types**
+
 - **Welcome Bonuses**: New customer acquisition
 - **Deposit Matches**: Encourage deposits
 - **Free Bets**: Trial wagering opportunities
@@ -232,12 +264,14 @@ stateDiagram-v2
 - **Referral Bonuses**: Viral growth incentives
 
 #### **Wagering Requirements**
+
 - Deposit wagering (1x-50x)
 - Sportsbook restrictions
 - Time limits (7-90 days)
 - Game type limitations
 
 ### **Getting Started Checklist**
+
 - [ ] Review bonus program catalog
 - [ ] Study wagering requirement calculations
 - [ ] Complete campaign creation training
@@ -250,11 +284,13 @@ stateDiagram-v2
 ## **4. Balance Domain Team Onboarding**
 
 ### **Domain Overview**
-**Purpose**: Manage customer account balances, transactions, and financial records
-**Business Impact**: Core to customer trust and regulatory compliance
+
+**Purpose**: Manage customer account balances, transactions, and financial
+records **Business Impact**: Core to customer trust and regulatory compliance
 **Key Metrics**: Transaction accuracy, account security, customer satisfaction
 
 ### **Technical Architecture**
+
 ```
 📁 controllers/balance/
 ├── balance.controller.ts         # Balance endpoints
@@ -266,13 +302,16 @@ stateDiagram-v2
 ### **Core Responsibilities**
 
 #### **Account Management**
+
 1. **Balance Tracking**
+
    - Monitor account balances
    - Track pending transactions
    - Calculate available funds
    - Handle multi-currency accounts
 
 2. **Transaction Processing**
+
    - Process deposits and withdrawals
    - Handle balance transfers
    - Manage transaction reversals
@@ -287,6 +326,7 @@ stateDiagram-v2
 ### **Key Workflows**
 
 #### **Deposit Processing**
+
 ```mermaid
 flowchart TD
     A[Deposit Request] --> B{Method Valid?}
@@ -304,12 +344,14 @@ flowchart TD
 ### **Essential Knowledge**
 
 #### **Balance Types**
+
 - **Available Balance**: Immediately accessible funds
 - **Pending Balance**: Funds in processing
 - **Bonus Balance**: Promotional funds
 - **Restricted Balance**: Funds with conditions
 
 #### **Transaction Types**
+
 - Deposits (bank, card, crypto)
 - Withdrawals (bank, wallet)
 - Transfers (internal, external)
@@ -317,6 +359,7 @@ flowchart TD
 - Fees (processing, service)
 
 ### **Getting Started Checklist**
+
 - [ ] Study balance calculation logic
 - [ ] Review transaction processing flows
 - [ ] Complete fraud detection training
@@ -329,11 +372,13 @@ flowchart TD
 ## **5. Adjustment Domain Team Onboarding**
 
 ### **Domain Overview**
+
 **Purpose**: Manage account adjustments, corrections, and special requests
-**Business Impact**: Critical for customer service and dispute resolution
-**Key Metrics**: Resolution time, customer satisfaction, error rates
+**Business Impact**: Critical for customer service and dispute resolution **Key
+Metrics**: Resolution time, customer satisfaction, error rates
 
 ### **Technical Architecture**
+
 ```
 📁 controllers/adjustment/
 ├── adjustment.controller.ts      # Adjustment endpoints
@@ -345,13 +390,16 @@ flowchart TD
 ### **Core Responsibilities**
 
 #### **Adjustment Processing**
+
 1. **Request Validation**
+
    - Verify adjustment requests
    - Check customer eligibility
    - Validate supporting documentation
    - Assess business justification
 
 2. **Approval Workflows**
+
    - Route to appropriate approvers
    - Implement dual-authorization
    - Track approval history
@@ -366,6 +414,7 @@ flowchart TD
 ### **Key Workflows**
 
 #### **Adjustment Lifecycle**
+
 ```mermaid
 flowchart TD
     A[Adjustment Request] --> B{Valid Request?}
@@ -385,6 +434,7 @@ flowchart TD
 ### **Essential Knowledge**
 
 #### **Adjustment Types**
+
 - **Balance Corrections**: Fix calculation errors
 - **Bonus Adjustments**: Modify promotional credits
 - **Fee Reversals**: Remove incorrect charges
@@ -392,12 +442,14 @@ flowchart TD
 - **Account Corrections**: Fix account data issues
 
 #### **Approval Levels**
+
 - **Level 1**: <$100, auto-approved
 - **Level 2**: $100-$1000, supervisor approval
 - **Level 3**: >$1000, manager approval
 - **Level 4**: >$10000, executive approval
 
 ### **Getting Started Checklist**
+
 - [ ] Review adjustment request types
 - [ ] Study approval workflow rules
 - [ ] Complete validation training
@@ -410,18 +462,21 @@ flowchart TD
 ## **6. Cross-Domain Collaboration**
 
 ### **Shared Responsibilities**
+
 - **Customer Experience**: All domains impact customer satisfaction
 - **Regulatory Compliance**: Cross-domain regulatory requirements
 - **System Performance**: Domain changes affect overall system
 - **Security**: Domain-specific security impacts enterprise security
 
 ### **Communication Protocols**
+
 - **Daily Standups**: Domain-specific updates
 - **Weekly Syncs**: Cross-domain coordination
 - **Incident Response**: Domain-specific escalation paths
 - **Change Management**: Domain impact assessments
 
 ### **Knowledge Sharing**
+
 - **Domain Deep Dives**: Monthly presentations
 - **Cross-Training**: Shadowing across domains
 - **Documentation**: Shared knowledge base
@@ -432,6 +487,7 @@ flowchart TD
 ## **7. Development Environment Setup**
 
 ### **Local Development**
+
 ```bash
 # Clone repository
 git clone https://github.com/fire22/dashboard-worker.git
@@ -449,6 +505,7 @@ bun run dev
 ```
 
 ### **Database Setup**
+
 ```bash
 # Initialize database
 bun run db:init
@@ -461,6 +518,7 @@ bun run db:seed
 ```
 
 ### **Testing Environment**
+
 ```bash
 # Run domain-specific tests
 bun test --grep "collections"
@@ -481,6 +539,7 @@ bun run test:coverage
 ## **8. Key Contacts & Resources**
 
 ### **Domain Leads**
+
 - **Collections**: Sarah Johnson (sarah.johnson@fire22.com)
 - **Distributions**: Mike Chen (mike.chen@fire22.com)
 - **Free Play**: Emma Rodriguez (emma.rodriguez@fire22.com)
@@ -488,12 +547,15 @@ bun run test:coverage
 - **Adjustment**: Lisa Wong (lisa.wong@fire22.com)
 
 ### **Technical Resources**
+
 - **Architecture Documentation**: `/docs/architecture/`
 - **API Reference**: `/docs/architecture/api-reference.md`
-- **Implementation Checklists**: `/docs/architecture/implementation-checklists.md`
+- **Implementation Checklists**:
+  `/docs/architecture/implementation-checklists.md`
 - **Code Style Guide**: `/docs/contributing/style-guide.md`
 
 ### **Support Channels**
+
 - **Slack Channels**: `#domain-collections`, `#domain-distributions`, etc.
 - **GitHub Issues**: For technical issues and feature requests
 - **Weekly Office Hours**: Domain-specific Q&A sessions
@@ -503,18 +565,21 @@ bun run test:coverage
 ## **9. Performance Expectations**
 
 ### **Week 1-2: Learning Phase**
+
 - Understand domain responsibilities
 - Complete onboarding checklists
 - Shadow experienced team members
 - Begin contributing to simple tasks
 
 ### **Week 3-4: Contribution Phase**
+
 - Handle routine domain tasks independently
 - Participate in code reviews
 - Contribute to documentation
 - Assist with testing and validation
 
 ### **Week 5+: Full Contribution Phase**
+
 - Own complex domain workflows
 - Lead domain-specific initiatives
 - Mentor junior team members
@@ -525,12 +590,14 @@ bun run test:coverage
 ## **10. Success Metrics**
 
 ### **Individual Performance**
+
 - **Task Completion**: 90%+ on-time delivery
 - **Code Quality**: Zero critical bugs in production
 - **Knowledge Sharing**: Regular contributions to documentation
 - **Team Collaboration**: Positive peer feedback
 
 ### **Domain Performance**
+
 - **Processing Time**: Meet or exceed SLA targets
 - **Error Rates**: Maintain <0.1% error rate
 - **Customer Satisfaction**: Achieve 95%+ satisfaction scores
@@ -538,4 +605,6 @@ bun run test:coverage
 
 ---
 
-*This onboarding guide is a living document. Regular updates ensure it reflects current best practices and domain evolution. New team members should review this guide quarterly to stay current with domain developments.*
+_This onboarding guide is a living document. Regular updates ensure it reflects
+current best practices and domain evolution. New team members should review this
+guide quarterly to stay current with domain developments._

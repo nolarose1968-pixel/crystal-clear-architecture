@@ -4,7 +4,7 @@
  * Ensures bunx and bun shell are fully global with proper PATH configuration
  */
 
-import { logger } from "./enhanced-logging-system";
+import { logger } from './enhanced-logging-system';
 
 interface GlobalSetupResult {
   success: boolean;
@@ -15,9 +15,9 @@ interface GlobalSetupResult {
 class GlobalBinaryManager {
   private bunBinPath: string = `${process.env.HOME}/.bun/bin`;
   private shellRcFiles: string[] = ['.bashrc', '.zshrc', '.profile'];
-  
+
   constructor() {
-    logger.info("GLOBAL", "1.0.0", "Initializing global binary setup for Fire22 Dashboard Worker");
+    logger.info('GLOBAL', '1.0.0', 'Initializing global binary setup for Fire22 Dashboard Worker');
   }
 
   /**
@@ -27,24 +27,25 @@ class GlobalBinaryManager {
     try {
       const bunVersion = Bun.version;
       const bunPath = await Bun.which('bun');
-      
+
       if (!bunPath) {
         return {
           success: false,
-          message: "❌ Bun not found in PATH. Please install Bun first: curl -fsSL https://bun.sh/install | bash"
+          message:
+            '❌ Bun not found in PATH. Please install Bun first: curl -fsSL https://bun.sh/install | bash',
         };
       }
 
-      logger.success("GLOBAL", "1.0.0", `Bun v${bunVersion} found at ${bunPath}`);
+      logger.success('GLOBAL', '1.0.0', `Bun v${bunVersion} found at ${bunPath}`);
       return {
         success: true,
         message: `✅ Bun v${bunVersion} properly installed`,
-        commands: [`bun --version`]
+        commands: [`bun --version`],
       };
     } catch (error) {
       return {
         success: false,
-        message: `❌ Error checking Bun installation: ${error}`
+        message: `❌ Error checking Bun installation: ${error}`,
       };
     }
   }
@@ -55,49 +56,50 @@ class GlobalBinaryManager {
   async setupShellPath(): Promise<GlobalSetupResult> {
     const pathExport = `export PATH="${this.bunBinPath}:$PATH"`;
     const updatedFiles: string[] = [];
-    
+
     try {
       for (const rcFile of this.shellRcFiles) {
         const filePath = `${process.env.HOME}/${rcFile}`;
-        
+
         try {
           // Check if file exists
           const fileExists = await Bun.file(filePath).exists();
-          
+
           if (fileExists) {
             const content = await Bun.file(filePath).text();
-            
+
             // Check if PATH is already configured
             if (!content.includes('.bun/bin')) {
               // Append PATH configuration
               await Bun.write(filePath, `${content}\n\n# Bun binary path\n${pathExport}\n`);
               updatedFiles.push(rcFile);
-              logger.info("GLOBAL", "1.0.0", `Updated PATH in ${rcFile}`);
+              logger.info('GLOBAL', '1.0.0', `Updated PATH in ${rcFile}`);
             } else {
-              logger.info("GLOBAL", "1.0.0", `PATH already configured in ${rcFile}`);
+              logger.info('GLOBAL', '1.0.0', `PATH already configured in ${rcFile}`);
             }
           } else {
             // Create file with PATH configuration
             await Bun.write(filePath, `# Bun binary path\n${pathExport}\n`);
             updatedFiles.push(rcFile);
-            logger.info("GLOBAL", "1.0.0", `Created ${rcFile} with PATH configuration`);
+            logger.info('GLOBAL', '1.0.0', `Created ${rcFile} with PATH configuration`);
           }
         } catch (error) {
-          logger.warning("GLOBAL", "1.0.0", `Could not update ${rcFile}: ${error}`);
+          logger.warning('GLOBAL', '1.0.0', `Could not update ${rcFile}: ${error}`);
         }
       }
 
       return {
         success: true,
-        message: updatedFiles.length > 0 
-          ? `✅ Updated PATH in: ${updatedFiles.join(', ')}. Restart your terminal or run: source ~/.bashrc`
-          : `✅ PATH already properly configured`,
-        commands: [`source ~/.bashrc`, `source ~/.zshrc`]
+        message:
+          updatedFiles.length > 0
+            ? `✅ Updated PATH in: ${updatedFiles.join(', ')}. Restart your terminal or run: source ~/.bashrc`
+            : `✅ PATH already properly configured`,
+        commands: [`source ~/.bashrc`, `source ~/.zshrc`],
       };
     } catch (error) {
       return {
         success: false,
-        message: `❌ Error setting up shell PATH: ${error}`
+        message: `❌ Error setting up shell PATH: ${error}`,
       };
     }
   }
@@ -110,18 +112,18 @@ class GlobalBinaryManager {
       // Run bun link to create global symlinks
       const linkProcess = Bun.spawn(['bun', 'link'], {
         cwd: process.cwd(),
-        stdio: ['inherit', 'pipe', 'pipe']
+        stdio: ['inherit', 'pipe', 'pipe'],
       });
-      
+
       const exitCode = await linkProcess.exited;
-      
+
       if (exitCode === 0) {
-        logger.success("GLOBAL", "1.0.0", "Global binaries linked successfully");
-        
+        logger.success('GLOBAL', '1.0.0', 'Global binaries linked successfully');
+
         // Verify linked binaries
         const binaries = ['fire22-dashboard', 'fire22-version', 'fire22-staging', 'fire22-hmr'];
         const verificationResults = [];
-        
+
         for (const binary of binaries) {
           const binaryPath = await Bun.which(binary);
           if (binaryPath) {
@@ -130,22 +132,22 @@ class GlobalBinaryManager {
             verificationResults.push(`⚠️ ${binary} → not found`);
           }
         }
-        
+
         return {
           success: true,
           message: `✅ Global binaries linked: ${binaries.join(', ')}`,
-          commands: binaries.map(bin => `${bin} --version`)
+          commands: binaries.map(bin => `${bin} --version`),
         };
       } else {
         return {
           success: false,
-          message: "❌ Failed to link global binaries"
+          message: '❌ Failed to link global binaries',
         };
       }
     } catch (error) {
       return {
         success: false,
-        message: `❌ Error linking global binaries: ${error}`
+        message: `❌ Error linking global binaries: ${error}`,
       };
     }
   }
@@ -160,39 +162,39 @@ class GlobalBinaryManager {
       if (!bunxPath) {
         return {
           success: false,
-          message: "❌ bunx not found. Bun installation may be incomplete."
+          message: '❌ bunx not found. Bun installation may be incomplete.',
         };
       }
 
       // Test bunx functionality
       const testProcess = Bun.spawn(['bunx', '--version'], {
-        stdio: ['inherit', 'pipe', 'pipe']
+        stdio: ['inherit', 'pipe', 'pipe'],
       });
-      
+
       const exitCode = await testProcess.exited;
-      
+
       if (exitCode === 0) {
-        logger.success("GLOBAL", "1.0.0", `bunx accessible at ${bunxPath}`);
-        
+        logger.success('GLOBAL', '1.0.0', `bunx accessible at ${bunxPath}`);
+
         return {
           success: true,
           message: `✅ bunx fully functional at ${bunxPath}`,
           commands: [
             'bunx --version',
             'bunx fire22-dashboard --version',
-            'bunx -p fire22-dashboard-worker fire22-version status'
-          ]
+            'bunx -p fire22-dashboard-worker fire22-version status',
+          ],
         };
       } else {
         return {
           success: false,
-          message: "❌ bunx not functioning properly"
+          message: '❌ bunx not functioning properly',
         };
       }
     } catch (error) {
       return {
         success: false,
-        message: `❌ Error setting up bunx: ${error}`
+        message: `❌ Error setting up bunx: ${error}`,
       };
     }
   }
@@ -205,7 +207,7 @@ class GlobalBinaryManager {
       { cmd: 'bun', args: ['--version'], name: 'Bun runtime' },
       { cmd: 'bunx', args: ['--version'], name: 'bunx package runner' },
       { cmd: 'fire22-dashboard', args: ['--version'], name: 'Fire22 Dashboard' },
-      { cmd: 'fire22-version', args: ['status'], name: 'Fire22 Version CLI' }
+      { cmd: 'fire22-version', args: ['status'], name: 'Fire22 Version CLI' },
     ];
 
     const results: string[] = [];
@@ -228,8 +230,10 @@ class GlobalBinaryManager {
 
     return {
       success: allPassed,
-      message: allPassed ? "✅ All global binaries verified" : "⚠️ Some global binaries have issues",
-      commands: results
+      message: allPassed
+        ? '✅ All global binaries verified'
+        : '⚠️ Some global binaries have issues',
+      commands: results,
     };
   }
 
@@ -237,11 +241,11 @@ class GlobalBinaryManager {
    * Complete global setup process
    */
   async setupGlobal(): Promise<void> {
-    logger.info("GLOBAL", "1.0.0", "🚀 Starting Fire22 Dashboard Worker global setup");
-    
+    logger.info('GLOBAL', '1.0.0', '🚀 Starting Fire22 Dashboard Worker global setup');
+
     console.log(`
 🔥 Fire22 Dashboard Worker - Global Setup
-==========================================
+!==!==!==!==!==!==!==!==
 Package: fire22-dashboard-worker@4.0.0-staging
 Bun Version: ${Bun.version}
 `);
@@ -265,7 +269,7 @@ Bun Version: ${Bun.version}
 
     // Step 5: Verify installation
     const verification = await this.verifyGlobalSetup();
-    console.log("\n🔍 Verification Results:");
+    console.log('\n🔍 Verification Results:');
     if (verification.commands) {
       verification.commands.forEach(result => console.log(`  ${result}`));
     }
@@ -290,7 +294,7 @@ Bun Version: ${Bun.version}
 📚 Documentation: http://localhost:3001/reference
 `);
 
-    logger.success("GLOBAL", "1.0.0", "🔥 Fire22 Dashboard Worker global setup completed");
+    logger.success('GLOBAL', '1.0.0', '🔥 Fire22 Dashboard Worker global setup completed');
   }
 }
 

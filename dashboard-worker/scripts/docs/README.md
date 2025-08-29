@@ -1,6 +1,7 @@
 # 🚀 Fire22 Dashboard Scripts - Enhanced Edition
 
-Welcome to the **enhanced Fire22 Dashboard Scripts directory**! This is your comprehensive automation and management toolkit for the Fire22 platform.
+Welcome to the **enhanced Fire22 Dashboard Scripts directory**! This is your
+comprehensive automation and management toolkit for the Fire22 platform.
 
 ## 📁 **Enhanced Directory Structure**
 
@@ -23,20 +24,26 @@ scripts/
 ## 🆕 **New Enhanced Features**
 
 ### **1. 🚀 Script Runner (Performance Wrapper)**
-Every script now gets automatic performance monitoring, error handling, and execution tracking.
+
+Every script now gets automatic performance monitoring, error handling, and
+execution tracking.
 
 ```typescript
 import { runScript } from './core/script-runner';
 
 // Wrap your script execution
-const result = await runScript('my-script', async () => {
-  // Your script logic here
-  return await performOperation();
-}, {
-  timeout: 60000,
-  retries: 3,
-  tags: ['build', 'production']
-});
+const result = await runScript(
+  'my-script',
+  async () => {
+    // Your script logic here
+    return await performOperation();
+  },
+  {
+    timeout: 60000,
+    retries: 3,
+    tags: ['build', 'production'],
+  }
+);
 
 // Get performance metrics
 console.log(`Duration: ${result.performance.duration}ms`);
@@ -44,7 +51,9 @@ console.log(`Memory: ${result.performance.memoryDelta.heapUsed} bytes`);
 ```
 
 ### **2. 🛡️ Enhanced Error Handler**
-Intelligent error categorization, automatic recovery, and detailed error reporting.
+
+Intelligent error categorization, automatic recovery, and detailed error
+reporting.
 
 ```typescript
 import { handleError, createError } from './core/error-handler';
@@ -55,22 +64,27 @@ try {
   await handleError(error, {
     scriptName: 'build-script',
     operation: 'compile-typescript',
-    environment: 'production'
+    environment: 'production',
   });
 }
 
 // Create custom errors with context
-throw createError('Configuration invalid', {
-  scriptName: 'config-loader',
-  operation: 'validate-env'
-}, {
-  type: 'validation',
-  severity: 'high',
-  recoverable: true
-});
+throw createError(
+  'Configuration invalid',
+  {
+    scriptName: 'config-loader',
+    operation: 'validate-env',
+  },
+  {
+    type: 'validation',
+    severity: 'high',
+    recoverable: true,
+  }
+);
 ```
 
 ### **3. ✅ Configuration Validator**
+
 Comprehensive input validation with schemas and common validation rules.
 
 ```typescript
@@ -81,14 +95,14 @@ const schema = {
     type: 'number',
     required: true,
     min: 1024,
-    max: 65535
+    max: 65535,
   },
   apiKey: {
     type: 'string',
     required: true,
     min: 32,
-    pattern: /^[a-zA-Z0-9_-]+$/
-  }
+    pattern: /^[a-zA-Z0-9_-]+$/,
+  },
 };
 
 const result = validateConfig(config, schema);
@@ -129,7 +143,7 @@ async function main() {
     } catch (error) {
       await handleError(error, {
         scriptName: 'my-script',
-        operation: 'main-operation'
+        operation: 'main-operation',
       });
       throw error;
     }
@@ -154,17 +168,17 @@ const configSchema = {
     required: true,
     properties: {
       url: { type: 'string', required: true },
-      poolSize: { type: 'number', min: 1, max: 100 }
-    }
+      poolSize: { type: 'number', min: 1, max: 100 },
+    },
   },
   api: {
     type: 'object',
     required: true,
     properties: {
       port: { type: 'number', min: 1024, max: 65535 },
-      timeout: { type: 'number', min: 1000, max: 30000 }
-    }
-  }
+      timeout: { type: 'number', min: 1000, max: 30000 },
+    },
+  },
 };
 
 // Validate your config
@@ -179,6 +193,7 @@ if (!validation.isValid) {
 ## 📊 **Performance Monitoring**
 
 ### **Built-in Metrics**
+
 - **Execution Time**: How long each script takes
 - **Memory Usage**: Memory consumption and deltas
 - **CPU Usage**: CPU time spent in user and system space
@@ -186,6 +201,7 @@ if (!validation.isValid) {
 - **Error Patterns**: Identify common failure modes
 
 ### **Performance Reports**
+
 ```bash
 # Generate performance report
 bun run scripts/core/script-runner.ts --report
@@ -200,12 +216,15 @@ bun run scripts/core/script-runner.ts --clear-history
 ## 🛡️ **Error Handling & Recovery**
 
 ### **Automatic Recovery**
+
 The enhanced error handler automatically attempts to recover from common errors:
+
 - **File Not Found**: Waits and retries
 - **Network Issues**: Exponential backoff retry
 - **Permission Issues**: Provides clear guidance
 
 ### **Error Reporting**
+
 - **Structured Error Logs**: Consistent error format
 - **Context Information**: Script name, operation, environment
 - **Recovery Suggestions**: Actionable advice for fixing issues
@@ -214,6 +233,7 @@ The enhanced error handler automatically attempts to recover from common errors:
 ## ✅ **Configuration Validation**
 
 ### **Schema-Based Validation**
+
 - **Type Checking**: Ensure correct data types
 - **Range Validation**: Min/max values for numbers
 - **Pattern Matching**: Regex validation for strings
@@ -221,14 +241,16 @@ The enhanced error handler automatically attempts to recover from common errors:
 - **Custom Validators**: Your own validation logic
 
 ### **Common Validation Rules**
+
 ```typescript
 import { getCommonRules } from '../core/config-validator';
 
 const rules = getCommonRules();
-const validation = validateValue(email, [
-  rules.nonEmptyString,
-  rules.validEmail
-], 'email');
+const validation = validateValue(
+  email,
+  [rules.nonEmptyString, rules.validEmail],
+  'email'
+);
 ```
 
 ## 🚀 **Migration Guide**
@@ -236,10 +258,13 @@ const validation = validateValue(email, [
 ### **From Old Scripts to Enhanced Scripts**
 
 1. **Add Performance Wrapper**
+
    ```typescript
    // Before
-   async function main() { /* ... */ }
-   
+   async function main() {
+     /* ... */
+   }
+
    // After
    import { runScript } from '../core/script-runner';
    async function main() {
@@ -250,25 +275,33 @@ const validation = validateValue(email, [
    ```
 
 2. **Add Error Handling**
+
    ```typescript
    // Before
-   try { /* ... */ } catch (error) { console.error(error); }
-   
+   try {
+     /* ... */
+   } catch (error) {
+     console.error(error);
+   }
+
    // After
    import { handleError } from '../core/error-handler';
-   try { /* ... */ } catch (error) {
+   try {
+     /* ... */
+   } catch (error) {
      await handleError(error, {
        scriptName: 'script-name',
-       operation: 'operation-name'
+       operation: 'operation-name',
      });
    }
    ```
 
 3. **Add Configuration Validation**
+
    ```typescript
    // Before
    const config = loadConfig();
-   
+
    // After
    import { validateConfig } from '../core/config-validator';
    const config = loadConfig();
@@ -282,6 +315,7 @@ const validation = validateValue(email, [
 ## 📈 **Benefits of Enhanced Scripts**
 
 ### **✅ What You Gain**
+
 - **Performance Insights**: Know exactly how your scripts perform
 - **Better Error Handling**: Automatic recovery and clear error messages
 - **Configuration Safety**: Validate inputs before they cause problems
@@ -289,6 +323,7 @@ const validation = validateValue(email, [
 - **Maintainability**: Consistent patterns across all scripts
 
 ### **✅ What You Keep**
+
 - **All Existing Functionality**: No breaking changes
 - **Performance**: Enhanced, not degraded
 - **Flexibility**: Still can run scripts individually
@@ -297,11 +332,13 @@ const validation = validateValue(email, [
 ## 🔮 **Future Enhancements**
 
 ### **Phase 2: Smart Consolidation**
+
 - Build script orchestrator
 - Test runner consolidation
 - Environment manager unification
 
 ### **Phase 3: Advanced Features**
+
 - AI-powered script recommendations
 - Predictive build optimization
 - Multi-repository orchestration
@@ -316,6 +353,7 @@ const validation = validateValue(email, [
 ## 🤝 **Contributing**
 
 When adding new scripts:
+
 1. Use the enhanced error handling
 2. Add performance monitoring
 3. Validate configurations
@@ -331,4 +369,5 @@ When adding new scripts:
 
 ---
 
-**🚀 Welcome to the future of script automation!** Your scripts are now enterprise-grade with built-in monitoring, error handling, and validation.
+**🚀 Welcome to the future of script automation!** Your scripts are now
+enterprise-grade with built-in monitoring, error handling, and validation.

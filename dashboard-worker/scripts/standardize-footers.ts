@@ -10,7 +10,7 @@ import { glob } from 'glob';
 
 // Standardized footer template
 const FIRE22_FOOTER_TEMPLATE = `
-    <!-- ==================== FIRE22 DASHBOARD WORKER FOOTER v4.0.0-staging ==================== -->
+    <!-- !==!==!===== FIRE22 DASHBOARD WORKER FOOTER v4.0.0-staging !==!==!===== -->
     <!-- Generated with [pk:fire22-dashboard-worker@4.0.0-staging] -->
     <footer style="
       margin-top: 60px; 
@@ -115,7 +115,7 @@ const PRIORITY_FILES = [
   'docs/build-automation-dashboard-enhanced.html',
   'docs/fire22-api-integration.html',
   'docs/enhanced-showcase.html',
-  'p2p-queue-system.html'
+  'p2p-queue-system.html',
 ];
 
 // Files to skip (node_modules, templates, etc.)
@@ -123,31 +123,28 @@ const SKIP_PATTERNS = [
   'node_modules/**',
   'templates/fire22-dashboard-footer.html', // Skip our footer template
   '**/*test*.html',
-  '**/*temp*.html'
+  '**/*temp*.html',
 ];
 
 async function updateHtmlFooter(filePath: string): Promise<boolean> {
   try {
     const content = await readFile(filePath, 'utf-8');
-    
+
     // Skip files that already have the standardized footer
     if (content.includes('FIRE22 DASHBOARD WORKER FOOTER v4.0.0-staging')) {
       console.log(`✅ ${filePath} - Already standardized`);
       return false;
     }
-    
+
     // Check if file has existing footer tag
     const hasFooter = content.includes('</footer>');
     const hasClosingBodyTag = content.includes('</body>');
-    
+
     let updatedContent = content;
-    
+
     if (hasFooter) {
       // Replace existing footer with standardized one
-      updatedContent = content.replace(
-        /<footer[\s\S]*?<\/footer>/i,
-        FIRE22_FOOTER_TEMPLATE.trim()
-      );
+      updatedContent = content.replace(/<footer[\s\S]*?<\/footer>/i, FIRE22_FOOTER_TEMPLATE.trim());
     } else if (hasClosingBodyTag) {
       // Add footer before closing body tag
       updatedContent = content.replace(
@@ -159,14 +156,14 @@ async function updateHtmlFooter(filePath: string): Promise<boolean> {
       console.log(`⚠️ ${filePath} - No footer or body tag found, skipping`);
       return false;
     }
-    
+
     // Only write if content changed
     if (updatedContent !== content) {
       await writeFile(filePath, updatedContent, 'utf-8');
       console.log(`🔄 ${filePath} - Footer standardized`);
       return true;
     }
-    
+
     return false;
   } catch (error) {
     console.error(`❌ ${filePath} - Error: ${error.message}`);
@@ -177,11 +174,11 @@ async function updateHtmlFooter(filePath: string): Promise<boolean> {
 async function standardizeFooters() {
   console.log('🔥 Fire22 Dashboard Worker Footer Standardization');
   console.log('═'.repeat(60));
-  
+
   let processed = 0;
   let updated = 0;
   let errors = 0;
-  
+
   try {
     // Process priority files first
     console.log('\n📋 Processing Priority Files:');
@@ -194,36 +191,37 @@ async function standardizeFooters() {
         console.log(`⚠️ ${filePath} - File not found or inaccessible`);
       }
     }
-    
+
     // Process all other HTML files
     console.log('\n📂 Processing Additional HTML Files:');
     const allHtmlFiles = await glob('**/*.html', {
       ignore: [
         ...SKIP_PATTERNS,
-        ...PRIORITY_FILES // Skip priority files (already processed)
-      ]
+        ...PRIORITY_FILES, // Skip priority files (already processed)
+      ],
     });
-    
+
     for (const filePath of allHtmlFiles) {
       const result = await updateHtmlFooter(filePath);
       processed++;
       if (result) updated++;
     }
-    
   } catch (error) {
     console.error(`❌ Fatal error: ${error.message}`);
     errors++;
   }
-  
+
   console.log('\n🎯 Standardization Complete');
   console.log('═'.repeat(60));
   console.log(`📊 Files processed: ${processed}`);
   console.log(`🔄 Files updated: ${updated}`);
   console.log(`❌ Errors: ${errors}`);
   console.log(`✅ Success rate: ${Math.round((updated / processed) * 100)}%`);
-  
+
   if (updated > 0) {
-    console.log('\n🔥 All HTML footers now standardized with Fire22 Dashboard Worker v4.0.0-staging');
+    console.log(
+      '\n🔥 All HTML footers now standardized with Fire22 Dashboard Worker v4.0.0-staging'
+    );
     console.log('📦 Package: fire22-dashboard-worker@4.0.0-staging');
     console.log('🚀 Enhanced with Bun v1.01.04-alpha features');
   }

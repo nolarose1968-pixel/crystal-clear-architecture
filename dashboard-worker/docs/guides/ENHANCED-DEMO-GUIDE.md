@@ -2,15 +2,19 @@
 
 ## Overview
 
-The Fire22 Enhanced Demo showcases all the advanced features of the Fire22 Dashboard Worker platform with interactive demonstrations, real-time data streams, and comprehensive testing capabilities.
+The Fire22 Enhanced Demo showcases all the advanced features of the Fire22
+Dashboard Worker platform with interactive demonstrations, real-time data
+streams, and comprehensive testing capabilities.
 
 ## Demo Components
 
 ### 1. Interactive CLI Demo (`scripts/fire22-interactive-demo.ts`)
 
-An interactive command-line interface that provides a menu-driven experience for exploring all Fire22 features.
+An interactive command-line interface that provides a menu-driven experience for
+exploring all Fire22 features.
 
 **Features:**
+
 - 🚀 Performance monitoring with real-time metrics
 - 🔐 Security features demonstration
 - 📊 Real-time data streaming
@@ -20,6 +24,7 @@ An interactive command-line interface that provides a menu-driven experience for
 - 🎮 Fire22 API integration testing
 
 **Usage:**
+
 ```bash
 # Run the interactive demo
 bun run demo
@@ -30,9 +35,11 @@ bun run scripts/fire22-interactive-demo.ts
 
 ### 2. Core Enhanced Demo (`scripts/core/enhanced-demo.ts`)
 
-The core demonstration script that showcases all enhanced features with comprehensive testing.
+The core demonstration script that showcases all enhanced features with
+comprehensive testing.
 
 **Features:**
+
 - Configuration validation
 - Performance monitoring
 - Error handling demonstrations
@@ -41,6 +48,7 @@ The core demonstration script that showcases all enhanced features with comprehe
 - Data validation
 
 **Usage:**
+
 ```bash
 # Run full demo
 bun run demo:core
@@ -53,9 +61,11 @@ bun run demo:core --errors    # Error handling demo
 
 ### 3. Web Dashboard Demo (`src/enhanced-dashboard-demo.html`)
 
-A fully interactive web-based dashboard that visualizes all Fire22 features in a modern UI.
+A fully interactive web-based dashboard that visualizes all Fire22 features in a
+modern UI.
 
 **Features:**
+
 - Real-time metrics dashboard
 - Live activity feed
 - Performance charts
@@ -65,6 +75,7 @@ A fully interactive web-based dashboard that visualizes all Fire22 features in a
 - Pattern system connections
 
 **Usage:**
+
 ```bash
 # Start the web demo
 bun run demo:web
@@ -77,6 +88,7 @@ bun run demo:web
 Real-time monitoring of Fire22 activity logs with categorization and analytics.
 
 **Features:**
+
 - Real-time activity parsing
 - User session tracking
 - Transaction monitoring
@@ -84,6 +96,7 @@ Real-time monitoring of Fire22 activity logs with categorization and analytics.
 - Activity categorization
 
 **Usage:**
+
 ```bash
 # Run activity monitor
 bun run demo:activity
@@ -94,6 +107,7 @@ bun run demo:activity
 Analyzes IP addresses and customer relationships for security insights.
 
 **Features:**
+
 - Multi-account detection
 - Risk assessment
 - Customer clustering
@@ -101,6 +115,7 @@ Analyzes IP addresses and customer relationships for security insights.
 - Security recommendations
 
 **Usage:**
+
 ```bash
 # Run IP analyzer
 bun run demo:analyzer
@@ -111,6 +126,7 @@ bun run demo:analyzer
 Run the full dashboard with demo mode enabled.
 
 **Usage:**
+
 ```bash
 # Start dashboard server with demo data
 bun run demo:dashboard
@@ -121,6 +137,7 @@ bun run demo:dashboard
 ## Key Features Demonstrated
 
 ### Performance Monitoring
+
 - Real-time performance metrics
 - Response time tracking
 - Memory usage analysis
@@ -128,6 +145,7 @@ bun run demo:dashboard
 - Request throughput measurement
 
 ### Security Features
+
 - JWT token validation
 - Rate limiting demonstration
 - CORS policy enforcement
@@ -136,30 +154,35 @@ bun run demo:dashboard
 - Security event logging
 
 ### Real-time Data
+
 - Server-Sent Events (SSE) streaming
 - Live metric updates
 - Activity feed updates
 - Dynamic chart visualization
 
 ### Database Operations
+
 - Query performance tracking
 - Cache hit rate monitoring
 - Connection pool management
 - Transaction processing
 
 ### P2P Queue System
+
 - Withdrawal queue management
 - Deposit queue tracking
 - Intelligent matching algorithm
 - Transaction completion visualization
 
 ### Pattern Weaver
+
 - Pattern identification
 - Connection mapping
 - System integration visualization
 - Performance optimization patterns
 
 ### Fire22 API Integration
+
 - Customer data synchronization
 - Agent hierarchy management
 - Live wager tracking
@@ -214,6 +237,7 @@ bun run demo
 ## Demo Data
 
 The demos use a combination of:
+
 - **Mock Data**: Pre-configured test data for consistent demonstrations
 - **Simulated Operations**: Realistic timing and processing simulations
 - **Live Data**: When configured, connects to real Fire22 APIs
@@ -223,28 +247,30 @@ The demos use a combination of:
 
 Expected performance metrics in demo mode:
 
-| Operation | Expected Time | Status |
-|-----------|--------------|--------|
-| Fast Operation | 100-200ms | ✅ Optimal |
-| Database Query | 45-125ms | ✅ Good |
-| API Response | 50-250ms | ✅ Normal |
-| Cache Hit | 1-5ms | ✅ Excellent |
-| P2P Matching | 500-2000ms | ✅ Expected |
+| Operation      | Expected Time | Status       |
+| -------------- | ------------- | ------------ |
+| Fast Operation | 100-200ms     | ✅ Optimal   |
+| Database Query | 45-125ms      | ✅ Good      |
+| API Response   | 50-250ms      | ✅ Normal    |
+| Cache Hit      | 1-5ms         | ✅ Excellent |
+| P2P Matching   | 500-2000ms    | ✅ Expected  |
 
 ## Troubleshooting
 
 ### Common Issues
 
 1. **Demo won't start**
+
    ```bash
    # Ensure dependencies are installed
    bun install
-   
+
    # Check Node/Bun version
    bun --version  # Should be >= 1.2.20
    ```
 
 2. **API endpoints not responding**
+
    ```bash
    # Check if running in demo mode (uses mock data)
    # Or configure real API credentials in .env
@@ -298,24 +324,28 @@ const sse = new EventSource(`${apiUrl}/api/live`);
 ## Demo Highlights
 
 ### 🌟 Visual Excellence
+
 - Fire22 branded color scheme
 - Animated flame logo
 - Gradient backgrounds
 - Smooth transitions
 
 ### ⚡ Performance
+
 - Sub-second response times
 - Efficient data updates
 - Optimized rendering
 - Minimal resource usage
 
 ### 🎯 User Experience
+
 - Intuitive navigation
 - Clear visual feedback
 - Responsive design
 - Keyboard shortcuts
 
 ### 📊 Data Visualization
+
 - Real-time charts
 - Live metrics
 - Activity feeds
@@ -334,7 +364,9 @@ After exploring the demos:
 ## Support
 
 For questions or issues:
-- GitHub Issues: [Report an issue](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues)
+
+- GitHub Issues:
+  [Report an issue](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues)
 - Documentation: Check the `/docs` directory
 - Team Contact: dev@fire22.com
 
@@ -344,5 +376,4 @@ Proprietary - Fire22 Development Team
 
 ---
 
-*Built with ❤️ by the Fire22 Development Team*
-*Powered by Bun 🚀*
+_Built with ❤️ by the Fire22 Development Team_ _Powered by Bun 🚀_

@@ -2,7 +2,7 @@
 
 /**
  * 🚀 Fire22 Developer Flow Script
- * 
+ *
  * Quick access to codebase patterns, files, and development workflows
  * Uses Bun's native APIs for maximum performance and zero external dependencies
  */
@@ -35,12 +35,12 @@ class DevFlow {
     ['html', ['.html', '.htm']],
     ['sql', ['.sql']],
     ['toml', ['.toml']],
-    ['yaml', ['.yaml', '.yml']]
+    ['yaml', ['.yaml', '.yml']],
   ]);
-  
+
   async run(args: string[]): Promise<void> {
     const options = this.parseArgs(args);
-    
+
     switch (options.command) {
       case 'find':
         await this.findPattern(options);
@@ -73,19 +73,19 @@ class DevFlow {
         this.showHelp();
     }
   }
-  
+
   private async findPattern(options: FlowOptions): Promise<void> {
     if (!options.pattern) {
       console.log('❌ Pattern required. Usage: dev-flow find "pattern"');
       return;
     }
-    
+
     console.log(`🔍 Searching for: ${options.pattern}\n`);
-    
+
     try {
       const pattern = new RegExp(options.pattern, 'i'); // Smart case by default
       const searchDirs = ['src/', 'scripts/', 'bench/'];
-      
+
       for (const dir of searchDirs) {
         const results = await this.searchInDirectory(dir, pattern, options);
         if (results.length > 0) {
@@ -97,31 +97,37 @@ class DevFlow {
       console.log(`❌ Invalid regex pattern: ${options.pattern}`);
     }
   }
-  
-  private async searchInDirectory(dir: string, pattern: RegExp, options: FlowOptions): Promise<SearchResult[]> {
+
+  private async searchInDirectory(
+    dir: string,
+    pattern: RegExp,
+    options: FlowOptions
+  ): Promise<SearchResult[]> {
     const results: SearchResult[] = [];
-    
+
     try {
       // Use Bun.glob for efficient file matching
-      const globPattern = options.type 
-        ? `${dir}**/*.{${this.getExtensionsForType(options.type).map(ext => ext.slice(1)).join(',')}}`
+      const globPattern = options.type
+        ? `${dir}**/*.{${this.getExtensionsForType(options.type)
+            .map(ext => ext.slice(1))
+            .join(',')}}`
         : `${dir}**/*.{ts,tsx,js,jsx,json,md,css,html,sql,toml,yaml,yml}`;
-        
+
       const files = await Array.fromAsync(Bun.glob(globPattern).scan());
-      
+
       for (const filePath of files) {
         const file = Bun.file(filePath);
         if (await file.exists()) {
           const content = await file.text();
           const lines = content.split('\n');
-          
+
           lines.forEach((line, index) => {
             if (pattern.test(line)) {
               results.push({
                 file: filePath,
                 line: index + 1,
                 content: line.trim(),
-                context: this.getContext(lines, index, options.context || 0)
+                context: this.getContext(lines, index, options.context || 0),
               });
             }
           });
@@ -130,7 +136,7 @@ class DevFlow {
     } catch (error) {
       // Directory might not exist, continue silently
     }
-    
+
     return results;
   }
 
@@ -140,7 +146,7 @@ class DevFlow {
 
   private getContext(lines: string[], lineIndex: number, contextLines: number): string[] {
     if (contextLines === 0) return [];
-    
+
     const start = Math.max(0, lineIndex - contextLines);
     const end = Math.min(lines.length, lineIndex + contextLines + 1);
     return lines.slice(start, end);
@@ -148,7 +154,7 @@ class DevFlow {
 
   private displaySearchResults(results: SearchResult[], contextLines?: number): void {
     const grouped = new Map<string, SearchResult[]>();
-    
+
     // Group by file
     for (const result of results) {
       if (!grouped.has(result.file)) {
@@ -156,7 +162,7 @@ class DevFlow {
       }
       grouped.get(result.file)!.push(result);
     }
-    
+
     for (const [file, fileResults] of grouped) {
       console.log(`\n🔸 ${file}:`);
       for (const result of fileResults) {
@@ -180,24 +186,24 @@ class DevFlow {
       await this.showAvailableTags();
       return;
     }
-    
+
     console.log(`🏷️  Searching for tag: ${tag}\n`);
-    
+
     // Search for common tag patterns using native search
     const patterns = [
-      `@${tag}`,           // JSDoc tags
-      `TODO.*${tag}`,      // TODO tags
-      `FIXME.*${tag}`,     // FIXME tags
-      `NOTE.*${tag}`,      // NOTE tags
-      `\\[${tag}\\]`,      // [tag] format
-      `#${tag}`,           // Hash tags
+      `@${tag}`, // JSDoc tags
+      `TODO.*${tag}`, // TODO tags
+      `FIXME.*${tag}`, // FIXME tags
+      `NOTE.*${tag}`, // NOTE tags
+      `\\[${tag}\\]`, // [tag] format
+      `#${tag}`, // Hash tags
     ];
-    
+
     for (const patternStr of patterns) {
       try {
         const pattern = new RegExp(patternStr, 'i');
         const searchDirs = ['src/', 'scripts/', 'bench/'];
-        
+
         for (const dir of searchDirs) {
           const results = await this.searchInDirectory(dir, pattern, options);
           if (results.length > 0) {
@@ -210,24 +216,27 @@ class DevFlow {
       }
     }
   }
-  
+
   private async findApiEndpoints(): Promise<void> {
     console.log('🌐 Finding API endpoints...\n');
-    
+
     const patterns = [
       'app\\.(get|post|put|delete|patch)',
       'router\\.(get|post|put|delete|patch)',
       'fetch\\(',
       'Request\\(',
       '\\.route\\(',
-      '/api/'
+      '/api/',
     ];
-    
+
     for (const patternStr of patterns) {
       try {
         const pattern = new RegExp(patternStr, 'i');
-        const results = await this.searchInDirectory('src/', pattern, { command: 'api', context: 2 });
-        
+        const results = await this.searchInDirectory('src/', pattern, {
+          command: 'api',
+          context: 2,
+        });
+
         if (results.length > 0) {
           console.log(`\n🔍 Pattern "${patternStr}":`);
           this.displaySearchResults(results, 2);
@@ -237,16 +246,16 @@ class DevFlow {
       }
     }
   }
-  
+
   private async findTests(options: FlowOptions): Promise<void> {
     console.log('🧪 Finding tests...\n');
-    
+
     if (options.pattern) {
       // Search for pattern in test files
       const pattern = new RegExp(options.pattern, 'i');
       const testGlob = '**/*.{test.ts,spec.ts,test.js,spec.js}';
       const files = await Array.fromAsync(Bun.glob(testGlob).scan());
-      
+
       let foundResults = false;
       for (const filePath of files) {
         const file = Bun.file(filePath);
@@ -258,7 +267,7 @@ class DevFlow {
           }
         }
       }
-      
+
       if (!foundResults) {
         console.log(`No test files found matching pattern: ${options.pattern}`);
       }
@@ -266,7 +275,7 @@ class DevFlow {
       // List all test files using Bun.glob
       const testGlob = '**/*.{test.ts,spec.ts,test.js,spec.js}';
       const files = await Array.fromAsync(Bun.glob(testGlob).scan());
-      
+
       if (files.length > 0) {
         console.log('Test files found:');
         for (const file of files.sort()) {
@@ -277,10 +286,10 @@ class DevFlow {
       }
     }
   }
-  
+
   private async findConfig(): Promise<void> {
     console.log('⚙️  Configuration files...\n');
-    
+
     const configPatterns = [
       'package.json',
       'tsconfig.json',
@@ -288,9 +297,9 @@ class DevFlow {
       'wrangler.toml',
       'workspace-config.json',
       'build.config.ts',
-      '.env*'
+      '.env*',
     ];
-    
+
     for (const pattern of configPatterns) {
       const files = await Array.fromAsync(Bun.glob(pattern).scan());
       for (const file of files) {
@@ -300,19 +309,19 @@ class DevFlow {
       }
     }
   }
-  
+
   private async showPatterns(): Promise<void> {
     console.log('🕸️  Pattern Weaver System...\n');
-    
+
     // Search pattern-weaver.ts for pattern definitions
     const patternFiles = await Array.fromAsync(Bun.glob('src/patterns/*.ts').scan());
-    
+
     for (const filePath of patternFiles) {
       const file = Bun.file(filePath);
       if (await file.exists()) {
         const content = await file.text();
         const lines = content.split('\n');
-        
+
         console.log(`\n🔸 ${filePath}:`);
         lines.forEach((line, index) => {
           if (line.match(/readonly patternTypes|PATTERN_|pattern.*:/)) {
@@ -328,10 +337,10 @@ class DevFlow {
       }
     }
   }
-  
+
   private async workspaceInfo(): Promise<void> {
     console.log('🏗️  Workspace Information...\n');
-    
+
     // Check if workspace-config.json exists using Bun.file
     const workspaceConfigFile = Bun.file('workspace-config.json');
     if (await workspaceConfigFile.exists()) {
@@ -347,22 +356,25 @@ class DevFlow {
         console.log('❌ Invalid workspace-config.json format');
       }
     }
-    
+
     // Show workspace orchestrator commands by searching scripts
     console.log('\n🚀 Workspace Commands:');
     const pattern = new RegExp('case.*workspace|workspace.*command', 'i');
-    const results = await this.searchInDirectory('scripts/', pattern, { command: 'workspace', context: 2 });
-    
+    const results = await this.searchInDirectory('scripts/', pattern, {
+      command: 'workspace',
+      context: 2,
+    });
+
     if (results.length > 0) {
       this.displaySearchResults(results, 2);
     } else {
       console.log('  No workspace commands found in scripts/');
     }
   }
-  
+
   private async quickHealth(): Promise<void> {
     console.log('🏥 Quick Health Check...\n');
-    
+
     // Check Bun version using Bun.spawn
     console.log('📊 Bun Version:');
     try {
@@ -372,7 +384,7 @@ class DevFlow {
     } catch {
       console.log('   ❌ Bun not available');
     }
-    
+
     // Check dependencies using package.json
     console.log('\n📊 Dependencies:');
     try {
@@ -386,7 +398,7 @@ class DevFlow {
     } catch {
       console.log('   ❌ Cannot read package.json');
     }
-    
+
     // Check build status
     console.log('\n📊 Build Status:');
     const distFiles = await Array.fromAsync(Bun.glob('dist/*').scan());
@@ -396,7 +408,7 @@ class DevFlow {
     } else {
       console.log('   ⚠️  No build output found in dist/');
     }
-    
+
     // Check database files
     console.log('\n📊 Database Connection:');
     const dbFiles = await Array.fromAsync(Bun.glob('*.db').scan());
@@ -407,29 +419,29 @@ class DevFlow {
       console.log('   ⚠️  No .db files found');
     }
   }
-  
+
   private async devSetup(): Promise<void> {
     console.log('🛠️  Development Setup...\n');
-    
+
     const setupSteps = [
       { name: 'Install Dependencies', cmd: ['bun', 'install', '--frozen-lockfile'] },
       { name: 'Setup Database', cmd: ['bun', 'run', 'setup-db'] },
       { name: 'Run Quick Test', cmd: ['bun', 'run', 'test:quick'] },
-      { name: 'Validate Environment', cmd: ['bun', 'run', 'env:validate'] }
+      { name: 'Validate Environment', cmd: ['bun', 'run', 'env:validate'] },
     ];
-    
+
     for (const step of setupSteps) {
       console.log(`\n⚡ ${step.name}...`);
       try {
         // Use Bun.spawn for better performance
         const proc = Bun.spawn(step.cmd, {
           stdout: 'pipe',
-          stderr: 'pipe'
+          stderr: 'pipe',
         });
-        
+
         const output = await proc.text();
         const success = proc.exitCode === 0;
-        
+
         if (success) {
           console.log(`✅ ${step.name} completed`);
           if (output.trim()) {
@@ -445,35 +457,47 @@ class DevFlow {
       }
     }
   }
-  
+
   private async showAvailableTags(): Promise<void> {
     const commonTags = [
-      'TODO', 'FIXME', 'NOTE', 'HACK', 'BUG',
-      'PERF', 'SECURITY', 'API', 'CONFIG', 'TEST',
-      'PATTERN', 'WORKSPACE', 'BUILD', 'DEPLOY'
+      'TODO',
+      'FIXME',
+      'NOTE',
+      'HACK',
+      'BUG',
+      'PERF',
+      'SECURITY',
+      'API',
+      'CONFIG',
+      'TEST',
+      'PATTERN',
+      'WORKSPACE',
+      'BUILD',
+      'DEPLOY',
     ];
-    
+
     console.log('Common tags to search:');
     for (const tag of commonTags) {
       console.log(`  ${tag.toLowerCase()}`);
     }
-    
+
     console.log('\nUsage: dev-flow tags <tag-name>');
   }
-  
+
   private parseArgs(args: string[]): FlowOptions {
     const [command = 'help', pattern, ...rest] = args;
-    
+
     return {
       command,
       pattern,
       tag: rest.find(arg => arg.startsWith('--tag='))?.split('=')[1],
       type: rest.find(arg => arg.startsWith('--type='))?.split('=')[1],
-      context: rest.find(arg => arg.startsWith('-C'))?.split('=')[1] ? 
-        parseInt(rest.find(arg => arg.startsWith('-C'))?.split('=')[1]!) : 3
+      context: rest.find(arg => arg.startsWith('-C'))?.split('=')[1]
+        ? parseInt(rest.find(arg => arg.startsWith('-C'))?.split('=')[1]!)
+        : 3,
     };
   }
-  
+
   private showHelp(): void {
     console.log(`
 🚀 Fire22 Developer Flow Script - Bun Native

@@ -2,7 +2,7 @@
 
 /**
  * 🚀 Fire22 Load Testing Infrastructure
- * 
+ *
  * High-performance load testing for HTTP endpoints
  * Integrates with bombardier/oha for stress testing
  */
@@ -54,7 +54,7 @@ export class LoadTester {
 
     this.server = Bun.serve({
       port,
-      fetch: (req) => this.handleTestRequest(req),
+      fetch: req => this.handleTestRequest(req),
       websocket: {
         open(ws) {
           ws.send(JSON.stringify({ type: 'connected' }));
@@ -64,8 +64,8 @@ export class LoadTester {
         },
         close(ws) {
           // Handle close
-        }
-      }
+        },
+      },
     });
 
     this.baseUrl = `http://localhost:${port}`;
@@ -89,11 +89,13 @@ export class LoadTester {
         return new Response(JSON.stringify({ status: 'ok', delayed: true }));
 
       case '/api/heavy':
-        const data = Array(1000).fill(null).map((_, i) => ({
-          id: i,
-          data: `Item ${i}`,
-          metadata: { created: Date.now() }
-        }));
+        const data = Array(1000)
+          .fill(null)
+          .map((_, i) => ({
+            id: i,
+            data: `Item ${i}`,
+            metadata: { created: Date.now() },
+          }));
         return new Response(JSON.stringify(data));
 
       case '/api/echo':
@@ -176,8 +178,8 @@ export class LoadTester {
 
     const url = this.baseUrl + scenario.endpoint;
     const startTime = Date.now();
-    const endTime = startTime + (scenario.duration * 1000);
-    
+    const endTime = startTime + scenario.duration * 1000;
+
     let totalRequests = 0;
     let successfulRequests = 0;
     let errors = 0;
@@ -185,64 +187,66 @@ export class LoadTester {
     const latencies: number[] = [];
 
     // Create worker threads for concurrent connections
-    const workers = Array(scenario.connections).fill(null).map(async () => {
-      while (Date.now() < endTime) {
-        const requestStart = Bun.nanoseconds();
-        
-        try {
-          const response = await fetch(url, {
-            method: scenario.method,
-            headers: scenario.headers,
-            body: scenario.body ? JSON.stringify(scenario.body) : undefined,
-            signal: AbortSignal.timeout(5000)
-          });
+    const workers = Array(scenario.connections)
+      .fill(null)
+      .map(async () => {
+        while (Date.now() < endTime) {
+          const requestStart = Bun.nanoseconds();
 
-          const requestEnd = Bun.nanoseconds();
-          const latency = Number(requestEnd - requestStart) / 1_000_000; // Convert to ms
-          
-          totalRequests++;
-          if (response.ok) {
-            successfulRequests++;
-          } else {
-            errors++;
-          }
-          
-          latencies.push(latency);
+          try {
+            const response = await fetch(url, {
+              method: scenario.method,
+              headers: scenario.headers,
+              body: scenario.body ? JSON.stringify(scenario.body) : undefined,
+              signal: AbortSignal.timeout(5000),
+            });
 
-          // Rate limiting if specified
-          if (scenario.rps) {
-            const delay = 1000 / (scenario.rps / scenario.connections);
-            await Bun.sleep(delay);
-          }
-        } catch (error: any) {
-          totalRequests++;
-          if (error.name === 'AbortError') {
-            timeouts++;
-          } else {
-            errors++;
+            const requestEnd = Bun.nanoseconds();
+            const latency = Number(requestEnd - requestStart) / 1_000_000; // Convert to ms
+
+            totalRequests++;
+            if (response.ok) {
+              successfulRequests++;
+            } else {
+              errors++;
+            }
+
+            latencies.push(latency);
+
+            // Rate limiting if specified
+            if (scenario.rps) {
+              const delay = 1000 / (scenario.rps / scenario.connections);
+              await Bun.sleep(delay);
+            }
+          } catch (error: any) {
+            totalRequests++;
+            if (error.name === 'AbortError') {
+              timeouts++;
+            } else {
+              errors++;
+            }
           }
         }
-      }
-    });
+      });
 
     // Wait for all workers to complete
     await Promise.all(workers);
 
     // Calculate statistics
     latencies.sort((a, b) => a - b);
-    
+
     const result: LoadTestResult = {
       endpoint: scenario.endpoint,
       duration: scenario.duration,
       requests: totalRequests,
       successRate: (successfulRequests / totalRequests) * 100,
       avgLatency: latencies.reduce((sum, l) => sum + l, 0) / latencies.length,
-      p50Latency: latencies[Math.floor(latencies.length * 0.50)],
+      p50Latency: latencies[Math.floor(latencies.length * 0.5)],
       p95Latency: latencies[Math.floor(latencies.length * 0.95)],
       p99Latency: latencies[Math.floor(latencies.length * 0.99)],
       throughput: totalRequests / scenario.duration,
       errors,
-      timeouts
+      timeouts,
     };
 
     this.results.push(result);
@@ -261,14 +265,19 @@ export class LoadTester {
     }
 
     console.log(`\n🎯 Bombardier Load Test: ${scenario.name}`);
-    
+
     const url = this.baseUrl + scenario.endpoint;
     const args = [
-      '-c', scenario.connections.toString(),
-      '-d', `${scenario.duration}s`,
-      '-m', scenario.method,
-      '--print', 'result',
-      '--format', 'json'
+      '-c',
+      scenario.connections.toString(),
+      '-d',
+      `${scenario.duration}s`,
+      '-m',
+      scenario.method,
+      '--print',
+      'result',
+      '--format',
+      'json',
     ];
 
     if (scenario.headers) {
@@ -289,11 +298,16 @@ export class LoadTester {
 
     try {
       const result = await $`bombardier ${args}`.json();
-      
+
       return {
         endpoint: scenario.endpoint,
         duration: scenario.duration,
-        requests: result.result.req1xx + result.result.req2xx + result.result.req3xx + result.result.req4xx + result.result.req5xx,
+        requests:
+          result.result.req1xx +
+          result.result.req2xx +
+          result.result.req3xx +
+          result.result.req4xx +
+          result.result.req5xx,
         successRate: (result.result.req2xx / result.result.requests) * 100,
         avgLatency: result.result.latency.mean / 1000,
         p50Latency: result.result.latency.percentiles['50'] / 1000,
@@ -301,7 +315,7 @@ export class LoadTester {
         p99Latency: result.result.latency.percentiles['99'] / 1000,
         throughput: result.result.rps.mean,
         errors: result.result.req4xx + result.result.req5xx,
-        timeouts: result.result.timeouts || 0
+        timeouts: result.result.timeouts || 0,
       };
     } catch (error) {
       console.error('❌ Bombardier test failed:', error);
@@ -322,21 +336,21 @@ export class LoadTester {
         endpoint: '/api/fast',
         method: 'GET',
         duration: 10,
-        connections: 10
+        connections: 10,
       },
       {
         name: 'Slow Endpoint',
         endpoint: '/api/slow',
         method: 'GET',
         duration: 10,
-        connections: 5
+        connections: 5,
       },
       {
         name: 'Heavy Payload',
         endpoint: '/api/heavy',
         method: 'GET',
         duration: 10,
-        connections: 10
+        connections: 10,
       },
       {
         name: 'Echo Service',
@@ -344,28 +358,28 @@ export class LoadTester {
         method: 'POST',
         body: { test: 'data', timestamp: Date.now() },
         duration: 10,
-        connections: 10
+        connections: 10,
       },
       {
         name: 'Error Handling',
         endpoint: '/api/error',
         method: 'GET',
         duration: 10,
-        connections: 5
+        connections: 5,
       },
       {
         name: 'Auth Required',
         endpoint: '/api/auth',
         method: 'GET',
-        headers: { 'Authorization': 'Bearer test-token' },
+        headers: { Authorization: 'Bearer test-token' },
         duration: 10,
-        connections: 10
-      }
+        connections: 10,
+      },
     ];
 
     for (const scenario of scenarios) {
       await this.runBunLoadTest(scenario);
-      
+
       // Cool down between tests
       await Bun.sleep(1000);
     }
@@ -389,13 +403,13 @@ export class LoadTester {
       if (connections > maxConnections) break;
 
       console.log(`\n📊 Testing with ${connections} connections...`);
-      
+
       const result = await this.runBunLoadTest({
         name: `Stress Test - ${connections} connections`,
         endpoint,
         method: 'GET',
         duration: 10,
-        connections
+        connections,
       });
 
       stressResults.push(result);
@@ -433,37 +447,39 @@ export class LoadTester {
     let connectionErrors = 0;
 
     const startTime = Date.now();
-    const endTime = startTime + (duration * 1000);
+    const endTime = startTime + duration * 1000;
 
     // Create WebSocket connections
-    const connectionPromises = Array(connections).fill(null).map(async () => {
-      try {
-        const ws = new WebSocket(wsUrl);
-        
-        ws.onmessage = () => {
-          messagesReceived++;
-        };
+    const connectionPromises = Array(connections)
+      .fill(null)
+      .map(async () => {
+        try {
+          const ws = new WebSocket(wsUrl);
 
-        ws.onerror = () => {
+          ws.onmessage = () => {
+            messagesReceived++;
+          };
+
+          ws.onerror = () => {
+            connectionErrors++;
+          };
+
+          await new Promise(resolve => {
+            ws.onopen = resolve;
+            setTimeout(resolve, 5000); // Timeout after 5s
+          });
+
+          sockets.push(ws);
+
+          // Send messages until duration ends
+          while (Date.now() < endTime && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ timestamp: Date.now() }));
+            await Bun.sleep(100); // Send every 100ms
+          }
+        } catch (error) {
           connectionErrors++;
-        };
-
-        await new Promise((resolve) => {
-          ws.onopen = resolve;
-          setTimeout(resolve, 5000); // Timeout after 5s
-        });
-
-        sockets.push(ws);
-
-        // Send messages until duration ends
-        while (Date.now() < endTime && ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({ timestamp: Date.now() }));
-          await Bun.sleep(100); // Send every 100ms
         }
-      } catch (error) {
-        connectionErrors++;
-      }
-    });
+      });
 
     await Promise.all(connectionPromises);
 
@@ -507,22 +523,22 @@ export class LoadTester {
     console.log('='.repeat(50));
 
     const table: any[] = [];
-    
+
     for (const result of this.results) {
       table.push({
         Endpoint: result.endpoint,
-        'Requests': result.requests.toLocaleString(),
+        Requests: result.requests.toLocaleString(),
         'Success %': result.successRate.toFixed(1),
         'Avg (ms)': result.avgLatency.toFixed(2),
         'P95 (ms)': result.p95Latency.toFixed(2),
-        'RPS': result.throughput.toFixed(0)
+        RPS: result.throughput.toFixed(0),
       });
     }
 
     console.table(table);
 
     // Find best and worst performers
-    const bestLatency = this.results.reduce((prev, current) => 
+    const bestLatency = this.results.reduce((prev, current) =>
       prev.avgLatency < current.avgLatency ? prev : current
     );
     const bestThroughput = this.results.reduce((prev, current) =>
@@ -530,8 +546,12 @@ export class LoadTester {
     );
 
     console.log('\n🏆 Best Performers:');
-    console.log(`   Lowest Latency: ${bestLatency.endpoint} (${bestLatency.avgLatency.toFixed(2)}ms)`);
-    console.log(`   Highest Throughput: ${bestThroughput.endpoint} (${bestThroughput.throughput.toFixed(0)} req/s)`);
+    console.log(
+      `   Lowest Latency: ${bestLatency.endpoint} (${bestLatency.avgLatency.toFixed(2)}ms)`
+    );
+    console.log(
+      `   Highest Throughput: ${bestThroughput.endpoint} (${bestThroughput.throughput.toFixed(0)} req/s)`
+    );
   }
 
   /**
@@ -548,7 +568,7 @@ export class LoadTester {
 // Run load tests if executed directly
 if (import.meta.main) {
   const tester = new LoadTester();
-  
+
   try {
     await tester.installTools();
     await tester.startTestServer();

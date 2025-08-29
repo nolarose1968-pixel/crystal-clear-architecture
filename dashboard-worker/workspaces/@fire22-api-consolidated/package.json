@@ -15,7 +15,7 @@
       "import": "./dist/middleware/index.js"
     },
     "./controllers": {
-      "types": "./dist/controllers/index.d.ts", 
+      "types": "./dist/controllers/index.d.ts",
       "import": "./dist/controllers/index.js"
     },
     "./routes": {
@@ -72,8 +72,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/brendadeeznuts1111/fire22-dashboard-worker.git",
-    "directory": "workspaces/@fire22-api-consolidated"
+    "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture.git",
+    "directory": "dashboard-worker/workspaces/@fire22-api-consolidated"
   },
   "publishConfig": {
     "registry": "https://fire22.workers.dev/registry/",

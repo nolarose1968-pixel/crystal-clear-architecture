@@ -12,38 +12,24 @@ import * as schemas from '@fire22/validator/schemas';
 const router = Router({ base: '/health' });
 
 // /api/test/fire22 (from index.ts:5665)
-router.get('//api/test/fire22',
-  controller.apiTestFire22
-);
+router.get('//api/test/fire22', controller.apiTestFire22);
 
 // /api/test-deployment (from index.ts:6008)
-router.get('//api/test-deployment',
-  controller.apiTestDeployment
-);
+router.get('//api/test-deployment', controller.apiTestDeployment);
 
 // /api/health/permissions (from index.ts:6135)
-router.get('/permissions',
-  controller.permissions
-);
+router.get('/permissions', controller.permissions);
 
 // /api/health/permissions-matrix (from index.ts:6358)
-router.get('/permissions-matrix',
-  controller.permissionsMatrix
-);
+router.get('/permissions-matrix', controller.permissionsMatrix);
 
 // /api/health/system (from index.ts:6939)
-router.get('/system',
-  controller.system
-);
+router.get('/system', controller.system);
 
 // /api/matrix/health (from index.ts:8394)
-router.get('//api/matrix/health',
-  controller.apiMatrixHealth
-);
+router.get('//api/matrix/health', controller.apiMatrixHealth);
 
 // /health (from server.js:1284)
-router.get('//health',
-  controller.health
-);
+router.get('//health', controller.health);
 
 export const healthRoutes = router;

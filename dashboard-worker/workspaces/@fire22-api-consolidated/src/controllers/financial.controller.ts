@@ -1,6 +1,6 @@
 /**
  * Fire22 Financial Controller
- * 
+ *
  * Handles all financial operations including deposits, withdrawals, and reporting
  */
 
@@ -12,7 +12,7 @@ import type { ValidatedRequest } from '../types/request';
 export async function processWithdrawal(request: ValidatedRequest): Promise<Response> {
   try {
     const body = await request.json();
-    
+
     // TODO: Implement withdrawal processing logic
     const response = {
       success: true,
@@ -21,22 +21,25 @@ export async function processWithdrawal(request: ValidatedRequest): Promise<Resp
         amount: body.amount,
         status: 'pending',
         estimatedProcessingTime: '24-48 hours',
-        reference: `REF${Math.random().toString(36).substr(2, 9).toUpperCase()}`
-      }
+        reference: `REF${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Withdrawal processing failed',
-      message: error.message
-    }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Withdrawal processing failed',
+        message: error.message,
+      }),
+      {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -46,7 +49,7 @@ export async function processWithdrawal(request: ValidatedRequest): Promise<Resp
 export async function processDeposit(request: ValidatedRequest): Promise<Response> {
   try {
     const body = await request.json();
-    
+
     // TODO: Implement deposit processing logic
     const response = {
       success: true,
@@ -55,22 +58,25 @@ export async function processDeposit(request: ValidatedRequest): Promise<Respons
         amount: body.amount,
         status: 'completed',
         confirmations: 1,
-        reference: `REF${Math.random().toString(36).substr(2, 9).toUpperCase()}`
-      }
+        reference: `REF${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Deposit processing failed',
-      message: error.message
-    }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Deposit processing failed',
+        message: error.message,
+      }),
+      {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -83,7 +89,7 @@ export async function getTransactionHistory(request: ValidatedRequest): Promise<
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '50');
     const type = url.searchParams.get('type'); // 'deposit' or 'withdrawal'
-    
+
     // TODO: Implement transaction history logic
     const response = {
       success: true,
@@ -93,23 +99,26 @@ export async function getTransactionHistory(request: ValidatedRequest): Promise<
           page,
           limit,
           total: 0,
-          totalPages: 0
-        }
-      }
+          totalPages: 0,
+        },
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get transaction history',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get transaction history',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -121,7 +130,7 @@ export async function getWithdrawalHistory(request: ValidatedRequest): Promise<R
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '50');
-    
+
     // TODO: Implement withdrawal history logic
     const response = {
       success: true,
@@ -130,29 +139,32 @@ export async function getWithdrawalHistory(request: ValidatedRequest): Promise<R
         summary: {
           totalWithdrawals: 0,
           pendingAmount: 0,
-          completedAmount: 0
+          completedAmount: 0,
         },
         pagination: {
           page,
           limit,
           total: 0,
-          totalPages: 0
-        }
-      }
+          totalPages: 0,
+        },
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get withdrawal history',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get withdrawal history',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -164,7 +176,7 @@ export async function getDepositHistory(request: ValidatedRequest): Promise<Resp
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '50');
-    
+
     // TODO: Implement deposit history logic
     const response = {
       success: true,
@@ -173,29 +185,32 @@ export async function getDepositHistory(request: ValidatedRequest): Promise<Resp
         summary: {
           totalDeposits: 0,
           pendingAmount: 0,
-          completedAmount: 0
+          completedAmount: 0,
         },
         pagination: {
           page,
           limit,
           total: 0,
-          totalPages: 0
-        }
-      }
+          totalPages: 0,
+        },
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get deposit history',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get deposit history',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -211,28 +226,31 @@ export async function getQueueStatus(request: ValidatedRequest): Promise<Respons
         withdrawals: {
           pending: 0,
           processing: 0,
-          completed: 0
+          completed: 0,
         },
         deposits: {
           pending: 0,
           processing: 0,
-          completed: 0
-        }
-      }
+          completed: 0,
+        },
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get queue status',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get queue status',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -243,7 +261,7 @@ export async function getFinancialSummary(request: ValidatedRequest): Promise<Re
   try {
     const url = new URL(request.url);
     const period = url.searchParams.get('period') || 'daily';
-    
+
     // TODO: Implement financial summary logic
     const response = {
       success: true,
@@ -256,24 +274,27 @@ export async function getFinancialSummary(request: ValidatedRequest): Promise<Re
           pendingWithdrawals: 0,
           processingTime: {
             averageDeposit: 0,
-            averageWithdrawal: 0
-          }
+            averageWithdrawal: 0,
+          },
         },
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get financial summary',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get financial summary',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }

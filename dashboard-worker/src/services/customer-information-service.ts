@@ -944,7 +944,7 @@ export class CustomerInformationService extends EventEmitter {
       for (const key in newObj) {
         const fullPath = path ? `${path}.${key}` : key;
 
-        if (typeof newObj[key] === 'object' && newObj[key] !=== null && !Array.isArray(newObj[key])) {
+        if (typeof newObj[key] === 'object' && newObj[key] !== null && !Array.isArray(newObj[key])) {
           compareObjects(oldObj[key], newObj[key], fullPath);
         } else if (oldObj[key] !== newObj[key]) {
           changes[fullPath] = {

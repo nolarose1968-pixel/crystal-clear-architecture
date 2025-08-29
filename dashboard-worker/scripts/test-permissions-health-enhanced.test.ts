@@ -522,9 +522,7 @@ describe('PermissionsHealthTester', () => {
       await expect(tester.testSpecificEndpoint('unknown')).resolves.not.toThrow();
 
       expect(mockFetch).toHaveBeenCalledTimes(2);
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Unknown endpoint')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Unknown endpoint'));
 
       consoleSpy.mockRestore();
     });
@@ -609,9 +607,7 @@ describe('PermissionsHealthTester', () => {
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining('Message: Connection refused')
       );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Code: ECONNREFUSED')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Code: ECONNREFUSED'));
 
       consoleSpy.mockRestore();
     });
@@ -663,9 +659,7 @@ describe('PermissionsHealthTester', () => {
 
       verboseTester.getConfig(); // This should trigger config logging
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Test Configuration')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Test Configuration'));
 
       consoleSpy.mockRestore();
     });
@@ -696,9 +690,7 @@ describe('PermissionsHealthTester', () => {
         `${defaultConfig.baseUrl}/api/health/permissions`
       );
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Attempt 1/3')
-      );
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Attempt 1/3'));
 
       consoleSpy.mockRestore();
     });

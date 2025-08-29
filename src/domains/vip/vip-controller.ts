@@ -5,33 +5,38 @@
  * API endpoints for VIP customer management
  */
 
-import { VipService } from './services/vip-service';
-import { VipCustomerRepository } from './repositories/vip-customer-repository';
-import { VipTier, VipTierLevel } from './value-objects/vip-tier';
-import { VipCustomer, VipStatus } from './entities/vip-customer';
-import { DomainEvents } from '../shared/events/domain-events';
-import { DomainError } from '../shared/domain-entity';
+import { VipService } from "./services/vip-service";
+import { VipCustomerRepository } from "./repositories/vip-customer-repository";
+import { VipTier, VipTierLevel } from "./value-objects/vip-tier";
+import { VipCustomer, VipStatus } from "./entities/vip-customer";
+import { DomainEvents } from "../shared/events/domain-events";
+import { DomainError } from "../shared/domain-entity";
 
 export class VipController {
   constructor(
     private vipService: VipService,
-    private repository: VipCustomerRepository
+    private repository: VipCustomerRepository,
   ) {}
 
   /**
    * Onboard a new VIP customer
    */
-  async onboardVipCustomer(request: OnboardVipRequest): Promise<VipResponse<VipCustomerData>> {
+  async onboardVipCustomer(
+    request: OnboardVipRequest,
+  ): Promise<VipResponse<VipCustomerData>> {
     try {
       // Validate request
       if (!request.customerId || !request.initialTier) {
-        throw new DomainError('Customer ID and initial tier are required', 'INVALID_REQUEST');
+        throw new DomainError(
+          "Customer ID and initial tier are required",
+          "INVALID_REQUEST",
+        );
       }
 
       // Validate tier exists
       const initialTier = this.getTierByLevel(request.initialTier);
       if (!initialTier.getIsActive()) {
-        throw new DomainError('Selected tier is not available', 'INVALID_TIER');
+        throw new DomainError("Selected tier is not available", "INVALID_TIER");
       }
 
       const vipCustomer = await this.vipService.onboardVipCustomer({
@@ -39,20 +44,22 @@ export class VipController {
         initialTier: request.initialTier,
         stats: request.stats,
         accountManagerId: request.accountManagerId,
-        communicationPreferences: request.communicationPreferences
+        communicationPreferences: request.communicationPreferences,
       });
 
       return {
         success: true,
         data: this.mapCustomerToData(vipCustomer),
-        message: `VIP customer onboarded successfully with ${request.initialTier} tier`
+        message: `VIP customer onboarded successfully with ${request.initialTier} tier`,
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -60,28 +67,32 @@ export class VipController {
   /**
    * Evaluate VIP qualification
    */
-  async evaluateVipQualification(request: EvaluateVipRequest): Promise<VipResponse<VipQualificationResult>> {
+  async evaluateVipQualification(
+    request: EvaluateVipRequest,
+  ): Promise<VipResponse<VipQualificationResult>> {
     try {
       if (!request.customerId) {
-        throw new DomainError('Customer ID is required', 'INVALID_REQUEST');
+        throw new DomainError("Customer ID is required", "INVALID_REQUEST");
       }
 
       const result = await this.vipService.evaluateVipQualification({
         customerId: request.customerId,
         stats: request.stats,
-        requestedTier: request.requestedTier
+        requestedTier: request.requestedTier,
       });
 
       return {
         success: true,
-        data: result
+        data: result,
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -89,30 +100,37 @@ export class VipController {
   /**
    * Upgrade VIP tier
    */
-  async upgradeVipTier(request: UpgradeVipRequest): Promise<VipResponse<VipCustomerData>> {
+  async upgradeVipTier(
+    request: UpgradeVipRequest,
+  ): Promise<VipResponse<VipCustomerData>> {
     try {
       if (!request.customerId || !request.targetTier || !request.approvedBy) {
-        throw new DomainError('Customer ID, target tier, and approver are required', 'INVALID_REQUEST');
+        throw new DomainError(
+          "Customer ID, target tier, and approver are required",
+          "INVALID_REQUEST",
+        );
       }
 
       const vipCustomer = await this.vipService.processVipUpgrade({
         customerId: request.customerId,
         targetTier: request.targetTier,
-        reason: request.reason || 'Tier upgrade request',
-        approvedBy: request.approvedBy
+        reason: request.reason || "Tier upgrade request",
+        approvedBy: request.approvedBy,
       });
 
       return {
         success: true,
         data: this.mapCustomerToData(vipCustomer),
-        message: `VIP tier upgraded to ${request.targetTier}`
+        message: `VIP tier upgraded to ${request.targetTier}`,
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -120,23 +138,30 @@ export class VipController {
   /**
    * Get VIP customer details
    */
-  async getVipCustomer(customerId: string): Promise<VipResponse<VipCustomerData>> {
+  async getVipCustomer(
+    customerId: string,
+  ): Promise<VipResponse<VipCustomerData>> {
     try {
       const vipCustomer = await this.repository.findByCustomerId(customerId);
       if (!vipCustomer) {
-        throw new DomainError('VIP customer not found', 'VIP_CUSTOMER_NOT_FOUND');
+        throw new DomainError(
+          "VIP customer not found",
+          "VIP_CUSTOMER_NOT_FOUND",
+        );
       }
 
       return {
         success: true,
-        data: this.mapCustomerToData(vipCustomer)
+        data: this.mapCustomerToData(vipCustomer),
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -144,27 +169,31 @@ export class VipController {
   /**
    * Calculate VIP benefits
    */
-  async calculateVipBenefits(request: CalculateBenefitsRequest): Promise<VipResponse<VipBenefitsData>> {
+  async calculateVipBenefits(
+    request: CalculateBenefitsRequest,
+  ): Promise<VipResponse<VipBenefitsData>> {
     try {
       if (!request.customerId) {
-        throw new DomainError('Customer ID is required', 'INVALID_REQUEST');
+        throw new DomainError("Customer ID is required", "INVALID_REQUEST");
       }
 
       const benefits = await this.vipService.calculateVipBenefits(
         request.customerId,
-        request.baseBalanceLimit || 10000
+        request.baseBalanceLimit || 10000,
       );
 
       return {
         success: true,
-        data: benefits
+        data: benefits,
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -178,14 +207,16 @@ export class VipController {
 
       return {
         success: true,
-        data: analytics
+        data: analytics,
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -193,7 +224,9 @@ export class VipController {
   /**
    * List VIP customers with filtering
    */
-  async listVipCustomers(request: ListVipCustomersRequest = {}): Promise<VipResponse<VipCustomerListData>> {
+  async listVipCustomers(
+    request: ListVipCustomersRequest = {},
+  ): Promise<VipResponse<VipCustomerListData>> {
     try {
       const customers = await this.repository.findByQuery({
         tier: request.tier,
@@ -201,25 +234,29 @@ export class VipController {
         accountManagerId: request.accountManagerId,
         needsReview: request.needsReview,
         createdAfter: request.createdAfter,
-        createdBefore: request.createdBefore
+        createdBefore: request.createdBefore,
       });
 
-      const customerData = customers.map(customer => this.mapCustomerToData(customer));
+      const customerData = customers.map((customer) =>
+        this.mapCustomerToData(customer),
+      );
 
       return {
         success: true,
         data: {
           customers: customerData,
           total: customerData.length,
-          filters: request
-        }
+          filters: request,
+        },
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -227,15 +264,25 @@ export class VipController {
   /**
    * Update VIP customer communication preferences
    */
-  async updateCommunicationPreferences(request: UpdateCommunicationRequest): Promise<VipResponse<VipCustomerData>> {
+  async updateCommunicationPreferences(
+    request: UpdateCommunicationRequest,
+  ): Promise<VipResponse<VipCustomerData>> {
     try {
       if (!request.customerId || !request.preferences) {
-        throw new DomainError('Customer ID and preferences are required', 'INVALID_REQUEST');
+        throw new DomainError(
+          "Customer ID and preferences are required",
+          "INVALID_REQUEST",
+        );
       }
 
-      const vipCustomer = await this.repository.findByCustomerId(request.customerId);
+      const vipCustomer = await this.repository.findByCustomerId(
+        request.customerId,
+      );
       if (!vipCustomer) {
-        throw new DomainError('VIP customer not found', 'VIP_CUSTOMER_NOT_FOUND');
+        throw new DomainError(
+          "VIP customer not found",
+          "VIP_CUSTOMER_NOT_FOUND",
+        );
       }
 
       vipCustomer.updateCommunicationPreferences(request.preferences);
@@ -244,14 +291,16 @@ export class VipController {
       return {
         success: true,
         data: this.mapCustomerToData(vipCustomer),
-        message: 'Communication preferences updated successfully'
+        message: "Communication preferences updated successfully",
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -259,15 +308,25 @@ export class VipController {
   /**
    * Assign account manager to VIP customer
    */
-  async assignAccountManager(request: AssignManagerRequest): Promise<VipResponse<VipCustomerData>> {
+  async assignAccountManager(
+    request: AssignManagerRequest,
+  ): Promise<VipResponse<VipCustomerData>> {
     try {
       if (!request.customerId || !request.managerId || !request.assignedBy) {
-        throw new DomainError('Customer ID, manager ID, and assigner are required', 'INVALID_REQUEST');
+        throw new DomainError(
+          "Customer ID, manager ID, and assigner are required",
+          "INVALID_REQUEST",
+        );
       }
 
-      const vipCustomer = await this.repository.findByCustomerId(request.customerId);
+      const vipCustomer = await this.repository.findByCustomerId(
+        request.customerId,
+      );
       if (!vipCustomer) {
-        throw new DomainError('VIP customer not found', 'VIP_CUSTOMER_NOT_FOUND');
+        throw new DomainError(
+          "VIP customer not found",
+          "VIP_CUSTOMER_NOT_FOUND",
+        );
       }
 
       vipCustomer.assignAccountManager(request.managerId, request.assignedBy);
@@ -276,14 +335,16 @@ export class VipController {
       return {
         success: true,
         data: this.mapCustomerToData(vipCustomer),
-        message: `Account manager assigned successfully`
+        message: `Account manager assigned successfully`,
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -291,21 +352,25 @@ export class VipController {
   /**
    * Process monthly VIP maintenance
    */
-  async processMonthlyMaintenance(): Promise<VipResponse<MonthlyMaintenanceResult>> {
+  async processMonthlyMaintenance(): Promise<
+    VipResponse<MonthlyMaintenanceResult>
+  > {
     try {
       const result = await this.vipService.processMonthlyVipMaintenance();
 
       return {
         success: true,
         data: result,
-        message: 'Monthly VIP maintenance completed successfully'
+        message: "Monthly VIP maintenance completed successfully",
       };
-
     } catch (error) {
       return {
         success: false,
-        error: error instanceof DomainError ? error.message : 'Internal server error',
-        code: error instanceof DomainError ? error.code : 'INTERNAL_ERROR'
+        error:
+          error instanceof DomainError
+            ? error.message
+            : "Internal server error",
+        code: error instanceof DomainError ? error.code : "INTERNAL_ERROR",
       };
     }
   }
@@ -317,7 +382,7 @@ export class VipController {
       silver: VipTier.silver(),
       gold: VipTier.gold(),
       platinum: VipTier.platinum(),
-      diamond: VipTier.diamond()
+      diamond: VipTier.diamond(),
     };
     return tierMap[level];
   }
@@ -329,7 +394,7 @@ export class VipController {
       currentTier: {
         level: customer.getCurrentTier().getLevel(),
         name: customer.getCurrentTier().getName(),
-        benefits: customer.getCurrentTier().getBenefits()
+        benefits: customer.getCurrentTier().getBenefits(),
       },
       status: customer.getStatus(),
       qualificationStatus: customer.getQualificationStatus(),
@@ -341,7 +406,7 @@ export class VipController {
       reviewHistory: customer.getReviewHistory(),
       nextReviewDate: customer.getNextReviewDate(),
       createdAt: customer.getCreatedAt(),
-      updatedAt: customer.getUpdatedAt()
+      updatedAt: customer.getUpdatedAt(),
     };
   }
 }

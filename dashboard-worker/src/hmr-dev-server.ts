@@ -4,8 +4,8 @@
  * Enables Hot Module Replacement with state persistence
  */
 
-import { logger } from "../scripts/enhanced-logging-system";
-import { connectionMonitor, packageTracker } from "./security/connection-monitor";
+import { logger } from '../scripts/enhanced-logging-system';
+import { connectionMonitor, packageTracker } from './security/connection-monitor';
 
 const HTML_TEMPLATE = `<!DOCTYPE html>
 <html lang="en">
@@ -551,18 +551,18 @@ document.addEventListener('DOMContentLoaded', () => {
 window.incrementCounter = incrementCounter;
 `;
 
-// ==================== HMR DEVELOPMENT SERVER ====================
+// !==!==!===== HMR DEVELOPMENT SERVER !==!==!=====
 const server = Bun.serve({
   port: 3001,
   development: {
     hmr: true, // Enable Hot Module Replacement
   },
-  
+
   async fetch(request) {
     const url = new URL(request.url);
-    
-    logger.info("SERVER", "2.0.0", `${request.method} ${url.pathname}`);
-    
+
+    logger.info('SERVER', '2.0.0', `${request.method} ${url.pathname}`);
+
     try {
       // Route handling
       switch (url.pathname) {
@@ -570,17 +570,17 @@ const server = Bun.serve({
           return new Response(HTML_TEMPLATE, {
             headers: { 'Content-Type': 'text/html' },
           });
-          
+
         case '/styles.css':
           return new Response(CSS_STYLES, {
             headers: { 'Content-Type': 'text/css' },
           });
-          
+
         case '/dashboard.js':
           return new Response(DASHBOARD_JS, {
             headers: { 'Content-Type': 'application/javascript' },
           });
-          
+
         case '/api/metrics':
           // API endpoint for metrics
           const metrics = {
@@ -588,11 +588,11 @@ const server = Bun.serve({
             cacheHits: Math.floor(Math.random() * 10000) + 10000,
             wsConnections: Math.floor(Math.random() * 1000) + 1000,
             sqliteOps: Math.floor(Math.random() * 100000) + 80000,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           };
-          
+
           return Response.json(metrics);
-          
+
         case '/api/logs':
           // API endpoint for log stream
           const logs = [
@@ -601,19 +601,19 @@ const server = Bun.serve({
               module: 'API',
               version: '2.0.0',
               message: 'Metrics endpoint accessed',
-              timestamp: Date.now()
-            }
+              timestamp: Date.now(),
+            },
           ];
-          
+
           return Response.json(logs);
-          
+
         case '/health':
           return Response.json({
             status: 'healthy',
             hmr: true,
             version: '2.0.0',
             uptime: process.uptime(),
-            timestamp: Date.now()
+            timestamp: Date.now(),
           });
 
         case '/api/security/status':
@@ -622,7 +622,7 @@ const server = Bun.serve({
           const recentAlerts = connectionMonitor.getRecentAlerts(5);
           const packageValidation = packageTracker.validatePackages();
           const trackedPackages = Array.from(packageTracker.getTrackedPackages().entries());
-          
+
           return Response.json({
             security: {
               ...securityStatus,
@@ -633,8 +633,8 @@ const server = Bun.serve({
                 type: alert.alertType,
                 reason: alert.reason,
                 timestamp: alert.timestamp,
-                resolved: alert.resolved
-              }))
+                resolved: alert.resolved,
+              })),
             },
             packages: {
               tracked: trackedPackages.length,
@@ -643,17 +643,17 @@ const server = Bun.serve({
               packages: trackedPackages.map(([name, info]) => ({
                 name,
                 version: info.version,
-                lastSeen: info.lastSeen
-              }))
+                lastSeen: info.lastSeen,
+              })),
             },
-            timestamp: Date.now()
+            timestamp: Date.now(),
           });
 
         case '/api/security/alerts':
           // Get detailed security alerts
           return Response.json({
             alerts: connectionMonitor.getRecentAlerts(20),
-            summary: connectionMonitor.getSecurityStatus()
+            summary: connectionMonitor.getSecurityStatus(),
           });
 
         case '/api/dependencies':
@@ -663,12 +663,12 @@ const server = Bun.serve({
             const bunLockExists = await Bun.file('./bun.lock').exists();
             let bunLockSize = 'Unknown';
             let bunLockVersion = 'Unknown';
-            
+
             if (bunLockExists) {
               const bunLockFile = await Bun.file('./bun.lock');
               const stats = await bunLockFile.size;
               bunLockSize = (stats / 1024).toFixed(1) + ' KB';
-              
+
               // Try to extract version info from bun.lock
               try {
                 const bunLockContent = await bunLockFile.text();
@@ -683,7 +683,7 @@ const server = Bun.serve({
                 bunLockVersion = `Generated with Bun ${Bun.version}`;
               }
             }
-            
+
             return Response.json({
               dependencies: Object.keys(packageJson.dependencies || {}).length,
               devDependencies: Object.keys(packageJson.devDependencies || {}).length,
@@ -693,7 +693,9 @@ const server = Bun.serve({
               bunLockSize,
               bunLockVersion,
               bunVersion: Bun.version,
-              sideEffects: Array.isArray(packageJson.sideEffects) ? packageJson.sideEffects.length : 0,
+              sideEffects: Array.isArray(packageJson.sideEffects)
+                ? packageJson.sideEffects.length
+                : 0,
               scripts: Object.keys(packageJson.scripts || {}).length,
               bin: Object.keys(packageJson.bin || {}).length,
               name: packageJson.name,
@@ -702,8 +704,11 @@ const server = Bun.serve({
                 format: 'Binary lockfile format',
                 integrity: 'SHA-256 checksums',
                 created: bunLockExists ? 'Present' : 'Not created',
-                compatible: bunLockVersion === Bun.version ? 'Fully compatible' : `Generated with v${bunLockVersion}, running v${Bun.version}`
-              }
+                compatible:
+                  bunLockVersion === Bun.version
+                    ? 'Fully compatible'
+                    : `Generated with v${bunLockVersion}, running v${Bun.version}`,
+              },
             });
           } catch (error) {
             return Response.json({ error: 'Failed to read package.json' }, { status: 500 });
@@ -837,8 +842,8 @@ const server = Bun.serve({
           return new Response(JSON.stringify(exportData, null, 2), {
             headers: {
               'Content-Type': 'application/json',
-              'Content-Disposition': `attachment; filename=p2p-queue-export-${new Date().toISOString().split('T')[0]}.json`
-            }
+              'Content-Disposition': `attachment; filename=p2p-queue-export-${new Date().toISOString().split('T')[0]}.json`,
+            },
           });
 
         default:
@@ -846,38 +851,38 @@ const server = Bun.serve({
           if (url.pathname.startsWith('/api/p2p/queue/')) {
             return await this.handleDynamicP2PEndpoint(request, url);
           }
-          
+
           return new Response('Not Found', { status: 404 });
       }
-      
     } catch (error) {
-      logger.error("SERVER", "2.0.0", `Request error: ${error}`, "E5001");
+      logger.error('SERVER', '2.0.0', `Request error: ${error}`, 'E5001');
       return new Response('Internal Server Error', { status: 500 });
     }
   },
-  
+
   websocket: {
     message(ws, message) {
       // Handle WebSocket messages
       try {
         const data = JSON.parse(message.toString());
-        logger.info("WEBSOCKET", "2.0.0", `Message received: ${data.type}`);
-        
+        logger.info('WEBSOCKET', '2.0.0', `Message received: ${data.type}`);
+
         // Track package references in WebSocket messages
         packageTracker.trackPackageReferences(message.toString());
-        
+
         // Echo back with server timestamp
-        ws.send(JSON.stringify({
-          ...data,
-          serverTime: Date.now(),
-          echo: true
-        }));
-        
+        ws.send(
+          JSON.stringify({
+            ...data,
+            serverTime: Date.now(),
+            echo: true,
+          })
+        );
       } catch (error) {
-        logger.error("WEBSOCKET", "2.0.0", `Message parse error: ${error}`, "E4001");
+        logger.error('WEBSOCKET', '2.0.0', `Message parse error: ${error}`, 'E4001');
       }
     },
-    
+
     async open(ws) {
       // Monitor new WebSocket connection
       const connectionInfo = {
@@ -888,18 +893,22 @@ const server = Bun.serve({
         connectionType: 'websocket' as const,
         geoLocation: {
           country: ws.data?.cf?.country || 'Unknown',
-          city: ws.data?.cf?.city || 'Unknown', 
-          region: ws.data?.cf?.region || 'Unknown'
-        }
+          city: ws.data?.cf?.city || 'Unknown',
+          region: ws.data?.cf?.region || 'Unknown',
+        },
       };
 
       // Security monitoring for new connection
       const alert = await connectionMonitor.monitorConnection(connectionInfo);
-      
+
       if (alert) {
-        logger.warning("SECURITY", "2.0.0", 
-          `Security alert for WebSocket connection: ${alert.reason}`, "E6002");
-        
+        logger.warning(
+          'SECURITY',
+          '2.0.0',
+          `Security alert for WebSocket connection: ${alert.reason}`,
+          'E6002'
+        );
+
         // For high/critical alerts, we might want to close the connection
         if (alert.severity === 'CRITICAL') {
           ws.close(1008, 'Connection rejected for security reasons');
@@ -907,25 +916,27 @@ const server = Bun.serve({
         }
       }
 
-      logger.success("WEBSOCKET", "2.0.0", "Client connected to WebSocket");
-      
+      logger.success('WEBSOCKET', '2.0.0', 'Client connected to WebSocket');
+
       // Send welcome with security status
-      ws.send(JSON.stringify({
-        type: 'welcome',
-        message: '🔥 HMR WebSocket connected',
-        timestamp: Date.now(),
-        securityStatus: alert ? 'monitored' : 'clean',
-        connectionId: connectionInfo.id
-      }));
+      ws.send(
+        JSON.stringify({
+          type: 'welcome',
+          message: '🔥 HMR WebSocket connected',
+          timestamp: Date.now(),
+          securityStatus: alert ? 'monitored' : 'clean',
+          connectionId: connectionInfo.id,
+        })
+      );
     },
-    
+
     close(ws, code, reason) {
-      logger.info("WEBSOCKET", "2.0.0", `Client disconnected: ${code} - ${reason}`);
-    }
-  }
+      logger.info('WEBSOCKET', '2.0.0', `Client disconnected: ${code} - ${reason}`);
+    },
+  },
 });
 
-// ==================== P2P QUEUE SYSTEM HELPER METHODS ====================
+// !==!==!===== P2P QUEUE SYSTEM HELPER METHODS !==!==!=====
 
 /**
  * Handle dynamic P2P Queue API endpoints
@@ -933,7 +944,7 @@ const server = Bun.serve({
 async function handleDynamicP2PEndpoint(request: Request, url: URL): Promise<Response> {
   const pathSegments = url.pathname.split('/');
   const action = pathSegments[pathSegments.length - 1];
-  
+
   try {
     switch (action) {
       case 'cancel':
@@ -943,7 +954,7 @@ async function handleDynamicP2PEndpoint(request: Request, url: URL): Promise<Res
           return Response.json(result);
         }
         break;
-        
+
       case 'update':
         if (request.method === 'PUT') {
           const body = await request.json();
@@ -951,7 +962,7 @@ async function handleDynamicP2PEndpoint(request: Request, url: URL): Promise<Res
           return Response.json(result);
         }
         break;
-        
+
       case 'approve':
         if (request.method === 'POST') {
           const body = await request.json();
@@ -959,7 +970,7 @@ async function handleDynamicP2PEndpoint(request: Request, url: URL): Promise<Res
           return Response.json(result);
         }
         break;
-        
+
       case 'reject':
         if (request.method === 'POST') {
           const body = await request.json();
@@ -967,7 +978,7 @@ async function handleDynamicP2PEndpoint(request: Request, url: URL): Promise<Res
           return Response.json(result);
         }
         break;
-        
+
       default:
         // Check if it's a specific item request
         if (request.method === 'GET' && pathSegments.includes('item')) {
@@ -977,10 +988,10 @@ async function handleDynamicP2PEndpoint(request: Request, url: URL): Promise<Res
         }
     }
   } catch (error) {
-    logger.error("P2P_API", "1.0.0", `Dynamic endpoint error: ${error}`, "P2P001");
+    logger.error('P2P_API', '1.0.0', `Dynamic endpoint error: ${error}`, 'P2P001');
     return Response.json({ error: 'Internal server error' }, { status: 500 });
   }
-  
+
   return new Response('Not Found', { status: 404 });
 }
 
@@ -1004,7 +1015,7 @@ async function generateMockWithdrawals(): Promise<any[]> {
       notes: 'Priority withdrawal request',
       priority: 'high',
       estimatedProcessingTime: '2-4 hours',
-      feeTier: 'standard'
+      feeTier: 'standard',
     },
     {
       id: 'w2',
@@ -1021,7 +1032,7 @@ async function generateMockWithdrawals(): Promise<any[]> {
       notes: 'VIP customer - expedite processing',
       priority: 'vip',
       estimatedProcessingTime: '30 minutes',
-      feeTier: 'vip'
+      feeTier: 'vip',
     },
     {
       id: 'w3',
@@ -1038,8 +1049,8 @@ async function generateMockWithdrawals(): Promise<any[]> {
       notes: 'Regular customer withdrawal',
       priority: 'normal',
       estimatedProcessingTime: '1-2 hours',
-      feeTier: 'standard'
-    }
+      feeTier: 'standard',
+    },
   ];
 }
 
@@ -1063,7 +1074,7 @@ async function generateMockDeposits(): Promise<any[]> {
       notes: 'New customer deposit - verify identity',
       priority: 'normal',
       verificationStatus: 'pending',
-      depositMethod: 'wire_transfer'
+      depositMethod: 'wire_transfer',
     },
     {
       id: 'd2',
@@ -1080,7 +1091,7 @@ async function generateMockDeposits(): Promise<any[]> {
       notes: 'Large crypto deposit - 3 confirmations received',
       priority: 'high',
       verificationStatus: 'verified',
-      depositMethod: 'bitcoin'
+      depositMethod: 'bitcoin',
     },
     {
       id: 'd3',
@@ -1097,8 +1108,8 @@ async function generateMockDeposits(): Promise<any[]> {
       notes: 'First time Zelle deposit',
       priority: 'normal',
       verificationStatus: 'pending',
-      depositMethod: 'zelle_transfer'
-    }
+      depositMethod: 'zelle_transfer',
+    },
   ];
 }
 
@@ -1122,8 +1133,8 @@ async function generateMockMatches(): Promise<any[]> {
       fees: {
         withdrawalFee: 5,
         depositFee: 8,
-        matchingFee: 2
-      }
+        matchingFee: 2,
+      },
     },
     {
       id: 'm2',
@@ -1138,11 +1149,11 @@ async function generateMockMatches(): Promise<any[]> {
       riskScore: 'medium',
       estimatedSettlementTime: '1 hour',
       fees: {
-        withdrawalFee: 7.50,
+        withdrawalFee: 7.5,
         depositFee: 3,
-        matchingFee: 1.50
-      }
-    }
+        matchingFee: 1.5,
+      },
+    },
   ];
 }
 
@@ -1153,12 +1164,14 @@ async function generateQueueStats(): Promise<any> {
   const withdrawals = await generateMockWithdrawals();
   const deposits = await generateMockDeposits();
   const matches = await generateMockMatches();
-  
+
   return {
     totalItems: withdrawals.length + deposits.length,
     matchedPairs: matches.length,
     successRate: 94.7,
-    totalVolume: withdrawals.reduce((sum, w) => sum + w.amount, 0) + deposits.reduce((sum, d) => sum + d.amount, 0),
+    totalVolume:
+      withdrawals.reduce((sum, w) => sum + w.amount, 0) +
+      deposits.reduce((sum, d) => sum + d.amount, 0),
     averageProcessingTime: '1.5 hours',
     activeUsers: 156,
     telegramGroups: 3,
@@ -1166,15 +1179,15 @@ async function generateQueueStats(): Promise<any> {
     pendingDeposits: deposits.filter(d => d.status === 'pending').length,
     completedToday: 47,
     revenue: {
-      today: 1247.50,
+      today: 1247.5,
       thisWeek: 8930.25,
-      thisMonth: 34562.75
+      thisMonth: 34562.75,
     },
     performance: {
       uptimePercentage: 99.8,
       avgResponseTime: '145ms',
-      errorRate: 0.2
-    }
+      errorRate: 0.2,
+    },
   };
 }
 
@@ -1182,11 +1195,11 @@ async function generateQueueStats(): Promise<any> {
  * Perform auto-matching algorithm
  */
 async function performAutoMatch(): Promise<any> {
-  logger.info("P2P_API", "1.0.0", "Running auto-matching algorithm");
-  
+  logger.info('P2P_API', '1.0.0', 'Running auto-matching algorithm');
+
   // Simulate processing time
   await new Promise(resolve => setTimeout(resolve, 2000));
-  
+
   return {
     success: true,
     matchesFound: 3,
@@ -1200,7 +1213,7 @@ async function performAutoMatch(): Promise<any> {
         depositId: 'd1',
         amount: 500,
         confidence: 0.89,
-        autoApproved: true
+        autoApproved: true,
       },
       {
         id: 'm_auto_2',
@@ -1208,9 +1221,9 @@ async function performAutoMatch(): Promise<any> {
         depositId: 'd3',
         amount: 300,
         confidence: 0.76,
-        autoApproved: true
-      }
-    ]
+        autoApproved: true,
+      },
+    ],
   };
 }
 
@@ -1218,15 +1231,15 @@ async function performAutoMatch(): Promise<any> {
  * Send Telegram notification
  */
 async function sendTelegramNotification(data: any): Promise<any> {
-  logger.info("P2P_API", "1.0.0", `Sending Telegram notification for item ${data.itemId}`);
-  
+  logger.info('P2P_API', '1.0.0', `Sending Telegram notification for item ${data.itemId}`);
+
   return {
     success: true,
     messageSent: true,
     telegramMessageId: `tg_msg_${Date.now()}`,
     chatId: data.telegramChatId || 'CHAT_DEFAULT',
     timestamp: new Date().toISOString(),
-    message: `P2P Queue Update: ${data.message || 'Status update for your transaction'}`
+    message: `P2P Queue Update: ${data.message || 'Status update for your transaction'}`,
   };
 }
 
@@ -1238,26 +1251,26 @@ async function exportQueueData(): Promise<any> {
   const deposits = await generateMockDeposits();
   const matches = await generateMockMatches();
   const stats = await generateQueueStats();
-  
+
   return {
     metadata: {
       exportedAt: new Date().toISOString(),
       exportedBy: 'system',
       version: '4.0.0-staging',
-      totalRecords: withdrawals.length + deposits.length + matches.length
+      totalRecords: withdrawals.length + deposits.length + matches.length,
     },
     data: {
       withdrawals,
       deposits,
       matches,
-      statistics: stats
+      statistics: stats,
     },
     summary: {
       withdrawalCount: withdrawals.length,
       depositCount: deposits.length,
       matchCount: matches.length,
-      totalVolume: stats.totalVolume
-    }
+      totalVolume: stats.totalVolume,
+    },
   };
 }
 
@@ -1265,8 +1278,8 @@ async function exportQueueData(): Promise<any> {
  * Cancel queue item
  */
 async function cancelQueueItem(itemId: string, reason: string): Promise<any> {
-  logger.info("P2P_API", "1.0.0", `Cancelling queue item ${itemId}: ${reason}`);
-  
+  logger.info('P2P_API', '1.0.0', `Cancelling queue item ${itemId}: ${reason}`);
+
   return {
     success: true,
     itemId,
@@ -1274,7 +1287,7 @@ async function cancelQueueItem(itemId: string, reason: string): Promise<any> {
     newStatus: 'cancelled',
     reason,
     cancelledAt: new Date().toISOString(),
-    refundInitiated: true
+    refundInitiated: true,
   };
 }
 
@@ -1282,8 +1295,8 @@ async function cancelQueueItem(itemId: string, reason: string): Promise<any> {
  * Update queue item
  */
 async function updateQueueItem(itemId: string, updates: any): Promise<any> {
-  logger.info("P2P_API", "1.0.0", `Updating queue item ${itemId}`, JSON.stringify(updates));
-  
+  logger.info('P2P_API', '1.0.0', `Updating queue item ${itemId}`, JSON.stringify(updates));
+
   return {
     success: true,
     itemId,
@@ -1292,8 +1305,8 @@ async function updateQueueItem(itemId: string, updates: any): Promise<any> {
     item: {
       id: itemId,
       ...updates,
-      lastModified: new Date().toISOString()
-    }
+      lastModified: new Date().toISOString(),
+    },
   };
 }
 
@@ -1301,8 +1314,8 @@ async function updateQueueItem(itemId: string, updates: any): Promise<any> {
  * Approve match
  */
 async function approveMatch(matchId: string): Promise<any> {
-  logger.success("P2P_API", "1.0.0", `Match ${matchId} approved`);
-  
+  logger.success('P2P_API', '1.0.0', `Match ${matchId} approved`);
+
   return {
     success: true,
     matchId,
@@ -1311,8 +1324,8 @@ async function approveMatch(matchId: string): Promise<any> {
     estimatedSettlement: new Date(Date.now() + 7200000).toISOString(), // 2 hours from now
     transactionIds: {
       withdrawal: `tx_w_${Date.now()}`,
-      deposit: `tx_d_${Date.now()}`
-    }
+      deposit: `tx_d_${Date.now()}`,
+    },
   };
 }
 
@@ -1320,15 +1333,15 @@ async function approveMatch(matchId: string): Promise<any> {
  * Reject match
  */
 async function rejectMatch(matchId: string, reason: string): Promise<any> {
-  logger.warning("P2P_API", "1.0.0", `Match ${matchId} rejected: ${reason}`);
-  
+  logger.warning('P2P_API', '1.0.0', `Match ${matchId} rejected: ${reason}`);
+
   return {
     success: true,
     matchId,
     status: 'rejected',
     reason,
     rejectedAt: new Date().toISOString(),
-    itemsReturnedToQueue: true
+    itemsReturnedToQueue: true,
   };
 }
 
@@ -1349,34 +1362,42 @@ async function getQueueItemDetails(itemId: string): Promise<any> {
       groupId: 'TG_GROUP_001',
       chatId: `CHAT_${itemId.toUpperCase()}`,
       username: `@user_${itemId}`,
-      channel: 'CHANNEL_MAIN'
+      channel: 'CHANNEL_MAIN',
     },
     transactionHistory: [
       {
         timestamp: new Date().toISOString(),
         action: 'created',
-        details: 'Queue item created'
-      }
+        details: 'Queue item created',
+      },
     ],
     metadata: {
       priority: 'normal',
       processingTime: '1-2 hours',
       fees: {
-        base: 5.00,
-        percentage: 0.5
-      }
-    }
+        base: 5.0,
+        percentage: 0.5,
+      },
+    },
   };
 }
 
-// ==================== SERVER STARTUP ====================
-logger.success("SERVER", "2.0.0", `🔥 HMR Development Server running at http://localhost:${server.port}`);
-logger.info("SERVER", "2.0.0", "Hot Module Replacement enabled - edit files to see instant updates!");
+// !==!==!===== SERVER STARTUP !==!==!=====
+logger.success(
+  'SERVER',
+  '2.0.0',
+  `🔥 HMR Development Server running at http://localhost:${server.port}`
+);
+logger.info(
+  'SERVER',
+  '2.0.0',
+  'Hot Module Replacement enabled - edit files to see instant updates!'
+);
 
 // Log server capabilities
 console.log(`
 🌈 **WATER DASHBOARD HMR SERVER** 🌈
-=====================================
+!==!==!==!==!==!==!==
 🔗 URL: http://localhost:${server.port}
 🔥 HMR: Enabled
 📡 WebSocket: Available
@@ -1421,12 +1442,12 @@ Edit any file to see instant updates with state preservation.
 
 // Handle graceful shutdown
 process.on('SIGINT', () => {
-  logger.info("SERVER", "2.0.0", "Shutting down HMR development server");
+  logger.info('SERVER', '2.0.0', 'Shutting down HMR development server');
   process.exit(0);
 });
 
 process.on('SIGTERM', () => {
-  logger.info("SERVER", "2.0.0", "Received SIGTERM, shutting down gracefully");
+  logger.info('SERVER', '2.0.0', 'Received SIGTERM, shutting down gracefully');
   process.exit(0);
 });
 

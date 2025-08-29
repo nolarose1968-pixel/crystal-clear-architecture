@@ -130,7 +130,6 @@ export class EnhancedPlayerUI {
       this.addSelect2EventHandlers(component.id, $element, enhancedConfig);
 
       console.log(`✅ Select2 component initialized: ${component.id}`);
-
     } catch (error) {
       console.error(`❌ Failed to initialize Select2 component ${component.id}:`, error);
     }
@@ -190,14 +189,14 @@ export class EnhancedPlayerUI {
       { id: 'WA', text: 'Washington' },
       { id: 'WV', text: 'West Virginia' },
       { id: 'WI', text: 'Wisconsin' },
-      { id: 'WY', text: 'Wyoming' }
+      { id: 'WY', text: 'Wyoming' },
     ];
 
     return {
       ...config,
       data: states,
-      placeholder: config.placeholder || "Select a state",
-      allowClear: config.allowClear !== false
+      placeholder: config.placeholder || 'Select a state',
+      allowClear: config.allowClear !== false,
     };
   }
 
@@ -212,16 +211,16 @@ export class EnhancedPlayerUI {
       { id: 'zelle', text: 'Zelle', icon: 'zelle' },
       { id: 'bank_transfer', text: 'Bank Transfer', icon: 'bank' },
       { id: 'wire_transfer', text: 'Wire Transfer', icon: 'wire' },
-      { id: 'crypto', text: 'Cryptocurrency', icon: 'crypto' }
+      { id: 'crypto', text: 'Cryptocurrency', icon: 'crypto' },
     ];
 
     return {
       ...config,
       data: paymentMethods,
-      placeholder: config.placeholder || "Select payment method",
+      placeholder: config.placeholder || 'Select payment method',
       allowClear: config.allowClear !== false,
       templateResult: this.formatPaymentMethod,
-      templateSelection: this.formatPaymentMethod
+      templateSelection: this.formatPaymentMethod,
     };
   }
 
@@ -236,23 +235,23 @@ export class EnhancedPlayerUI {
         return {
           ...config,
           data: [],
-          placeholder: "No games available"
+          placeholder: 'No games available',
         };
       }
 
       const games = gamesResult.games.map(game => ({
         id: game.gameId,
         text: `${game.gameName} (${game.gameType})`,
-        gameData: game
+        gameData: game,
       }));
 
       return {
         ...config,
         data: games,
-        placeholder: config.placeholder || "Select lottery game",
+        placeholder: config.placeholder || 'Select lottery game',
         allowClear: config.allowClear !== false,
         templateResult: this.formatLotteryGame,
-        templateSelection: this.formatLotteryGame
+        templateSelection: this.formatLotteryGame,
       };
     } catch (error) {
       console.error('Failed to configure lottery game select:', error);
@@ -269,14 +268,14 @@ export class EnhancedPlayerUI {
       { id: 'venmo_users', text: 'Venmo Users Club' },
       { id: 'high_frequency', text: 'High Frequency Traders' },
       { id: 'vip_network', text: 'VIP Network' },
-      { id: 'trusted_circle', text: 'Trusted Circle' }
+      { id: 'trusted_circle', text: 'Trusted Circle' },
     ];
 
     return {
       ...config,
       data: peerGroups,
-      placeholder: config.placeholder || "Select peer group",
-      allowClear: config.allowClear !== false
+      placeholder: config.placeholder || 'Select peer group',
+      allowClear: config.allowClear !== false,
     };
   }
 
@@ -290,16 +289,16 @@ export class EnhancedPlayerUI {
       { id: 'suspended', text: 'Suspended', color: 'warning' },
       { id: 'locked', text: 'Locked', color: 'danger' },
       { id: 'vip', text: 'VIP', color: 'primary' },
-      { id: 'pending', text: 'Pending', color: 'info' }
+      { id: 'pending', text: 'Pending', color: 'info' },
     ];
 
     return {
       ...config,
       data: statuses,
-      placeholder: config.placeholder || "Select customer status",
+      placeholder: config.placeholder || 'Select customer status',
       allowClear: config.allowClear !== false,
       templateResult: this.formatStatus,
-      templateSelection: this.formatStatus
+      templateSelection: this.formatStatus,
     };
   }
 
@@ -316,7 +315,7 @@ export class EnhancedPlayerUI {
       zelle: '🏦',
       bank_transfer: '🏦',
       wire_transfer: '💰',
-      crypto: '₿'
+      crypto: '₿',
     };
 
     const icon = iconMap[method.id] || '💳';
@@ -330,8 +329,9 @@ export class EnhancedPlayerUI {
     if (!game.id) return game.text;
 
     const gameData = game.gameData || {};
-    const jackpot = gameData.jackpotAmount ?
-      `<span class="text-success">$${gameData.jackpotAmount.toLocaleString()}</span>` : '';
+    const jackpot = gameData.jackpotAmount
+      ? `<span class="text-success">$${gameData.jackpotAmount.toLocaleString()}</span>`
+      : '';
 
     return `<div class="lottery-game-option">
       <strong>${gameData.gameName || game.text}</strong>
@@ -351,7 +351,7 @@ export class EnhancedPlayerUI {
       suspended: 'warning',
       locked: 'danger',
       vip: 'primary',
-      pending: 'info'
+      pending: 'info',
     };
 
     const color = colorMap[status.id] || 'secondary';
@@ -495,8 +495,8 @@ export class EnhancedPlayerUI {
    * Initialize Date/Time pickers
    */
   private async initializeDateTimePickers(): Promise<void> {
-    const dateTimeComponents = this.config.components.filter(c =>
-      c.type === 'datetimepicker' || c.type === 'daterangepicker'
+    const dateTimeComponents = this.config.components.filter(
+      c => c.type === 'datetimepicker' || c.type === 'daterangepicker'
     );
 
     for (const component of dateTimeComponents) {
@@ -543,7 +543,6 @@ export class EnhancedPlayerUI {
       this.addDateTimeEventHandlers(component.id, $element, enhancedConfig);
 
       console.log(`✅ Date/Time component initialized: ${component.id}`);
-
     } catch (error) {
       console.error(`❌ Failed to initialize Date/Time component ${component.id}:`, error);
     }
@@ -558,7 +557,7 @@ export class EnhancedPlayerUI {
       format: config.format || 'MM/DD/YYYY',
       maxDate: moment(), // Can't select future dates for transactions
       minDate: moment().subtract(1, 'year'), // Can't go back more than 1 year
-      useCurrent: false
+      useCurrent: false,
     };
   }
 
@@ -572,7 +571,7 @@ export class EnhancedPlayerUI {
       minDate: moment(), // Can't select past dates for draws
       maxDate: moment().add(1, 'year'), // Can't go too far into future
       daysOfWeekDisabled: [0, 6], // Disable weekends for most lottery draws
-      useCurrent: false
+      useCurrent: false,
     };
   }
 
@@ -584,7 +583,7 @@ export class EnhancedPlayerUI {
       ...config,
       format: config.format || 'LT', // Time only format
       useCurrent: false,
-      stepping: 15 // 15-minute intervals
+      stepping: 15, // 15-minute intervals
     };
   }
 
@@ -632,7 +631,9 @@ export class EnhancedPlayerUI {
    * Handle date range apply
    */
   private handleDateRangeApply(id: string, startDate: any, endDate: any): void {
-    console.log(`📅 Date range applied: ${startDate.format('MM/DD/YYYY')} - ${endDate.format('MM/DD/YYYY')}`);
+    console.log(
+      `📅 Date range applied: ${startDate.format('MM/DD/YYYY')} - ${endDate.format('MM/DD/YYYY')}`
+    );
     // Could trigger data filtering or report generation
   }
 
@@ -718,7 +719,6 @@ export class EnhancedPlayerUI {
       this.addTooltipEventHandlers(component.id, $element, enhancedConfig);
 
       console.log(`✅ Tooltip component initialized: ${component.id}`);
-
     } catch (error) {
       console.error(`❌ Failed to initialize tooltip component ${component.id}:`, error);
     }
@@ -733,7 +733,7 @@ export class EnhancedPlayerUI {
       title: 'Current account balance and available funds',
       placement: config.placement || 'top',
       trigger: config.trigger || 'hover',
-      html: true
+      html: true,
     };
   }
 
@@ -746,7 +746,7 @@ export class EnhancedPlayerUI {
       title: 'Risk assessment based on transaction history and behavior patterns',
       placement: config.placement || 'right',
       trigger: config.trigger || 'hover',
-      html: true
+      html: true,
     };
   }
 
@@ -759,7 +759,7 @@ export class EnhancedPlayerUI {
       title: 'VIP status benefits and exclusive features',
       placement: config.placement || 'bottom',
       trigger: config.trigger || 'hover',
-      html: true
+      html: true,
     };
   }
 
@@ -835,7 +835,7 @@ export class EnhancedPlayerUI {
    * Initialize keyboard shortcuts
    */
   private initializeKeyboardShortcuts(): void {
-    $(document).on('keydown', (e) => {
+    $(document).on('keydown', e => {
       // Ctrl+S for save
       if (e.ctrlKey && e.key === 's') {
         e.preventDefault();
@@ -952,9 +952,9 @@ export class EnhancedPlayerUI {
           type: 'select2',
           selector: '.select2-placeholder',
           config: {
-            placeholder: "Select a state",
-            allowClear: true
-          }
+            placeholder: 'Select a state',
+            allowClear: true,
+          },
         },
         {
           id: 'payment-method-select',
@@ -963,14 +963,14 @@ export class EnhancedPlayerUI {
           config: {
             minimumResultsForSearch: Infinity,
             templateResult: 'iconFormat',
-            templateSelection: 'iconFormat'
-          }
+            templateSelection: 'iconFormat',
+          },
         },
         {
           id: 'customer-status-select',
           type: 'select2',
           selector: '.select2-data-array',
-          config: {}
+          config: {},
         },
 
         // Date/Time Components
@@ -979,8 +979,8 @@ export class EnhancedPlayerUI {
           type: 'datetimepicker',
           selector: '#datetimepicker6',
           config: {
-            format: 'MM/DD/YYYY'
-          }
+            format: 'MM/DD/YYYY',
+          },
         },
         {
           id: 'transaction-date-to',
@@ -988,16 +988,16 @@ export class EnhancedPlayerUI {
           selector: '#datetimepicker7',
           config: {
             format: 'MM/DD/YYYY',
-            useCurrent: false
-          }
+            useCurrent: false,
+          },
         },
         {
           id: 'session-time',
           type: 'datetimepicker',
           selector: '#datetimepicker3',
           config: {
-            format: 'LT'
-          }
+            format: 'LT',
+          },
         },
 
         // Date Range Components
@@ -1005,7 +1005,7 @@ export class EnhancedPlayerUI {
           id: 'date-range-picker',
           type: 'daterangepicker',
           selector: '.daterange',
-          config: {}
+          config: {},
         },
 
         // Tooltip Components
@@ -1016,8 +1016,8 @@ export class EnhancedPlayerUI {
           config: {
             title: 'Tooltip Show Event',
             trigger: 'click',
-            placement: 'right'
-          }
+            placement: 'right',
+          },
         },
         {
           id: 'vip-tooltip',
@@ -1026,9 +1026,9 @@ export class EnhancedPlayerUI {
           config: {
             title: 'VIP Status Information',
             trigger: 'hover',
-            placement: 'top'
-          }
-        }
+            placement: 'top',
+          },
+        },
       ],
       theme: 'light',
       language: 'en',
@@ -1037,8 +1037,8 @@ export class EnhancedPlayerUI {
         realTimeUpdates: true,
         notifications: true,
         autoSave: true,
-        keyboardShortcuts: true
-      }
+        keyboardShortcuts: true,
+      },
     };
   }
 
@@ -1064,8 +1064,8 @@ export class EnhancedPlayerUI {
       performance: {
         initializationTime: 0, // Would track actual timing
         componentLoadSuccess: this.activeComponents.size,
-        componentLoadFailures: this.config.components.length - this.activeComponents.size
-      }
+        componentLoadFailures: this.config.components.length - this.activeComponents.size,
+      },
     };
   }
 }

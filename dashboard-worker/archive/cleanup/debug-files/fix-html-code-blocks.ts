@@ -15,7 +15,7 @@ function fixHtmlCodeBlocks(filePath: string) {
       newLines.push('');
       modified = true;
     }
-    
+
     newLines.push(line);
   });
 

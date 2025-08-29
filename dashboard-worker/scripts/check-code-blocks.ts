@@ -25,7 +25,7 @@ function checkCodeBlocks(filePath: string): CodeBlockIssue[] {
         issues.push({
           file: filePath,
           line: lineNumber,
-          content: line.trim()
+          content: line.trim(),
         });
       }
     }
@@ -42,7 +42,7 @@ const keyFiles = [
   'SECURITY-INTEGRATION-GUIDE.md',
   'REGISTRY.md',
   'wiki/Getting-Started.md',
-  'wiki/Home.md'
+  'wiki/Home.md',
 ];
 
 console.log('🔍 Checking for code blocks starting at odd line numbers...\n');

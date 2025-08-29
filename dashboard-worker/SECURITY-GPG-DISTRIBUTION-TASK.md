@@ -3,24 +3,27 @@
 **Document Classification:** CONFIDENTIAL - Fire22 Security Operations  
 **Distribution:** Team Leads Only  
 **Version:** 1.0  
-**Date:** August 28, 2025  
+**Date:** August 28, 2025
 
 ---
 
 ## 🎯 **Executive Summary**
 
-This document provides Fire22 team leads with secure procedures for GPG key storage, distribution, and management across all departments.
+This document provides Fire22 team leads with secure procedures for GPG key
+storage, distribution, and management across all departments.
 
 ## 🏢 **Team Structure & Responsibilities**
 
 ### **Department Team Leads:**
+
 - **Security Team Lead:** Primary GPG authority, master key holder
-- **Infrastructure Team Lead:** Database/system commits, secondary authority  
+- **Infrastructure Team Lead:** Database/system commits, secondary authority
 - **DevOps Team Lead:** Configuration/deployment commits
 - **Data Team Lead:** Schema/migration commits
 - **Development Team Lead:** Application code commits
 
 ### **Chain of Authority:**
+
 ```
 Security Head
     ↓
@@ -36,6 +39,7 @@ Team Members
 ## 🔒 **Secure Key Storage System**
 
 ### **Primary Storage: Bun.secrets Integration**
+
 Each team lead must use Fire22's native credential storage:
 
 ```bash
@@ -47,11 +51,13 @@ bun run gpg:audit --comprehensive
 ```
 
 ### **Platform-Specific Storage:**
+
 - **macOS:** Keychain Services (encrypted, biometric protected)
 - **Linux:** libsecret with GNOME Keyring integration
 - **Windows:** Windows Credential Manager (enterprise domain)
 
 ### **Storage Structure:**
+
 ```
 Service: fire22-dashboard-worker-gpg
 Account Pattern: [department]-[member]-gpg-private
@@ -95,7 +101,7 @@ bun run gpg:store --team=[department] --type=public --file=[department]-public.a
 for member in $(bun run team:members --department=[department]); do
   # Generate individual member key
   gpg --batch --generate-key << EOF
-Key-Type: RSA  
+Key-Type: RSA
 Key-Length: 4096
 Subkey-Type: RSA
 Subkey-Length: 4096
@@ -108,12 +114,12 @@ EOF
 
   # Sign with team lead master key
   gpg --default-key [TEAM-LEAD-KEY] --sign-key ${member}@fire22.ag
-  
+
   # Store securely
   KEY_ID=$(gpg --list-secret-keys --with-colons ${member}@fire22.ag | grep ^sec | cut -d: -f5)
   gpg --armor --export $KEY_ID > ${member}-public.asc
   gpg --armor --export-secret-keys $KEY_ID > ${member}-private.asc
-  
+
   bun run gpg:store --team=[department] --member=$member --type=private --file=${member}-private.asc
   bun run gpg:store --team=[department] --member=$member --type=public --file=${member}-public.asc
 done
@@ -124,7 +130,7 @@ done
 ```bash
 # Team lead distributes keys via secure channels
 bun run gpg:distribute --team=[department] --method=secure-email
-bun run gpg:distribute --team=[department] --method=slack-encrypted  
+bun run gpg:distribute --team=[department] --method=slack-encrypted
 bun run gpg:distribute --team=[department] --method=in-person-qr
 ```
 
@@ -133,18 +139,21 @@ bun run gpg:distribute --team=[department] --method=in-person-qr
 ## 🛡️ **Distribution Methods by Security Level**
 
 ### **Method 1: Secure Email (Moderate Security)**
+
 ```bash
 # Encrypted email with GPG-encrypted attachments
 bun run gpg:email --recipient=[member]@fire22.ag --key-bundle=[member] --encrypt-to=[recipient-public-key]
 ```
 
 ### **Method 2: Slack Encrypted Messages (High Security)**
-```bash  
+
+```bash
 # Slack with end-to-end encryption and auto-deletion
 bun run gpg:slack --channel=#[department]-security --member=[member] --auto-delete=24h
 ```
 
 ### **Method 3: In-Person QR Codes (Maximum Security)**
+
 ```bash
 # Generate time-limited QR codes for in-person key exchange
 bun run gpg:qr-generate --member=[member] --expires=30min --location=[meeting-room]
@@ -152,6 +161,7 @@ bun run gpg:qr-scan --verify-identity=[member] --biometric-check
 ```
 
 ### **Method 4: Hardware Security Keys (Enterprise)**
+
 ```bash
 # Store on YubiKey or similar hardware tokens
 bun run gpg:hardware-store --device=yubikey --member=[member] --pin-required
@@ -163,17 +173,19 @@ bun run gpg:hardware-distribute --tracking-number=[fedex-tracking]
 ## 📊 **Security Compliance Matrix**
 
 ### **Access Control Matrix:**
-| Role | Generate Keys | Store Keys | Distribute Keys | Revoke Keys | Audit Keys |
-|------|---------------|------------|-----------------|-------------|------------|
-| Security Head | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Security Team Lead | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Dept Team Lead | ✅ | ✅ | ✅ | ❌ | ✅ |
-| Senior Developer | ❌ | ✅ | ❌ | ❌ | ✅ |
-| Developer | ❌ | ✅ | ❌ | ❌ | ❌ |
+
+| Role               | Generate Keys | Store Keys | Distribute Keys | Revoke Keys | Audit Keys |
+| ------------------ | ------------- | ---------- | --------------- | ----------- | ---------- |
+| Security Head      | ✅            | ✅         | ✅              | ✅          | ✅         |
+| Security Team Lead | ✅            | ✅         | ✅              | ✅          | ✅         |
+| Dept Team Lead     | ✅            | ✅         | ✅              | ❌          | ✅         |
+| Senior Developer   | ❌            | ✅         | ❌              | ❌          | ✅         |
+| Developer          | ❌            | ✅         | ❌              | ❌          | ❌         |
 
 ### **Security Requirements:**
+
 - ✅ **Two-Factor Authentication:** Required for all key operations
-- ✅ **Biometric Verification:** Required for sensitive key access  
+- ✅ **Biometric Verification:** Required for sensitive key access
 - ✅ **Audit Logging:** All key operations logged with timestamps
 - ✅ **Encryption at Rest:** All stored keys encrypted with AES-256
 - ✅ **Key Rotation:** Annual key rotation for all team members
@@ -184,6 +196,7 @@ bun run gpg:hardware-distribute --tracking-number=[fedex-tracking]
 ## 🔧 **Team Lead CLI Commands**
 
 ### **Key Management:**
+
 ```bash
 # Generate department master key
 bun run gpg:master-gen --department=[dept] --security-level=high
@@ -199,11 +212,12 @@ bun run gpg:audit --department=[dept] --compliance-check
 ```
 
 ### **Distribution Commands:**
+
 ```bash
 # Secure distribution workflow
 bun run gpg:distribute-workflow --department=[dept] --method=auto-select
 
-# Emergency key distribution  
+# Emergency key distribution
 bun run gpg:emergency-distribute --member=[member] --reason="[incident-id]"
 
 # Key verification
@@ -211,6 +225,7 @@ bun run gpg:verify-distribution --department=[dept] --check-signatures
 ```
 
 ### **Monitoring & Compliance:**
+
 ```bash
 # Real-time key status
 bun run gpg:status --department=[dept] --live-monitor
@@ -227,6 +242,7 @@ bun run gpg:audit-trail --department=[dept] --date-range="2025-08-01,2025-08-31"
 ## 🚨 **Emergency Procedures**
 
 ### **Compromised Key Protocol:**
+
 ```bash
 # 1. Immediate revocation
 bun run gpg:revoke --key-id=[compromised-key] --reason=compromised --urgent
@@ -242,6 +258,7 @@ bun run gpg:validate-commits --repository=fire22-dashboard-worker --since=[incid
 ```
 
 ### **Team Lead Unavailability:**
+
 ```bash
 # Escalate to Security Head
 bun run gpg:escalate --team-lead=[unavailable-lead] --emergency-contact=[security-head]
@@ -255,6 +272,7 @@ bun run gpg:delegate --from=[team-lead] --to=[deputy] --duration=72h --approval=
 ## 📋 **Implementation Checklist for Team Leads**
 
 ### **Initial Setup (Week 1):**
+
 - [ ] Install and configure Bun.secrets GPG integration
 - [ ] Generate master key for department with secure passphrase
 - [ ] Set up secure key storage using platform-native encryption
@@ -262,6 +280,7 @@ bun run gpg:delegate --from=[team-lead] --to=[deputy] --duration=72h --approval=
 - [ ] Test key generation and storage workflows
 
 ### **Team Rollout (Week 2):**
+
 - [ ] Generate keys for all team members
 - [ ] Distribute keys using appropriate security method
 - [ ] Verify Git configuration for all team members
@@ -269,8 +288,9 @@ bun run gpg:delegate --from=[team-lead] --to=[deputy] --duration=72h --approval=
 - [ ] Document team-specific procedures
 
 ### **Ongoing Operations:**
+
 - [ ] Monthly key status audits
-- [ ] Quarterly security compliance reviews  
+- [ ] Quarterly security compliance reviews
 - [ ] Annual key rotation procedures
 - [ ] Emergency response drills
 - [ ] Security awareness training
@@ -280,6 +300,7 @@ bun run gpg:delegate --from=[team-lead] --to=[deputy] --duration=72h --approval=
 ## 🔍 **Audit & Compliance**
 
 ### **Automated Compliance Monitoring:**
+
 ```bash
 # Daily automated checks
 0 8 * * * bun run gpg:daily-audit --all-departments --report-email=security@fire22.ag
@@ -292,8 +313,11 @@ bun run gpg:delegate --from=[team-lead] --to=[deputy] --duration=72h --approval=
 ```
 
 ### **Manual Audit Procedures:**
-1. **Key Integrity Verification:** Validate all stored keys against known good hashes
-2. **Access Pattern Analysis:** Review unusual access patterns or failed attempts
+
+1. **Key Integrity Verification:** Validate all stored keys against known good
+   hashes
+2. **Access Pattern Analysis:** Review unusual access patterns or failed
+   attempts
 3. **Signature Validation:** Verify recent commits have valid GPG signatures
 4. **Compliance Gap Assessment:** Identify and remediate compliance gaps
 
@@ -302,12 +326,14 @@ bun run gpg:delegate --from=[team-lead] --to=[deputy] --duration=72h --approval=
 ## 📞 **Support & Escalation**
 
 ### **Team Lead Support Channels:**
+
 - **Primary:** Fire22 Security Team Lead
-- **Secondary:** Infrastructure Team Lead  
+- **Secondary:** Infrastructure Team Lead
 - **Emergency:** Security Head (24/7 hotline)
 - **Technical:** DevOps Team Lead
 
 ### **Escalation Matrix:**
+
 - **Level 1:** Key generation/distribution issues → Department Team Lead
 - **Level 2:** Security compliance issues → Security Team Lead
 - **Level 3:** System compromise/emergency → Security Head
@@ -315,7 +341,9 @@ bun run gpg:delegate --from=[team-lead] --to=[deputy] --duration=72h --approval=
 
 ---
 
-**🔒 This document contains sensitive security procedures. Distribution is restricted to authorized Fire22 team leads only. Unauthorized sharing is prohibited and subject to disciplinary action.**
+**🔒 This document contains sensitive security procedures. Distribution is
+restricted to authorized Fire22 team leads only. Unauthorized sharing is
+prohibited and subject to disciplinary action.**
 
 **Document Owner:** Fire22 Security Team  
 **Review Date:** Monthly  

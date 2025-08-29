@@ -1,0 +1,7 @@
+
+name: "Fire22 Export"
+version: "2.0.0"
+services:
+  - api
+  - database
+  - cache

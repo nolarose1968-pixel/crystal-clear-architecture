@@ -154,13 +154,8 @@
     "@fire22/wager-system": [],
     "@fire22/benchmark-suite": [],
     "@fire22/env-manager": [],
-    "@fire22/micro-benchmarks": [
-      "@fire22/benchmark-suite",
-      "@fire22/memory-profiler"
-    ],
-    "@fire22/load-testing": [
-      "@fire22/benchmark-formatter"
-    ]
+    "@fire22/micro-benchmarks": ["@fire22/benchmark-suite", "@fire22/memory-profiler"],
+    "@fire22/load-testing": ["@fire22/benchmark-formatter"]
   },
   "BUILD_METADATA": {
     "timestamp": 1756272726325,

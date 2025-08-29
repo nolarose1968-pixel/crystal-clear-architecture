@@ -27,64 +27,67 @@ export interface PhoneValidationOptions {
 }
 
 // Country-specific phone number patterns
-const COUNTRY_PATTERNS: Record<string, {
-  regex: RegExp;
-  length: number;
-  format: string;
-  name: string;
-}> = {
+const COUNTRY_PATTERNS: Record<
+  string,
+  {
+    regex: RegExp;
+    length: number;
+    format: string;
+    name: string;
+  }
+> = {
   US: {
     regex: /^\+?1[2-9]\d{2}[2-9]\d{2}\d{4}$/,
     length: 10,
     format: '(XXX) XXX-XXXX',
-    name: 'United States'
+    name: 'United States',
   },
   CA: {
     regex: /^\+?1[2-9]\d{2}[2-9]\d{2}\d{4}$/,
     length: 10,
     format: '(XXX) XXX-XXXX',
-    name: 'Canada'
+    name: 'Canada',
   },
   GB: {
     regex: /^\+?44\d{10}$/,
     length: 10,
     format: 'XXXX XXX XXX',
-    name: 'United Kingdom'
+    name: 'United Kingdom',
   },
   AU: {
     regex: /^\+?61\d{9}$/,
     length: 9,
     format: 'XXXX XXX XXX',
-    name: 'Australia'
+    name: 'Australia',
   },
   DE: {
     regex: /^\+?49\d{10,11}$/,
     length: 10,
     format: 'XXXX XXXXXXX',
-    name: 'Germany'
+    name: 'Germany',
   },
   FR: {
     regex: /^\+?33\d{9}$/,
     length: 9,
     format: 'X XX XX XX XX',
-    name: 'France'
+    name: 'France',
   },
   JP: {
     regex: /^\+?81\d{9,10}$/,
     length: 9,
     format: 'XX-XXXX-XXXX',
-    name: 'Japan'
-  }
+    name: 'Japan',
+  },
 };
 
 // Common invalid phone number patterns
 const INVALID_PATTERNS = [
-  /^1{8,}$/,  // Too many 1s
-  /^2{8,}$/,  // Too many 2s
-  /^0{8,}$/,  // Too many 0s
-  /^123456/,  // Sequential numbers
-  /^987654/,  // Reverse sequential
-  /(\d)\1{6,}/  // Same digit repeated 7+ times
+  /^1{8,}$/, // Too many 1s
+  /^2{8,}$/, // Too many 2s
+  /^0{8,}$/, // Too many 0s
+  /^123456/, // Sequential numbers
+  /^987654/, // Reverse sequential
+  /(\d)\1{6,}/, // Same digit repeated 7+ times
 ];
 
 /**
@@ -102,7 +105,7 @@ export function validatePhone(
     internationalFormat: phone,
     country: 'Unknown',
     type: 'unknown',
-    errors: []
+    errors: [],
   };
 
   // Basic validation
@@ -202,7 +205,7 @@ export function parsePhoneNumber(phone: string): { countryCode: string; national
       if (COUNTRY_PATTERNS[potentialCode]) {
         return {
           countryCode: potentialCode,
-          nationalNumber: cleaned.substring(len)
+          nationalNumber: cleaned.substring(len),
         };
       }
     }
@@ -212,7 +215,7 @@ export function parsePhoneNumber(phone: string): { countryCode: string; national
   if (cleaned.length === 10) {
     return {
       countryCode: '1',
-      nationalNumber: cleaned
+      nationalNumber: cleaned,
     };
   }
 
@@ -220,14 +223,14 @@ export function parsePhoneNumber(phone: string): { countryCode: string; national
   if (cleaned.length === 11 && cleaned.startsWith('1')) {
     return {
       countryCode: '1',
-      nationalNumber: cleaned.substring(1)
+      nationalNumber: cleaned.substring(1),
     };
   }
 
   // Default: assume no country code
   return {
     countryCode: '',
-    nationalNumber: cleaned
+    nationalNumber: cleaned,
   };
 }
 
@@ -428,7 +431,7 @@ export function validatePhoneCountry(
   return {
     isValid: isValidPhoneFormat(phone),
     countryCode,
-    allowed
+    allowed,
   };
 }
 
@@ -461,7 +464,7 @@ export function getPhoneValidationStats(results: PhoneValidationResult[]): {
     mobile: results.filter(r => r.type === 'mobile').length,
     landline: results.filter(r => r.type === 'landline').length,
     voip: results.filter(r => r.type === 'voip').length,
-    tollFree: results.filter(r => r.type === 'toll-free').length
+    tollFree: results.filter(r => r.type === 'toll-free').length,
   };
 }
 

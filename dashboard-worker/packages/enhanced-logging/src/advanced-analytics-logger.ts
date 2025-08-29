@@ -8,7 +8,13 @@ import { LKeyAuditLogger } from './l-key-audit-logger';
 // Enhanced Log Entry with Analytics
 export interface AnalyticsLogEntry extends LKeyLogEntry {
   errorCode?: string;
-  errorType?: 'CACHE_MISS' | 'DB_TIMEOUT' | 'API_FAILURE' | 'VALIDATION_ERROR' | 'NETWORK_ERROR' | 'MEMORY_ERROR';
+  errorType?:
+    | 'CACHE_MISS'
+    | 'DB_TIMEOUT'
+    | 'API_FAILURE'
+    | 'VALIDATION_ERROR'
+    | 'NETWORK_ERROR'
+    | 'MEMORY_ERROR';
   resolution?: string;
   impact?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   affectedUsers?: number;
@@ -59,7 +65,14 @@ export interface CacheAnalysis {
 
 // Advanced Sorting Options
 export interface SortingOptions {
-  field: 'timestamp' | 'level' | 'lKey' | 'entityType' | 'impact' | 'recoveryTime' | 'affectedUsers';
+  field:
+    | 'timestamp'
+    | 'level'
+    | 'lKey'
+    | 'entityType'
+    | 'impact'
+    | 'recoveryTime'
+    | 'affectedUsers';
   direction: 'asc' | 'desc';
   secondary?: {
     field: string;
@@ -90,14 +103,14 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
     errorRate: 0.05, // 5%
     responseTime: 1000, // 1 second
     cacheHitRate: 0.85, // 85%
-    affectedUsers: 100
+    affectedUsers: 100,
   };
 
   constructor(config = {}) {
     super({
       component: 'advanced-analytics',
       enableLKeyTracking: true,
-      ...config
+      ...config,
     });
   }
 
@@ -123,14 +136,14 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
       entityId: context.entityId || 'UNKNOWN',
       action: analytics.action || 'LOG_ENTRY',
       auditTrail: [context.lKey || 'L0000'],
-      ...analytics
+      ...analytics,
     };
 
     this.addAnalyticsEntry(analyticsEntry);
-    
+
     // Check for alerts
     this.checkAlertThresholds(analyticsEntry);
-    
+
     // Log to base system
     this.log(level, message, context, metadata);
   }
@@ -152,7 +165,7 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
       `Cache ${operation}: ${key} (${hit ? 'HIT' : 'MISS'})`,
       {
         ...context,
-        component: 'cache-monitor'
+        component: 'cache-monitor',
       },
       {
         entityType: 'CACHE_OPERATION',
@@ -164,8 +177,8 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
           cpuUsage: 0,
           memoryUsage: 0,
           diskIO: latency,
-          networkIO: 0
-        }
+          networkIO: 0,
+        },
       },
       {
         cacheType,
@@ -173,7 +186,7 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
         key,
         hit,
         latency,
-        ...metadata
+        ...metadata,
       }
     );
 
@@ -193,13 +206,13 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
     metadata?: Record<string, any>
   ): string {
     const failureId = `FAIL_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     this.logWithAnalytics(
       LogLevel.ERROR,
       `System Failure: ${errorType}`,
       {
         ...context,
-        component: 'failure-tracker'
+        component: 'failure-tracker',
       },
       {
         entityType: 'SYSTEM_FAILURE',
@@ -208,20 +221,20 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
         errorType: errorType as any,
         impact: this.calculateImpact(affectedUsers),
         affectedUsers,
-        correlationId: failureId
+        correlationId: failureId,
       },
       {
         failureId,
         rootCause,
         affectedSystems,
         affectedUsers,
-        ...metadata
+        ...metadata,
       }
     );
 
     // Store failure analysis
     this.storeFailureAnalysis(failureId, errorType, rootCause, affectedSystems, affectedUsers);
-    
+
     return failureId;
   }
 
@@ -240,7 +253,7 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
       `Failure Resolved: ${failureId}`,
       {
         ...context,
-        component: 'failure-tracker'
+        component: 'failure-tracker',
       },
       {
         entityType: 'FAILURE_RESOLUTION',
@@ -248,13 +261,13 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
         action: 'FAILURE_RESOLVED',
         resolution,
         recoveryTime,
-        correlationId: failureId
+        correlationId: failureId,
       },
       {
         failureId,
         resolution,
         recoveryTime,
-        preventionSteps
+        preventionSteps,
       }
     );
 
@@ -265,10 +278,7 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
   /**
    * Advanced sorting of log entries
    */
-  public getSortedEntries(
-    options: SortingOptions,
-    filters?: FilterOptions
-  ): AnalyticsLogEntry[] {
+  public getSortedEntries(options: SortingOptions, filters?: FilterOptions): AnalyticsLogEntry[] {
     let entries = this.analyticsEntries;
 
     // Apply filters
@@ -333,14 +343,14 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
       criticalIssues: [] as any[],
       performanceOptimizations: [] as any[],
       cacheOptimizations: [] as any[],
-      trends: [] as any[]
+      trends: [] as any[],
     };
 
     // Analyze critical issues
     const criticalEntries = this.getFilteredEntries({
       ...timeRange,
       logLevels: [LogLevel.ERROR, LogLevel.CRITICAL],
-      impactLevels: ['HIGH', 'CRITICAL']
+      impactLevels: ['HIGH', 'CRITICAL'],
     });
 
     // Group by error type
@@ -355,16 +365,18 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
 
     // Generate critical issue insights
     errorGroups.forEach((entries, errorType) => {
-      if (entries.length > 1) { // Recurring issues
+      if (entries.length > 1) {
+        // Recurring issues
         const totalAffectedUsers = entries.reduce((sum, e) => sum + (e.affectedUsers || 0), 0);
-        const avgRecoveryTime = entries.reduce((sum, e) => sum + (e.recoveryTime || 0), 0) / entries.length;
-        
+        const avgRecoveryTime =
+          entries.reduce((sum, e) => sum + (e.recoveryTime || 0), 0) / entries.length;
+
         insights.criticalIssues.push({
           issue: `Recurring ${errorType} errors (${entries.length} occurrences)`,
           severity: 'HIGH',
           recommendation: entries[0].resolution || 'Implement monitoring and automated recovery',
           affectedSystems: [...new Set(entries.flatMap(e => e.traceRoute || []))],
-          estimatedImpact: `${totalAffectedUsers} users, ${avgRecoveryTime.toFixed(0)}ms avg recovery`
+          estimatedImpact: `${totalAffectedUsers} users, ${avgRecoveryTime.toFixed(0)}ms avg recovery`,
         });
       }
     });
@@ -376,7 +388,7 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
           cacheType,
           currentHitRate: stats.hitRate,
           targetHitRate: 0.95,
-          recommendations: stats.recommendations
+          recommendations: stats.recommendations,
         });
       }
     });
@@ -384,23 +396,24 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
     // Analyze performance trends
     const responseTimeEntries = this.getFilteredEntries({
       ...timeRange,
-      hasResolution: false
+      hasResolution: false,
     }).filter(e => e.performanceMetrics);
 
     if (responseTimeEntries.length > 10) {
       const recent = responseTimeEntries.slice(-5);
       const older = responseTimeEntries.slice(-15, -10);
-      
+
       const recentAvg = recent.reduce((sum, e) => sum + (e.recoveryTime || 0), 0) / recent.length;
       const olderAvg = older.reduce((sum, e) => sum + (e.recoveryTime || 0), 0) / older.length;
-      
+
       const changePercent = ((recentAvg - olderAvg) / olderAvg) * 100;
-      
+
       insights.trends.push({
         metric: 'Response Time',
         trend: changePercent > 5 ? 'increasing' : changePercent < -5 ? 'decreasing' : 'stable',
         changePercent: Math.abs(changePercent),
-        significance: Math.abs(changePercent) > 20 ? 'high' : Math.abs(changePercent) > 10 ? 'medium' : 'low'
+        significance:
+          Math.abs(changePercent) > 20 ? 'high' : Math.abs(changePercent) > 10 ? 'medium' : 'low',
       });
     }
 
@@ -419,7 +432,7 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
    */
   public getFailureAnalysis(failureId?: string): FailureAnalysis | FailureAnalysis[] {
     if (failureId) {
-      return this.failureDatabase.get(failureId) || {} as FailureAnalysis;
+      return this.failureDatabase.get(failureId) || ({} as FailureAnalysis);
     }
     return Array.from(this.failureDatabase.values());
   }
@@ -445,22 +458,22 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
     // High error rate alert
     const errorEntries = recentEntries.filter(e => e.level >= LogLevel.ERROR);
     const errorRate = errorEntries.length / Math.max(recentEntries.length, 1);
-    
+
     if (errorRate > this.alertThresholds.errorRate) {
       alerts.push({
         id: `ERROR_RATE_${Date.now()}`,
         timestamp: new Date(),
         severity: errorRate > 0.2 ? 'CRITICAL' : 'HIGH',
         title: `High Error Rate Detected: ${(errorRate * 100).toFixed(1)}%`,
-        description: `Error rate of ${(errorRate * 100).toFixed(1)}% exceeds threshold of ${(this.alertThresholds.errorRate * 100)}%`,
+        description: `Error rate of ${(errorRate * 100).toFixed(1)}% exceeds threshold of ${this.alertThresholds.errorRate * 100}%`,
         affectedSystems: [...new Set(errorEntries.map(e => e.context.component || 'unknown'))],
         recommendedActions: [
           'Review recent deployments',
           'Check system resources',
           'Validate external dependencies',
-          'Scale up if necessary'
+          'Scale up if necessary',
         ],
-        autoResolution: errorRate > 0.5 ? 'ESCALATE_TO_ON_CALL' : undefined
+        autoResolution: errorRate > 0.5 ? 'ESCALATE_TO_ON_CALL' : undefined,
       });
     }
 
@@ -475,7 +488,7 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
           description: `${cacheType} cache hit rate of ${(stats.hitRate * 100).toFixed(1)}% is below threshold`,
           affectedSystems: [cacheType],
           recommendedActions: stats.recommendations,
-          autoResolution: stats.hitRate < 0.3 ? 'INCREASE_CACHE_SIZE' : undefined
+          autoResolution: stats.hitRate < 0.3 ? 'INCREASE_CACHE_SIZE' : undefined,
         });
       }
     });
@@ -487,7 +500,7 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
 
   private addAnalyticsEntry(entry: AnalyticsLogEntry): void {
     this.analyticsEntries.push(entry);
-    
+
     // Maintain max size
     if (this.analyticsEntries.length > 20000) {
       this.analyticsEntries = this.analyticsEntries.slice(-15000);
@@ -521,8 +534,8 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
       businessImpact: {
         affectedUsers,
         revenueImpact: affectedUsers * 10, // Estimated $10 per affected user
-        transactionsAffected: 0
-      }
+        transactionsAffected: 0,
+      },
     };
 
     this.failureDatabase.set(failureId, analysis);
@@ -542,12 +555,7 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
     }
   }
 
-  private updateCacheStats(
-    cacheType: string,
-    key: string,
-    hit: boolean,
-    latency: number
-  ): void {
+  private updateCacheStats(cacheType: string, key: string, hit: boolean, latency: number): void {
     let stats = this.cacheStats.get(cacheType);
     if (!stats) {
       stats = {
@@ -560,17 +568,18 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
         memoryUtilization: 0,
         hotKeys: [],
         coldKeys: [],
-        recommendations: []
+        recommendations: [],
       };
       this.cacheStats.set(cacheType, stats);
     }
 
     stats.totalRequests++;
-    stats.averageLatency = (stats.averageLatency * (stats.totalRequests - 1) + latency) / stats.totalRequests;
-    
+    stats.averageLatency =
+      (stats.averageLatency * (stats.totalRequests - 1) + latency) / stats.totalRequests;
+
     if (hit) {
       stats.hitRate = (stats.hitRate * (stats.totalRequests - 1) + 1) / stats.totalRequests;
-      
+
       // Track hot keys
       const hotKey = stats.hotKeys.find(hk => hk.key === key);
       if (hotKey) {
@@ -581,7 +590,7 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
       }
     } else {
       stats.missRate = (stats.missRate * (stats.totalRequests - 1) + 1) / stats.totalRequests;
-      
+
       // Track cold keys
       const coldKey = stats.coldKeys.find(ck => ck.key === key);
       if (coldKey) {
@@ -598,24 +607,23 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
 
   private updateCacheRecommendations(stats: CacheAnalysis): void {
     stats.recommendations = [];
-    
+
     if (stats.hitRate < 0.5) {
       stats.recommendations.push('Consider increasing cache size');
       stats.recommendations.push('Review cache key patterns for optimization');
     }
-    
+
     if (stats.averageLatency > 100) {
       stats.recommendations.push('Investigate cache performance bottlenecks');
     }
-    
+
     if (stats.coldKeys.length > 7) {
       stats.recommendations.push('Implement cache warming for frequently missed keys');
     }
   }
 
   private countSimilarIncidents(errorType: string): number {
-    return Array.from(this.failureDatabase.values())
-      .filter(f => f.errorType === errorType).length;
+    return Array.from(this.failureDatabase.values()).filter(f => f.errorType === errorType).length;
   }
 
   private applyFilters(entries: AnalyticsLogEntry[], filters: FilterOptions): AnalyticsLogEntry[] {
@@ -645,14 +653,19 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
         }
       }
 
-      if (filters.minAffectedUsers && (!entry.affectedUsers || entry.affectedUsers < filters.minAffectedUsers)) {
+      if (
+        filters.minAffectedUsers &&
+        (!entry.affectedUsers || entry.affectedUsers < filters.minAffectedUsers)
+      ) {
         return false;
       }
 
       if (filters.textSearch) {
         const searchText = filters.textSearch.toLowerCase();
-        if (!entry.message.toLowerCase().includes(searchText) && 
-            !entry.errorType?.toLowerCase().includes(searchText)) {
+        if (
+          !entry.message.toLowerCase().includes(searchText) &&
+          !entry.errorType?.toLowerCase().includes(searchText)
+        ) {
           return false;
         }
       }
@@ -668,14 +681,22 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
   private compareValues(a: AnalyticsLogEntry, b: AnalyticsLogEntry, field: string): number {
     const getValue = (entry: AnalyticsLogEntry, field: string): any => {
       switch (field) {
-        case 'timestamp': return entry.timestamp.getTime();
-        case 'level': return entry.level;
-        case 'lKey': return entry.lKey;
-        case 'entityType': return entry.entityType;
-        case 'impact': return entry.impact || 'LOW';
-        case 'recoveryTime': return entry.recoveryTime || 0;
-        case 'affectedUsers': return entry.affectedUsers || 0;
-        default: return 0;
+        case 'timestamp':
+          return entry.timestamp.getTime();
+        case 'level':
+          return entry.level;
+        case 'lKey':
+          return entry.lKey;
+        case 'entityType':
+          return entry.entityType;
+        case 'impact':
+          return entry.impact || 'LOW';
+        case 'recoveryTime':
+          return entry.recoveryTime || 0;
+        case 'affectedUsers':
+          return entry.affectedUsers || 0;
+        default:
+          return 0;
       }
     };
 
@@ -691,7 +712,11 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
 
   private checkAlertThresholds(entry: AnalyticsLogEntry): void {
     // Real-time threshold checking
-    if (entry.level >= LogLevel.ERROR && entry.affectedUsers && entry.affectedUsers > this.alertThresholds.affectedUsers) {
+    if (
+      entry.level >= LogLevel.ERROR &&
+      entry.affectedUsers &&
+      entry.affectedUsers > this.alertThresholds.affectedUsers
+    ) {
       this.generateImmediateAlert(entry);
     }
   }
@@ -701,7 +726,7 @@ export class AdvancedAnalyticsLogger extends LKeyAuditLogger {
       level: LogLevel[entry.level],
       affectedUsers: entry.affectedUsers,
       errorType: entry.errorType,
-      timestamp: entry.timestamp.toISOString()
+      timestamp: entry.timestamp.toISOString(),
     });
   }
 }

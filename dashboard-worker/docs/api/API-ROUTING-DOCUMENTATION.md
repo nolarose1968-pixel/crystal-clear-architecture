@@ -1,6 +1,7 @@
 # 🚀 Fire22 Dashboard Worker API Routing Documentation
 
 ## Table of Contents
+
 - [Overview](#overview)
 - [Authentication & Authorization](#authentication--authorization)
 - [API Endpoint Groups](#api-endpoint-groups)
@@ -11,9 +12,12 @@
 
 ## Overview
 
-The Fire22 Dashboard Worker implements a comprehensive REST API with **119+ endpoints** organized into modular route groups. The system uses multiple routing frameworks optimized for different use cases.
+The Fire22 Dashboard Worker implements a comprehensive REST API with **119+
+endpoints** organized into modular route groups. The system uses multiple
+routing frameworks optimized for different use cases.
 
 ### Key Statistics
+
 - **Total Endpoints**: 119+ routes
 - **API Groups**: 7 main groups + 3 special systems
 - **Authentication**: JWT-based with role permissions
@@ -23,20 +27,23 @@ The Fire22 Dashboard Worker implements a comprehensive REST API with **119+ endp
 ## Authentication & Authorization
 
 ### JWT Authentication
+
 ```typescript
 // Authentication endpoints
-POST /api/auth/login     // User login
-POST /api/auth/logout    // User logout  
-GET  /api/auth/verify    // Token verification
+POST / api / auth / login; // User login
+POST / api / auth / logout; // User logout
+GET / api / auth / verify; // Token verification
 ```
 
 ### Role-Based Permissions
+
 - **Admin**: Full system access
 - **Manager**: Customer and wager management
 - **Financial**: Withdrawal and deposit operations
 - **Customer**: Limited read-only access
 
 ### Headers Required
+
 ```bash
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
@@ -45,84 +52,95 @@ Content-Type: application/json
 ## API Endpoint Groups
 
 ### 🔐 Authentication Routes (`/api/auth`)
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/auth/login` | User authentication | No |
-| POST | `/api/auth/logout` | User logout | Yes |
-| GET | `/api/auth/verify` | Verify JWT token | Yes |
+
+| Method | Endpoint           | Description         | Auth Required |
+| ------ | ------------------ | ------------------- | ------------- |
+| POST   | `/api/auth/login`  | User authentication | No            |
+| POST   | `/api/auth/logout` | User logout         | Yes           |
+| GET    | `/api/auth/verify` | Verify JWT token    | Yes           |
 
 ### 👨‍💼 Admin Routes (`/api/admin`)
-| Method | Endpoint | Description | Permission |
-|--------|----------|-------------|------------|
-| POST | `/api/admin/settle-wagers` | Settle pending wagers | admin.* |
-| POST | `/api/admin/bulk-settle` | Bulk wager settlement | admin.* |
-| POST | `/api/admin/void-wager` | Void a wager | admin.* |
-| POST | `/api/admin/create-customer` | Create new customer | admin.* |
-| POST | `/api/admin/import-customers` | Bulk import customers | admin.* |
-| POST | `/api/admin/deposit` | Process deposit | admin.* |
-| POST | `/api/admin/sync-fire22` | Sync with Fire22 API | admin.* |
-| GET | `/api/admin/debug/cache-stats` | Cache statistics | admin.* |
-| GET | `/api/admin/agent-configs-dashboard` | Agent configurations | admin.* |
-| GET | `/api/admin/permissions-matrix-dashboard` | Permissions overview | admin.* |
+
+| Method | Endpoint                                  | Description           | Permission |
+| ------ | ----------------------------------------- | --------------------- | ---------- |
+| POST   | `/api/admin/settle-wagers`                | Settle pending wagers | admin.\*   |
+| POST   | `/api/admin/bulk-settle`                  | Bulk wager settlement | admin.\*   |
+| POST   | `/api/admin/void-wager`                   | Void a wager          | admin.\*   |
+| POST   | `/api/admin/create-customer`              | Create new customer   | admin.\*   |
+| POST   | `/api/admin/import-customers`             | Bulk import customers | admin.\*   |
+| POST   | `/api/admin/deposit`                      | Process deposit       | admin.\*   |
+| POST   | `/api/admin/sync-fire22`                  | Sync with Fire22 API  | admin.\*   |
+| GET    | `/api/admin/debug/cache-stats`            | Cache statistics      | admin.\*   |
+| GET    | `/api/admin/agent-configs-dashboard`      | Agent configurations  | admin.\*   |
+| GET    | `/api/admin/permissions-matrix-dashboard` | Permissions overview  | admin.\*   |
 
 ### 📊 Manager Routes (`/api/manager`)
-| Method | Endpoint | Description | Permission |
-|--------|----------|-------------|------------|
-| POST | `/api/manager/getWeeklyFigureByAgent` | Weekly performance | manager.* |
-| POST | `/api/manager/getParlayActivity` | Parlay activity | manager.* |
-| POST | `/api/manager/getLiveWagers` | Live wagers | manager.* |
-| POST | `/api/manager/getLiveActivity` | Live activity feed | manager.* |
-| POST | `/api/manager/getCustomers` | Customer list | manager.* |
-| POST | `/api/manager/getCustomerDetails` | Customer details | manager.* |
-| POST | `/api/manager/getAgentPerformance` | Agent metrics | manager.* |
-| POST | `/api/manager/getBetTicker` | Bet ticker feed | manager.* |
-| GET | `/api/manager/reports/daily` | Daily reports | manager.* |
-| GET | `/api/manager/reports/weekly` | Weekly reports | manager.* |
-| GET | `/api/manager/reports/monthly` | Monthly reports | manager.* |
 
-### 💰 Financial Routes (`/api/financial`) - *[Fixed Double Slash Bug]*
-| Method | Endpoint | Description | Permission |
-|--------|----------|-------------|------------|
-| POST | `/api/financial/withdrawals/request` | Request withdrawal | financial.* |
-| POST | `/api/financial/withdrawals/approve` | Approve withdrawal | financial.* |
-| POST | `/api/financial/withdrawals/complete` | Complete withdrawal | financial.* |
-| POST | `/api/financial/withdrawals/reject` | Reject withdrawal | financial.* |
-| GET | `/api/financial/withdrawals/pending` | Pending withdrawals | financial.* |
-| GET | `/api/financial/withdrawals` | All withdrawals | financial.* |
-| POST | `/api/financial/queue/init` | Initialize P2P queue | financial.* |
-| POST | `/api/financial/queue/withdrawal` | Queue withdrawal | financial.* |
-| POST | `/api/financial/queue/deposit` | Queue deposit | financial.* |
-| GET | `/api/financial/queue/stats` | Queue statistics | financial.* |
-| GET | `/api/financial/queue/items` | Queue items | financial.* |
-| GET | `/api/financial/queue/opportunities` | P2P opportunities | financial.* |
-| POST | `/api/financial/queue/process` | Process queue | financial.* |
-| POST | `/api/financial/queue/complete` | Complete transaction | financial.* |
+| Method | Endpoint                              | Description        | Permission |
+| ------ | ------------------------------------- | ------------------ | ---------- |
+| POST   | `/api/manager/getWeeklyFigureByAgent` | Weekly performance | manager.\* |
+| POST   | `/api/manager/getParlayActivity`      | Parlay activity    | manager.\* |
+| POST   | `/api/manager/getLiveWagers`          | Live wagers        | manager.\* |
+| POST   | `/api/manager/getLiveActivity`        | Live activity feed | manager.\* |
+| POST   | `/api/manager/getCustomers`           | Customer list      | manager.\* |
+| POST   | `/api/manager/getCustomerDetails`     | Customer details   | manager.\* |
+| POST   | `/api/manager/getAgentPerformance`    | Agent metrics      | manager.\* |
+| POST   | `/api/manager/getBetTicker`           | Bet ticker feed    | manager.\* |
+| GET    | `/api/manager/reports/daily`          | Daily reports      | manager.\* |
+| GET    | `/api/manager/reports/weekly`         | Weekly reports     | manager.\* |
+| GET    | `/api/manager/reports/monthly`        | Monthly reports    | manager.\* |
+
+### 💰 Financial Routes (`/api/financial`) - _[Fixed Double Slash Bug]_
+
+| Method | Endpoint                              | Description          | Permission   |
+| ------ | ------------------------------------- | -------------------- | ------------ |
+| POST   | `/api/financial/withdrawals/request`  | Request withdrawal   | financial.\* |
+| POST   | `/api/financial/withdrawals/approve`  | Approve withdrawal   | financial.\* |
+| POST   | `/api/financial/withdrawals/complete` | Complete withdrawal  | financial.\* |
+| POST   | `/api/financial/withdrawals/reject`   | Reject withdrawal    | financial.\* |
+| GET    | `/api/financial/withdrawals/pending`  | Pending withdrawals  | financial.\* |
+| GET    | `/api/financial/withdrawals`          | All withdrawals      | financial.\* |
+| POST   | `/api/financial/queue/init`           | Initialize P2P queue | financial.\* |
+| POST   | `/api/financial/queue/withdrawal`     | Queue withdrawal     | financial.\* |
+| POST   | `/api/financial/queue/deposit`        | Queue deposit        | financial.\* |
+| GET    | `/api/financial/queue/stats`          | Queue statistics     | financial.\* |
+| GET    | `/api/financial/queue/items`          | Queue items          | financial.\* |
+| GET    | `/api/financial/queue/opportunities`  | P2P opportunities    | financial.\* |
+| POST   | `/api/financial/queue/process`        | Process queue        | financial.\* |
+| POST   | `/api/financial/queue/complete`       | Complete transaction | financial.\* |
 
 ### 👤 Customer Routes (`/api/customer`)
-| Method | Endpoint | Description | Permission |
-|--------|----------|-------------|------------|
-| POST | `/api/customer/getHeriarchy` | Customer hierarchy | customer.* |
+
+| Method | Endpoint                     | Description        | Permission  |
+| ------ | ---------------------------- | ------------------ | ----------- |
+| POST   | `/api/customer/getHeriarchy` | Customer hierarchy | customer.\* |
 
 ### ❤️ Health Routes (`/api/health`)
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/health` | System health status | No |
-| GET | `/api/health/ready` | Readiness check | No |
-| GET | `/api/health/live` | Liveness probe | No |
-| GET | `/api/health/metrics` | Health metrics | Yes |
-| GET | `/api/health/permissions` | Permissions check | Yes |
-| GET | `/api/health/fire22` | Fire22 API status | Yes |
-| GET | `/api/health/database` | Database status | Yes |
+
+| Method | Endpoint                  | Description          | Auth Required |
+| ------ | ------------------------- | -------------------- | ------------- |
+| GET    | `/api/health`             | System health status | No            |
+| GET    | `/api/health/ready`       | Readiness check      | No            |
+| GET    | `/api/health/live`        | Liveness probe       | No            |
+| GET    | `/api/health/metrics`     | Health metrics       | Yes           |
+| GET    | `/api/health/permissions` | Permissions check    | Yes           |
+| GET    | `/api/health/fire22`      | Fire22 API status    | Yes           |
+| GET    | `/api/health/database`    | Database status      | Yes           |
 
 ### 📈 Other Routes (`/api/other`)
-Large collection of analytics, reporting, and Fire22 integration endpoints (49+ routes).
+
+Large collection of analytics, reporting, and Fire22 integration endpoints (49+
+routes).
 
 ## Special API Systems
 
 ### 🎯 Hub API (`/api/hub`)
-Advanced system integration endpoints for D1, R2, SQLite, Language, and Telegram systems.
+
+Advanced system integration endpoints for D1, R2, SQLite, Language, and Telegram
+systems.
 
 #### Hub Endpoints Overview
+
 ```typescript
 // Health & Metrics
 GET  /api/hub/health              // Hub health check
@@ -157,6 +175,7 @@ GET  /api/hub/telegram/metrics       // Telegram metrics
 ```
 
 ### 📦 Package Review Grid (`/api/packages`)
+
 ```typescript
 GET  /api/packages/review-grid       // Complete package analysis
 GET  /api/packages/analyze/:path     // Analyze specific package
@@ -164,11 +183,13 @@ GET  /api/packages/discover          // Discover all packages
 ```
 
 ### 🔄 Unified API Handler
+
 Consolidated endpoint handler for dashboard and Telegram bot integration.
 
 ## Routing Architecture
 
 ### Framework Stack
+
 ```typescript
 // Main API Router (itty-router)
 import { Router } from 'itty-router';
@@ -184,6 +205,7 @@ const router = express.Router();
 ```
 
 ### Route Organization
+
 ```
 src/api/
 ├── index.ts                 # Main API router
@@ -210,6 +232,7 @@ src/api/
 ## Middleware Stack
 
 ### Execution Order
+
 1. **CORS** - Cross-origin resource sharing
 2. **Rate Limiting** - Request throttling
 3. **Authentication** - JWT verification
@@ -219,6 +242,7 @@ src/api/
 7. **Error Handler** - Centralized error handling
 
 ### Rate Limiting Configuration
+
 ```typescript
 // Default limits
 General: 100 requests/minute
@@ -234,6 +258,7 @@ POST /api/admin/bulk-*: 10 requests/minute
 ## Testing & Examples
 
 ### Basic Authentication
+
 ```bash
 # Login
 curl -X POST http://localhost:3001/api/auth/login \
@@ -246,6 +271,7 @@ curl -X GET http://localhost:3001/api/health/metrics \
 ```
 
 ### Fire22 Integration
+
 ```bash
 # Sync customers
 curl -X POST http://localhost:3001/api/admin/sync-fire22 \
@@ -260,6 +286,7 @@ curl -X POST http://localhost:3001/api/manager/getLiveWagers \
 ```
 
 ### Package Review
+
 ```bash
 # Get package review grid
 curl -X GET http://localhost:3001/api/packages/review-grid \
@@ -267,6 +294,7 @@ curl -X GET http://localhost:3001/api/packages/review-grid \
 ```
 
 ### Hub Operations
+
 ```bash
 # Execute D1 query
 curl -X POST http://localhost:3001/api/hub/d1/fire22-dashboard/query \
@@ -278,6 +306,7 @@ curl -X POST http://localhost:3001/api/hub/d1/fire22-dashboard/query \
 ## Error Responses
 
 ### Standard Error Format
+
 ```json
 {
   "success": false,
@@ -289,6 +318,7 @@ curl -X POST http://localhost:3001/api/hub/d1/fire22-dashboard/query \
 ```
 
 ### Common Error Codes
+
 - `AUTH_001` - Invalid credentials
 - `AUTH_002` - Token expired
 - `AUTH_003` - Insufficient permissions
@@ -299,11 +329,13 @@ curl -X POST http://localhost:3001/api/hub/d1/fire22-dashboard/query \
 ## Development Notes
 
 ### Fixed Issues
+
 - ✅ Fixed double slash bug in financial routes (`//api/` → `/api/`)
 - ✅ Standardized route prefixes across all route files
 - ✅ Consolidated middleware execution order
 
 ### TODO Items
+
 - ⚠️ Complete financial controller implementations
 - ⚠️ Add OpenAPI/Swagger documentation
 - ⚠️ Implement comprehensive error logging
@@ -313,12 +345,14 @@ curl -X POST http://localhost:3001/api/hub/d1/fire22-dashboard/query \
 ## Performance Optimizations
 
 ### Caching Strategy
+
 - **Customer Data**: 5-minute TTL
 - **Agent Hierarchy**: 15-minute TTL
 - **Fire22 API**: Request-level caching
 - **DNS Prefetching**: Proactive resolution
 
 ### Database Optimization
+
 - **Connection Pooling**: Max 20 connections
 - **Query Optimization**: Indexed lookups
 - **Batch Operations**: Bulk insert/update support
@@ -326,6 +360,7 @@ curl -X POST http://localhost:3001/api/hub/d1/fire22-dashboard/query \
 ## Security Considerations
 
 ### Best Practices
+
 - JWT tokens expire after 24 hours
 - Refresh tokens stored securely
 - Rate limiting prevents abuse
@@ -335,6 +370,7 @@ curl -X POST http://localhost:3001/api/hub/d1/fire22-dashboard/query \
 - CORS configuration
 
 ### Audit Trail
+
 - All financial operations logged
 - User actions tracked
 - API access monitoring
@@ -342,6 +378,4 @@ curl -X POST http://localhost:3001/api/hub/d1/fire22-dashboard/query \
 
 ---
 
-*Last Updated: 2024-12-28*
-*Version: 4.0.0-staging*
-*Total Endpoints: 119+*
+_Last Updated: 2024-12-28_ _Version: 4.0.0-staging_ _Total Endpoints: 119+_

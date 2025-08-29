@@ -1,0 +1,70 @@
+name: "Fire22 Runtime Configuration"
+version: "2.0.0"
+description: "Dynamic runtime configuration for Fire22 services"
+
+metadata:
+  created: "2024-12-19T12:00:00Z"
+  environment: "development"
+  author: "Fire22 Automation"
+
+services:
+  - name: "api-gateway"
+    port: 3000
+    protocol: "http"
+    enabled: true
+    health_check: "/health"
+    timeout: 30
+
+  - name: "database"
+    port: 5432
+    protocol: "postgresql"
+    enabled: true
+    connection_pool: 10
+    ssl_enabled: true
+
+  - name: "redis-cache"
+    port: 6379
+    protocol: "redis"
+    enabled: false
+    max_memory: "512mb"
+    persistence: "rdb"
+
+  - name: "elasticsearch"
+    port: 9200
+    protocol: "http"
+    enabled: true
+    cluster_name: "fire22-cluster"
+    indices:
+      - "logs-*"
+      - "metrics-*"
+
+configuration:
+  log_level: "info"
+  max_connections: 1000
+  request_timeout: 30
+  rate_limit:
+    requests_per_minute: 1000
+    burst_limit: 100
+
+features:
+  authentication: true
+  authorization: true
+  rate_limiting: true
+  caching: true
+  monitoring: true
+  tracing: false
+
+security:
+  jwt_secret_rotation: true
+  api_key_validation: true
+  ip_whitelisting: false
+  encryption_at_rest: true
+
+monitoring:
+  metrics_enabled: true
+  health_checks: true
+  log_aggregation: true
+  alert_thresholds:
+    cpu_usage: 80
+    memory_usage: 85
+    response_time: 500

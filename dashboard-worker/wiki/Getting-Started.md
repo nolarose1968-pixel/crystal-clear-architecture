@@ -1,18 +1,21 @@
 # Getting Started with Fire22 Dashboard Worker
 
-Welcome to Fire22 Dashboard Worker! This guide will help you get up and running quickly.
+Welcome to Fire22 Dashboard Worker! This guide will help you get up and running
+quickly.
 
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
 
 ### Required Software
+
 - **Bun** >= 1.2.20 ([Download](https://bun.sh/))
 - **Git** for version control
 - **Cloudflare account** (for deployment)
 - **PostgreSQL** (for local development)
 
 ### Optional but Recommended
+
 - **VS Code** with recommended extensions
 - **Docker** for containerized development
 - **wrangler** CLI for Cloudflare Workers
@@ -118,7 +121,9 @@ fire22-dashboard-worker/
 ## Core Concepts
 
 ### 1. Multi-Workspace Architecture
+
 The project is organized into 6 specialized workspaces:
+
 - **Core Dashboard**: Main UI and functionality
 - **Pattern System**: Advanced pattern weaver
 - **API Client**: Fire22 API integration
@@ -127,13 +132,16 @@ The project is organized into 6 specialized workspaces:
 - **Build System**: Build tools and automation
 
 ### 2. Pattern Weaver System
+
 A unified pattern system that provides:
+
 - 13 unified patterns (LOADER, STYLER, TABULAR, etc.)
 - Auto-connection between related patterns
 - Advanced stream processing
 - Security scanning integration
 
 ### 3. Bun-Native Performance
+
 - Direct TypeScript execution
 - Native SQLite integration
 - Optimized build pipeline
@@ -182,8 +190,8 @@ wrangler tail              # Live logs
 ## Configuration
 
 ### Environment Variables
-Key environment variables to configure:
 
+Key environment variables to configure:
 
 ```bash
 # Core Configuration
@@ -206,7 +214,9 @@ TELEGRAM_BOT_TOKEN=your_bot_token
 ```
 
 ### Workspace Configuration
+
 Each workspace has its own configuration in `workspace-config.json`:
+
 - Bundle size limits
 - Cloudflare Workers settings
 - Dependency management
@@ -227,9 +237,12 @@ Once you have the basics running, explore these areas:
 If you run into issues:
 
 1. **Check the [[FAQ]]** for common problems
-2. **Search [Issues](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues)**
+2. **Search
+   [Issues](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues)**
 3. **Create a new issue** if you can't find a solution
-4. **Join [Discussions](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/discussions)** for questions
+4. **Join
+   [Discussions](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/discussions)**
+   for questions
 
 ## Common Issues
 

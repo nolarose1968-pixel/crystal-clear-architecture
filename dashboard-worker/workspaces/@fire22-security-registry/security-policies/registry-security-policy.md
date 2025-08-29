@@ -2,20 +2,25 @@
 
 ## Overview
 
-This document outlines the comprehensive security policies and procedures for the Fire22 Security Registry, ensuring the highest standards of package security and integrity.
+This document outlines the comprehensive security policies and procedures for
+the Fire22 Security Registry, ensuring the highest standards of package security
+and integrity.
 
 ## Security Scanning Requirements
 
 ### Pre-Publication Scanning
 
-All packages **MUST** undergo comprehensive security scanning before publication:
+All packages **MUST** undergo comprehensive security scanning before
+publication:
 
 1. **Vulnerability Detection**
+
    - Known CVE scanning against NIST database
    - Proprietary vulnerability database checks
    - Real-time threat intelligence integration
 
 2. **Code Analysis**
+
    - Static code analysis for security patterns
    - Dynamic analysis for runtime vulnerabilities
    - Malware and backdoor detection
@@ -43,6 +48,7 @@ All packages **MUST** undergo comprehensive security scanning before publication
 ### Metadata Requirements
 
 1. **Required Fields**
+
    - Package name (must match allowed scopes)
    - Semantic version
    - Description
@@ -58,6 +64,7 @@ All packages **MUST** undergo comprehensive security scanning before publication
 ### Content Restrictions
 
 #### Prohibited Content
+
 - Malicious code or backdoors
 - Cryptocurrency miners
 - Keyloggers or data harvesting tools
@@ -65,6 +72,7 @@ All packages **MUST** undergo comprehensive security scanning before publication
 - Code obfuscation (unless justified)
 
 #### Restricted Content
+
 - Binary executables (require manual review)
 - Native modules (enhanced scanning)
 - Network libraries (additional security checks)
@@ -75,6 +83,7 @@ All packages **MUST** undergo comprehensive security scanning before publication
 ### API Authentication
 
 1. **Token-Based Authentication**
+
    - Bearer tokens for all API operations
    - JWT with RS256 signing
    - Token expiration and rotation
@@ -88,7 +97,8 @@ All packages **MUST** undergo comprehensive security scanning before publication
 ### Package Ownership
 
 1. **Scope Management**
-   - Scoped packages (@fire22/*, @ff/*)
+
+   - Scoped packages (@fire22/_, @ff/_)
    - Owner verification required
    - Transfer approval process
 
@@ -102,6 +112,7 @@ All packages **MUST** undergo comprehensive security scanning before publication
 ### Continuous Scanning
 
 1. **Real-Time Monitoring**
+
    - New vulnerability database updates
    - Package integrity verification
    - Anomaly detection
@@ -114,6 +125,7 @@ All packages **MUST** undergo comprehensive security scanning before publication
 ### Incident Response
 
 1. **Vulnerability Discovery**
+
    - Immediate notification system
    - Automated package flagging
    - Risk assessment and prioritization
@@ -129,6 +141,7 @@ All packages **MUST** undergo comprehensive security scanning before publication
 ### Data Handling
 
 1. **Package Data**
+
    - Encrypted storage (AES-256)
    - Integrity verification (SHA-512)
    - Secure transmission (TLS 1.3)
@@ -141,6 +154,7 @@ All packages **MUST** undergo comprehensive security scanning before publication
 ### Storage Security
 
 1. **Database Security**
+
    - Encrypted at rest
    - Access logging and monitoring
    - Regular security patches
@@ -155,6 +169,7 @@ All packages **MUST** undergo comprehensive security scanning before publication
 ### Regulatory Compliance
 
 1. **Standards Adherence**
+
    - NIST Cybersecurity Framework
    - OWASP guidelines
    - ISO 27001 principles
@@ -167,6 +182,7 @@ All packages **MUST** undergo comprehensive security scanning before publication
 ### Audit Requirements
 
 1. **Internal Audits**
+
    - Monthly security reviews
    - Quarterly compliance checks
    - Annual comprehensive audit
@@ -181,6 +197,7 @@ All packages **MUST** undergo comprehensive security scanning before publication
 ### Security Incident Response
 
 1. **Severity Levels**
+
    - **P0**: Critical security breach
    - **P1**: High-impact vulnerability
    - **P2**: Medium-risk issue
@@ -195,6 +212,7 @@ All packages **MUST** undergo comprehensive security scanning before publication
 ### Package Removal
 
 1. **Emergency Removal**
+
    - Malicious package detection
    - Critical vulnerability discovery
    - Legal compliance requirements
@@ -210,6 +228,7 @@ All packages **MUST** undergo comprehensive security scanning before publication
 ### For Publishers
 
 1. **Pre-Publication Checklist**
+
    - Run local security scan
    - Review dependency licenses
    - Verify package metadata
@@ -224,6 +243,7 @@ All packages **MUST** undergo comprehensive security scanning before publication
 ### For Consumers
 
 1. **Package Selection**
+
    - Review security scores
    - Check vulnerability reports
    - Verify package authenticity
@@ -238,11 +258,13 @@ All packages **MUST** undergo comprehensive security scanning before publication
 ## Contact Information
 
 ### Security Team
+
 - **Email**: security@fire22.dev
 - **Emergency**: security-emergency@fire22.dev
 - **GPG Key**: [Public key fingerprint]
 
 ### Reporting Vulnerabilities
+
 - **Responsible Disclosure**: security-reports@fire22.dev
 - **Bug Bounty Program**: Available for critical vulnerabilities
 - **Response Time**: Within 24 hours for all reports

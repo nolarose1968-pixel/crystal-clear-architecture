@@ -9,7 +9,7 @@ import type {
   PatternResult,
   PatternPipeline,
   PatternExecutionOptions,
-  TabularResult
+  TabularResult,
 } from '../core/pattern-types';
 
 export class PatternUtils {
@@ -18,7 +18,9 @@ export class PatternUtils {
   /**
    * Apply multiple patterns in sequence (chain)
    */
-  static async chain(...contexts: Array<{ pattern: PatternType; context: any }>): Promise<PatternResult[]> {
+  static async chain(
+    ...contexts: Array<{ pattern: PatternType; context: any }>
+  ): Promise<PatternResult[]> {
     const results: PatternResult[] = [];
 
     for (const { pattern, context } of contexts) {
@@ -33,7 +35,7 @@ export class PatternUtils {
           success: true,
           data: result,
           executionTime,
-          pattern
+          pattern,
         });
       } catch (error) {
         const executionTime = Date.now() - startTime;
@@ -43,7 +45,7 @@ export class PatternUtils {
           data: null,
           error: error instanceof Error ? error.message : 'Unknown error',
           executionTime,
-          pattern
+          pattern,
         });
 
         // Stop chain on first error
@@ -57,7 +59,9 @@ export class PatternUtils {
   /**
    * Apply multiple patterns in parallel
    */
-  static async parallel(...contexts: Array<{ pattern: PatternType; context: any }>): Promise<PatternResult[]> {
+  static async parallel(
+    ...contexts: Array<{ pattern: PatternType; context: any }>
+  ): Promise<PatternResult[]> {
     const promises = contexts.map(async ({ pattern, context }) => {
       const startTime = Date.now();
 
@@ -69,7 +73,7 @@ export class PatternUtils {
           success: true,
           data: result,
           executionTime,
-          pattern
+          pattern,
         };
       } catch (error) {
         const executionTime = Date.now() - startTime;
@@ -79,7 +83,7 @@ export class PatternUtils {
           data: null,
           error: error instanceof Error ? error.message : 'Unknown error',
           executionTime,
-          pattern
+          pattern,
         };
       }
     });
@@ -96,7 +100,10 @@ export class PatternUtils {
   } {
     const pipelineId = `pipeline_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    const execute = async (context: any, options?: PatternExecutionOptions): Promise<PatternResult[]> => {
+    const execute = async (
+      context: any,
+      options?: PatternExecutionOptions
+    ): Promise<PatternResult[]> => {
       const pipeline: PatternPipeline = {
         id: pipelineId,
         name: `Pipeline ${patterns.join(' → ')}`,
@@ -104,7 +111,7 @@ export class PatternUtils {
         context,
         options,
         status: 'running',
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       this.pipelines.set(pipelineId, pipeline);
@@ -124,7 +131,7 @@ export class PatternUtils {
               success: true,
               data: result,
               executionTime,
-              pattern
+              pattern,
             });
           } catch (error) {
             const executionTime = Date.now() - startTime;
@@ -134,7 +141,7 @@ export class PatternUtils {
               data: null,
               error: error instanceof Error ? error.message : 'Unknown error',
               executionTime,
-              pattern
+              pattern,
             });
 
             // Update pipeline status
@@ -153,7 +160,6 @@ export class PatternUtils {
         this.pipelines.set(pipelineId, pipeline);
 
         return results;
-
       } catch (error) {
         pipeline.status = 'failed';
         pipeline.completedAt = new Date();
@@ -178,7 +184,10 @@ export class PatternUtils {
     return {
       then: (...thenPatterns: PatternType[]) => ({
         otherwise: (...otherwisePatterns: PatternType[]) => ({
-          execute: async (context: any, options?: PatternExecutionOptions): Promise<PatternResult[]> => {
+          execute: async (
+            context: any,
+            options?: PatternExecutionOptions
+          ): Promise<PatternResult[]> => {
             const shouldExecuteThen = await this.evaluateCondition(condition, context);
             const patternsToExecute = shouldExecuteThen ? thenPatterns : otherwisePatterns;
 
@@ -188,9 +197,9 @@ export class PatternUtils {
 
             const { execute } = this.pipeline(...patternsToExecute);
             return await execute(context, options);
-          }
-        })
-      })
+          },
+        }),
+      }),
     };
   }
 
@@ -215,7 +224,7 @@ export class PatternUtils {
               success: true,
               data: result,
               executionTime: 0, // Would be tracked by the pattern itself
-              pattern
+              pattern,
             };
           } catch (error) {
             lastError = error instanceof Error ? error : new Error('Unknown error');
@@ -233,9 +242,9 @@ export class PatternUtils {
           data: null,
           error: lastError?.message || 'Max retries exceeded',
           executionTime: 0,
-          pattern
+          pattern,
         };
-      }
+      },
     };
   }
 
@@ -251,9 +260,7 @@ export class PatternUtils {
 
         try {
           // Execute all patterns in parallel and combine results
-          const results = await this.parallel(
-            ...patterns.map(pattern => ({ pattern, context }))
-          );
+          const results = await this.parallel(...patterns.map(pattern => ({ pattern, context })));
 
           const executionTime = Date.now() - startTime;
 
@@ -263,8 +270,8 @@ export class PatternUtils {
             summary: {
               totalPatterns: patterns.length,
               successful: results.filter(r => r.success).length,
-              failed: results.filter(r => !r.success).length
-            }
+              failed: results.filter(r => !r.success).length,
+            },
           };
 
           return {
@@ -274,10 +281,9 @@ export class PatternUtils {
             pattern: patterns[0], // Primary pattern
             metadata: {
               composedPatterns: patterns,
-              individualResults: results
-            }
+              individualResults: results,
+            },
           };
-
         } catch (error) {
           const executionTime = Date.now() - startTime;
 
@@ -286,12 +292,12 @@ export class PatternUtils {
             data: null,
             error: error instanceof Error ? error.message : 'Composition failed',
             executionTime,
-            pattern: patterns[0]
+            pattern: patterns[0],
           };
         }
-      }
+      },
     };
-  };
+  }
 
   /**
    * Get pipeline status
@@ -326,7 +332,8 @@ export class PatternUtils {
   /**
    * Clean up completed pipelines (older than specified time)
    */
-  static cleanupPipelines(olderThanMs: number = 3600000): number { // 1 hour default
+  static cleanupPipelines(olderThanMs: number = 3600000): number {
+    // 1 hour default
     const cutoffTime = Date.now() - olderThanMs;
     let cleanedCount = 0;
 
@@ -365,7 +372,8 @@ export class PatternUtils {
       active: pipelines.filter(p => p.status === 'running').length,
       completed: completedPipelines.length,
       failed: pipelines.filter(p => p.status === 'failed').length,
-      averageExecutionTime: completedPipelines.length > 0 ? totalExecutionTime / completedPipelines.length : 0
+      averageExecutionTime:
+        completedPipelines.length > 0 ? totalExecutionTime / completedPipelines.length : 0,
     };
   }
 
@@ -407,8 +415,8 @@ export class PatternUtils {
         summary: {
           totalRows: data.length,
           totalColumns: headers.length,
-          executionTime: 0
-        }
+          executionTime: 0,
+        },
       };
     }
 
@@ -418,12 +426,15 @@ export class PatternUtils {
       summary: {
         totalRows: Object.keys(data).length,
         totalColumns: 2,
-        executionTime: 0
-      }
+        executionTime: 0,
+      },
     };
   }
 
-  private static async evaluateCondition(condition: (context: any) => boolean | Promise<boolean>, context: any): Promise<boolean> {
+  private static async evaluateCondition(
+    condition: (context: any) => boolean | Promise<boolean>,
+    context: any
+  ): Promise<boolean> {
     try {
       return await condition(context);
     } catch (error) {
@@ -438,11 +449,4 @@ export class PatternUtils {
 }
 
 // Export utility functions for direct use
-export const {
-  chain,
-  parallel,
-  pipeline,
-  conditional,
-  retry,
-  compose
-} = PatternUtils;
+export const { chain, parallel, pipeline, conditional, retry, compose } = PatternUtils;

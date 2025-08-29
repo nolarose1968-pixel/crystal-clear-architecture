@@ -2,235 +2,426 @@
  * Regulatory Filing Value Object
  * Domain-Driven Design Implementation
  *
- * Represents regulatory filings and compliance requirements
+ * Represents regulatory filings and compliance submissions
  */
 
-import { DomainError } from '../../shared/domain-entity';
+import { ValueObject } from "../../shared/value-object";
+import { DomainError } from "../../shared/domain-entity";
+import { AccountingPeriod } from "./accounting-period";
 
 export enum FilingStatus {
-  PENDING = 'pending',
-  SUBMITTED = 'submitted',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  OVERDUE = 'overdue'
+  PENDING = "pending",
+  SUBMITTED = "submitted",
+  ACCEPTED = "accepted",
+  REJECTED = "rejected",
+  UNDER_REVIEW = "under_review",
+  AMENDED = "amended",
+  WITHDRAWN = "withdrawn",
 }
 
 export enum FilingType {
-  FINANCIAL_STATEMENT = 'financial_statement',
-  AML_REPORT = 'aml_report',
-  KYC_REPORT = 'kyc_report',
-  TAX_REPORT = 'tax_report',
-  REGULATORY_DISCLOSURE = 'regulatory_disclosure',
-  AUDIT_REPORT = 'audit_report'
+  // IRS Filings
+  FORM_1099 = "form_1099",
+  FORM_1096 = "form_1096",
+  FORM_8300 = "form_8300",
+  FORM_1120 = "form_1120",
+  FORM_941 = "form_941",
+
+  // FinCEN Filings
+  SAR = "sar", // Suspicious Activity Report
+  CTR = "ctr", // Currency Transaction Report
+  BSA_REPORT = "bsa_report",
+
+  // SEC Filings
+  FORM_10K = "form_10k",
+  FORM_10Q = "form_10q",
+  FORM_8K = "form_8k",
+
+  // State Filings
+  STATE_TAX_RETURN = "state_tax_return",
+  SALES_TAX_REPORT = "sales_tax_report",
+  BUSINESS_LICENSE = "business_license",
+
+  // Other Regulatory
+  AML_REPORT = "aml_report",
+  KYC_REPORT = "kyc_report",
+  PCI_REPORT = "pci_report",
 }
 
-export class RegulatoryFiling {
+export enum RegulatoryBody {
+  IRS = "irs",
+  FINCEN = "fincen",
+  SEC = "sec",
+  FDIC = "fdic",
+  OCC = "occ",
+  CFPB = "cfpb",
+  STATE_AG = "state_ag",
+  LOCAL_AGENCY = "local_agency",
+}
+
+export enum FilingPriority {
+  LOW = "low",
+  NORMAL = "normal",
+  HIGH = "high",
+  CRITICAL = "critical",
+  EMERGENCY = "emergency",
+}
+
+export class RegulatoryFiling extends ValueObject {
   private readonly _id: string;
   private readonly _filingType: FilingType;
-  private readonly _description: string;
+  private readonly _regulatoryBody: RegulatoryBody;
+  private readonly _period: AccountingPeriod;
   private readonly _dueDate: Date;
-  private readonly _jurisdiction: string;
-  private _status: FilingStatus;
-  private _submittedDate?: Date;
-  private _approvedDate?: Date;
-  private _rejectionReason?: string;
-  private readonly _requiredDocuments: string[];
+  private readonly _description: string;
+  private readonly _priority: FilingPriority;
+  private readonly _isMandatory: boolean;
+  private readonly _thresholdAmount?: number;
   private readonly _metadata: Record<string, any>;
+  private readonly _createdAt: Date;
 
   constructor(params: RegulatoryFilingParams) {
-    this.validateParams(params);
+    super();
+    this.validateFiling(params);
 
     this._id = params.id;
     this._filingType = params.filingType;
-    this._description = params.description;
+    this._regulatoryBody = params.regulatoryBody;
+    this._period = params.period;
     this._dueDate = new Date(params.dueDate);
-    this._jurisdiction = params.jurisdiction;
-    this._status = params.status || FilingStatus.PENDING;
-    this._submittedDate = params.submittedDate ? new Date(params.submittedDate) : undefined;
-    this._approvedDate = params.approvedDate ? new Date(params.approvedDate) : undefined;
-    this._rejectionReason = params.rejectionReason;
-    this._requiredDocuments = [...params.requiredDocuments];
+    this._description = params.description;
+    this._priority = params.priority || FilingPriority.NORMAL;
+    this._isMandatory = params.isMandatory ?? true;
+    this._thresholdAmount = params.thresholdAmount;
     this._metadata = { ...params.metadata };
+    this._createdAt = new Date(params.createdAt);
+  }
+
+  static create(params: {
+    id: string;
+    filingType: FilingType;
+    regulatoryBody: RegulatoryBody;
+    period: AccountingPeriod;
+    dueDate: Date;
+    description: string;
+    priority?: FilingPriority;
+    isMandatory?: boolean;
+    thresholdAmount?: number;
+    metadata?: Record<string, any>;
+  }): RegulatoryFiling {
+    return new RegulatoryFiling({
+      ...params,
+      createdAt: new Date(),
+    });
   }
 
   // Getters
-  getId(): string { return this._id; }
-  getFilingType(): FilingType { return this._filingType; }
-  getDescription(): string { return this._description; }
-  getDueDate(): Date { return new Date(this._dueDate); }
-  getJurisdiction(): string { return this._jurisdiction; }
-  getStatus(): FilingStatus { return this._status; }
-  getSubmittedDate(): Date | undefined { return this._submittedDate ? new Date(this._submittedDate) : undefined; }
-  getApprovedDate(): Date | undefined { return this._approvedDate ? new Date(this._approvedDate) : undefined; }
-  getRejectionReason(): string | undefined { return this._rejectionReason; }
-  getRequiredDocuments(): string[] { return [...this._requiredDocuments]; }
-  getMetadata(): Record<string, any> { return { ...this._metadata }; }
+  getId(): string {
+    return this._id;
+  }
+  getFilingType(): FilingType {
+    return this._filingType;
+  }
+  getRegulatoryBody(): RegulatoryBody {
+    return this._regulatoryBody;
+  }
+  getPeriod(): AccountingPeriod {
+    return this._period;
+  }
+  getDueDate(): Date {
+    return new Date(this._dueDate);
+  }
+  getDescription(): string {
+    return this._description;
+  }
+  getPriority(): FilingPriority {
+    return this._priority;
+  }
+  getIsMandatory(): boolean {
+    return this._isMandatory;
+  }
+  getThresholdAmount(): number | undefined {
+    return this._thresholdAmount;
+  }
+  getMetadata(): Record<string, any> {
+    return { ...this._metadata };
+  }
+  getCreatedAt(): Date {
+    return new Date(this._createdAt);
+  }
 
   // Business Logic Methods
-  submit(submittedDate?: Date): void {
-    if (this._status !== FilingStatus.PENDING && this._status !== FilingStatus.OVERDUE) {
-      throw new DomainError(`Cannot submit filing with status: ${this._status}`, 'INVALID_FILING_STATUS');
-    }
-
-    this._submittedDate = submittedDate || new Date();
-    this._status = FilingStatus.SUBMITTED;
-  }
-
-  approve(approvedDate?: Date): void {
-    if (this._status !== FilingStatus.SUBMITTED) {
-      throw new DomainError(`Cannot approve filing with status: ${this._status}`, 'INVALID_FILING_STATUS');
-    }
-
-    this._approvedDate = approvedDate || new Date();
-    this._status = FilingStatus.APPROVED;
-  }
-
-  reject(reason: string): void {
-    if (this._status !== FilingStatus.SUBMITTED) {
-      throw new DomainError(`Cannot reject filing with status: ${this._status}`, 'INVALID_FILING_STATUS');
-    }
-
-    this._rejectionReason = reason;
-    this._status = FilingStatus.REJECTED;
-  }
-
-  markOverdue(): void {
-    if (this._status === FilingStatus.PENDING && new Date() > this._dueDate) {
-      this._status = FilingStatus.OVERDUE;
-    }
-  }
-
-  // Utility Methods
   isOverdue(): boolean {
-    return this._status === FilingStatus.OVERDUE ||
-           (this._status === FilingStatus.PENDING && new Date() > this._dueDate);
+    return new Date() > this._dueDate;
   }
 
-  isCompleted(): boolean {
-    return this._status === FilingStatus.APPROVED || this._status === FilingStatus.REJECTED;
-  }
-
-  getDaysUntilDue(): number {
+  daysUntilDue(): number {
     const now = new Date();
     const diffTime = this._dueDate.getTime() - now.getTime();
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
-  getDaysOverdue(): number {
-    if (!this.isOverdue()) return 0;
-
-    const now = new Date();
-    const diffTime = now.getTime() - this._dueDate.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  isDueSoon(daysThreshold: number = 30): boolean {
+    const daysUntilDue = this.daysUntilDue();
+    return daysUntilDue >= 0 && daysUntilDue <= daysThreshold;
   }
 
-  hasRequiredDocument(documentName: string): boolean {
-    return this._requiredDocuments.includes(documentName);
+  requiresImmediateAttention(): boolean {
+    return (
+      this.isOverdue() ||
+      this._priority === FilingPriority.CRITICAL ||
+      this._priority === FilingPriority.EMERGENCY
+    );
   }
 
-  addRequiredDocument(documentName: string): void {
-    if (!this._requiredDocuments.includes(documentName)) {
-      this._requiredDocuments.push(documentName);
+  canBeAutoGenerated(): boolean {
+    // Some filing types can be auto-generated based on transaction data
+    const autoGeneratableTypes = [
+      FilingType.FORM_1099,
+      FilingType.SAR,
+      FilingType.CTR,
+      FilingType.AML_REPORT,
+    ];
+
+    return autoGeneratableTypes.includes(this._filingType);
+  }
+
+  getFilingFrequency(): "one-time" | "periodic" {
+    // Determine if this is a one-time or periodic filing
+    switch (this._filingType) {
+      case FilingType.FORM_10K:
+      case FilingType.FORM_1120:
+        return "one-time";
+      case FilingType.FORM_941:
+      case FilingType.FORM_10Q:
+      case FilingType.SALES_TAX_REPORT:
+        return "periodic";
+      default:
+        return "periodic";
     }
   }
 
-  removeRequiredDocument(documentName: string): void {
-    const index = this._requiredDocuments.indexOf(documentName);
-    if (index > -1) {
-      this._requiredDocuments.splice(index, 1);
-    }
+  getEstimatedPreparationTime(): number {
+    // Estimated preparation time in hours based on filing type
+    const estimates: Record<FilingType, number> = {
+      [FilingType.FORM_1099]: 2,
+      [FilingType.FORM_1096]: 1,
+      [FilingType.FORM_8300]: 4,
+      [FilingType.FORM_1120]: 40,
+      [FilingType.FORM_941]: 8,
+      [FilingType.SAR]: 16,
+      [FilingType.CTR]: 4,
+      [FilingType.BSA_REPORT]: 12,
+      [FilingType.FORM_10K]: 160,
+      [FilingType.FORM_10Q]: 80,
+      [FilingType.FORM_8K]: 24,
+      [FilingType.STATE_TAX_RETURN]: 20,
+      [FilingType.SALES_TAX_REPORT]: 6,
+      [FilingType.BUSINESS_LICENSE]: 4,
+      [FilingType.AML_REPORT]: 32,
+      [FilingType.KYC_REPORT]: 12,
+      [FilingType.PCI_REPORT]: 16,
+    };
+
+    return estimates[this._filingType] || 8; // Default 8 hours
   }
 
-  updateMetadata(key: string, value: any): void {
-    this._metadata[key] = value;
+  getRequiredDocuments(): string[] {
+    // Documents required for this filing type
+    const requirements: Record<FilingType, string[]> = {
+      [FilingType.FORM_1099]: [
+        "transaction_records",
+        "payee_information",
+        "tax_id_verification",
+      ],
+      [FilingType.FORM_8300]: [
+        "cash_transaction_details",
+        "customer_identification",
+        "source_of_funds",
+      ],
+      [FilingType.SAR]: [
+        "transaction_details",
+        "customer_profile",
+        "supporting_evidence",
+        "narrative",
+      ],
+      [FilingType.CTR]: [
+        "transaction_details",
+        "customer_identification",
+        "cash_amount_verification",
+      ],
+      [FilingType.FORM_1120]: [
+        "financial_statements",
+        "income_records",
+        "expense_records",
+        "balance_sheet",
+      ],
+      [FilingType.FORM_941]: [
+        "payroll_records",
+        "employee_information",
+        "tax_withholdings",
+      ],
+      // Add more filing type requirements...
+    };
+
+    return (
+      requirements[this._filingType] || [
+        "financial_records",
+        "supporting_documentation",
+      ]
+    );
   }
 
-  toJSON() {
+  // Utility Methods
+  toJSON(): any {
     return {
       id: this._id,
       filingType: this._filingType,
-      description: this._description,
+      regulatoryBody: this._regulatoryBody,
+      period: this._period.toJSON(),
       dueDate: this._dueDate.toISOString(),
-      jurisdiction: this._jurisdiction,
-      status: this._status,
-      submittedDate: this._submittedDate?.toISOString(),
-      approvedDate: this._approvedDate?.toISOString(),
-      rejectionReason: this._rejectionReason,
-      requiredDocuments: this._requiredDocuments,
+      description: this._description,
+      priority: this._priority,
+      isMandatory: this._isMandatory,
+      thresholdAmount: this._thresholdAmount,
       metadata: this._metadata,
+      createdAt: this._createdAt.toISOString(),
       isOverdue: this.isOverdue(),
-      isCompleted: this.isCompleted(),
-      daysUntilDue: this.getDaysUntilDue(),
-      daysOverdue: this.getDaysOverdue()
+      daysUntilDue: this.daysUntilDue(),
+      requiresAttention: this.requiresImmediateAttention(),
+      canAutoGenerate: this.canBeAutoGenerated(),
+      estimatedPrepTime: this.getEstimatedPreparationTime(),
+      requiredDocuments: this.getRequiredDocuments(),
     };
   }
 
-  equals(other: RegulatoryFiling): boolean {
+  equals(other: ValueObject): boolean {
+    if (!(other instanceof RegulatoryFiling)) return false;
     return this._id === other._id;
   }
 
-  private validateParams(params: RegulatoryFilingParams): void {
-    if (!params.id || typeof params.id !== 'string') {
-      throw new DomainError('Filing ID is required and must be a string', 'INVALID_FILING_ID');
+  private validateFiling(params: RegulatoryFilingParams): void {
+    if (!params.id || typeof params.id !== "string") {
+      throw new DomainError("Filing ID is required", "INVALID_FILING_ID");
     }
 
-    if (!params.filingType || !Object.values(FilingType).includes(params.filingType)) {
-      throw new DomainError('Valid filing type is required', 'INVALID_FILING_TYPE');
+    if (!Object.values(FilingType).includes(params.filingType)) {
+      throw new DomainError(
+        "Valid filing type is required",
+        "INVALID_FILING_TYPE",
+      );
     }
 
-    if (!params.description || typeof params.description !== 'string') {
-      throw new DomainError('Filing description is required', 'INVALID_DESCRIPTION');
+    if (!Object.values(RegulatoryBody).includes(params.regulatoryBody)) {
+      throw new DomainError(
+        "Valid regulatory body is required",
+        "INVALID_REGULATORY_BODY",
+      );
+    }
+
+    if (!params.period || !(params.period instanceof AccountingPeriod)) {
+      throw new DomainError(
+        "Valid accounting period is required",
+        "INVALID_PERIOD",
+      );
     }
 
     if (!params.dueDate) {
-      throw new DomainError('Due date is required', 'INVALID_DUE_DATE');
+      throw new DomainError("Due date is required", "INVALID_DUE_DATE");
     }
 
-    if (!params.jurisdiction || typeof params.jurisdiction !== 'string') {
-      throw new DomainError('Jurisdiction is required', 'INVALID_JURISDICTION');
+    if (params.dueDate <= new Date()) {
+      throw new DomainError(
+        "Due date must be in the future",
+        "INVALID_DUE_DATE",
+      );
     }
 
-    if (!params.requiredDocuments || !Array.isArray(params.requiredDocuments)) {
-      throw new DomainError('Required documents must be an array', 'INVALID_DOCUMENTS');
+    if (!params.description || params.description.trim().length === 0) {
+      throw new DomainError("Description is required", "INVALID_DESCRIPTION");
+    }
+
+    if (params.thresholdAmount !== undefined && params.thresholdAmount < 0) {
+      throw new DomainError(
+        "Threshold amount cannot be negative",
+        "INVALID_THRESHOLD",
+      );
     }
   }
 }
 
-// Factory for creating regulatory filings
+// Filing Template Factory
 export class RegulatoryFilingFactory {
-  static create(params: RegulatoryFilingParams): RegulatoryFiling {
-    return new RegulatoryFiling(params);
-  }
+  static createMonthlyTaxReport(
+    period: AccountingPeriod,
+    regulatoryBody: RegulatoryBody = RegulatoryBody.IRS,
+  ): RegulatoryFiling {
+    const dueDate = new Date(period.getEndDate());
+    dueDate.setDate(dueDate.getDate() + 15); // 15 days after period end
 
-  static createFinancialStatement(params: Omit<RegulatoryFilingParams, 'filingType' | 'description'>): RegulatoryFiling {
-    return new RegulatoryFiling({
-      ...params,
-      filingType: FilingType.FINANCIAL_STATEMENT,
-      description: 'Periodic financial statement filing'
+    return RegulatoryFiling.create({
+      id: `filing_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      filingType: FilingType.FORM_941,
+      regulatoryBody,
+      period,
+      dueDate,
+      description: `Monthly tax report for ${period.getDisplayName()}`,
+      priority: FilingPriority.HIGH,
+      isMandatory: true,
+      metadata: {
+        formNumber: "941",
+        frequency: "monthly",
+      },
     });
   }
 
-  static createAMLReport(params: Omit<RegulatoryFilingParams, 'filingType' | 'description'>): RegulatoryFiling {
-    return new RegulatoryFiling({
-      ...params,
-      filingType: FilingType.AML_REPORT,
-      description: 'Anti-Money Laundering compliance report'
+  static createSARFiling(
+    transactionId: string,
+    amount: number,
+    reason: string,
+    period: AccountingPeriod,
+  ): RegulatoryFiling {
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 30); // 30 days to file SAR
+
+    return RegulatoryFiling.create({
+      id: `sar_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      filingType: FilingType.SAR,
+      regulatoryBody: RegulatoryBody.FINCEN,
+      period,
+      dueDate,
+      description: `Suspicious Activity Report - Transaction ${transactionId}`,
+      priority: FilingPriority.CRITICAL,
+      isMandatory: true,
+      thresholdAmount: amount,
+      metadata: {
+        transactionId,
+        reason,
+        amount,
+      },
     });
   }
 
-  static createKYCReport(params: Omit<RegulatoryFilingParams, 'filingType' | 'description'>): RegulatoryFiling {
-    return new RegulatoryFiling({
-      ...params,
-      filingType: FilingType.KYC_REPORT,
-      description: 'Know Your Customer compliance report'
-    });
-  }
+  static createAnnualReport(
+    period: AccountingPeriod,
+    regulatoryBody: RegulatoryBody = RegulatoryBody.IRS,
+  ): RegulatoryFiling {
+    const dueDate = new Date(period.getEndDate());
+    dueDate.setMonth(dueDate.getMonth() + 4); // 4 months after fiscal year end
 
-  static createTaxReport(params: Omit<RegulatoryFilingParams, 'filingType' | 'description'>): RegulatoryFiling {
-    return new RegulatoryFiling({
-      ...params,
-      filingType: FilingType.TAX_REPORT,
-      description: 'Tax compliance and reporting'
+    return RegulatoryFiling.create({
+      id: `filing_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      filingType: FilingType.FORM_1120,
+      regulatoryBody,
+      period,
+      dueDate,
+      description: `Annual corporate tax return for ${period.getDisplayName()}`,
+      priority: FilingPriority.CRITICAL,
+      isMandatory: true,
+      metadata: {
+        formNumber: "1120",
+        frequency: "annual",
+      },
     });
   }
 }
@@ -238,13 +429,13 @@ export class RegulatoryFilingFactory {
 export interface RegulatoryFilingParams {
   id: string;
   filingType: FilingType;
-  description: string;
+  regulatoryBody: RegulatoryBody;
+  period: AccountingPeriod;
   dueDate: Date;
-  jurisdiction: string;
-  status?: FilingStatus;
-  submittedDate?: Date;
-  approvedDate?: Date;
-  rejectionReason?: string;
-  requiredDocuments: string[];
+  description: string;
+  priority?: FilingPriority;
+  isMandatory?: boolean;
+  thresholdAmount?: number;
   metadata?: Record<string, any>;
+  createdAt: Date;
 }

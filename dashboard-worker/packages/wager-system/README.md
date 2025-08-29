@@ -1,6 +1,7 @@
 # @fire22/wager-system
 
-Fire22 Wager System - **Comprehensive Production Sportsbook System** with complete risk management, validation, and business logic
+Fire22 Wager System - **Comprehensive Production Sportsbook System** with
+complete risk management, validation, and business logic
 
 ## 📋 **Table of Contents**
 
@@ -20,6 +21,7 @@ Fire22 Wager System - **Comprehensive Production Sportsbook System** with comple
 ## 🚀 **Quick Start**
 
 ### **Installation**
+
 ```bash
 # Install the package
 bun add @fire22/wager-system
@@ -29,6 +31,7 @@ import { wagerSystem, WagerRequest } from '@fire22/wager-system';
 ```
 
 ### **Basic Usage**
+
 ```typescript
 // Create a comprehensive wager
 const wagerRequest: WagerRequest = {
@@ -40,12 +43,12 @@ const wagerRequest: WagerRequest = {
     {
       selectionId: 'SEL001',
       odds: -110, // American odds
-      line: -5.5  // Spread
-    }
+      line: -5.5, // Spread
+    },
   ],
   amountWagered: 100,
   betType: 'straight',
-  customerNotes: 'Lakers game'
+  customerNotes: 'Lakers game',
 };
 
 // Create wager with full validation
@@ -56,7 +59,7 @@ const settlement = await wagerSystem.settleWager({
   wagerNumber: wager.wagerNumber,
   settlementType: 'win',
   settledBy: 'AGENT001',
-  settlementNotes: 'Lakers won by 8'
+  settlementNotes: 'Lakers won by 8',
 });
 ```
 
@@ -66,16 +69,23 @@ const settlement = await wagerSystem.settleWager({
 
 ### **What We've Built - Complete Production System**
 
-This is **NOT** just a simple wager interface - this is a **full-featured sportsbook wager system** that addresses **ALL** the critical missing aspects:
+This is **NOT** just a simple wager interface - this is a **full-featured
+sportsbook wager system** that addresses **ALL** the critical missing aspects:
 
 #### **✅ COMPREHENSIVE COVERAGE**
 
-- **🏈 Sports & Event Management**: Sport, League, Team hierarchies with full metadata
-- **🎯 Complete Betting System**: Bet types, selection management, line movement tracking
-- **⚖️ Advanced Risk Management**: Risk scoring, exposure calculations, liability management
-- **💰 Financial Engine**: Commission structures, payout calculations, balance management
-- **🔒 Security & Compliance**: KYC verification, AML checks, regulatory compliance
-- **📊 Business Intelligence**: Performance metrics, risk analytics, system monitoring
+- **🏈 Sports & Event Management**: Sport, League, Team hierarchies with full
+  metadata
+- **🎯 Complete Betting System**: Bet types, selection management, line movement
+  tracking
+- **⚖️ Advanced Risk Management**: Risk scoring, exposure calculations,
+  liability management
+- **💰 Financial Engine**: Commission structures, payout calculations, balance
+  management
+- **🔒 Security & Compliance**: KYC verification, AML checks, regulatory
+  compliance
+- **📊 Business Intelligence**: Performance metrics, risk analytics, system
+  monitoring
 
 ---
 
@@ -90,30 +100,30 @@ interface Wager {
   wagerNumber: number;
   customerId: string;
   agentId: string;
-  
+
   // Sports & events
   eventId: string;
   sportId: string;
   leagueId: string;
-  
+
   // Betting details
   selections: Selection[];
   betType: 'straight' | 'parlay' | 'teaser';
   amountWagered: number;
   toWinAmount: number;
-  
+
   // Risk management
   riskMetrics: RiskMetrics;
   limits: BettingLimits;
-  
+
   // Financial
   commission: CommissionStructure;
   payout: PayoutDetails;
-  
+
   // Compliance
   validation: ValidationStatus;
   compliance: ComplianceChecks;
-  
+
   // Audit & notifications
   auditTrail: AuditEntry[];
   notifications: Notification[];
@@ -126,7 +136,7 @@ interface Wager {
 interface RiskMetrics {
   totalExposure: number;
   maxLiability: number;
-  riskScore: number;        // 0-100 scale
+  riskScore: number; // 0-100 scale
   concentrationRisk: number;
   correlationRisk: number;
   recommendations: string[];
@@ -151,30 +161,35 @@ interface CommissionStructure {
 ## 🔧 **Key Features**
 
 ### **1. 🎯 Smart Validation**
+
 - **Multi-layer validation** (customer, agent, event, selection)
 - **Risk assessment** with automatic scoring
 - **Limit checking** across all dimensions
 - **Approval workflows** for high-risk wagers
 
 ### **2. ⚖️ Risk Management**
+
 - **Real-time exposure** calculations
 - **Liability tracking** with early warning systems
 - **Risk scoring** with actionable recommendations
 - **Limit enforcement** with violation detection
 
 ### **3. 💰 Commission Engine**
+
 - **Dynamic commission** based on volume and performance
 - **Bonus structures** for high-performing agents
 - **Risk adjustments** for complex wagers
 - **Transparent calculations** with full breakdowns
 
 ### **4. 🔄 Settlement Processing**
+
 - **Multiple settlement types** (win, loss, push, void, partial)
 - **Automatic balance updates** with audit trails
 - **Commission calculations** with real-time updates
 - **Notification system** for all parties
 
 ### **5. 📊 Business Intelligence**
+
 - **Performance metrics** for customers and agents
 - **Risk analytics** with trend analysis
 - **System health monitoring** with alerts
@@ -185,15 +200,18 @@ interface CommissionStructure {
 ## 📚 **Documentation**
 
 ### **Component Documentation**
+
 - **[Templates](./templates/)** - Reusable wager templates and examples
 - **[Components](./components/)** - Individual component documentation
 - **[Benchmarks](./benchmarks/)** - Performance testing and metrics
 - **[Integration](./integration/)** - Build system and external integrations
 
 ### **API Reference**
+
 - **[Core API](./api/core.md)** - Main wager system API
 - **[Risk Management](./api/risk.md)** - Risk calculation and management
-- **[Financial Engine](./api/financial.md)** - Commission and payout calculations
+- **[Financial Engine](./api/financial.md)** - Commission and payout
+  calculations
 - **[Validation](./api/validation.md)** - Wager validation and approval
 
 ---
@@ -201,6 +219,7 @@ interface CommissionStructure {
 ## 🧪 **Testing & Validation**
 
 ### **Test Commands**
+
 ```bash
 # Run all wager tests
 bun run test:wager:all
@@ -214,6 +233,7 @@ bun run test:wager:smoke       # Smoke tests
 ```
 
 ### **Test Examples**
+
 ```typescript
 // Test wager validation
 const validation = await wagerSystem.validateWager(wagerRequest);
@@ -237,6 +257,7 @@ console.log('Commission Breakdown:', commission.calculation);
 ## 📊 **Performance & Benchmarks**
 
 ### **Performance Metrics**
+
 - **Sub-millisecond** response times for validation
 - **Real-time risk** calculations
 - **Concurrent wager** processing
@@ -244,6 +265,7 @@ console.log('Commission Breakdown:', commission.calculation);
 - **Horizontal scaling** ready
 
 ### **Benchmark Results**
+
 ```bash
 # Run performance benchmarks
 bun run benchmark:performance
@@ -252,6 +274,7 @@ bun run benchmark:memory
 ```
 
 ### **Current Performance**
+
 - **Validation Response**: < 1ms average
 - **Risk Calculation**: < 5ms average
 - **Commission Processing**: < 2ms average
@@ -262,23 +285,27 @@ bun run benchmark:memory
 ## 🔗 **Integration Points**
 
 ### **Fire22 API Integration**
+
 - **Event data** from Fire22 sports feed
 - **Customer data** synchronization
 - **Agent hierarchy** management
 - **Real-time odds** updates
 
 ### **Payment Systems**
+
 - **Stripe integration** for deposits/withdrawals
 - **Balance management** with real-time updates
 - **Transaction tracking** with full audit trails
 
 ### **Communication Systems**
+
 - **Telegram bot** notifications
 - **Email alerts** for important events
 - **SMS notifications** for urgent matters
 - **Push notifications** for mobile apps
 
 ### **Build System Integration**
+
 - **Automatic testing** with quality gates
 - **Performance monitoring** with benchmarks
 - **Documentation generation** with search
@@ -289,18 +316,21 @@ bun run benchmark:memory
 ## 🚨 **Production Features**
 
 ### **Risk Alerts**
+
 - **High-exposure** wager notifications
 - **Limit violation** alerts
 - **Suspicious activity** detection
 - **Market manipulation** prevention
 
 ### **Compliance Monitoring**
+
 - **KYC verification** tracking
 - **AML compliance** monitoring
 - **Responsible gaming** controls
 - **Regulatory reporting** support
 
 ### **Audit & Security**
+
 - **Complete audit trails** for all operations
 - **Change tracking** with before/after snapshots
 - **User activity** monitoring
@@ -322,6 +352,7 @@ bun run benchmark:memory
 ## 🎉 **What This Solves**
 
 ### **❌ Before (Missing Aspects)**
+
 - Basic wager interface only
 - No risk management
 - No validation system
@@ -331,6 +362,7 @@ bun run benchmark:memory
 - No business intelligence
 
 ### **✅ After (Complete System)**
+
 - **Full sportsbook** functionality
 - **Comprehensive risk** management
 - **Smart validation** with AI-like recommendations
@@ -341,7 +373,8 @@ bun run benchmark:memory
 
 ---
 
-**🏆 This is now a PRODUCTION-READY sportsbook wager system that rivals commercial platforms!**
+**🏆 This is now a PRODUCTION-READY sportsbook wager system that rivals
+commercial platforms!**
 
 ## 📖 **Additional Resources**
 

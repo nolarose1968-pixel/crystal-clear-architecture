@@ -34,34 +34,34 @@ class HealthMonitor {
       endpoint: '/api/test-deployment',
       expectedStatus: 200,
       expectedField: 'message',
-      timeout: 5000
+      timeout: 5000,
     },
     {
       name: 'Live Metrics',
       endpoint: '/api/live-metrics',
       expectedStatus: 200,
       expectedField: 'success',
-      timeout: 3000
+      timeout: 3000,
     },
     {
       name: 'Database Connection',
       endpoint: '/api/customers',
       expectedStatus: 200,
       expectedField: 'success',
-      timeout: 5000
+      timeout: 5000,
     },
     {
       name: 'Fire22 Integration',
       endpoint: '/api/test/fire22',
       expectedStatus: 200,
       expectedField: 'success',
-      timeout: 10000
+      timeout: 10000,
     },
     {
       name: 'Authentication System',
       endpoint: '/api/auth/login',
       expectedStatus: 401, // Should reject invalid credentials
-      timeout: 3000
+      timeout: 3000,
     },
     // 🆕 NEW: Dashboard Permissions Matrix Health Checks
     {
@@ -69,20 +69,20 @@ class HealthMonitor {
       endpoint: '/api/admin/agent-configs-dashboard',
       expectedStatus: 200,
       expectedField: 'success',
-      timeout: 5000
+      timeout: 5000,
     },
     {
       name: 'Dashboard Accessibility',
       endpoint: '/dashboard',
       expectedStatus: 200,
-      timeout: 5000
+      timeout: 5000,
     },
     {
       name: 'Permissions Matrix Data',
       endpoint: '/api/admin/agent-configs-dashboard',
       expectedStatus: 200,
       expectedField: 'data.agents',
-      timeout: 5000
+      timeout: 5000,
     },
     // 🆕 NEW: Advanced Permissions Health Checks
     {
@@ -90,22 +90,22 @@ class HealthMonitor {
       endpoint: '/api/health/permissions',
       expectedStatus: 200,
       expectedField: 'health_score',
-      timeout: 8000
+      timeout: 8000,
     },
     {
       name: 'Permissions Matrix Health',
       endpoint: '/api/health/permissions-matrix',
       expectedStatus: 200,
       expectedField: 'matrix_health_score',
-      timeout: 8000
+      timeout: 8000,
     },
     {
       name: 'Overall System Health',
       endpoint: '/api/health/system',
       expectedStatus: 200,
       expectedField: 'system_health_score',
-      timeout: 10000
-    }
+      timeout: 10000,
+    },
   ];
 
   async runHealthChecks(): Promise<void> {
@@ -115,10 +115,10 @@ class HealthMonitor {
     for (const check of this.healthChecks) {
       const result = await this.performHealthCheck(check);
       this.results.push(result);
-      
+
       // Display result immediately
-      const statusIcon = result.status === 'healthy' ? '✅' : 
-                        result.status === 'warning' ? '⚠️' : '❌';
+      const statusIcon =
+        result.status === 'healthy' ? '✅' : result.status === 'warning' ? '⚠️' : '❌';
       console.log(`${statusIcon} ${result.name}: ${result.details} (${result.responseTime}ms)`);
     }
 
@@ -133,7 +133,7 @@ class HealthMonitor {
       responseTime: 0,
       statusCode: 0,
       details: '',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     try {
@@ -143,8 +143,11 @@ class HealthMonitor {
       const response = await fetch(`${this.baseUrl}${check.endpoint}`, {
         method: check.endpoint === '/api/auth/login' ? 'POST' : 'GET',
         headers: check.endpoint === '/api/auth/login' ? { 'Content-Type': 'application/json' } : {},
-        body: check.endpoint === '/api/auth/login' ? JSON.stringify({ username: 'admin', password: 'wrong' }) : undefined,
-        signal: controller.signal
+        body:
+          check.endpoint === '/api/auth/login'
+            ? JSON.stringify({ username: 'admin', password: 'wrong' })
+            : undefined,
+        signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
@@ -154,13 +157,13 @@ class HealthMonitor {
       if (response.status === check.expectedStatus) {
         if (check.expectedField) {
           const data = await response.json();
-          
+
           // Enhanced validation for nested fields (e.g., 'data.agents')
           if (check.expectedField.includes('.')) {
             const fieldParts = check.expectedField.split('.');
             let fieldValue = data;
             let fieldExists = true;
-            
+
             for (const part of fieldParts) {
               if (fieldValue && typeof fieldValue === 'object' && fieldValue[part] !== undefined) {
                 fieldValue = fieldValue[part];
@@ -169,7 +172,7 @@ class HealthMonitor {
                 break;
               }
             }
-            
+
             if (fieldExists) {
               // Special validation for permissions matrix data
               if (check.name === 'Permissions Matrix Data' && Array.isArray(fieldValue)) {
@@ -213,11 +216,10 @@ class HealthMonitor {
         result.status = result.status === 'healthy' ? 'warning' : result.status;
         result.details += ' (SLOW RESPONSE)';
       }
-
     } catch (error) {
       result.responseTime = Date.now() - startTime;
       result.status = 'critical';
-      
+
       if (error.name === 'AbortError') {
         result.details = `Timeout after ${check.timeout}ms`;
       } else {
@@ -249,16 +251,20 @@ class HealthMonitor {
     // Show warnings and critical issues
     if (warnings > 0) {
       console.log('\n⚠️  WARNINGS:');
-      this.results.filter(r => r.status === 'warning').forEach(result => {
-        console.log(`   - ${result.name}: ${result.details}`);
-      });
+      this.results
+        .filter(r => r.status === 'warning')
+        .forEach(result => {
+          console.log(`   - ${result.name}: ${result.details}`);
+        });
     }
 
     if (critical > 0) {
       console.log('\n❌ CRITICAL ISSUES:');
-      this.results.filter(r => r.status === 'critical').forEach(result => {
-        console.log(`   - ${result.name}: ${result.details}`);
-      });
+      this.results
+        .filter(r => r.status === 'critical')
+        .forEach(result => {
+          console.log(`   - ${result.name}: ${result.details}`);
+        });
     }
 
     // Overall status
@@ -278,31 +284,42 @@ class HealthMonitor {
     console.log(`   Slowest Response: ${Math.max(...this.results.map(r => r.responseTime))}ms`);
 
     // 🆕 NEW: Dashboard-specific insights
-    const dashboardChecks = this.results.filter(r => 
-      r.name.includes('Dashboard') || r.name.includes('Permissions') || r.name.includes('Agent Configs')
+    const dashboardChecks = this.results.filter(
+      r =>
+        r.name.includes('Dashboard') ||
+        r.name.includes('Permissions') ||
+        r.name.includes('Agent Configs')
     );
-    
+
     if (dashboardChecks.length > 0) {
       console.log(`\n🎯 Dashboard Health Insights:`);
       const dashboardHealthy = dashboardChecks.filter(r => r.status === 'healthy').length;
       const dashboardTotal = dashboardChecks.length;
-      console.log(`   Dashboard Health Score: ${Math.round((dashboardHealthy / dashboardTotal) * 100)}%`);
-      
+      console.log(
+        `   Dashboard Health Score: ${Math.round((dashboardHealthy / dashboardTotal) * 100)}%`
+      );
+
       if (dashboardHealthy === dashboardTotal) {
         console.log(`   ✅ Permissions Matrix: All systems operational`);
         console.log(`   ✅ Agent Configs API: Functioning correctly`);
         console.log(`   ✅ Dashboard Access: Available and responsive`);
       } else {
-        console.log(`   ⚠️  Dashboard Issues: ${dashboardTotal - dashboardHealthy} problems detected`);
-        dashboardChecks.filter(r => r.status !== 'healthy').forEach(check => {
-          console.log(`      - ${check.name}: ${check.details}`);
-        });
+        console.log(
+          `   ⚠️  Dashboard Issues: ${dashboardTotal - dashboardHealthy} problems detected`
+        );
+        dashboardChecks
+          .filter(r => r.status !== 'healthy')
+          .forEach(check => {
+            console.log(`      - ${check.name}: ${check.details}`);
+          });
       }
     }
 
     // Recommendations
     if (avgResponseTime > 3000) {
-      console.log('\n💡 Recommendation: Consider optimizing response times. Current average is above 3 seconds.');
+      console.log(
+        '\n💡 Recommendation: Consider optimizing response times. Current average is above 3 seconds.'
+      );
     }
 
     if (critical > 0) {
@@ -314,19 +331,24 @@ class HealthMonitor {
     }
 
     // 🆕 NEW: Dashboard-specific recommendations
-    const dashboardIssues = this.results.filter(r => 
-      (r.name.includes('Dashboard') || r.name.includes('Permissions') || r.name.includes('Agent Configs')) && 
-      r.status !== 'healthy'
+    const dashboardIssues = this.results.filter(
+      r =>
+        (r.name.includes('Dashboard') ||
+          r.name.includes('Permissions') ||
+          r.name.includes('Agent Configs')) &&
+        r.status !== 'healthy'
     );
-    
+
     if (dashboardIssues.length > 0) {
       console.log('\n🎯 DASHBOARD ISSUE RECOMMENDATIONS:');
       console.log('   1. Check agent_configs table in D1 database');
       console.log('   2. Verify permissions matrix data structure');
-      console.log('   3. Test dashboard manually: https://dashboard-worker.brendawill2233.workers.dev/dashboard');
+      console.log(
+        '   3. Test dashboard manually: https://dashboard-worker.brendawill2233.workers.dev/dashboard'
+      );
       console.log('   4. Check browser console for JavaScript errors');
       console.log('   5. Verify API response format matches frontend expectations');
-      
+
       if (dashboardIssues.some(r => r.name.includes('Permissions Matrix'))) {
         console.log('   6. 🔍 PERMISSIONS MATRIX SPECIFIC:');
         console.log('      - Verify agent_configs table has correct structure');
@@ -349,7 +371,7 @@ class HealthMonitor {
 
     // Check first agent for required structure
     const firstAgent = agents[0];
-    
+
     // Required fields for permissions matrix
     const requiredFields = ['agent_id', 'permissions', 'commissionRates', 'status'];
     for (const field of requiredFields) {
@@ -380,7 +402,8 @@ class HealthMonitor {
     }
 
     // Check that all agents have consistent structure
-    for (let i = 1; i < Math.min(agents.length, 3); i++) { // Check first 3 agents
+    for (let i = 1; i < Math.min(agents.length, 3); i++) {
+      // Check first 3 agents
       const agent = agents[i];
       if (!agent.agent_id || !agent.permissions || !agent.commissionRates || !agent.status) {
         return { isValid: false, error: `Agent ${i} missing required fields` };
@@ -394,14 +417,14 @@ class HealthMonitor {
 // Main execution
 async function main() {
   const monitor = new HealthMonitor();
-  
+
   try {
     await monitor.runHealthChecks();
-    
+
     // Exit with appropriate code for CI/CD systems
     const hasCritical = monitor.exportResults().some(r => r.status === 'critical');
     const hasWarnings = monitor.exportResults().some(r => r.status === 'warning');
-    
+
     if (hasCritical) {
       process.exit(2); // Critical issues
     } else if (hasWarnings) {

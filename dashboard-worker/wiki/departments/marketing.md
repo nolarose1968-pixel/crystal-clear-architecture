@@ -5,29 +5,34 @@
 **Department Lead**: Sarah Johnson (Chief Marketing Officer)  
 **Team Size**: 14 members  
 **Key Metrics**: 127% lead generation growth, 4.2x marketing ROI  
-**Live Page**: [Marketing Department](../../src/departments/marketing-department.html)  
+**Live Page**:
+[Marketing Department](../../src/departments/marketing-department.html)  
 **Full Documentation**: [Marketing Docs](../../docs/departments/marketing.md)
 
 ## Core Functions
 
 ### Brand Strategy & Development
+
 - Brand identity and guidelines management
 - Brand monitoring and reputation management
 - Strategic brand positioning and evolution
 
 ### Digital Marketing
+
 - SEO/SEM strategy and implementation
 - Social media management across platforms
 - Email marketing automation and campaigns
 - Content marketing and thought leadership
 
 ### Campaign Management
+
 - Integrated multi-channel campaign development
 - Creative asset development and production
 - Campaign performance analysis and optimization
 - Marketing attribution and ROI analysis
 
 ### Lead Generation
+
 - Lead generation strategy and implementation
 - Lead nurturing workflows and automation
 - Conversion optimization and funnel management
@@ -43,7 +48,7 @@
 ## Tools & Systems
 
 - **CRM**: Salesforce Marketing Cloud
-- **Marketing Automation**: HubSpot Marketing Hub  
+- **Marketing Automation**: HubSpot Marketing Hub
 - **Analytics**: Google Analytics 4, Adobe Analytics
 - **Social Media**: Hootsuite Enterprise
 - **Design**: Adobe Creative Suite, Canva Pro
@@ -60,7 +65,9 @@ curl -X POST /api/hierarchy/query \
 ```
 
 **Cross-System Connections**:
-- **Sarah Johnson**: CMO (organizational) ↔ Marketing Director (department) - 95% confidence
+
+- **Sarah Johnson**: CMO (organizational) ↔ Marketing Director (department) -
+  95% confidence
 - **Team Structure**: 1 leadership, 2 managers, 11 contributors
 
 ## Contact Information

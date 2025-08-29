@@ -44,13 +44,12 @@ export interface AgentHierarchy {
  * Repository for Fire22 agent data operations
  */
 export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
-  
   constructor() {
     super('fire22_agents', undefined);
     this.primaryKey = 'agent_id';
   }
 
-  // ===== SPECIALIZED FIND METHODS =====
+  // !== SPECIALIZED FIND METHODS !==
 
   /**
    * Find agent by agent ID
@@ -69,48 +68,58 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
   /**
    * Find agents by type
    */
-  public async findByType(agentType: AgentType, options: QueryOptions = {}): Promise<RepositoryResult<Fire22Agent[]>> {
+  public async findByType(
+    agentType: AgentType,
+    options: QueryOptions = {}
+  ): Promise<RepositoryResult<Fire22Agent[]>> {
     return await this.findAll({
       ...options,
       filters: {
         ...options.filters,
-        agent_type: agentType
-      }
+        agent_type: agentType,
+      },
     });
   }
 
   /**
    * Find master agents
    */
-  public async findMasterAgents(options: QueryOptions = {}): Promise<RepositoryResult<Fire22Agent[]>> {
+  public async findMasterAgents(
+    options: QueryOptions = {}
+  ): Promise<RepositoryResult<Fire22Agent[]>> {
     return await this.findAll({
       ...options,
       filters: {
         ...options.filters,
-        agent_type: ['master_agent', 'super_agent']
-      }
+        agent_type: ['master_agent', 'super_agent'],
+      },
     });
   }
 
   /**
    * Find agents by parent
    */
-  public async findByParent(parentAgentId: string, options: QueryOptions = {}): Promise<RepositoryResult<Fire22Agent[]>> {
+  public async findByParent(
+    parentAgentId: string,
+    options: QueryOptions = {}
+  ): Promise<RepositoryResult<Fire22Agent[]>> {
     return await this.findAll({
       ...options,
       filters: {
         ...options.filters,
-        parent_agent: parentAgentId
-      }
+        parent_agent: parentAgentId,
+      },
     });
   }
 
   /**
    * Advanced agent search
    */
-  public async searchAgents(searchOptions: AgentSearchOptions): Promise<RepositoryResult<Fire22Agent[]>> {
+  public async searchAgents(
+    searchOptions: AgentSearchOptions
+  ): Promise<RepositoryResult<Fire22Agent[]>> {
     const filters: Record<string, any> = {};
-    
+
     // Basic filters
     if (searchOptions.agent_type) filters.agent_type = searchOptions.agent_type;
     if (searchOptions.status) filters.status = searchOptions.status;
@@ -153,7 +162,9 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
 
     // Search text filter
     if (searchOptions.search && searchOptions.searchFields) {
-      const searchConditions = searchOptions.searchFields.map(field => `${field} LIKE ?`).join(' OR ');
+      const searchConditions = searchOptions.searchFields
+        .map(field => `${field} LIKE ?`)
+        .join(' OR ');
       conditions.push(`(${searchConditions})`);
       searchOptions.searchFields.forEach(() => params.push(`%${searchOptions.search}%`));
     }
@@ -183,31 +194,33 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
     return await this.executeQuery<Fire22Agent>(customQuery, params);
   }
 
-  // ===== HIERARCHY OPERATIONS =====
+  // !== HIERARCHY OPERATIONS !==
 
   /**
    * Get agent hierarchy tree
    */
-  public async getAgentHierarchy(rootAgentId?: string): Promise<RepositoryResult<AgentHierarchy[]>> {
+  public async getAgentHierarchy(
+    rootAgentId?: string
+  ): Promise<RepositoryResult<AgentHierarchy[]>> {
     try {
       // Build hierarchy recursively
       const buildHierarchy = async (parentId?: string): Promise<AgentHierarchy[]> => {
-        const query = parentId 
+        const query = parentId
           ? 'SELECT * FROM fire22_agents WHERE parent_agent = ? AND (deleted_at IS NULL OR deleted_at = "") ORDER BY agent_name'
           : 'SELECT * FROM fire22_agents WHERE (parent_agent IS NULL OR parent_agent = "") AND (deleted_at IS NULL OR deleted_at = "") ORDER BY agent_name';
-        
+
         const params = parentId ? [parentId] : [];
         const agentsResult = await this.executeQuery<Fire22Agent>(query, params);
-        
+
         if (!agentsResult.success || !agentsResult.data) {
           return [];
         }
 
         const hierarchyNodes: AgentHierarchy[] = [];
-        
+
         for (const agent of agentsResult.data) {
           const children = await buildHierarchy(agent.agent_id);
-          
+
           hierarchyNodes.push({
             agent_id: agent.agent_id,
             agent_name: agent.agent_name,
@@ -215,24 +228,24 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
             level: agent.level,
             children,
             customer_count: agent.total_customers,
-            total_volume: agent.total_volume
+            total_volume: agent.total_volume,
           });
         }
-        
+
         return hierarchyNodes;
       };
 
       const hierarchy = await buildHierarchy(rootAgentId);
-      
+
       return {
         success: true,
-        data: hierarchy
+        data: hierarchy,
       };
     } catch (error) {
       return {
         success: false,
         error: `Failed to get agent hierarchy: ${error.message}`,
-        data: []
+        data: [],
       };
     }
   }
@@ -244,11 +257,11 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
     try {
       const descendants: Fire22Agent[] = [];
       const visited = new Set<string>();
-      
+
       const getChildren = async (parentId: string) => {
         if (visited.has(parentId)) return; // Prevent infinite loops
         visited.add(parentId);
-        
+
         const childrenResult = await this.findByParent(parentId);
         if (childrenResult.success && childrenResult.data) {
           for (const child of childrenResult.data) {
@@ -257,18 +270,18 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
           }
         }
       };
-      
+
       await getChildren(agentId);
-      
+
       return {
         success: true,
-        data: descendants
+        data: descendants,
       };
     } catch (error) {
       return {
         success: false,
         error: `Failed to get agent descendants: ${error.message}`,
-        data: []
+        data: [],
       };
     }
   }
@@ -281,13 +294,13 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
       const ancestors: Fire22Agent[] = [];
       let currentAgentId = agentId;
       const visited = new Set<string>();
-      
+
       while (currentAgentId && !visited.has(currentAgentId)) {
         visited.add(currentAgentId);
-        
+
         const agentResult = await this.findByAgentId(currentAgentId);
         if (!agentResult.success || !agentResult.data) break;
-        
+
         const agent = agentResult.data;
         if (agent.parent_agent) {
           const parentResult = await this.findByAgentId(agent.parent_agent);
@@ -301,21 +314,21 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
           break;
         }
       }
-      
+
       return {
         success: true,
-        data: ancestors.reverse() // Return in top-down order
+        data: ancestors.reverse(), // Return in top-down order
       };
     } catch (error) {
       return {
         success: false,
         error: `Failed to get agent ancestors: ${error.message}`,
-        data: []
+        data: [],
       };
     }
   }
 
-  // ===== PERFORMANCE AND METRICS =====
+  // !== PERFORMANCE AND METRICS !==
 
   /**
    * Update agent performance metrics
@@ -332,30 +345,30 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
         FROM fire22_customers 
         WHERE agent_id = ? AND (deleted_at IS NULL OR deleted_at = '')
       `;
-      
+
       const metricsResult = await this.executeQuerySingle(customerMetricsQuery, [agentId]);
       if (!metricsResult.success) {
         return { success: false, error: 'Failed to get customer metrics' };
       }
-      
+
       const metrics = metricsResult.data as any;
       const totalVolume = parseFloat(metrics.total_volume) || 0;
       const totalCustomers = parseInt(metrics.total_customers) || 0;
       const activeCustomers = parseInt(metrics.active_customers) || 0;
-      
+
       // Calculate performance score (0-100)
       let performanceScore = 0;
-      
+
       // Customer retention (40% weight)
       const retentionRate = totalCustomers > 0 ? (activeCustomers / totalCustomers) * 100 : 0;
       performanceScore += (retentionRate / 100) * 40;
-      
+
       // Volume performance (30% weight)
       if (totalVolume > 100000) performanceScore += 30;
       else if (totalVolume > 50000) performanceScore += 25;
       else if (totalVolume > 10000) performanceScore += 20;
       else if (totalVolume > 1000) performanceScore += 10;
-      
+
       // Activity score (30% weight) - based on last login
       const agentResult = await this.findByAgentId(agentId);
       if (agentResult.success && agentResult.data) {
@@ -364,18 +377,18 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
           const daysSinceLogin = Math.floor(
             (Date.now() - new Date(agent.last_login).getTime()) / (1000 * 60 * 60 * 24)
           );
-          
+
           if (daysSinceLogin <= 1) performanceScore += 30;
           else if (daysSinceLogin <= 7) performanceScore += 25;
           else if (daysSinceLogin <= 30) performanceScore += 15;
           else if (daysSinceLogin <= 90) performanceScore += 5;
         }
       }
-      
+
       // Calculate commission
       const agentData = agentResult.data!;
       const commissionEarned = totalVolume * agentData.commission_rate;
-      
+
       return await this.update(agentId, {
         total_customers: totalCustomers,
         active_customers: activeCustomers,
@@ -383,13 +396,12 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
         total_commission: agentData.total_commission + commissionEarned,
         pending_commission: agentData.pending_commission + commissionEarned,
         performance_score: Math.min(100, Math.max(0, performanceScore)),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       } as Partial<Fire22Agent>);
-      
     } catch (error) {
       return {
         success: false,
-        error: `Failed to update performance metrics: ${error.message}`
+        error: `Failed to update performance metrics: ${error.message}`,
       };
     }
   }
@@ -436,7 +448,7 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
         this.executeQuerySingle(metricsQuery),
         this.executeQuery(typeQuery),
         this.executeQuery(statusQuery),
-        this.executeQuery(levelQuery)
+        this.executeQuery(levelQuery),
       ]);
 
       if (!metricsResult.success) {
@@ -447,7 +459,10 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
 
       // Process type counts
       const byType: Record<AgentType, number> = {
-        agent: 0, sub_agent: 0, master_agent: 0, super_agent: 0
+        agent: 0,
+        sub_agent: 0,
+        master_agent: 0,
+        super_agent: 0,
       };
       if (typeResult.success && typeResult.data) {
         typeResult.data.forEach((row: any) => {
@@ -457,7 +472,10 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
 
       // Process status counts
       const byStatus: Record<AgentStatus, number> = {
-        active: 0, inactive: 0, suspended: 0, terminated: 0
+        active: 0,
+        inactive: 0,
+        suspended: 0,
+        terminated: 0,
       };
       if (statusResult.success && statusResult.data) {
         statusResult.data.forEach((row: any) => {
@@ -482,27 +500,30 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
         average_performance_score: parseFloat(metrics.average_performance_score) || 0,
         by_type: byType,
         by_status: byStatus,
-        by_level: byLevel
+        by_level: byLevel,
       };
 
       return {
         success: true,
-        data: agentMetrics
+        data: agentMetrics,
       };
     } catch (error) {
       return {
         success: false,
-        error: `Failed to get agent metrics: ${error.message}`
+        error: `Failed to get agent metrics: ${error.message}`,
       };
     }
   }
 
-  // ===== COMMISSION OPERATIONS =====
+  // !== COMMISSION OPERATIONS !==
 
   /**
    * Add pending commission
    */
-  public async addPendingCommission(agentId: string, amount: number): Promise<RepositoryResult<Fire22Agent>> {
+  public async addPendingCommission(
+    agentId: string,
+    amount: number
+  ): Promise<RepositoryResult<Fire22Agent>> {
     const agentResult = await this.findByAgentId(agentId);
     if (!agentResult.success || !agentResult.data) {
       return { success: false, error: 'Agent not found' };
@@ -511,7 +532,7 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
     const agent = agentResult.data;
     return await this.update(agentId, {
       pending_commission: agent.pending_commission + amount,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     } as Partial<Fire22Agent>);
   }
 
@@ -519,7 +540,7 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
    * Process commission payment
    */
   public async processCommissionPayment(
-    agentId: string, 
+    agentId: string,
     amount?: number
   ): Promise<RepositoryResult<Fire22Agent>> {
     const agentResult = await this.findByAgentId(agentId);
@@ -538,11 +559,11 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
       pending_commission: agent.pending_commission - paymentAmount,
       commission_balance: agent.commission_balance + paymentAmount,
       total_paid_commission: agent.total_paid_commission + paymentAmount,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     } as Partial<Fire22Agent>);
   }
 
-  // ===== ACTIVITY TRACKING =====
+  // !== ACTIVITY TRACKING !==
 
   /**
    * Record agent login
@@ -559,7 +580,7 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
     return await this.update(agentId, {
       login_count: agent.login_count + 1,
       last_login: now,
-      updated_at: now
+      updated_at: now,
     } as Partial<Fire22Agent>);
   }
 
@@ -589,16 +610,18 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
       filters: { status: 'active' },
       sortBy: 'performance_score',
       sortOrder: 'DESC',
-      limit
+      limit,
     });
   }
 
-  // ===== BULK OPERATIONS =====
+  // !== BULK OPERATIONS !==
 
   /**
    * Sync agent data from Fire22 API
    */
-  public async syncFromFire22(fire22Data: any[]): Promise<RepositoryResult<{ created: number; updated: number }>> {
+  public async syncFromFire22(
+    fire22Data: any[]
+  ): Promise<RepositoryResult<{ created: number; updated: number }>> {
     try {
       let created = 0;
       let updated = 0;
@@ -622,7 +645,7 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
 
         return {
           success: true,
-          data: { created, updated }
+          data: { created, updated },
         };
       } catch (error) {
         await this.rollbackTransaction();
@@ -631,7 +654,7 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
     } catch (error) {
       return {
         success: false,
-        error: `Failed to sync from Fire22: ${error.message}`
+        error: `Failed to sync from Fire22: ${error.message}`,
       };
     }
   }
@@ -639,7 +662,9 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
   /**
    * Update all agent performance metrics
    */
-  public async updateAllPerformanceMetrics(): Promise<RepositoryResult<{ updated: number; failed: number }>> {
+  public async updateAllPerformanceMetrics(): Promise<
+    RepositoryResult<{ updated: number; failed: number }>
+  > {
     try {
       const agentsResult = await this.findAll({ filters: { status: 'active' } });
       if (!agentsResult.success || !agentsResult.data) {
@@ -661,12 +686,12 @@ export class Fire22AgentRepository extends Fire22BaseRepository<Fire22Agent> {
 
       return {
         success: true,
-        data: { updated, failed }
+        data: { updated, failed },
       };
     } catch (error) {
       return {
         success: false,
-        error: `Failed to update all performance metrics: ${error.message}`
+        error: `Failed to update all performance metrics: ${error.message}`,
       };
     }
   }

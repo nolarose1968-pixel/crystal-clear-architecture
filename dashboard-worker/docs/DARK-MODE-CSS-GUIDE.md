@@ -2,11 +2,13 @@
 
 ## Overview
 
-The Fire22 Dashboard now features a comprehensive dark mode implementation with consolidated CSS architecture using Bun's native bundling capabilities.
+The Fire22 Dashboard now features a comprehensive dark mode implementation with
+consolidated CSS architecture using Bun's native bundling capabilities.
 
 ## Features
 
 ### 🌓 Dark Mode
+
 - **Automatic Detection**: Respects system preferences (`prefers-color-scheme`)
 - **Manual Toggle**: Floating button (top-right) for user control
 - **Keyboard Shortcut**: `Ctrl/Cmd + Shift + L` to toggle themes
@@ -14,6 +16,7 @@ The Fire22 Dashboard now features a comprehensive dark mode implementation with 
 - **Smooth Transitions**: All theme changes animate smoothly
 
 ### 📦 CSS Architecture
+
 - **Single Source**: All styles consolidated in `/css/styles.css`
 - **Bun Bundling**: Native CSS bundling with content hashing
 - **Extracted Styles**: Inline styles from 33 HTML files consolidated
@@ -41,23 +44,25 @@ src/js/
 ## Usage
 
 ### HTML Integration
+
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+  <head>
     <!-- Consolidated CSS with Dark Mode -->
-    <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
     <!-- Your content -->
-    
+
     <!-- Theme Toggle Component -->
     <script src="/src/js/theme-toggle.js"></script>
-</body>
+  </body>
 </html>
 ```
 
 ### Bun Commands
+
 ```bash
 # Extract and consolidate CSS
 bun run css:extract
@@ -73,6 +78,7 @@ bun run css:consolidate
 ```
 
 ### Configuration (bunfig.toml)
+
 ```toml
 [scripts]
 "css:extract" = "bun run scripts/extract-css.ts"
@@ -94,6 +100,7 @@ directory = "public"
 The dark mode uses CSS custom properties that automatically switch:
 
 ### Light Mode (Default)
+
 ```css
 --color-background: #ffffff;
 --color-text: #1a1a1a;
@@ -102,6 +109,7 @@ The dark mode uses CSS custom properties that automatically switch:
 ```
 
 ### Dark Mode
+
 ```css
 --color-background: #1a1a1a;
 --color-text: #e0e0e0;
@@ -115,24 +123,30 @@ The Express server (`server.js`) serves static files with proper caching:
 
 ```javascript
 // Serve styles
-app.use('/src/styles', express.static('src/styles', {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.css')) {
-      res.setHeader('Content-Type', 'text/css');
-      res.setHeader('Cache-Control', 'public, max-age=3600');
-    }
-  }
-}));
+app.use(
+  '/src/styles',
+  express.static('src/styles', {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css');
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+      }
+    },
+  })
+);
 
 // Serve JavaScript
-app.use('/src/js', express.static('src/js', {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript');
-      res.setHeader('Cache-Control', 'public, max-age=3600');
-    }
-  }
-}));
+app.use(
+  '/src/js',
+  express.static('src/js', {
+    setHeaders: (res, path) => {
+      if (path.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+      }
+    },
+  })
+);
 ```
 
 ## Testing

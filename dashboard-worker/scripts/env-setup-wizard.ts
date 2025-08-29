@@ -1,17 +1,17 @@
 #!/usr/bin/env bun
 /**
  * 🔐 Fire22 Environment Setup Wizard
- * 
+ *
  * Interactive wizard for setting up development, staging, and production environments
  * Uses Bun's native secrets management with OS keychain integration
- * 
+ *
  * Features:
  * - Interactive credential collection
  * - OS-native keychain storage (Keychain/libsecret/CredMan)
  * - Environment validation and testing
  * - Template-based configuration
  * - Secure credential generation
- * 
+ *
  * @version 3.0.9
  * @author Fire22 Development Team
  */
@@ -70,7 +70,7 @@ class Fire22EnvWizard {
             type: 'string',
             required: true,
             default: 'development',
-            sensitive: false
+            sensitive: false,
           },
           {
             key: 'PORT',
@@ -79,7 +79,7 @@ class Fire22EnvWizard {
             type: 'number',
             required: true,
             default: '8080',
-            sensitive: false
+            sensitive: false,
           },
           {
             key: 'HOST',
@@ -88,7 +88,7 @@ class Fire22EnvWizard {
             type: 'string',
             required: true,
             default: 'localhost',
-            sensitive: false
+            sensitive: false,
           },
           {
             key: 'DATABASE_URL',
@@ -98,7 +98,7 @@ class Fire22EnvWizard {
             required: true,
             default: 'postgresql://localhost:5432/fire22_dev',
             validation: /^postgresql:\/\/.+/,
-            sensitive: true
+            sensitive: true,
           },
           {
             key: 'JWT_SECRET',
@@ -106,7 +106,7 @@ class Fire22EnvWizard {
             description: 'Secret key for JWT token signing',
             type: 'token',
             required: true,
-            sensitive: true
+            sensitive: true,
           },
           {
             key: 'FIRE22_API_KEY',
@@ -114,7 +114,7 @@ class Fire22EnvWizard {
             description: 'API key for Fire22 services',
             type: 'token',
             required: true,
-            sensitive: true
+            sensitive: true,
           },
           {
             key: 'FIRE22_API_BASE_URL',
@@ -124,7 +124,7 @@ class Fire22EnvWizard {
             required: true,
             default: 'https://api.fire22.dev',
             validation: /^https?:\/\/.+/,
-            sensitive: false
+            sensitive: false,
           },
           {
             key: 'CLOUDFLARE_ACCOUNT_ID',
@@ -132,7 +132,7 @@ class Fire22EnvWizard {
             description: 'Cloudflare account identifier',
             type: 'string',
             required: false,
-            sensitive: false
+            sensitive: false,
           },
           {
             key: 'CLOUDFLARE_API_TOKEN',
@@ -140,7 +140,7 @@ class Fire22EnvWizard {
             description: 'API token for Cloudflare Workers deployment',
             type: 'token',
             required: false,
-            sensitive: true
+            sensitive: true,
           },
           {
             key: 'TELEGRAM_BOT_TOKEN',
@@ -148,7 +148,7 @@ class Fire22EnvWizard {
             description: 'Token for Telegram bot integration',
             type: 'token',
             required: false,
-            sensitive: true
+            sensitive: true,
           },
           {
             key: 'LOG_LEVEL',
@@ -157,9 +157,9 @@ class Fire22EnvWizard {
             type: 'string',
             required: true,
             default: 'info',
-            sensitive: false
-          }
-        ]
+            sensitive: false,
+          },
+        ],
       },
       {
         name: 'staging',
@@ -173,7 +173,7 @@ class Fire22EnvWizard {
             type: 'string',
             required: true,
             default: 'staging',
-            sensitive: false
+            sensitive: false,
           },
           {
             key: 'DATABASE_URL',
@@ -182,7 +182,7 @@ class Fire22EnvWizard {
             type: 'url',
             required: true,
             validation: /^postgresql:\/\/.+/,
-            sensitive: true
+            sensitive: true,
           },
           {
             key: 'JWT_SECRET',
@@ -190,7 +190,7 @@ class Fire22EnvWizard {
             description: 'Secret key for JWT token signing (staging)',
             type: 'token',
             required: true,
-            sensitive: true
+            sensitive: true,
           },
           {
             key: 'FIRE22_API_KEY',
@@ -198,7 +198,7 @@ class Fire22EnvWizard {
             description: 'API key for Fire22 staging services',
             type: 'token',
             required: true,
-            sensitive: true
+            sensitive: true,
           },
           {
             key: 'FIRE22_API_BASE_URL',
@@ -208,7 +208,7 @@ class Fire22EnvWizard {
             required: true,
             default: 'https://api.staging.fire22.com',
             validation: /^https:\/\/.+/,
-            sensitive: false
+            sensitive: false,
           },
           {
             key: 'LOG_LEVEL',
@@ -217,9 +217,9 @@ class Fire22EnvWizard {
             type: 'string',
             required: true,
             default: 'warn',
-            sensitive: false
-          }
-        ]
+            sensitive: false,
+          },
+        ],
       },
       {
         name: 'production',
@@ -233,7 +233,7 @@ class Fire22EnvWizard {
             type: 'string',
             required: true,
             default: 'production',
-            sensitive: false
+            sensitive: false,
           },
           {
             key: 'DATABASE_URL',
@@ -242,7 +242,7 @@ class Fire22EnvWizard {
             type: 'url',
             required: true,
             validation: /^postgresql:\/\/.+/,
-            sensitive: true
+            sensitive: true,
           },
           {
             key: 'JWT_SECRET',
@@ -250,7 +250,7 @@ class Fire22EnvWizard {
             description: 'Secret key for JWT token signing (production)',
             type: 'token',
             required: true,
-            sensitive: true
+            sensitive: true,
           },
           {
             key: 'FIRE22_API_KEY',
@@ -258,7 +258,7 @@ class Fire22EnvWizard {
             description: 'API key for Fire22 production services',
             type: 'token',
             required: true,
-            sensitive: true
+            sensitive: true,
           },
           {
             key: 'FIRE22_API_BASE_URL',
@@ -268,7 +268,7 @@ class Fire22EnvWizard {
             required: true,
             default: 'https://api.fire22.com',
             validation: /^https:\/\/.+/,
-            sensitive: false
+            sensitive: false,
           },
           {
             key: 'CLOUDFLARE_ACCOUNT_ID',
@@ -276,7 +276,7 @@ class Fire22EnvWizard {
             description: 'Cloudflare account identifier for production',
             type: 'string',
             required: true,
-            sensitive: false
+            sensitive: false,
           },
           {
             key: 'CLOUDFLARE_API_TOKEN',
@@ -284,7 +284,7 @@ class Fire22EnvWizard {
             description: 'API token for production Cloudflare Workers',
             type: 'token',
             required: true,
-            sensitive: true
+            sensitive: true,
           },
           {
             key: 'LOG_LEVEL',
@@ -293,10 +293,10 @@ class Fire22EnvWizard {
             type: 'string',
             required: true,
             default: 'error',
-            sensitive: false
-          }
-        ]
-      }
+            sensitive: false,
+          },
+        ],
+      },
     ];
   }
 
@@ -306,19 +306,19 @@ class Fire22EnvWizard {
   private async prompt(question: string, defaultValue?: string): Promise<string> {
     const displayDefault = defaultValue ? ` (${defaultValue})` : '';
     process.stdout.write(`${question}${displayDefault}: `);
-    
-    return new Promise((resolve) => {
+
+    return new Promise(resolve => {
       process.stdin.resume();
       process.stdin.setEncoding('utf8');
-      
+
       const handler = (data: string) => {
         process.stdin.pause();
         process.stdin.removeListener('data', handler);
-        
+
         const input = data.toString().trim();
         resolve(input || defaultValue || '');
       };
-      
+
       process.stdin.on('data', handler);
     });
   }
@@ -328,17 +328,17 @@ class Fire22EnvWizard {
    */
   private async securePrompt(question: string): Promise<string> {
     process.stdout.write(`${question}: `);
-    
-    return new Promise((resolve) => {
+
+    return new Promise(resolve => {
       process.stdin.resume();
       process.stdin.setRawMode(true);
       process.stdin.setEncoding('utf8');
-      
+
       let password = '';
-      
+
       const handler = (data: string) => {
         const char = data.toString();
-        
+
         if (char === '\n' || char === '\r' || char === '\u0004') {
           // Enter or Ctrl+D
           process.stdin.setRawMode(false);
@@ -361,7 +361,7 @@ class Fire22EnvWizard {
           process.stdout.write('*');
         }
       };
-      
+
       process.stdin.on('data', handler);
     });
   }
@@ -372,14 +372,14 @@ class Fire22EnvWizard {
   private generateSecureToken(length: number = 64): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
     let result = '';
-    
+
     const randomBytes = new Uint8Array(length);
     crypto.getRandomValues(randomBytes);
-    
+
     for (let i = 0; i < length; i++) {
       result += chars[randomBytes[i] % chars.length];
     }
-    
+
     return result;
   }
 
@@ -399,7 +399,11 @@ class Fire22EnvWizard {
       return `${template.name} must be a number`;
     }
 
-    if (template.type === 'boolean' && value && !['true', 'false', '1', '0'].includes(value.toLowerCase())) {
+    if (
+      template.type === 'boolean' &&
+      value &&
+      !['true', 'false', '1', '0'].includes(value.toLowerCase())
+    ) {
       return `${template.name} must be true/false`;
     }
 
@@ -409,9 +413,14 @@ class Fire22EnvWizard {
   /**
    * Store credential using Bun.secrets (if available) or environment file
    */
-  private async storeCredential(env: string, key: string, value: string, sensitive: boolean): Promise<void> {
+  private async storeCredential(
+    env: string,
+    key: string,
+    value: string,
+    sensitive: boolean
+  ): Promise<void> {
     const secretKey = `FIRE22_${env.toUpperCase()}_${key}`;
-    
+
     try {
       // Try to use Bun.secrets if available
       if (typeof Bun !== 'undefined' && Bun.secrets) {
@@ -442,7 +451,7 @@ class Fire22EnvWizard {
   private async appendToEnvFile(env: string, key: string, value: string): Promise<void> {
     const envFile = `.env.${env}`;
     const envPath = join(process.cwd(), envFile);
-    
+
     let envContent = '';
     if (existsSync(envPath)) {
       envContent = readFileSync(envPath, 'utf8');
@@ -467,7 +476,7 @@ class Fire22EnvWizard {
    */
   private async testEnvironment(env: string): Promise<boolean> {
     console.log(`🧪 Testing ${env} environment configuration...`);
-    
+
     try {
       // Test database connection if URL is provided
       const dbUrl = await this.getCredentialValue(env, 'DATABASE_URL');
@@ -480,15 +489,15 @@ class Fire22EnvWizard {
       // Test Fire22 API if key is provided
       const apiKey = await this.getCredentialValue(env, 'FIRE22_API_KEY');
       const apiBaseUrl = await this.getCredentialValue(env, 'FIRE22_API_BASE_URL');
-      
+
       if (apiKey && apiBaseUrl) {
         console.log('   🔌 Testing Fire22 API connection...');
         try {
           const response = await fetch(`${apiBaseUrl}/health`, {
-            headers: { 'Authorization': `Bearer ${apiKey}` },
-            signal: AbortSignal.timeout(5000)
+            headers: { Authorization: `Bearer ${apiKey}` },
+            signal: AbortSignal.timeout(5000),
           });
-          
+
           if (response.ok) {
             console.log('   ✅ Fire22 API connection successful');
           } else {
@@ -512,7 +521,7 @@ class Fire22EnvWizard {
    */
   private async getCredentialValue(env: string, key: string): Promise<string | null> {
     const secretKey = `FIRE22_${env.toUpperCase()}_${key}`;
-    
+
     try {
       // Try Bun.secrets first
       if (typeof Bun !== 'undefined' && Bun.secrets) {
@@ -526,7 +535,7 @@ class Fire22EnvWizard {
     // Try environment file
     const envFile = `.env.${env}`;
     const envPath = join(process.cwd(), envFile);
-    
+
     if (existsSync(envPath)) {
       const envContent = readFileSync(envPath, 'utf8');
       const match = envContent.match(new RegExp(`^${key}=(.*)$`, 'm'));
@@ -557,7 +566,10 @@ class Fire22EnvWizard {
       while (!isValid) {
         if (credential.sensitive) {
           if (credential.type === 'token' && !credential.default) {
-            const useGenerated = await this.prompt(`   Generate secure ${credential.name}? (y/n)`, 'y');
+            const useGenerated = await this.prompt(
+              `   Generate secure ${credential.name}? (y/n)`,
+              'y'
+            );
             if (useGenerated.toLowerCase() === 'y' || useGenerated.toLowerCase() === 'yes') {
               value = this.generateSecureToken();
               console.log('   🔐 Generated secure token');
@@ -579,16 +591,19 @@ class Fire22EnvWizard {
       }
 
       if (value) {
-        envData[credential.key] = credential.type === 'number' ? Number(value) : 
-                                  credential.type === 'boolean' ? ['true', '1'].includes(value.toLowerCase()) : 
-                                  value;
+        envData[credential.key] =
+          credential.type === 'number'
+            ? Number(value)
+            : credential.type === 'boolean'
+              ? ['true', '1'].includes(value.toLowerCase())
+              : value;
 
         await this.storeCredential(envConfig.name, credential.key, value, credential.sensitive);
       }
     }
 
     console.log(`\n✅ ${envConfig.name} environment configuration complete!`);
-    
+
     // Test the environment
     await this.testEnvironment(envConfig.name);
   }
@@ -599,7 +614,7 @@ class Fire22EnvWizard {
   private async updateGitignore(): Promise<void> {
     const gitignorePath = join(process.cwd(), '.gitignore');
     let gitignoreContent = '';
-    
+
     if (existsSync(gitignorePath)) {
       gitignoreContent = readFileSync(gitignorePath, 'utf8');
     }
@@ -611,7 +626,7 @@ class Fire22EnvWizard {
       '.env.development',
       '.env.staging',
       '.env.production',
-      '.env.*.local'
+      '.env.*.local',
     ];
 
     for (const entry of envEntries) {
@@ -631,12 +646,12 @@ class Fire22EnvWizard {
   private async showSummary(): Promise<void> {
     console.log('\n📊 Environment Setup Summary');
     console.log('='.repeat(50));
-    
+
     for (const envConfig of this.environments) {
       const envFile = `.env.${envConfig.name}`;
       const hasEnvFile = existsSync(join(process.cwd(), envFile));
       const status = hasEnvFile ? '✅ Configured' : '❌ Not configured';
-      
+
       console.log(`${envConfig.name.padEnd(12)} ${status}`);
     }
 
@@ -669,7 +684,7 @@ class Fire22EnvWizard {
 
       console.log('');
       const setupAll = await this.prompt('Setup all environments? (y/n)', 'y');
-      
+
       if (setupAll.toLowerCase() === 'y' || setupAll.toLowerCase() === 'yes') {
         // Setup all environments
         for (const envConfig of this.environments) {
@@ -678,8 +693,11 @@ class Fire22EnvWizard {
       } else {
         // Let user choose environments
         for (const envConfig of this.environments) {
-          const setupEnv = await this.prompt(`Setup ${envConfig.name} environment? (y/n)`, envConfig.required ? 'y' : 'n');
-          
+          const setupEnv = await this.prompt(
+            `Setup ${envConfig.name} environment? (y/n)`,
+            envConfig.required ? 'y' : 'n'
+          );
+
           if (setupEnv.toLowerCase() === 'y' || setupEnv.toLowerCase() === 'yes') {
             await this.setupEnvironment(envConfig);
           }
@@ -693,7 +711,6 @@ class Fire22EnvWizard {
       await this.showSummary();
 
       console.log('\n🎉 Environment setup complete! Happy coding! 🔥');
-      
     } catch (error) {
       console.error('💥 Setup wizard failed:', error.message);
       process.exit(1);
@@ -704,7 +721,7 @@ class Fire22EnvWizard {
 // CLI interface
 async function main() {
   const args = process.argv.slice(2);
-  
+
   if (args.includes('--help') || args.includes('-h')) {
     console.log(`
 🔐 Fire22 Environment Setup Wizard

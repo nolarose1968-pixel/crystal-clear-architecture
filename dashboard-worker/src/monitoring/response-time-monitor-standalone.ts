@@ -11,7 +11,7 @@ class ResponseTimeDistribution {
   private measurements: number[];
   private maxMeasurements: number;
   private bucketRanges: number[];
-  
+
   private stats: {
     count: number;
     min: number;
@@ -31,14 +31,12 @@ class ResponseTimeDistribution {
   constructor(maxMeasurements = 10000) {
     this.maxMeasurements = maxMeasurements;
     this.measurements = [];
-    
-    this.bucketRanges = [
-      0, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, Infinity
-    ];
-    
+
+    this.bucketRanges = [0, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, Infinity];
+
     this.buckets = new Map();
     this.bucketRanges.forEach(range => this.buckets.set(range, 0));
-    
+
     this.stats = this.getEmptyStats();
   }
 
@@ -60,7 +58,7 @@ class ResponseTimeDistribution {
 
   private calculatePercentile(percentile: number): number {
     if (this.measurements.length === 0) return 0;
-    
+
     const sorted = [...this.measurements].sort((a, b) => a - b);
     const index = Math.ceil((percentile / 100) * sorted.length) - 1;
     return sorted[Math.max(0, index)];
@@ -68,9 +66,10 @@ class ResponseTimeDistribution {
 
   private calculateStdDev(mean: number): number {
     if (this.measurements.length === 0) return 0;
-    
+
     const squaredDiffs = this.measurements.map(value => Math.pow(value - mean, 2));
-    const avgSquaredDiff = squaredDiffs.reduce((sum, value) => sum + value, 0) / this.measurements.length;
+    const avgSquaredDiff =
+      squaredDiffs.reduce((sum, value) => sum + value, 0) / this.measurements.length;
     return Math.sqrt(avgSquaredDiff);
   }
 
@@ -88,7 +87,7 @@ class ResponseTimeDistribution {
       p99: 0,
       p999: 0,
       stdDev: 0,
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     };
   }
 
@@ -117,7 +116,7 @@ class ResponseTimeDistribution {
       p99: this.calculatePercentile(99),
       p999: this.calculatePercentile(99.9),
       stdDev: this.calculateStdDev(mean),
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     };
 
     return this.stats;
@@ -125,18 +124,18 @@ class ResponseTimeDistribution {
 
   getHistogram() {
     const histogram = [];
-    
+
     for (let i = 0; i < this.bucketRanges.length - 1; i++) {
       const rangeStart = this.bucketRanges[i];
       const rangeEnd = this.bucketRanges[i + 1];
       const count = this.buckets.get(rangeStart) || 0;
-      
+
       histogram.push({
         range: rangeEnd === Infinity ? `>${rangeStart}ms` : `${rangeStart}-${rangeEnd}ms`,
         rangeStart,
         rangeEnd,
         count,
-        percentage: this.measurements.length > 0 ? (count / this.measurements.length) * 100 : 0
+        percentage: this.measurements.length > 0 ? (count / this.measurements.length) * 100 : 0,
       });
     }
 
@@ -152,10 +151,12 @@ class ResponseTimeDistribution {
       histogram,
       summary: {
         fast: histogram.filter(h => h.rangeStart < 100).reduce((sum, h) => sum + h.count, 0),
-        medium: histogram.filter(h => h.rangeStart >= 100 && h.rangeStart < 1000).reduce((sum, h) => sum + h.count, 0),
+        medium: histogram
+          .filter(h => h.rangeStart >= 100 && h.rangeStart < 1000)
+          .reduce((sum, h) => sum + h.count, 0),
         slow: histogram.filter(h => h.rangeStart >= 1000).reduce((sum, h) => sum + h.count, 0),
-        totalRequests: stats.count
-      }
+        totalRequests: stats.count,
+      },
     };
   }
 
@@ -211,7 +212,7 @@ class ResponseTimeMonitor {
 
   getAllStats() {
     const endpoints: Record<string, any> = {};
-    
+
     this.distributions.forEach((distribution, endpoint) => {
       endpoints[endpoint] = distribution.getDistribution();
     });
@@ -224,8 +225,8 @@ class ResponseTimeMonitor {
         totalEndpoints: this.distributions.size,
         totalRequests: this.globalDistribution.getStats().count,
         averageResponseTime: this.globalDistribution.getStats().mean,
-        activeAlerts: 0
-      }
+        activeAlerts: 0,
+      },
     };
   }
 
@@ -491,46 +492,45 @@ const DASHBOARD_HTML = `<!DOCTYPE html>
 // Create server
 const server = Bun.serve({
   port: 3005,
-  
+
   async fetch(req) {
     const url = new URL(req.url);
     const startTime = monitor.startTiming();
-    
+
     try {
       // Dashboard
-      if (url.pathname === "/" || url.pathname === "/dashboard") {
+      if (url.pathname === '/' || url.pathname === '/dashboard') {
         return new Response(DASHBOARD_HTML, {
-          headers: { "content-type": "text/html; charset=utf-8" }
+          headers: { 'content-type': 'text/html; charset=utf-8' },
         });
       }
-      
+
       // API endpoints
-      if (url.pathname === "/api/stats") {
+      if (url.pathname === '/api/stats') {
         return Response.json(monitor.getAllStats());
       }
-      
-      if (url.pathname === "/api/clear" && req.method === "POST") {
+
+      if (url.pathname === '/api/clear' && req.method === 'POST') {
         monitor.clear();
-        return Response.json({ message: "Cleared" });
+        return Response.json({ message: 'Cleared' });
       }
-      
+
       // Test endpoints with simulated delays
-      if (url.pathname.startsWith("/api/test/")) {
+      if (url.pathname.startsWith('/api/test/')) {
         const delay = Math.random() * 200;
         await Bun.sleep(delay);
-        monitor.endTiming("GET /api/test", startTime);
+        monitor.endTiming('GET /api/test', startTime);
         return Response.json({ delay });
       }
-      
+
       // Track 404s
-      monitor.endTiming("404", startTime);
-      return new Response("Not Found", { status: 404 });
-      
+      monitor.endTiming('404', startTime);
+      return new Response('Not Found', { status: 404 });
     } catch (error) {
-      monitor.endTiming("ERROR", startTime);
+      monitor.endTiming('ERROR', startTime);
       throw error;
     }
-  }
+  },
 });
 
 console.log(`

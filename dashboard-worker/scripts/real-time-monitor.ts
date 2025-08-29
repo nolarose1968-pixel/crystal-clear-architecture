@@ -1,14 +1,14 @@
 #!/usr/bin/env bun
 /**
  * 📊 Fire22 Real-Time Performance Monitor
- * 
+ *
  * Enhanced real-time monitoring system with:
  * - Live performance metrics streaming
  * - API endpoint response time tracking
- * - Resource utilization monitoring  
+ * - Resource utilization monitoring
  * - Alert system for performance thresholds
  * - Dashboard integration
- * 
+ *
  * @version 3.0.9
  * @author Fire22 Development Team
  */
@@ -102,17 +102,12 @@ class RealTimeMonitor {
         cpu: 80,
         memory: 85,
         responseTime: 2000,
-        errorRate: 5
+        errorRate: 5,
       },
-      endpoints: [
-        '/api/health',
-        '/api/health/detailed',
-        '/api/manager/agents',
-        '/dashboard'
-      ],
+      endpoints: ['/api/health', '/api/health/detailed', '/api/manager/agents', '/dashboard'],
       exportInterval: 60000, // 1 minute
       maxHistory: 288, // 24 hours at 5-second intervals
-      ...config
+      ...config,
     };
 
     console.log('📊 Real-Time Monitor initialized');
@@ -179,14 +174,14 @@ class RealTimeMonitor {
     }
 
     console.log('\n🛑 Stopping real-time monitoring...');
-    
+
     this.intervalIds.forEach(id => clearInterval(id));
     this.intervalIds = [];
     this.isMonitoring = false;
 
     // Final export
     this.exportMetrics();
-    
+
     console.log('✅ Monitoring stopped');
   }
 
@@ -196,7 +191,7 @@ class RealTimeMonitor {
   private async collectSystemMetrics(): Promise<void> {
     const memUsage = process.memoryUsage();
     const cpuUsage = process.cpuUsage();
-    
+
     const metrics: SystemMetrics = {
       timestamp: new Date().toISOString(),
       cpu: {
@@ -254,32 +249,32 @@ class RealTimeMonitor {
   private async checkEndpoint(endpoint: string): Promise<void> {
     const url = `${this.config.apiBaseUrl}${endpoint}`;
     const startTime = performance.now();
-    
+
     try {
       const response = await fetch(url, {
-        signal: AbortSignal.timeout(10000) // 10 second timeout
+        signal: AbortSignal.timeout(10000), // 10 second timeout
       });
-      
+
       const responseTime = performance.now() - startTime;
       const success = response.ok;
-      
+
       // Update metrics
       const existing = this.apiMetrics.get(endpoint);
       const totalRequests = (existing?.totalRequests || 0) + 1;
-      const successCount = success ? (existing ? Math.round(existing.successRate * existing.totalRequests / 100) : 0) + 1 : (existing ? Math.round(existing.successRate * existing.totalRequests / 100) : 0);
-      
+      const successCount = success
+        ? (existing ? Math.round((existing.successRate * existing.totalRequests) / 100) : 0) + 1
+        : existing
+          ? Math.round((existing.successRate * existing.totalRequests) / 100)
+          : 0;
+
       const metrics: APIEndpointMetrics = {
         endpoint,
         method: 'GET',
-        averageResponseTime: existing 
+        averageResponseTime: existing
           ? (existing.averageResponseTime * (totalRequests - 1) + responseTime) / totalRequests
           : responseTime,
-        minResponseTime: existing 
-          ? Math.min(existing.minResponseTime, responseTime) 
-          : responseTime,
-        maxResponseTime: existing 
-          ? Math.max(existing.maxResponseTime, responseTime) 
-          : responseTime,
+        minResponseTime: existing ? Math.min(existing.minResponseTime, responseTime) : responseTime,
+        maxResponseTime: existing ? Math.max(existing.maxResponseTime, responseTime) : responseTime,
         totalRequests,
         successRate: Math.round((successCount / totalRequests) * 100),
         lastChecked: new Date().toISOString(),
@@ -290,7 +285,6 @@ class RealTimeMonitor {
 
       // Check for API alerts
       this.checkAPIAlerts(metrics);
-
     } catch (error) {
       // Handle endpoint failure
       const metrics: APIEndpointMetrics = {
@@ -306,7 +300,7 @@ class RealTimeMonitor {
       };
 
       this.apiMetrics.set(endpoint, metrics);
-      
+
       this.addAlert({
         id: `api-down-${endpoint}`,
         timestamp: new Date().toISOString(),
@@ -314,7 +308,7 @@ class RealTimeMonitor {
         metric: 'api-availability',
         value: 0,
         threshold: 100,
-        message: `API endpoint ${endpoint} is down: ${error.message}`
+        message: `API endpoint ${endpoint} is down: ${error.message}`,
       });
     }
   }
@@ -342,7 +336,7 @@ class RealTimeMonitor {
         metric: 'cpu-usage',
         value: metrics.cpu.usage,
         threshold: this.config.alertThresholds.cpu,
-        message: `High CPU usage detected: ${metrics.cpu.usage}%`
+        message: `High CPU usage detected: ${metrics.cpu.usage}%`,
       });
     }
 
@@ -355,7 +349,7 @@ class RealTimeMonitor {
         metric: 'memory-usage',
         value: metrics.memory.percentage,
         threshold: this.config.alertThresholds.memory,
-        message: `High memory usage detected: ${metrics.memory.percentage}%`
+        message: `High memory usage detected: ${metrics.memory.percentage}%`,
       });
     }
   }
@@ -373,7 +367,7 @@ class RealTimeMonitor {
         metric: 'response-time',
         value: metrics.averageResponseTime,
         threshold: this.config.alertThresholds.responseTime,
-        message: `Slow response time for ${metrics.endpoint}: ${metrics.averageResponseTime.toFixed(2)}ms`
+        message: `Slow response time for ${metrics.endpoint}: ${metrics.averageResponseTime.toFixed(2)}ms`,
       });
     }
 
@@ -387,7 +381,7 @@ class RealTimeMonitor {
         metric: 'error-rate',
         value: errorRate,
         threshold: this.config.alertThresholds.errorRate,
-        message: `High error rate for ${metrics.endpoint}: ${errorRate}%`
+        message: `High error rate for ${metrics.endpoint}: ${errorRate}%`,
       });
     }
   }
@@ -398,10 +392,10 @@ class RealTimeMonitor {
   private addAlert(alert: PerformanceAlert): void {
     // Remove existing alert with same ID
     this.alerts = this.alerts.filter(a => a.id !== alert.id);
-    
+
     // Add new alert
     this.alerts.unshift(alert);
-    
+
     // Keep only recent alerts (last 100)
     if (this.alerts.length > 100) {
       this.alerts = this.alerts.slice(0, 100);
@@ -419,19 +413,25 @@ class RealTimeMonitor {
   private displayLiveDashboard(): void {
     // Clear screen and position cursor at top
     process.stdout.write('\x1b[2J\x1b[H');
-    
+
     const currentMetrics = this.systemHistory[0];
     if (!currentMetrics) return;
 
     console.log('🔥 Fire22 Real-Time Performance Dashboard');
-    console.log('=' .repeat(50));
+    console.log('='.repeat(50));
     console.log(`📅 ${new Date().toLocaleString()}\n`);
 
     // System metrics
     console.log('💻 System Metrics:');
-    console.log(`   CPU Usage: ${currentMetrics.cpu.usage}% ${this.getHealthIndicator(currentMetrics.cpu.usage, 80)}`);
-    console.log(`   Memory: ${currentMetrics.memory.used}MB / ${currentMetrics.memory.total}MB (${currentMetrics.memory.percentage}%) ${this.getHealthIndicator(currentMetrics.memory.percentage, 85)}`);
-    console.log(`   Uptime: ${Math.floor(currentMetrics.bun.uptime / 60)}m ${Math.floor(currentMetrics.bun.uptime % 60)}s`);
+    console.log(
+      `   CPU Usage: ${currentMetrics.cpu.usage}% ${this.getHealthIndicator(currentMetrics.cpu.usage, 80)}`
+    );
+    console.log(
+      `   Memory: ${currentMetrics.memory.used}MB / ${currentMetrics.memory.total}MB (${currentMetrics.memory.percentage}%) ${this.getHealthIndicator(currentMetrics.memory.percentage, 85)}`
+    );
+    console.log(
+      `   Uptime: ${Math.floor(currentMetrics.bun.uptime / 60)}m ${Math.floor(currentMetrics.bun.uptime % 60)}s`
+    );
     console.log(`   Bun Version: ${currentMetrics.bun.version}\n`);
 
     // API endpoints status
@@ -439,7 +439,9 @@ class RealTimeMonitor {
     for (const [endpoint, metrics] of this.apiMetrics.entries()) {
       const statusIcon = this.getStatusIcon(metrics.status);
       const responseTime = metrics.averageResponseTime.toFixed(0);
-      console.log(`   ${statusIcon} ${endpoint} - ${responseTime}ms (${metrics.successRate}% success)`);
+      console.log(
+        `   ${statusIcon} ${endpoint} - ${responseTime}ms (${metrics.successRate}% success)`
+      );
     }
 
     // Recent alerts
@@ -453,7 +455,9 @@ class RealTimeMonitor {
       }
     }
 
-    console.log(`\n📊 Monitoring active | Interval: ${this.config.interval}ms | Press Ctrl+C to stop`);
+    console.log(
+      `\n📊 Monitoring active | Interval: ${this.config.interval}ms | Press Ctrl+C to stop`
+    );
   }
 
   /**
@@ -470,11 +474,16 @@ class RealTimeMonitor {
    */
   private getStatusIcon(status: APIEndpointMetrics['status']): string {
     switch (status) {
-      case 'healthy': return '🟢';
-      case 'warning': return '🟡';
-      case 'critical': return '🟠';
-      case 'down': return '🔴';
-      default: return '⚪';
+      case 'healthy':
+        return '🟢';
+      case 'warning':
+        return '🟡';
+      case 'critical':
+        return '🟠';
+      case 'down':
+        return '🔴';
+      default:
+        return '⚪';
     }
   }
 
@@ -483,11 +492,16 @@ class RealTimeMonitor {
    */
   private getSeverityIcon(severity: PerformanceAlert['severity']): string {
     switch (severity) {
-      case 'low': return '🔵';
-      case 'medium': return '🟡';
-      case 'high': return '🟠';
-      case 'critical': return '🔴';
-      default: return '⚪';
+      case 'low':
+        return '🔵';
+      case 'medium':
+        return '🟡';
+      case 'high':
+        return '🟠';
+      case 'critical':
+        return '🔴';
+      default:
+        return '⚪';
     }
   }
 
@@ -508,9 +522,10 @@ class RealTimeMonitor {
         totalAlerts: this.alerts.length,
         criticalAlerts: this.alerts.filter(a => a.severity === 'critical').length,
         uptime: this.systemHistory[0]?.bun.uptime || 0,
-        healthyEndpoints: Array.from(this.apiMetrics.values()).filter(m => m.status === 'healthy').length,
+        healthyEndpoints: Array.from(this.apiMetrics.values()).filter(m => m.status === 'healthy')
+          .length,
         totalEndpoints: this.apiMetrics.size,
-      }
+      },
     };
 
     const exportPath = join(process.cwd(), 'monitoring-report.json');
@@ -522,14 +537,17 @@ class RealTimeMonitor {
    */
   async generateReport(): Promise<string> {
     const reportPath = join(process.cwd(), `performance-report-${Date.now()}.json`);
-    
+
     const report = {
       timestamp: new Date().toISOString(),
-      duration: this.systemHistory.length * this.config.interval / 1000, // seconds
+      duration: (this.systemHistory.length * this.config.interval) / 1000, // seconds
       systemMetrics: {
         samples: this.systemHistory.length,
-        averageCPU: this.systemHistory.reduce((sum, m) => sum + m.cpu.usage, 0) / this.systemHistory.length,
-        averageMemory: this.systemHistory.reduce((sum, m) => sum + m.memory.percentage, 0) / this.systemHistory.length,
+        averageCPU:
+          this.systemHistory.reduce((sum, m) => sum + m.cpu.usage, 0) / this.systemHistory.length,
+        averageMemory:
+          this.systemHistory.reduce((sum, m) => sum + m.memory.percentage, 0) /
+          this.systemHistory.length,
         peakCPU: Math.max(...this.systemHistory.map(m => m.cpu.usage)),
         peakMemory: Math.max(...this.systemHistory.map(m => m.memory.percentage)),
       },
@@ -541,8 +559,8 @@ class RealTimeMonitor {
           high: this.alerts.filter(a => a.severity === 'high').length,
           medium: this.alerts.filter(a => a.severity === 'medium').length,
           low: this.alerts.filter(a => a.severity === 'low').length,
-        }
-      }
+        },
+      },
     };
 
     writeFileSync(reportPath, JSON.stringify(report, null, 2));
@@ -553,14 +571,14 @@ class RealTimeMonitor {
 // CLI interface
 async function main() {
   const args = process.argv.slice(2);
-  
+
   // Parse arguments
   const config: Partial<MonitoringConfig> = {};
   let duration = 0; // 0 = infinite
-  
+
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    
+
     switch (arg) {
       case '--interval':
       case '-i':
@@ -609,10 +627,10 @@ EXAMPLES:
   }
 
   const monitor = new RealTimeMonitor(config);
-  
+
   try {
     await monitor.startMonitoring();
-    
+
     // Stop monitoring after duration if specified
     if (duration > 0) {
       setTimeout(async () => {
@@ -622,7 +640,6 @@ EXAMPLES:
         process.exit(0);
       }, duration);
     }
-    
   } catch (error) {
     console.error('💥 Monitoring failed:', error);
     process.exit(1);

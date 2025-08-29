@@ -1,6 +1,6 @@
 /**
  * Fire22 Dashboard Worker - Cloudflare Workers Entry Point
- * 
+ *
  * This is the main entry point for Cloudflare Workers deployment
  */
 
@@ -18,27 +18,31 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
-    
+
     // Health check endpoint
     if (path === '/health' || path === '/') {
-      return new Response(JSON.stringify({
-        status: 'ok',
-        version: '3.0.8',
-        timestamp: new Date().toISOString(),
-        environment: 'cloudflare-workers',
-        message: 'Fire22 Dashboard Worker is running'
-      }), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Version': '3.0.8'
+      return new Response(
+        JSON.stringify({
+          status: 'ok',
+          version: '3.0.8',
+          timestamp: new Date().toISOString(),
+          environment: 'cloudflare-workers',
+          message: 'Fire22 Dashboard Worker is running',
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Version': '3.0.8',
+          },
         }
-      });
+      );
     }
-    
+
     // Dashboard endpoint
     if (path === '/dashboard') {
-      return new Response(`
+      return new Response(
+        `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -94,36 +98,36 @@ export default {
     </div>
 </body>
 </html>
-      `, {
-        status: 200,
-        headers: {
-          'Content-Type': 'text/html;charset=UTF-8',
+      `,
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'text/html;charset=UTF-8',
+          },
         }
-      });
+      );
     }
-    
+
     // API endpoints
     if (path.startsWith('/api/')) {
       return handleAPI(request, env, path);
     }
-    
+
     // 404 for unknown routes
-    return new Response(JSON.stringify({
-      error: 'Not Found',
-      message: `The requested path ${path} was not found`,
-      availableEndpoints: [
-        '/',
-        '/health',
-        '/dashboard',
-        '/api/status'
-      ]
-    }), {
-      status: 404,
-      headers: {
-        'Content-Type': 'application/json',
+    return new Response(
+      JSON.stringify({
+        error: 'Not Found',
+        message: `The requested path ${path} was not found`,
+        availableEndpoints: ['/', '/health', '/dashboard', '/api/status'],
+      }),
+      {
+        status: 404,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
-    });
-  }
+    );
+  },
 };
 
 /**
@@ -132,28 +136,34 @@ export default {
 async function handleAPI(request: Request, env: Env, path: string): Promise<Response> {
   // API status endpoint
   if (path === '/api/status') {
-    return new Response(JSON.stringify({
-      api: 'Fire22 Dashboard API',
-      version: '3.0.8',
-      status: 'operational',
-      database: env.DB ? 'connected' : 'not configured',
-      timestamp: new Date().toISOString()
-    }), {
-      status: 200,
+    return new Response(
+      JSON.stringify({
+        api: 'Fire22 Dashboard API',
+        version: '3.0.8',
+        status: 'operational',
+        database: env.DB ? 'connected' : 'not configured',
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  }
+
+  // Add more API endpoints as needed
+
+  return new Response(
+    JSON.stringify({
+      error: 'API endpoint not found',
+    }),
+    {
+      status: 404,
       headers: {
         'Content-Type': 'application/json',
-      }
-    });
-  }
-  
-  // Add more API endpoints as needed
-  
-  return new Response(JSON.stringify({
-    error: 'API endpoint not found'
-  }), {
-    status: 404,
-    headers: {
-      'Content-Type': 'application/json',
+      },
     }
-  });
+  );
 }

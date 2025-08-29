@@ -34,5 +34,10 @@
   },
   "publishConfig": {
     "registry": "https://fire22.workers.dev/registry/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture.git",
+    "directory": "dashboard-worker/packages/@fire22/security-scanner"
   }
 }

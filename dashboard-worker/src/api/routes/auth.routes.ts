@@ -12,18 +12,12 @@ import * as schemas from '@fire22/validator/schemas';
 const router = Router({ base: '/auth' });
 
 // /api/auth/login (from index.ts:2601)
-router.post('/login',
-  controller.login
-);
+router.post('/login', controller.login);
 
 // /api/auth/logout (from index.ts:2655)
-router.post('/logout',
-  controller.logout
-);
+router.post('/logout', controller.logout);
 
 // /api/auth/verify (from index.ts:2665)
-router.get('/verify',
-  controller.verify
-);
+router.get('/verify', controller.verify);
 
 export const authRoutes = router;

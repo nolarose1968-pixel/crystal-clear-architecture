@@ -5,8 +5,8 @@
  * Data persistence layer for VIP customer management
  */
 
-import { VipCustomer } from '../entities/vip-customer';
-import { VipTierLevel, VipStatus } from '../entities/vip-customer';
+import { VipCustomer } from "../entities/vip-customer";
+import { VipTierLevel, VipStatus } from "../entities/vip-customer";
 
 export interface VipCustomerQuery {
   customerId?: string;
@@ -55,93 +55,106 @@ export class SQLiteVipCustomerRepository extends VipCustomerRepository {
   async save(vipCustomer: VipCustomer): Promise<void> {
     const data = vipCustomer.toJSON();
 
-    await this.db.run(`
+    await this.db.run(
+      `
       INSERT OR REPLACE INTO vip_customers (
         id, customerId, currentTier, status, qualificationStatus,
         stats, benefitsTracking, accountManagerId, communicationPreferences,
         upgradeHistory, reviewHistory, nextReviewDate, createdAt, updatedAt
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [
-      data.id,
-      data.customerId,
-      JSON.stringify(data.currentTier),
-      data.status,
-      data.qualificationStatus,
-      JSON.stringify(data.stats),
-      JSON.stringify(data.benefitsTracking),
-      data.accountManagerId || null,
-      JSON.stringify(data.communicationPreferences),
-      JSON.stringify(data.upgradeHistory),
-      JSON.stringify(data.reviewHistory),
-      data.nextReviewDate || null,
-      data.createdAt,
-      data.updatedAt
-    ]);
+    `,
+      [
+        data.id,
+        data.customerId,
+        JSON.stringify(data.currentTier),
+        data.status,
+        data.qualificationStatus,
+        JSON.stringify(data.stats),
+        JSON.stringify(data.benefitsTracking),
+        data.accountManagerId || null,
+        JSON.stringify(data.communicationPreferences),
+        JSON.stringify(data.upgradeHistory),
+        JSON.stringify(data.reviewHistory),
+        data.nextReviewDate || null,
+        data.createdAt,
+        data.updatedAt,
+      ],
+    );
   }
 
   async findById(id: string): Promise<VipCustomer | null> {
-    const row = await this.db.query(`
+    const row = await this.db
+      .query(
+        `
       SELECT * FROM vip_customers WHERE id = ?
-    `, [id]).then((rows: any[]) => rows[0]);
+    `,
+        [id],
+      )
+      .then((rows: any[]) => rows[0]);
 
     return row ? this.mapRowToEntity(row) : null;
   }
 
   async findByCustomerId(customerId: string): Promise<VipCustomer | null> {
-    const row = await this.db.query(`
+    const row = await this.db
+      .query(
+        `
       SELECT * FROM vip_customers WHERE customerId = ?
-    `, [customerId]).then((rows: any[]) => rows[0]);
+    `,
+        [customerId],
+      )
+      .then((rows: any[]) => rows[0]);
 
     return row ? this.mapRowToEntity(row) : null;
   }
 
   async findByQuery(query: VipCustomerQuery): Promise<VipCustomer[]> {
-    let sql = 'SELECT * FROM vip_customers WHERE 1=1';
+    let sql = "SELECT * FROM vip_customers WHERE 1=1";
     const params: any[] = [];
 
     if (query.customerId) {
-      sql += ' AND customerId = ?';
+      sql += " AND customerId = ?";
       params.push(query.customerId);
     }
 
     if (query.tier) {
-      sql += ' AND json_extract(currentTier, \'$.level\') = ?';
+      sql += " AND json_extract(currentTier, '$.level') = ?";
       params.push(query.tier);
     }
 
     if (query.status) {
-      sql += ' AND status = ?';
+      sql += " AND status = ?";
       params.push(query.status);
     }
 
     if (query.accountManagerId) {
-      sql += ' AND accountManagerId = ?';
+      sql += " AND accountManagerId = ?";
       params.push(query.accountManagerId);
     }
 
     if (query.needsReview) {
-      sql += ' AND nextReviewDate <= ?';
+      sql += " AND nextReviewDate <= ?";
       params.push(new Date().toISOString());
     }
 
     if (query.createdAfter) {
-      sql += ' AND createdAt >= ?';
+      sql += " AND createdAt >= ?";
       params.push(query.createdAfter.toISOString());
     }
 
     if (query.createdBefore) {
-      sql += ' AND createdAt <= ?';
+      sql += " AND createdAt <= ?";
       params.push(query.createdBefore.toISOString());
     }
 
-    sql += ' ORDER BY createdAt DESC';
+    sql += " ORDER BY createdAt DESC";
 
     const rows = await this.db.query(sql, params);
     return rows.map((row: any) => this.mapRowToEntity(row));
   }
 
   async findAllActive(): Promise<VipCustomer[]> {
-    return this.findByQuery({ status: 'active' });
+    return this.findByQuery({ status: "active" });
   }
 
   async findByTier(tier: VipTierLevel): Promise<VipCustomer[]> {
@@ -158,9 +171,13 @@ export class SQLiteVipCustomerRepository extends VipCustomerRepository {
 
   async getAnalytics(): Promise<VipAnalyticsData> {
     // Get basic counts
-    const totalResult = await this.db.query('SELECT COUNT(*) as count FROM vip_customers')
+    const totalResult = await this.db
+      .query("SELECT COUNT(*) as count FROM vip_customers")
       .then((rows: any[]) => rows[0]);
-    const activeResult = await this.db.query('SELECT COUNT(*) as count FROM vip_customers WHERE status = "active"')
+    const activeResult = await this.db
+      .query(
+        'SELECT COUNT(*) as count FROM vip_customers WHERE status = "active"',
+      )
       .then((rows: any[]) => rows[0]);
 
     // Get tier distribution
@@ -171,7 +188,11 @@ export class SQLiteVipCustomerRepository extends VipCustomerRepository {
     `);
 
     const tierDistribution: Record<VipTierLevel, number> = {
-      bronze: 0, silver: 0, gold: 0, platinum: 0, diamond: 0
+      bronze: 0,
+      silver: 0,
+      gold: 0,
+      platinum: 0,
+      diamond: 0,
     };
 
     tierRows.forEach((row: any) => {
@@ -179,14 +200,18 @@ export class SQLiteVipCustomerRepository extends VipCustomerRepository {
     });
 
     // Get average stats
-    const statsResult = await this.db.query(`
+    const statsResult = await this.db
+      .query(
+        `
       SELECT
         AVG(json_extract(stats, '$.totalDeposits')) as avgDeposits,
         AVG(json_extract(stats, '$.totalBettingVolume')) as avgBettingVolume,
         AVG(json_extract(stats, '$.accountAgeDays')) as avgAccountAge,
         AVG(json_extract(stats, '$.loyaltyPoints')) as avgLoyaltyPoints
       FROM vip_customers
-    `).then((rows: any[]) => rows[0]);
+    `,
+      )
+      .then((rows: any[]) => rows[0]);
 
     return {
       totalCustomers: totalResult.count,
@@ -196,19 +221,20 @@ export class SQLiteVipCustomerRepository extends VipCustomerRepository {
         totalDeposits: statsResult.avgDeposits || 0,
         totalBettingVolume: statsResult.avgBettingVolume || 0,
         accountAgeDays: statsResult.avgAccountAge || 0,
-        loyaltyPoints: statsResult.avgLoyaltyPoints || 0
+        loyaltyPoints: statsResult.avgLoyaltyPoints || 0,
       },
       churnRate: 0.05, // Would calculate from actual data
-      upgradeRate: 0.15 // Would calculate from upgrade history
+      upgradeRate: 0.15, // Would calculate from upgrade history
     };
   }
 
   async delete(id: string): Promise<void> {
-    await this.db.run('DELETE FROM vip_customers WHERE id = ?', [id]);
+    await this.db.run("DELETE FROM vip_customers WHERE id = ?", [id]);
   }
 
   async count(): Promise<number> {
-    const result = await this.db.query('SELECT COUNT(*) as count FROM vip_customers')
+    const result = await this.db
+      .query("SELECT COUNT(*) as count FROM vip_customers")
       .then((rows: any[]) => rows[0]);
     return result.count;
   }
@@ -217,7 +243,9 @@ export class SQLiteVipCustomerRepository extends VipCustomerRepository {
     // This would reconstruct the VipCustomer entity from database row
     // For now, returning a placeholder - in real implementation would use
     // VipCustomer.fromPersistence() or similar method
-    throw new Error('mapRowToEntity not implemented - would reconstruct entity from database row');
+    throw new Error(
+      "mapRowToEntity not implemented - would reconstruct entity from database row",
+    );
   }
 }
 
@@ -246,38 +274,42 @@ export class InMemoryVipCustomerRepository extends VipCustomerRepository {
     let results = Array.from(this.customers.values());
 
     if (query.customerId) {
-      results = results.filter(c => c.getCustomerId() === query.customerId);
+      results = results.filter((c) => c.getCustomerId() === query.customerId);
     }
 
     if (query.tier) {
-      results = results.filter(c => c.getCurrentTier().getLevel() === query.tier);
+      results = results.filter(
+        (c) => c.getCurrentTier().getLevel() === query.tier,
+      );
     }
 
     if (query.status) {
-      results = results.filter(c => c.getStatus() === query.status);
+      results = results.filter((c) => c.getStatus() === query.status);
     }
 
     if (query.accountManagerId) {
-      results = results.filter(c => c.getAccountManagerId() === query.accountManagerId);
+      results = results.filter(
+        (c) => c.getAccountManagerId() === query.accountManagerId,
+      );
     }
 
     if (query.needsReview) {
-      results = results.filter(c => c.needsReview());
+      results = results.filter((c) => c.needsReview());
     }
 
     if (query.createdAfter) {
-      results = results.filter(c => c.getCreatedAt() >= query.createdAfter!);
+      results = results.filter((c) => c.getCreatedAt() >= query.createdAfter!);
     }
 
     if (query.createdBefore) {
-      results = results.filter(c => c.getCreatedAt() <= query.createdBefore!);
+      results = results.filter((c) => c.getCreatedAt() <= query.createdBefore!);
     }
 
     return results;
   }
 
   async findAllActive(): Promise<VipCustomer[]> {
-    return this.findByQuery({ status: 'active' });
+    return this.findByQuery({ status: "active" });
   }
 
   async findByTier(tier: VipTierLevel): Promise<VipCustomer[]> {
@@ -294,10 +326,14 @@ export class InMemoryVipCustomerRepository extends VipCustomerRepository {
 
   async getAnalytics(): Promise<VipAnalyticsData> {
     const customers = Array.from(this.customers.values());
-    const activeCustomers = customers.filter(c => c.isActive());
+    const activeCustomers = customers.filter((c) => c.isActive());
 
     const tierDistribution: Record<VipTierLevel, number> = {
-      bronze: 0, silver: 0, gold: 0, platinum: 0, diamond: 0
+      bronze: 0,
+      silver: 0,
+      gold: 0,
+      platinum: 0,
+      diamond: 0,
     };
 
     let totalDeposits = 0;
@@ -321,13 +357,17 @@ export class InMemoryVipCustomerRepository extends VipCustomerRepository {
       activeCustomers: activeCustomers.length,
       tierDistribution,
       averageStats: {
-        totalDeposits: customers.length > 0 ? totalDeposits / customers.length : 0,
-        totalBettingVolume: customers.length > 0 ? totalBettingVolume / customers.length : 0,
-        accountAgeDays: customers.length > 0 ? totalAccountAge / customers.length : 0,
-        loyaltyPoints: customers.length > 0 ? totalLoyaltyPoints / customers.length : 0
+        totalDeposits:
+          customers.length > 0 ? totalDeposits / customers.length : 0,
+        totalBettingVolume:
+          customers.length > 0 ? totalBettingVolume / customers.length : 0,
+        accountAgeDays:
+          customers.length > 0 ? totalAccountAge / customers.length : 0,
+        loyaltyPoints:
+          customers.length > 0 ? totalLoyaltyPoints / customers.length : 0,
       },
       churnRate: 0.05,
-      upgradeRate: 0.15
+      upgradeRate: 0.15,
     };
   }
 

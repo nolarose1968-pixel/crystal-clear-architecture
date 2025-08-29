@@ -46,7 +46,7 @@
       ]
     },
     "technology": {
-      "name": "Technology Department", 
+      "name": "Technology Department",
       "head": "Mike Hunt",
       "email": "mike.hunt@technology.fire22",
       "status": "active",
@@ -93,7 +93,7 @@
     "security": {
       "name": "Security Department",
       "head": "TBD",
-      "email": "head@security.fire22", 
+      "email": "head@security.fire22",
       "status": "pending",
       "workflows": {
         "monthlySecurityBriefings": {
@@ -118,11 +118,11 @@
           ]
         },
         "policyUpdates": {
-          "trigger": "policy-changes", 
+          "trigger": "policy-changes",
           "sla": "48-hours",
           "tasks": [
             "Draft security policy updates and changes",
-            "Coordinate with Legal for compliance review", 
+            "Coordinate with Legal for compliance review",
             "Work with Communications for policy distribution",
             "Provide training materials and implementation guidance"
           ]
@@ -130,14 +130,14 @@
       },
       "communicationTasks": [
         "Monthly security briefings to all departments via Communications",
-        "Security incident communications coordination", 
+        "Security incident communications coordination",
         "Security policy updates and announcements",
         "Emergency security communications protocols"
       ]
     },
     "finance": {
       "name": "Finance Department",
-      "head": "TBD", 
+      "head": "TBD",
       "email": "head@finance.fire22",
       "status": "pending",
       "workflows": {
@@ -146,7 +146,7 @@
           "deadline": "5th business day of month",
           "recipient": "sarah.martinez@communications.fire22",
           "tasks": [
-            "Compile monthly financial performance summary", 
+            "Compile monthly financial performance summary",
             "Provide budget vs actual variance analysis",
             "Highlight significant financial developments",
             "Include departmental budget status updates"
@@ -164,7 +164,7 @@
         },
         "expensePolicy": {
           "trigger": "policy-updates",
-          "sla": "72-hours", 
+          "sla": "72-hours",
           "tasks": [
             "Draft expense policy changes and updates",
             "Coordinate with HR and Legal for policy review",
@@ -175,7 +175,7 @@
       },
       "communicationTasks": [
         "Monthly financial updates to Communications team",
-        "Budget communications and announcements", 
+        "Budget communications and announcements",
         "Financial policy changes via Communications",
         "Expense report guidelines and updates"
       ]
@@ -184,7 +184,7 @@
       "name": "Marketing Department",
       "head": "TBD",
       "email": "head@marketing.fire22",
-      "status": "pending", 
+      "status": "pending",
       "workflows": {
         "weeklyCampaignUpdates": {
           "frequency": "weekly",
@@ -212,7 +212,7 @@
           "sla": "48-hours",
           "tasks": [
             "Submit campaign materials for Communications approval",
-            "Coordinate legal review for campaign compliance", 
+            "Coordinate legal review for campaign compliance",
             "Obtain executive approval for major campaigns",
             "Schedule campaign communications and announcements"
           ]
@@ -232,7 +232,7 @@
       "status": "pending",
       "workflows": {
         "weeklyOperationalReports": {
-          "frequency": "weekly", 
+          "frequency": "weekly",
           "deadline": "Friday 2PM",
           "recipient": "sarah.martinez@communications.fire22",
           "tasks": [
@@ -266,7 +266,7 @@
       "communicationTasks": [
         "Weekly operational status reports to Communications",
         "Process change announcements via Communications",
-        "Operational incident communications", 
+        "Operational incident communications",
         "Department efficiency metrics reporting"
       ]
     },
@@ -279,7 +279,7 @@
         "policyUpdates": {
           "frequency": "as-needed",
           "sla": "72-hours",
-          "recipient": "sarah.martinez@communications.fire22", 
+          "recipient": "sarah.martinez@communications.fire22",
           "tasks": [
             "Draft legal policy updates and changes",
             "Provide compliance requirement communications",
@@ -318,7 +318,7 @@
     "design": {
       "name": "Design Department",
       "head": "Isabella Martinez",
-      "email": "isabella.martinez@design.fire22", 
+      "email": "isabella.martinez@design.fire22",
       "status": "active",
       "workflows": {
         "weeklyDesignUpdates": {
@@ -334,7 +334,7 @@
         },
         "brandAssetApproval": {
           "trigger": "asset-creation",
-          "sla": "24-hours", 
+          "sla": "24-hours",
           "tasks": [
             "Submit all brand assets for Communications review",
             "Ensure brand guideline compliance",
@@ -355,7 +355,7 @@
       },
       "communicationTasks": [
         "Weekly design updates to Communications team",
-        "Cross-department design consultation and support", 
+        "Cross-department design consultation and support",
         "Design system documentation and guidelines",
         "Creative asset approval and brand consistency"
       ]
@@ -423,7 +423,7 @@
       "primary": "#communications",
       "departments": {
         "technology": "#technology",
-        "security": "#security", 
+        "security": "#security",
         "finance": "#finance",
         "marketing": "#marketing",
         "operations": "#operations",
@@ -440,7 +440,7 @@
       "announcements": "announcements@fire22.com"
     },
     "automationTriggers": {
-      "weeklyReports": "Friday 6PM - Consolidation reminder", 
+      "weeklyReports": "Friday 6PM - Consolidation reminder",
       "monthlyReports": "Last Friday - Monthly report generation",
       "emergencyAlerts": "Immediate - Crisis communication activation",
       "policyUpdates": "As needed - Policy change workflow"
@@ -456,41 +456,34 @@
       ]
     },
     "p1High": {
-      "responseTime": "15-minutes", 
-      "contacts": [
-        "alex.chen@communications.fire22",
-        "sarah.martinez@communications.fire22"
-      ]
+      "responseTime": "15-minutes",
+      "contacts": ["alex.chen@communications.fire22", "sarah.martinez@communications.fire22"]
     },
     "p2Medium": {
       "responseTime": "2-hours",
-      "contacts": [
-        "maria.rodriguez@communications.fire22"
-      ]
+      "contacts": ["maria.rodriguez@communications.fire22"]
     },
     "p3Low": {
       "responseTime": "24-hours",
-      "contacts": [
-        "communications@fire22.com"
-      ]
+      "contacts": ["communications@fire22.com"]
     }
   },
   "performanceMetrics": {
     "communicationEffectiveness": {
       "targetEngagement": "85%",
-      "currentEngagement": "87%", 
+      "currentEngagement": "87%",
       "responseTime": "< 4 hours",
       "currentResponseTime": "3.2 hours"
     },
     "departmentParticipation": {
       "weeklyReportSubmission": "95%",
       "currentSubmissionRate": "92%",
-      "templateUsage": "90%", 
+      "templateUsage": "90%",
       "currentTemplateUsage": "89%"
     },
     "escalationPerformance": {
       "p0ResponseTime": "< 5 minutes",
-      "p1ResponseTime": "< 15 minutes", 
+      "p1ResponseTime": "< 15 minutes",
       "p2ResponseTime": "< 2 hours",
       "averageResolutionTime": "2.1 hours"
     }

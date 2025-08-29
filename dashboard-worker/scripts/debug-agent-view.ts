@@ -7,7 +7,7 @@
 
 async function debugAgentView() {
   console.log('🔍 Debugging Agent View Tab Issues');
-  console.log('==================================');
+  console.log('!==!==!==!==!==!====');
 
   const BASE_URL = 'http://localhost:3000';
 
@@ -18,25 +18,24 @@ async function debugAgentView() {
     const response = await fetch(`${BASE_URL}/dashboard`);
     if (response.ok) {
       const html = await response.text();
-      
+
       // Check key elements
       const checks = {
         'Agent View Tab Button': html.includes('🎯 Agent View'),
-        'Agent View Content': html.includes("x-show=\"activeTab === 'agent-view'\""),
+        'Agent View Content': html.includes('x-show="activeTab === \'agent-view\'"'),
         'agentViewData Function': html.includes('function agentViewData()'),
         'agentData Flag': html.includes('agentData: true'),
         'x-data Directive': html.includes('x-data="agentViewData()"'),
-        'Auto-refresh Logic': html.includes('startAutoRefresh()')
+        'Auto-refresh Logic': html.includes('startAutoRefresh()'),
       };
-      
+
       console.log('Dashboard Elements Check:');
       Object.entries(checks).forEach(([key, passed]) => {
         console.log(`  ${passed ? '✅' : '❌'} ${key}`);
       });
-      
+
       const allPassed = Object.values(checks).every(Boolean);
       console.log(`\nOverall: ${allPassed ? '✅ All elements present' : '❌ Missing elements'}`);
-      
     } else {
       console.log(`❌ Dashboard failed to load: ${response.status}`);
     }
@@ -54,7 +53,9 @@ async function debugAgentView() {
       if (data.success) {
         console.log('✅ API working');
         console.log(`   Agent: ${data.data.agentProfile?.customerID}`);
-        console.log(`   Weekly P&L: $${data.data.financialPerformance?.currentWeek?.profit?.toLocaleString()}`);
+        console.log(
+          `   Weekly P&L: $${data.data.financialPerformance?.currentWeek?.profit?.toLocaleString()}`
+        );
         console.log(`   Players: ${data.data.financialPerformance?.currentWeek?.activePlayers}`);
         console.log(`   Token Status: ${data.data.operationalStatus?.tokenStatus}`);
       } else {
@@ -73,12 +74,12 @@ async function debugAgentView() {
   try {
     const response = await fetch(`${BASE_URL}/dashboard`);
     const html = await response.text();
-    
+
     // Extract the JavaScript portion
     const scriptMatch = html.match(/<script>(.*?)<\/script>/s);
     if (scriptMatch) {
       const jsCode = scriptMatch[1];
-      
+
       // Check for common issues
       const issues = {
         'Template Literals': /`[^`]*\$\{[^}]*\}[^`]*`/.test(jsCode),
@@ -86,14 +87,19 @@ async function debugAgentView() {
         'Missing Semicolons': /\n\s*[a-zA-Z].*[^;]\s*\n/.test(jsCode),
         'Function Definitions': jsCode.includes('function agentViewData()'),
         'Async Functions': jsCode.includes('async refreshData()'),
-        'Event Handlers': jsCode.includes('@click="refreshData()"')
+        'Event Handlers': jsCode.includes('@click="refreshData()"'),
       };
-      
+
       console.log('JavaScript Analysis:');
       Object.entries(issues).forEach(([key, hasIssue]) => {
-        const status = key === 'Template Literals' || key === 'Unescaped Quotes' || key === 'Missing Semicolons'
-          ? (hasIssue ? '⚠️' : '✅') 
-          : (hasIssue ? '✅' : '❌');
+        const status =
+          key === 'Template Literals' || key === 'Unescaped Quotes' || key === 'Missing Semicolons'
+            ? hasIssue
+              ? '⚠️'
+              : '✅'
+            : hasIssue
+              ? '✅'
+              : '❌';
         console.log(`  ${status} ${key}`);
       });
     }

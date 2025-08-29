@@ -1,6 +1,6 @@
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // FIRE22 DASHBOARD WORKER - HIERARCHY SYSTEM & MATRIX ORGANIZATION
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // 
 // ARCHITECTURE OVERVIEW:
 // ┌─────────────────────────────────────────────────────────────────────────┐
@@ -41,41 +41,41 @@
 // • Data Flow → Request → Auth → Service → Cache → Database → Response
 // • Error Handling → Service → Response → Client
 //
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Bun Environment Variable Type Definitions
 // This provides proper TypeScript support for environment variables
 declare module "bun" {
   interface Env {
-    // ===== DATABASE LAYER =====
+    // !== DATABASE LAYER !==
     DB?: D1Database;
     
-    // ===== BOT CONFIGURATION LAYER =====
+    // !== BOT CONFIGURATION LAYER !==
     BOT_TOKEN?: string;
     CASHIER_BOT_TOKEN?: string;
     
-    // ===== FIRE22 INTEGRATION LAYER =====
+    // !== FIRE22 INTEGRATION LAYER !==
     FIRE22_API_URL?: string;
     FIRE22_TOKEN?: string;
     FIRE22_WEBHOOK_SECRET?: string;
     
-    // ===== AUTHENTICATION LAYER =====
+    // !== AUTHENTICATION LAYER !==
     JWT_SECRET: string;
     ADMIN_PASSWORD: string;
     
-    // ===== PAYMENT GATEWAY LAYER =====
+    // !== PAYMENT GATEWAY LAYER !==
     STRIPE_SECRET_KEY: string;
     STRIPE_WEBHOOK_SECRET: string;
     
-    // ===== COMMUNICATION SERVICES LAYER =====
+    // !== COMMUNICATION SERVICES LAYER !==
     SENDGRID_API_KEY: string;
     TWILIO_ACCOUNT_SID: string;
     TWILIO_AUTH_TOKEN: string;
     
-    // ===== SYSTEM CONFIGURATION LAYER =====
+    // !== SYSTEM CONFIGURATION LAYER !==
     CRON_SECRET: string;
     
-    // ===== DEVELOPMENT SETTINGS LAYER =====
+    // !== DEVELOPMENT SETTINGS LAYER !==
     NODE_ENV?: string;
     BUN_CONFIG_VERBOSE_FETCH?: string;
     BUN_CONFIG_MAX_HTTP_REQUESTS?: string;
@@ -88,9 +88,9 @@ const dashboardHtml = `<!DOCTYPE html><html><head><title>Dashboard</title></head
 // Import queue system
 import { WithdrawalQueueSystem } from './queue-system';
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // CORE INTERFACES & TYPES - HIERARCHY FOUNDATION
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Cache entry structure
 interface CacheEntry<T> {
@@ -110,9 +110,9 @@ interface Fire22CacheInterface {
   };
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // CACHE LAYER IMPLEMENTATION
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Adapted Fire22Cache for Cloudflare D1
 class Fire22Cache implements Fire22CacheInterface {
@@ -176,9 +176,9 @@ class Fire22Cache implements Fire22CacheInterface {
   }
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // VERSION MANAGEMENT IMPLEMENTATION
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Version cache implementation
 class VersionCache implements VersionCacheInterface {
@@ -450,9 +450,9 @@ class VersionDatabase implements VersionDatabaseInterface {
   }
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // VERSION MANAGEMENT DATA LAYER
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Version information structure
 interface VersionInfo {
@@ -547,9 +547,9 @@ interface VersionDatabaseInterface {
   getDeploymentHistory(environment: string): Promise<DeploymentStatus[]>;
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // DATABASE LAYER INTERFACES - HIERARCHY CONTRACTS
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Cloudflare D1 Database interface
 interface D1Database {
@@ -584,9 +584,9 @@ interface D1RunResult {
   meta: any;
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // SERVICE LAYER INTERFACES - HIERARCHY CONTRACTS
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Base service interface for all services
 interface BaseService {
@@ -647,9 +647,9 @@ interface VersionManagementServiceInterface extends BaseService {
   validateVersionFormat(version: string): Promise<boolean>;
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // DATA MODEL INTERFACES - HIERARCHY STRUCTURE
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // User model interface
 interface User {
@@ -704,9 +704,9 @@ interface SettlementResult {
   error?: string;
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // HIERARCHY MATRIX OVERVIEW
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 //
 // SERVICE DEPENDENCY MATRIX:
 // ┌─────────────────────────────────────────────────────────────────────────┐
@@ -738,9 +738,9 @@ interface SettlementResult {
 // │  DB     │  Query Error       │  500 Server Error    │  Cached Data     │
 // └─────────────────────────────────────────────────────────────────────────┘
 //
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // SERVICE IMPLEMENTATIONS - HIERARCHY LAYERS
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 // Fire22 Enhanced Login Page HTML
 const loginHtml = `<!DOCTYPE html>
@@ -1871,9 +1871,9 @@ class AuthService {
   }
 }
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // VERSION MANAGEMENT SERVICE IMPLEMENTATION
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
 class VersionManagementService implements VersionManagementServiceInterface {
   readonly env: Env;
@@ -2742,7 +2742,7 @@ class Fire22APIService {
   }
 }
 
-// ===== MATRIX HEALTH HELPER FUNCTIONS =====
+// !== MATRIX HEALTH HELPER FUNCTIONS !==
 // Helper functions for matrix health calculations
 
 async function calculateConfigCompleteness(env: Env): Promise<number> {
@@ -3459,9 +3459,9 @@ export default {
       }
     }
 
-    // ========================================
+    // !==!==!==!==!==!==!====
     // PHASE 3: CRITICAL OPERATIONS
-    // ========================================
+    // !==!==!==!==!==!==!====
 
     // 1. WITHDRAWAL PROCESSING SYSTEM
     // Request withdrawal
@@ -4179,9 +4179,9 @@ export default {
       }
     }
 
-    // ========================================
+    // !==!==!==!==!==!==!====
     // MISSING FIRE22 API ENDPOINTS FOR DASHBOARD
-    // ========================================
+    // !==!==!==!==!==!==!====
 
     // POST /api/manager/getWeeklyFigureByAgent - Dashboard expects this format
     if (url.pathname === '/api/manager/getWeeklyFigureByAgent' && req.method === 'POST') {
@@ -4385,9 +4385,9 @@ export default {
       }
     }
 
-    // ========================================
+    // !==!==!==!==!==!==!====
     // DASHBOARD BACKEND PACK - Real-time SSE & APIs
-    // ========================================
+    // !==!==!==!==!==!==!====
 
     // 1. Real-time SSE endpoint for live dashboard updates (NO AUTH REQUIRED)
     if (url.pathname === '/api/live' && req.method === 'GET') {
@@ -6814,8 +6814,7 @@ export default {
                             <div class="fire22-data-card bg-fire22-midnight border border-fire22-navy">
                                 <div class="fire22-data-row" style="border-left-color: var(--fire22-accent);">
                                     <span class="fire22-data-label text-sm">Team Range:</span>
-                                    <span class="fire22-data-value text-fire22-accent font-bold" 
-                                          x-text="teaserProfile?.settings ? `${teaserProfile.settings.minTeams || 2}-${teaserProfile.settings.maxTeams || 10}` : 'N/A'"></span>
+                                    <span class="fire22-data-value text-fire22-accent font-bold" x-text="teaserProfile?.settings ? `${teaserProfile.settings.minTeams || 2}-${teaserProfile.settings.maxTeams || 10}` : 'N/A'"></span>
                                 </div>
                             </div>
                             <div class="fire22-data-card bg-fire22-midnight border border-fire22-navy">
@@ -7621,9 +7620,9 @@ export default {
       }
     }
 
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
     // DEPARTMENT API ENDPOINTS - Dynamic Data & Hub Integration
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
     
     // Get all departments overview
     if (url.pathname === '/api/departments' && req.method === 'GET') {
@@ -7783,9 +7782,9 @@ export default {
       });
     }
 
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
     // NATURAL HIERARCHY AGGREGATION API ENDPOINTS
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
     
     // Get aggregated hierarchy data (respects all existing systems)
     if (url.pathname === '/api/hierarchy/aggregated' && req.method === 'GET') {
@@ -8065,9 +8064,9 @@ export default {
       });
     }
     
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
     // LEGACY: UNIFIED HIERARCHY API ENDPOINTS (KEPT FOR COMPATIBILITY)
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
     
     // Get unified hierarchy data
     if (url.pathname === '/api/hierarchy/unified' && req.method === 'GET') {
@@ -8293,9 +8292,9 @@ export default {
       });
     }
     
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
     // COMPREHENSIVE REVIEW API ENDPOINTS
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
     
     // Get all pending reviews
     if (url.pathname === '/api/reviews/pending' && req.method === 'GET') {
@@ -11478,9 +11477,9 @@ export default {
       }
     }
 
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
     // VERSION MANAGEMENT API ENDPOINTS
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
     // Initialize version management service
     const versionService = new VersionManagementService(env);
@@ -11705,9 +11704,9 @@ export default {
       }
     }
 
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
     // END VERSION MANAGEMENT API ENDPOINTS
-    // ============================================================================
+    // !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 
     // Bulk import customers from CSV/JSON
     if (url.pathname === '/api/admin/import-customers' && req.method === 'POST') {
@@ -12326,9 +12325,9 @@ export default {
       }
     }
 
-    // ========================================
+    // !==!==!==!==!==!==!====
     // QUEUE SYSTEM ENDPOINTS
-    // ========================================
+    // !==!==!==!==!==!==!====
 
     // Initialize queue system
     if (url.pathname === '/api/queue/init' && req.method === 'POST') {
@@ -12893,9 +12892,9 @@ export default {
   },
 };
 
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 // HIERARCHY SYSTEM SUMMARY & MATRIX COMPLETION
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===
 //
 // 🏗️  ARCHITECTURE COMPLETION STATUS: 100%
 // ┌─────────────────────────────────────────────────────────────────────────┐
@@ -12961,4 +12960,4 @@ export default {
 // └─────────────────────────────────────────────────────────────────────────┘
 //
 // 🎉  HIERARCHY SYSTEM COMPLETE - FIRE22 DASHBOARD WORKER READY!
-// ============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!===

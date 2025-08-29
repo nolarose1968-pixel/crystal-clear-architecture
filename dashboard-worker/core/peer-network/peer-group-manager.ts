@@ -3,8 +3,15 @@
  * Enables trust building and efficient P2P transactions through peer networks
  */
 
-import { CustomerDatabaseManagement, CustomerProfile } from '../customers/customer-database-management';
-import { P2PPaymentMatching, P2PPaymentRequest, P2PTransaction } from '../payments/p2p-payment-matching';
+import {
+  CustomerDatabaseManagement,
+  CustomerProfile,
+} from '../customers/customer-database-management';
+import {
+  P2PPaymentMatching,
+  P2PPaymentRequest,
+  P2PTransaction,
+} from '../payments/p2p-payment-matching';
 import { CustomerPaymentValidation } from '../payments/customer-payment-validation';
 import { DepositWithdrawalSystem } from '../finance/deposit-withdrawal-system';
 
@@ -122,7 +129,9 @@ export class PeerGroupManager {
     // Check if creator has sufficient trust score for creating groups
     const minTrustScore = type === 'vip_network' ? 90 : 70;
     if (creator.rankingProfile.overallScore < minTrustScore) {
-      throw new Error(`Insufficient trust score for creating ${type} group. Required: ${minTrustScore}`);
+      throw new Error(
+        `Insufficient trust score for creating ${type} group. Required: ${minTrustScore}`
+      );
     }
 
     // Set default rules based on group type
@@ -141,7 +150,7 @@ export class PeerGroupManager {
       averageResponseTime: 30, // minutes
       commonPaymentMethods: this.analyzeGroupPaymentMethods([creatorId, ...initialMembers]),
       activityScore: 100,
-      rules: defaultRules
+      rules: defaultRules,
     };
 
     // Validate all members
@@ -198,7 +207,8 @@ export class PeerGroupManager {
         requestType
       );
 
-      if (matchScore.score > 50) { // Only include good matches
+      if (matchScore.score > 50) {
+        // Only include good matches
         const relationship = this.getPeerRelationship(requesterId, peerId);
 
         recommendations.push({
@@ -208,7 +218,7 @@ export class PeerGroupManager {
           estimatedResponseTime: relationship?.responseTime || 45,
           commonHistory: relationship?.totalTransactions || 0,
           trustScore: relationship?.trustScore || 70,
-          preferredMethod: relationship?.preferredPaymentMethod || paymentMethod
+          preferredMethod: relationship?.preferredPaymentMethod || paymentMethod,
         });
       }
     }
@@ -233,7 +243,7 @@ export class PeerGroupManager {
           groupName: group.name,
           matchScore: groupMatchScore,
           memberCount: group.members.length,
-          successRate: group.successRate
+          successRate: group.successRate,
         });
       }
     }
@@ -244,7 +254,7 @@ export class PeerGroupManager {
     return {
       requesterId,
       recommendedPeers: recommendations.slice(0, maxResults),
-      groupSuggestions: groupSuggestions.slice(0, 5)
+      groupSuggestions: groupSuggestions.slice(0, 5),
     };
   }
 
@@ -291,7 +301,8 @@ export class PeerGroupManager {
     const enhancedRequesterValidation = {
       ...requesterValidation,
       validationScore: Math.min(requesterValidation.validationScore + 15, 100),
-      riskLevel: requesterValidation.riskLevel === 'high' ? 'medium' : requesterValidation.riskLevel
+      riskLevel:
+        requesterValidation.riskLevel === 'high' ? 'medium' : requesterValidation.riskLevel,
     };
 
     // Create P2P transaction request
@@ -317,8 +328,8 @@ export class PeerGroupManager {
       peerNetworkData: {
         relationshipTrustScore: relationship.trustScore,
         commonGroups: commonGroups.length,
-        peerValidation: enhancedRequesterValidation
-      }
+        peerValidation: enhancedRequesterValidation,
+      },
     } as P2PTransaction;
   }
 
@@ -356,7 +367,7 @@ export class PeerGroupManager {
       peerGroups: customerGroups,
       networkStats,
       recentActivity: this.getRecentPeerActivity(customerId),
-      recommendations: this.generatePeerRecommendations(customerId)
+      recommendations: this.generatePeerRecommendations(customerId),
     };
   }
 
@@ -413,7 +424,10 @@ export class PeerGroupManager {
 
   // Private helper methods
 
-  private getDefaultRulesForType(type: PeerGroup['type'], customRules: Partial<PeerGroupRules>): PeerGroupRules {
+  private getDefaultRulesForType(
+    type: PeerGroup['type'],
+    customRules: Partial<PeerGroupRules>
+  ): PeerGroupRules {
     const baseRules: PeerGroupRules = {
       minTrustScore: 70,
       maxMembers: 50,
@@ -421,12 +435,12 @@ export class PeerGroupManager {
       transactionLimits: {
         minAmount: 10,
         maxAmount: 1000,
-        dailyLimit: 5000
+        dailyLimit: 5000,
       },
       vipOnly: false,
       autoApprovalThreshold: 100,
       requireVerification: true,
-      escrowRequired: true
+      escrowRequired: true,
     };
 
     switch (type) {
@@ -462,7 +476,7 @@ export class PeerGroupManager {
           communicationRating: 80,
           reliabilityScore: 85,
           sharedGroups: [],
-          preferredPaymentMethod: 'venmo'
+          preferredPaymentMethod: 'venmo',
         };
 
         const key = this.getRelationshipKey(memberIds[i], memberIds[j]);
@@ -488,7 +502,10 @@ export class PeerGroupManager {
     const paymentStats = this.paymentValidation.getPaymentMethodStats(customerId);
     if (paymentStats[paymentMethod]) {
       // Find other customers with similar payment method usage
-      const similarCustomers = await this.findCustomersWithSimilarPaymentPatterns(customerId, paymentMethod);
+      const similarCustomers = await this.findCustomersWithSimilarPaymentPatterns(
+        customerId,
+        paymentMethod
+      );
       peers.push(...similarCustomers.filter(id => !peers.includes(id)));
     }
 
@@ -545,7 +562,10 @@ export class PeerGroupManager {
     }
 
     // Amount compatibility
-    if (relationship && Math.abs(amount - relationship.averageAmount) / relationship.averageAmount < 0.5) {
+    if (
+      relationship &&
+      Math.abs(amount - relationship.averageAmount) / relationship.averageAmount < 0.5
+    ) {
       score += 10;
       reasons.push(`Amount matches historical average`);
     }
@@ -553,7 +573,10 @@ export class PeerGroupManager {
     return { score: Math.min(Math.max(score, 0), 100), reasons };
   }
 
-  private getPeerRelationship(customerId1: string, customerId2: string): PeerRelationship | undefined {
+  private getPeerRelationship(
+    customerId1: string,
+    customerId2: string
+  ): PeerRelationship | undefined {
     const key1 = this.getRelationshipKey(customerId1, customerId2);
     const key2 = this.getRelationshipKey(customerId2, customerId1);
 
@@ -572,9 +595,7 @@ export class PeerGroupManager {
   }
 
   private getCustomerPeerGroups(customerId: string): PeerGroup[] {
-    return Array.from(this.peerGroups.values()).filter(group =>
-      group.members.includes(customerId)
-    );
+    return Array.from(this.peerGroups.values()).filter(group => group.members.includes(customerId));
   }
 
   private getDirectPeers(customerId: string): PeerRelationship[] {
@@ -594,18 +615,22 @@ export class PeerGroupManager {
     const customerGroups = this.getCustomerPeerGroups(customerId);
 
     const totalPeers = directPeers.length;
-    const averageTrustScore = directPeers.length > 0
-      ? directPeers.reduce((sum, p) => sum + p.trustScore, 0) / directPeers.length
-      : 0;
+    const averageTrustScore =
+      directPeers.length > 0
+        ? directPeers.reduce((sum, p) => sum + p.trustScore, 0) / directPeers.length
+        : 0;
 
     const totalTransactions = directPeers.reduce((sum, p) => sum + p.totalTransactions, 0);
-    const successfulTransactions = directPeers.reduce((sum, p) => sum + p.successfulTransactions, 0);
+    const successfulTransactions = directPeers.reduce(
+      (sum, p) => sum + p.successfulTransactions,
+      0
+    );
     const successRate = totalTransactions > 0 ? successfulTransactions / totalTransactions : 0;
 
     const networkStrength = Math.min(
       (averageTrustScore / 100) * 40 +
-      (successRate * 100) * 0.4 +
-      Math.min(customerGroups.length * 10, 20),
+        successRate * 100 * 0.4 +
+        Math.min(customerGroups.length * 10, 20),
       100
     );
 
@@ -614,7 +639,7 @@ export class PeerGroupManager {
       averageTrustScore: Math.round(averageTrustScore),
       totalTransactions,
       successRate: Math.round(successRate * 100) / 100,
-      networkStrength: Math.round(networkStrength)
+      networkStrength: Math.round(networkStrength),
     };
   }
 
@@ -625,14 +650,14 @@ export class PeerGroupManager {
         type: 'transaction',
         description: 'Completed P2P transaction with peer network',
         timestamp: new Date(Date.now() - 3600000).toISOString(),
-        impact: 5
+        impact: 5,
       },
       {
         type: 'group_join',
         description: 'Joined Venmo Users peer group',
         timestamp: new Date(Date.now() - 86400000).toISOString(),
-        impact: 10
-      }
+        impact: 10,
+      },
     ];
   }
 
@@ -644,8 +669,8 @@ export class PeerGroupManager {
       improvementActions: [
         'Complete more P2P transactions to build trust',
         'Join additional peer groups',
-        'Maintain high success rate'
-      ]
+        'Maintain high success rate',
+      ],
     };
   }
 
@@ -663,7 +688,9 @@ export class PeerGroupManager {
     return groups;
   }
 
-  private groupByPaymentMethodPreferences(customers: CustomerProfile[]): Record<string, CustomerProfile[]> {
+  private groupByPaymentMethodPreferences(
+    customers: CustomerProfile[]
+  ): Record<string, CustomerProfile[]> {
     const groups: Record<string, CustomerProfile[]> = {};
 
     for (const customer of customers) {
@@ -728,10 +755,11 @@ export class PeerGroupManager {
     customerId: string,
     paymentMethod: string
   ): Promise<PeerGroup[]> {
-    return Array.from(this.peerGroups.values()).filter(group =>
-      group.members.includes(customerId) &&
-      group.commonPaymentMethods.includes(paymentMethod) &&
-      group.activityScore > 70
+    return Array.from(this.peerGroups.values()).filter(
+      group =>
+        group.members.includes(customerId) &&
+        group.commonPaymentMethods.includes(paymentMethod) &&
+        group.activityScore > 70
     );
   }
 
@@ -759,8 +787,10 @@ export class PeerGroupManager {
     }
 
     // Amount within group limits
-    if (amount >= group.rules.transactionLimits.minAmount &&
-        amount <= group.rules.transactionLimits.maxAmount) {
+    if (
+      amount >= group.rules.transactionLimits.minAmount &&
+      amount <= group.rules.transactionLimits.maxAmount
+    ) {
       score += 10;
     }
 
@@ -809,10 +839,12 @@ export class PeerGroupManager {
     group.totalVolume += amount;
 
     if (success) {
-      group.successRate = (group.successRate * (group.totalTransactions - 1) + 1) / group.totalTransactions;
+      group.successRate =
+        (group.successRate * (group.totalTransactions - 1) + 1) / group.totalTransactions;
       group.trustScore = Math.min(group.trustScore + 1, 100);
     } else {
-      group.successRate = (group.successRate * (group.totalTransactions - 1)) / group.totalTransactions;
+      group.successRate =
+        (group.successRate * (group.totalTransactions - 1)) / group.totalTransactions;
       group.trustScore = Math.max(group.trustScore - 2, 0);
     }
   }

@@ -111,37 +111,44 @@ export function generateProfileHero(employee: EmployeeData): string {
 /**
  * Generate action buttons
  */
-export function generateActionButtons(buttons: Array<{
-  href: string;
-  label: string;
-  icon: string;
-  className?: string;
-  onclick?: string;
-}>): string {
+export function generateActionButtons(
+  buttons: Array<{
+    href: string;
+    label: string;
+    icon: string;
+    className?: string;
+    onclick?: string;
+  }>
+): string {
   return buttons
-    .map(button => `
+    .map(
+      button => `
       <a href="${button.href}"
          class="action-btn ${button.className || 'primary'}"
          ${button.onclick ? `onclick="${button.onclick}"` : ''}>
         <span class="icon">${button.icon}</span>
         <span>${button.label}</span>
       </a>
-    `)
+    `
+    )
     .join('');
 }
 
 /**
  * Generate tool cards
  */
-export function generateToolCards(tools: Array<{
-  icon: string;
-  title: string;
-  description: string;
-  url: string;
-  onclick?: string;
-}>): string {
+export function generateToolCards(
+  tools: Array<{
+    icon: string;
+    title: string;
+    description: string;
+    url: string;
+    onclick?: string;
+  }>
+): string {
   return tools
-    .map(tool => `
+    .map(
+      tool => `
       <div class="tool-card">
         <div class="tool-icon">${tool.icon}</div>
         <div class="tool-title">${tool.title}</div>
@@ -150,28 +157,33 @@ export function generateToolCards(tools: Array<{
           ${tool.title}
         </a>
       </div>
-    `)
+    `
+    )
     .join('');
 }
 
 /**
  * Generate metric grid
  */
-export function generateMetricGrid(metrics: Array<{
-  icon: string;
-  value: string;
-  label: string;
-}>): string {
+export function generateMetricGrid(
+  metrics: Array<{
+    icon: string;
+    value: string;
+    label: string;
+  }>
+): string {
   return `
     <div class="metric-grid">
       ${metrics
-        .map(metric => `
+        .map(
+          metric => `
           <div class="metric-item">
             <div class="metric-icon">${metric.icon}</div>
             <div class="metric-value">${metric.value}</div>
             <div class="metric-label">${metric.label}</div>
           </div>
-        `)
+        `
+        )
         .join('')}
     </div>
   `;

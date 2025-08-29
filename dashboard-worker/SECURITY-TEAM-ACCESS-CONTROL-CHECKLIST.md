@@ -3,14 +3,16 @@
 **Document Classification:** INTERNAL - Fire22 Security Operations  
 **Audience:** Department Team Leads  
 **Version:** 1.0  
-**Date:** August 28, 2025  
+**Date:** August 28, 2025
 
 ---
 
 ## ✅ **Pre-Distribution Security Checklist**
 
 ### **🔐 Secure Storage Verification**
+
 - [ ] **Bun.secrets Integration Tested**
+
   - [ ] macOS Keychain Services operational
   - [ ] Linux libsecret/GNOME Keyring functional
   - [ ] Windows Credential Manager accessible
@@ -23,7 +25,9 @@
   - [ ] Backup encryption keys stored in separate secure location
 
 ### **🔑 Key Generation Compliance**
+
 - [ ] **RSA 4096-bit Keys Generated**
+
   - [ ] Primary key: RSA 4096-bit with signing capability
   - [ ] Subkey: RSA 4096-bit for encryption
   - [ ] Expiration set (1-2 years maximum)
@@ -36,7 +40,9 @@
   - [ ] Private key securely stored with access logging
 
 ### **👥 Team Member Key Validation**
+
 - [ ] **Individual Member Keys**
+
   - [ ] Each team member has unique GPG key pair
   - [ ] Keys signed by department team lead master key
   - [ ] Member email addresses match Fire22 domain (@fire22.ag)
@@ -53,7 +59,9 @@
 ## 📋 **Distribution Method Security Checklist**
 
 ### **🔒 Method 1: Secure Email Distribution**
+
 - [ ] **Email Security Requirements**
+
   - [ ] Recipient public key obtained and verified
   - [ ] GPG encryption applied to email content and attachments
   - [ ] Email sent from secure Fire22 domain
@@ -66,7 +74,9 @@
   - [ ] Digital signature applied to all attachments
 
 ### **💬 Method 2: Slack Encrypted Messages**
+
 - [ ] **Slack Channel Security**
+
   - [ ] Private department security channel created (#dept-security)
   - [ ] End-to-end encryption enabled
   - [ ] Auto-deletion set to 24 hours maximum
@@ -79,7 +89,9 @@
   - [ ] Verification hash included for integrity checking
 
 ### **📱 Method 3: In-Person QR Code Exchange**
+
 - [ ] **QR Code Generation Security**
+
   - [ ] Time-limited QR codes (30-minute maximum expiration)
   - [ ] Meeting location secured and private
   - [ ] QR code content encrypted with session-specific key
@@ -92,7 +104,9 @@
   - [ ] QR code automatically deleted after successful scan
 
 ### **🔐 Method 4: Hardware Security Key Distribution**
+
 - [ ] **Hardware Token Security**
+
   - [ ] YubiKey or equivalent hardware security module
   - [ ] GPG key stored on hardware token with PIN protection
   - [ ] Token configured for Fire22 domain authentication
@@ -109,7 +123,9 @@
 ## 🔍 **Post-Distribution Verification Checklist**
 
 ### **✅ Recipient Configuration Verification**
+
 - [ ] **Git Configuration Validated**
+
   - [ ] `git config --global user.signingkey [KEY-ID]` set correctly
   - [ ] `git config --global commit.gpgsign true` enabled
   - [ ] `git config --global gpg.program gpg` configured
@@ -122,7 +138,9 @@
   - [ ] Key fingerprint matches expected value
 
 ### **🛡️ Security Compliance Verification**
+
 - [ ] **Access Control Validation**
+
   - [ ] Recipient has appropriate role permissions
   - [ ] Two-factor authentication enabled on recipient accounts
   - [ ] Biometric verification configured where available
@@ -139,7 +157,9 @@
 ## 🚨 **Emergency Response Procedures**
 
 ### **⚠️ Compromised Key Response**
+
 - [ ] **Immediate Actions**
+
   - [ ] Key revocation certificate generated and published
   - [ ] All team members notified via secure channel
   - [ ] Git commits using compromised key identified
@@ -152,7 +172,9 @@
   - [ ] Security incident report filed
 
 ### **🔄 Lost Access Recovery**
+
 - [ ] **Identity Verification**
+
   - [ ] Multi-factor identity verification completed
   - [ ] Manager approval obtained for key replacement
   - [ ] Security team notification sent
@@ -169,7 +191,9 @@
 ## 📊 **Compliance Monitoring Dashboard**
 
 ### **📈 Key Distribution Metrics**
+
 - [ ] **Distribution Success Rate**
+
   - [ ] Track successful distributions per method
   - [ ] Monitor failed distribution attempts
   - [ ] Measure time-to-completion for each method
@@ -182,7 +206,9 @@
   - [ ] Analyze security breach root causes
 
 ### **🎯 Compliance KPIs**
+
 - [ ] **Team Coverage Metrics**
+
   - [ ] Percentage of team members with valid GPG keys
   - [ ] Expiration date monitoring and alerts
   - [ ] Key rotation compliance tracking
@@ -199,6 +225,7 @@
 ## 🔧 **Team Lead Implementation Commands**
 
 ### **Pre-Distribution Setup**
+
 ```bash
 # Verify Bun.secrets integration
 bun run gpg:verify-storage --comprehensive
@@ -211,6 +238,7 @@ bun run gpg:validate-encryption --audit-trail
 ```
 
 ### **Distribution Execution**
+
 ```bash
 # Execute secure distribution workflow
 bun run gpg:distribute-secure --department=[dept] --method=[method] --verify
@@ -223,6 +251,7 @@ bun run gpg:verify-distribution --department=[dept] --comprehensive
 ```
 
 ### **Post-Distribution Validation**
+
 ```bash
 # Verify all team member configurations
 bun run gpg:verify-team-config --department=[dept] --test-commits
@@ -239,12 +268,14 @@ bun run gpg:monitor-compliance --department=[dept] --dashboard
 ## 📞 **Support Contacts**
 
 ### **Primary Support Channels:**
+
 - **Security Team Lead:** security-lead@fire22.ag (Priority response: 2 hours)
-- **Infrastructure Team Lead:** infra-lead@fire22.ag (Technical issues: 4 hours)  
+- **Infrastructure Team Lead:** infra-lead@fire22.ag (Technical issues: 4 hours)
 - **DevOps Team Lead:** devops-lead@fire22.ag (Git/CI issues: 4 hours)
 - **Security Head:** security-head@fire22.ag (Emergencies: 24/7 hotline)
 
 ### **Emergency Escalation:**
+
 - **Level 1:** Team Lead (GPG/distribution issues)
 - **Level 2:** Security Team Lead (Compliance/security issues)
 - **Level 3:** Security Head (Emergencies/breaches)
@@ -252,7 +283,9 @@ bun run gpg:monitor-compliance --department=[dept] --dashboard
 
 ---
 
-**🔐 Team leads must complete this entire checklist before distributing GPG keys to team members. Each item must be verified and documented for security compliance.**
+**🔐 Team leads must complete this entire checklist before distributing GPG keys
+to team members. Each item must be verified and documented for security
+compliance.**
 
 **Document Owner:** Fire22 Security Team  
 **Review Cycle:** Weekly  

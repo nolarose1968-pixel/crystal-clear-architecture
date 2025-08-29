@@ -1,15 +1,19 @@
 # 🔐 Enhanced Security Integration for Fire22 Dashboard
 
-This document provides comprehensive guidance on using the enhanced security features integrated with your existing Fire22 security infrastructure.
+This document provides comprehensive guidance on using the enhanced security
+features integrated with your existing Fire22 security infrastructure.
 
 ## 🚀 Overview
 
-The Enhanced Security Integration extends your existing Fire22 security infrastructure with:
+The Enhanced Security Integration extends your existing Fire22 security
+infrastructure with:
 
-- **Bun.secrets Integration**: Native OS credential storage for enhanced security
+- **Bun.secrets Integration**: Native OS credential storage for enhanced
+  security
 - **Enhanced Security Scanning**: Comprehensive dependency and policy scanning
 - **Secure Deployment Pipeline**: Pre and post-deployment security validation
-- **Interactive Security Setup**: Wizard-based configuration for all security features
+- **Interactive Security Setup**: Wizard-based configuration for all security
+  features
 
 ## 📋 Prerequisites
 
@@ -83,12 +87,12 @@ bun run enhanced:scan help
 
 The scanner enforces these Fire22 security policies:
 
-| Policy | Severity | Description | Exceptions |
-|--------|----------|-------------|------------|
-| `telegram-bot-security` | High | Telegram bot packages require security review | `@fire22/telegram-*` |
-| `dashboard-security` | High | Dashboard and auth packages require review | `@fire22/dashboard-*`, `@fire22/auth-*` |
-| `financial-security` | Critical | Financial packages require strict review | `@fire22/payment-*`, `@fire22/financial-*` |
-| `database-security` | High | Database packages require review | `@fire22/database-*`, `@fire22/orm-*` |
+| Policy                  | Severity | Description                                   | Exceptions                                 |
+| ----------------------- | -------- | --------------------------------------------- | ------------------------------------------ |
+| `telegram-bot-security` | High     | Telegram bot packages require security review | `@fire22/telegram-*`                       |
+| `dashboard-security`    | High     | Dashboard and auth packages require review    | `@fire22/dashboard-*`, `@fire22/auth-*`    |
+| `financial-security`    | Critical | Financial packages require strict review      | `@fire22/payment-*`, `@fire22/financial-*` |
+| `database-security`     | High     | Database packages require review              | `@fire22/database-*`, `@fire22/orm-*`      |
 
 ## 🔐 Enhanced Secure Configuration
 
@@ -134,7 +138,8 @@ The system uses multiple storage backends with fallback:
 
 All credentials are validated before storage:
 
-- **Telegram Bot Tokens**: Format validation (`123456789:ABCdefGHIjklMNOpqrsTUVwxyz`)
+- **Telegram Bot Tokens**: Format validation
+  (`123456789:ABCdefGHIjklMNOpqrsTUVwxyz`)
 - **JWT Secrets**: Minimum length (32 characters)
 - **Database URLs**: PostgreSQL format validation
 - **API Tokens**: Fire22 format validation (`f22_*`)
@@ -169,21 +174,21 @@ bun run scripts/categories/deploy/enhanced-deploy-with-security.ts production 2.
 
 ### Deployment Strategies
 
-| Strategy | Description | Security Level |
-|----------|-------------|----------------|
-| `secure-rolling` | Rolling deployment with enhanced security | Enhanced |
-| `blue-green` | Blue-green deployment with security validation | Enhanced |
-| `rolling` | Standard rolling deployment with security checks | Standard |
-| `canary` | Canary deployment with security monitoring | Enhanced |
-| `recreate` | Recreate deployment with security validation | Standard |
+| Strategy         | Description                                      | Security Level |
+| ---------------- | ------------------------------------------------ | -------------- |
+| `secure-rolling` | Rolling deployment with enhanced security        | Enhanced       |
+| `blue-green`     | Blue-green deployment with security validation   | Enhanced       |
+| `rolling`        | Standard rolling deployment with security checks | Standard       |
+| `canary`         | Canary deployment with security monitoring       | Enhanced       |
+| `recreate`       | Recreate deployment with security validation     | Standard       |
 
 ### Security Levels
 
-| Level | Description | Features |
-|-------|-------------|----------|
-| `standard` | Basic security checks | Pre-deployment scan, credential validation |
-| `enhanced` | Comprehensive security (default) | All standard + policy compliance, dependency analysis |
-| `strict` | Maximum security | All enhanced + additional validations, security monitoring |
+| Level      | Description                      | Features                                                   |
+| ---------- | -------------------------------- | ---------------------------------------------------------- |
+| `standard` | Basic security checks            | Pre-deployment scan, credential validation                 |
+| `enhanced` | Comprehensive security (default) | All standard + policy compliance, dependency analysis      |
+| `strict`   | Maximum security                 | All enhanced + additional validations, security monitoring |
 
 ## 📊 Security Monitoring and Reporting
 
@@ -214,7 +219,8 @@ bun run enhanced:scan
 
 ### From Existing Security Infrastructure
 
-The enhanced security system integrates seamlessly with your existing Fire22 security:
+The enhanced security system integrates seamlessly with your existing Fire22
+security:
 
 ```bash
 # Migrate existing credentials
@@ -272,11 +278,11 @@ Customize which security checks run:
 ```typescript
 const config = {
   securityChecks: {
-    preDeploy: true,        // Pre-deployment security scan
-    postDeploy: true,       // Post-deployment validation
-    dependencyScan: true,   // Package vulnerability scan
-    credentialValidation: true  // Credential access validation
-  }
+    preDeploy: true, // Pre-deployment security scan
+    postDeploy: true, // Post-deployment validation
+    dependencyScan: true, // Package vulnerability scan
+    credentialValidation: true, // Credential access validation
+  },
 };
 ```
 
@@ -339,19 +345,21 @@ bun --debug run enhanced:scan
 ```typescript
 class EnhancedConfigManager {
   // Setup enhanced configuration
-  async setupEnhancedConfig(config: Partial<EnhancedSecureConfig>): Promise<void>
-  
+  async setupEnhancedConfig(
+    config: Partial<EnhancedSecureConfig>
+  ): Promise<void>;
+
   // Retrieve configuration
-  async getEnhancedConfig(): Promise<Partial<EnhancedSecureConfig>>
-  
+  async getEnhancedConfig(): Promise<Partial<EnhancedSecureConfig>>;
+
   // Security audit
-  async auditEnhancedSecurity(): Promise<void>
-  
+  async auditEnhancedSecurity(): Promise<void>;
+
   // Migrate credentials
-  async migrateToEnhancedStorage(): Promise<void>
-  
+  async migrateToEnhancedStorage(): Promise<void>;
+
   // Clear configuration
-  async clearEnhancedConfig(): Promise<void>
+  async clearEnhancedConfig(): Promise<void>;
 }
 ```
 
@@ -360,13 +368,13 @@ class EnhancedConfigManager {
 ```typescript
 class EnhancedSecurityScanner {
   // Perform comprehensive security scan
-  async performEnhancedScan(): Promise<EnhancedScanResult>
-  
+  async performEnhancedScan(): Promise<EnhancedScanResult>;
+
   // Generate security report
-  generateEnhancedReport(result: EnhancedScanResult): void
-  
+  generateEnhancedReport(result: EnhancedScanResult): void;
+
   // Integrate with existing security
-  async integrateWithFire22Security(): Promise<void>
+  async integrateWithFire22Security(): Promise<void>;
 }
 ```
 
@@ -379,22 +387,25 @@ export async function deployWithEnhancedSecurity(
   version: string = '1.0.0',
   strategy: string = 'secure-rolling',
   securityLevel: string = 'enhanced'
-): Promise<void>
+): Promise<void>;
 ```
 
 ## 🚀 Best Practices
 
 ### Security Configuration
 
-1. **Use Enhanced Security by Default**: Always use `enhanced` or `strict` security levels
+1. **Use Enhanced Security by Default**: Always use `enhanced` or `strict`
+   security levels
 2. **Regular Security Scans**: Run `bun run enhanced:scan` before deployments
 3. **Credential Rotation**: Regularly update stored credentials
-4. **Policy Compliance**: Ensure all packages comply with Fire22 security policies
+4. **Policy Compliance**: Ensure all packages comply with Fire22 security
+   policies
 
 ### Deployment Security
 
 1. **Pre-deployment Validation**: Always run security checks before deployment
-2. **Environment Isolation**: Use different security levels for different environments
+2. **Environment Isolation**: Use different security levels for different
+   environments
 3. **Monitoring**: Enable post-deployment security validation
 4. **Documentation**: Document security decisions and configurations
 

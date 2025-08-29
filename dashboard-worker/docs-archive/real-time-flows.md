@@ -1,9 +1,12 @@
 # Fire22 Dashboard Real-Time Flows
 
 ## Overview
-Complete documentation of real-time data flows, WebSocket implementations, and live data streaming in the Fire22 Dashboard system.
+
+Complete documentation of real-time data flows, WebSocket implementations, and
+live data streaming in the Fire22 Dashboard system.
 
 ## Table of Contents
+
 - [Real-Time Architecture](#real-time-architecture)
 - [WebSocket Implementation](#websocket-implementation)
 - [Event System](#event-system)
@@ -20,6 +23,7 @@ Complete documentation of real-time data flows, WebSocket implementations, and l
 ## Real-Time Architecture
 
 ### System Overview
+
 ```
 [Data Sources] → [Event Bus] → [WebSocket Server] → [Client Applications]
       ↓              ↓              ↓                    ↓
@@ -31,13 +35,16 @@ Complete documentation of real-time data flows, WebSocket implementations, and l
 ```
 
 ### Core Components
+
 1. **Event Bus**
+
    - Database change triggers
    - Business logic events
    - System notifications
    - External webhooks
 
 2. **WebSocket Server**
+
    - Connection management
    - Event broadcasting
    - Session handling
@@ -54,24 +61,25 @@ Complete documentation of real-time data flows, WebSocket implementations, and l
 ## WebSocket Implementation
 
 ### Connection Lifecycle
+
 ```mermaid
 sequenceDiagram
     participant C as Client
     participant W as WebSocket Server
     participant A as Auth Service
     participant E as Event System
-    
+
     C->>W: WebSocket Connection Request
     W->>A: Validate Authentication Token
     A->>W: Authentication Result
-    
+
     alt Authentication Success
         W->>C: Connection Established
         C->>W: Subscribe to Events
         W->>E: Register Client Subscription
         E->>W: Confirmation
         W->>C: Subscription Confirmed
-        
+
         loop Real-time Updates
             E->>W: Event Data
             W->>C: Broadcast Update
@@ -82,18 +90,21 @@ sequenceDiagram
 ```
 
 ### WebSocket Message Types
+
 ```typescript
 interface WebSocketMessage {
   type: 'tick' | 'update' | 'alert' | 'notification' | 'error';
   timestamp: string;
   data: any;
-  target?: string;        // Specific client or broadcast
+  target?: string; // Specific client or broadcast
   priority?: 'low' | 'normal' | 'high' | 'critical';
 }
 ```
 
 ### Connection Management
+
 1. **Connection Pooling**
+
    - Maximum connections per server
    - Connection timeout settings
    - Heartbeat monitoring
@@ -110,13 +121,16 @@ interface WebSocketMessage {
 ## Event System
 
 ### Event Types
+
 1. **Data Change Events**
+
    - Database record updates
    - New record creation
    - Record deletion
    - Bulk operations
 
 2. **Business Logic Events**
+
    - Wager placement
    - Payment processing
    - Risk alerts
@@ -129,6 +143,7 @@ interface WebSocketMessage {
    - Security warnings
 
 ### Event Structure
+
 ```typescript
 interface Event {
   id: string;
@@ -146,6 +161,7 @@ interface Event {
 ```
 
 ### Event Routing
+
 ```
 Event Source → Event Bus → Event Handlers → WebSocket Server → Clients
      ↓           ↓           ↓              ↓              ↓
@@ -158,6 +174,7 @@ Event Source → Event Bus → Event Handlers → WebSocket Server → Clients
 ## Data Streaming
 
 ### Real-Time Data Pipeline
+
 ```mermaid
 graph TD
     A[Data Source] --> B[Change Detection]
@@ -166,20 +183,23 @@ graph TD
     D --> E[Data Transformation]
     E --> F[WebSocket Broadcast]
     F --> G[Client Update]
-    
+
     B --> H[Database Triggers]
     B --> I[Polling Services]
     B --> J[Webhook Listeners]
 ```
 
 ### Data Flow Types
+
 1. **Continuous Streams**
+
    - Live KPI updates
    - Real-time metrics
    - Performance monitoring
    - System health
 
 2. **Event-Driven Updates**
+
    - User actions
    - System events
    - External notifications
@@ -196,6 +216,7 @@ graph TD
 ## Real-Time Updates
 
 ### KPI Real-Time Updates
+
 ```typescript
 interface KPIUpdate {
   type: 'kpi_update';
@@ -216,6 +237,7 @@ interface KPIUpdate {
 ```
 
 ### Wager Real-Time Updates
+
 ```typescript
 interface WagerUpdate {
   type: 'wager_update';
@@ -232,6 +254,7 @@ interface WagerUpdate {
 ```
 
 ### Activity Real-Time Updates
+
 ```typescript
 interface ActivityUpdate {
   type: 'activity_update';
@@ -252,7 +275,9 @@ interface ActivityUpdate {
 ## Performance Optimization
 
 ### Connection Optimization
+
 1. **Connection Pooling**
+
    - Reuse connections
    - Limit concurrent connections
    - Implement connection timeouts
@@ -265,7 +290,9 @@ interface ActivityUpdate {
    - Use efficient serialization
 
 ### Data Optimization
+
 1. **Delta Updates**
+
    - Send only changes
    - Implement change detection
    - Use efficient diffing
@@ -278,7 +305,9 @@ interface ActivityUpdate {
    - Smart cache updates
 
 ### Network Optimization
+
 1. **Compression**
+
    - Message compression
    - Connection compression
    - Efficient encoding
@@ -295,6 +324,7 @@ interface ActivityUpdate {
 ## Error Handling
 
 ### Connection Errors
+
 ```typescript
 interface ConnectionError {
   type: 'connection_error';
@@ -307,7 +337,9 @@ interface ConnectionError {
 ```
 
 ### Error Recovery Strategies
+
 1. **Automatic Reconnection**
+
    - Exponential backoff
    - Maximum retry attempts
    - Connection health checks
@@ -320,13 +352,16 @@ interface ConnectionError {
    - Sync on reconnect
 
 ### Error Categories
+
 1. **Network Errors**
+
    - Connection failures
    - Timeout errors
    - Network interruptions
    - Server unavailability
 
 2. **Authentication Errors**
+
    - Token expiration
    - Invalid credentials
    - Permission denied
@@ -343,7 +378,9 @@ interface ConnectionError {
 ## Security Considerations
 
 ### WebSocket Security
+
 1. **Authentication**
+
    - JWT token validation
    - Session management
    - Permission checking
@@ -356,7 +393,9 @@ interface ConnectionError {
    - Output sanitization
 
 ### Security Measures
+
 1. **Connection Security**
+
    - WSS (WebSocket Secure)
    - Certificate validation
    - TLS encryption
@@ -373,13 +412,16 @@ interface ConnectionError {
 ## Monitoring and Analytics
 
 ### Real-Time Metrics
+
 1. **Connection Metrics**
+
    - Active connections
    - Connection rate
    - Disconnection rate
    - Connection duration
 
 2. **Performance Metrics**
+
    - Message latency
    - Throughput
    - Error rates
@@ -392,6 +434,7 @@ interface ConnectionError {
    - Data freshness
 
 ### Monitoring Tools
+
 - **Real-time Dashboards**: Live system status
 - **Alert Systems**: Automated notifications
 - **Logging**: Comprehensive event logs
@@ -402,7 +445,9 @@ interface ConnectionError {
 ## Scalability
 
 ### Horizontal Scaling
+
 1. **Load Balancing**
+
    - Distribute connections
    - Geographic distribution
    - Health monitoring
@@ -415,7 +460,9 @@ interface ConnectionError {
    - Data consistency
 
 ### Vertical Scaling
+
 1. **Resource Optimization**
+
    - Memory management
    - CPU optimization
    - Network efficiency
@@ -432,26 +479,22 @@ interface ConnectionError {
 ## Implementation Examples
 
 ### WebSocket Server Setup
-```typescript
+
+````typescript
 ```javascript
 import { WebSocketServer } from 'ws';
-```
+````
 
-const wss = new WebSocketServer({
-  port: 8080,
-  perMessageDeflate: true,
-  maxPayload: 1024 * 1024, // 1MB
+const wss = new WebSocketServer({ port: 8080, perMessageDeflate: true,
+maxPayload: 1024 \* 1024, // 1MB });
+
+wss.on('connection', (ws, request) => { // Handle new connection
+handleConnection(ws, request); });
+
+wss.on('error', (error) => { console.error('WebSocket Server Error:', error);
 });
 
-wss.on('connection', (ws, request) => {
-  // Handle new connection
-  handleConnection(ws, request);
-});
-
-wss.on('error', (error) => {
-  console.error('WebSocket Server Error:', error);
-});
-```
+````
 
 ### Event Broadcasting
 ```typescript
@@ -465,8 +508,9 @@ function broadcastEvent(event: Event, target?: string) {
     }
   });
 }
-```
-```
+````
+
+````
 
 ### Client Connection Handler
 ```typescript
@@ -475,27 +519,28 @@ function handleConnection(ws: WebSocket, request: IncomingMessage) {
   // Authenticate connection
   const token = extractToken(request);
   const user = validateToken(token);
-  
+
   if (!user) {
     ws.close(1008, 'Authentication failed');
     return;
   }
-  
+
   // Set up client
   ws.userId = user.id;
   ws.subscriptions = [];
-  
+
   // Handle messages
   ws.on('message', (data) => {
     handleMessage(ws, data);
   });
-  
+
   // Handle disconnection
   ws.on('close', () => {
     handleDisconnection(ws);
   });
 }
-```
+````
+
 ```
 
 ---
@@ -575,3 +620,4 @@ function handleConnection(ws: WebSocket, request: IncomingMessage) {
 *Last Updated: 2024-01-20*
 *Version: 1.0*
 *Maintainer: Fire22 Development Team*
+```

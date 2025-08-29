@@ -2,7 +2,8 @@
 
 ## Water Dashboard - Bun HMR Enhanced Edition
 
-This guide demonstrates Bun's Hot Module Replacement capabilities with state persistence, real-time updates, and comprehensive error tracking.
+This guide demonstrates Bun's Hot Module Replacement capabilities with state
+persistence, real-time updates, and comprehensive error tracking.
 
 ## 🚀 **Quick Start**
 
@@ -18,8 +19,9 @@ Server will start at: **http://localhost:3000**
 ### 2. Open Multiple Browser Tabs
 
 Open the dashboard in multiple browser tabs to see synchronized updates:
+
 - Main Dashboard: http://localhost:3000
-- Health Check: http://localhost:3000/health  
+- Health Check: http://localhost:3000/health
 - Metrics API: http://localhost:3000/api/metrics
 
 ## 🔥 **HMR Features Demonstrated**
@@ -30,12 +32,12 @@ The dashboard preserves state during hot reloads:
 
 ```typescript
 // This state survives hot reloads!
-const dashboardState = import.meta.hot.data.state ??= {
+const dashboardState = (import.meta.hot.data.state ??= {
   metrics: { activeLogs: 1245789, cacheHits: 12456 },
   errors: new Map(),
   timezone: 'America/New_York',
-  updateCount: 0
-};
+  updateCount: 0,
+});
 ```
 
 ### **Real-time HMR Event Handling**
@@ -43,22 +45,22 @@ const dashboardState = import.meta.hot.data.state ??= {
 ```typescript
 if (import.meta.hot) {
   // Save state before updates
-  import.meta.hot.on("bun:beforeUpdate", () => {
+  import.meta.hot.on('bun:beforeUpdate', () => {
     dashboardState.updateCount++;
-    console.log("📦 Preserving state...");
+    console.log('📦 Preserving state...');
   });
-  
-  // Restore state after updates  
-  import.meta.hot.on("bun:afterUpdate", () => {
-    console.log("✅ State restored!");
-    showNotification("🔥 Hot reload applied!");
+
+  // Restore state after updates
+  import.meta.hot.on('bun:afterUpdate', () => {
+    console.log('✅ State restored!');
+    showNotification('🔥 Hot reload applied!');
   });
-  
+
   // WebSocket connection events
-  import.meta.hot.on("bun:ws:connect", () => {
-    showNotification("🟢 HMR connected");
+  import.meta.hot.on('bun:ws:connect', () => {
+    showNotification('🟢 HMR connected');
   });
-  
+
   // Accept hot updates
   import.meta.hot.accept();
 }
@@ -129,7 +131,7 @@ if (import.meta.hot) {
 
 ```bash
 🔥 HMR enabled for dashboard client
-📦 Preserving state before HMR update  
+📦 Preserving state before HMR update
 ✅ State restored after HMR update
 🟢 HMR WebSocket connected
 ❌ HMR Error: [error details]
@@ -162,7 +164,7 @@ import.meta.hot.accept(newModule => {
 
 ```typescript
 // Accept updates for specific dependencies
-import.meta.hot.accept('./utils', (newUtils) => {
+import.meta.hot.accept('./utils', newUtils => {
   // Handle utils module updates
   updateUtilities(newUtils);
 });
@@ -180,7 +182,7 @@ import.meta.hot.accept('./utils', (newUtils) => {
 ### **Bun-Specific Advantages**
 
 - **Native TypeScript**: No transpilation needed
-- **SIMD-optimized**: Ultra-fast file watching and rebuilds  
+- **SIMD-optimized**: Ultra-fast file watching and rebuilds
 - **Built-in WebSocket**: HMR communication built into runtime
 - **Zero config**: HMR works out of the box with `development: { hmr: true }`
 
@@ -206,7 +208,7 @@ src/
 ### **State Not Persisting?**
 
 1. **Check import.meta.hot.data usage**: Must use `??=` pattern
-2. **Verify accept() call**: Must call `import.meta.hot.accept()`  
+2. **Verify accept() call**: Must call `import.meta.hot.accept()`
 3. **Resource cleanup**: Implement dispose handlers for cleanup
 
 ### **Build Errors?**
@@ -220,7 +222,7 @@ src/
 Try these advanced HMR scenarios:
 
 1. **Multi-file updates**: Edit multiple connected files
-2. **CSS hot reloading**: Update styles without losing state  
+2. **CSS hot reloading**: Update styles without losing state
 3. **API hot reloading**: Update server endpoints live
 4. **Database schema changes**: Apply migrations during development
 5. **Component tree preservation**: Update React/Vue components
@@ -244,6 +246,6 @@ You've successfully implemented HMR when you see:
 ✅ **WebSocket connection** working  
 ✅ **Console messages** showing HMR events  
 ✅ **Visual notifications** in UI  
-✅ **Metrics continuity** during updates  
+✅ **Metrics continuity** during updates
 
 **Happy Hot Reloading! 🔥**

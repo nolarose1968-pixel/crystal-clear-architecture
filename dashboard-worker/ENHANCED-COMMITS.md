@@ -2,17 +2,20 @@
 
 ## ✅ **IMPLEMENTED** - Option A Complete
 
-All commits are now tracked with department attribution and Fire22 company emails!
+All commits are now tracked with department attribution and Fire22 company
+emails!
 
 ## 🎯 Quick Start
 
 ### Setup (One-time)
+
 ```bash
 # Install the enhanced commit system
 bun run commit:setup
 ```
 
 ### Generate Commit Messages
+
 ```bash
 # Basic commit
 bun run commit:template -d finance -t feat -m "implement transaction monitoring"
@@ -28,8 +31,9 @@ bun run commit:help
 ## 📋 Enhanced Commit Format
 
 Every commit now includes:
+
 - ✅ **Department Attribution** with lead contact
-- ✅ **Fire22 Company Emails** (@dept.fire22 format)  
+- ✅ **Fire22 Company Emails** (@dept.fire22 format)
 - ✅ **Contributors List** with email addresses
 - ✅ **L-Key Integration** for language key tracking
 - ✅ **Automatic Validation** via git hooks
@@ -37,10 +41,13 @@ Every commit now includes:
 ## 🏢 Department Examples
 
 ### 💰 Finance Department
+
 ```bash
 bun run commit:template -d finance -t feat -m "implement L-69 transaction tracking"
 ```
+
 **Output:**
+
 ```
 feat(finance): implement L-69 transaction tracking
 
@@ -54,11 +61,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 ### 🎧 Customer Support
+
 ```bash
 bun run commit:template -d support -t fix -m "resolve ticket assignment bug" \
   -c "Alex Wilson"
 ```
+
 **Output:**
+
 ```
 fix(support): resolve ticket assignment bug
 
@@ -72,15 +82,18 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 ### ⚙️ Operations (Betting L-Keys)
+
 ```bash
 bun run commit:template -d operations -t feat -m "enhance live betting system" \
   -l "L-12,L-15,L-16,L-85,L-1390"
 ```
+
 **Output:**
+
 ```
 feat(operations): enhance live betting system
 
-Department: Operations  
+Department: Operations
 Lead: David Martinez <david.martinez@operations.fire22>
 L-Keys: L-12, L-15, L-16, L-85, L-1390
 
@@ -93,42 +106,50 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ### **All Departments & Leads:**
 
-| Department | Lead | Email | L-Keys |
-|------------|------|-------|--------|
-| 💰 **Finance** | John Smith | john.smith@finance.fire22 | L-69, L-627, L-628, L-187, L-202, L-206 |
-| 🎧 **Support** | Emily Davis | emily.davis@support.fire22 | L-301, L-302, L-303 |
-| ⚖️ **Compliance** | Lisa Anderson | lisa.anderson@compliance.fire22 | L-401, L-402, L-403 |
-| ⚙️ **Operations** | David Martinez | david.martinez@operations.fire22 | L-12, L-15, L-16, L-85, L-1390 |
-| 💻 **Technology** | Chris Brown | chris.brown@tech.fire22 | L-501, L-502, L-503 |
-| 📈 **Marketing** | Michelle Rodriguez | michelle.rodriguez@marketing.fire22 | L-601, L-602, L-603 |
-| 👔 **Management** | William Harris | william.harris@exec.fire22 | L-701, L-702, L-703 |
-| 👥 **Contributors** | Alex Chen | alex.chen@team.fire22 | L-801, L-802, L-803 |
+| Department          | Lead               | Email                               | L-Keys                                  |
+| ------------------- | ------------------ | ----------------------------------- | --------------------------------------- |
+| 💰 **Finance**      | John Smith         | john.smith@finance.fire22           | L-69, L-627, L-628, L-187, L-202, L-206 |
+| 🎧 **Support**      | Emily Davis        | emily.davis@support.fire22          | L-301, L-302, L-303                     |
+| ⚖️ **Compliance**   | Lisa Anderson      | lisa.anderson@compliance.fire22     | L-401, L-402, L-403                     |
+| ⚙️ **Operations**   | David Martinez     | david.martinez@operations.fire22    | L-12, L-15, L-16, L-85, L-1390          |
+| 💻 **Technology**   | Chris Brown        | chris.brown@tech.fire22             | L-501, L-502, L-503                     |
+| 📈 **Marketing**    | Michelle Rodriguez | michelle.rodriguez@marketing.fire22 | L-601, L-602, L-603                     |
+| 👔 **Management**   | William Harris     | william.harris@exec.fire22          | L-701, L-702, L-703                     |
+| 👥 **Contributors** | Alex Chen          | alex.chen@team.fire22               | L-801, L-802, L-803                     |
 
 ### **Team Members by Department:**
 
 **Finance:**
+
 - Sarah Johnson <sarah.johnson@finance.fire22>
 - Mike Chen <mike.chen@finance.fire22>
 
 **Support:**
+
 - Alex Wilson <alex.wilson@support.fire22>
 
 **Compliance:**
+
 - Robert Taylor <robert.taylor@compliance.fire22>
 
 **Operations:**
+
 - Jennifer Lee <jennifer.lee@operations.fire22>
 
 **Technology:**
+
 - Amanda Garcia <amanda.garcia@tech.fire22>
 
 **Marketing:**
+
 - Kevin Thompson <kevin.thompson@marketing.fire22>
 
 **Management:**
+
 - Patricia Clark <patricia.clark@exec.fire22>
 
 **Contributors:**
+
 - Jordan Taylor <jordan.taylor@team.fire22>
 - Sam Wilson <sam.wilson@team.fire22>
 - Morgan Lee <morgan.lee@team.fire22>
@@ -137,18 +158,21 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ## 🔧 Advanced Usage
 
 ### Custom Contributors
+
 ```bash
 bun run commit:template -d technology -t feat -m "integrate third-party API" \
   --custom "External Dev<dev@vendor.com>,Consultant<expert@consulting.com>"
 ```
 
 ### Multiple L-Keys
+
 ```bash
 bun run commit:template -d finance -t feat -m "complete transaction system" \
   -l "L-69,L-627,L-628,L-187,L-202,L-206"
 ```
 
 ### Complex Example
+
 ```bash
 bun run commit:template \
   --department operations \
@@ -162,6 +186,7 @@ bun run commit:template \
 ## 🎖️ Validation & Enforcement
 
 The git hook automatically validates:
+
 - ✅ Conventional commit format
 - ✅ Valid department names
 - ✅ Fire22 company email format
@@ -169,6 +194,7 @@ The git hook automatically validates:
 - ✅ Claude Code attribution
 
 **Example Validation Success:**
+
 ```
 🔍 Fire22 Commit Message Validation
 
@@ -176,7 +202,7 @@ The git hook automatically validates:
 
 📊 Enhancement detected:
    ✅ L-Keys specified
-   ✅ Contributors listed  
+   ✅ Contributors listed
    ✅ Department: finance
    ✅ Fire22 email format used
 ```
@@ -184,19 +210,21 @@ The git hook automatically validates:
 ## 📊 Tracking Benefits
 
 ### **Before:** Single Author
+
 ```
 91cd3d7 feat: merge team contributors department page [Brenda Williams]
-85c3d3c feat(docs): add comprehensive documentation [Brenda Williams]  
+85c3d3c feat(docs): add comprehensive documentation [Brenda Williams]
 18cd6ea feat(api): add UUID support [Brenda Williams]
 ```
 
 ### **After:** Department Attribution
+
 ```
 4767e91 feat(contributors): implement enhanced commit system [Alex Chen <alex.chen@team.fire22>]
 - Contributors: Jordan Taylor, Sam Wilson
 - L-Keys: L-801, L-802, L-803
 
-[next] feat(finance): implement transaction monitoring [John Smith <john.smith@finance.fire22>]  
+[next] feat(finance): implement transaction monitoring [John Smith <john.smith@finance.fire22>]
 - Contributors: Sarah Johnson, Mike Chen
 - L-Keys: L-69, L-187, L-202
 ```
@@ -215,6 +243,7 @@ The git hook automatically validates:
 ---
 
 **Next Steps:**
+
 1. Team leads review their department information
 2. Contributors start using enhanced commit messages
 3. Monitor git hook validation effectiveness

@@ -7,7 +7,7 @@ import { Fantasy42AgentClient } from '../src/api/fantasy42-agent-client';
 import {
   createSpecificElementManager,
   Fantasy42SpecificElementManager,
-  SpecificElementConfig
+  SpecificElementConfig,
 } from '../core/integrations/fantasy42-specific-element-integration';
 import { handleSpecificElement, findSpecificElement } from '../core/ui/xpath-element-handler';
 
@@ -18,7 +18,7 @@ async function basicUsageExample() {
   // Create a Fantasy42 client (you'll need to configure this)
   const client = new Fantasy42AgentClient({
     baseURL: 'https://api.fantasy42.com',
-    token: 'your-api-token'
+    token: 'your-api-token',
   });
 
   // Create the element manager with default configuration
@@ -40,7 +40,6 @@ async function basicUsageExample() {
 
     // Check if ready
     console.log('🔍 Integration ready:', elementManager.isReady());
-
   } else {
     console.log('❌ Failed to initialize element integration');
   }
@@ -52,7 +51,7 @@ async function advancedUsageExample() {
 
   const client = new Fantasy42AgentClient({
     baseURL: 'https://api.fantasy42.com',
-    token: 'your-api-token'
+    token: 'your-api-token',
   });
 
   // Custom configuration
@@ -63,7 +62,7 @@ async function advancedUsageExample() {
     updateInterval: 3000, // Check every 3 seconds
     validation: {
       required: true,
-      minLength: 1
+      minLength: 1,
     },
     onDataChange: (newData, element) => {
       console.log('🔄 Data changed:', newData);
@@ -75,7 +74,7 @@ async function advancedUsageExample() {
       // - Update other UI elements
       // - Log changes for analytics
     },
-    onElementFound: (element) => {
+    onElementFound: element => {
       console.log('🎯 Element found:', element.tagName);
       console.log('📋 Element attributes:', element.attributes);
       console.log('📝 Element content:', element.textContent);
@@ -84,7 +83,7 @@ async function advancedUsageExample() {
       // - Setup additional event listeners
       // - Modify the element's appearance
       // - Extract initial data
-    }
+    },
   };
 
   const elementManager = new Fantasy42SpecificElementManager(client, customConfig);
@@ -102,7 +101,6 @@ async function advancedUsageExample() {
       // Write new data (if the element supports it)
       const writeSuccess = elementManager.writeElementData('New content from integration');
       console.log('✏️ Write operation:', writeSuccess ? 'Success' : 'Failed');
-
     }, 5000);
   }
 }
@@ -124,7 +122,7 @@ async function directHandlerExample() {
       tagName: element.tagName,
       id: element.id,
       className: element.className,
-      textContent: element.textContent?.substring(0, 100) + '...'
+      textContent: element.textContent?.substring(0, 100) + '...',
     });
 
     // Handle the element with different actions
@@ -134,12 +132,13 @@ async function directHandlerExample() {
     if (readResult.success && readResult.data) {
       console.log('📊 Element data:', readResult.data);
     }
-
   } else {
     console.log('❌ Element not found');
 
     // You might want to retry or use the integration manager
-    console.log('💡 Tip: Use the integration manager for automatic element detection and monitoring');
+    console.log(
+      '💡 Tip: Use the integration manager for automatic element detection and monitoring'
+    );
   }
 }
 
@@ -149,7 +148,7 @@ async function monitoringExample() {
 
   const client = new Fantasy42AgentClient({
     baseURL: 'https://api.fantasy42.com',
-    token: 'your-api-token'
+    token: 'your-api-token',
   });
 
   const monitoringConfig: SpecificElementConfig = {
@@ -170,7 +169,7 @@ async function monitoringExample() {
 
       // Example: Trigger alerts for specific changes
       checkForAlerts(newData);
-    }
+    },
   };
 
   const monitor = new Fantasy42SpecificElementManager(client, monitoringConfig);
@@ -206,7 +205,7 @@ function checkForAlerts(data: any) {
 // Main example runner
 export async function runSpecificElementExamples() {
   console.log('🎯 Running Specific Element Integration Examples');
-  console.log('=' .repeat(50));
+  console.log('='.repeat(50));
 
   try {
     // Run examples sequentially
@@ -223,7 +222,6 @@ export async function runSpecificElementExamples() {
     // await monitoringExample();
 
     console.log('✅ All examples completed successfully');
-
   } catch (error) {
     console.error('❌ Example execution failed:', error);
   }
@@ -235,7 +233,7 @@ export async function quickStartSpecificElementIntegration() {
 
   const client = new Fantasy42AgentClient({
     baseURL: 'https://api.fantasy42.com',
-    token: 'your-api-token'
+    token: 'your-api-token',
   });
 
   const manager = createSpecificElementManager(client);
@@ -243,7 +241,9 @@ export async function quickStartSpecificElementIntegration() {
 
   if (success) {
     console.log('✅ Quick start successful!');
-    console.log('💡 You can now monitor the element at: /html/body/div[3]/div[5]/div/div[4]/div[7]/div');
+    console.log(
+      '💡 You can now monitor the element at: /html/body/div[3]/div[5]/div/div[4]/div[7]/div'
+    );
 
     // Return the manager for further use
     return manager;
@@ -254,9 +254,4 @@ export async function quickStartSpecificElementIntegration() {
 }
 
 // Export everything for external use
-export {
-  basicUsageExample,
-  advancedUsageExample,
-  directHandlerExample,
-  monitoringExample
-};
+export { basicUsageExample, advancedUsageExample, directHandlerExample, monitoringExample };

@@ -287,7 +287,8 @@
 
 /* Animations */
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -302,7 +303,7 @@
   .card-grid--4 {
     grid-template-columns: 1fr;
   }
-  
+
   .kpi-card__value {
     font-size: var(--font-size-3xl);
   }

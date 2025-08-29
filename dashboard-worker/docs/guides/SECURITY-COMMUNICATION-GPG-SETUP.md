@@ -2,7 +2,8 @@
 
 **From**: Security Team  
 **To**: All Department Heads  
-**Subject**: **CRITICAL ACTION REQUIRED**: GPG Key Setup - 2:30:05.000005000 Resolution SLA  
+**Subject**: **CRITICAL ACTION REQUIRED**: GPG Key Setup - 2:30:05.000005000
+Resolution SLA  
 **Priority**: CRITICAL  
 **Deadline**: 2 hours, 30 minutes, 5 seconds, and 5000 nanoseconds from receipt
 
@@ -12,7 +13,9 @@
 
 Dear Department Head,
 
-As part of Fire22's enhanced security protocols, **all department heads must configure GPG commit signing** for repository access. This communication provides your secure setup instructions.
+As part of Fire22's enhanced security protocols, **all department heads must
+configure GPG commit signing** for repository access. This communication
+provides your secure setup instructions.
 
 ### 🔐 Your GPG Key Information
 
@@ -22,7 +25,8 @@ As part of Fire22's enhanced security protocols, **all department heads must con
 
 ### 📋 Required Setup Commands
 
-Execute these commands in your terminal **after receiving your GPG key package**:
+Execute these commands in your terminal **after receiving your GPG key
+package**:
 
 ```bash
 # 1. Import your private GPG key (provided by Security team)
@@ -97,6 +101,7 @@ Your GPG key package will be delivered via:
 **Common Issues and Solutions:**
 
 #### GPG Key Import Fails
+
 ```bash
 # Check GPG version
 gpg --version
@@ -106,6 +111,7 @@ gpg --import --verbose [your-name]-private.asc
 ```
 
 #### Git Signing Fails
+
 ```bash
 # Test GPG directly
 echo "test" | gpg --clearsign
@@ -118,6 +124,7 @@ git commit -S --gpg-sign=[YOUR_GPG_KEY_ID] -m "test commit"
 ```
 
 #### "Bad signature" or "Can't check signature"
+
 ```bash
 # Trust your key
 gpg --edit-key [YOUR_GPG_KEY_ID]
@@ -130,30 +137,37 @@ gpg --fingerprint [YOUR_GPG_KEY_ID]
 ### 📞 Support Contacts
 
 **Immediate Technical Support**:
+
 - **Mike Hunt** (Technology): `mike.hunt@technology.fire22`
 - **Sarah Martinez** (Communications): `sarah.martinez@communications.fire22`
 
 **Security Issues**:
+
 - **Security Team**: `head@security.fire22`
 - **Security Emergency**: `security-emergency@fire22.com`
 
 **General Questions**:
+
 - **Communications Team**: `sarah.martinez@communications.fire22`
 
 ### ⏰ CRITICAL TIMING REQUIREMENTS
 
-**MAXIMUM RESOLUTION TIME**: 2 hours, 30 minutes, 5 seconds, and 5000 nanoseconds
+**MAXIMUM RESOLUTION TIME**: 2 hours, 30 minutes, 5 seconds, and 5000
+nanoseconds
 
 **Precise Timeline** (Bun-native nanosecond tracking):
+
 - **T+0**: Receive GPG key package from Security (timer starts)
 - **T+30 minutes**: Key import and Git configuration must be completed
-- **T+60 minutes**: Verification steps and test commit completed  
+- **T+60 minutes**: Verification steps and test commit completed
 - **T+90 minutes**: Confirmation email sent to Security team
 - **T+2:30:05.000005000**: **CRITICAL DEADLINE** - All setup must be complete
 
-**Escalation Trigger**: Any issues not resolved within the precise timeframe above trigger automatic critical escalation procedures.
+**Escalation Trigger**: Any issues not resolved within the precise timeframe
+above trigger automatic critical escalation procedures.
 
 **Compliance Requirements**:
+
 - All commits **must** be GPG signed starting [EFFECTIVE_DATE]
 - Unsigned commits will be **rejected** by repository protection rules
 - Department heads without GPG setup will **lose repository access**
@@ -162,12 +176,14 @@ gpg --fingerprint [YOUR_GPG_KEY_ID]
 ### 📋 Confirmation Required
 
 **Please reply to this email confirming**:
+
 - [ ] GPG key package received and imported successfully
 - [ ] Git configuration completed and verified
 - [ ] Test signed commit created and signature verified
 - [ ] Understanding of ongoing security requirements
 
 **Reply Template**:
+
 ```
 Subject: GPG Setup Complete - [DEPARTMENT] Department
 
@@ -200,7 +216,8 @@ Best regards,
 
 ---
 
-**This communication is classified as INTERNAL and contains security-sensitive information. Do not forward or share outside of authorized Fire22 personnel.**
+**This communication is classified as INTERNAL and contains security-sensitive
+information. Do not forward or share outside of authorized Fire22 personnel.**
 
 **Security Team**  
 Fire22 Gaming Platform  
@@ -209,6 +226,7 @@ Fire22 Gaming Platform
 ---
 
 **Distribution List**:
+
 - Sarah Martinez - Communications (`sarah.martinez@communications.fire22`)
 - Mike Hunt - Technology (`mike.hunt@technology.fire22`)
 - [All Department Heads - Upon Appointment]

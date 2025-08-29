@@ -290,7 +290,16 @@
           "phone": "+1-555-0701",
           "status": "available",
           "avatar": "SM",
-          "quickActions": ["schedule", "email", "slack", "call", "announcement", "approval", "telegram-channels", "telegram-broadcast"]
+          "quickActions": [
+            "schedule",
+            "email",
+            "slack",
+            "call",
+            "announcement",
+            "approval",
+            "telegram-channels",
+            "telegram-broadcast"
+          ]
         },
         {
           "id": "alex-chen",
@@ -301,7 +310,14 @@
           "phone": "+1-555-0702",
           "status": "available",
           "avatar": "AC",
-          "quickActions": ["email", "slack", "schedule", "department-update", "telegram-bots", "telegram-analytics"]
+          "quickActions": [
+            "email",
+            "slack",
+            "schedule",
+            "department-update",
+            "telegram-bots",
+            "telegram-analytics"
+          ]
         },
         {
           "id": "maria-rodriguez",
@@ -385,7 +401,15 @@
           "phone": "+1-555-0901",
           "status": "available",
           "avatar": "IM",
-          "quickActions": ["schedule", "email", "slack", "portfolio", "figma", "widget-library", "design-tokens"]
+          "quickActions": [
+            "schedule",
+            "email",
+            "slack",
+            "portfolio",
+            "figma",
+            "widget-library",
+            "design-tokens"
+          ]
         },
         {
           "id": "ethan-cooper",
@@ -428,7 +452,14 @@
           "status": "available",
           "avatar": "V2",
           "priority": "vip-executive",
-          "quickActions": ["schedule", "email", "slack", "call", "vip-escalation", "high-roller-review"]
+          "quickActions": [
+            "schedule",
+            "email",
+            "slack",
+            "call",
+            "vip-escalation",
+            "high-roller-review"
+          ]
         }
       ]
     },
@@ -449,7 +480,15 @@
           "status": "available",
           "avatar": "JA",
           "priority": "department-head",
-          "quickActions": ["schedule", "email", "slack", "call", "directory-update", "employee-records", "team-directory-audit"]
+          "quickActions": [
+            "schedule",
+            "email",
+            "slack",
+            "call",
+            "directory-update",
+            "employee-records",
+            "team-directory-audit"
+          ]
         },
         {
           "id": "marcus-rivera",
@@ -480,7 +519,14 @@
           "phone": "+1-555-1101",
           "status": "on-call",
           "avatar": "CS",
-          "quickActions": ["call", "email", "slack", "system-maintenance", "infrastructure-check", "directory-upkeep"]
+          "quickActions": [
+            "call",
+            "email",
+            "slack",
+            "system-maintenance",
+            "infrastructure-check",
+            "directory-upkeep"
+          ]
         },
         {
           "id": "diane-foster",
@@ -491,7 +537,13 @@
           "phone": "+1-555-1102",
           "status": "available",
           "avatar": "DF",
-          "quickActions": ["email", "slack", "system-maintenance", "data-cleanup", "directory-validation"]
+          "quickActions": [
+            "email",
+            "slack",
+            "system-maintenance",
+            "data-cleanup",
+            "directory-validation"
+          ]
         }
       ]
     },
@@ -512,7 +564,15 @@
           "status": "available",
           "avatar": "AK",
           "priority": "executive",
-          "quickActions": ["schedule", "email", "slack", "call", "roadmap", "product-review", "feature-planning"]
+          "quickActions": [
+            "schedule",
+            "email",
+            "slack",
+            "call",
+            "roadmap",
+            "product-review",
+            "feature-planning"
+          ]
         },
         {
           "id": "daniel-wong",
@@ -523,7 +583,14 @@
           "phone": "+1-555-1202",
           "status": "strategic-planning",
           "avatar": "DW",
-          "quickActions": ["email", "slack", "schedule", "roadmap", "feature-planning", "user-research"]
+          "quickActions": [
+            "email",
+            "slack",
+            "schedule",
+            "roadmap",
+            "feature-planning",
+            "user-research"
+          ]
         },
         {
           "id": "samantha-rivera",
@@ -534,7 +601,14 @@
           "phone": "+1-555-1203",
           "status": "available",
           "avatar": "SR",
-          "quickActions": ["email", "slack", "task", "feature-planning", "user-stories", "backlog-management"]
+          "quickActions": [
+            "email",
+            "slack",
+            "task",
+            "feature-planning",
+            "user-stories",
+            "backlog-management"
+          ]
         },
         {
           "id": "ryan-thompson",
@@ -566,7 +640,15 @@
           "status": "available",
           "avatar": "NC",
           "priority": "department-head",
-          "quickActions": ["schedule", "email", "slack", "call", "onboarding-flow", "employee-setup", "training-modules"]
+          "quickActions": [
+            "schedule",
+            "email",
+            "slack",
+            "call",
+            "onboarding-flow",
+            "employee-setup",
+            "training-modules"
+          ]
         },
         {
           "id": "luis-martinez",
@@ -588,7 +670,13 @@
           "phone": "+1-555-1303",
           "status": "available",
           "avatar": "KA",
-          "quickActions": ["email", "slack", "training-modules", "skill-assessment", "progress-tracking"]
+          "quickActions": [
+            "email",
+            "slack",
+            "training-modules",
+            "skill-assessment",
+            "progress-tracking"
+          ]
         },
         {
           "id": "troy-williams",
@@ -599,7 +687,13 @@
           "phone": "+1-555-1304",
           "status": "available",
           "avatar": "TW",
-          "quickActions": ["email", "slack", "system-setup", "access-management", "tool-integration"]
+          "quickActions": [
+            "email",
+            "slack",
+            "system-setup",
+            "access-management",
+            "tool-integration"
+          ]
         }
       ]
     },
@@ -620,7 +714,15 @@
           "status": "available",
           "avatar": "AM",
           "priority": "department-head",
-          "quickActions": ["schedule", "email", "slack", "call", "system-maintenance", "infrastructure-check", "metrics"]
+          "quickActions": [
+            "schedule",
+            "email",
+            "slack",
+            "call",
+            "system-maintenance",
+            "infrastructure-check",
+            "metrics"
+          ]
         },
         {
           "id": "flow-specialist",
@@ -631,7 +733,13 @@
           "phone": "+1-555-1402",
           "status": "available",
           "avatar": "FS",
-          "quickActions": ["email", "slack", "metrics", "system-maintenance", "infrastructure-check"]
+          "quickActions": [
+            "email",
+            "slack",
+            "metrics",
+            "system-maintenance",
+            "infrastructure-check"
+          ]
         },
         {
           "id": "pressure-engineer",
@@ -642,7 +750,13 @@
           "phone": "+1-555-1403",
           "status": "available",
           "avatar": "PE",
-          "quickActions": ["email", "slack", "system-maintenance", "infrastructure-check", "metrics"]
+          "quickActions": [
+            "email",
+            "slack",
+            "system-maintenance",
+            "infrastructure-check",
+            "metrics"
+          ]
         },
         {
           "id": "temp-analyst",
@@ -661,7 +775,25 @@
   "communicationChannels": {
     "email": {
       "server": "mail.fire22.com",
-      "domains": ["@fire22.com", "@finance.fire22", "@support.fire22", "@compliance.fire22", "@operations.fire22", "@tech.fire22", "@marketing.fire22", "@exec.fire22", "@team.fire22", "@design.fire22", "@communications.fire22", "@vip.fire22", "@hr.fire22", "@maintenance.fire22", "@product.fire22", "@onboarding.fire22", "@water-system.fire22"],
+      "domains": [
+        "@fire22.com",
+        "@finance.fire22",
+        "@support.fire22",
+        "@compliance.fire22",
+        "@operations.fire22",
+        "@tech.fire22",
+        "@marketing.fire22",
+        "@exec.fire22",
+        "@team.fire22",
+        "@design.fire22",
+        "@communications.fire22",
+        "@vip.fire22",
+        "@hr.fire22",
+        "@maintenance.fire22",
+        "@product.fire22",
+        "@onboarding.fire22",
+        "@water-system.fire22"
+      ],
       "groups": {
         "all": "all@fire22.com",
         "department-heads": "heads@fire22.com",
@@ -684,7 +816,7 @@
       "channels": {
         "main": "@fire22_support",
         "finance": "@fire22_finance_support",
-        "support": "@fire22_customer_support", 
+        "support": "@fire22_customer_support",
         "compliance": "@fire22_compliance",
         "operations": "@fire22_operations",
         "technology": "@fire22_tech_support",
@@ -740,16 +872,31 @@
       "urgent-call": { "icon": "🚨", "action": "tel:{phone}?urgent=true" },
       "board-meeting": { "icon": "🏛️", "action": "https://board.fire22.com/schedule/{id}" },
       "ops-review": { "icon": "📈", "action": "https://ops.fire22.com/review/{id}" },
-      "code-review": { "icon": "👀", "action": "https://github.com/fire22/pulls/review-requested/{username}" },
+      "code-review": {
+        "icon": "👀",
+        "action": "https://github.com/fire22/pulls/review-requested/{username}"
+      },
       "portfolio": { "icon": "🎨", "action": "https://portfolio.fire22.com/{id}" },
       "figma": { "icon": "🎯", "action": "https://figma.com/team/fire22/{id}" },
-      "announcement": { "icon": "📢", "action": "https://communications.fire22.com/announcement/{id}" },
+      "announcement": {
+        "icon": "📢",
+        "action": "https://communications.fire22.com/announcement/{id}"
+      },
       "approval": { "icon": "✅", "action": "https://communications.fire22.com/approval/{id}" },
-      "department-update": { "icon": "📝", "action": "https://communications.fire22.com/department-update/{id}" },
+      "department-update": {
+        "icon": "📝",
+        "action": "https://communications.fire22.com/department-update/{id}"
+      },
       "template": { "icon": "📄", "action": "https://communications.fire22.com/template/{id}" },
       "metrics": { "icon": "📊", "action": "https://communications.fire22.com/metrics/{id}" },
-      "vip-escalation": { "icon": "👑", "action": "https://vinny2times.fire22.workers.dev/escalation/{id}" },
-      "high-roller-review": { "icon": "💎", "action": "https://vinny2times.fire22.workers.dev/high-roller-review/{id}" },
+      "vip-escalation": {
+        "icon": "👑",
+        "action": "https://vinny2times.fire22.workers.dev/escalation/{id}"
+      },
+      "high-roller-review": {
+        "icon": "💎",
+        "action": "https://vinny2times.fire22.workers.dev/high-roller-review/{id}"
+      },
       "widget-library": { "icon": "🧩", "action": "https://widgets.fire22.com/library/{id}" },
       "card-components": { "icon": "🃏", "action": "https://components.fire22.com/cards/{id}" },
       "css-framework": { "icon": "🎨", "action": "https://css.fire22.com/framework/{id}" },
@@ -758,20 +905,47 @@
       "telegram-channels": { "icon": "📢", "action": "https://t.me/fire22_admin/channels/{id}" },
       "telegram-bots": { "icon": "🤖", "action": "https://telegram.fire22.com/bots/manage/{id}" },
       "telegram-shortlinks": { "icon": "🔗", "action": "https://t.me/fire22.ag/{id}" },
-      "telegram-analytics": { "icon": "📊", "action": "https://telegram.fire22.com/analytics/{id}" },
-      "telegram-broadcast": { "icon": "📻", "action": "https://telegram.fire22.com/broadcast/{id}" },
+      "telegram-analytics": {
+        "icon": "📊",
+        "action": "https://telegram.fire22.com/analytics/{id}"
+      },
+      "telegram-broadcast": {
+        "icon": "📻",
+        "action": "https://telegram.fire22.com/broadcast/{id}"
+      },
       "directory-update": { "icon": "📝", "action": "https://hr.fire22.com/directory/update/{id}" },
       "employee-records": { "icon": "👥", "action": "https://hr.fire22.com/records/{id}" },
-      "team-directory-audit": { "icon": "🔍", "action": "https://hr.fire22.com/directory/audit/{id}" },
+      "team-directory-audit": {
+        "icon": "🔍",
+        "action": "https://hr.fire22.com/directory/audit/{id}"
+      },
       "onboarding": { "icon": "🚀", "action": "https://hr.fire22.com/onboarding/{id}" },
-      "system-maintenance": { "icon": "🔧", "action": "https://maintenance.fire22.com/systems/{id}" },
-      "infrastructure-check": { "icon": "🏗️", "action": "https://maintenance.fire22.com/infrastructure/{id}" },
-      "directory-upkeep": { "icon": "🗂️", "action": "https://maintenance.fire22.com/directory/upkeep/{id}" },
-      "data-cleanup": { "icon": "🧹", "action": "https://maintenance.fire22.com/data-cleanup/{id}" },
-      "directory-validation": { "icon": "✅", "action": "https://maintenance.fire22.com/directory/validate/{id}" },
+      "system-maintenance": {
+        "icon": "🔧",
+        "action": "https://maintenance.fire22.com/systems/{id}"
+      },
+      "infrastructure-check": {
+        "icon": "🏗️",
+        "action": "https://maintenance.fire22.com/infrastructure/{id}"
+      },
+      "directory-upkeep": {
+        "icon": "🗂️",
+        "action": "https://maintenance.fire22.com/directory/upkeep/{id}"
+      },
+      "data-cleanup": {
+        "icon": "🧹",
+        "action": "https://maintenance.fire22.com/data-cleanup/{id}"
+      },
+      "directory-validation": {
+        "icon": "✅",
+        "action": "https://maintenance.fire22.com/directory/validate/{id}"
+      },
       "roadmap": { "icon": "🗺️", "action": "https://product.fire22.com/roadmap/{id}" },
       "product-review": { "icon": "📋", "action": "https://product.fire22.com/review/{id}" },
-      "feature-planning": { "icon": "🎯", "action": "https://product.fire22.com/features/plan/{id}" },
+      "feature-planning": {
+        "icon": "🎯",
+        "action": "https://product.fire22.com/features/plan/{id}"
+      },
       "user-research": { "icon": "👥", "action": "https://product.fire22.com/research/{id}" },
       "user-stories": { "icon": "📖", "action": "https://product.fire22.com/stories/{id}" },
       "backlog-management": { "icon": "📋", "action": "https://product.fire22.com/backlog/{id}" },
@@ -779,8 +953,14 @@
       "onboarding-flow": { "icon": "🚀", "action": "https://onboarding.fire22.com/flow/{id}" },
       "employee-setup": { "icon": "👤", "action": "https://onboarding.fire22.com/setup/{id}" },
       "training-modules": { "icon": "🎓", "action": "https://onboarding.fire22.com/training/{id}" },
-      "skill-assessment": { "icon": "📝", "action": "https://onboarding.fire22.com/assessment/{id}" },
-      "progress-tracking": { "icon": "📈", "action": "https://onboarding.fire22.com/progress/{id}" },
+      "skill-assessment": {
+        "icon": "📝",
+        "action": "https://onboarding.fire22.com/assessment/{id}"
+      },
+      "progress-tracking": {
+        "icon": "📈",
+        "action": "https://onboarding.fire22.com/progress/{id}"
+      },
       "system-setup": { "icon": "⚙️", "action": "https://onboarding.fire22.com/systems/{id}" },
       "access-management": { "icon": "🔑", "action": "https://onboarding.fire22.com/access/{id}" },
       "tool-integration": { "icon": "🔧", "action": "https://onboarding.fire22.com/tools/{id}" },

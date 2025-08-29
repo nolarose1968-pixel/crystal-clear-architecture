@@ -5,9 +5,9 @@ name: 🚀 Enhanced CI with bunx --package
 
 on:
   push:
-    branches: [ main, develop, feature/* ]
+    branches: [main, develop, feature/*]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 env:
   BUN_VERSION: '1.2.21'
@@ -182,7 +182,7 @@ jobs:
         if: matrix.build-target == 'production'
         run: |
           bunx --package webpack webpack --config webpack.prod.js --mode production
-          
+
       - name: 📊 Bundle analysis with bunx --package
         if: matrix.build-target == 'bundle-analysis'
         run: |
@@ -305,7 +305,7 @@ jobs:
       - name: 📊 Post-deployment bundle analysis
         run: |
           bunx --package webpack-bundle-analyzer webpack-bundle-analyzer dist/stats.json --mode json --report bundle-analysis.json
-          
+
   notify:
     name: 📢 Notification
     runs-on: ubuntu-latest

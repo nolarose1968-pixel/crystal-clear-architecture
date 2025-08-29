@@ -1,26 +1,26 @@
 /**
  * Fire22 Registry Error Codes - Production Registry Specific
- * 
+ *
  * Comprehensive error code definitions with solutions, monitoring,
  * and production-ready error handling
  */
 
 export enum ErrorCategory {
   REGISTRY = 'REGISTRY',
-  CONNECTION = 'CONNECTION', 
+  CONNECTION = 'CONNECTION',
   AUTHENTICATION = 'AUTHENTICATION',
   VALIDATION = 'VALIDATION',
   STORAGE = 'STORAGE',
   CIRCUIT_BREAKER = 'CIRCUIT_BREAKER',
   RATE_LIMIT = 'RATE_LIMIT',
-  MONITORING = 'MONITORING'
+  MONITORING = 'MONITORING',
 }
 
 export enum ErrorSeverity {
   CRITICAL = 'CRITICAL',
-  ERROR = 'ERROR', 
+  ERROR = 'ERROR',
   WARNING = 'WARNING',
-  INFO = 'INFO'
+  INFO = 'INFO',
 }
 
 export interface ErrorCode {
@@ -56,20 +56,20 @@ export const REGISTRY_ERRORS: Record<string, ErrorCode> = {
       'R2 storage bucket access denied',
       'KV namespace binding missing',
       'Environment variables not configured',
-      'Cloudflare Workers runtime issues'
+      'Cloudflare Workers runtime issues',
     ],
     solutions: [
       'Check D1 database status and bindings',
       'Verify R2 bucket permissions and configuration',
       'Validate KV namespace binding in wrangler.toml',
       'Review environment variable configuration',
-      'Check Cloudflare Workers deployment logs'
+      'Check Cloudflare Workers deployment logs',
     ],
     monitoring: {
       alertThreshold: 1,
       alertWindow: '1m',
-      runbook: '/docs/runbooks/registry-initialization'
-    }
+      runbook: '/docs/runbooks/registry-initialization',
+    },
   },
 
   R1002: {
@@ -84,19 +84,19 @@ export const REGISTRY_ERRORS: Record<string, ErrorCode> = {
       'Database connection intermittent',
       'Storage service slow responses',
       'Cache service partially unavailable',
-      'High error rates from dependencies'
+      'High error rates from dependencies',
     ],
     solutions: [
       'Check individual service health endpoints',
       'Review connection pool utilization',
       'Monitor circuit breaker states',
-      'Scale resources if needed'
+      'Scale resources if needed',
     ],
     monitoring: {
       alertThreshold: 1,
       alertWindow: '5m',
-      runbook: '/docs/runbooks/registry-degraded'
-    }
+      runbook: '/docs/runbooks/registry-degraded',
+    },
   },
 
   R1003: {
@@ -112,24 +112,24 @@ export const REGISTRY_ERRORS: Record<string, ErrorCode> = {
       'Package already exists with same version',
       'Tarball upload failed',
       'Database transaction failure',
-      'Package size exceeds limits'
+      'Package size exceeds limits',
     ],
     solutions: [
       'Validate package.json structure',
       'Increment package version',
       'Check storage space and permissions',
       'Retry with exponential backoff',
-      'Reduce package size'
+      'Reduce package size',
     ],
     monitoring: {
       alertThreshold: 10,
       alertWindow: '10m',
-      runbook: '/docs/runbooks/package-publish-failures'
-    }
-  }
+      runbook: '/docs/runbooks/package-publish-failures',
+    },
+  },
 };
 
-// Connection Error Codes (C2000-C2999)  
+// Connection Error Codes (C2000-C2999)
 export const CONNECTION_ERRORS: Record<string, ErrorCode> = {
   C2001: {
     code: 'C2001',
@@ -144,20 +144,20 @@ export const CONNECTION_ERRORS: Record<string, ErrorCode> = {
       'Database binding configuration error',
       'Network connectivity issues',
       'Database resource limits exceeded',
-      'Authentication/authorization failure'
+      'Authentication/authorization failure',
     ],
     solutions: [
       'Check Cloudflare D1 service status',
       'Verify database binding in wrangler.toml',
       'Review database metrics and limits',
       'Check database permissions',
-      'Implement connection retry logic'
+      'Implement connection retry logic',
     ],
     monitoring: {
       alertThreshold: 5,
-      alertWindow: '5m', 
-      runbook: '/docs/runbooks/database-connection'
-    }
+      alertWindow: '5m',
+      runbook: '/docs/runbooks/database-connection',
+    },
   },
 
   C2002: {
@@ -173,25 +173,25 @@ export const CONNECTION_ERRORS: Record<string, ErrorCode> = {
       'Bucket access permissions insufficient',
       'Storage binding misconfigured',
       'Network timeout to R2 endpoints',
-      'Rate limits exceeded'
+      'Rate limits exceeded',
     ],
     solutions: [
       'Check Cloudflare R2 service status',
       'Verify bucket permissions and policies',
       'Review R2 binding configuration',
       'Implement storage retry mechanisms',
-      'Check usage against R2 limits'
+      'Check usage against R2 limits',
     ],
     monitoring: {
       alertThreshold: 3,
       alertWindow: '5m',
-      runbook: '/docs/runbooks/storage-connection'
-    }
+      runbook: '/docs/runbooks/storage-connection',
+    },
   },
 
   C2003: {
     code: 'C2003',
-    name: 'CACHE_CONNECTION_FAILED', 
+    name: 'CACHE_CONNECTION_FAILED',
     message: 'Cache connection failed',
     category: ErrorCategory.CONNECTION,
     severity: ErrorSeverity.WARNING,
@@ -201,20 +201,20 @@ export const CONNECTION_ERRORS: Record<string, ErrorCode> = {
       'KV namespace temporarily unavailable',
       'Cache binding misconfigured',
       'KV operation limits exceeded',
-      'Network issues to KV service'
+      'Network issues to KV service',
     ],
     solutions: [
       'Check Cloudflare KV service status',
       'Verify KV binding configuration',
       'Review KV usage metrics',
-      'Implement cache fallback logic'
+      'Implement cache fallback logic',
     ],
     monitoring: {
       alertThreshold: 10,
       alertWindow: '10m',
-      runbook: '/docs/runbooks/cache-connection'
-    }
-  }
+      runbook: '/docs/runbooks/cache-connection',
+    },
+  },
 };
 
 // Authentication Error Codes (A3000-A3999)
@@ -232,27 +232,27 @@ export const AUTHENTICATION_ERRORS: Record<string, ErrorCode> = {
       'Malformed Bearer token format',
       'Expired authentication token',
       'Invalid token signature',
-      'Revoked or blacklisted token'
+      'Revoked or blacklisted token',
     ],
     solutions: [
       'Include valid Authorization header',
       'Use Bearer token format: "Bearer <token>"',
       'Refresh expired tokens',
       'Generate new authentication token',
-      'Check token blacklist status'
+      'Check token blacklist status',
     ],
     monitoring: {
       alertThreshold: 50,
       alertWindow: '10m',
-      runbook: '/docs/runbooks/authentication-failures'
-    }
+      runbook: '/docs/runbooks/authentication-failures',
+    },
   },
 
   A3002: {
     code: 'A3002',
     name: 'INSUFFICIENT_SCOPE_PERMISSIONS',
     message: 'Insufficient permissions for package scope',
-    category: ErrorCategory.AUTHENTICATION, 
+    category: ErrorCategory.AUTHENTICATION,
     severity: ErrorSeverity.WARNING,
     httpStatus: 403,
     description: 'Token does not have permission to access requested package scope',
@@ -260,20 +260,20 @@ export const AUTHENTICATION_ERRORS: Record<string, ErrorCode> = {
       'Package not in allowed scopes',
       'Token lacks publish permissions',
       'Organization membership required',
-      'Scope-specific restrictions apply'
+      'Scope-specific restrictions apply',
     ],
     solutions: [
       'Use packages in allowed scopes (@fire22, @ff, @brendadeeznuts)',
       'Request publish permissions for scope',
       'Join required organization',
-      'Contact registry administrators'
+      'Contact registry administrators',
     ],
     monitoring: {
       alertThreshold: 20,
       alertWindow: '10m',
-      runbook: '/docs/runbooks/permission-denied'
-    }
-  }
+      runbook: '/docs/runbooks/permission-denied',
+    },
+  },
 };
 
 // Validation Error Codes (V4000-V4999)
@@ -291,20 +291,20 @@ export const VALIDATION_ERRORS: Record<string, ErrorCode> = {
       'Missing required fields (name, version)',
       'Invalid semver version format',
       'Package name format violations',
-      'Metadata size exceeds limits'
+      'Metadata size exceeds limits',
     ],
     solutions: [
       'Validate JSON structure and syntax',
       'Include required name and version fields',
       'Use valid semantic version format',
       'Follow npm package naming conventions',
-      'Reduce metadata size'
+      'Reduce metadata size',
     ],
     monitoring: {
       alertThreshold: 15,
-      alertWindow: '10m', 
-      runbook: '/docs/runbooks/package-validation'
-    }
+      alertWindow: '10m',
+      runbook: '/docs/runbooks/package-validation',
+    },
   },
 
   V4002: {
@@ -319,20 +319,20 @@ export const VALIDATION_ERRORS: Record<string, ErrorCode> = {
       'Package contains large binary files',
       'Unoptimized dependencies included',
       'Generated files not excluded',
-      'Development files included in package'
+      'Development files included in package',
     ],
     solutions: [
       'Remove or optimize large binary files',
       'Use .npmignore to exclude unnecessary files',
       'Optimize package contents',
-      'Consider splitting large packages'
+      'Consider splitting large packages',
     ],
     monitoring: {
       alertThreshold: 5,
       alertWindow: '10m',
-      runbook: '/docs/runbooks/package-size-limits'
-    }
-  }
+      runbook: '/docs/runbooks/package-size-limits',
+    },
+  },
 };
 
 // Storage Error Codes (S5000-S5999)
@@ -349,23 +349,23 @@ export const STORAGE_ERRORS: Record<string, ErrorCode> = {
       'Too many packages stored',
       'Large package files consuming space',
       'Old package versions not cleaned up',
-      'Storage quota configuration too low'
+      'Storage quota configuration too low',
     ],
     solutions: [
       'Clean up old package versions',
       'Implement package lifecycle management',
       'Increase storage quota',
-      'Optimize package sizes'
+      'Optimize package sizes',
     ],
     monitoring: {
       alertThreshold: 1,
       alertWindow: '1m',
-      runbook: '/docs/runbooks/storage-quota'
-    }
+      runbook: '/docs/runbooks/storage-quota',
+    },
   },
 
   S5002: {
-    code: 'S5002', 
+    code: 'S5002',
     name: 'PACKAGE_UPLOAD_FAILED',
     message: 'Package upload failed',
     category: ErrorCategory.STORAGE,
@@ -377,21 +377,21 @@ export const STORAGE_ERRORS: Record<string, ErrorCode> = {
       'Network timeout during upload',
       'Storage permissions insufficient',
       'Corrupted package data',
-      'Concurrent upload conflicts'
+      'Concurrent upload conflicts',
     ],
     solutions: [
       'Retry upload with exponential backoff',
       'Check R2 service status',
       'Verify storage permissions',
       'Validate package integrity',
-      'Implement upload conflict resolution'
+      'Implement upload conflict resolution',
     ],
     monitoring: {
       alertThreshold: 10,
       alertWindow: '5m',
-      runbook: '/docs/runbooks/package-upload'
-    }
-  }
+      runbook: '/docs/runbooks/package-upload',
+    },
+  },
 };
 
 // Circuit Breaker Error Codes (CB6000-CB6999)
@@ -408,24 +408,24 @@ export const CIRCUIT_BREAKER_ERRORS: Record<string, ErrorCode> = {
       'Multiple consecutive database failures',
       'Database response timeouts',
       'Database connection pool exhaustion',
-      'Database service degradation'
+      'Database service degradation',
     ],
     solutions: [
       'Check database health and availability',
       'Review database connection configuration',
       'Wait for circuit breaker to reset',
-      'Scale database resources if needed'
+      'Scale database resources if needed',
     ],
     monitoring: {
       alertThreshold: 1,
       alertWindow: '1m',
-      runbook: '/docs/runbooks/circuit-breaker-database'
-    }
+      runbook: '/docs/runbooks/circuit-breaker-database',
+    },
   },
 
   CB6002: {
     code: 'CB6002',
-    name: 'STORAGE_CIRCUIT_BREAKER_OPEN', 
+    name: 'STORAGE_CIRCUIT_BREAKER_OPEN',
     message: 'Storage circuit breaker is open',
     category: ErrorCategory.CIRCUIT_BREAKER,
     severity: ErrorSeverity.ERROR,
@@ -435,20 +435,20 @@ export const CIRCUIT_BREAKER_ERRORS: Record<string, ErrorCode> = {
       'Multiple storage operation failures',
       'R2 service timeouts or errors',
       'Storage rate limits exceeded',
-      'Storage service degradation'
+      'Storage service degradation',
     ],
     solutions: [
       'Check R2 service status',
       'Review storage operation patterns',
       'Wait for circuit breaker to reset',
-      'Implement storage fallback mechanisms'
+      'Implement storage fallback mechanisms',
     ],
     monitoring: {
       alertThreshold: 1,
       alertWindow: '2m',
-      runbook: '/docs/runbooks/circuit-breaker-storage'
-    }
-  }
+      runbook: '/docs/runbooks/circuit-breaker-storage',
+    },
+  },
 };
 
 // Rate Limiting Error Codes (RL7000-RL7999)
@@ -465,19 +465,19 @@ export const RATE_LIMIT_ERRORS: Record<string, ErrorCode> = {
       'Too many requests from single client',
       'Automated tooling without rate limiting',
       'DDoS or abuse attempt',
-      'Client retry loop without backoff'
+      'Client retry loop without backoff',
     ],
     solutions: [
       'Implement client-side rate limiting',
       'Add exponential backoff to retries',
       'Distribute requests over time',
-      'Contact support for rate limit increases'
+      'Contact support for rate limit increases',
     ],
     monitoring: {
       alertThreshold: 100,
       alertWindow: '5m',
-      runbook: '/docs/runbooks/rate-limiting'
-    }
+      runbook: '/docs/runbooks/rate-limiting',
+    },
   },
 
   RL7002: {
@@ -492,20 +492,20 @@ export const RATE_LIMIT_ERRORS: Record<string, ErrorCode> = {
       'Automated publishing without throttling',
       'Bulk package imports',
       'Development workflow publishing too frequently',
-      'CI/CD pipeline misconfiguration'
+      'CI/CD pipeline misconfiguration',
     ],
     solutions: [
       'Throttle automated publishing',
       'Batch package publications',
       'Review CI/CD publishing triggers',
-      'Implement publish queuing'
+      'Implement publish queuing',
     ],
     monitoring: {
       alertThreshold: 20,
       alertWindow: '10m',
-      runbook: '/docs/runbooks/publish-rate-limits'
-    }
-  }
+      runbook: '/docs/runbooks/publish-rate-limits',
+    },
+  },
 };
 
 // Monitoring Error Codes (M8000-M8999)
@@ -522,20 +522,20 @@ export const MONITORING_ERRORS: Record<string, ErrorCode> = {
       'Metrics storage service unavailable',
       'Metric collection logic errors',
       'Memory constraints affecting metrics',
-      'Metrics aggregation timeouts'
+      'Metrics aggregation timeouts',
     ],
     solutions: [
       'Check metrics storage service',
       'Review metrics collection code',
       'Increase memory allocation',
-      'Optimize metrics aggregation'
+      'Optimize metrics aggregation',
     ],
     monitoring: {
       alertThreshold: 5,
       alertWindow: '15m',
-      runbook: '/docs/runbooks/metrics-collection'
-    }
-  }
+      runbook: '/docs/runbooks/metrics-collection',
+    },
+  },
 };
 
 // Consolidated error registry
@@ -547,7 +547,7 @@ export const ALL_ERROR_CODES: Record<string, ErrorCode> = {
   ...STORAGE_ERRORS,
   ...CIRCUIT_BREAKER_ERRORS,
   ...RATE_LIMIT_ERRORS,
-  ...MONITORING_ERRORS
+  ...MONITORING_ERRORS,
 };
 
 // Error lookup functions
@@ -566,13 +566,13 @@ export function getErrorsBySeverity(severity: ErrorSeverity): ErrorCode[] {
 // Error response formatter
 export function formatErrorResponse(code: string, details?: Record<string, any>): object {
   const error = getErrorByCode(code);
-  
+
   if (!error) {
     return {
       error: 'unknown',
       message: 'Unknown error code',
       code,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -588,7 +588,7 @@ export function formatErrorResponse(code: string, details?: Record<string, any>)
     runbook: error.monitoring.runbook,
     timestamp: new Date().toISOString(),
     requestId: crypto.randomUUID(),
-    ...details
+    ...details,
   };
 }
 
@@ -607,16 +607,16 @@ export function getErrorStatistics(): object {
     totalErrorCodes: Object.keys(ALL_ERROR_CODES).length,
     byCategory: {} as Record<string, number>,
     bySeverity: {} as Record<string, number>,
-    criticalErrorCodes: [] as string[]
+    criticalErrorCodes: [] as string[],
   };
 
   for (const error of Object.values(ALL_ERROR_CODES)) {
     // Category counts
     stats.byCategory[error.category] = (stats.byCategory[error.category] || 0) + 1;
-    
+
     // Severity counts
     stats.bySeverity[error.severity] = (stats.bySeverity[error.severity] || 0) + 1;
-    
+
     // Critical errors
     if (error.severity === ErrorSeverity.CRITICAL) {
       stats.criticalErrorCodes.push(error.code);

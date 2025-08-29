@@ -24,8 +24,8 @@ export interface CreateCustomerRequest {
  */
 export async function getHierarchy(request: ValidatedRequest): Promise<Response> {
   try {
-    const { customerId } = request.validatedBody || await request.json();
-    
+    const { customerId } = request.validatedBody || (await request.json());
+
     // TODO: Implement customer hierarchy logic
     const response = {
       success: true,
@@ -34,23 +34,26 @@ export async function getHierarchy(request: ValidatedRequest): Promise<Response>
         hierarchy: {
           level: 1,
           parent: null,
-          children: []
-        }
-      }
+          children: [],
+        },
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get customer hierarchy',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get customer hierarchy',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -60,17 +63,20 @@ export async function getHierarchy(request: ValidatedRequest): Promise<Response>
 export async function getProfile(request: ValidatedRequest): Promise<Response> {
   try {
     const customerId = request.user?.id;
-    
+
     if (!customerId) {
-      return new Response(JSON.stringify({
-        error: 'Unauthorized',
-        message: 'Customer ID not found in token'
-      }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Unauthorized',
+          message: 'Customer ID not found in token',
+        }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
-    
+
     // TODO: Implement customer profile logic
     const response = {
       success: true,
@@ -82,23 +88,26 @@ export async function getProfile(request: ValidatedRequest): Promise<Response> {
           status: 'active',
           balance: 0,
           currency: 'USD',
-          createdAt: new Date().toISOString()
-        }
-      }
+          createdAt: new Date().toISOString(),
+        },
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get customer profile',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get customer profile',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -108,36 +117,42 @@ export async function getProfile(request: ValidatedRequest): Promise<Response> {
 export async function updateProfile(request: ValidatedRequest): Promise<Response> {
   try {
     const customerId = request.user?.id;
-    const profileData = request.validatedBody || await request.json();
-    
+    const profileData = request.validatedBody || (await request.json());
+
     if (!customerId) {
-      return new Response(JSON.stringify({
-        error: 'Unauthorized',
-        message: 'Customer ID not found in token'
-      }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Unauthorized',
+          message: 'Customer ID not found in token',
+        }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
-    
+
     // TODO: Implement profile update logic
     const response = {
       success: true,
-      message: 'Profile updated successfully'
+      message: 'Profile updated successfully',
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to update customer profile',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to update customer profile',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -150,17 +165,20 @@ export async function getBettingHistory(request: ValidatedRequest): Promise<Resp
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '10');
-    
+
     if (!customerId) {
-      return new Response(JSON.stringify({
-        error: 'Unauthorized',
-        message: 'Customer ID not found in token'
-      }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Unauthorized',
+          message: 'Customer ID not found in token',
+        }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
-    
+
     // TODO: Implement betting history logic
     const response = {
       success: true,
@@ -170,23 +188,26 @@ export async function getBettingHistory(request: ValidatedRequest): Promise<Resp
           page,
           limit,
           total: 0,
-          totalPages: 0
-        }
-      }
+          totalPages: 0,
+        },
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get betting history',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get betting history',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -198,13 +219,16 @@ export async function getBalance(request: ValidatedRequest): Promise<Response> {
     const customerId = request.user?.id;
 
     if (!customerId) {
-      return new Response(JSON.stringify({
-        error: 'Unauthorized',
-        message: 'Customer ID not found in token'
-      }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Unauthorized',
+          message: 'Customer ID not found in token',
+        }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     // TODO: Implement balance logic
@@ -216,24 +240,27 @@ export async function getBalance(request: ValidatedRequest): Promise<Response> {
           available: 0,
           pending: 0,
           total: 0,
-          currency: 'USD'
+          currency: 'USD',
         },
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get customer balance',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get customer balance',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -242,52 +269,64 @@ export async function getBalance(request: ValidatedRequest): Promise<Response> {
  */
 export async function createCustomer(request: ValidatedRequest): Promise<Response> {
   try {
-    const customerData: CreateCustomerRequest = request.validatedBody || await request.json();
+    const customerData: CreateCustomerRequest = request.validatedBody || (await request.json());
 
     // Validate required fields
     if (!customerData.name || !customerData.email || !customerData.customerType) {
-      return new Response(JSON.stringify({
-        error: 'Validation Error',
-        message: 'Name, email, and customer type are required'
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Validation Error',
+          message: 'Name, email, and customer type are required',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(customerData.email)) {
-      return new Response(JSON.stringify({
-        error: 'Validation Error',
-        message: 'Invalid email format'
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Validation Error',
+          message: 'Invalid email format',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     // Validate customer type
     const validTypes = ['NEW', 'REGULAR', 'VIP', 'VVIP', 'PREPAID', 'CREDIT', 'CASH_ONLY'];
     if (!validTypes.includes(customerData.customerType)) {
-      return new Response(JSON.stringify({
-        error: 'Validation Error',
-        message: 'Invalid customer type'
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Validation Error',
+          message: 'Invalid customer type',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     // Validate service tier
     if (customerData.serviceTier < 1 || customerData.serviceTier > 3) {
-      return new Response(JSON.stringify({
-        error: 'Validation Error',
-        message: 'Service tier must be between 1 and 3'
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Validation Error',
+          message: 'Service tier must be between 1 and 3',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     // Generate customer ID
@@ -309,7 +348,7 @@ export async function createCustomer(request: ValidatedRequest): Promise<Respons
       status: 'ACTIVE',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      createdBy: request.user?.id || 'SYSTEM'
+      createdBy: request.user?.id || 'SYSTEM',
     };
 
     // TODO: Save to database
@@ -333,22 +372,25 @@ export async function createCustomer(request: ValidatedRequest): Promise<Respons
         name: newCustomer.name,
         email: newCustomer.email,
         status: newCustomer.status,
-        createdAt: newCustomer.createdAt
-      }
+        createdAt: newCustomer.createdAt,
+      },
     };
 
     return new Response(JSON.stringify(response), {
       status: 201,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
     console.error('❌ Create customer error:', error);
-    return new Response(JSON.stringify({
-      error: 'Failed to create customer',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to create customer',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }

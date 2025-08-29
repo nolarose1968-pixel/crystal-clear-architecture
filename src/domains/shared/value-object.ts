@@ -4,8 +4,6 @@
  */
 
 export abstract class ValueObject {
-  abstract equals(other: ValueObject): boolean;
-
   protected constructor() {
     // Prevent direct instantiation
   }
@@ -29,7 +27,10 @@ export abstract class ValueObject {
       const thisValue = (this as any)[prop];
       const otherValue = (other as any)[prop];
 
-      if (thisValue instanceof ValueObject && otherValue instanceof ValueObject) {
+      if (
+        thisValue instanceof ValueObject &&
+        otherValue instanceof ValueObject
+      ) {
         if (!thisValue.equals(otherValue)) {
           return false;
         }

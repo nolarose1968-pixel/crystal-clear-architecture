@@ -1,4 +1,4 @@
-import { BunFile } from "bun";
+import { BunFile } from 'bun';
 
 // Enhanced ETag Server with Advanced Caching Strategies
 // Demonstrates Bun's automatic ETag with real-world optimizations
@@ -16,157 +16,169 @@ const cacheMetrics: CacheMetrics = {
   misses: 0,
   bandwidth_saved: 0,
   etags_generated: 0,
-  not_modified_responses: 0
+  not_modified_responses: 0,
 };
 
 // Large static data that benefits from ETag caching
 const PACKAGE_REGISTRY = {
   packages: [
     {
-      name: "@fire22/telegram-bot",
-      version: "1.0.0",
-      dependencies: Array(50).fill(null).map((_, i) => `dep-${i}@1.0.0`),
+      name: '@fire22/telegram-bot',
+      version: '1.0.0',
+      dependencies: Array(50)
+        .fill(null)
+        .map((_, i) => `dep-${i}@1.0.0`),
       metadata: {
-        description: "Grammy Framework with 77 language codes",
-        license: "MIT",
-        repository: "https://github.com/fire22/telegram-bot",
-        keywords: ["telegram", "bot", "grammy", "multilingual"],
-        maintainers: ["fire22-team"],
+        description: 'Grammy Framework with 77 language codes',
+        license: 'MIT',
+        repository: 'https://github.com/fire22/telegram-bot',
+        keywords: ['telegram', 'bot', 'grammy', 'multilingual'],
+        maintainers: ['fire22-team'],
         downloads_last_week: 15234,
-        bundle_size: "847KB",
-        gzipped_size: "267KB"
-      }
+        bundle_size: '847KB',
+        gzipped_size: '267KB',
+      },
     },
     {
-      name: "@fire22/queue-system",
-      version: "1.0.0",
-      dependencies: Array(30).fill(null).map((_, i) => `queue-dep-${i}@2.0.0`),
+      name: '@fire22/queue-system',
+      version: '1.0.0',
+      dependencies: Array(30)
+        .fill(null)
+        .map((_, i) => `queue-dep-${i}@2.0.0`),
       metadata: {
-        description: "P2P Matching and Transaction Processing",
-        license: "MIT",
-        repository: "https://github.com/fire22/queue-system",
-        keywords: ["p2p", "queue", "matching", "transactions"],
-        maintainers: ["fire22-team"],
+        description: 'P2P Matching and Transaction Processing',
+        license: 'MIT',
+        repository: 'https://github.com/fire22/queue-system',
+        keywords: ['p2p', 'queue', 'matching', 'transactions'],
+        maintainers: ['fire22-team'],
         downloads_last_week: 8921,
-        bundle_size: "523KB",
-        gzipped_size: "178KB"
-      }
-    }
+        bundle_size: '523KB',
+        gzipped_size: '178KB',
+      },
+    },
   ],
   total_packages: 11,
-  last_updated: new Date().toISOString()
+  last_updated: new Date().toISOString(),
 };
 
 // Simulated database of review artifacts (large data)
 const REVIEW_ARTIFACTS = {
-  "telegram-bot": {
-    build_logs: Array(500).fill(null).map((_, i) => 
-      `[${new Date(Date.now() - i * 1000).toISOString()}] Build step ${i}: Success`
-    ),
+  'telegram-bot': {
+    build_logs: Array(500)
+      .fill(null)
+      .map((_, i) => `[${new Date(Date.now() - i * 1000).toISOString()}] Build step ${i}: Success`),
     test_results: {
-      unit: Array(47).fill(null).map((_, i) => ({
-        name: `test_${i}`,
-        status: "passed",
-        duration_ms: Math.random() * 1000
-      })),
-      integration: Array(23).fill(null).map((_, i) => ({
-        name: `integration_test_${i}`,
-        status: "passed",
-        duration_ms: Math.random() * 2000
-      }))
+      unit: Array(47)
+        .fill(null)
+        .map((_, i) => ({
+          name: `test_${i}`,
+          status: 'passed',
+          duration_ms: Math.random() * 1000,
+        })),
+      integration: Array(23)
+        .fill(null)
+        .map((_, i) => ({
+          name: `integration_test_${i}`,
+          status: 'passed',
+          duration_ms: Math.random() * 2000,
+        })),
     },
     coverage_report: {
       lines: 94.2,
       branches: 89.3,
       functions: 91.7,
       statements: 93.8,
-      files: Array(50).fill(null).map((_, i) => ({
-        path: `src/file_${i}.ts`,
-        coverage: 85 + Math.random() * 15
-      }))
-    }
-  }
+      files: Array(50)
+        .fill(null)
+        .map((_, i) => ({
+          path: `src/file_${i}.ts`,
+          coverage: 85 + Math.random() * 15,
+        })),
+    },
+  },
 };
 
 const server = Bun.serve({
   port: 3003,
-  
+
   // Advanced fetch handler with ETag awareness
   async fetch(req, server) {
     const url = new URL(req.url);
-    const ifNoneMatch = req.headers.get("if-none-match");
-    
+    const ifNoneMatch = req.headers.get('if-none-match');
+
     // Track metrics
     if (ifNoneMatch) {
     }
-    
+
     // Large JSON responses that benefit from ETag caching
-    if (url.pathname === "/api/registry/packages") {
+    if (url.pathname === '/api/registry/packages') {
       const response = Response.json(PACKAGE_REGISTRY);
-      
+
       // Log bandwidth savings when 304 is returned
       if (ifNoneMatch) {
         const dataSize = JSON.stringify(PACKAGE_REGISTRY).length;
         cacheMetrics.bandwidth_saved += dataSize;
         cacheMetrics.hits++;
       }
-      
+
       return response;
     }
-    
+
     // Review artifacts endpoint (very large response)
-    if (url.pathname.startsWith("/api/artifacts/")) {
-      const reviewId = url.pathname.split("/").pop();
+    if (url.pathname.startsWith('/api/artifacts/')) {
+      const reviewId = url.pathname.split('/').pop();
       const artifacts = REVIEW_ARTIFACTS[reviewId as keyof typeof REVIEW_ARTIFACTS];
-      
+
       if (artifacts) {
         const response = Response.json(artifacts);
-        
+
         if (ifNoneMatch) {
           const dataSize = JSON.stringify(artifacts).length;
           cacheMetrics.bandwidth_saved += dataSize;
           cacheMetrics.hits++;
         }
-        
+
         return response;
       }
-      
-      return new Response("Artifacts not found", { status: 404 });
+
+      return new Response('Artifacts not found', { status: 404 });
     }
-    
+
     // Cache metrics endpoint
-    if (url.pathname === "/api/cache/metrics") {
-      const hitRate = cacheMetrics.hits / (cacheMetrics.hits + cacheMetrics.misses) * 100;
+    if (url.pathname === '/api/cache/metrics') {
+      const hitRate = (cacheMetrics.hits / (cacheMetrics.hits + cacheMetrics.misses)) * 100;
       return Response.json({
         ...cacheMetrics,
         hit_rate: `${hitRate.toFixed(2)}%`,
         bandwidth_saved_mb: (cacheMetrics.bandwidth_saved / 1024 / 1024).toFixed(2),
-        message: "ETag caching is automatically handled by Bun!"
+        message: 'ETag caching is automatically handled by Bun!',
       });
     }
-    
+
     // Demonstration endpoint
-    if (url.pathname === "/api/demo/etag-test") {
+    if (url.pathname === '/api/demo/etag-test') {
       const testData = {
         timestamp: Date.now(),
         random: Math.random(),
-        message: "This response will have an automatic ETag",
-        large_array: Array(1000).fill(null).map((_, i) => ({
-          id: i,
-          value: `item_${i}`,
-          nested: {
-            deep: {
-              value: Math.random()
-            }
-          }
-        }))
+        message: 'This response will have an automatic ETag',
+        large_array: Array(1000)
+          .fill(null)
+          .map((_, i) => ({
+            id: i,
+            value: `item_${i}`,
+            nested: {
+              deep: {
+                value: Math.random(),
+              },
+            },
+          })),
       };
-      
+
       return Response.json(testData);
     }
-    
+
     // Static file serving with automatic ETag
-    if (url.pathname === "/") {
+    if (url.pathname === '/') {
       return new Response(
         `<!DOCTYPE html>
 <html>
@@ -332,15 +344,14 @@ Cached fetch:
 </html>`,
         {
           headers: {
-            "content-type": "text/html; charset=utf-8"
-          }
+            'content-type': 'text/html; charset=utf-8',
+          },
         }
       );
     }
-    
-    return new Response("Not Found", { status: 404 });
-  }
-});
 
+    return new Response('Not Found', { status: 404 });
+  },
+});
 
 export { server, cacheMetrics };

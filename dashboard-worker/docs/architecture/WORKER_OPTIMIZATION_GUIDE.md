@@ -2,9 +2,14 @@
 
 ## **Executive Summary**
 
-This guide implements **Bun's native YAML support** with the new **500x faster postMessage** performance improvement to optimize inter-domain communication in our Crystal Clear Architecture. This optimization targets high-volume data transfers between Collections, Distributions, Free Play, Balance, and Adjustment domains.
+This guide implements **Bun's native YAML support** with the new **500x faster
+postMessage** performance improvement to optimize inter-domain communication in
+our Crystal Clear Architecture. This optimization targets high-volume data
+transfers between Collections, Distributions, Free Play, Balance, and Adjustment
+domains.
 
 **Expected Impact:**
+
 - **70-80% reduction** in inter-domain communication latency
 - **3-5x improvement** in message throughput for settlement processing
 - **Enhanced developer experience** through more readable message formats
@@ -17,6 +22,7 @@ This guide implements **Bun's native YAML support** with the new **500x faster p
 ### **Existing Worker Communication Patterns**
 
 #### **Settlement Processing Workflow**
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -34,22 +40,23 @@ sequenceDiagram
 ```
 
 #### **Current Message Format (JSON)**
+
 ```javascript
 // Current: JSON-based messaging
 const settlementMessage = {
-  type: "SETTLEMENT_UPDATE",
+  type: 'SETTLEMENT_UPDATE',
   payload: {
-    settlementId: "PEN_001",
-    customerId: "CUST_001",
+    settlementId: 'PEN_001',
+    customerId: 'CUST_001',
     amount: 166.67,
-    status: "completed",
-    timestamp: "2025-01-26T15:30:00Z",
+    status: 'completed',
+    timestamp: '2025-01-26T15:30:00Z',
     metadata: {
-      processedBy: "Agent Smith",
+      processedBy: 'Agent Smith',
       processingTime: 2300,
-      retryCount: 0
-    }
-  }
+      retryCount: 0,
+    },
+  },
 };
 
 // Sending via postMessage
@@ -57,6 +64,7 @@ worker.postMessage(JSON.stringify(settlementMessage));
 ```
 
 #### **Performance Bottlenecks Identified**
+
 - JSON serialization/deserialization overhead
 - Large message sizes for complex settlement data
 - String cloning in structuredClone operations
@@ -69,6 +77,7 @@ worker.postMessage(JSON.stringify(settlementMessage));
 ### **New Message Format (YAML)**
 
 #### **YAML Message Structure**
+
 ```yaml
 # settlement-update.yaml
 type: SETTLEMENT_UPDATE
@@ -104,7 +113,7 @@ payload:
 
 ```javascript
 // worker-communication.js
-import { YAML } from "bun";
+import { YAML } from 'bun';
 
 // YAML-based message utilities
 export class WorkerMessenger {
@@ -115,7 +124,7 @@ export class WorkerMessenger {
       messagesSent: 0,
       messagesReceived: 0,
       averageLatency: 0,
-      errors: 0
+      errors: 0,
     };
   }
 
@@ -129,7 +138,7 @@ export class WorkerMessenger {
         ...message,
         correlationId: message.correlationId || this.generateCorrelationId(),
         timestamp: new Date().toISOString(),
-        version: '1.0'
+        version: '1.0',
       });
 
       // Send with performance optimization
@@ -148,7 +157,7 @@ export class WorkerMessenger {
 
   // Receive and parse YAML message
   async onMessage(callback) {
-    this.worker.onmessage = async (event) => {
+    this.worker.onmessage = async event => {
       const startTime = performance.now();
 
       try {
@@ -202,6 +211,7 @@ export class WorkerMessenger {
 ### **Domain-Specific Message Templates**
 
 #### **Collections Domain Messages**
+
 ```yaml
 # settlement-processed.yaml
 type: SETTLEMENT_PROCESSED
@@ -227,6 +237,7 @@ payload:
 ```
 
 #### **Distributions Domain Messages**
+
 ```yaml
 # commission-calculated.yaml
 type: COMMISSION_CALCULATED
@@ -256,6 +267,7 @@ payload:
 ```
 
 #### **Free Play Domain Messages**
+
 ```yaml
 # bonus-issued.yaml
 type: BONUS_ISSUED
@@ -288,13 +300,13 @@ payload:
 
 ```javascript
 // performance-benchmark.js
-import { YAML } from "bun";
+import { YAML } from 'bun';
 
 export class MessagePerformanceBenchmark {
   constructor() {
     this.results = {
       json: { times: [], sizes: [], latencies: [] },
-      yaml: { times: [], sizes: [], latencies: [] }
+      yaml: { times: [], sizes: [], latencies: [] },
     };
   }
 
@@ -329,7 +341,9 @@ export class MessagePerformanceBenchmark {
 
   // Benchmark worker communication
   async benchmarkWorkerCommunication(message, iterations = 100) {
-    console.log(`\n🚀 Worker Communication Benchmark (${iterations} messages)...`);
+    console.log(
+      `\n🚀 Worker Communication Benchmark (${iterations} messages)...`
+    );
 
     // Create workers for testing
     const worker1 = new Worker('./test-worker.js');
@@ -345,7 +359,7 @@ export class MessagePerformanceBenchmark {
       await messenger1.send({
         type: 'TEST_MESSAGE',
         payload: message,
-        testId: i
+        testId: i,
       });
     }
     const jsonLatency = (performance.now() - jsonStart) / iterations;
@@ -358,7 +372,7 @@ export class MessagePerformanceBenchmark {
       await messenger2.send({
         type: 'TEST_MESSAGE',
         payload: message,
-        testId: i
+        testId: i,
       });
     }
     const yamlLatency = (performance.now() - yamlStart) / iterations;
@@ -368,28 +382,46 @@ export class MessagePerformanceBenchmark {
   }
 
   displayResults() {
-    const jsonAvg = this.results.json.times.reduce((a, b) => a + b, 0) / this.results.json.times.length;
-    const yamlAvg = this.results.yaml.times.reduce((a, b) => a + b, 0) / this.results.yaml.times.length;
-    const jsonSizeAvg = this.results.json.sizes.reduce((a, b) => a + b, 0) / this.results.json.sizes.length;
-    const yamlSizeAvg = this.results.yaml.sizes.reduce((a, b) => a + b, 0) / this.results.yaml.sizes.length;
+    const jsonAvg =
+      this.results.json.times.reduce((a, b) => a + b, 0) /
+      this.results.json.times.length;
+    const yamlAvg =
+      this.results.yaml.times.reduce((a, b) => a + b, 0) /
+      this.results.yaml.times.length;
+    const jsonSizeAvg =
+      this.results.json.sizes.reduce((a, b) => a + b, 0) /
+      this.results.json.sizes.length;
+    const yamlSizeAvg =
+      this.results.yaml.sizes.reduce((a, b) => a + b, 0) /
+      this.results.yaml.sizes.length;
 
     console.log('\n📊 Serialization Results:');
     console.log(`JSON Average Time: ${jsonAvg.toFixed(2)}ms`);
     console.log(`YAML Average Time: ${yamlAvg.toFixed(2)}ms`);
-    console.log(`Performance Improvement: ${((jsonAvg - yamlAvg) / jsonAvg * 100).toFixed(1)}%`);
+    console.log(
+      `Performance Improvement: ${(((jsonAvg - yamlAvg) / jsonAvg) * 100).toFixed(1)}%`
+    );
     console.log(`JSON Average Size: ${jsonSizeAvg.toFixed(0)} bytes`);
     console.log(`YAML Average Size: ${yamlSizeAvg.toFixed(0)} bytes`);
-    console.log(`Size Difference: ${((yamlSizeAvg - jsonSizeAvg) / jsonSizeAvg * 100).toFixed(1)}%`);
+    console.log(
+      `Size Difference: ${(((yamlSizeAvg - jsonSizeAvg) / jsonSizeAvg) * 100).toFixed(1)}%`
+    );
   }
 
   displayLatencyResults() {
-    const jsonLatencyAvg = this.results.json.latencies.reduce((a, b) => a + b, 0) / this.results.json.latencies.length;
-    const yamlLatencyAvg = this.results.yaml.latencies.reduce((a, b) => a + b, 0) / this.results.yaml.latencies.length;
+    const jsonLatencyAvg =
+      this.results.json.latencies.reduce((a, b) => a + b, 0) /
+      this.results.json.latencies.length;
+    const yamlLatencyAvg =
+      this.results.yaml.latencies.reduce((a, b) => a + b, 0) /
+      this.results.yaml.latencies.length;
 
     console.log('\n🚀 Worker Communication Results:');
     console.log(`JSON Average Latency: ${jsonLatencyAvg.toFixed(2)}ms`);
     console.log(`YAML Average Latency: ${yamlLatencyAvg.toFixed(2)}ms`);
-    console.log(`Performance Improvement: ${((jsonLatencyAvg - yamlLatencyAvg) / jsonLatencyAvg * 100).toFixed(1)}%`);
+    console.log(
+      `Performance Improvement: ${(((jsonLatencyAvg - yamlLatencyAvg) / jsonLatencyAvg) * 100).toFixed(1)}%`
+    );
   }
 }
 ```
@@ -411,27 +443,31 @@ const testMessage = {
       processingTime: 2300,
       retryCount: 0,
       relatedTransactions: [
-        'TXN_001', 'TXN_002', 'TXN_003', 'TXN_004', 'TXN_005'
+        'TXN_001',
+        'TXN_002',
+        'TXN_003',
+        'TXN_004',
+        'TXN_005',
       ],
       auditTrail: {
         created: '2025-01-26T14:30:00Z',
         processed: '2025-01-26T15:30:00Z',
-        validated: '2025-01-26T15:25:00Z'
-      }
-    }
-  }
+        validated: '2025-01-26T15:25:00Z',
+      },
+    },
+  },
 };
 
 // Expected benchmark results
 const expectedResults = {
   serialization: {
     improvement: '15-25%',
-    sizeIncrease: '5-15%'
+    sizeIncrease: '5-15%',
   },
   communication: {
     improvement: '70-80%',
-    throughputIncrease: '3-5x'
-  }
+    throughputIncrease: '3-5x',
+  },
 };
 ```
 
@@ -442,7 +478,9 @@ const expectedResults = {
 ### **Phase 1: Pilot Implementation (Weeks 1-2)**
 
 #### **Collections Domain Pilot**
+
 1. **Setup YAML Infrastructure**
+
    ```bash
    # Install YAML utilities
    bun add @types/bun # For TypeScript support
@@ -454,9 +492,10 @@ const expectedResults = {
    ```
 
 2. **Implement WorkerMessenger Class**
+
    ```javascript
    // src/worker/worker-messenger.js
-   import { YAML } from "bun";
+   import { YAML } from 'bun';
 
    export class WorkerMessenger {
      // Implementation from earlier section
@@ -464,25 +503,27 @@ const expectedResults = {
    ```
 
 3. **Update Settlement Processing**
+
    ```javascript
    // Before (JSON)
    const message = {
      type: 'SETTLEMENT_UPDATE',
-     payload: settlementData
+     payload: settlementData,
    };
    worker.postMessage(JSON.stringify(message));
 
    // After (YAML)
-   import { YAML } from "bun";
+   import { YAML } from 'bun';
 
    const message = {
      type: 'SETTLEMENT_UPDATE',
-     payload: settlementData
+     payload: settlementData,
    };
    worker.postMessage(YAML.stringify(message));
    ```
 
 #### **Success Metrics for Pilot**
+
 - [ ] YAML serialization working without errors
 - [ ] Message parsing successful in receiving workers
 - [ ] No data loss in message transmission
@@ -491,16 +532,19 @@ const expectedResults = {
 ### **Phase 2: Full Domain Rollout (Weeks 3-4)**
 
 #### **Distributions Domain**
+
 1. **Commission Calculation Messages**
 2. **Payment Processing Updates**
 3. **Partner Notification Events**
 
 #### **Free Play Domain**
+
 1. **Bonus Issuance Messages**
 2. **Redemption Processing Updates**
 3. **Campaign Performance Events**
 
 #### **Balance Domain**
+
 1. **Account Update Messages**
 2. **Transaction Processing Events**
 3. **Security Alert Notifications**
@@ -508,6 +552,7 @@ const expectedResults = {
 ### **Phase 3: Cross-Domain Integration (Weeks 5-6)**
 
 #### **Inter-Domain Workflows**
+
 ```yaml
 # settlement-to-distribution.yaml
 workflow: SETTLEMENT_TO_DISTRIBUTION
@@ -524,9 +569,10 @@ steps:
 ```
 
 #### **Event-Driven Communication**
+
 ```javascript
 // event-bus.js
-import { YAML } from "bun";
+import { YAML } from 'bun';
 
 export class DomainEventBus {
   constructor() {
@@ -545,7 +591,7 @@ export class DomainEventBus {
       data,
       sourceDomain: this.currentDomain,
       targetDomains,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     targetDomains.forEach(domain => {
@@ -570,9 +616,10 @@ export class DomainEventBus {
 ### **Phase 4: Performance Optimization (Weeks 7-8)**
 
 #### **Message Compression**
+
 ```javascript
 // compressed-messaging.js
-import { YAML } from "bun";
+import { YAML } from 'bun';
 
 export class CompressedMessenger extends WorkerMessenger {
   async send(message, options = {}) {
@@ -585,7 +632,7 @@ export class CompressedMessenger extends WorkerMessenger {
         type: 'COMPRESSED_MESSAGE',
         originalSize: yamlMessage.length,
         compressedData: compressed,
-        compressionRatio: yamlMessage.length / compressed.length
+        compressionRatio: yamlMessage.length / compressed.length,
       };
       return super.send(compressedMessage, options);
     }
@@ -594,10 +641,12 @@ export class CompressedMessenger extends WorkerMessenger {
   }
 
   async onMessage(callback) {
-    return super.onMessage(async (message) => {
+    return super.onMessage(async message => {
       if (message.type === 'COMPRESSED_MESSAGE') {
         const decompressed = await Bun.gunzip(message.compressedData);
-        const originalMessage = YAML.parse(new TextDecoder().decode(decompressed));
+        const originalMessage = YAML.parse(
+          new TextDecoder().decode(decompressed)
+        );
         return callback(originalMessage);
       }
       return callback(message);
@@ -607,6 +656,7 @@ export class CompressedMessenger extends WorkerMessenger {
 ```
 
 #### **Message Batching**
+
 ```javascript
 // batched-messaging.js
 export class BatchedMessenger extends WorkerMessenger {
@@ -639,7 +689,7 @@ export class BatchedMessenger extends WorkerMessenger {
       type: 'MESSAGE_BATCH',
       messages: this.messageBatch.map(item => item.message),
       timestamp: new Date().toISOString(),
-      batchId: this.generateBatchId()
+      batchId: this.generateBatchId(),
     };
 
     this.messageBatch = [];
@@ -661,7 +711,7 @@ export class BatchedMessenger extends WorkerMessenger {
 
 ```javascript
 // monitoring-dashboard.js
-import { YAML } from "bun";
+import { YAML } from 'bun';
 
 export class WorkerPerformanceDashboard {
   constructor() {
@@ -670,7 +720,7 @@ export class WorkerPerformanceDashboard {
       averageLatency: 0,
       errorRate: 0,
       throughput: 0,
-      compressionRatio: 0
+      compressionRatio: 0,
     };
     this.alerts = [];
   }
@@ -681,8 +731,10 @@ export class WorkerPerformanceDashboard {
     // Update rolling averages
     this.metrics.messagesProcessed = messengerMetrics.messagesSent;
     this.metrics.averageLatency = messengerMetrics.averageLatency;
-    this.metrics.errorRate = messengerMetrics.errors / messengerMetrics.messagesSent;
-    this.metrics.throughput = messengerMetrics.messagesSent / ((Date.now() - this.startTime) / 1000);
+    this.metrics.errorRate =
+      messengerMetrics.errors / messengerMetrics.messagesSent;
+    this.metrics.throughput =
+      messengerMetrics.messagesSent / ((Date.now() - this.startTime) / 1000);
 
     // Check for alerts
     this.checkAlerts();
@@ -693,7 +745,7 @@ export class WorkerPerformanceDashboard {
       this.alerts.push({
         type: 'HIGH_LATENCY',
         message: `Average latency ${this.metrics.averageLatency.toFixed(2)}ms exceeds threshold`,
-        severity: 'warning'
+        severity: 'warning',
       });
     }
 
@@ -701,7 +753,7 @@ export class WorkerPerformanceDashboard {
       this.alerts.push({
         type: 'HIGH_ERROR_RATE',
         message: `Error rate ${(this.metrics.errorRate * 100).toFixed(2)}% exceeds threshold`,
-        severity: 'error'
+        severity: 'error',
       });
     }
   }
@@ -713,7 +765,7 @@ export class WorkerPerformanceDashboard {
       period: 'last_24_hours',
       metrics: this.metrics,
       alerts: this.alerts,
-      recommendations: this.generateRecommendations()
+      recommendations: this.generateRecommendations(),
     });
   }
 
@@ -721,11 +773,15 @@ export class WorkerPerformanceDashboard {
     const recommendations = [];
 
     if (this.metrics.averageLatency > 50) {
-      recommendations.push('Consider implementing message batching for high-volume operations');
+      recommendations.push(
+        'Consider implementing message batching for high-volume operations'
+      );
     }
 
     if (this.metrics.errorRate > 0.005) {
-      recommendations.push('Review message validation logic and error handling');
+      recommendations.push(
+        'Review message validation logic and error handling'
+      );
     }
 
     if (this.metrics.throughput < 100) {
@@ -740,12 +796,14 @@ export class WorkerPerformanceDashboard {
 ### **Success Metrics Tracking**
 
 #### **Performance Metrics**
+
 - **Latency Reduction**: Target 70-80% improvement in inter-domain communication
 - **Throughput Increase**: Target 3-5x improvement in messages per second
 - **Error Rate**: Maintain < 0.1% error rate
 - **CPU Usage**: Monitor worker process utilization
 
 #### **Business Metrics**
+
 - **Settlement Processing Time**: Reduce from current average to < 2 seconds
 - **User Experience**: Improve real-time dashboard response times
 - **System Scalability**: Support 10x current transaction volumes
@@ -763,22 +821,22 @@ export const WORKER_COMMUNICATION_FLAGS = {
     enabled: true,
     description: 'Use YAML instead of JSON for worker messages',
     rolloutPercentage: 100,
-    fallback: 'json'
+    fallback: 'json',
   },
 
   enableCompression: {
     enabled: false,
     description: 'Compress large messages to reduce bandwidth',
     rolloutPercentage: 0,
-    fallback: 'uncompressed'
+    fallback: 'uncompressed',
   },
 
   enableBatching: {
     enabled: false,
     description: 'Batch multiple messages for efficiency',
     rolloutPercentage: 0,
-    fallback: 'individual'
-  }
+    fallback: 'individual',
+  },
 };
 
 // Usage in worker messenger
@@ -851,6 +909,7 @@ echo "✅ Rollback complete. System running on JSON messaging."
 ## **7. Implementation Checklist**
 
 ### **Week 1: Infrastructure Setup**
+
 - [ ] Create YAML message templates for all domains
 - [ ] Implement WorkerMessenger base class
 - [ ] Set up performance benchmarking framework
@@ -858,6 +917,7 @@ echo "✅ Rollback complete. System running on JSON messaging."
 - [ ] Document rollback procedures
 
 ### **Week 2: Pilot Implementation**
+
 - [ ] Update Collections domain to use YAML messaging
 - [ ] Implement message validation and error handling
 - [ ] Run initial performance benchmarks
@@ -865,6 +925,7 @@ echo "✅ Rollback complete. System running on JSON messaging."
 - [ ] Collect baseline performance metrics
 
 ### **Week 3: Domain Expansion**
+
 - [ ] Roll out to Distributions domain
 - [ ] Update Free Play domain messaging
 - [ ] Implement Balance domain updates
@@ -872,6 +933,7 @@ echo "✅ Rollback complete. System running on JSON messaging."
 - [ ] Monitor performance improvements
 
 ### **Week 4: Optimization & Stabilization**
+
 - [ ] Implement message compression for large payloads
 - [ ] Add message batching for high-volume operations
 - [ ] Optimize worker pool sizing
@@ -879,6 +941,7 @@ echo "✅ Rollback complete. System running on JSON messaging."
 - [ ] Documentation updates
 
 ### **Ongoing: Monitoring & Maintenance**
+
 - [ ] Regular performance monitoring and alerting
 - [ ] Periodic benchmarking against baselines
 - [ ] Message format evolution and updates
@@ -889,18 +952,21 @@ echo "✅ Rollback complete. System running on JSON messaging."
 ## **8. Expected Outcomes & ROI**
 
 ### **Performance Improvements**
+
 - **Latency Reduction**: 70-80% faster inter-domain communication
 - **Throughput Increase**: 3-5x more messages per second
 - **CPU Efficiency**: Reduced serialization overhead
 - **Memory Usage**: More efficient message formats
 
 ### **Business Impact**
+
 - **User Experience**: Faster real-time dashboard updates
 - **Scalability**: Support for higher transaction volumes
 - **Developer Productivity**: Better debugging and monitoring
 - **System Reliability**: Improved error handling and recovery
 
 ### **ROI Calculation**
+
 ```
 Implementation Cost: $45K (1 month development)
 Annual Performance Savings: $180K (infrastructure + developer time)
@@ -914,12 +980,15 @@ Payback Period: 1 week
 ## **9. Next Steps**
 
 ### **Immediate Actions**
-1. **Schedule ARB Review**: Present this optimization plan to the Architecture Review Board
+
+1. **Schedule ARB Review**: Present this optimization plan to the Architecture
+   Review Board
 2. **Allocate Resources**: Assign development team for Week 1 implementation
 3. **Setup Monitoring**: Establish baseline performance metrics
 4. **Create Timeline**: Set specific dates for each rollout phase
 
 ### **Success Criteria**
+
 - [ ] YAML messaging implemented in Collections domain by end of Week 2
 - [ ] 70%+ latency improvement demonstrated in staging
 - [ ] No production incidents during rollout
@@ -928,4 +997,7 @@ Payback Period: 1 week
 
 ---
 
-*This optimization leverages Bun's native YAML support and 500x faster postMessage to create a more efficient, maintainable, and scalable inter-domain communication system. The implementation is designed for gradual rollout with comprehensive monitoring and rollback capabilities.*
+_This optimization leverages Bun's native YAML support and 500x faster
+postMessage to create a more efficient, maintainable, and scalable inter-domain
+communication system. The implementation is designed for gradual rollout with
+comprehensive monitoring and rollback capabilities._

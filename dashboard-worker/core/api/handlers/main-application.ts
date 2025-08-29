@@ -19,17 +19,17 @@ export class MainApplication {
         connectionString: process.env.DATABASE_URL || 'sqlite::memory:',
         poolSize: 10,
         timeout: 30000,
-        retryAttempts: 3
+        retryAttempts: 3,
       },
       cache: {
         enabled: true,
-        ttl: 3600
+        ttl: 3600,
       },
       logging: {
         level: (process.env.LOG_LEVEL as any) || 'info',
-        enableConsole: true
+        enableConsole: true,
       },
-      ...config
+      ...config,
     };
 
     // Initialize dependency container
@@ -66,7 +66,6 @@ export class MainApplication {
 
       console.log('✅ Application initialized successfully');
       console.log('📊 Health Status:', this.container.getHealthStatus());
-
     } catch (error) {
       console.error('❌ Application initialization failed:', error);
       throw error;

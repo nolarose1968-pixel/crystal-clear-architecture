@@ -997,6 +997,7 @@ export class PatternWeaver {
           validCount: validationResults.filter(f => f.valid).length,
           invalidFiles: validationResults.filter(f => !f.valid)
         };
+        break;
 
       case 'info':
         if (path) {

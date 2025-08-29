@@ -28,7 +28,7 @@ class BuildOrganizer {
     docusaurus: 'needs-cleanup',
     mdx: 'needs-sanitization',
     dependencies: 'needs-update',
-    artifacts: 'needs-cleanup'
+    artifacts: 'needs-cleanup',
   };
 
   constructor() {
@@ -42,39 +42,39 @@ class BuildOrganizer {
         name: 'clean-build-artifacts',
         description: 'Remove all build artifacts and temporary files',
         priority: 'high',
-        action: async () => await this.cleanBuildArtifacts()
+        action: async () => await this.cleanBuildArtifacts(),
       },
       {
         name: 'organize-mdx-files',
         description: 'Move problematic MDX files to archive and create clean versions',
         priority: 'high',
-        action: async () => await this.organizeMDXFiles()
+        action: async () => await this.organizeMDXFiles(),
       },
       {
         name: 'validate-docusaurus-config',
         description: 'Ensure Docusaurus configuration is clean and optimized',
         priority: 'high',
-        action: async () => await this.validateDocusaurusConfig()
+        action: async () => await this.validateDocusaurusConfig(),
       },
 
-      // Medium Priority - Organization and Optimization  
+      // Medium Priority - Organization and Optimization
       {
         name: 'organize-documentation-structure',
         description: 'Create proper documentation hierarchy',
         priority: 'medium',
-        action: async () => await this.organizeDocumentationStructure()
+        action: async () => await this.organizeDocumentationStructure(),
       },
       {
         name: 'clean-dependencies',
         description: 'Remove unused dependencies and update lockfiles',
         priority: 'medium',
-        action: async () => await this.cleanDependencies()
+        action: async () => await this.cleanDependencies(),
       },
       {
         name: 'organize-scripts',
         description: 'Organize build scripts and remove duplicates',
         priority: 'medium',
-        action: async () => await this.organizeScripts()
+        action: async () => await this.organizeScripts(),
       },
 
       // Low Priority - Polish and Maintenance
@@ -82,20 +82,20 @@ class BuildOrganizer {
         name: 'create-build-reports',
         description: 'Generate comprehensive build status reports',
         priority: 'low',
-        action: async () => await this.createBuildReports()
+        action: async () => await this.createBuildReports(),
       },
       {
         name: 'setup-build-automation',
         description: 'Configure automated build validation',
         priority: 'low',
-        action: async () => await this.setupBuildAutomation()
-      }
+        action: async () => await this.setupBuildAutomation(),
+      },
     ];
   }
 
   async run(): Promise<void> {
     console.log('🧹 Fire22 Dashboard - Build Cleanup & Organization');
-    console.log('==================================================');
+    console.log('!==!==!==!==!==!==!==!==!====');
     console.log('🎯 Organizing and cleaning all build systems for optimal performance');
     console.log('');
 
@@ -123,7 +123,7 @@ class BuildOrganizer {
     for (const task of tasks) {
       console.log(`\\n🔧 ${task.name}:`);
       console.log(`   📋 ${task.description}`);
-      
+
       try {
         const taskStart = Date.now();
         await task.action();
@@ -144,11 +144,11 @@ class BuildOrganizer {
       '*.log',
       'coverage/**/*',
       'logs/*.json',
-      '**/*.backup-*'
+      '**/*.backup-*',
     ];
 
     let cleanedFiles = 0;
-    
+
     for (const pattern of artifactPatterns) {
       try {
         const files = await glob(pattern, { ignore: ['node_modules/**/*'] });
@@ -205,7 +205,7 @@ class BuildOrganizer {
       'docs/real-time-flows.md',
       'docs/terminal-footer-component.md',
       'docs/terminal-optimization-guide.md',
-      'docs/withdrawal-system.md'
+      'docs/withdrawal-system.md',
     ];
 
     let archivedFiles = 0;
@@ -215,7 +215,7 @@ class BuildOrganizer {
       const fullPath = join(process.cwd(), filePath);
       try {
         await fs.access(fullPath);
-        
+
         // Move to archive
         const archivePath = join(archiveDir, filePath.replace('docs/', ''));
         await fs.mkdir(dirname(archivePath), { recursive: true });
@@ -227,7 +227,6 @@ class BuildOrganizer {
         const cleanContent = this.generateCleanMDXContent(fileName, filePath);
         await fs.writeFile(fullPath, cleanContent);
         createdCleanFiles++;
-
       } catch (error) {
         // File doesn't exist, skip
       }
@@ -240,7 +239,7 @@ class BuildOrganizer {
 
   private generateCleanMDXContent(title: string, originalPath: string): string {
     const cleanTitle = title.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    
+
     return `# ${cleanTitle}
 
 <div className="fire22-notice">
@@ -304,7 +303,7 @@ const config = {
   private async validateDocusaurusConfig(): Promise<void> {
     const configPath = join(process.cwd(), 'docusaurus.config.js');
     const content = await fs.readFile(configPath, 'utf-8');
-    
+
     // Create a minimal, clean configuration
     const cleanConfig = `// @ts-check
 // Fire22 Dashboard - Clean Docusaurus Configuration
@@ -460,10 +459,10 @@ export default config;
 
     // Backup original config
     await fs.writeFile(`${configPath}.backup`, content);
-    
+
     // Write clean config
     await fs.writeFile(configPath, cleanConfig);
-    
+
     console.log('     ⚙️  Created clean Docusaurus configuration');
     console.log('     💾 Original config backed up');
     this.status.docusaurus = 'clean';
@@ -479,7 +478,7 @@ export default config;
       'docs/tutorials',
       'docs/troubleshooting',
       'static/img',
-      'static/assets'
+      'static/assets',
     ];
 
     for (const dir of directories) {
@@ -517,10 +516,10 @@ export default config;
     // Create organized script directories
     const scriptDirs = [
       'scripts/build',
-      'scripts/dev', 
+      'scripts/dev',
       'scripts/deploy',
       'scripts/maintenance',
-      'scripts/utils'
+      'scripts/utils',
     ];
 
     for (const dir of scriptDirs) {
@@ -534,23 +533,23 @@ export default config;
       { pattern: '*deploy*', dir: 'deploy' },
       { pattern: '*clean*', dir: 'maintenance' },
       { pattern: '*sanitize*', dir: 'maintenance' },
-      { pattern: '*fix*', dir: 'maintenance' }
+      { pattern: '*fix*', dir: 'maintenance' },
     ];
 
     let organizedScripts = 0;
     const scriptsDir = join(process.cwd(), 'scripts');
-    
+
     try {
       const files = await fs.readdir(scriptsDir);
-      
+
       for (const file of files) {
         if (!file.endsWith('.ts') && !file.endsWith('.js')) continue;
-        
+
         for (const mapping of scriptMappings) {
           if (file.includes(mapping.pattern.replace('*', ''))) {
             const oldPath = join(scriptsDir, file);
             const newPath = join(scriptsDir, mapping.dir, file);
-            
+
             try {
               await fs.rename(oldPath, newPath);
               organizedScripts++;
@@ -579,18 +578,18 @@ export default config;
         docusaurusConfigCleaned: this.status.docusaurus === 'clean',
         mdxFilesOrganized: this.status.mdx === 'clean',
         dependenciesCleaned: this.status.dependencies === 'clean',
-        artifactsRemoved: this.status.artifacts === 'clean'
+        artifactsRemoved: this.status.artifacts === 'clean',
       },
       nextSteps: [
         'Run bun install to reinstall clean dependencies',
         'Start Docusaurus with bun run docs:start',
         'Verify all documentation pages load correctly',
-        'Restore archived content gradually with proper MDX formatting'
-      ]
+        'Restore archived content gradually with proper MDX formatting',
+      ],
     };
 
     await fs.writeFile(
-      join(reportsDir, 'build-cleanup-report.json'), 
+      join(reportsDir, 'build-cleanup-report.json'),
       JSON.stringify(buildReport, null, 2)
     );
 
@@ -605,10 +604,10 @@ export default config;
     // Add clean build scripts
     packageJson.scripts = {
       ...packageJson.scripts,
-      "docs:clean": "bun run scripts/maintenance/clean-and-organize-builds.ts",
-      "docs:start:clean": "bun run docs:clean && bun run docs:start",
-      "docs:build:clean": "bun run docs:clean && bun run docs:build",
-      "build:all:clean": "bun run docs:clean && bun run build && bun run docs:build"
+      'docs:clean': 'bun run scripts/maintenance/clean-and-organize-builds.ts',
+      'docs:start:clean': 'bun run docs:clean && bun run docs:start',
+      'docs:build:clean': 'bun run docs:clean && bun run docs:build',
+      'build:all:clean': 'bun run docs:clean && bun run build && bun run docs:build',
     };
 
     await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2));
@@ -617,13 +616,13 @@ export default config;
 
   private async generateFinalReport(duration: number): Promise<void> {
     console.log('\\n🎉 Build Cleanup & Organization Complete!');
-    console.log('==========================================');
+    console.log('!==!==!==!==!==!==!==!==');
     console.log(`⏱️  Total Duration: ${duration}ms`);
     console.log('');
     console.log('📊 Final Status:');
     console.log(`   📖 Docusaurus: ${this.status.docusaurus}`);
     console.log(`   📝 MDX Files: ${this.status.mdx}`);
-    console.log(`   📦 Dependencies: ${this.status.dependencies}`);  
+    console.log(`   📦 Dependencies: ${this.status.dependencies}`);
     console.log(`   🗑️  Artifacts: ${this.status.artifacts}`);
     console.log('');
     console.log('🚀 Next Steps:');

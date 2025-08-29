@@ -14,9 +14,9 @@
  *   bun run performance-profiling-script.ts --benchmark
  */
 
-import { performance } from 'perf_hooks';
-import { readdirSync, statSync } from 'fs';
-import { join, relative } from 'path';
+import { performance } from "perf_hooks";
+import { readdirSync, statSync } from "fs";
+import { join, relative } from "path";
 
 interface ProfilingResult {
   module: string;
@@ -38,7 +38,7 @@ interface ModuleMetrics {
 class PerformanceProfiler {
   private results: ProfilingResult[] = [];
   private moduleMetrics: Map<string, ModuleMetrics> = new Map();
-  private basePath = './dashboard-worker/src';
+  private basePath = "./dashboard-worker/src";
 
   /**
    * Main profiling entry point
@@ -46,23 +46,23 @@ class PerformanceProfiler {
   async run(args: string[]): Promise<void> {
     const command = args[0];
 
-    console.log('🎯 Fire22 Performance Profiler');
-    console.log('================================\n');
+    console.log("🎯 Fire22 Performance Profiler");
+    console.log("!==!==!==!==!==!==\n");
 
     switch (command) {
-      case '--module':
+      case "--module":
         await this.profileModule(args[1]);
         break;
-      case '--function':
+      case "--function":
         await this.profileFunction(args[1]);
         break;
-      case '--hotspots':
+      case "--hotspots":
         await this.findHotspots();
         break;
-      case '--benchmark':
+      case "--benchmark":
         await this.runBenchmark();
         break;
-      case '--analyze':
+      case "--analyze":
         await this.analyzeModules();
         break;
       default:
@@ -75,7 +75,7 @@ class PerformanceProfiler {
    */
   private async profileModule(moduleName: string): Promise<void> {
     console.log(`🔍 Profiling module: ${moduleName}`);
-    console.log('----------------------------------\n');
+    console.log("----------------------------------\n");
 
     const modulePath = join(this.basePath, moduleName);
 
@@ -89,7 +89,6 @@ class PerformanceProfiler {
       }
 
       this.displayResults();
-
     } catch (error) {
       console.error(`❌ Error profiling module ${moduleName}:`, error);
     }
@@ -100,17 +99,18 @@ class PerformanceProfiler {
    */
   private async profileFunction(functionName: string): Promise<void> {
     console.log(`🔍 Profiling function: ${functionName}`);
-    console.log('-------------------------------------\n');
+    console.log("-------------------------------------\n");
 
     const allFiles = this.getAllSourceFiles();
 
     for (const file of allFiles) {
       const content = await Bun.file(file).text();
 
-      if (content.includes(`function ${functionName}`) ||
-          content.includes(`${functionName}(`) ||
-          content.includes(`${functionName} =`)) {
-
+      if (
+        content.includes(`function ${functionName}`) ||
+        content.includes(`${functionName}(`) ||
+        content.includes(`${functionName} =`)
+      ) {
         console.log(`📍 Found in: ${relative(this.basePath, file)}`);
         await this.profileSpecificFunction(file, functionName);
       }
@@ -123,8 +123,8 @@ class PerformanceProfiler {
    * Find performance hotspots across the entire codebase
    */
   private async findHotspots(): Promise<void> {
-    console.log('🔥 Finding Performance Hotspots');
-    console.log('=================================\n');
+    console.log("🔥 Finding Performance Hotspots");
+    console.log("!==!==!==!==!==!===\n");
 
     await this.analyzeModules();
 
@@ -133,17 +133,19 @@ class PerformanceProfiler {
       .sort(([, a], [, b]) => a.performanceScore - b.performanceScore)
       .slice(0, 10);
 
-    console.log('🏆 Top Performance Hotspots:');
-    console.log('------------------------------');
+    console.log("🏆 Top Performance Hotspots:");
+    console.log("------------------------------");
 
     hotspots.forEach(([moduleName, metrics], index) => {
       const risk = this.getRiskLevel(metrics.performanceScore);
       console.log(`${index + 1}. ${moduleName}`);
       console.log(`   📏 Lines: ${metrics.lineCount}`);
       console.log(`   🔄 Complexity: ${metrics.complexity}`);
-      console.log(`   📊 Score: ${metrics.performanceScore.toFixed(2)} (${risk})`);
+      console.log(
+        `   📊 Score: ${metrics.performanceScore.toFixed(2)} (${risk})`,
+      );
       console.log(`   🔗 Dependencies: ${metrics.dependencies.length}`);
-      console.log('');
+      console.log("");
     });
   }
 
@@ -151,14 +153,14 @@ class PerformanceProfiler {
    * Run comprehensive benchmark suite
    */
   private async runBenchmark(): Promise<void> {
-    console.log('⚡ Running Performance Benchmark');
-    console.log('=================================\n');
+    console.log("⚡ Running Performance Benchmark");
+    console.log("!==!==!==!==!==!===\n");
 
     const benchmarkResults = {
       moduleAnalysis: 0,
       fileProfiling: 0,
       functionCalls: 0,
-      totalTime: 0
+      totalTime: 0,
     };
 
     const startTime = performance.now();
@@ -170,7 +172,10 @@ class PerformanceProfiler {
 
     // Benchmark file profiling
     const fileStart = performance.now();
-    const sampleFile = join(this.basePath, 'api/controllers/settlement/settlement-controller.ts');
+    const sampleFile = join(
+      this.basePath,
+      "api/controllers/settlement/settlement-controller.ts",
+    );
     if (await this.fileExists(sampleFile)) {
       await this.profileFile(sampleFile);
     }
@@ -178,38 +183,47 @@ class PerformanceProfiler {
 
     benchmarkResults.totalTime = performance.now() - startTime;
 
-    console.log('📊 Benchmark Results:');
-    console.log('---------------------');
-    console.log(`🔍 Module Analysis: ${benchmarkResults.moduleAnalysis.toFixed(2)}ms`);
-    console.log(`📁 File Profiling: ${benchmarkResults.fileProfiling.toFixed(2)}ms`);
+    console.log("📊 Benchmark Results:");
+    console.log("---------------------");
+    console.log(
+      `🔍 Module Analysis: ${benchmarkResults.moduleAnalysis.toFixed(2)}ms`,
+    );
+    console.log(
+      `📁 File Profiling: ${benchmarkResults.fileProfiling.toFixed(2)}ms`,
+    );
     console.log(`⏱️  Total Time: ${benchmarkResults.totalTime.toFixed(2)}ms`);
-    console.log(`📈 Performance Score: ${((benchmarkResults.totalTime / 1000) * 1000).toFixed(0)}`);
+    console.log(
+      `📈 Performance Score: ${((benchmarkResults.totalTime / 1000) * 1000).toFixed(0)}`,
+    );
   }
 
   /**
    * Analyze all modules for performance metrics
    */
   private async analyzeModules(): Promise<void> {
-    console.log('📊 Analyzing Module Performance...');
+    console.log("📊 Analyzing Module Performance...");
 
     const modules = [
-      'api/controllers/settlement',
-      'api/controllers/adjustment',
-      'api/controllers/balance',
-      'finance/validation',
-      'finance/audit',
-      'sports/events',
-      'sports/betting',
-      'telegram/core',
-      'components/customer',
-      'hierarchy/agents'
+      "api/controllers/settlement",
+      "api/controllers/adjustment",
+      "api/controllers/balance",
+      "finance/validation",
+      "finance/audit",
+      "sports/events",
+      "sports/betting",
+      "telegram/core",
+      "components/customer",
+      "hierarchy/agents",
     ];
 
     for (const moduleName of modules) {
       const modulePath = join(this.basePath, moduleName);
 
       if (await this.directoryExists(modulePath)) {
-        const metrics = await this.calculateModuleMetrics(modulePath, moduleName);
+        const metrics = await this.calculateModuleMetrics(
+          modulePath,
+          moduleName,
+        );
         this.moduleMetrics.set(moduleName, metrics);
       }
     }
@@ -220,7 +234,10 @@ class PerformanceProfiler {
   /**
    * Calculate performance metrics for a module
    */
-  private async calculateModuleMetrics(modulePath: string, moduleName: string): Promise<ModuleMetrics> {
+  private async calculateModuleMetrics(
+    modulePath: string,
+    moduleName: string,
+  ): Promise<ModuleMetrics> {
     const files = this.getModuleFiles(modulePath);
     let totalLines = 0;
     let complexity = 0;
@@ -228,25 +245,26 @@ class PerformanceProfiler {
 
     for (const file of files) {
       const content = await Bun.file(file).text();
-      totalLines += content.split('\n').length;
+      totalLines += content.split("\n").length;
 
       // Calculate complexity based on various factors
       complexity += this.calculateComplexity(content);
 
       // Extract dependencies
       const deps = this.extractDependencies(content);
-      deps.forEach(dep => dependencies.add(dep));
+      deps.forEach((dep) => dependencies.add(dep));
     }
 
     // Calculate performance score (lower is better)
-    const performanceScore = (totalLines * 0.3) + (complexity * 0.4) + (dependencies.size * 0.3);
+    const performanceScore =
+      totalLines * 0.3 + complexity * 0.4 + dependencies.size * 0.3;
 
     return {
       name: moduleName,
       lineCount: totalLines,
       complexity,
       dependencies: Array.from(dependencies),
-      performanceScore
+      performanceScore,
     };
   }
 
@@ -270,7 +288,10 @@ class PerformanceProfiler {
   /**
    * Profile a specific function in a file
    */
-  private async profileSpecificFunction(filePath: string, functionName: string): Promise<ProfilingResult | null> {
+  private async profileSpecificFunction(
+    filePath: string,
+    functionName: string,
+  ): Promise<ProfilingResult | null> {
     // This would typically involve running the function with test data
     // For demonstration, we'll simulate profiling
 
@@ -287,7 +308,7 @@ class PerformanceProfiler {
       executionTime: endTime - startTime,
       callCount: 1,
       averageTime: executionTime,
-      hotspots: executionTime > 50 ? [`Slow execution in ${functionName}`] : []
+      hotspots: executionTime > 50 ? [`Slow execution in ${functionName}`] : [],
     };
   }
 
@@ -300,10 +321,10 @@ class PerformanceProfiler {
       /function\s+(\w+)/g,
       /(\w+)\s*\([^)]*\)\s*{/g,
       /(\w+)\s*=\s*\([^)]*\)\s*=>/g,
-      /(\w+)\s*=\s*function/g
+      /(\w+)\s*=\s*function/g,
     ];
 
-    patterns.forEach(pattern => {
+    patterns.forEach((pattern) => {
       let match;
       while ((match = pattern.exec(content)) !== null) {
         if (match[1] && !functions.includes(match[1])) {
@@ -323,10 +344,11 @@ class PerformanceProfiler {
 
     // Count various complexity indicators
     complexity += (content.match(/\bif\b/g) || []).length;
-    complexity += (content.match(/\bfor\b|\bwhile\b|\bforEach\b/g) || []).length;
+    complexity += (content.match(/\bfor\b|\bwhile\b|\bforEach\b/g) || [])
+      .length;
     complexity += (content.match(/\btry\b|\bcatch\b/g) || []).length;
     complexity += (content.match(/\bawait\b/g) || []).length;
-    complexity += Math.floor(content.split('\n').length / 50); // Lines factor
+    complexity += Math.floor(content.split("\n").length / 50); // Lines factor
 
     return complexity;
   }
@@ -360,9 +382,16 @@ class PerformanceProfiler {
           const fullPath = join(dir, item);
           const stat = statSync(fullPath);
 
-          if (stat.isDirectory() && !item.startsWith('.') && item !== 'node_modules') {
+          if (
+            stat.isDirectory() &&
+            !item.startsWith(".") &&
+            item !== "node_modules"
+          ) {
             scanDirectory(fullPath);
-          } else if (stat.isFile() && (item.endsWith('.ts') || item.endsWith('.js'))) {
+          } else if (
+            stat.isFile() &&
+            (item.endsWith(".ts") || item.endsWith(".js"))
+          ) {
             files.push(fullPath);
           }
         }
@@ -391,7 +420,10 @@ class PerformanceProfiler {
 
           if (stat.isDirectory()) {
             scanDirectory(fullPath);
-          } else if (stat.isFile() && (item.endsWith('.ts') || item.endsWith('.js'))) {
+          } else if (
+            stat.isFile() &&
+            (item.endsWith(".ts") || item.endsWith(".js"))
+          ) {
             files.push(fullPath);
           }
         }
@@ -430,10 +462,10 @@ class PerformanceProfiler {
    * Get risk level based on performance score
    */
   private getRiskLevel(score: number): string {
-    if (score < 50) return '🟢 Low Risk';
-    if (score < 100) return '🟡 Medium Risk';
-    if (score < 150) return '🟠 High Risk';
-    return '🔴 Critical Risk';
+    if (score < 50) return "🟢 Low Risk";
+    if (score < 100) return "🟡 Medium Risk";
+    if (score < 150) return "🟠 High Risk";
+    return "🔴 Critical Risk";
   }
 
   /**
@@ -441,23 +473,25 @@ class PerformanceProfiler {
    */
   private displayResults(): void {
     if (this.results.length === 0) {
-      console.log('❌ No profiling results found');
+      console.log("❌ No profiling results found");
       return;
     }
 
-    console.log('\n📊 Profiling Results:');
-    console.log('=====================');
+    console.log("\n📊 Profiling Results:");
+    console.log("!==!==!==!==");
 
     this.results.forEach((result, index) => {
       console.log(`${index + 1}. ${result.module}::${result.function}`);
-      console.log(`   ⏱️  Execution Time: ${result.executionTime.toFixed(2)}ms`);
+      console.log(
+        `   ⏱️  Execution Time: ${result.executionTime.toFixed(2)}ms`,
+      );
       console.log(`   🔄 Call Count: ${result.callCount}`);
       console.log(`   📈 Average Time: ${result.averageTime.toFixed(2)}ms`);
 
       if (result.hotspots.length > 0) {
-        console.log(`   🔥 Hotspots: ${result.hotspots.join(', ')}`);
+        console.log(`   🔥 Hotspots: ${result.hotspots.join(", ")}`);
       }
-      console.log('');
+      console.log("");
     });
   }
 
@@ -465,26 +499,30 @@ class PerformanceProfiler {
    * Show usage information
    */
   private showUsage(): void {
-    console.log('🔍 Fire22 Performance Profiler Usage:');
-    console.log('=====================================');
-    console.log('');
-    console.log('Commands:');
-    console.log('  --module <name>     Profile a specific module');
-    console.log('  --function <name>   Profile a specific function');
-    console.log('  --hotspots          Find performance hotspots');
-    console.log('  --benchmark         Run performance benchmark');
-    console.log('  --analyze           Analyze all modules');
-    console.log('');
-    console.log('Examples:');
-    console.log('  bun run performance-profiling-script.ts --module controllers/settlement');
-    console.log('  bun run performance-profiling-script.ts --function validateSettlement');
-    console.log('  bun run performance-profiling-script.ts --hotspots');
-    console.log('');
-    console.log('Benefits of Modular Architecture:');
-    console.log('• 🔍 Granular profiling instead of file-level hotspots');
-    console.log('• 🎯 Precise function identification');
-    console.log('• ⚡ Rapid optimization targeting');
-    console.log('• 📊 Measurable performance improvements');
+    console.log("🔍 Fire22 Performance Profiler Usage:");
+    console.log("!==!==!==!==!==!==!==");
+    console.log("");
+    console.log("Commands:");
+    console.log("  --module <name>     Profile a specific module");
+    console.log("  --function <name>   Profile a specific function");
+    console.log("  --hotspots          Find performance hotspots");
+    console.log("  --benchmark         Run performance benchmark");
+    console.log("  --analyze           Analyze all modules");
+    console.log("");
+    console.log("Examples:");
+    console.log(
+      "  bun run performance-profiling-script.ts --module controllers/settlement",
+    );
+    console.log(
+      "  bun run performance-profiling-script.ts --function validateSettlement",
+    );
+    console.log("  bun run performance-profiling-script.ts --hotspots");
+    console.log("");
+    console.log("Benefits of Modular Architecture:");
+    console.log("• 🔍 Granular profiling instead of file-level hotspots");
+    console.log("• 🎯 Precise function identification");
+    console.log("• ⚡ Rapid optimization targeting");
+    console.log("• 📊 Measurable performance improvements");
   }
 }
 

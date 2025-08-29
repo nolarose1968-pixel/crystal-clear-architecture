@@ -5,11 +5,15 @@
  * Business logic for VIP customer management, tier qualification, and benefits processing
  */
 
-import { VipCustomer, VipCustomerStats, VipStatus } from '../entities/vip-customer';
-import { VipTier, VipTierLevel } from '../value-objects/vip-tier';
-import { VipCustomerRepository } from '../repositories/vip-customer-repository';
-import { DomainEvents } from '../../shared/events/domain-events';
-import { DomainError } from '../../shared/domain-entity';
+import {
+  VipCustomer,
+  VipCustomerStats,
+  VipStatus,
+} from "../entities/vip-customer";
+import { VipTier, VipTierLevel } from "../value-objects/vip-tier";
+import { VipCustomerRepository } from "../repositories/vip-customer-repository";
+import { DomainEvents } from "../../shared/events/domain-events";
+import { DomainError } from "../../shared/domain-entity";
 
 export interface VipQualificationRequest {
   customerId: string;
@@ -34,7 +38,7 @@ export interface VipBenefitsCalculation {
 export class VipService {
   constructor(
     private repository: VipCustomerRepository,
-    private eventPublisher: DomainEvents
+    private eventPublisher: DomainEvents,
   ) {}
 
   /**
@@ -51,13 +55,21 @@ export class VipService {
       // Validate initial tier qualification
       const requestedTier = this.getTierByLevel(params.initialTier);
       if (!requestedTier.isEligibleForUpgrade(params.stats)) {
-        throw new DomainError('Customer does not meet requirements for initial VIP tier', 'INSUFFICIENT_QUALIFICATION');
+        throw new DomainError(
+          "Customer does not meet requirements for initial VIP tier",
+          "INSUFFICIENT_QUALIFICATION",
+        );
       }
 
       // Check if customer already exists
-      const existingCustomer = await this.repository.findByCustomerId(params.customerId);
+      const existingCustomer = await this.repository.findByCustomerId(
+        params.customerId,
+      );
       if (existingCustomer) {
-        throw new DomainError('Customer is already a VIP member', 'CUSTOMER_ALREADY_VIP');
+        throw new DomainError(
+          "Customer is already a VIP member",
+          "CUSTOMER_ALREADY_VIP",
+        );
       }
 
       // Create new VIP customer
@@ -66,23 +78,22 @@ export class VipService {
         initialTier: requestedTier,
         stats: params.stats,
         accountManagerId: params.accountManagerId,
-        communicationPreferences: params.communicationPreferences
+        communicationPreferences: params.communicationPreferences,
       });
 
       await this.repository.save(vipCustomer);
 
       // Publish domain event
-      await this.eventPublisher.publish('vip.customer.onboarded', {
+      await this.eventPublisher.publish("vip.customer.onboarded", {
         vipCustomerId: vipCustomer.getId(),
         customerId: params.customerId,
         tier: params.initialTier,
-        accountManagerId: params.accountManagerId
+        accountManagerId: params.accountManagerId,
       });
 
       return vipCustomer;
-
     } catch (error) {
-      console.error('❌ VIP Service: Failed to onboard VIP customer:', error);
+      console.error("❌ VIP Service: Failed to onboard VIP customer:", error);
       throw error;
     }
   }
@@ -98,7 +109,7 @@ export class VipService {
   }> {
     try {
       const tiers = this.getAllTiers();
-      let highestEligibleTier: VipTierLevel = 'bronze';
+      let highestEligibleTier: VipTierLevel = "bronze";
       const qualificationDetails: any = {};
 
       // Evaluate against each tier
@@ -107,32 +118,44 @@ export class VipService {
         qualificationDetails[tier.getLevel()] = {
           eligible: isEligible,
           requirements: tier.getRequirements(),
-          customerStats: request.stats
+          customerStats: request.stats,
         };
 
-        if (isEligible && this.getTierOrder(tier.getLevel()) > this.getTierOrder(highestEligibleTier)) {
+        if (
+          isEligible &&
+          this.getTierOrder(tier.getLevel()) >
+            this.getTierOrder(highestEligibleTier)
+        ) {
           highestEligibleTier = tier.getLevel();
         }
       }
 
       // Determine recommended tier
       let recommendedTier = highestEligibleTier;
-      if (request.requestedTier && this.isTierHigherOrEqual(request.requestedTier, highestEligibleTier)) {
+      if (
+        request.requestedTier &&
+        this.isTierHigherOrEqual(request.requestedTier, highestEligibleTier)
+      ) {
         recommendedTier = request.requestedTier;
       }
 
       // Generate next steps
-      const nextSteps = this.generateQualificationNextSteps(qualificationDetails, highestEligibleTier);
+      const nextSteps = this.generateQualificationNextSteps(
+        qualificationDetails,
+        highestEligibleTier,
+      );
 
       return {
-        isEligible: highestEligibleTier !== 'bronze',
+        isEligible: highestEligibleTier !== "bronze",
         recommendedTier,
         qualificationDetails,
-        nextSteps
+        nextSteps,
       };
-
     } catch (error) {
-      console.error('❌ VIP Service: Failed to evaluate VIP qualification:', error);
+      console.error(
+        "❌ VIP Service: Failed to evaluate VIP qualification:",
+        error,
+      );
       throw error;
     }
   }
@@ -142,13 +165,21 @@ export class VipService {
    */
   async processVipUpgrade(request: VipUpgradeRequest): Promise<VipCustomer> {
     try {
-      const vipCustomer = await this.repository.findByCustomerId(request.customerId);
+      const vipCustomer = await this.repository.findByCustomerId(
+        request.customerId,
+      );
       if (!vipCustomer) {
-        throw new DomainError('VIP customer not found', 'VIP_CUSTOMER_NOT_FOUND');
+        throw new DomainError(
+          "VIP customer not found",
+          "VIP_CUSTOMER_NOT_FOUND",
+        );
       }
 
       if (!vipCustomer.isActive()) {
-        throw new DomainError('VIP customer account is not active', 'VIP_CUSTOMER_INACTIVE');
+        throw new DomainError(
+          "VIP customer account is not active",
+          "VIP_CUSTOMER_INACTIVE",
+        );
       }
 
       const targetTier = this.getTierByLevel(request.targetTier);
@@ -159,19 +190,18 @@ export class VipService {
       await this.repository.save(vipCustomer);
 
       // Publish domain event
-      await this.eventPublisher.publish('vip.customer.upgraded', {
+      await this.eventPublisher.publish("vip.customer.upgraded", {
         vipCustomerId: vipCustomer.getId(),
         customerId: request.customerId,
         fromTier: vipCustomer.getUpgradeHistory().slice(-1)[0].fromTier,
         toTier: request.targetTier,
         upgradeBonus: targetTier.getUpgradeBonus(),
-        approvedBy: request.approvedBy
+        approvedBy: request.approvedBy,
       });
 
       return vipCustomer;
-
     } catch (error) {
-      console.error('❌ VIP Service: Failed to process VIP upgrade:', error);
+      console.error("❌ VIP Service: Failed to process VIP upgrade:", error);
       throw error;
     }
   }
@@ -179,7 +209,10 @@ export class VipService {
   /**
    * Calculate VIP benefits for a customer
    */
-  async calculateVipBenefits(customerId: string, baseBalanceLimit: number): Promise<VipBenefitsCalculation> {
+  async calculateVipBenefits(
+    customerId: string,
+    baseBalanceLimit: number,
+  ): Promise<VipBenefitsCalculation> {
     try {
       const vipCustomer = await this.repository.findByCustomerId(customerId);
       if (!vipCustomer || !vipCustomer.canReceiveBenefits()) {
@@ -187,7 +220,7 @@ export class VipService {
           monthlyCashback: 0,
           depositBonus: 0,
           effectiveBalanceLimit: baseBalanceLimit,
-          availableBenefits: []
+          availableBenefits: [],
         };
       }
 
@@ -195,28 +228,38 @@ export class VipService {
       const benefits = tier.getBenefits();
       const stats = vipCustomer.getStats();
 
-      const monthlyCashback = tier.calculateMonthlyCashback(stats.monthlyDeposits);
-      const effectiveBalanceLimit = tier.getEffectiveBalanceLimit(baseBalanceLimit);
+      const monthlyCashback = tier.calculateMonthlyCashback(
+        stats.monthlyDeposits,
+      );
+      const effectiveBalanceLimit =
+        tier.getEffectiveBalanceLimit(baseBalanceLimit);
 
       // Determine available benefits
       const availableBenefits: string[] = [];
-      if (benefits.dedicatedAccountManager) availableBenefits.push('Dedicated Account Manager');
-      if (benefits.prioritySupport) availableBenefits.push('Priority Support');
-      if (benefits.exclusiveEventsAccess) availableBenefits.push('Exclusive Events Access');
-      if (benefits.freeSpinsMonthly > 0) availableBenefits.push(`${benefits.freeSpinsMonthly} Free Spins Monthly`);
-      if (benefits.personalizedNewsletters) availableBenefits.push('Personalized Newsletters');
-      if (benefits.directPhoneSupport) availableBenefits.push('Direct Phone Support');
-      if (benefits.customBirthdayOffers) availableBenefits.push('Custom Birthday Offers');
+      if (benefits.dedicatedAccountManager)
+        availableBenefits.push("Dedicated Account Manager");
+      if (benefits.prioritySupport) availableBenefits.push("Priority Support");
+      if (benefits.exclusiveEventsAccess)
+        availableBenefits.push("Exclusive Events Access");
+      if (benefits.freeSpinsMonthly > 0)
+        availableBenefits.push(
+          `${benefits.freeSpinsMonthly} Free Spins Monthly`,
+        );
+      if (benefits.personalizedNewsletters)
+        availableBenefits.push("Personalized Newsletters");
+      if (benefits.directPhoneSupport)
+        availableBenefits.push("Direct Phone Support");
+      if (benefits.customBirthdayOffers)
+        availableBenefits.push("Custom Birthday Offers");
 
       return {
         monthlyCashback,
         depositBonus: benefits.depositBonusRate * 100, // Convert to percentage
         effectiveBalanceLimit,
-        availableBenefits
+        availableBenefits,
       };
-
     } catch (error) {
-      console.error('❌ VIP Service: Failed to calculate VIP benefits:', error);
+      console.error("❌ VIP Service: Failed to calculate VIP benefits:", error);
       throw error;
     }
   }
@@ -253,11 +296,13 @@ export class VipService {
             // Determine appropriate action
             const qualification = await this.evaluateVipQualification({
               customerId: vipCustomer.getCustomerId(),
-              stats
+              stats,
             });
 
             if (qualification.recommendedTier !== currentTier.getLevel()) {
-              const tierOrder = this.getTierOrder(qualification.recommendedTier);
+              const tierOrder = this.getTierOrder(
+                qualification.recommendedTier,
+              );
               const currentOrder = this.getTierOrder(currentTier.getLevel());
 
               if (tierOrder > currentOrder) {
@@ -265,13 +310,20 @@ export class VipService {
                 await this.processVipUpgrade({
                   customerId: vipCustomer.getCustomerId(),
                   targetTier: qualification.recommendedTier,
-                  reason: 'Maintenance review upgrade',
-                  approvedBy: 'system'
+                  reason: "Maintenance review upgrade",
+                  approvedBy: "system",
                 });
                 upgradesProcessed++;
-              } else if (tierOrder < currentOrder - 1) { // Downgrade only if significantly below
-                const downgradeTier = this.getTierByLevel(qualification.recommendedTier);
-                vipCustomer.downgradeTier(downgradeTier, 'Maintenance review downgrade', 'system');
+              } else if (tierOrder < currentOrder - 1) {
+                // Downgrade only if significantly below
+                const downgradeTier = this.getTierByLevel(
+                  qualification.recommendedTier,
+                );
+                vipCustomer.downgradeTier(
+                  downgradeTier,
+                  "Maintenance review downgrade",
+                  "system",
+                );
                 await this.repository.save(vipCustomer);
                 downgradesProcessed++;
               }
@@ -283,9 +335,11 @@ export class VipService {
             vipCustomer.awardBirthdayBonus();
             await this.repository.save(vipCustomer);
           }
-
         } catch (error) {
-          console.error(`❌ VIP Service: Error processing VIP customer ${vipCustomer.getId()}:`, error);
+          console.error(
+            `❌ VIP Service: Error processing VIP customer ${vipCustomer.getId()}:`,
+            error,
+          );
         }
       }
 
@@ -293,11 +347,13 @@ export class VipService {
         reviewsCompleted,
         upgradesProcessed,
         downgradesProcessed,
-        suspensionsProcessed
+        suspensionsProcessed,
       };
-
     } catch (error) {
-      console.error('❌ VIP Service: Failed to process monthly VIP maintenance:', error);
+      console.error(
+        "❌ VIP Service: Failed to process monthly VIP maintenance:",
+        error,
+      );
       throw error;
     }
   }
@@ -317,7 +373,11 @@ export class VipService {
       const vipCustomers = await this.repository.findAll();
 
       const tierDistribution: Record<VipTierLevel, number> = {
-        bronze: 0, silver: 0, gold: 0, platinum: 0, diamond: 0
+        bronze: 0,
+        silver: 0,
+        gold: 0,
+        platinum: 0,
+        diamond: 0,
       };
 
       let totalRevenue = 0;
@@ -333,7 +393,10 @@ export class VipService {
 
         // Calculate benefits utilization
         const benefits = customer.getBenefitsTracking();
-        totalBenefitsUtilization += Object.values(benefits).reduce((sum, val) => sum + val, 0);
+        totalBenefitsUtilization += Object.values(benefits).reduce(
+          (sum, val) => sum + val,
+          0,
+        );
       }
 
       return {
@@ -342,14 +405,14 @@ export class VipService {
         revenueByTier: tierDistribution, // Simplified - would calculate actual revenue per tier
         benefitsUtilization: {
           totalUtilization: totalBenefitsUtilization,
-          averageUtilizationPerCustomer: totalBenefitsUtilization / vipCustomers.length
+          averageUtilizationPerCustomer:
+            totalBenefitsUtilization / vipCustomers.length,
         },
         churnRate: 0.05, // Would calculate from actual data
-        averageLifetimeValue: totalRevenue / vipCustomers.length
+        averageLifetimeValue: totalRevenue / vipCustomers.length,
       };
-
     } catch (error) {
-      console.error('❌ VIP Service: Failed to get VIP analytics:', error);
+      console.error("❌ VIP Service: Failed to get VIP analytics:", error);
       throw error;
     }
   }
@@ -361,7 +424,7 @@ export class VipService {
       silver: VipTier.silver(),
       gold: VipTier.gold(),
       platinum: VipTier.platinum(),
-      diamond: VipTier.diamond()
+      diamond: VipTier.diamond(),
     };
     return tierMap[level];
   }
@@ -372,7 +435,7 @@ export class VipService {
       VipTier.silver(),
       VipTier.gold(),
       VipTier.platinum(),
-      VipTier.diamond()
+      VipTier.diamond(),
     ];
   }
 
@@ -381,23 +444,26 @@ export class VipService {
     return order[level];
   }
 
-  private isTierHigherOrEqual(tier1: VipTierLevel, tier2: VipTierLevel): boolean {
+  private isTierHigherOrEqual(
+    tier1: VipTierLevel,
+    tier2: VipTierLevel,
+  ): boolean {
     return this.getTierOrder(tier1) >= this.getTierOrder(tier2);
   }
 
   private generateQualificationNextSteps(
     details: any,
-    highestEligibleTier: VipTierLevel
+    highestEligibleTier: VipTierLevel,
   ): string[] {
     const nextSteps: string[] = [];
 
-    if (highestEligibleTier === 'bronze') {
-      nextSteps.push('Increase deposit amount to $500+');
-      nextSteps.push('Build betting volume to $1,000+');
-      nextSteps.push('Maintain active account for 30+ days');
+    if (highestEligibleTier === "bronze") {
+      nextSteps.push("Increase deposit amount to $500+");
+      nextSteps.push("Build betting volume to $1,000+");
+      nextSteps.push("Maintain active account for 30+ days");
     } else {
       nextSteps.push(`Apply for ${highestEligibleTier} VIP tier`);
-      nextSteps.push('Schedule consultation with account manager');
+      nextSteps.push("Schedule consultation with account manager");
     }
 
     return nextSteps;

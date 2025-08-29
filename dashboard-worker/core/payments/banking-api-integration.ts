@@ -74,7 +74,13 @@ export interface BankingTransaction {
   id: string;
   customerId: string;
   bankAccountId: string;
-  type: 'ach_debit' | 'ach_credit' | 'wire_inbound' | 'wire_outbound' | 'check_deposit' | 'check_payment';
+  type:
+    | 'ach_debit'
+    | 'ach_credit'
+    | 'wire_inbound'
+    | 'wire_outbound'
+    | 'check_deposit'
+    | 'check_payment';
   amount: number;
   currency: string;
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled' | 'returned';
@@ -237,7 +243,7 @@ export class BankingAPIIntegration {
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        metadata: metadata || {}
+        metadata: metadata || {},
       };
 
       // Store bank account
@@ -284,7 +290,7 @@ export class BankingAPIIntegration {
       effectiveDate: effectiveDate || this.getNextBusinessDay(),
       status: 'pending',
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.achTransfers.set(transfer.id, transfer);
@@ -329,11 +335,11 @@ export class BankingAPIIntegration {
       fees: {
         wireFee: this.calculateWireFee(amount),
         intermediaryFees: 0,
-        totalFees: this.calculateWireFee(amount)
+        totalFees: this.calculateWireFee(amount),
       },
       estimatedSettlementTime: direction === 'outbound' ? '1-2 business days' : 'instant',
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.wireTransfers.set(transfer.id, transfer);
@@ -445,19 +451,19 @@ export class BankingAPIIntegration {
           dailyDebitLimit: 5000,
           dailyCreditLimit: 10000,
           monthlyDebitLimit: 25000,
-          monthlyCreditLimit: 50000
+          monthlyCreditLimit: 50000,
         },
         wire: {
           dailyOutboundLimit: 50000,
           monthlyOutboundLimit: 250000,
-          maxTransactionAmount: 100000
+          maxTransactionAmount: 100000,
         },
         verification: {
           maxVerificationAttempts: 3,
-          verificationExpiryDays: 7
+          verificationExpiryDays: 7,
         },
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       });
     }
 
@@ -489,23 +495,33 @@ export class BankingAPIIntegration {
       accountType: 'checking',
       accountName: 'Checking Account',
       bankName: 'Test Bank',
-      currency: 'USD'
+      currency: 'USD',
     };
   }
 
-  private async getBankAccount(customerId: string, bankAccountId: string): Promise<BankAccount | undefined> {
+  private async getBankAccount(
+    customerId: string,
+    bankAccountId: string
+  ): Promise<BankAccount | undefined> {
     const accounts = this.bankAccounts.get(customerId);
     return accounts?.find(acc => acc.id === bankAccountId);
   }
 
-  private async checkACHLimits(customerId: string, direction: 'debit' | 'credit', amount: number): Promise<void> {
+  private async checkACHLimits(
+    customerId: string,
+    direction: 'debit' | 'credit',
+    amount: number
+  ): Promise<void> {
     const limits = this.getBankingLimits(customerId);
     if (!limits) return; // Use default limits
 
     const today = new Date().toDateString();
-    const todayTransfers = Array.from(this.achTransfers.values())
-      .filter(t => t.customerId === customerId && t.direction === direction &&
-                  new Date(t.createdAt).toDateString() === today);
+    const todayTransfers = Array.from(this.achTransfers.values()).filter(
+      t =>
+        t.customerId === customerId &&
+        t.direction === direction &&
+        new Date(t.createdAt).toDateString() === today
+    );
 
     const todayTotal = todayTransfers.reduce((sum, t) => sum + t.amount, 0);
 
@@ -529,9 +545,12 @@ export class BankingAPIIntegration {
     }
 
     const today = new Date().toDateString();
-    const todayTransfers = Array.from(this.wireTransfers.values())
-      .filter(t => t.customerId === customerId && t.direction === 'outbound' &&
-                  new Date(t.createdAt).toDateString() === today);
+    const todayTransfers = Array.from(this.wireTransfers.values()).filter(
+      t =>
+        t.customerId === customerId &&
+        t.direction === 'outbound' &&
+        new Date(t.createdAt).toDateString() === today
+    );
 
     const todayTotal = todayTransfers.reduce((sum, t) => sum + t.amount, 0);
 
@@ -565,12 +584,18 @@ export class BankingAPIIntegration {
     }, 3000);
   }
 
-  private async sendMicroDeposits(bankAccount: BankAccount, amounts: [number, number]): Promise<void> {
+  private async sendMicroDeposits(
+    bankAccount: BankAccount,
+    amounts: [number, number]
+  ): Promise<void> {
     // In real implementation, would send micro-deposits via ACH
     console.log(`Sending micro-deposits to ${bankAccount.accountNumber}: ${amounts.join(', ')}`);
   }
 
-  private async verifyMicroDepositAmounts(bankAccount: BankAccount, amounts: [number, number]): Promise<boolean> {
+  private async verifyMicroDepositAmounts(
+    bankAccount: BankAccount,
+    amounts: [number, number]
+  ): Promise<boolean> {
     // In real implementation, would verify against actual deposits
     console.log(`Verifying micro-deposit amounts for ${bankAccount.accountNumber}`);
     return Math.random() > 0.1; // 90% success rate
@@ -581,9 +606,12 @@ export class BankingAPIIntegration {
     const day = date.getDay();
 
     // If it's Friday or later, add days to get to Monday
-    if (day === 5) date.setDate(date.getDate() + 3); // Friday -> Monday
-    else if (day === 6) date.setDate(date.getDate() + 2); // Saturday -> Monday
-    else if (day === 0) date.setDate(date.getDate() + 1); // Sunday -> Monday
+    if (day === 5)
+      date.setDate(date.getDate() + 3); // Friday -> Monday
+    else if (day === 6)
+      date.setDate(date.getDate() + 2); // Saturday -> Monday
+    else if (day === 0)
+      date.setDate(date.getDate() + 1); // Sunday -> Monday
     else date.setDate(date.getDate() + 1); // Next business day
 
     return date.toISOString().split('T')[0];
@@ -619,18 +647,25 @@ export class BankingAPIIntegration {
     completedTransactions: number;
     failedTransactions: number;
   } {
-    const totalBankAccounts = Array.from(this.bankAccounts.values()).reduce((sum, accounts) => sum + accounts.length, 0);
+    const totalBankAccounts = Array.from(this.bankAccounts.values()).reduce(
+      (sum, accounts) => sum + accounts.length,
+      0
+    );
     const totalACHTransfers = this.achTransfers.size;
     const totalWireTransfers = this.wireTransfers.size;
 
     const allTransactions = [
       ...Array.from(this.achTransfers.values()),
-      ...Array.from(this.wireTransfers.values())
+      ...Array.from(this.wireTransfers.values()),
     ];
 
     const pendingTransactions = allTransactions.filter(t => t.status === 'pending').length;
-    const completedTransactions = allTransactions.filter(t => t.status === 'completed' || t.status === 'processed').length;
-    const failedTransactions = allTransactions.filter(t => t.status === 'failed' || t.status === 'returned').length;
+    const completedTransactions = allTransactions.filter(
+      t => t.status === 'completed' || t.status === 'processed'
+    ).length;
+    const failedTransactions = allTransactions.filter(
+      t => t.status === 'failed' || t.status === 'returned'
+    ).length;
 
     return {
       totalBankAccounts,
@@ -638,7 +673,7 @@ export class BankingAPIIntegration {
       totalWireTransfers,
       pendingTransactions,
       completedTransactions,
-      failedTransactions
+      failedTransactions,
     };
   }
 }

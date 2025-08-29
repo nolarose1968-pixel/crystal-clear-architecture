@@ -70,7 +70,7 @@ class DepartmentDependencyManager {
           packages: ['@fire22/core-dashboard', '@fire22/pattern-system'],
           dependencies: [],
           maintenanceResponsibilities: [],
-          status: 'active'
+          status: 'active',
         },
         {
           name: 'Marketing',
@@ -81,7 +81,7 @@ class DepartmentDependencyManager {
           packages: ['@fire22/marketing-tools'],
           dependencies: [],
           maintenanceResponsibilities: [],
-          status: 'pending'
+          status: 'pending',
         },
         {
           name: 'Security',
@@ -92,7 +92,7 @@ class DepartmentDependencyManager {
           packages: ['@fire22/security-scanner'],
           dependencies: [],
           maintenanceResponsibilities: [],
-          status: 'pending'
+          status: 'pending',
         },
         {
           name: 'Finance',
@@ -103,7 +103,7 @@ class DepartmentDependencyManager {
           packages: ['@fire22/financial-reporting'],
           dependencies: [],
           maintenanceResponsibilities: [],
-          status: 'pending'
+          status: 'pending',
         },
         {
           name: 'Operations',
@@ -114,7 +114,7 @@ class DepartmentDependencyManager {
           packages: ['@fire22/ops-tools'],
           dependencies: [],
           maintenanceResponsibilities: [],
-          status: 'pending'
+          status: 'pending',
         },
         {
           name: 'Legal',
@@ -125,8 +125,8 @@ class DepartmentDependencyManager {
           packages: ['@fire22/compliance-tools'],
           dependencies: [],
           maintenanceResponsibilities: [],
-          status: 'pending'
-        }
+          status: 'pending',
+        },
       ];
       this.saveDepartments(defaultDepartments);
     }
@@ -192,13 +192,13 @@ class DepartmentDependencyManager {
       const nanoseconds = Bun.nanoseconds();
       const nanoFormatted = (nanoseconds / 1_000_000).toFixed(6);
       const timestampWithNano = `${new Date().toISOString()}[${nanoFormatted}ns]`;
-      
+
       const newSubmission: DependencySubmission = {
         department,
         dependencies,
         justification,
         submittedBy,
-        timestamp: timestampWithNano
+        timestamp: timestampWithNano,
       };
 
       submissions.push(newSubmission);
@@ -234,16 +234,16 @@ class DepartmentDependencyManager {
         maintainerEmail: 'mike.hunt@technology.fire22',
         maintainerEmployeeId: 'EMP-TECH-001',
         priority: 'critical' as const,
-        description: 'Main dashboard application with SSE and real-time features'
+        description: 'Main dashboard application with SSE and real-time features',
       },
       {
         packageName: '@fire22/pattern-system',
-        department: 'Technology', 
+        department: 'Technology',
         maintainer: 'Mike Hunt',
         maintainerEmail: 'mike.hunt@technology.fire22',
         maintainerEmployeeId: 'EMP-TECH-001',
         priority: 'critical' as const,
-        description: 'Pattern Weaver system with 13 unified patterns'
+        description: 'Pattern Weaver system with 13 unified patterns',
       },
       {
         packageName: '@fire22/security-scanner',
@@ -252,7 +252,7 @@ class DepartmentDependencyManager {
         maintainerEmail: 'head@security.fire22',
         maintainerEmployeeId: 'TBD',
         priority: 'critical' as const,
-        description: 'Bun-native security scanner with CVE detection'
+        description: 'Bun-native security scanner with CVE detection',
       },
       {
         packageName: '@fire22/api-client',
@@ -261,7 +261,7 @@ class DepartmentDependencyManager {
         maintainerEmail: 'mike.hunt@technology.fire22',
         maintainerEmployeeId: 'EMP-TECH-001',
         priority: 'high' as const,
-        description: 'Fire22 API integration client with authentication'
+        description: 'Fire22 API integration client with authentication',
       },
       {
         packageName: '@fire22/sports-betting',
@@ -270,7 +270,7 @@ class DepartmentDependencyManager {
         maintainerEmail: 'head@operations.fire22',
         maintainerEmployeeId: 'TBD',
         priority: 'high' as const,
-        description: 'Sports betting functionality and wager management'
+        description: 'Sports betting functionality and wager management',
       },
       {
         packageName: '@fire22/telegram-integration',
@@ -279,7 +279,7 @@ class DepartmentDependencyManager {
         maintainerEmail: 'head@marketing.fire22',
         maintainerEmployeeId: 'TBD',
         priority: 'medium' as const,
-        description: 'Telegram bot and notification system'
+        description: 'Telegram bot and notification system',
       },
       {
         packageName: '@fire22/build-system',
@@ -288,7 +288,7 @@ class DepartmentDependencyManager {
         maintainerEmail: 'mike.hunt@technology.fire22',
         maintainerEmployeeId: 'EMP-TECH-001',
         priority: 'high' as const,
-        description: 'Multi-profile build system with 9 build profiles'
+        description: 'Multi-profile build system with 9 build profiles',
       },
       {
         packageName: '@fire22/financial-reporting',
@@ -297,7 +297,7 @@ class DepartmentDependencyManager {
         maintainerEmail: 'head@finance.fire22',
         maintainerEmployeeId: 'TBD',
         priority: 'high' as const,
-        description: 'Financial data processing and reporting tools'
+        description: 'Financial data processing and reporting tools',
       },
       {
         packageName: '@fire22/compliance-tools',
@@ -306,8 +306,8 @@ class DepartmentDependencyManager {
         maintainerEmail: 'head@legal.fire22',
         maintainerEmployeeId: 'TBD',
         priority: 'medium' as const,
-        description: 'Legal compliance and audit trail management'
-      }
+        description: 'Legal compliance and audit trail management',
+      },
     ];
 
     assignments.push(...coreAssignments);
@@ -344,15 +344,17 @@ class DepartmentDependencyManager {
         head: dept.head,
         timestamp: `${new Date().toISOString()}[${(Bun.nanoseconds() / 1_000_000).toFixed(6)}ns]`,
         subject: `Package Maintenance Assignments - ${dept.name} Department`,
-        priority: criticalPackages.length > 0 ? 'critical' : highPackages.length > 0 ? 'high' : 'medium',
+        priority:
+          criticalPackages.length > 0 ? 'critical' : highPackages.length > 0 ? 'high' : 'medium',
         content: {
           totalPackages: deptAssignments.length,
           criticalPackages: criticalPackages.length,
           highPackages: highPackages.length,
           assignments: deptAssignments,
-          actionRequired: dept.head === 'TBD' ? 'Assign department head' : 'Review and acknowledge assignments',
-          dependencySubmissionRequired: dept.dependencies.length === 0
-        }
+          actionRequired:
+            dept.head === 'TBD' ? 'Assign department head' : 'Review and acknowledge assignments',
+          dependencySubmissionRequired: dept.dependencies.length === 0,
+        },
       };
 
       notifications.push(notification);
@@ -372,7 +374,7 @@ class DepartmentDependencyManager {
 
     departments.forEach(dept => {
       const deptAssignments = assignments.filter(a => a.department === dept.name);
-      
+
       const emailTemplate = {
         to: dept.email,
         cc: 'mike.hunt@management.fire22',
@@ -385,11 +387,15 @@ As part of our enterprise workspace orchestration, your department has been assi
 
 📦 **Your Package Assignments (${deptAssignments.length} total):**
 
-${deptAssignments.map(a => `
+${deptAssignments
+  .map(
+    a => `
    • **${a.packageName}** (${a.priority.toUpperCase()} priority)
      └─ ${a.description}
      └─ Maintainer: ${a.maintainer}
-`).join('')}
+`
+  )
+  .join('')}
 
 📋 **Action Items Required:**
 
@@ -400,14 +406,18 @@ ${dept.dependencies.length === 0 ? '2. 📝 **Submit department dependencies** u
 5. 📬 Confirm receipt of this assignment
 
 🛠️ **Department Dependency Submission:**
-${dept.dependencies.length === 0 ? `
+${
+  dept.dependencies.length === 0
+    ? `
 To submit your department's required dependencies, use:
 \`\`\`bash
 bun run deps:submit --department "${dept.name}" --deps "package1,package2,package3" --justification "reason"
 \`\`\`
-` : `
+`
+    : `
 ✅ Dependencies already submitted: ${dept.dependencies.join(', ')}
-`}
+`
+}
 
 📈 **Package Priority Breakdown:**
 - Critical: ${deptAssignments.filter(a => a.priority === 'critical').length} packages
@@ -437,14 +447,17 @@ Fire22 Management System
 ---
 Department: Management  
 System: Fire22 Dashboard Worker
-Timestamp: ${new Date().toISOString()}[${(Bun.nanoseconds() / 1_000_000).toFixed(6)}ns]`
+Timestamp: ${new Date().toISOString()}[${(Bun.nanoseconds() / 1_000_000).toFixed(6)}ns]`,
       };
 
       templates.push(emailTemplate);
     });
 
     // Save email templates
-    writeFileSync('src/notifications/department-email-templates.json', JSON.stringify(templates, null, 2));
+    writeFileSync(
+      'src/notifications/department-email-templates.json',
+      JSON.stringify(templates, null, 2)
+    );
     console.log('✅ Email templates generated');
     return templates;
   }
@@ -456,12 +469,12 @@ Timestamp: ${new Date().toISOString()}[${(Bun.nanoseconds() / 1_000_000).toFixed
     const submissions = this.loadSubmissions();
 
     console.log('\n📊 DEPARTMENT STATUS REPORT');
-    console.log('============================');
+    console.log('!==!==!==!==!===');
 
     departments.forEach(dept => {
       const deptAssignments = assignments.filter(a => a.department === dept.name);
       const deptSubmissions = submissions.filter(s => s.department === dept.name);
-      
+
       console.log(`\n🏢 ${dept.name.toUpperCase()} DEPARTMENT`);
       console.log(`ID: ${dept.internalId}`);
       console.log(`Head: ${dept.head} (${dept.email})`);
@@ -470,7 +483,7 @@ Timestamp: ${new Date().toISOString()}[${(Bun.nanoseconds() / 1_000_000).toFixed
       console.log(`Packages: ${deptAssignments.length}`);
       console.log(`Dependencies: ${dept.dependencies.length}`);
       console.log(`Submissions: ${deptSubmissions.length}`);
-      
+
       if (deptAssignments.length > 0) {
         console.log('Package Assignments:');
         deptAssignments.forEach(a => {
@@ -494,13 +507,15 @@ Timestamp: ${new Date().toISOString()}[${(Bun.nanoseconds() / 1_000_000).toFixed
     switch (command) {
       case 'submit':
         if (args.length < 4) {
-          console.log('Usage: bun run deps:submit --department "Department" --deps "dep1,dep2" --justification "reason"');
+          console.log(
+            'Usage: bun run deps:submit --department "Department" --deps "dep1,dep2" --justification "reason"'
+          );
           return;
         }
         const deptIndex = args.indexOf('--department') + 1;
         const depsIndex = args.indexOf('--deps') + 1;
         const justIndex = args.indexOf('--justification') + 1;
-        
+
         if (deptIndex && depsIndex && justIndex) {
           const department = args[deptIndex];
           const dependencies = args[depsIndex].split(',').map(d => d.trim());

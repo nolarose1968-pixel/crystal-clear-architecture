@@ -34,14 +34,13 @@ export interface CustomerMetrics {
  * Repository for Fire22 customer data operations
  */
 export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Customer> {
-  
   constructor() {
     super('fire22_customers', undefined);
     // Use fire22_customer_id as primary key for Fire22 customers
     this.primaryKey = 'fire22_customer_id';
   }
 
-  // ===== SPECIALIZED FIND METHODS =====
+  // !== SPECIALIZED FIND METHODS !==
 
   /**
    * Find customer by Fire22 customer ID
@@ -60,35 +59,42 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
   /**
    * Find customers by agent
    */
-  public async findByAgent(agentId: string, options: QueryOptions = {}): Promise<RepositoryResult<Fire22Customer[]>> {
+  public async findByAgent(
+    agentId: string,
+    options: QueryOptions = {}
+  ): Promise<RepositoryResult<Fire22Customer[]>> {
     return await this.findAll({
       ...options,
       filters: {
         ...options.filters,
-        agent_id: agentId
-      }
+        agent_id: agentId,
+      },
     });
   }
 
   /**
    * Find VIP customers
    */
-  public async findVipCustomers(options: QueryOptions = {}): Promise<RepositoryResult<Fire22Customer[]>> {
+  public async findVipCustomers(
+    options: QueryOptions = {}
+  ): Promise<RepositoryResult<Fire22Customer[]>> {
     return await this.findAll({
       ...options,
       filters: {
         ...options.filters,
-        vip_status: true
-      }
+        vip_status: true,
+      },
     });
   }
 
   /**
    * Advanced customer search with multiple criteria
    */
-  public async searchCustomers(searchOptions: CustomerSearchOptions): Promise<RepositoryResult<Fire22Customer[]>> {
+  public async searchCustomers(
+    searchOptions: CustomerSearchOptions
+  ): Promise<RepositoryResult<Fire22Customer[]>> {
     const filters: Record<string, any> = {};
-    
+
     // Basic filters
     if (searchOptions.agent_id) filters.agent_id = searchOptions.agent_id;
     if (searchOptions.tier) filters.tier = searchOptions.tier;
@@ -119,12 +125,18 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
 
     // Last activity filter
     if (searchOptions.last_activity_days !== undefined) {
-      conditions.push('datetime(last_activity) >= datetime("now", "-' + searchOptions.last_activity_days + ' days")');
+      conditions.push(
+        'datetime(last_activity) >= datetime("now", "-' +
+          searchOptions.last_activity_days +
+          ' days")'
+      );
     }
 
     // Search text filter
     if (searchOptions.search && searchOptions.searchFields) {
-      const searchConditions = searchOptions.searchFields.map(field => `${field} LIKE ?`).join(' OR ');
+      const searchConditions = searchOptions.searchFields
+        .map(field => `${field} LIKE ?`)
+        .join(' OR ');
       conditions.push(`(${searchConditions})`);
       searchOptions.searchFields.forEach(() => params.push(`%${searchOptions.search}%`));
     }
@@ -154,14 +166,14 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
     return await this.executeQuery<Fire22Customer>(customQuery, params);
   }
 
-  // ===== FINANCIAL OPERATIONS =====
+  // !== FINANCIAL OPERATIONS !==
 
   /**
    * Update customer balance
    */
   public async updateBalance(
-    customerId: string, 
-    amount: number, 
+    customerId: string,
+    amount: number,
     balanceType: 'balance' | 'casino_balance' | 'sports_balance' | 'freeplay_balance' = 'balance'
   ): Promise<RepositoryResult<Fire22Customer>> {
     try {
@@ -170,21 +182,21 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
       if (!customerResult.success || !customerResult.data) {
         return {
           success: false,
-          error: 'Customer not found'
+          error: 'Customer not found',
         };
       }
 
       const customer = customerResult.data;
       const newBalance = Math.max(0, customer[balanceType] + amount);
-      
+
       return await this.update(customerId, {
         [balanceType]: newBalance,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       } as Partial<Fire22Customer>);
     } catch (error) {
       return {
         success: false,
-        error: `Failed to update balance: ${error.message}`
+        error: `Failed to update balance: ${error.message}`,
       };
     }
   }
@@ -192,7 +204,10 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
   /**
    * Process deposit
    */
-  public async processDeposit(customerId: string, amount: number): Promise<RepositoryResult<Fire22Customer>> {
+  public async processDeposit(
+    customerId: string,
+    amount: number
+  ): Promise<RepositoryResult<Fire22Customer>> {
     try {
       const customerResult = await this.findByFire22Id(customerId);
       if (!customerResult.success || !customerResult.data) {
@@ -206,12 +221,12 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
       return await this.update(customerId, {
         balance: newBalance,
         total_deposits: newTotalDeposits,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       } as Partial<Fire22Customer>);
     } catch (error) {
       return {
         success: false,
-        error: `Failed to process deposit: ${error.message}`
+        error: `Failed to process deposit: ${error.message}`,
       };
     }
   }
@@ -219,7 +234,10 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
   /**
    * Process withdrawal
    */
-  public async processWithdrawal(customerId: string, amount: number): Promise<RepositoryResult<Fire22Customer>> {
+  public async processWithdrawal(
+    customerId: string,
+    amount: number
+  ): Promise<RepositoryResult<Fire22Customer>> {
     try {
       const customerResult = await this.findByFire22Id(customerId);
       if (!customerResult.success || !customerResult.data) {
@@ -228,7 +246,7 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
 
       const customer = customerResult.data;
       const totalBalance = customer.balance + customer.casino_balance + customer.sports_balance;
-      
+
       if (amount > totalBalance) {
         return { success: false, error: 'Insufficient balance' };
       }
@@ -239,47 +257,56 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
       return await this.update(customerId, {
         balance: newBalance,
         total_withdrawals: newTotalWithdrawals,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       } as Partial<Fire22Customer>);
     } catch (error) {
       return {
         success: false,
-        error: `Failed to process withdrawal: ${error.message}`
+        error: `Failed to process withdrawal: ${error.message}`,
       };
     }
   }
 
-  // ===== TIER AND STATUS MANAGEMENT =====
+  // !== TIER AND STATUS MANAGEMENT !==
 
   /**
    * Update customer tier
    */
-  public async updateTier(customerId: string, tier: CustomerTier): Promise<RepositoryResult<Fire22Customer>> {
+  public async updateTier(
+    customerId: string,
+    tier: CustomerTier
+  ): Promise<RepositoryResult<Fire22Customer>> {
     const isVip = tier === 'vip' || tier === 'diamond';
-    
+
     return await this.update(customerId, {
       tier,
       vip_status: isVip,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     } as Partial<Fire22Customer>);
   }
 
   /**
    * Update customer status
    */
-  public async updateStatus(customerId: string, status: CustomerStatus): Promise<RepositoryResult<Fire22Customer>> {
+  public async updateStatus(
+    customerId: string,
+    status: CustomerStatus
+  ): Promise<RepositoryResult<Fire22Customer>> {
     return await this.update(customerId, {
       status,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     } as Partial<Fire22Customer>);
   }
 
   /**
    * Update risk score
    */
-  public async updateRiskScore(customerId: string, riskScore: number): Promise<RepositoryResult<Fire22Customer>> {
+  public async updateRiskScore(
+    customerId: string,
+    riskScore: number
+  ): Promise<RepositoryResult<Fire22Customer>> {
     let riskLevel: 'low' | 'medium' | 'high' | 'critical' = 'low';
-    
+
     if (riskScore >= 90) riskLevel = 'critical';
     else if (riskScore >= 75) riskLevel = 'high';
     else if (riskScore >= 50) riskLevel = 'medium';
@@ -287,11 +314,11 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
     return await this.update(customerId, {
       risk_score: riskScore,
       risk_level: riskLevel,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     } as Partial<Fire22Customer>);
   }
 
-  // ===== ACTIVITY TRACKING =====
+  // !== ACTIVITY TRACKING !==
 
   /**
    * Record customer login
@@ -309,7 +336,7 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
       login_count: customer.login_count + 1,
       last_login: now,
       last_activity: now,
-      updated_at: now
+      updated_at: now,
     } as Partial<Fire22Customer>);
   }
 
@@ -317,9 +344,9 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
    * Record betting activity
    */
   public async recordBet(
-    customerId: string, 
-    betAmount: number, 
-    won: boolean = false, 
+    customerId: string,
+    betAmount: number,
+    won: boolean = false,
     payoutAmount?: number
   ): Promise<RepositoryResult<Fire22Customer>> {
     const customerResult = await this.findByFire22Id(customerId);
@@ -334,7 +361,7 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
       total_bets_placed: customer.total_bets_placed + 1,
       lifetime_volume: customer.lifetime_volume + betAmount,
       last_activity: now,
-      updated_at: now
+      updated_at: now,
     };
 
     if (won && payoutAmount) {
@@ -347,7 +374,7 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
     return await this.update(customerId, updateData);
   }
 
-  // ===== ANALYTICS AND METRICS =====
+  // !== ANALYTICS AND METRICS !==
 
   /**
    * Get customer metrics
@@ -388,7 +415,7 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
       const [metricsResult, tierResult, statusResult] = await Promise.all([
         this.executeQuerySingle(metricsQuery),
         this.executeQuery(tierQuery),
-        this.executeQuery(statusQuery)
+        this.executeQuery(statusQuery),
       ]);
 
       if (!metricsResult.success) {
@@ -396,10 +423,15 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
       }
 
       const metrics = metricsResult.data as any;
-      
+
       // Process tier counts
       const byTier: Record<CustomerTier, number> = {
-        bronze: 0, silver: 0, gold: 0, platinum: 0, diamond: 0, vip: 0
+        bronze: 0,
+        silver: 0,
+        gold: 0,
+        platinum: 0,
+        diamond: 0,
+        vip: 0,
       };
       if (tierResult.success && tierResult.data) {
         tierResult.data.forEach((row: any) => {
@@ -409,7 +441,12 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
 
       // Process status counts
       const byStatus: Record<CustomerStatus, number> = {
-        active: 0, inactive: 0, suspended: 0, pending: 0, banned: 0, closed: 0
+        active: 0,
+        inactive: 0,
+        suspended: 0,
+        pending: 0,
+        banned: 0,
+        closed: 0,
       };
       if (statusResult.success && statusResult.data) {
         statusResult.data.forEach((row: any) => {
@@ -426,17 +463,17 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
         total_withdrawals: parseFloat(metrics.total_withdrawals) || 0,
         average_balance: parseFloat(metrics.average_balance) || 0,
         by_tier: byTier,
-        by_status: byStatus
+        by_status: byStatus,
       };
 
       return {
         success: true,
-        data: customerMetrics
+        data: customerMetrics,
       };
     } catch (error) {
       return {
         success: false,
-        error: `Failed to get customer metrics: ${error.message}`
+        error: `Failed to get customer metrics: ${error.message}`,
       };
     }
   }
@@ -463,7 +500,7 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
     } catch (error) {
       return {
         success: false,
-        error: `Failed to get agent customer metrics: ${error.message}`
+        error: `Failed to get agent customer metrics: ${error.message}`,
       };
     }
   }
@@ -471,7 +508,9 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
   /**
    * Find dormant customers (no activity in X days)
    */
-  public async findDormantCustomers(days: number = 30): Promise<RepositoryResult<Fire22Customer[]>> {
+  public async findDormantCustomers(
+    days: number = 30
+  ): Promise<RepositoryResult<Fire22Customer[]>> {
     const query = `
       SELECT * FROM ${this.tableName}
       WHERE status = 'active'
@@ -489,19 +528,21 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
   public async findHighRiskCustomers(): Promise<RepositoryResult<Fire22Customer[]>> {
     return await this.findAll({
       filters: {
-        risk_level: 'high'
+        risk_level: 'high',
       },
       sortBy: 'risk_score',
-      sortOrder: 'DESC'
+      sortOrder: 'DESC',
     });
   }
 
-  // ===== BULK OPERATIONS =====
+  // !== BULK OPERATIONS !==
 
   /**
    * Sync customer data from Fire22 API
    */
-  public async syncFromFire22(fire22Data: any[]): Promise<RepositoryResult<{ created: number; updated: number }>> {
+  public async syncFromFire22(
+    fire22Data: any[]
+  ): Promise<RepositoryResult<{ created: number; updated: number }>> {
     try {
       let created = 0;
       let updated = 0;
@@ -511,11 +552,11 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
       try {
         for (const customerData of fire22Data) {
           const existingCustomer = await this.findByFire22Id(customerData.customer_id);
-          
+
           const syncedData = {
             ...customerData,
             fire22_synced_at: new Date().toISOString(),
-            sync_version: (existingCustomer.data?.sync_version || 0) + 1
+            sync_version: (existingCustomer.data?.sync_version || 0) + 1,
           };
 
           if (existingCustomer.success && existingCustomer.data) {
@@ -531,7 +572,7 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
 
         return {
           success: true,
-          data: { created, updated }
+          data: { created, updated },
         };
       } catch (error) {
         await this.rollbackTransaction();
@@ -540,7 +581,7 @@ export class Fire22CustomerRepository extends Fire22BaseRepository<Fire22Custome
     } catch (error) {
       return {
         success: false,
-        error: `Failed to sync from Fire22: ${error.message}`
+        error: `Failed to sync from Fire22: ${error.message}`,
       };
     }
   }

@@ -1,0 +1,5 @@
+# Minimal test configuration
+logLevel = "info"
+
+[resolve.aliases]
+"@ff/*" = "./*"

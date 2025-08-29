@@ -15,7 +15,9 @@ async function testTelegramNotifications() {
   // Check environment variables
   const botToken = process.env.TELEGRAM_BOT_TOKEN || process.env.BOT_TOKEN;
   if (!botToken) {
-    console.error('❌ No bot token found. Set TELEGRAM_BOT_TOKEN or BOT_TOKEN environment variable.');
+    console.error(
+      '❌ No bot token found. Set TELEGRAM_BOT_TOKEN or BOT_TOKEN environment variable.'
+    );
     process.exit(1);
   }
 
@@ -28,8 +30,8 @@ async function testTelegramNotifications() {
         wagerUpdates: true,
         balanceChanges: true,
         systemAlerts: true,
-        weeklyReports: true
-      }
+        weeklyReports: true,
+      },
     });
 
     // Test 1: Basic bot connectivity
@@ -111,7 +113,6 @@ async function testTelegramNotifications() {
           console.log(`🎯 Type: ${status.type}`);
           console.log(`⏱️ Created: ${status.metadata.createdAt.toLocaleString()}`);
         }
-
       } catch (error) {
         console.log('❌ Test notification failed:', error.message);
       }
@@ -128,7 +129,7 @@ async function testTelegramNotifications() {
       const mockRecipients = [
         { telegramId: 123456789 },
         { username: 'testuser1' },
-        { telegramId: 987654321, username: 'testuser2' }
+        { telegramId: 987654321, username: 'testuser2' },
       ];
 
       const bulkMessage = `
@@ -142,7 +143,6 @@ async function testTelegramNotifications() {
       const notificationIds = await bot.sendBulkNotifications(mockRecipients, bulkMessage);
       console.log(`✅ Bulk notification queued for ${mockRecipients.length} recipients`);
       console.log(`🆔 Notification IDs: ${notificationIds.join(', ')}`);
-
     } catch (error) {
       console.log('❌ Bulk notification test failed:', error.message);
       console.log('💡 This is expected with mock recipients');
@@ -150,7 +150,7 @@ async function testTelegramNotifications() {
 
     // Final status report
     console.log('\n📊 Final Status Report');
-    console.log('=' .repeat(50));
+    console.log('='.repeat(50));
 
     const finalStats = bot.getNotificationStats();
     const finalQueue = bot.getNotificationQueueStatus();
@@ -165,7 +165,7 @@ async function testTelegramNotifications() {
       console.log(`⏱️ Avg Processing Time: ${finalStats.averageProcessingTime.toFixed(0)}ms`);
     }
 
-    console.log('=' .repeat(50));
+    console.log('='.repeat(50));
 
     // Success message
     console.log('\n🎉 Telegram Notification System Test Complete!');
@@ -175,7 +175,6 @@ async function testTelegramNotifications() {
     console.log('2. Set up webhook for real-time updates');
     console.log('3. Add user registration system');
     console.log('4. Monitor performance and error rates');
-
   } catch (error) {
     console.error('❌ Test failed:', error);
     process.exit(1);

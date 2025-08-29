@@ -2,7 +2,7 @@
 
 /**
  * 🔥📱 Fire22 Complete Telegram Integration
- * 
+ *
  * Master integration file that combines all Telegram components:
  * - Multilingual bot system
  * - Queue system integration
@@ -27,9 +27,9 @@ import {
   API_ENDPOINTS,
 } from './telegram-constants';
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🎯 MASTER INTEGRATION CLASS
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 export class Fire22TelegramIntegration {
   private environment: TelegramEnvironment;
@@ -37,7 +37,7 @@ export class Fire22TelegramIntegration {
   private languageSystem: Fire22LanguageSystem;
   private queueSystem: WithdrawalQueueSystem;
   private telegramBot: Fire22TelegramBot;
-  
+
   // System status tracking
   private isInitialized: boolean = false;
   private isRunning: boolean = false;
@@ -58,13 +58,13 @@ export class Fire22TelegramIntegration {
 
   constructor(env: any) {
     console.log('🔥📱 Initializing Fire22 Telegram Integration...');
-    
+
     // Initialize core components
     this.environment = TelegramEnvironment.getInstance(env);
     this.languageSystem = new Fire22LanguageSystem();
     this.queueSystem = new WithdrawalQueueSystem(env);
     this.workflowOrchestrator = new TelegramWorkflowOrchestrator(env);
-    
+
     // Initialize legacy bot for backward compatibility
     this.telegramBot = new Fire22TelegramBot({
       token: this.environment.botToken,
@@ -76,22 +76,24 @@ export class Fire22TelegramIntegration {
         balanceChanges: true,
         systemAlerts: true,
         weeklyReports: true,
-      }
+      },
     });
 
     this.validateConfiguration();
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🔧 INITIALIZATION & CONFIGURATION
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   private validateConfiguration(): void {
     console.log('🔍 Validating Telegram integration configuration...');
-    
+
     const validation = this.environment.validateRequiredSecrets();
     if (!validation.valid) {
-      throw new Error(`❌ Missing required environment variables: ${validation.missing.join(', ')}`);
+      throw new Error(
+        `❌ Missing required environment variables: ${validation.missing.join(', ')}`
+      );
     }
 
     const configSummary = this.environment.getConfigSummary();
@@ -134,9 +136,9 @@ export class Fire22TelegramIntegration {
     }
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🚀 START/STOP METHODS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   public async start(): Promise<void> {
     if (!this.isInitialized) {
@@ -161,7 +163,6 @@ export class Fire22TelegramIntegration {
 
       this.isRunning = true;
       this.logStartupSummary();
-
     } catch (error) {
       console.error('❌ Failed to start Telegram integration:', error);
       throw error;
@@ -183,15 +184,14 @@ export class Fire22TelegramIntegration {
 
       this.isRunning = false;
       this.logShutdownSummary();
-
     } catch (error) {
       console.error('❌ Error during shutdown:', error);
     }
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // ⚙️ BACKGROUND PROCESSES
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   private startPeriodicTasks(): void {
     // Queue processing
@@ -227,16 +227,16 @@ export class Fire22TelegramIntegration {
 
   private collectSystemMetrics(): void {
     this.systemMetrics.activeUsers = this.workflowOrchestrator.getActiveWorkflows();
-    
+
     // Log metrics if in development
     if (this.environment.isDevelopment) {
       console.log('📊 System Metrics:', this.systemMetrics);
     }
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 SYSTEM STATUS & HEALTH
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   public getSystemStatus() {
     const uptime = this.startTime ? Date.now() - this.startTime.getTime() : 0;
@@ -248,7 +248,7 @@ export class Fire22TelegramIntegration {
       startTime: this.startTime,
       uptime: Math.round(uptime / 1000), // seconds
       environment: this.environment.environment,
-      
+
       // Component status
       components: {
         workflowOrchestrator: this.isRunning,
@@ -256,36 +256,41 @@ export class Fire22TelegramIntegration {
         queueSystem: true,
         environment: true,
       },
-      
+
       // Features enabled
       features: this.environment.featureFlags,
-      
+
       // System metrics
       metrics: this.systemMetrics,
-      
+
       // Queue status
       queue: queueStats,
-      
+
       // Active workflows by department
       workflows: {
         active: this.workflowOrchestrator.getActiveWorkflows(),
         departments: this.workflowOrchestrator.getDepartmentWorkflows(),
       },
-      
+
       // Performance stats
       performance: {
         avgResponseTime: '< 1s', // Mock data
-        uptime: uptime > 0 ? ((uptime - this.systemMetrics.errors * 1000) / uptime * 100).toFixed(2) + '%' : '100%',
-        errorRate: this.systemMetrics.totalMessages > 0 
-          ? (this.systemMetrics.errors / this.systemMetrics.totalMessages * 100).toFixed(2) + '%' 
-          : '0%',
-      }
+        uptime:
+          uptime > 0
+            ? (((uptime - this.systemMetrics.errors * 1000) / uptime) * 100).toFixed(2) + '%'
+            : '100%',
+        errorRate:
+          this.systemMetrics.totalMessages > 0
+            ? ((this.systemMetrics.errors / this.systemMetrics.totalMessages) * 100).toFixed(2) +
+              '%'
+            : '0%',
+      },
     };
   }
 
   public getHealthCheck() {
     const status = this.getSystemStatus();
-    
+
     return {
       status: status.status === 'running' ? 'healthy' : 'unhealthy',
       timestamp: new Date().toISOString(),
@@ -301,18 +306,17 @@ export class Fire22TelegramIntegration {
     };
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🎯 INTEGRATION METHODS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   public async processWebhookUpdate(update: any): Promise<void> {
     try {
       this.systemMetrics.totalMessages++;
-      
+
       // Pass to workflow orchestrator for processing
       // Note: This would need proper integration with Grammy bot instance
       console.log('📨 Processing webhook update:', update);
-      
     } catch (error) {
       console.error('❌ Error processing webhook update:', error);
       this.systemMetrics.errors++;
@@ -323,7 +327,6 @@ export class Fire22TelegramIntegration {
     try {
       // Use workflow orchestrator to send notifications
       console.log(`📢 Sending notification to ${userId}: ${message}`);
-      
     } catch (error) {
       console.error('❌ Error sending notification:', error);
       this.systemMetrics.errors++;
@@ -342,13 +345,13 @@ export class Fire22TelegramIntegration {
     }
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📝 LOGGING METHODS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   private logStartupSummary(): void {
     const configSummary = this.environment.getConfigSummary();
-    
+
     console.log(`
 🔥📱 Fire22 Telegram Integration Started Successfully!
 ════════════════════════════════════════════════════
@@ -385,7 +388,7 @@ Department Workflows: ${this.workflowOrchestrator.getDepartmentWorkflows().join(
 
   private logShutdownSummary(): void {
     const uptime = this.startTime ? Date.now() - this.startTime.getTime() : 0;
-    
+
     console.log(`
 🛑 Fire22 Telegram Integration Shutdown Summary
 ══════════════════════════════════════════════
@@ -396,18 +399,20 @@ Queue Matches: ${this.systemMetrics.queueMatches}
 Language Switches: ${this.systemMetrics.languageSwitches}
 Errors: ${this.systemMetrics.errors}
 
-Error Rate: ${this.systemMetrics.totalMessages > 0 
-  ? (this.systemMetrics.errors / this.systemMetrics.totalMessages * 100).toFixed(2) + '%' 
-  : '0%'}
+Error Rate: ${
+      this.systemMetrics.totalMessages > 0
+        ? ((this.systemMetrics.errors / this.systemMetrics.totalMessages) * 100).toFixed(2) + '%'
+        : '0%'
+    }
 
 ✅ Shutdown completed successfully
 ══════════════════════════════════════════════
     `);
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 🎯 STATIC FACTORY METHODS
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   public static create(env: any): Fire22TelegramIntegration {
     return new Fire22TelegramIntegration(env);
@@ -420,9 +425,9 @@ Error Rate: ${this.systemMetrics.totalMessages > 0
   }
 }
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 📤 EXPORTS
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 export default Fire22TelegramIntegration;
 

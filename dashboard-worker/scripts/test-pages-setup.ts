@@ -5,9 +5,9 @@
  * Validates that all components are properly configured
  */
 
-import { existsSync } from "fs";
-import { join } from "path";
-import { $ } from "bun";
+import { existsSync } from 'fs';
+import { join } from 'path';
+import { $ } from 'bun';
 
 interface TestResult {
   name: string;
@@ -20,7 +20,7 @@ class PagesSetupTester {
 
   async runTests(): Promise<void> {
     console.log('🧪 Testing GitHub Pages & Wiki Setup');
-    console.log('====================================\n');
+    console.log('!==!==!==!==!==!=====\n');
 
     // Test workflows
     await this.testWorkflows();
@@ -68,7 +68,7 @@ class PagesSetupTester {
       'scripts/sync-wiki.ts',
       'scripts/build-wiki-pages.ts',
       'scripts/validate-deployment.ts',
-      'scripts/generate-deployment-report.ts'
+      'scripts/generate-deployment-report.ts',
     ];
 
     for (const script of scripts) {
@@ -101,7 +101,7 @@ class PagesSetupTester {
         'wiki:sync',
         'departments:generate',
         'validate:deployment',
-        'deployment:report'
+        'deployment:report',
       ];
 
       for (const script of requiredScripts) {
@@ -125,7 +125,7 @@ class PagesSetupTester {
     const commands = [
       { name: 'Build Pages', cmd: 'bun run pages:build' },
       { name: 'Generate Departments', cmd: 'bun run departments:generate' },
-      { name: 'Mirror Wiki', cmd: 'bun run wiki:mirror' }
+      { name: 'Mirror Wiki', cmd: 'bun run wiki:mirror' },
     ];
 
     for (const { name, cmd } of commands) {
@@ -147,9 +147,9 @@ class PagesSetupTester {
   }
 
   private displayResults(): void {
-    console.log('=' .repeat(50));
+    console.log('='.repeat(50));
     console.log('📊 TEST RESULTS SUMMARY');
-    console.log('=' .repeat(50));
+    console.log('='.repeat(50));
 
     const passed = this.results.filter(r => r.passed).length;
     const failed = this.results.filter(r => !r.passed).length;
@@ -160,9 +160,7 @@ class PagesSetupTester {
 
     if (failed > 0) {
       console.log('\n⚠️ Failed Tests:');
-      this.results
-        .filter(r => !r.passed)
-        .forEach(r => console.log(`  - ${r.name}: ${r.message}`));
+      this.results.filter(r => !r.passed).forEach(r => console.log(`  - ${r.name}: ${r.message}`));
     }
 
     const percentage = Math.round((passed / total) * 100);
@@ -182,7 +180,9 @@ class PagesSetupTester {
     console.log('2. Run: bun run wiki:mirror');
     console.log('3. Run: bun run validate:deployment');
     console.log('4. Commit changes and push to trigger GitHub Actions');
-    console.log('5. Check deployment at: https://brendadeeznuts1111.github.io/fire22-dashboard-worker');
+    console.log(
+      '5. Check deployment at: https://brendadeeznuts1111.github.io/fire22-dashboard-worker'
+    );
   }
 }
 

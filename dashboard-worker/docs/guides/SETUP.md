@@ -2,7 +2,8 @@
 
 ## Quick Start (Local Development)
 
-The dashboard worker is pre-configured with all necessary Cloudflare infrastructure. Follow these steps to get started:
+The dashboard worker is pre-configured with all necessary Cloudflare
+infrastructure. Follow these steps to get started:
 
 ### 1. Install Dependencies
 
@@ -50,14 +51,17 @@ open http://localhost:8787/dashboard
 All Cloudflare infrastructure is already provisioned:
 
 ### D1 Databases ✅
+
 - `fire22-dashboard` - Main application database
 - `fire22-registry` - Package registry database
 
 ### R2 Buckets ✅
+
 - `fire22-packages` - Package storage
 - `fire22-department-assets` - Department asset storage
 
 ### KV Namespaces ✅
+
 - `REGISTRY_CACHE` - Package registry cache
 - `DEPARTMENT_DATA` - Department configuration
 - `ERROR_CODES` - Error code definitions
@@ -71,15 +75,17 @@ All Cloudflare infrastructure is already provisioned:
 
 The `.env` file contains placeholder values suitable for local development:
 
-| Variable | Purpose | Development Value |
-|----------|---------|-------------------|
-| `JWT_SECRET` | JWT token signing | 32+ char placeholder |
-| `ADMIN_PASSWORD` | Admin dashboard access | `DevAdmin2025!` |
-| `FIRE22_TOKEN` | Fire22 API access | Placeholder token |
-| `FIRE22_WEBHOOK_SECRET` | Webhook validation | 32+ char placeholder |
-| `CRON_SECRET` | Cron job authentication | 32+ char placeholder |
+| Variable                | Purpose                 | Development Value    |
+| ----------------------- | ----------------------- | -------------------- |
+| `JWT_SECRET`            | JWT token signing       | 32+ char placeholder |
+| `ADMIN_PASSWORD`        | Admin dashboard access  | `DevAdmin2025!`      |
+| `FIRE22_TOKEN`          | Fire22 API access       | Placeholder token    |
+| `FIRE22_WEBHOOK_SECRET` | Webhook validation      | 32+ char placeholder |
+| `CRON_SECRET`           | Cron job authentication | 32+ char placeholder |
 
-**Note:** These placeholders work for local development. Real credentials are only needed when:
+**Note:** These placeholders work for local development. Real credentials are
+only needed when:
+
 - Connecting to the actual Fire22 API
 - Testing Telegram bot functionality
 - Processing real payments (Stripe)
@@ -98,6 +104,7 @@ For production deployment, use the provided script to configure real secrets:
 ```
 
 Required production secrets:
+
 - `JWT_SECRET` - Minimum 32 characters
 - `ADMIN_PASSWORD` - Strong password for admin access
 - `FIRE22_TOKEN` - Your Fire22 API token
@@ -105,6 +112,7 @@ Required production secrets:
 - `CRON_SECRET` - Cron authentication secret
 
 Optional production secrets:
+
 - `BOT_TOKEN` - Telegram bot token
 - `CASHIER_BOT_TOKEN` - Cashier bot token
 - `STRIPE_SECRET_KEY` - Stripe API key
@@ -185,7 +193,8 @@ wrangler d1 list
 
 #### 2. Secret Not Found Errors
 
-For local development, the `.env` file provides all necessary placeholders. If you need real values:
+For local development, the `.env` file provides all necessary placeholders. If
+you need real values:
 
 ```bash
 # Set a specific secret for production
@@ -234,11 +243,15 @@ Once running, these endpoints are available:
 ## Support
 
 For issues or questions:
+
 1. Check the troubleshooting section above
 2. Review the error messages in the console
 3. Ensure all dependencies are installed: `bun install --frozen-lockfile`
-4. Verify Cloudflare resources exist: `wrangler d1 list`, `wrangler r2 bucket list`
+4. Verify Cloudflare resources exist: `wrangler d1 list`,
+   `wrangler r2 bucket list`
 
 ---
 
-**Ready to develop!** The worker is fully configured with placeholder values for local development. Real credentials are only needed for production deployment or when testing specific integrations.
+**Ready to develop!** The worker is fully configured with placeholder values for
+local development. Real credentials are only needed for production deployment or
+when testing specific integrations.

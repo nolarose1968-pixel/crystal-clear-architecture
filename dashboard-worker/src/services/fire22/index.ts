@@ -12,13 +12,10 @@ export type {
   ValidationResult,
   BusinessRuleResult,
   TierUpgradeResult,
-  RiskAssessmentResult
+  RiskAssessmentResult,
 } from './business-logic';
 
-export type {
-  ValidationError,
-  FieldValidationRule
-} from './validation-service';
+export type { ValidationError, FieldValidationRule } from './validation-service';
 
 // Service instances (if needed as singletons)
 export const businessLogic = Fire22BusinessLogic;

@@ -24,23 +24,23 @@ export { healthRoutes } from './routes/health.routes';
 export { financialRoutes } from './routes/financial.routes';
 export * from './schemas';
 export interface Fire22APIConfig {
-    jwtSecret?: string;
-    rateLimit?: {
-        enabled: boolean;
-        storage?: 'memory' | 'cloudflare-kv';
-    };
-    validation?: {
-        enabled: boolean;
-        strict?: boolean;
-    };
-    cors?: {
-        origins: string[];
-        methods: string[];
-    };
+  jwtSecret?: string;
+  rateLimit?: {
+    enabled: boolean;
+    storage?: 'memory' | 'cloudflare-kv';
+  };
+  validation?: {
+    enabled: boolean;
+    strict?: boolean;
+  };
+  cors?: {
+    origins: string[];
+    methods: string[];
+  };
 }
 export interface Fire22APIContext {
-    env?: any;
-    ctx?: any;
-    request: Request;
+  env?: any;
+  ctx?: any;
+  request: Request;
 }
 //# sourceMappingURL=index.d.ts.map

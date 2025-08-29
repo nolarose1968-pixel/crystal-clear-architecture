@@ -1,6 +1,6 @@
 /**
  * Other Controller
- * 
+ *
  * Handles miscellaneous operations that don't fit other categories
  */
 
@@ -14,7 +14,7 @@ export async function settlementHistory(request: ValidatedRequest): Promise<Resp
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '10');
-    
+
     // TODO: Implement settlement history logic
     const response = {
       success: true,
@@ -24,23 +24,26 @@ export async function settlementHistory(request: ValidatedRequest): Promise<Resp
           page,
           limit,
           total: 0,
-          totalPages: 0
-        }
-      }
+          totalPages: 0,
+        },
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get settlement history',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get settlement history',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -57,26 +60,29 @@ export async function dashboard(request: ValidatedRequest): Promise<Response> {
           totalCustomers: 0,
           activeWagers: 0,
           totalRevenue: 0,
-          conversionRate: 0
+          conversionRate: 0,
         },
         recentActivity: [],
         alerts: [],
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
-    
+
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to get dashboard data',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get dashboard data',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -95,47 +101,48 @@ export async function live(request: ValidatedRequest): Promise<Response> {
               kpis: {
                 activeUsers: Math.floor(Math.random() * 100) + 50,
                 liveWagers: Math.floor(Math.random() * 20) + 10,
-                revenue: Math.floor(Math.random() * 10000) + 5000
-              }
+                revenue: Math.floor(Math.random() * 10000) + 5000,
+              },
             };
-            
-            controller.enqueue(
-              `data: ${JSON.stringify(data)}\n\n`
-            );
+
+            controller.enqueue(`data: ${JSON.stringify(data)}\n\n`);
           };
-          
+
           // Send initial data
           sendUpdate();
-          
+
           // Send updates every 5 seconds
           const interval = setInterval(sendUpdate, 5000);
-          
+
           // Cleanup on close
           return () => {
             clearInterval(interval);
           };
-        }
+        },
       }),
       {
         headers: {
           'Content-Type': 'text/event-stream',
           'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive',
+          Connection: 'keep-alive',
           'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Cache-Control'
-        }
+          'Access-Control-Allow-Headers': 'Cache-Control',
+        },
       }
     );
-    
+
     return response;
   } catch (error: any) {
-    return new Response(JSON.stringify({
-      error: 'Failed to start live stream',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to start live stream',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -144,17 +151,20 @@ export async function live(request: ValidatedRequest): Promise<Response> {
  */
 export async function placeholder(request: ValidatedRequest): Promise<Response> {
   const url = new URL(request.url);
-  
-  return new Response(JSON.stringify({
-    success: true,
-    message: 'Endpoint is recognized but not yet implemented',
-    endpoint: url.pathname,
-    method: request.method,
-    timestamp: new Date().toISOString()
-  }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' }
-  });
+
+  return new Response(
+    JSON.stringify({
+      success: true,
+      message: 'Endpoint is recognized but not yet implemented',
+      endpoint: url.pathname,
+      method: request.method,
+      timestamp: new Date().toISOString(),
+    }),
+    {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    }
+  );
 }
 
 // Export placeholder as default for all missing handlers

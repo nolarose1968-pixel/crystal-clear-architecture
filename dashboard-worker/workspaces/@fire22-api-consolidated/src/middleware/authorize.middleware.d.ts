@@ -14,13 +14,17 @@ import type { AuthenticatedRequest } from './auth.middleware';
  * @param options.minLevel Minimum role level required
  * @param options.checkScope Whether to enforce scope restrictions
  */
-export declare function authorize(options: {
-    permissions?: string[];
-    anyPermissions?: string[];
-    roles?: string[];
-    minLevel?: number;
-    checkScope?: boolean;
-} | string[]): (request: AuthenticatedRequest) => Promise<Response | void>;
+export declare function authorize(
+  options:
+    | {
+        permissions?: string[];
+        anyPermissions?: string[];
+        roles?: string[];
+        minLevel?: number;
+        checkScope?: boolean;
+      }
+    | string[]
+): (request: AuthenticatedRequest) => Promise<Response | void>;
 /**
  * Preset authorization middleware for common roles
  */
@@ -31,14 +35,24 @@ export declare const requireCustomer: (request: AuthenticatedRequest) => Promise
 /**
  * Check if a user can perform an action on a resource
  */
-export declare function canUserAccess(user: AuthenticatedRequest['user'], resource: {
+export declare function canUserAccess(
+  user: AuthenticatedRequest['user'],
+  resource: {
     type: string;
     id: string;
     ownerId?: string;
-}, action: string): Promise<boolean>;
+  },
+  action: string
+): Promise<boolean>;
 /**
  * Audit log for authorization events
  */
-export declare function logAuthorizationEvent(user: AuthenticatedRequest['user'], action: string, resource: string, allowed: boolean, reason?: string): Promise<void>;
+export declare function logAuthorizationEvent(
+  user: AuthenticatedRequest['user'],
+  action: string,
+  resource: string,
+  allowed: boolean,
+  reason?: string
+): Promise<void>;
 export default authorize;
 //# sourceMappingURL=authorize.middleware.d.ts.map

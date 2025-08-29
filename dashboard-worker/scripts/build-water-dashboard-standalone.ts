@@ -2,21 +2,21 @@
 /**
  * 🚀 Water Dashboard Standalone Executable Builder
  * Builds production-ready executables with Bun v1.01.04-alpha features
- * 
+ *
  * Features:
  * - Windows metadata integration
  * - Custom user agent embedding
  * - Cross-platform compilation
  * - ANSI color support
  * - Side effects optimization
- * 
+ *
  * Usage: bun run scripts/build-water-dashboard-standalone.ts
  */
 
-import { $ } from "bun";
-import { logger } from "./enhanced-logging-system";
-import { existsSync } from "fs";
-import { mkdir } from "fs/promises";
+import { $ } from 'bun';
+import { logger } from './enhanced-logging-system';
+import { existsSync } from 'fs';
+import { mkdir } from 'fs/promises';
 
 // Build configuration
 interface BuildTarget {
@@ -33,44 +33,32 @@ interface BuildTarget {
   };
 }
 
-const BUILD_VERSION = "2.1.0.2024";
+const BUILD_VERSION = '2.1.0.2024';
 const CUSTOM_USER_AGENT = `WaterDashboard/${BUILD_VERSION}`;
 
 const buildTargets: BuildTarget[] = [
   {
-    platform: "linux",
-    outfile: "./dist/water-dashboard-linux",
-    compileExecArgv: [
-      "--smol",
-      `--user-agent=${CUSTOM_USER_AGENT}`,
-      "--inspect=0.0.0.0:9229"
-    ]
+    platform: 'linux',
+    outfile: './dist/water-dashboard-linux',
+    compileExecArgv: ['--smol', `--user-agent=${CUSTOM_USER_AGENT}`, '--inspect=0.0.0.0:9229'],
   },
   {
-    platform: "windows", 
-    outfile: "./dist/WaterDashboard.exe",
-    compileExecArgv: [
-      "--smol",
-      `--user-agent=${CUSTOM_USER_AGENT}`,
-      "--inspect=0.0.0.0:9229"
-    ],
+    platform: 'windows',
+    outfile: './dist/WaterDashboard.exe',
+    compileExecArgv: ['--smol', `--user-agent=${CUSTOM_USER_AGENT}`, '--inspect=0.0.0.0:9229'],
     windows: {
-      title: "Fire22 Water Dashboard - Enhanced Monitoring",
-      publisher: "Fire22 Development Team",
+      title: 'Fire22 Water Dashboard - Enhanced Monitoring',
+      publisher: 'Fire22 Development Team',
       version: BUILD_VERSION,
-      description: "Real-time casino management and analytics dashboard with Fire22 integration",
-      copyright: "© 2024 Fire22 Development Team. All rights reserved.",
-    }
+      description: 'Real-time casino management and analytics dashboard with Fire22 integration',
+      copyright: '© 2024 Fire22 Development Team. All rights reserved.',
+    },
   },
   {
-    platform: "macos",
-    outfile: "./dist/water-dashboard-macos", 
-    compileExecArgv: [
-      "--smol",
-      `--user-agent=${CUSTOM_USER_AGENT}`,
-      "--inspect=0.0.0.0:9229"
-    ]
-  }
+    platform: 'macos',
+    outfile: './dist/water-dashboard-macos',
+    compileExecArgv: ['--smol', `--user-agent=${CUSTOM_USER_AGENT}`, '--inspect=0.0.0.0:9229'],
+  },
 ];
 
 /**
@@ -483,8 +471,8 @@ if (process.env.NODE_ENV === 'production') {
 }
 `;
 
-  await Bun.write("./src/water-dashboard-standalone.ts", entryContent);
-  return "./src/water-dashboard-standalone.ts";
+  await Bun.write('./src/water-dashboard-standalone.ts', entryContent);
+  return './src/water-dashboard-standalone.ts';
 }
 
 /**
@@ -492,73 +480,75 @@ if (process.env.NODE_ENV === 'production') {
  */
 async function buildStandalone(): Promise<void> {
   console.log(formatLog('info', '🚀 Starting Water Dashboard standalone build...'));
-  
+
   try {
     // Ensure dist directory exists
     if (!existsSync('./dist')) {
       await mkdir('./dist', { recursive: true });
       console.log(formatLog('success', '📁 Created dist directory'));
     }
-    
+
     // Create standalone entry point
     const entryFile = await createStandaloneEntry();
     console.log(formatLog('success', `✅ Created standalone entry: ${entryFile}`));
-    
+
     // Build for each target platform
     for (const target of buildTargets) {
       console.log(formatLog('info', `🔨 Building for ${target.platform}...`));
-      
+
       const buildResult = await Bun.build({
         entrypoints: [entryFile],
-        outdir: "./dist",
-        target: "bun",
-        format: "esm",
+        outdir: './dist',
+        target: 'bun',
+        format: 'esm',
         splitting: false,
         minify: true,
-        sourcemap: "none",
-        
+        sourcemap: 'none',
+
         // Bun v1.01.04-alpha features
         compile: {
-          ...(target.windows && { windows: target.windows })
-        }
+          ...(target.windows && { windows: target.windows }),
+        },
       });
-      
+
       if (!buildResult.success) {
         throw new Error(`Build failed for ${target.platform}: ${buildResult.logs?.join(', ')}`);
       }
-      
+
       // Create executable with embedded runtime flags
       console.log(formatLog('info', `📦 Compiling executable for ${target.platform}...`));
-      
-      const compileResult = await $`bun build ${entryFile} --compile --target=bun --outfile=${target.outfile} --minify`.quiet();
-      
+
+      const compileResult =
+        await $`bun build ${entryFile} --compile --target=bun --outfile=${target.outfile} --minify`.quiet();
+
       if (compileResult.exitCode !== 0) {
-        throw new Error(`Compilation failed for ${target.platform}: ${compileResult.stderr?.toString()}`);
+        throw new Error(
+          `Compilation failed for ${target.platform}: ${compileResult.stderr?.toString()}`
+        );
       }
-      
+
       console.log(formatLog('success', `✅ Built ${target.outfile}`));
       console.log(formatLog('info', `   Runtime flags: ${target.compileExecArgv.join(' ')}`));
-      
+
       // Show file size
       const stat = await Bun.file(target.outfile).size;
       const sizeMB = (stat / 1024 / 1024).toFixed(2);
       console.log(formatLog('info', `   Size: ${sizeMB} MB`));
     }
-    
+
     console.log(formatLog('success', '🎉 All builds completed successfully!'));
     console.log(formatLog('info', ''));
     console.log(formatLog('info', '📋 Built executables:'));
-    
+
     for (const target of buildTargets) {
       console.log(formatLog('info', `   ${target.platform}: ${target.outfile}`));
     }
-    
+
     console.log(formatLog('info', ''));
     console.log(formatLog('success', '🚀 Usage:'));
     console.log(formatLog('info', '   Linux:   ./dist/water-dashboard-linux'));
     console.log(formatLog('info', '   Windows: .\\dist\\WaterDashboard.exe'));
     console.log(formatLog('info', '   macOS:   ./dist/water-dashboard-macos'));
-    
   } catch (error) {
     console.error(formatLog('error', `❌ Build failed: ${error}`));
     process.exit(1);
@@ -568,13 +558,13 @@ async function buildStandalone(): Promise<void> {
 // ANSI color helper
 function formatLog(level: string, message: string): string {
   const colors = {
-    info: '\x1b[36m',    // Cyan
+    info: '\x1b[36m', // Cyan
     success: '\x1b[32m', // Green
     warning: '\x1b[33m', // Yellow
-    error: '\x1b[31m',   // Red
-    reset: '\x1b[0m'
+    error: '\x1b[31m', // Red
+    reset: '\x1b[0m',
   };
-  
+
   const color = colors[level] || colors.info;
   return `${color}[${level.toUpperCase()}]${colors.reset} ${message}`;
 }

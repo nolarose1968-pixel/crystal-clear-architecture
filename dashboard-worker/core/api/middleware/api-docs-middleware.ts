@@ -48,10 +48,7 @@ export class APIDocsMiddleware {
     }
 
     // Set global security (bearer auth by default)
-    this.generator.setGlobalSecurity([
-      { bearerAuth: [] },
-      { apiKeyAuth: [] }
-    ]);
+    this.generator.setGlobalSecurity([{ bearerAuth: [] }, { apiKeyAuth: [] }]);
   }
 
   /**
@@ -85,8 +82,8 @@ export class APIDocsMiddleware {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type',
-            'Cache-Control': 'public, max-age=3600' // Cache for 1 hour
-          }
+            'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+          },
         });
       }
 
@@ -96,21 +93,24 @@ export class APIDocsMiddleware {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
-          'Cache-Control': 'public, max-age=3600' // Cache for 1 hour
-        }
+          'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+        },
       });
     } catch (error) {
       console.error('Error generating API docs:', error);
-      return new Response(JSON.stringify({
-        error: 'Failed to generate API documentation',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      }), {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
+      return new Response(
+        JSON.stringify({
+          error: 'Failed to generate API documentation',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        }),
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
         }
-      });
+      );
     }
   }
 
@@ -123,8 +123,8 @@ export class APIDocsMiddleware {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-API-Key',
-        'Access-Control-Max-Age': '86400'
-      }
+        'Access-Control-Max-Age': '86400',
+      },
     });
   }
 
@@ -188,8 +188,8 @@ export class APIDocsMiddleware {
       headers: {
         'Content-Type': 'text/html',
         'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'public, max-age=3600'
-      }
+        'Cache-Control': 'public, max-age=3600',
+      },
     });
   }
 
@@ -220,8 +220,8 @@ export class APIDocsMiddleware {
       headers: {
         'Content-Type': 'text/html',
         'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'public, max-age=3600'
-      }
+        'Cache-Control': 'public, max-age=3600',
+      },
     });
   }
 
@@ -274,21 +274,21 @@ export class APIDocsMiddleware {
       {
         path: this.config.path,
         method: 'GET',
-        handler: (request) => this.generateDocs(request),
-        description: 'OpenAPI/Swagger JSON specification'
+        handler: request => this.generateDocs(request),
+        description: 'OpenAPI/Swagger JSON specification',
       },
       {
         path: `${this.config.path}/swagger-ui`,
         method: 'GET',
-        handler: (request) => this.generateSwaggerUI(request),
-        description: 'Swagger UI documentation interface'
+        handler: request => this.generateSwaggerUI(request),
+        description: 'Swagger UI documentation interface',
       },
       {
         path: `${this.config.path}/redoc`,
         method: 'GET',
-        handler: (request) => this.generateRedoc(request),
-        description: 'Redoc documentation interface'
-      }
+        handler: request => this.generateRedoc(request),
+        description: 'Redoc documentation interface',
+      },
     ];
   }
 }
@@ -303,20 +303,20 @@ export const defaultAPIDocsConfig: APIDocsConfig = {
   servers: [
     {
       url: 'https://api.fire22.com/v1',
-      description: 'Production server'
+      description: 'Production server',
     },
     {
       url: 'https://staging-api.fire22.com/v1',
-      description: 'Staging server'
+      description: 'Staging server',
     },
     {
       url: 'http://localhost:8787/v1',
-      description: 'Local development server'
-    }
+      description: 'Local development server',
+    },
   ],
   contact: {
     name: 'Fire22 Team',
     email: 'api@fire22.com',
-    url: 'https://fire22.com'
-  }
+    url: 'https://fire22.com',
+  },
 };

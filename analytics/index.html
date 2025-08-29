@@ -18,6 +18,13 @@
     <link rel="stylesheet" href="../src/styles/mobile-responsive.css" />
     <link rel="stylesheet" href="analytics.css" />
 
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.fantasy402.com https://ws.fantasy402.com wss://ws.fantasy402.com;" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+
     <!-- Chart.js for Data Visualization -->
     <script>
       // Fallback Chart.js loading with error handling
@@ -127,6 +134,15 @@
           📊 Analytics Dashboard
         </a>
         <a href="../search/index.html" class="mobile-menu-link"> 🔍 Search </a>
+        <a href="performance-dashboard.html" class="mobile-menu-link">
+          🚀 Performance Monitor
+        </a>
+        <a href="performance-test-dashboard.html" class="mobile-menu-link">
+          🧪 Load Testing
+        </a>
+        <a href="test-initialization.html" class="mobile-menu-link">
+          🧪 Test Diagnostics
+        </a>
         <a href="../collaboration/index.html" class="mobile-menu-link">
           🤝 Collaborate
         </a>
@@ -519,6 +535,7 @@
 
     <!-- Scripts -->
     <script src="config.js"></script>
+    <script src="security.js"></script>
     <script src="analytics.js"></script>
   </body>
 </html>

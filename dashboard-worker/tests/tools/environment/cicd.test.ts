@@ -19,7 +19,7 @@ const stages = [
   { name: '🧪 Environment Tests', command: 'bun run env:test' },
   { name: '🏗️ Build Application', command: 'bun run build:prod' },
   { name: '📊 Analyze Build', command: 'bun run build:analyze' },
-  { name: '🔍 Pre-deployment Validation', command: 'bun run env:deploy' }
+  { name: '🔍 Pre-deployment Validation', command: 'bun run env:deploy' },
 ];
 
 let passedStages = 0;
@@ -29,7 +29,7 @@ console.log(`Testing ${totalStages} CI/CD stages...\n`);
 
 stages.forEach((stage, index) => {
   console.log(`${index + 1}/${totalStages} ${stage.name}...`);
-  
+
   try {
     execSync(stage.command, { stdio: 'inherit' });
     console.log(`✅ ${stage.name} - PASSED\n`);

@@ -12,7 +12,7 @@ import {
   getCrossReferences,
   getSystemView,
   getAgentsHierarchy,
-  getUnifiedHierarchy
+  getUnifiedHierarchy,
 } from '../controllers/hierarchy.controller';
 
 const router = Router({ base: '/hierarchy' });
@@ -42,8 +42,8 @@ function createResponse(data: any, status: number = 200, cacheMaxAge?: number) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-    }
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
   });
 
   addRateLimitHeaders(response);
@@ -56,14 +56,18 @@ function createResponse(data: any, status: number = 200, cacheMaxAge?: number) {
 }
 
 // CORS preflight
-router.options('*', () => new Response(null, {
-  status: 200,
-  headers: {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-  }
-}));
+router.options(
+  '*',
+  () =>
+    new Response(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+    })
+);
 
 /**
  * GET /api/hierarchy/aggregated
@@ -80,11 +84,15 @@ router.get('/aggregated', async () => {
     }
   } catch (error) {
     console.error('Hierarchy aggregated endpoint error:', error);
-    return createResponse({
-      success: false,
-      error: 'Internal server error',
-      code: 'INTERNAL_ERROR'
-    }, 500, 0);
+    return createResponse(
+      {
+        success: false,
+        error: 'Internal server error',
+        code: 'INTERNAL_ERROR',
+      },
+      500,
+      0
+    );
   }
 });
 
@@ -100,11 +108,15 @@ router.post('/query', async (request: Request) => {
       try {
         body = await request.json();
       } catch (error) {
-        return createResponse({
-          success: false,
-          error: 'Invalid JSON in request body',
-          code: 'INVALID_QUERY'
-        }, 400, 0);
+        return createResponse(
+          {
+            success: false,
+            error: 'Invalid JSON in request body',
+            code: 'INVALID_QUERY',
+          },
+          400,
+          0
+        );
       }
     }
 
@@ -118,11 +130,15 @@ router.post('/query', async (request: Request) => {
     }
   } catch (error) {
     console.error('Hierarchy query endpoint error:', error);
-    return createResponse({
-      success: false,
-      error: 'Internal server error',
-      code: 'INTERNAL_ERROR'
-    }, 500, 0);
+    return createResponse(
+      {
+        success: false,
+        error: 'Internal server error',
+        code: 'INTERNAL_ERROR',
+      },
+      500,
+      0
+    );
   }
 });
 
@@ -141,11 +157,15 @@ router.get('/cross-references', async () => {
     }
   } catch (error) {
     console.error('Hierarchy cross-references endpoint error:', error);
-    return createResponse({
-      success: false,
-      error: 'Internal server error',
-      code: 'INTERNAL_ERROR'
-    }, 500, 0);
+    return createResponse(
+      {
+        success: false,
+        error: 'Internal server error',
+        code: 'INTERNAL_ERROR',
+      },
+      500,
+      0
+    );
   }
 });
 
@@ -158,11 +178,15 @@ router.get('/view/:system', async (request: any) => {
     const system = request.params?.system;
 
     if (!system) {
-      return createResponse({
-        success: false,
-        error: 'System parameter is required',
-        code: 'INVALID_QUERY'
-      }, 400, 0);
+      return createResponse(
+        {
+          success: false,
+          error: 'System parameter is required',
+          code: 'INVALID_QUERY',
+        },
+        400,
+        0
+      );
     }
 
     const result = await getSystemView(system);
@@ -175,11 +199,15 @@ router.get('/view/:system', async (request: any) => {
     }
   } catch (error) {
     console.error('Hierarchy system view endpoint error:', error);
-    return createResponse({
-      success: false,
-      error: 'Internal server error',
-      code: 'INTERNAL_ERROR'
-    }, 500, 0);
+    return createResponse(
+      {
+        success: false,
+        error: 'Internal server error',
+        code: 'INTERNAL_ERROR',
+      },
+      500,
+      0
+    );
   }
 });
 
@@ -198,11 +226,15 @@ router.get('/unified', async () => {
     }
   } catch (error) {
     console.error('Hierarchy unified endpoint error:', error);
-    return createResponse({
-      success: false,
-      error: 'Internal server error',
-      code: 'INTERNAL_ERROR'
-    }, 500, 0);
+    return createResponse(
+      {
+        success: false,
+        error: 'Internal server error',
+        code: 'INTERNAL_ERROR',
+      },
+      500,
+      0
+    );
   }
 });
 
@@ -221,11 +253,15 @@ router.get('/agents/hierarchy', async () => {
     }
   } catch (error) {
     console.error('Agents hierarchy endpoint error:', error);
-    return createResponse({
-      success: false,
-      error: 'Internal server error',
-      code: 'INTERNAL_ERROR'
-    }, 500, 0);
+    return createResponse(
+      {
+        success: false,
+        error: 'Internal server error',
+        code: 'INTERNAL_ERROR',
+      },
+      500,
+      0
+    );
   }
 });
 
@@ -234,21 +270,24 @@ router.get('/agents/hierarchy', async () => {
  * GET /api/hierarchy/health
  */
 router.get('/health', () => {
-  return createResponse({
-    success: true,
-    status: 'healthy',
-    endpoints: [
-      'GET /api/hierarchy/aggregated',
-      'POST /api/hierarchy/query',
-      'GET /api/hierarchy/cross-references',
-      'GET /api/hierarchy/view/{system}',
-      'GET /api/hierarchy/unified (legacy)',
-      'GET /api/agents/hierarchy (legacy)'
-    ],
-    supportedSystems: ['fire22', 'organizational', 'departments'],
-    timestamp: new Date().toISOString()
-  }, 200, 0);
+  return createResponse(
+    {
+      success: true,
+      status: 'healthy',
+      endpoints: [
+        'GET /api/hierarchy/aggregated',
+        'POST /api/hierarchy/query',
+        'GET /api/hierarchy/cross-references',
+        'GET /api/hierarchy/view/{system}',
+        'GET /api/hierarchy/unified (legacy)',
+        'GET /api/agents/hierarchy (legacy)',
+      ],
+      supportedSystems: ['fire22', 'organizational', 'departments'],
+      timestamp: new Date().toISOString(),
+    },
+    200,
+    0
+  );
 });
 
 export { router as hierarchyRoutes };
-

@@ -4,7 +4,9 @@
 
 ## Overview
 
-The Water Dashboard implements a sophisticated data transfer architecture that seamlessly connects frontend user interactions to multiple backend database systems through Fire22 API integration and enterprise logging.
+The Water Dashboard implements a sophisticated data transfer architecture that
+seamlessly connects frontend user interactions to multiple backend database
+systems through Fire22 API integration and enterprise logging.
 
 ## High-Level Architecture
 
@@ -41,15 +43,16 @@ The Water Dashboard implements a sophisticated data transfer architecture that s
 
 ### 1. Frontend Layer: Water Dashboard HTML
 
-**File**: `/src/water-dashboard.html` (2,000+ lines)
-**Framework**: Alpine.js reactive components
-**Key Features**:
+**File**: `/src/water-dashboard.html` (2,000+ lines) **Framework**: Alpine.js
+reactive components **Key Features**:
+
 - Real-time data binding
 - Command-driven interactions
 - Fire22 API integration
 - Multi-language support with Fire22 L-keys
 
 **Critical Code Sections**:
+
 ```javascript
 // Lines 1200-1300: API Authentication & Token Management
 getAuthToken() {
@@ -89,22 +92,25 @@ async executeCommand(commandType) {
 ### 2. API Layer: Fire22 Integration
 
 **Authentication Flow**:
+
 ```typescript
 JWT Token → Fire22 API Validation → Database Access Authorization
 ```
 
 **Key Endpoints**:
+
 - `POST /api/Manager/getWeeklyFigureByAgent` - Performance data
 - `POST /api/Manager/getLiveWagers` - Pending wager data
 - `GET /api/fire22/customers` - Customer management (2,600+ records)
 - `GET /api/live` - Server-Sent Events stream
 
 **API Response Processing**:
+
 ```javascript
 // Automatic database logging for all API responses
 async processApiResponse(response, requestContext) {
     const webLogManager = new WebLogManager(this.env);
-    
+
     // Log API call for compliance
     await webLogManager.createLog({
         logType: 'API_ACCESS',
@@ -116,22 +122,23 @@ async processApiResponse(response, requestContext) {
         },
         fire22LanguageKeys: ['L-1391'] // Audit Trail
     });
-    
+
     return response.data;
 }
 ```
 
 ### 3. Logging Layer: WebLogManager Enterprise System
 
-**File**: `/src/services/WebLogManager.ts` (547 lines)
-**Architecture**: Multi-tier storage with risk assessment
-**Features**:
+**File**: `/src/services/WebLogManager.ts` (547 lines) **Architecture**:
+Multi-tier storage with risk assessment **Features**:
+
 - Automatic risk scoring
 - Fire22 L-key integration
 - Compliance tracking
 - Real-time analytics
 
 **Core Database Operations**:
+
 ```typescript
 // Primary log creation with enhanced metadata
 async createLog<T extends LogType>(logData: CreateLogRequest<T>): Promise<string> {
@@ -148,7 +155,7 @@ async createLog<T extends LogType>(logData: CreateLogRequest<T>): Promise<string
     // Multi-tier storage execution
     await Promise.all([
         this.storeInDatabase(enhancedLog),     // D1 Database
-        this.updateCacheLog(enhancedLog),      // KV Cache  
+        this.updateCacheLog(enhancedLog),      // KV Cache
         this.updateAnalytics(enhancedLog)      // Background analytics
     ]);
 
@@ -157,6 +164,7 @@ async createLog<T extends LogType>(logData: CreateLogRequest<T>): Promise<string
 ```
 
 **Fire22 Language Integration**:
+
 ```typescript
 // Maps database operations to Fire22 L-keys
 private getRelevantLanguageKeys(logType: LogType): string[] {
@@ -226,11 +234,11 @@ sequenceDiagram
 async executeCommand(commandType) {
     const startTime = Date.now();
     const webLogManager = new WebLogManager(this.env);
-    
+
     try {
         // Execute command logic
         const result = await this.commands[commandType]();
-        
+
         // Success logging
         await webLogManager.createLog({
             logType: 'SYSTEM',
@@ -241,9 +249,9 @@ async executeCommand(commandType) {
             },
             processingTimeMs: Date.now() - startTime
         });
-        
+
         return result;
-        
+
     } catch (error) {
         // Error logging with risk assessment
         await webLogManager.logSecurityIncident({
@@ -255,7 +263,7 @@ async executeCommand(commandType) {
             },
             riskScore: 75 // High risk for command failures
         });
-        
+
         throw error;
     }
 }
@@ -266,6 +274,7 @@ async executeCommand(commandType) {
 ### Tier 1: D1 Database (Active Data - 90 Days)
 
 **Schema Design**:
+
 ```sql
 CREATE TABLE web_logs (
     id TEXT PRIMARY KEY,
@@ -299,6 +308,7 @@ CREATE INDEX idx_web_logs_suspicious ON web_logs(is_suspicious);
 ```
 
 **Performance Characteristics**:
+
 - **Query Speed**: <50ms for dashboard queries
 - **Retention**: 90-day rolling window
 - **Batch Operations**: 1,000 records per batch
@@ -307,6 +317,7 @@ CREATE INDEX idx_web_logs_suspicious ON web_logs(is_suspicious);
 ### Tier 2: R2 Bucket (Long-term Archive)
 
 **Archive Structure**:
+
 ```
 logs/archived/
 ├── 2024-08-27/
@@ -318,27 +329,31 @@ logs/archived/
 ```
 
 **Archive Metadata**:
+
 ```json
 {
-    "metadata": {
-        "archiveDate": "2024-08-27T10:30:00Z",
-        "cutoffDate": "2024-07-28T10:30:00Z", 
-        "totalLogs": 15420,
-        "fire22Version": "3.0.9",
-        "compressionEnabled": true,
-        "retentionYears": 7
-    },
-    "logs": [/* archived log entries */]
+  "metadata": {
+    "archiveDate": "2024-08-27T10:30:00Z",
+    "cutoffDate": "2024-07-28T10:30:00Z",
+    "totalLogs": 15420,
+    "fire22Version": "3.0.9",
+    "compressionEnabled": true,
+    "retentionYears": 7
+  },
+  "logs": [
+    /* archived log entries */
+  ]
 }
 ```
 
 **Automated Archival Process**:
+
 ```typescript
 // Runs daily via Cloudflare Cron Triggers
 async performDailyArchival() {
     const archivedCount = await webLogManager.archiveOldLogs(30);
     const cleanedCount = await webLogManager.cleanupExpiredLogs();
-    
+
     // Archive performance logging
     await webLogManager.createLog({
         logType: 'SYSTEM',
@@ -355,33 +370,35 @@ async performDailyArchival() {
 ### Tier 3: KV Cache (Performance Layer)
 
 **Cache Strategy**:
+
 ```typescript
 // Performance-optimized caching
 const cacheStrategy = {
-    // Recent logs by type (50 most recent)
-    recent_logs: {
-        key: `recent_logs:${logType}`,
-        ttl: 3600, // 1 hour
-        maxItems: 50
-    },
-    
-    // Query result caching
-    query_results: {
-        key: `logs:query:${queryHash}`,
-        ttl: 300,  // 5 minutes
-        compression: true
-    },
-    
-    // Analytics summaries
-    analytics: {
-        key: `analytics:summary:${timeframe}`,
-        ttl: 300,  // 5 minutes
-        autoRefresh: true
-    }
+  // Recent logs by type (50 most recent)
+  recent_logs: {
+    key: `recent_logs:${logType}`,
+    ttl: 3600, // 1 hour
+    maxItems: 50,
+  },
+
+  // Query result caching
+  query_results: {
+    key: `logs:query:${queryHash}`,
+    ttl: 300, // 5 minutes
+    compression: true,
+  },
+
+  // Analytics summaries
+  analytics: {
+    key: `analytics:summary:${timeframe}`,
+    ttl: 300, // 5 minutes
+    autoRefresh: true,
+  },
 };
 ```
 
 **Cache Performance Metrics**:
+
 - **Hit Rate**: 85%+ for dashboard queries
 - **Response Time**: <10ms for cached queries
 - **Memory Usage**: ~50MB for typical workload
@@ -396,15 +413,15 @@ const cacheStrategy = {
 async syncFire22Data() {
     const token = this.getAuthToken();
     const webLogManager = new WebLogManager(this.env);
-    
+
     try {
         // Parallel API calls for efficiency
         const [customers, wagers, transactions] = await Promise.all([
             this.fetchFire22Customers(token),
-            this.fetchPendingWagers(token), 
+            this.fetchPendingWagers(token),
             this.fetchWeeklyFigures(token)
         ]);
-        
+
         // Batch logging for performance
         const logPromises = [
             webLogManager.createLog({
@@ -413,26 +430,26 @@ async syncFire22Data() {
                 actionData: { customerCount: customers.length }
             }),
             webLogManager.createLog({
-                logType: 'SYNC', 
+                logType: 'SYNC',
                 actionType: 'fire22_wagers_sync',
                 actionData: { wagerCount: wagers.length }
             }),
             webLogManager.createLog({
                 logType: 'SYNC',
-                actionType: 'fire22_transactions_sync', 
+                actionType: 'fire22_transactions_sync',
                 actionData: { transactionCount: transactions.length }
             })
         ];
-        
+
         await Promise.all(logPromises);
-        
+
         return {
             customers: customers.length,
             wagers: wagers.length,
             transactions: transactions.length,
             syncTimestamp: new Date().toISOString()
         };
-        
+
     } catch (error) {
         // Critical error logging
         await webLogManager.logSecurityIncident({
@@ -444,7 +461,7 @@ async syncFire22Data() {
             },
             riskScore: 90 // Very high risk for sync failures
         });
-        
+
         throw error;
     }
 }
@@ -455,44 +472,45 @@ async syncFire22Data() {
 ```javascript
 // Server-Sent Events integration
 class DashboardEventProcessor {
-    constructor() {
-        this.webLogManager = new WebLogManager(env);
-        this.eventHandlers = {
-            'transaction': this.handleTransactionEvent.bind(this),
-            'wager': this.handleWagerEvent.bind(this),
-            'customer': this.handleCustomerEvent.bind(this),
-            'system': this.handleSystemEvent.bind(this)
-        };
-    }
-    
-    async handleTransactionEvent(eventData) {
-        // Real-time UI update
-        this.updateTransactionDisplay(eventData);
-        
-        // Database logging with risk assessment
-        const logId = await this.webLogManager.logTransaction({
-            actionType: 'real_time_transaction',
-            customerId: eventData.customerId,
-            actionData: {
-                transactionId: eventData.id,
-                amount: eventData.amount,
-                method: eventData.method,
-                realTimeProcessed: true
-            },
-            processingTimeMs: Date.now() - eventData.serverTimestamp
-        });
-        
-        // Analytics update
-        this.updateTransactionAnalytics(eventData);
-        
-        return logId;
-    }
+  constructor() {
+    this.webLogManager = new WebLogManager(env);
+    this.eventHandlers = {
+      transaction: this.handleTransactionEvent.bind(this),
+      wager: this.handleWagerEvent.bind(this),
+      customer: this.handleCustomerEvent.bind(this),
+      system: this.handleSystemEvent.bind(this),
+    };
+  }
+
+  async handleTransactionEvent(eventData) {
+    // Real-time UI update
+    this.updateTransactionDisplay(eventData);
+
+    // Database logging with risk assessment
+    const logId = await this.webLogManager.logTransaction({
+      actionType: 'real_time_transaction',
+      customerId: eventData.customerId,
+      actionData: {
+        transactionId: eventData.id,
+        amount: eventData.amount,
+        method: eventData.method,
+        realTimeProcessed: true,
+      },
+      processingTimeMs: Date.now() - eventData.serverTimestamp,
+    });
+
+    // Analytics update
+    this.updateTransactionAnalytics(eventData);
+
+    return logId;
+  }
 }
 ```
 
 ## Performance Characteristics
 
 ### Response Times
+
 - **Dashboard Load**: <2 seconds (full data)
 - **Command Execution**: <500ms average
 - **Real-time Updates**: <100ms latency
@@ -500,6 +518,7 @@ class DashboardEventProcessor {
 - **Cache Lookups**: <10ms (KV)
 
 ### Throughput Metrics
+
 - **Concurrent Users**: 100+ supported
 - **Events/Second**: 1,000+ processed
 - **Database Writes**: 10,000+ per hour
@@ -507,6 +526,7 @@ class DashboardEventProcessor {
 - **Cache Operations**: 50,000+ per hour
 
 ### Reliability Features
+
 - **Error Recovery**: Automatic retry logic
 - **Fallback Systems**: Cache-first when API unavailable
 - **Circuit Breakers**: Prevent cascade failures
@@ -521,7 +541,7 @@ class DashboardEventProcessor {
 // Comprehensive risk scoring
 private async calculateRiskScore(logData: any): Promise<number> {
     let riskScore = 0;
-    
+
     // Base risk by log type
     const typeRisk = {
         SECURITY: 50,
@@ -531,28 +551,29 @@ private async calculateRiskScore(logData: any): Promise<number> {
         CASINO_BET: 25
     };
     riskScore += typeRisk[logData.logType] || 0;
-    
+
     // Amount-based risk
     if (logData.actionData?.amount > 10000) riskScore += 20;
     if (logData.actionData?.stakeAmount > 5000) riskScore += 15;
-    
+
     // Geographic risk (non-Brazilian IPs)
     if (logData.geoLocation?.country !== 'BR') riskScore += 25;
-    
+
     // Behavioral patterns
     const recentActivity = await this.getRecentActivityCount(
         logData.customerId, 300 // 5 minutes
     );
     if (recentActivity > 10) riskScore += 20;
-    
+
     // IP reputation check
     if (!this.isKnownSafeIP(logData.ipAddress)) riskScore += 10;
-    
+
     return Math.min(riskScore, 100); // Cap at 100
 }
 ```
 
 ### Compliance Features
+
 - **Data Retention**: 90-day active + 7-year archive
 - **Audit Trails**: Complete action logging
 - **Fire22 L-keys**: Authentic multilingual compliance
@@ -568,7 +589,7 @@ private async calculateRiskScore(logData: any): Promise<number> {
 // Analytics dashboard integration
 async getDashboardAnalytics() {
     const analytics = await webLogManager.getLogAnalyticsSummary(24); // Last 24 hours
-    
+
     return {
         totalEvents: Object.values(analytics).reduce((sum, a) => sum + a.totalEvents, 0),
         successRate: this.calculateSuccessRate(analytics),
@@ -581,8 +602,9 @@ async getDashboardAnalytics() {
 ```
 
 ### Alert System
+
 - **High Risk Events**: Risk score >70
-- **API Failures**: >5 failures in 5 minutes  
+- **API Failures**: >5 failures in 5 minutes
 - **Suspicious Activity**: Pattern detection
 - **System Performance**: Response time >1 second
 - **Compliance Issues**: Missing audit trails
@@ -590,6 +612,7 @@ async getDashboardAnalytics() {
 ## Deployment & Infrastructure
 
 ### Cloudflare Workers Configuration
+
 ```toml
 # wrangler.toml
 [env.production]
@@ -602,7 +625,7 @@ binding = "DB"
 database_name = "fire22-dashboard"
 database_id = "database_id"
 
-[[env.production.r2_buckets]]  
+[[env.production.r2_buckets]]
 binding = "REGISTRY_STORAGE"
 bucket_name = "fire22-packages"
 
@@ -613,24 +636,25 @@ ARCHIVE_RETENTION_YEARS = "7"
 ```
 
 ### Health Monitoring
+
 ```javascript
 // Comprehensive system health check
 async getSystemHealth() {
     const health = {
         database: await this.checkD1Health(),
-        cache: await this.checkKVHealth(), 
+        cache: await this.checkKVHealth(),
         storage: await this.checkR2Health(),
         fire22Api: await this.checkFire22Health(),
         timestamp: new Date().toISOString()
     };
-    
+
     // Log health status
     await webLogManager.createLog({
         logType: 'SYSTEM',
         actionType: 'health_check',
         actionData: health
     });
-    
+
     return health;
 }
 ```
@@ -638,6 +662,7 @@ async getSystemHealth() {
 ## Future Enhancements
 
 ### Planned Features
+
 - **Machine Learning**: Advanced risk scoring with ML models
 - **Real-time Analytics**: Sub-second analytics updates
 - **Multi-region**: Global database distribution
@@ -645,6 +670,7 @@ async getSystemHealth() {
 - **Enhanced Security**: Biometric authentication integration
 
 ### Scalability Roadmap
+
 - **Horizontal Scaling**: Multi-worker deployment
 - **Database Sharding**: Customer-based partitioning
 - **Edge Computing**: Regional data processing

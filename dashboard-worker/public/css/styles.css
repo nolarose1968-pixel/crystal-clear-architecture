@@ -9053,7 +9053,7 @@
 
 /* Inline styles from src-dashboard */
 .src-dashboard-inline-1 {
-  `width: ${queue.progress || 0}%`
+  width: 0%;
 }
 .src-dashboard-inline-2 {
   margin-top: 60px;

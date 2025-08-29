@@ -7,34 +7,34 @@
 
 :root {
   /* Brand Colors - Fire22 Identity */
-  --fire22-brand-primary: oklch(70% 0.25 30);     /* Fire orange */
-  --fire22-brand-secondary: oklch(65% 0.2 45);    /* Warm orange */
-  
+  --fire22-brand-primary: oklch(70% 0.25 30); /* Fire orange */
+  --fire22-brand-secondary: oklch(65% 0.2 45); /* Warm orange */
+
   /* Status Colors - WCAG AA Compliant (4.5:1 contrast minimum) */
-  --fire22-status-default: oklch(70% 0.15 240);   /* Neutral blue */
-  --fire22-status-success: oklch(65% 0.18 145);   /* Success green */
-  --fire22-status-warning: oklch(75% 0.20 85);    /* Warning yellow */
-  --fire22-status-error: oklch(60% 0.22 25);      /* Error red */
-  --fire22-status-info: oklch(70% 0.15 260);      /* Info blue */
-  --fire22-status-draft: oklch(60% 0.08 280);     /* Draft purple */
-  --fire22-status-archived: oklch(50% 0.05 200);  /* Archived gray */
-  
+  --fire22-status-default: oklch(70% 0.15 240); /* Neutral blue */
+  --fire22-status-success: oklch(65% 0.18 145); /* Success green */
+  --fire22-status-warning: oklch(75% 0.2 85); /* Warning yellow */
+  --fire22-status-error: oklch(60% 0.22 25); /* Error red */
+  --fire22-status-info: oklch(70% 0.15 260); /* Info blue */
+  --fire22-status-draft: oklch(60% 0.08 280); /* Draft purple */
+  --fire22-status-archived: oklch(50% 0.05 200); /* Archived gray */
+
   /* Highlight Ring Variations */
   --fire22-highlight-thin: 0 0 0 1px;
   --fire22-highlight-medium: 0 0 0 2px;
   --fire22-highlight-thick: 0 0 0 3px;
   --fire22-highlight-glow: 0 0 0 2px, 0 0 8px 0;
-  
+
   /* Animation & Timing */
   --fire22-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --fire22-transition-medium: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --fire22-transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   /* Spacing & Layout */
   --fire22-border-radius-sm: 6px;
   --fire22-border-radius-md: 12px;
   --fire22-border-radius-lg: 16px;
-  
+
   /* Z-index Management */
   --fire22-z-highlight: 1;
   --fire22-z-hover: 2;
@@ -48,7 +48,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --fire22-status-default: oklch(75% 0.18 240);
-    --fire22-status-success: oklch(70% 0.20 145);
+    --fire22-status-success: oklch(70% 0.2 145);
     --fire22-status-warning: oklch(80% 0.22 85);
     --fire22-status-error: oklch(65% 0.24 25);
     --fire22-status-info: oklch(75% 0.18 260);
@@ -64,12 +64,12 @@
 .fire22-highlight {
   position: relative;
   border-radius: var(--fire22-border-radius-md);
-  transition: 
+  transition:
     box-shadow var(--fire22-transition-medium),
     transform var(--fire22-transition-medium),
     background-color var(--fire22-transition-medium);
   z-index: var(--fire22-z-highlight);
-  
+
   /* Default highlight ring */
   box-shadow: var(--fire22-highlight-medium) var(--fire22-status-default);
 }
@@ -186,7 +186,8 @@
   inset: -3px;
   border-radius: inherit;
   padding: 3px;
-  background: linear-gradient(45deg, 
+  background: linear-gradient(
+    45deg,
     var(--fire22-brand-primary),
     var(--fire22-status-success),
     var(--fire22-brand-secondary),
@@ -194,8 +195,9 @@
     var(--fire22-brand-primary)
   );
   background-size: 200% 200%;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, 
-                linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   animation: fire22-rainbow-glow 3s ease-in-out infinite;
@@ -203,11 +205,12 @@
 }
 
 @keyframes fire22-rainbow-glow {
-  0%, 100% { 
+  0%,
+  100% {
     background-position: 0% 50%;
     opacity: 0.6;
   }
-  50% { 
+  50% {
     background-position: 100% 50%;
     opacity: 1;
   }
@@ -219,10 +222,11 @@
 }
 
 @keyframes fire22-pulse {
-  0%, 100% { 
+  0%,
+  100% {
     box-shadow: var(--fire22-highlight-medium) var(--fire22-status-default);
   }
-  50% { 
+  50% {
     box-shadow: var(--fire22-highlight-glow) var(--fire22-status-default);
   }
 }
@@ -299,16 +303,16 @@
   .fire22-highlight {
     border-radius: var(--fire22-border-radius-sm);
   }
-  
+
   .fire22-highlight:hover {
     transform: none;
   }
-  
+
   .fire22-package-card {
     padding: 16px;
     gap: 12px;
   }
-  
+
   /* Reduce motion for users who prefer it */
   @media (prefers-reduced-motion: reduce) {
     .fire22-highlight,
@@ -330,9 +334,9 @@
     --fire22-status-success: oklch(70% 0.25 145);
     --fire22-status-warning: oklch(85% 0.25 85);
     --fire22-status-error: oklch(65% 0.28 25);
-    --fire22-status-info: oklch(75% 0.20 260);
+    --fire22-status-info: oklch(75% 0.2 260);
   }
-  
+
   .fire22-highlight {
     box-shadow: var(--fire22-highlight-thick) var(--fire22-status-default);
   }
@@ -353,7 +357,7 @@
 }
 
 /* Interactive cursor */
-.fire22-highlight[role="button"],
+.fire22-highlight[role='button'],
 .fire22-highlight.clickable {
   cursor: pointer;
 }
@@ -369,7 +373,7 @@
    ================================================================================================ */
 
 /* Debug mode - shows color values */
-[data-fire22-debug="true"] .fire22-highlight::after {
+[data-fire22-debug='true'] .fire22-highlight::after {
   content: attr(class);
   position: absolute;
   top: -20px;

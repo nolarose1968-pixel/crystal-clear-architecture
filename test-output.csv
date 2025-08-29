@@ -1,0 +1,4 @@
+name,version,status
+API,2.0.0,running
+Database,2.0.0,running
+Cache,2.0.0,stopped

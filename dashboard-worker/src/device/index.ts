@@ -17,12 +17,12 @@ export class DeviceManagementSystem {
   constructor(config?: any) {
     this.detector = new DeviceDetector();
     this.userAgentConfig = {
-      name: "Fire22Dashboard",
-      version: "2.1.0",
+      name: 'Fire22Dashboard',
+      version: '2.1.0',
       platform: process.platform,
-      features: ["DeviceDetection", "Fingerprinting", "SecurityMonitoring", "Analytics"],
+      features: ['DeviceDetection', 'Fingerprinting', 'SecurityMonitoring', 'Analytics'],
       buildDate: new Date(),
-      ...config
+      ...config,
     };
   }
 
@@ -145,7 +145,7 @@ export class DeviceManagementSystem {
       updatedAt: new Date(),
       isActive: true,
       createdBy: 'system',
-      updatedBy: 'system'
+      updatedBy: 'system',
     };
 
     this.apiCalls.push(apiCall);
@@ -158,7 +158,9 @@ export class DeviceManagementSystem {
     // Update analytics
     this.updateAnalytics(callData.userAgent, callData);
 
-    console.log(`📡 API Call tracked: ${callData.method} ${callData.endpoint} (${callData.responseTime}ms)`);
+    console.log(
+      `📡 API Call tracked: ${callData.method} ${callData.endpoint} (${callData.responseTime}ms)`
+    );
   }
 
   /**
@@ -205,16 +207,18 @@ export class DeviceManagementSystem {
    * Get user agent analytics
    */
   getUserAgentAnalytics(userAgent: string): any {
-    return this.analytics.get(userAgent) || {
-      userAgent,
-      requestCount: 0,
-      successCount: 0,
-      errorCount: 0,
-      avgResponseTime: 0,
-      lastUsed: null,
-      endpoints: new Map(),
-      errors: new Map()
-    };
+    return (
+      this.analytics.get(userAgent) || {
+        userAgent,
+        requestCount: 0,
+        successCount: 0,
+        errorCount: 0,
+        avgResponseTime: 0,
+        lastUsed: null,
+        endpoints: new Map(),
+        errors: new Map(),
+      }
+    );
   }
 
   /**
@@ -254,7 +258,7 @@ export class DeviceManagementSystem {
 
     const requestOptions = {
       ...options,
-      headers
+      headers,
     };
 
     try {
@@ -272,7 +276,7 @@ export class DeviceManagementSystem {
         success: response.ok,
         bytesTransferred: parseInt(response.headers.get('content-length') || '0'),
         requestHeaders: Object.fromEntries(headers.entries()),
-        responseHeaders: Object.fromEntries(response.headers.entries())
+        responseHeaders: Object.fromEntries(response.headers.entries()),
       });
 
       return response;
@@ -288,7 +292,7 @@ export class DeviceManagementSystem {
         responseTime,
         statusCode: 0,
         success: false,
-        errorMessage: error instanceof Error ? error.message : 'Unknown error'
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
       });
 
       throw error;
@@ -302,30 +306,32 @@ export class DeviceManagementSystem {
    */
   getSystemHealth() {
     const apiCallCount = this.apiCalls.length;
-    const recentCalls = this.apiCalls.filter(call =>
-      call.timestamp > new Date(Date.now() - 60 * 60 * 1000) // Last hour
+    const recentCalls = this.apiCalls.filter(
+      call => call.timestamp > new Date(Date.now() - 60 * 60 * 1000) // Last hour
     );
 
-    const successRate = recentCalls.length > 0
-      ? (recentCalls.filter(call => call.success).length / recentCalls.length) * 100
-      : 0;
+    const successRate =
+      recentCalls.length > 0
+        ? (recentCalls.filter(call => call.success).length / recentCalls.length) * 100
+        : 0;
 
-    const avgResponseTime = recentCalls.length > 0
-      ? recentCalls.reduce((sum, call) => sum + call.responseTime, 0) / recentCalls.length
-      : 0;
+    const avgResponseTime =
+      recentCalls.length > 0
+        ? recentCalls.reduce((sum, call) => sum + call.responseTime, 0) / recentCalls.length
+        : 0;
 
     return {
       apiCalls: {
         total: apiCallCount,
         recent: recentCalls.length,
         successRate,
-        avgResponseTime
+        avgResponseTime,
       },
       analytics: {
         trackedUserAgents: this.analytics.size,
-        cacheEfficiency: this.calculateCacheEfficiency()
+        cacheEfficiency: this.calculateCacheEfficiency(),
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -338,9 +344,10 @@ export class DeviceManagementSystem {
 
     const totalRequests = allAnalytics.reduce((sum, ua) => sum + ua.requestCount, 0);
     const totalErrors = allAnalytics.reduce((sum, ua) => sum + ua.errorCount, 0);
-    const avgResponseTime = allAnalytics.length > 0
-      ? allAnalytics.reduce((sum, ua) => sum + ua.avgResponseTime, 0) / allAnalytics.length
-      : 0;
+    const avgResponseTime =
+      allAnalytics.length > 0
+        ? allAnalytics.reduce((sum, ua) => sum + ua.avgResponseTime, 0) / allAnalytics.length
+        : 0;
 
     return {
       health,
@@ -349,10 +356,10 @@ export class DeviceManagementSystem {
         totalErrors,
         errorRate: totalRequests > 0 ? (totalErrors / totalRequests) * 100 : 0,
         avgResponseTime,
-        uniqueUserAgents: allAnalytics.length
+        uniqueUserAgents: allAnalytics.length,
       },
       endpoints: this.getEndpointStatistics(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -367,7 +374,7 @@ export class DeviceManagementSystem {
       avgResponseTime: 0,
       lastUsed: new Date(),
       endpoints: new Map(),
-      errors: new Map()
+      errors: new Map(),
     };
 
     // Update counters
@@ -379,9 +386,9 @@ export class DeviceManagementSystem {
     }
 
     // Update average response time
-    existing.avgResponseTime = (
-      (existing.avgResponseTime * (existing.requestCount - 1)) + callData.responseTime
-    ) / existing.requestCount;
+    existing.avgResponseTime =
+      (existing.avgResponseTime * (existing.requestCount - 1) + callData.responseTime) /
+      existing.requestCount;
 
     // Update last used
     existing.lastUsed = new Date();
@@ -402,9 +409,9 @@ export class DeviceManagementSystem {
   private calculateCacheEfficiency(): number {
     // Simple cache efficiency calculation
     const totalEntries = this.analytics.size;
-    const activeEntries = Array.from(this.analytics.values())
-      .filter(ua => ua.lastUsed > new Date(Date.now() - 24 * 60 * 60 * 1000)) // Last 24 hours
-      .length;
+    const activeEntries = Array.from(this.analytics.values()).filter(
+      ua => ua.lastUsed > new Date(Date.now() - 24 * 60 * 60 * 1000)
+    ).length; // Last 24 hours
 
     return totalEntries > 0 ? (activeEntries / totalEntries) * 100 : 0;
   }
@@ -415,11 +422,14 @@ export class DeviceManagementSystem {
     successRate: number;
     avgResponseTime: number;
   }> {
-    const endpointStats = new Map<string, {
-      totalRequests: number;
-      successfulRequests: number;
-      totalResponseTime: number;
-    }>();
+    const endpointStats = new Map<
+      string,
+      {
+        totalRequests: number;
+        successfulRequests: number;
+        totalResponseTime: number;
+      }
+    >();
 
     // Aggregate data from all user agents
     for (const analytics of this.analytics.values()) {
@@ -427,7 +437,7 @@ export class DeviceManagementSystem {
         const existing = endpointStats.get(endpoint) || {
           totalRequests: 0,
           successfulRequests: 0,
-          totalResponseTime: 0
+          totalResponseTime: 0,
         };
 
         existing.totalRequests += count;
@@ -440,7 +450,7 @@ export class DeviceManagementSystem {
       endpoint,
       totalRequests: stats.totalRequests,
       successRate: 0, // Would need more detailed tracking
-      avgResponseTime: 0 // Would need more detailed tracking
+      avgResponseTime: 0, // Would need more detailed tracking
     }));
   }
 

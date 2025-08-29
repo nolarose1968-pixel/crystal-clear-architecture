@@ -6,7 +6,7 @@
  * for optimized inter-domain communication in Crystal Clear Architecture.
  */
 
-import { YAML } from 'bun';
+import { YAML } from "bun";
 
 export interface MessageMetadata {
   correlationId: string;
@@ -14,7 +14,7 @@ export interface MessageMetadata {
   version: string;
   sourceDomain: string;
   targetDomain: string;
-  priority: 'low' | 'normal' | 'high' | 'critical';
+  priority: "low" | "normal" | "high" | "critical";
   ttl: number; // Time to live in milliseconds
   compression?: boolean;
   batchId?: string;
@@ -40,7 +40,7 @@ export interface MessageBatch {
   messages: WorkerMessage[];
   totalSize: number;
   compressionRatio: number;
-  priority: 'low' | 'normal' | 'high' | 'critical';
+  priority: "low" | "normal" | "high" | "critical";
 }
 
 export class WorkerMessenger {
@@ -53,7 +53,10 @@ export class WorkerMessenger {
   private readonly MAX_BATCH_SIZE = 10;
   private readonly COMPRESSION_THRESHOLD = 1024; // bytes
 
-  constructor(worker: Worker, private domainName: string) {
+  constructor(
+    worker: Worker,
+    private domainName: string,
+  ) {
     this.worker = worker;
     this.performanceMetrics = {
       messagesSent: 0,
@@ -61,7 +64,7 @@ export class WorkerMessenger {
       averageLatency: 0,
       errors: 0,
       compressionRatio: 1.0,
-      batchEfficiency: 1.0
+      batchEfficiency: 1.0,
     };
 
     this.setupMessageHandler();
@@ -71,12 +74,15 @@ export class WorkerMessenger {
   /**
    * Send YAML message with performance optimization
    */
-  async send(message: Omit<WorkerMessage, 'metadata'>, options: {
-    priority?: 'low' | 'normal' | 'high' | 'critical';
-    compress?: boolean;
-    batch?: boolean;
-    ttl?: number;
-  } = {}): Promise<{ success: boolean; correlationId: string; latency?: number }> {
+  async send(
+    message: Omit<WorkerMessage, "metadata">,
+    options: {
+      priority?: "low" | "normal" | "high" | "critical";
+      compress?: boolean;
+      batch?: boolean;
+      ttl?: number;
+    } = {},
+  ): Promise<{ success: boolean; correlationId: string; latency?: number }> {
     const startTime = performance.now();
 
     try {
@@ -84,17 +90,17 @@ export class WorkerMessenger {
       const metadata: MessageMetadata = {
         correlationId,
         timestamp: new Date().toISOString(),
-        version: '1.0',
+        version: "1.0",
         sourceDomain: this.domainName,
-        targetDomain: message.payload.targetDomain || 'unknown',
-        priority: options.priority || 'normal',
+        targetDomain: message.payload.targetDomain || "unknown",
+        priority: options.priority || "normal",
         ttl: options.ttl || 300000, // 5 minutes default
-        compression: options.compress || false
+        compression: options.compress || false,
       };
 
       const fullMessage: WorkerMessage = {
         ...message,
-        metadata
+        metadata,
       };
 
       // Check if message should be batched
@@ -107,7 +113,7 @@ export class WorkerMessenger {
 
       // Send with performance optimization
       this.worker.postMessage(yamlMessage, {
-        transfer: options.compress ? [] : undefined
+        transfer: options.compress ? [] : undefined,
       });
 
       // Track metrics
@@ -126,9 +132,8 @@ export class WorkerMessenger {
       return {
         success: true,
         correlationId,
-        latency
+        latency,
       };
-
     } catch (error) {
       this.performanceMetrics.errors++;
       console.error(`❌ Worker Messenger: Failed to send message:`, error);
@@ -139,7 +144,10 @@ export class WorkerMessenger {
   /**
    * Send batch of messages for efficiency
    */
-  async sendBatch(messages: Omit<WorkerMessage, 'metadata'>[], priority: 'low' | 'normal' | 'high' | 'critical' = 'normal'): Promise<{ success: boolean; batchId: string; latency: number }> {
+  async sendBatch(
+    messages: Omit<WorkerMessage, "metadata">[],
+    priority: "low" | "normal" | "high" | "critical" = "normal",
+  ): Promise<{ success: boolean; batchId: string; latency: number }> {
     const startTime = performance.now();
     const batchId = this.generateCorrelationId();
 
@@ -147,41 +155,44 @@ export class WorkerMessenger {
       // Create batch message
       const batchMessage: MessageBatch = {
         batchId,
-        messages: messages.map(msg => ({
+        messages: messages.map((msg) => ({
           ...msg,
           metadata: {
             correlationId: this.generateCorrelationId(),
             timestamp: new Date().toISOString(),
-            version: '1.0',
+            version: "1.0",
             sourceDomain: this.domainName,
-            targetDomain: msg.payload.targetDomain || 'unknown',
+            targetDomain: msg.payload.targetDomain || "unknown",
             priority,
-            ttl: 300000
-          }
+            ttl: 300000,
+          },
         })),
         totalSize: 0,
         compressionRatio: 1.0,
-        priority
+        priority,
       };
 
       // Calculate total size and apply compression if beneficial
       const serializedBatch = YAML.stringify({
-        type: 'BATCH_MESSAGE',
+        type: "BATCH_MESSAGE",
         metadata: {
           correlationId: batchId,
           timestamp: new Date().toISOString(),
-          version: '1.0',
+          version: "1.0",
           sourceDomain: this.domainName,
-          targetDomain: 'batch',
+          targetDomain: "batch",
           priority,
           ttl: 300000,
-          compression: true
+          compression: true,
         },
-        payload: batchMessage
+        payload: batchMessage,
       });
 
       batchMessage.totalSize = new Blob([serializedBatch]).size;
-      batchMessage.compressionRatio = this.calculateCompressionRatio(messages, serializedBatch);
+      batchMessage.compressionRatio = this.calculateCompressionRatio(
+        messages,
+        serializedBatch,
+      );
 
       // Send batch
       this.worker.postMessage(serializedBatch);
@@ -196,9 +207,8 @@ export class WorkerMessenger {
       return {
         success: true,
         batchId,
-        latency
+        latency,
       };
-
     } catch (error) {
       this.performanceMetrics.errors++;
       console.error(`❌ Worker Messenger: Failed to send batch:`, error);
@@ -216,7 +226,7 @@ export class WorkerMessenger {
       try {
         const message = this.deserializeMessage(event.data);
 
-        if (message.type === 'BATCH_MESSAGE') {
+        if (message.type === "BATCH_MESSAGE") {
           await this.processBatchMessage(message.payload as MessageBatch);
         } else {
           await this.processSingleMessage(message);
@@ -225,7 +235,6 @@ export class WorkerMessenger {
         this.performanceMetrics.messagesReceived++;
         const latency = performance.now() - startTime;
         this.trackLatency(latency);
-
       } catch (error) {
         this.performanceMetrics.errors++;
         console.error(`❌ Worker Messenger: Failed to process message:`, error);
@@ -239,32 +248,34 @@ export class WorkerMessenger {
   private async processSingleMessage(message: WorkerMessage): Promise<void> {
     // Validate message structure
     if (!this.validateMessage(message)) {
-      throw new Error('Invalid message format');
+      throw new Error("Invalid message format");
     }
 
     // Handle different message types
     switch (message.type) {
-      case 'SETTLEMENT_UPDATE':
+      case "SETTLEMENT_UPDATE":
         await this.handleSettlementUpdate(message);
         break;
-      case 'COMMISSION_CALCULATED':
+      case "COMMISSION_CALCULATED":
         await this.handleCommissionCalculated(message);
         break;
-      case 'BONUS_AWARDED':
+      case "BONUS_AWARDED":
         await this.handleBonusAwarded(message);
         break;
-      case 'BALANCE_UPDATED':
+      case "BALANCE_UPDATED":
         await this.handleBalanceUpdated(message);
         break;
       default:
-        console.warn(`⚠️ Worker Messenger: Unknown message type: ${message.type}`);
+        console.warn(
+          `⚠️ Worker Messenger: Unknown message type: ${message.type}`,
+        );
     }
 
     // Publish domain event for tracking
-    await this.publishDomainEvent('worker.message.processed', {
+    await this.publishDomainEvent("worker.message.processed", {
       messageType: message.type,
       correlationId: message.metadata.correlationId,
-      processingTime: performance.now()
+      processingTime: performance.now(),
     });
   }
 
@@ -272,7 +283,9 @@ export class WorkerMessenger {
    * Process batch message
    */
   private async processBatchMessage(batch: MessageBatch): Promise<void> {
-    console.log(`📦 Processing batch: ${batch.batchId} (${batch.messages.length} messages)`);
+    console.log(
+      `📦 Processing batch: ${batch.batchId} (${batch.messages.length} messages)`,
+    );
 
     for (const message of batch.messages) {
       await this.processSingleMessage(message);
@@ -289,47 +302,52 @@ export class WorkerMessenger {
     console.log(`💰 Processing settlement update:`, message.payload);
 
     // Forward to appropriate domain handler
-    await this.publishDomainEvent('settlement.update.received', {
+    await this.publishDomainEvent("settlement.update.received", {
       settlementId: message.payload.settlementId,
       amount: message.payload.amount,
-      correlationId: message.metadata.correlationId
+      correlationId: message.metadata.correlationId,
     });
   }
 
-  private async handleCommissionCalculated(message: WorkerMessage): Promise<void> {
+  private async handleCommissionCalculated(
+    message: WorkerMessage,
+  ): Promise<void> {
     console.log(`📊 Processing commission calculation:`, message.payload);
 
-    await this.publishDomainEvent('commission.calculated.received', {
+    await this.publishDomainEvent("commission.calculated.received", {
       recipientId: message.payload.recipientId,
       amount: message.payload.calculatedAmount,
-      correlationId: message.metadata.correlationId
+      correlationId: message.metadata.correlationId,
     });
   }
 
   private async handleBonusAwarded(message: WorkerMessage): Promise<void> {
     console.log(`🎁 Processing bonus award:`, message.payload);
 
-    await this.publishDomainEvent('bonus.awarded.received', {
+    await this.publishDomainEvent("bonus.awarded.received", {
       customerId: message.payload.customerId,
       bonusAmount: message.payload.amount,
-      correlationId: message.metadata.correlationId
+      correlationId: message.metadata.correlationId,
     });
   }
 
   private async handleBalanceUpdated(message: WorkerMessage): Promise<void> {
     console.log(`💵 Processing balance update:`, message.payload);
 
-    await this.publishDomainEvent('balance.updated.received', {
+    await this.publishDomainEvent("balance.updated.received", {
       agentId: message.payload.agentId,
       newBalance: message.payload.newBalance,
-      correlationId: message.metadata.correlationId
+      correlationId: message.metadata.correlationId,
     });
   }
 
   /**
    * Message serialization with optional compression
    */
-  private serializeMessage(message: WorkerMessage, compress: boolean = false): string {
+  private serializeMessage(
+    message: WorkerMessage,
+    compress: boolean = false,
+  ): string {
     const yamlString = YAML.stringify(message);
 
     if (compress && yamlString.length > this.COMPRESSION_THRESHOLD) {
@@ -344,9 +362,9 @@ export class WorkerMessenger {
    * Message deserialization with compression support
    */
   private deserializeMessage(data: string): WorkerMessage {
-    if (data.startsWith('COMPRESSED:')) {
+    if (data.startsWith("COMPRESSED:")) {
       // Decompress (in real implementation, use proper decompression)
-      const compressedData = data.substring('COMPRESSED:'.length);
+      const compressedData = data.substring("COMPRESSED:".length);
       data = atob(compressedData);
     }
 
@@ -357,14 +375,20 @@ export class WorkerMessenger {
    * Message validation
    */
   private validateMessage(message: WorkerMessage): boolean {
-    const requiredFields = ['type', 'metadata', 'payload'];
+    const requiredFields = ["type", "metadata", "payload"];
 
-    if (!requiredFields.every(field => message[field])) {
+    if (!requiredFields.every((field) => message[field])) {
       return false;
     }
 
-    const requiredMetadata = ['correlationId', 'timestamp', 'version', 'sourceDomain', 'targetDomain'];
-    if (!requiredMetadata.every(field => message.metadata[field])) {
+    const requiredMetadata = [
+      "correlationId",
+      "timestamp",
+      "version",
+      "sourceDomain",
+      "targetDomain",
+    ];
+    if (!requiredMetadata.every((field) => message.metadata[field])) {
       return false;
     }
 
@@ -374,13 +398,20 @@ export class WorkerMessenger {
   /**
    * Batch management
    */
-  private shouldBatch(message: Omit<WorkerMessage, 'metadata'>): boolean {
-    return message.type.includes('UPDATE') || message.type.includes('CALCULATED');
+  private shouldBatch(message: Omit<WorkerMessage, "metadata">): boolean {
+    return (
+      message.type.includes("UPDATE") || message.type.includes("CALCULATED")
+    );
   }
 
-  private addToBatch(message: WorkerMessage): { success: boolean; correlationId: string } {
+  private addToBatch(message: WorkerMessage): {
+    success: boolean;
+    correlationId: string;
+  } {
     // Find or create appropriate batch
-    let batch = this.batchQueue.find(b => b.priority === message.metadata.priority);
+    let batch = this.batchQueue.find(
+      (b) => b.priority === message.metadata.priority,
+    );
 
     if (!batch) {
       batch = {
@@ -388,7 +419,7 @@ export class WorkerMessenger {
         messages: [],
         totalSize: 0,
         compressionRatio: 1.0,
-        priority: message.metadata.priority
+        priority: message.metadata.priority,
       };
       this.batchQueue.push(batch);
     }
@@ -403,7 +434,7 @@ export class WorkerMessenger {
 
     return {
       success: true,
-      correlationId: message.metadata.correlationId
+      correlationId: message.metadata.correlationId,
     };
   }
 
@@ -426,7 +457,10 @@ export class WorkerMessenger {
     try {
       await this.sendBatch(batch.messages, batch.priority);
     } catch (error) {
-      console.error(`❌ Worker Messenger: Failed to process batch ${batch.batchId}:`, error);
+      console.error(
+        `❌ Worker Messenger: Failed to process batch ${batch.batchId}:`,
+        error,
+      );
     }
   }
 
@@ -443,7 +477,10 @@ export class WorkerMessenger {
       alpha * latency + (1 - alpha) * this.performanceMetrics.averageLatency;
   }
 
-  private calculateCompressionRatio(originalMessages: any[], compressedString: string): number {
+  private calculateCompressionRatio(
+    originalMessages: any[],
+    compressedString: string,
+  ): number {
     const originalSize = JSON.stringify(originalMessages).length;
     const compressedSize = compressedString.length;
     return originalSize / compressedSize;
@@ -453,7 +490,10 @@ export class WorkerMessenger {
     return new Blob([YAML.stringify(messages)]).size;
   }
 
-  private async publishDomainEvent(eventType: string, payload: any): Promise<void> {
+  private async publishDomainEvent(
+    eventType: string,
+    payload: any,
+  ): Promise<void> {
     // This would integrate with our domain events system
     console.log(`📢 Domain Event: ${eventType}`, payload);
   }
@@ -469,7 +509,7 @@ export class WorkerMessenger {
    * Health check
    */
   public async healthCheck(): Promise<{
-    status: 'healthy' | 'degraded' | 'unhealthy';
+    status: "healthy" | "degraded" | "unhealthy";
     message: string;
     metrics: WorkerMetrics;
   }> {
@@ -477,24 +517,24 @@ export class WorkerMessenger {
 
     if (metrics.errors > 10) {
       return {
-        status: 'unhealthy',
-        message: 'High error rate detected',
-        metrics
+        status: "unhealthy",
+        message: "High error rate detected",
+        metrics,
       };
     }
 
     if (metrics.averageLatency > 100) {
       return {
-        status: 'degraded',
-        message: 'High latency detected',
-        metrics
+        status: "degraded",
+        message: "High latency detected",
+        metrics,
       };
     }
 
     return {
-      status: 'healthy',
-      message: 'Worker messenger operating normally',
-      metrics
+      status: "healthy",
+      message: "Worker messenger operating normally",
+      metrics,
     };
   }
 

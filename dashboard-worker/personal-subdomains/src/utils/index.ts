@@ -198,7 +198,10 @@ export function isFeatureAvailable(feature: string, tier: number): boolean {
 /**
  * Create cache headers based on configuration
  */
-export function createCacheHeaders(cacheConfig: { ttl: number; cacheControl: string }): Record<string, string> {
+export function createCacheHeaders(cacheConfig: {
+  ttl: number;
+  cacheControl: string;
+}): Record<string, string> {
   return {
     'Cache-Control': cacheConfig.cacheControl,
     'X-Cache-TTL': cacheConfig.ttl.toString(),
@@ -348,7 +351,7 @@ export class CacheManager {
   private static cache = new Map<string, { data: any; expires: number; etag?: string }>();
 
   static set(key: string, data: any, ttlSeconds: number): void {
-    const expires = Date.now() + (ttlSeconds * 1000);
+    const expires = Date.now() + ttlSeconds * 1000;
     const etag = this.generateETag(data);
 
     this.cache.set(key, { data, expires, etag });
@@ -405,7 +408,7 @@ export class CacheManager {
 
     for (let i = 0; i < content.length; i++) {
       const char = content.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
 
@@ -440,11 +443,7 @@ export class CacheManager {
  * HTTP Cache utilities
  */
 export class HttpCache {
-  static createConditionalResponse(
-    request: Request,
-    response: Response,
-    etag?: string
-  ): Response {
+  static createConditionalResponse(request: Request, response: Response, etag?: string): Response {
     if (etag) {
       // Add ETag header
       const newResponse = new Response(response.body, response);
@@ -458,7 +457,7 @@ export class HttpCache {
           status: 304,
           statusText: 'Not Modified',
           headers: {
-            'ETag': etag,
+            ETag: etag,
             'Cache-Control': response.headers.get('Cache-Control') || 'no-cache',
           },
         });
@@ -470,7 +469,11 @@ export class HttpCache {
     return response;
   }
 
-  static createCacheHeaders(config: { ttl: number; cacheControl?: string; etag?: string }): Record<string, string> {
+  static createCacheHeaders(config: {
+    ttl: number;
+    cacheControl?: string;
+    etag?: string;
+  }): Record<string, string> {
     const headers: Record<string, string> = {};
 
     if (config.cacheControl) {
@@ -489,7 +492,10 @@ export class HttpCache {
     return headers;
   }
 
-  static parseCacheControl(cacheControl: string): { maxAge?: number; staleWhileRevalidate?: number } {
+  static parseCacheControl(cacheControl: string): {
+    maxAge?: number;
+    staleWhileRevalidate?: number;
+  } {
     const directives = cacheControl.split(',').map(d => d.trim());
     const result: { maxAge?: number; staleWhileRevalidate?: number } = {};
 
@@ -540,8 +546,6 @@ export class Compression {
     return acceptEncoding.includes('gzip') || acceptEncoding.includes('deflate');
   }
 }
-
-
 
 /**
  * Enhanced API Response utilities
@@ -721,13 +725,18 @@ export class ApiMiddleware {
     const version = ApiVersioning.getVersionFromRequest(request);
 
     if (!ApiVersioning.isVersionSupported(version)) {
-      throw new Error(`API version '${version}' is not supported. Supported versions: ${ApiVersioning.getSupportedVersions().join(', ')}`);
+      throw new Error(
+        `API version '${version}' is not supported. Supported versions: ${ApiVersioning.getSupportedVersions().join(', ')}`
+      );
     }
 
     return { request, version };
   }
 
-  static validateContentType(request: Request, allowedTypes: string[] = ['application/json']): void {
+  static validateContentType(
+    request: Request,
+    allowedTypes: string[] = ['application/json']
+  ): void {
     const contentType = request.headers.get('Content-Type');
 
     if (!contentType || !allowedTypes.some(type => contentType.includes(type))) {
@@ -784,10 +793,10 @@ export class ApiVersioning {
         'Basic health, status, and analytics endpoints',
         'Profile, tools, contacts, and schedule endpoints',
         'Admin endpoints for cache and logs',
-        'API documentation endpoint'
+        'API documentation endpoint',
       ],
-      deprecated: false
-    }
+      deprecated: false,
+    },
   ];
 
   static getCurrentVersion(): string {
@@ -821,7 +830,7 @@ export class ApiVersioning {
         version,
         releaseDate: new Date().toISOString().split('T')[0],
         changes,
-        deprecated: false
+        deprecated: false,
       });
       return true;
     }
@@ -860,8 +869,8 @@ export class ApiVersioning {
       _metadata: {
         apiVersion: version,
         requestedAt: new Date().toISOString(),
-        supportedVersions: this.getSupportedVersions()
-      }
+        supportedVersions: this.getSupportedVersions(),
+      },
     };
   }
 
@@ -890,15 +899,18 @@ export class ApiVersioning {
  * API Analytics and Metrics Tracker
  */
 export class ApiAnalytics {
-  private static metrics: Map<string, {
-    totalRequests: number;
-    successfulRequests: number;
-    failedRequests: number;
-    responseTimes: number[];
-    errorCodes: Map<number, number>;
-    hourlyStats: Map<number, number>;
-    lastAccessed: Date;
-  }> = new Map();
+  private static metrics: Map<
+    string,
+    {
+      totalRequests: number;
+      successfulRequests: number;
+      failedRequests: number;
+      responseTimes: number[];
+      errorCodes: Map<number, number>;
+      hourlyStats: Map<number, number>;
+      lastAccessed: Date;
+    }
+  > = new Map();
 
   private static globalStats = {
     totalRequests: 0,
@@ -908,7 +920,7 @@ export class ApiAnalytics {
     errorRate: 0,
     uptime: Date.now(),
     peakHour: 0,
-    peakRequests: 0
+    peakRequests: 0,
   };
 
   static trackRequest(
@@ -928,7 +940,7 @@ export class ApiAnalytics {
         responseTimes: [],
         errorCodes: new Map(),
         hourlyStats: new Map(),
-        lastAccessed: new Date()
+        lastAccessed: new Date(),
       });
     }
 
@@ -942,7 +954,10 @@ export class ApiAnalytics {
       endpointMetrics.successfulRequests++;
     } else {
       endpointMetrics.failedRequests++;
-      endpointMetrics.errorCodes.set(statusCode, (endpointMetrics.errorCodes.get(statusCode) || 0) + 1);
+      endpointMetrics.errorCodes.set(
+        statusCode,
+        (endpointMetrics.errorCodes.get(statusCode) || 0) + 1
+      );
     }
 
     // Track response time (keep last 1000 for memory efficiency)
@@ -964,11 +979,13 @@ export class ApiAnalytics {
     }
 
     // Update average response time (rolling average)
-    const totalResponseTime = this.globalStats.averageResponseTime * (this.globalStats.totalRequests - 1) + responseTime;
+    const totalResponseTime =
+      this.globalStats.averageResponseTime * (this.globalStats.totalRequests - 1) + responseTime;
     this.globalStats.averageResponseTime = totalResponseTime / this.globalStats.totalRequests;
 
     // Update error rate
-    this.globalStats.errorRate = (this.globalStats.failedRequests / this.globalStats.totalRequests) * 100;
+    this.globalStats.errorRate =
+      (this.globalStats.failedRequests / this.globalStats.totalRequests) * 100;
 
     // Track peak hour
     if (endpointMetrics.hourlyStats.get(hour)! > this.globalStats.peakRequests) {
@@ -981,7 +998,8 @@ export class ApiAnalytics {
     const metrics = this.metrics.get(endpoint);
     if (!metrics) return null;
 
-    const avgResponseTime = metrics.responseTimes.reduce((a, b) => a + b, 0) / metrics.responseTimes.length;
+    const avgResponseTime =
+      metrics.responseTimes.reduce((a, b) => a + b, 0) / metrics.responseTimes.length;
     const successRate = (metrics.successfulRequests / metrics.totalRequests) * 100;
 
     return {
@@ -994,7 +1012,7 @@ export class ApiAnalytics {
       responseTimes: metrics.responseTimes,
       errorCodes: Object.fromEntries(metrics.errorCodes),
       hourlyStats: Object.fromEntries(metrics.hourlyStats),
-      lastAccessed: metrics.lastAccessed
+      lastAccessed: metrics.lastAccessed,
     };
   }
 
@@ -1004,7 +1022,7 @@ export class ApiAnalytics {
       averageResponseTime: Math.round(this.globalStats.averageResponseTime * 100) / 100,
       errorRate: Math.round(this.globalStats.errorRate * 100) / 100,
       uptime: Date.now() - this.globalStats.uptime,
-      peakHourFormatted: `${this.globalStats.peakHour.toString().padStart(2, '0')}:00`
+      peakHourFormatted: `${this.globalStats.peakHour.toString().padStart(2, '0')}:00`,
     };
   }
 
@@ -1015,9 +1033,7 @@ export class ApiAnalytics {
 
   static getTopEndpoints(limit: number = 10) {
     const endpoints = this.getAllEndpointStats();
-    return endpoints
-      .sort((a, b) => b!.totalRequests - a!.totalRequests)
-      .slice(0, limit);
+    return endpoints.sort((a, b) => b!.totalRequests - a!.totalRequests).slice(0, limit);
   }
 
   static getSlowestEndpoints(limit: number = 10) {
@@ -1046,7 +1062,7 @@ export class ApiAnalytics {
       errorRate: 0,
       uptime: Date.now(),
       peakHour: 0,
-      peakRequests: 0
+      peakRequests: 0,
     };
   }
 
@@ -1055,7 +1071,7 @@ export class ApiAnalytics {
       global: this.getGlobalStats(),
       endpoints: this.getAllEndpointStats(),
       exportedAt: new Date().toISOString(),
-      version: '1.0'
+      version: '1.0',
     };
   }
 }
@@ -1101,17 +1117,19 @@ export class BatchProcessor {
 
     if (requests.length > this.maxBatchSize) {
       return {
-        results: [{
-          id: 'batch_error',
-          status: 400,
-          error: `Batch size exceeds maximum of ${this.maxBatchSize} requests`
-        }],
+        results: [
+          {
+            id: 'batch_error',
+            status: 400,
+            error: `Batch size exceeds maximum of ${this.maxBatchSize} requests`,
+          },
+        ],
         summary: {
           total: requests.length,
           successful: 0,
           failed: 1,
-          duration: Date.now() - startTime
-        }
+          duration: Date.now() - startTime,
+        },
       };
     }
 
@@ -1132,7 +1150,7 @@ export class BatchProcessor {
         results.push({
           id: request.id,
           status: 500,
-          error: error instanceof Error ? error.message : 'Internal error'
+          error: error instanceof Error ? error.message : 'Internal error',
         });
         failed++;
       }
@@ -1144,8 +1162,8 @@ export class BatchProcessor {
         total: requests.length,
         successful,
         failed,
-        duration: Date.now() - startTime
-      }
+        duration: Date.now() - startTime,
+      },
     };
   }
 
@@ -1177,8 +1195,8 @@ export class BatchProcessor {
             data: {
               status: 'healthy',
               employee: employee.name,
-              timestamp: new Date().toISOString()
-            }
+              timestamp: new Date().toISOString(),
+            },
           };
 
         case '/api/profile':
@@ -1189,8 +1207,8 @@ export class BatchProcessor {
               id: employee.id,
               name: employee.name,
               title: employee.title,
-              department: employee.department
-            }
+              department: employee.department,
+            },
           };
 
         case '/api/status':
@@ -1200,22 +1218,22 @@ export class BatchProcessor {
             data: {
               employee: employee.name,
               tier: employee.tier,
-              status: 'active'
-            }
+              status: 'active',
+            },
           };
 
         default:
           return {
             id: request.id,
             status: 404,
-            error: 'Endpoint not found in batch processing'
+            error: 'Endpoint not found in batch processing',
           };
       }
     } catch (error) {
       return {
         id: request.id,
         status: 500,
-        error: error instanceof Error ? error.message : 'Internal error'
+        error: error instanceof Error ? error.message : 'Internal error',
       };
     }
   }

@@ -7,137 +7,149 @@
  * Get settlement history
  */
 export async function settlementHistory(request) {
-    try {
-        const url = new URL(request.url);
-        const page = parseInt(url.searchParams.get('page') || '1');
-        const limit = parseInt(url.searchParams.get('limit') || '10');
-        // TODO: Implement settlement history logic
-        const response = {
-            success: true,
-            data: {
-                settlements: [],
-                pagination: {
-                    page,
-                    limit,
-                    total: 0,
-                    totalPages: 0
-                }
-            }
-        };
-        return new Response(JSON.stringify(response), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' }
-        });
-    }
-    catch (error) {
-        return new Response(JSON.stringify({
-            error: 'Failed to get settlement history',
-            message: error.message
-        }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' }
-        });
-    }
+  try {
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const limit = parseInt(url.searchParams.get('limit') || '10');
+    // TODO: Implement settlement history logic
+    const response = {
+      success: true,
+      data: {
+        settlements: [],
+        pagination: {
+          page,
+          limit,
+          total: 0,
+          totalPages: 0,
+        },
+      },
+    };
+    return new Response(JSON.stringify(response), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get settlement history',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
 }
 /**
  * Get dashboard data
  */
 export async function dashboard(request) {
-    try {
-        // TODO: Implement dashboard data logic
-        const response = {
-            success: true,
-            data: {
-                kpis: {
-                    totalCustomers: 0,
-                    activeWagers: 0,
-                    totalRevenue: 0,
-                    conversionRate: 0
-                },
-                recentActivity: [],
-                alerts: [],
-                timestamp: new Date().toISOString()
-            }
-        };
-        return new Response(JSON.stringify(response), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' }
-        });
-    }
-    catch (error) {
-        return new Response(JSON.stringify({
-            error: 'Failed to get dashboard data',
-            message: error.message
-        }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' }
-        });
-    }
+  try {
+    // TODO: Implement dashboard data logic
+    const response = {
+      success: true,
+      data: {
+        kpis: {
+          totalCustomers: 0,
+          activeWagers: 0,
+          totalRevenue: 0,
+          conversionRate: 0,
+        },
+        recentActivity: [],
+        alerts: [],
+        timestamp: new Date().toISOString(),
+      },
+    };
+    return new Response(JSON.stringify(response), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to get dashboard data',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
 }
 /**
  * Get live data stream
  */
 export async function live(request) {
-    try {
-        // Server-Sent Events for real-time updates
-        const response = new Response(new ReadableStream({
-            start(controller) {
-                const sendUpdate = () => {
-                    const data = {
-                        timestamp: new Date().toISOString(),
-                        kpis: {
-                            activeUsers: Math.floor(Math.random() * 100) + 50,
-                            liveWagers: Math.floor(Math.random() * 20) + 10,
-                            revenue: Math.floor(Math.random() * 10000) + 5000
-                        }
-                    };
-                    controller.enqueue(`data: ${JSON.stringify(data)}\n\n`);
-                };
-                // Send initial data
-                sendUpdate();
-                // Send updates every 5 seconds
-                const interval = setInterval(sendUpdate, 5000);
-                // Cleanup on close
-                return () => {
-                    clearInterval(interval);
-                };
-            }
-        }), {
-            headers: {
-                'Content-Type': 'text/event-stream',
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': 'Cache-Control'
-            }
-        });
-        return response;
-    }
-    catch (error) {
-        return new Response(JSON.stringify({
-            error: 'Failed to start live stream',
-            message: error.message
-        }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' }
-        });
-    }
+  try {
+    // Server-Sent Events for real-time updates
+    const response = new Response(
+      new ReadableStream({
+        start(controller) {
+          const sendUpdate = () => {
+            const data = {
+              timestamp: new Date().toISOString(),
+              kpis: {
+                activeUsers: Math.floor(Math.random() * 100) + 50,
+                liveWagers: Math.floor(Math.random() * 20) + 10,
+                revenue: Math.floor(Math.random() * 10000) + 5000,
+              },
+            };
+            controller.enqueue(`data: ${JSON.stringify(data)}\n\n`);
+          };
+          // Send initial data
+          sendUpdate();
+          // Send updates every 5 seconds
+          const interval = setInterval(sendUpdate, 5000);
+          // Cleanup on close
+          return () => {
+            clearInterval(interval);
+          };
+        },
+      }),
+      {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          Connection: 'keep-alive',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Cache-Control',
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to start live stream',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  }
 }
 /**
  * Generic placeholder handler for unimplemented endpoints
  */
 export async function placeholder(request) {
-    const url = new URL(request.url);
-    return new Response(JSON.stringify({
-        success: true,
-        message: 'Endpoint is recognized but not yet implemented',
-        endpoint: url.pathname,
-        method: request.method,
-        timestamp: new Date().toISOString()
-    }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-    });
+  const url = new URL(request.url);
+  return new Response(
+    JSON.stringify({
+      success: true,
+      message: 'Endpoint is recognized but not yet implemented',
+      endpoint: url.pathname,
+      method: request.method,
+      timestamp: new Date().toISOString(),
+    }),
+    {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    }
+  );
 }
 // Export placeholder as default for all missing handlers
 export const defaultHandler = placeholder;

@@ -17,11 +17,11 @@ async function testQueueSystem() {
         bind: (...params: any[]) => ({
           all: async () => ({ results: [] }),
           first: async () => null,
-          run: async () => ({ success: true })
+          run: async () => ({ success: true }),
         }),
-        exec: async () => ({ success: true })
-      })
-    }
+        exec: async () => ({ success: true }),
+      }),
+    },
   };
 
   const queueSystem = new WithdrawalQueueSystem(mockEnv as any);
@@ -29,7 +29,12 @@ async function testQueueSystem() {
   // Test 1: Queue initialization
   console.log('📋 Test 1: Queue System Initialization');
   console.log('Queue System:', queueSystem.constructor.name);
-  console.log('Available Methods:', Object.getOwnPropertyNames(WithdrawalQueueSystem.prototype).filter(name => name !== 'constructor'));
+  console.log(
+    'Available Methods:',
+    Object.getOwnPropertyNames(WithdrawalQueueSystem.prototype).filter(
+      name => name !== 'constructor'
+    )
+  );
   console.log('');
 
   // Test 2: Add withdrawal to queue
@@ -42,7 +47,7 @@ async function testQueueSystem() {
       paymentType: 'bank_transfer',
       paymentDetails: 'Bank Account: 1234567890',
       priority: 2,
-      notes: 'Test withdrawal'
+      notes: 'Test withdrawal',
     });
     console.log('Withdrawal added:', withdrawalId);
   } catch (error) {
@@ -59,7 +64,7 @@ async function testQueueSystem() {
       paymentType: 'bank_transfer',
       paymentDetails: 'Bank Account: 0987654321',
       priority: 1,
-      notes: 'Test deposit'
+      notes: 'Test deposit',
     });
     console.log('Deposit added:', depositId);
   } catch (error) {
@@ -83,7 +88,9 @@ async function testQueueSystem() {
     const opportunities = await queueSystem.findMatchingOpportunities();
     console.log('Matching opportunities:', opportunities.length);
     opportunities.slice(0, 3).forEach((opp, index) => {
-      console.log(`  ${index + 1}. Withdrawal: ${opp.withdrawalId} (${opp.withdrawalAmount}) ↔ Deposit: ${opp.depositId} (${opp.depositAmount}) - Score: ${opp.matchScore}`);
+      console.log(
+        `  ${index + 1}. Withdrawal: ${opp.withdrawalId} (${opp.withdrawalAmount}) ↔ Deposit: ${opp.depositId} (${opp.depositAmount}) - Score: ${opp.matchScore}`
+      );
     });
   } catch (error) {
     console.log('Matching error:', error.message);
@@ -95,10 +102,13 @@ async function testQueueSystem() {
   try {
     const items = queueSystem.getQueueItems();
     console.log('Total queue items:', items.length);
-    const byType = items.reduce((acc, item) => {
-      acc[item.type] = (acc[item.type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const byType = items.reduce(
+      (acc, item) => {
+        acc[item.type] = (acc[item.type] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
     console.log('Items by type:', byType);
   } catch (error) {
     console.log('Item retrieval error:', error.message);

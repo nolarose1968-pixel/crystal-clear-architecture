@@ -1,6 +1,6 @@
 /**
  * Balance Management Test Suite
- * 
+ *
  * Comprehensive tests for all balance enhancement areas:
  * 1. Balance validation with min/max limits
  * 2. Enhanced audit trail for balance changes
@@ -17,10 +17,10 @@ import {
   BalanceManager,
   initializeBalanceTables,
   type BalanceValidationRules,
-  type BalanceChangeEvent
+  type BalanceChangeEvent,
 } from '../../balance-management';
 
-// ===== TEST SETUP =====
+// !== TEST SETUP !==
 
 beforeAll(async () => {
   try {
@@ -32,7 +32,7 @@ beforeAll(async () => {
   }
 });
 
-// ===== BALANCE VALIDATION TESTS =====
+// !== BALANCE VALIDATION TESTS !==
 
 describe('BalanceValidator', () => {
   describe('validateBalanceChange', () => {
@@ -43,7 +43,7 @@ describe('BalanceValidator', () => {
         warningThreshold: 100,
         criticalThreshold: 50,
         dailyChangeLimit: 1000,
-        weeklyChangeLimit: 5000
+        weeklyChangeLimit: 5000,
       };
 
       // Valid changes
@@ -64,7 +64,7 @@ describe('BalanceValidator', () => {
         warningThreshold: 100,
         criticalThreshold: 50,
         dailyChangeLimit: 1000,
-        weeklyChangeLimit: 5000
+        weeklyChangeLimit: 5000,
       };
 
       const result = BalanceValidator.validateBalanceChange(500, -2000, rules);
@@ -79,7 +79,7 @@ describe('BalanceValidator', () => {
         warningThreshold: 100,
         criticalThreshold: 50,
         dailyChangeLimit: 1000,
-        weeklyChangeLimit: 5000
+        weeklyChangeLimit: 5000,
       };
 
       const result = BalanceValidator.validateBalanceChange(9500, 1000, rules);
@@ -94,7 +94,7 @@ describe('BalanceValidator', () => {
         warningThreshold: 100,
         criticalThreshold: 50,
         dailyChangeLimit: 1000,
-        weeklyChangeLimit: 5000
+        weeklyChangeLimit: 5000,
       };
 
       const result = BalanceValidator.validateBalanceChange(1000, 1500, rules);
@@ -109,7 +109,7 @@ describe('BalanceValidator', () => {
         warningThreshold: 100,
         criticalThreshold: 50,
         dailyChangeLimit: 1000,
-        weeklyChangeLimit: 5000
+        weeklyChangeLimit: 5000,
       };
 
       const result = BalanceValidator.validateBalanceChange(200, -150, rules);
@@ -124,7 +124,7 @@ describe('BalanceValidator', () => {
         warningThreshold: 100,
         criticalThreshold: 50,
         dailyChangeLimit: 1000,
-        weeklyChangeLimit: 5000
+        weeklyChangeLimit: 5000,
       };
 
       const result = BalanceValidator.validateBalanceChange(100, -60, rules);
@@ -177,7 +177,7 @@ describe('BalanceValidator', () => {
   });
 });
 
-// ===== AUDIT TRAIL TESTS =====
+// !== AUDIT TRAIL TESTS !==
 
 describe('BalanceAuditTrail', () => {
   const testEvent: BalanceChangeEvent = {
@@ -192,13 +192,15 @@ describe('BalanceAuditTrail', () => {
     reason: 'Test deposit',
     performedBy: 'test_user',
     metadata: { test: true },
-    riskScore: 5
+    riskScore: 5,
   };
 
   beforeEach(async () => {
     // Clean up test data before each test
     try {
-      await Bun.sqlite.query('DELETE FROM balance_audit_trail WHERE customer_id LIKE ?').run('TEST_%');
+      await Bun.sqlite
+        .query('DELETE FROM balance_audit_trail WHERE customer_id LIKE ?')
+        .run('TEST_%');
     } catch (error) {
       // Table might not exist yet, ignore
     }
@@ -206,7 +208,7 @@ describe('BalanceAuditTrail', () => {
 
   test('should log balance change events', async () => {
     await BalanceAuditTrail.logBalanceChange(testEvent);
-    
+
     // Verify the event was logged
     const history = await BalanceAuditTrail.getBalanceHistory(testEvent.customerId, 10);
     expect(history).toHaveLength(1);
@@ -219,7 +221,7 @@ describe('BalanceAuditTrail', () => {
     const events = [
       { ...testEvent, id: 'test-1', changeAmount: 100, newBalance: 1100 },
       { ...testEvent, id: 'test-2', changeAmount: 200, newBalance: 1300 },
-      { ...testEvent, id: 'test-3', changeAmount: -50, newBalance: 1250 }
+      { ...testEvent, id: 'test-3', changeAmount: -50, newBalance: 1250 },
     ];
 
     for (const event of events) {
@@ -237,7 +239,11 @@ describe('BalanceAuditTrail', () => {
     const events = [
       { ...testEvent, id: 'recent-1', timestamp: new Date(now.getTime() - 1000).toISOString() },
       { ...testEvent, id: 'recent-2', timestamp: new Date(now.getTime() - 2000).toISOString() },
-      { ...testEvent, id: 'old-1', timestamp: new Date(now.getTime() - 25 * 60 * 60 * 1000).toISOString() }
+      {
+        ...testEvent,
+        id: 'old-1',
+        timestamp: new Date(now.getTime() - 25 * 60 * 60 * 1000).toISOString(),
+      },
     ];
 
     for (const event of events) {
@@ -252,11 +258,11 @@ describe('BalanceAuditTrail', () => {
     const eventWithMetadata = {
       ...testEvent,
       id: 'metadata-test',
-      metadata: { testKey: 'testValue', number: 42, boolean: true }
+      metadata: { testKey: 'testValue', number: 42, boolean: true },
     };
 
     await BalanceAuditTrail.logBalanceChange(eventWithMetadata);
-    
+
     const history = await BalanceAuditTrail.getBalanceHistory(testEvent.customerId, 10);
     const loggedEvent = history.find(e => e.id === 'metadata-test');
     expect(loggedEvent).toBeDefined();
@@ -266,7 +272,7 @@ describe('BalanceAuditTrail', () => {
   });
 });
 
-// ===== NOTIFICATIONS TESTS =====
+// !== NOTIFICATIONS TESTS !==
 
 describe('BalanceNotificationService', () => {
   const testRules: BalanceValidationRules = {
@@ -275,13 +281,15 @@ describe('BalanceNotificationService', () => {
     warningThreshold: 100,
     criticalThreshold: 50,
     dailyChangeLimit: 1000,
-    weeklyChangeLimit: 5000
+    weeklyChangeLimit: 5000,
   };
 
   beforeEach(async () => {
     // Clean up test data before each test
     try {
-      await Bun.sqlite.query('DELETE FROM balance_threshold_alerts WHERE customer_id LIKE ?').run('TEST_%');
+      await Bun.sqlite
+        .query('DELETE FROM balance_threshold_alerts WHERE customer_id LIKE ?')
+        .run('TEST_%');
     } catch (error) {
       // Table might not exist yet, ignore
     }
@@ -330,19 +338,9 @@ describe('BalanceNotificationService', () => {
 
   test('should retrieve active alerts', async () => {
     // Create some test alerts
-    await BalanceNotificationService.checkAndCreateAlerts(
-      'TEST_CUSTOMER_001',
-      80,
-      200,
-      testRules
-    );
+    await BalanceNotificationService.checkAndCreateAlerts('TEST_CUSTOMER_001', 80, 200, testRules);
 
-    await BalanceNotificationService.checkAndCreateAlerts(
-      'TEST_CUSTOMER_002',
-      25,
-      200,
-      testRules
-    );
+    await BalanceNotificationService.checkAndCreateAlerts('TEST_CUSTOMER_002', 25, 200, testRules);
 
     const activeAlerts = await BalanceNotificationService.getActiveAlerts();
     expect(activeAlerts.length).toBeGreaterThan(0);
@@ -370,14 +368,16 @@ describe('BalanceNotificationService', () => {
   });
 });
 
-// ===== ANALYTICS TESTS =====
+// !== ANALYTICS TESTS !==
 
 describe('BalanceAnalyticsService', () => {
   beforeEach(async () => {
     // Clean up test data and create some test events
     try {
-      await Bun.sqlite.query('DELETE FROM balance_audit_trail WHERE customer_id LIKE ?').run('TEST_%');
-      
+      await Bun.sqlite
+        .query('DELETE FROM balance_audit_trail WHERE customer_id LIKE ?')
+        .run('TEST_%');
+
       // Create test balance history
       const testEvents = [
         {
@@ -392,7 +392,7 @@ describe('BalanceAnalyticsService', () => {
           reason: 'Test deposit',
           performedBy: 'test_user',
           metadata: {},
-          riskScore: 5
+          riskScore: 5,
         },
         {
           id: 'analytics-2',
@@ -406,7 +406,7 @@ describe('BalanceAnalyticsService', () => {
           reason: 'Test withdrawal',
           performedBy: 'test_user',
           metadata: {},
-          riskScore: 10
+          riskScore: 10,
         },
         {
           id: 'analytics-3',
@@ -420,8 +420,8 @@ describe('BalanceAnalyticsService', () => {
           reason: 'Test settlement',
           performedBy: 'test_user',
           metadata: {},
-          riskScore: 5
-        }
+          riskScore: 5,
+        },
       ];
 
       for (const event of testEvents) {
@@ -482,7 +482,7 @@ describe('BalanceAnalyticsService', () => {
   });
 });
 
-// ===== INTEGRATION TESTS =====
+// !== INTEGRATION TESTS !==
 
 describe('BalanceManager Integration', () => {
   test('should update balance with full validation and logging', async () => {
@@ -509,7 +509,7 @@ describe('BalanceManager Integration', () => {
     const report = await BalanceManager.getCustomerBalanceReport(
       'TEST_CUSTOMER_001',
       true, // include history
-      true  // include alerts
+      true // include alerts
     );
 
     expect(report.currentBalance).toBeDefined();
@@ -539,7 +539,7 @@ describe('BalanceManager Integration', () => {
   });
 });
 
-// ===== PERFORMANCE TESTS =====
+// !== PERFORMANCE TESTS !==
 
 describe('Performance Tests', () => {
   test('should handle multiple balance updates efficiently', async () => {
@@ -569,18 +569,15 @@ describe('Performance Tests', () => {
 
   test('should generate analytics quickly', async () => {
     const startTime = Date.now();
-    
-    await BalanceAnalyticsService.generateCustomerAnalytics(
-      'TEST_CUSTOMER_001',
-      'monthly'
-    );
-    
+
+    await BalanceAnalyticsService.generateCustomerAnalytics('TEST_CUSTOMER_001', 'monthly');
+
     const endTime = Date.now();
     expect(endTime - startTime).toBeLessThan(1000); // Should complete within 1 second
   });
 });
 
-// ===== ERROR HANDLING TESTS =====
+// !== ERROR HANDLING TESTS !==
 
 describe('Error Handling', () => {
   test('should handle database connection errors gracefully', async () => {

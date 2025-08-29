@@ -4,10 +4,7 @@
  */
 
 // Base repository classes
-export {
-  BaseRepository,
-  BaseAuditableRepository
-} from './base-repository';
+export { BaseRepository, BaseAuditableRepository } from './base-repository';
 
 // Domain repositories
 export { default as CustomerRepository } from './customer-repository';
@@ -51,7 +48,7 @@ export class RepositoryFactory {
     customer: CustomerRepository;
   } {
     return {
-      customer: this.getCustomerRepository()
+      customer: this.getCustomerRepository(),
     };
   }
 }
@@ -132,7 +129,7 @@ export class RepositoryContainer {
     return {
       status: allHealthy ? 'healthy' : 'unhealthy',
       repositories,
-      connection: connectionHealthy
+      connection: connectionHealthy,
     };
   }
 }
@@ -186,9 +183,9 @@ export interface RepositoryService {
  */
 export function createRepositoryService(connection: DatabaseConnection): RepositoryService {
   const factory = new RepositoryFactory(connection);
-  
+
   return {
-    customer: factory.getCustomerRepository()
+    customer: factory.getCustomerRepository(),
   };
 }
 
@@ -233,7 +230,7 @@ export class RepositoryTransaction {
    */
   async execute<T>(fn: (transaction: any) => Promise<T>): Promise<T> {
     await this.begin();
-    
+
     try {
       const result = await fn(this.transaction);
       await this.commit();
@@ -257,20 +254,20 @@ export default {
   // Base classes
   BaseRepository,
   BaseAuditableRepository,
-  
+
   // Domain repositories
   CustomerRepository,
-  
+
   // Factory and container
   RepositoryFactory,
   RepositoryContainer,
   RepositoryTransaction,
-  
+
   // Utility functions
   initializeRepositories,
   getRepositoryContainer,
   getRepositoryFactory,
   getCustomerRepository,
   createRepositoryService,
-  createTransaction
+  createTransaction,
 };

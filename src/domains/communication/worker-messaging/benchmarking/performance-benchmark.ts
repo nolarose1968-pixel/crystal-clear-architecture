@@ -5,11 +5,11 @@
  * Comprehensive benchmarking for JSON vs YAML messaging performance
  */
 
-import { YAML } from 'bun';
-import { WorkerMessenger } from '../core/worker-messenger';
+import { YAML } from "bun";
+import { WorkerMessenger } from "../core/worker-messenger";
 
 export interface BenchmarkResult {
-  format: 'json' | 'yaml';
+  format: "json" | "yaml";
   iterations: number;
   totalTime: number;
   averageTime: number;
@@ -69,7 +69,7 @@ export class MessagePerformanceBenchmark {
   constructor() {
     this.results = {
       json: { times: [], sizes: [] },
-      yaml: { times: [], sizes: [] }
+      yaml: { times: [], sizes: [] },
     };
   }
 
@@ -83,17 +83,22 @@ export class MessagePerformanceBenchmark {
       enableCompression?: boolean;
       enableBatching?: boolean;
       batchSize?: number;
-    } = {}
+    } = {},
   ): Promise<BenchmarkComparison> {
     console.log(`🧪 Running performance benchmark: ${iterations} iterations`);
 
     // Benchmark JSON serialization
-    console.log('📊 Benchmarking JSON serialization...');
-    const jsonResult = await this.benchmarkFormat('json', message, iterations);
+    console.log("📊 Benchmarking JSON serialization...");
+    const jsonResult = await this.benchmarkFormat("json", message, iterations);
 
     // Benchmark YAML serialization
-    console.log('📊 Benchmarking YAML serialization...');
-    const yamlResult = await this.benchmarkFormat('yaml', message, iterations, options);
+    console.log("📊 Benchmarking YAML serialization...");
+    const yamlResult = await this.benchmarkFormat(
+      "yaml",
+      message,
+      iterations,
+      options,
+    );
 
     // Calculate improvements
     const improvement = this.calculateImprovement(jsonResult, yamlResult);
@@ -105,10 +110,10 @@ export class MessagePerformanceBenchmark {
       json: jsonResult,
       yaml: yamlResult,
       improvement,
-      recommendation
+      recommendation,
     };
 
-    console.log('✅ Benchmark completed');
+    console.log("✅ Benchmark completed");
     this.printResults(comparison);
 
     return comparison;
@@ -118,10 +123,10 @@ export class MessagePerformanceBenchmark {
    * Benchmark specific format
    */
   private async benchmarkFormat(
-    format: 'json' | 'yaml',
+    format: "json" | "yaml",
     message: MessageTestData,
     iterations: number,
-    options: { enableCompression?: boolean } = {}
+    options: { enableCompression?: boolean } = {},
   ): Promise<BenchmarkResult> {
     const times: number[] = [];
     const sizes: number[] = [];
@@ -133,7 +138,7 @@ export class MessagePerformanceBenchmark {
       let serialized: string;
       let originalSize: number;
 
-      if (format === 'json') {
+      if (format === "json") {
         serialized = JSON.stringify(message);
         originalSize = new Blob([serialized]).size;
 
@@ -153,8 +158,8 @@ export class MessagePerformanceBenchmark {
 
         // Round-trip test
         let dataToParse = serialized;
-        if (dataToParse.startsWith('COMPRESSED:')) {
-          dataToParse = atob(dataToParse.substring('COMPRESSED:'.length));
+        if (dataToParse.startsWith("COMPRESSED:")) {
+          dataToParse = atob(dataToParse.substring("COMPRESSED:".length));
         }
         YAML.parse(dataToParse);
       }
@@ -183,57 +188,65 @@ export class MessagePerformanceBenchmark {
       sizes: {
         average: sizes.reduce((sum, size) => sum + size, 0) / sizes.length,
         min: Math.min(...sizes),
-        max: Math.max(...sizes)
+        max: Math.max(...sizes),
       },
-      compressionRatio: format === 'yaml' ? compressionRatio : undefined
+      compressionRatio: format === "yaml" ? compressionRatio : undefined,
     };
   }
 
   /**
    * Calculate performance improvements
    */
-  private calculateImprovement(json: BenchmarkResult, yaml: BenchmarkResult): BenchmarkComparison['improvement'] {
-    const latencyImprovement = ((json.averageTime - yaml.averageTime) / json.averageTime) * 100;
-    const throughputImprovement = ((yaml.throughput - json.throughput) / json.throughput) * 100;
-    const sizeReduction = ((json.sizes.average - yaml.sizes.average) / json.sizes.average) * 100;
+  private calculateImprovement(
+    json: BenchmarkResult,
+    yaml: BenchmarkResult,
+  ): BenchmarkComparison["improvement"] {
+    const latencyImprovement =
+      ((json.averageTime - yaml.averageTime) / json.averageTime) * 100;
+    const throughputImprovement =
+      ((yaml.throughput - json.throughput) / json.throughput) * 100;
+    const sizeReduction =
+      ((json.sizes.average - yaml.sizes.average) / json.sizes.average) * 100;
 
     return {
       latency: latencyImprovement,
       throughput: throughputImprovement,
-      size: sizeReduction
+      size: sizeReduction,
     };
   }
 
   /**
    * Generate performance recommendation
    */
-  private generateRecommendation(improvement: BenchmarkComparison['improvement']): string {
-    let recommendation = 'YAML messaging recommended for ';
+  private generateRecommendation(
+    improvement: BenchmarkComparison["improvement"],
+  ): string {
+    let recommendation = "YAML messaging recommended for ";
 
     if (improvement.latency > 50) {
-      recommendation += 'significant latency improvement. ';
+      recommendation += "significant latency improvement. ";
     } else if (improvement.latency > 20) {
-      recommendation += 'moderate latency improvement. ';
+      recommendation += "moderate latency improvement. ";
     } else {
-      recommendation += 'minimal latency improvement. ';
+      recommendation += "minimal latency improvement. ";
     }
 
     if (improvement.throughput > 100) {
-      recommendation += 'Excellent throughput gains. ';
+      recommendation += "Excellent throughput gains. ";
     } else if (improvement.throughput > 50) {
-      recommendation += 'Good throughput improvement. ';
+      recommendation += "Good throughput improvement. ";
     }
 
     if (improvement.size > 30) {
-      recommendation += 'Significant message size reduction. ';
+      recommendation += "Significant message size reduction. ";
     }
 
     if (improvement.latency > 30 && improvement.throughput > 50) {
-      recommendation += 'Strong recommendation for production deployment.';
+      recommendation += "Strong recommendation for production deployment.";
     } else if (improvement.latency > 10 || improvement.throughput > 25) {
-      recommendation += 'Consider for production with monitoring.';
+      recommendation += "Consider for production with monitoring.";
     } else {
-      recommendation += 'Evaluate further or maintain JSON for stability.';
+      recommendation += "Evaluate further or maintain JSON for stability.";
     }
 
     return recommendation;
@@ -243,32 +256,43 @@ export class MessagePerformanceBenchmark {
    * Print benchmark results
    */
   private printResults(comparison: BenchmarkComparison): void {
-    console.log('\n📊 PERFORMANCE BENCHMARK RESULTS');
-    console.log('='.repeat(60));
+    console.log("\n📊 PERFORMANCE BENCHMARK RESULTS");
+    console.log("=".repeat(60));
 
-    console.log('\n📈 LATENCY COMPARISON:');
+    console.log("\n📈 LATENCY COMPARISON:");
     console.log(`JSON Average: ${comparison.json.averageTime.toFixed(3)}ms`);
     console.log(`YAML Average: ${comparison.yaml.averageTime.toFixed(3)}ms`);
     console.log(`Improvement: ${comparison.improvement.latency.toFixed(2)}%`);
 
-    console.log('\n⚡ THROUGHPUT COMPARISON:');
+    console.log("\n⚡ THROUGHPUT COMPARISON:");
     console.log(`JSON: ${comparison.json.throughput.toFixed(0)} msg/sec`);
     console.log(`YAML: ${comparison.yaml.throughput.toFixed(0)} msg/sec`);
-    console.log(`Improvement: ${comparison.improvement.throughput.toFixed(2)}%`);
+    console.log(
+      `Improvement: ${comparison.improvement.throughput.toFixed(2)}%`,
+    );
 
-    console.log('\n💾 SIZE COMPARISON:');
-    console.log(`JSON Average: ${comparison.json.sizes.average.toFixed(0)} bytes`);
-    console.log(`YAML Average: ${comparison.yaml.sizes.average.toFixed(0)} bytes`);
+    console.log("\n💾 SIZE COMPARISON:");
+    console.log(
+      `JSON Average: ${comparison.json.sizes.average.toFixed(0)} bytes`,
+    );
+    console.log(
+      `YAML Average: ${comparison.yaml.sizes.average.toFixed(0)} bytes`,
+    );
     console.log(`Reduction: ${comparison.improvement.size.toFixed(2)}%`);
 
-    if (comparison.yaml.compressionRatio && comparison.yaml.compressionRatio < 1) {
-      console.log(`Compression Ratio: ${comparison.yaml.compressionRatio.toFixed(2)}x`);
+    if (
+      comparison.yaml.compressionRatio &&
+      comparison.yaml.compressionRatio < 1
+    ) {
+      console.log(
+        `Compression Ratio: ${comparison.yaml.compressionRatio.toFixed(2)}x`,
+      );
     }
 
-    console.log('\n🎯 RECOMMENDATION:');
+    console.log("\n🎯 RECOMMENDATION:");
     console.log(comparison.recommendation);
 
-    console.log('\n' + '='.repeat(60));
+    console.log("\n" + "=".repeat(60));
   }
 
   /**
@@ -277,7 +301,7 @@ export class MessagePerformanceBenchmark {
   async runStressTest(
     message: MessageTestData,
     maxIterations: number = 10000,
-    stepSize: number = 1000
+    stepSize: number = 1000,
   ): Promise<{
     loadPoints: number[];
     jsonThroughput: number[];
@@ -292,24 +316,40 @@ export class MessagePerformanceBenchmark {
       jsonThroughput: [] as number[],
       yamlThroughput: [] as number[],
       jsonLatency: [] as number[],
-      yamlLatency: [] as number[]
+      yamlLatency: [] as number[],
     };
 
-    for (let iterations = stepSize; iterations <= maxIterations; iterations += stepSize) {
+    for (
+      let iterations = stepSize;
+      iterations <= maxIterations;
+      iterations += stepSize
+    ) {
       console.log(`📊 Testing ${iterations} iterations...`);
 
       // Quick benchmark for this load point
-      const jsonResult = await this.benchmarkFormat('json', message, Math.min(iterations, 100));
-      const yamlResult = await this.benchmarkFormat('yaml', message, Math.min(iterations, 100));
+      const jsonResult = await this.benchmarkFormat(
+        "json",
+        message,
+        Math.min(iterations, 100),
+      );
+      const yamlResult = await this.benchmarkFormat(
+        "yaml",
+        message,
+        Math.min(iterations, 100),
+      );
 
       results.loadPoints.push(iterations);
-      results.jsonThroughput.push(jsonResult.throughput * (iterations / Math.min(iterations, 100)));
-      results.yamlThroughput.push(yamlResult.throughput * (iterations / Math.min(iterations, 100)));
+      results.jsonThroughput.push(
+        jsonResult.throughput * (iterations / Math.min(iterations, 100)),
+      );
+      results.yamlThroughput.push(
+        yamlResult.throughput * (iterations / Math.min(iterations, 100)),
+      );
       results.jsonLatency.push(jsonResult.averageTime);
       results.yamlLatency.push(yamlResult.averageTime);
     }
 
-    console.log('✅ Stress test completed');
+    console.log("✅ Stress test completed");
     return results;
   }
 
@@ -318,32 +358,32 @@ export class MessagePerformanceBenchmark {
    */
   generateReport(comparison: BenchmarkComparison): string {
     return YAML.stringify({
-      reportType: 'WORKER_MESSAGING_PERFORMANCE',
+      reportType: "WORKER_MESSAGING_PERFORMANCE",
       timestamp: new Date().toISOString(),
       benchmark: {
         iterations: comparison.json.iterations,
-        messageType: 'settlement_update'
+        messageType: "settlement_update",
       },
       results: {
         json: {
           averageLatency: comparison.json.averageTime,
           throughput: comparison.json.throughput,
-          averageSize: comparison.json.sizes.average
+          averageSize: comparison.json.sizes.average,
         },
         yaml: {
           averageLatency: comparison.yaml.averageTime,
           throughput: comparison.yaml.throughput,
           averageSize: comparison.yaml.sizes.average,
-          compressionRatio: comparison.yaml.compressionRatio
+          compressionRatio: comparison.yaml.compressionRatio,
         },
-        improvement: comparison.improvement
+        improvement: comparison.improvement,
       },
       recommendation: comparison.recommendation,
       metadata: {
-        testEnvironment: 'bun_runtime',
-        yamlVersion: 'latest',
-        benchmarkVersion: '1.0'
-      }
+        testEnvironment: "bun_runtime",
+        yamlVersion: "latest",
+        benchmarkVersion: "1.0",
+      },
     });
   }
 
@@ -360,26 +400,26 @@ export class MessagePerformanceBenchmark {
         yaml_vs_json_latency_improvement: `${comparison.improvement.latency.toFixed(2)}%`,
         yaml_vs_json_throughput_improvement: `${comparison.improvement.throughput.toFixed(2)}%`,
         message_size_reduction: `${comparison.improvement.size.toFixed(2)}%`,
-        recommendation: comparison.recommendation
+        recommendation: comparison.recommendation,
       },
       rawData: {
         json: comparison.json,
-        yaml: comparison.yaml
+        yaml: comparison.yaml,
       },
       charts: {
         latencyComparison: {
           json: comparison.json.averageTime,
-          yaml: comparison.yaml.averageTime
+          yaml: comparison.yaml.averageTime,
         },
         throughputComparison: {
           json: comparison.json.throughput,
-          yaml: comparison.yaml.throughput
+          yaml: comparison.yaml.throughput,
         },
         sizeComparison: {
           json: comparison.json.sizes.average,
-          yaml: comparison.yaml.sizes.average
-        }
-      }
+          yaml: comparison.yaml.sizes.average,
+        },
+      },
     };
   }
 }
@@ -389,7 +429,7 @@ export class MessagePerformanceBenchmark {
  */
 export async function quickBenchmark(
   message: any,
-  iterations: number = 100
+  iterations: number = 100,
 ): Promise<{ json: number; yaml: number; improvement: number }> {
   const benchmark = new MessagePerformanceBenchmark();
 
@@ -417,6 +457,6 @@ export async function quickBenchmark(
   return {
     json: jsonTime,
     yaml: yamlTime,
-    improvement
+    improvement,
   };
 }

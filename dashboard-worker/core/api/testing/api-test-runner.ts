@@ -170,7 +170,7 @@ export class APITestRunner {
       const url = `${this.config.baseUrl}${test.path}`;
       const headers = {
         ...this.config.headers,
-        ...test.headers
+        ...test.headers,
       };
 
       // Add auth token if configured
@@ -180,7 +180,7 @@ export class APITestRunner {
 
       const requestInit: RequestInit = {
         method: test.method,
-        headers
+        headers,
       };
 
       // Add body for non-GET requests
@@ -217,9 +217,8 @@ export class APITestRunner {
         statusCode: response.status,
         response: responseBody,
         assertions,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
-
     } catch (error) {
       const duration = Date.now() - startTime;
 
@@ -239,7 +238,7 @@ export class APITestRunner {
         duration,
         error: error instanceof Error ? error.message : 'Unknown error',
         assertions: [],
-        timestamp: new Date()
+        timestamp: new Date(),
       };
     }
   }
@@ -260,7 +259,7 @@ export class APITestRunner {
       description: 'HTTP status code matches expected',
       success: response.status === test.expectedStatus,
       expected: test.expectedStatus,
-      actual: response.status
+      actual: response.status,
     });
 
     // Response body assertions
@@ -270,7 +269,7 @@ export class APITestRunner {
         description: 'Response body matches expected structure',
         success: this.deepEqual(responseBody, test.expectedResponse),
         expected: test.expectedResponse,
-        actual: responseBody
+        actual: responseBody,
       });
     }
 
@@ -283,7 +282,7 @@ export class APITestRunner {
           description: `Header '${header}' matches expected value`,
           success: actualValue === expectedValue,
           expected: expectedValue,
-          actual: actualValue
+          actual: actualValue,
         });
       }
     }
@@ -295,7 +294,7 @@ export class APITestRunner {
         type: 'schema',
         description: 'Response matches expected schema',
         success: schemaValidation.valid,
-        error: schemaValidation.errors?.join(', ')
+        error: schemaValidation.errors?.join(', '),
       });
     }
 
@@ -395,12 +394,14 @@ export class APITestRunner {
       suiteId,
       success: true, // Skipped tests are considered successful
       duration: 0,
-      assertions: [{
-        type: 'status',
-        description: 'Test skipped',
-        success: true
-      }],
-      timestamp: new Date()
+      assertions: [
+        {
+          type: 'status',
+          description: 'Test skipped',
+          success: true,
+        },
+      ],
+      timestamp: new Date(),
     };
   }
 
@@ -411,7 +412,9 @@ export class APITestRunner {
     const total = this.testResults.length;
     const passed = this.testResults.filter(r => r.success).length;
     const failed = this.testResults.filter(r => !r.success).length;
-    const skipped = this.testResults.filter(r => r.assertions.some(a => a.description === 'Test skipped')).length;
+    const skipped = this.testResults.filter(r =>
+      r.assertions.some(a => a.description === 'Test skipped')
+    ).length;
 
     return { total, passed, failed, skipped };
   }
@@ -511,22 +514,30 @@ export class APITestRunner {
         <p class="skipped">Skipped: ${summary.skipped}</p>
     </div>
     <h2>Test Details</h2>
-    ${this.testResults.map(result => `
+    ${this.testResults
+      .map(
+        result => `
         <div class="test ${result.success ? 'passed' : 'failed'}">
             <h3>${result.testId}</h3>
             <p>Duration: ${result.duration}ms</p>
             <p>Status: ${result.success ? 'PASSED' : 'FAILED'}</p>
             ${result.error ? `<p>Error: ${result.error}</p>` : ''}
             <div class="assertions">
-                ${result.assertions.map(assertion => `
+                ${result.assertions
+                  .map(
+                    assertion => `
                     <div class="assertion ${assertion.success ? '' : 'failed'}">
                         ${assertion.description}: ${assertion.success ? '✓' : '✗'}
                         ${assertion.error ? ` (${assertion.error})` : ''}
                     </div>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </div>
         </div>
-    `).join('')}
+    `
+      )
+      .join('')}
 </body>
 </html>`;
   }
@@ -546,22 +557,26 @@ export class APITestRunner {
     const averageDuration = this.testResults.reduce((sum, r) => sum + r.duration, 0) / totalTests;
 
     const sortedByDuration = [...this.testResults].sort((a, b) => b.duration - a.duration);
-    const slowestTest = sortedByDuration[0] ? {
-      id: sortedByDuration[0].testId,
-      duration: sortedByDuration[0].duration
-    } : { id: '', duration: 0 };
+    const slowestTest = sortedByDuration[0]
+      ? {
+          id: sortedByDuration[0].testId,
+          duration: sortedByDuration[0].duration,
+        }
+      : { id: '', duration: 0 };
 
-    const fastestTest = sortedByDuration[totalTests - 1] ? {
-      id: sortedByDuration[totalTests - 1].testId,
-      duration: sortedByDuration[totalTests - 1].duration
-    } : { id: '', duration: 0 };
+    const fastestTest = sortedByDuration[totalTests - 1]
+      ? {
+          id: sortedByDuration[totalTests - 1].testId,
+          duration: sortedByDuration[totalTests - 1].duration,
+        }
+      : { id: '', duration: 0 };
 
     return {
       totalSuites,
       totalTests,
       averageDuration,
       slowestTest,
-      fastestTest
+      fastestTest,
     };
   }
 }
@@ -576,6 +591,6 @@ export const defaultTestConfig: TestConfig = {
   enableLoadTesting: false,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
+    Accept: 'application/json',
+  },
 };

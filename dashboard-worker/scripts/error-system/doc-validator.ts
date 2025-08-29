@@ -7,7 +7,7 @@
 
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
-import { color } from "bun" with { type: "macro" };
+import { color } from 'bun' with { type: 'macro' };
 
 interface ValidationResult {
   valid: boolean;
@@ -45,7 +45,7 @@ class ErrorDocValidator {
   private registry: any;
   private projectRoot: string;
   private validHttpCodes = new Set([
-    200, 201, 204, 400, 401, 403, 404, 409, 422, 429, 500, 502, 503, 504, 507
+    200, 201, 204, 400, 401, 403, 404, 409, 422, 429, 500, 502, 503, 504, 507,
   ]);
   private validSeverities = new Set(['CRITICAL', 'ERROR', 'WARNING', 'INFO']);
   private validDocTypes = new Set(['guide', 'reference', 'troubleshooting', 'specification']);
@@ -59,7 +59,7 @@ class ErrorDocValidator {
    */
   private loadRegistry(): boolean {
     const registryPath = join(this.projectRoot, 'docs', 'error-codes.json');
-    
+
     if (!existsSync(registryPath)) {
       console.error(color('#ef4444', 'css') + '❌ Error registry not found at: ' + registryPath);
       return false;
@@ -70,7 +70,9 @@ class ErrorDocValidator {
       this.registry = JSON.parse(content);
       return true;
     } catch (error) {
-      console.error(color('#ef4444', 'css') + '❌ Failed to parse error registry: ' + error.message);
+      console.error(
+        color('#ef4444', 'css') + '❌ Failed to parse error registry: ' + error.message
+      );
       return false;
     }
   }
@@ -88,14 +90,14 @@ class ErrorDocValidator {
       httpStatusCodes: new Set(),
       missingDocumentation: 0,
       orphanedCodes: 0,
-      duplicateCodes: 0
+      duplicateCodes: 0,
     };
 
     if (!this.registry.errorCodes) {
       errors.push({
         code: 'MISSING_ERROR_CODES',
         message: 'Error codes section is missing from registry',
-        severity: 'ERROR'
+        severity: 'ERROR',
       });
       return { valid: false, errors, warnings, stats };
     }
@@ -118,7 +120,7 @@ class ErrorDocValidator {
           field: 'code',
           message: `Invalid error code format. Expected E[1-8]XXX pattern`,
           severity: 'ERROR',
-          suggestion: 'Use format like E1001, E2001, etc.'
+          suggestion: 'Use format like E1001, E2001, etc.',
         });
         isValid = false;
       }
@@ -128,7 +130,7 @@ class ErrorDocValidator {
         errors.push({
           code: codeKey,
           message: `Duplicate error code detected`,
-          severity: 'ERROR'
+          severity: 'ERROR',
         });
         stats.duplicateCodes++;
         isValid = false;
@@ -141,7 +143,7 @@ class ErrorDocValidator {
           code: codeKey,
           field: 'name',
           message: `Duplicate error name: ${errorData.name}`,
-          suggestion: 'Consider using more specific naming'
+          suggestion: 'Consider using more specific naming',
         });
       }
       if (errorData.name) seenNames.add(errorData.name);
@@ -154,7 +156,7 @@ class ErrorDocValidator {
             code: codeKey,
             field,
             message: `Missing required field: ${field}`,
-            severity: 'ERROR'
+            severity: 'ERROR',
           });
           isValid = false;
         }
@@ -167,7 +169,7 @@ class ErrorDocValidator {
           field: 'severity',
           message: `Invalid severity: ${errorData.severity}`,
           severity: 'ERROR',
-          suggestion: 'Use: CRITICAL, ERROR, WARNING, or INFO'
+          suggestion: 'Use: CRITICAL, ERROR, WARNING, or INFO',
         });
         isValid = false;
       }
@@ -179,7 +181,7 @@ class ErrorDocValidator {
           field: 'category',
           message: `Unknown category: ${errorData.category}`,
           severity: 'ERROR',
-          suggestion: `Available categories: ${Array.from(categories).join(', ')}`
+          suggestion: `Available categories: ${Array.from(categories).join(', ')}`,
         });
         isValid = false;
       }
@@ -191,7 +193,7 @@ class ErrorDocValidator {
             code: codeKey,
             field: 'httpStatusCode',
             message: `Uncommon HTTP status code: ${errorData.httpStatusCode}`,
-            suggestion: 'Verify this is the correct status code'
+            suggestion: 'Verify this is the correct status code',
           });
         }
         stats.httpStatusCodes.add(errorData.httpStatusCode);
@@ -204,7 +206,7 @@ class ErrorDocValidator {
             code: codeKey,
             field: 'documentation',
             message: 'No documentation links provided',
-            suggestion: 'Add at least one documentation link'
+            suggestion: 'Add at least one documentation link',
           });
           stats.missingDocumentation++;
         } else {
@@ -214,17 +216,17 @@ class ErrorDocValidator {
                 code: codeKey,
                 field: `documentation[${index}]`,
                 message: 'Documentation entry missing required fields (title, url, type)',
-                severity: 'ERROR'
+                severity: 'ERROR',
               });
               isValid = false;
             }
-            
+
             if (doc.type && !this.validDocTypes.has(doc.type)) {
               warnings.push({
                 code: codeKey,
                 field: `documentation[${index}].type`,
                 message: `Invalid documentation type: ${doc.type}`,
-                suggestion: 'Use: guide, reference, troubleshooting, or specification'
+                suggestion: 'Use: guide, reference, troubleshooting, or specification',
               });
             }
           }
@@ -238,7 +240,7 @@ class ErrorDocValidator {
             code: codeKey,
             field: 'solutions',
             message: 'No solutions provided',
-            suggestion: 'Add at least one solution step'
+            suggestion: 'Add at least one solution step',
           });
         }
       }
@@ -250,7 +252,7 @@ class ErrorDocValidator {
             code: codeKey,
             field: 'causes',
             message: 'No common causes listed',
-            suggestion: 'Add common causes to help troubleshooting'
+            suggestion: 'Add common causes to help troubleshooting',
           });
         }
       }
@@ -263,7 +265,7 @@ class ErrorDocValidator {
               code: codeKey,
               field: 'relatedCodes',
               message: `Related error code ${relatedCode} does not exist`,
-              suggestion: 'Remove or add the related error code'
+              suggestion: 'Remove or add the related error code',
             });
             stats.orphanedCodes++;
           }
@@ -276,7 +278,7 @@ class ErrorDocValidator {
           code: codeKey,
           field: 'description',
           message: 'Description is too short',
-          suggestion: 'Provide a more detailed description (at least 20 characters)'
+          suggestion: 'Provide a more detailed description (at least 20 characters)',
         });
       }
 
@@ -289,7 +291,7 @@ class ErrorDocValidator {
       valid: errors.length === 0,
       errors,
       warnings,
-      stats
+      stats,
     };
   }
 
@@ -313,7 +315,7 @@ class ErrorDocValidator {
             code: `CATEGORY_${categoryKey}`,
             field,
             message: `Missing required category field: ${field}`,
-            severity: 'ERROR'
+            severity: 'ERROR',
           });
         }
       }
@@ -325,7 +327,7 @@ class ErrorDocValidator {
           field: 'prefix',
           message: `Invalid category prefix: ${categoryData.prefix}`,
           severity: 'ERROR',
-          suggestion: 'Use E1-E8 for category prefixes'
+          suggestion: 'Use E1-E8 for category prefixes',
         });
       }
 
@@ -336,7 +338,7 @@ class ErrorDocValidator {
           field: 'range',
           message: `Invalid range format: ${categoryData.range}`,
           severity: 'ERROR',
-          suggestion: 'Use format like "1000-1999"'
+          suggestion: 'Use format like "1000-1999"',
         });
       }
 
@@ -347,7 +349,7 @@ class ErrorDocValidator {
           field: 'color',
           message: `Invalid color format: ${categoryData.color}`,
           severity: 'ERROR',
-          suggestion: 'Use hex color format like "#dc2626"'
+          suggestion: 'Use hex color format like "#dc2626"',
         });
       }
     }
@@ -371,7 +373,7 @@ class ErrorDocValidator {
         field: 'totalErrorCodes',
         message: `Metadata count (${metadata.totalErrorCodes}) doesn't match actual count (${actualCount})`,
         severity: 'ERROR',
-        suggestion: 'Update metadata.totalErrorCodes or regenerate metadata'
+        suggestion: 'Update metadata.totalErrorCodes or regenerate metadata',
       });
     }
 
@@ -390,7 +392,7 @@ class ErrorDocValidator {
             code: 'METADATA_CATEGORY_COUNT',
             field: `categoryCounts.${category}`,
             message: `Category count mismatch for ${category}: expected ${expectedCount}, got ${actualCount}`,
-            severity: 'ERROR'
+            severity: 'ERROR',
           });
         }
       }
@@ -410,7 +412,7 @@ class ErrorDocValidator {
       errors.push({
         code: 'CONSTANTS_FILE_MISSING',
         message: 'Constants file not found at src/constants/index.ts',
-        severity: 'WARNING'
+        severity: 'WARNING',
       });
       return errors;
     }
@@ -420,7 +422,7 @@ class ErrorDocValidator {
     try {
       const constantsContent = readFileSync(constantsPath, 'utf-8');
       const errorCodesInRegistry = new Set(Object.keys(this.registry.errorCodes || {}));
-      
+
       // Check if major error codes are referenced in constants
       const majorCodes = ['E1001', 'E2001', 'E3001', 'E4001'];
       for (const code of majorCodes) {
@@ -430,7 +432,7 @@ class ErrorDocValidator {
             field: code,
             message: `Error code ${code} not found in constants file`,
             severity: 'WARNING',
-            suggestion: 'Add error code to ERROR_MESSAGES in constants file'
+            suggestion: 'Add error code to ERROR_MESSAGES in constants file',
           });
         }
       }
@@ -438,7 +440,7 @@ class ErrorDocValidator {
       errors.push({
         code: 'CONSTANTS_FILE_READ_ERROR',
         message: `Failed to read constants file: ${error.message}`,
-        severity: 'WARNING'
+        severity: 'WARNING',
       });
     }
 
@@ -454,7 +456,13 @@ class ErrorDocValidator {
     if (!this.loadRegistry()) {
       return {
         valid: false,
-        errors: [{ code: 'REGISTRY_LOAD_FAILED', message: 'Failed to load error registry', severity: 'ERROR' }],
+        errors: [
+          {
+            code: 'REGISTRY_LOAD_FAILED',
+            message: 'Failed to load error registry',
+            severity: 'ERROR',
+          },
+        ],
         warnings: [],
         stats: {
           totalErrorCodes: 0,
@@ -463,8 +471,8 @@ class ErrorDocValidator {
           httpStatusCodes: new Set(),
           missingDocumentation: 0,
           orphanedCodes: 0,
-          duplicateCodes: 0
-        }
+          duplicateCodes: 0,
+        },
       };
     }
 
@@ -485,14 +493,14 @@ class ErrorDocValidator {
       ...errorCodeValidation.errors,
       ...categoryErrors,
       ...metadataErrors,
-      ...constantsErrors
+      ...constantsErrors,
     ];
 
     return {
       valid: allErrors.filter(e => e.severity === 'ERROR').length === 0,
       errors: allErrors,
       warnings: errorCodeValidation.warnings,
-      stats: errorCodeValidation.stats
+      stats: errorCodeValidation.stats,
     };
   }
 
@@ -515,7 +523,9 @@ class ErrorDocValidator {
     console.log(`   Total Error Codes: ${result.stats.totalErrorCodes}`);
     console.log(`   Valid Error Codes: ${result.stats.validErrorCodes}`);
     console.log(`   Total Categories: ${result.stats.totalCategories}`);
-    console.log(`   HTTP Status Codes: ${Array.from(result.stats.httpStatusCodes).sort().join(', ')}`);
+    console.log(
+      `   HTTP Status Codes: ${Array.from(result.stats.httpStatusCodes).sort().join(', ')}`
+    );
     console.log(`   Missing Documentation: ${result.stats.missingDocumentation}`);
     console.log(`   Orphaned References: ${result.stats.orphanedCodes}`);
     console.log(`   Duplicate Codes: ${result.stats.duplicateCodes}`);
@@ -523,18 +533,24 @@ class ErrorDocValidator {
     // Errors
     if (result.errors.length > 0) {
       console.log(`\n❌ ERRORS (${result.errors.length}):`);
-      const errorsBySeverity = result.errors.reduce((acc, error) => {
-        acc[error.severity] = (acc[error.severity] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      const errorsBySeverity = result.errors.reduce(
+        (acc, error) => {
+          acc[error.severity] = (acc[error.severity] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
 
       console.log(`   Critical: ${errorsBySeverity.ERROR || 0}`);
       console.log(`   Warnings: ${errorsBySeverity.WARNING || 0}`);
 
       console.log('\n🔍 Error Details:');
       result.errors.forEach((error, index) => {
-        const severityColor = error.severity === 'ERROR' ? color('#ef4444', 'css') : color('#f59e0b', 'css');
-        console.log(`${index + 1}. ${severityColor}[${error.severity}]${color('#ffffff', 'css')} ${error.code}${error.field ? '.' + error.field : ''}`);
+        const severityColor =
+          error.severity === 'ERROR' ? color('#ef4444', 'css') : color('#f59e0b', 'css');
+        console.log(
+          `${index + 1}. ${severityColor}[${error.severity}]${color('#ffffff', 'css')} ${error.code}${error.field ? '.' + error.field : ''}`
+        );
         console.log(`   ${error.message}`);
         if (error.suggestion) {
           console.log(`   💡 Suggestion: ${error.suggestion}`);
@@ -547,7 +563,9 @@ class ErrorDocValidator {
     if (result.warnings.length > 0) {
       console.log(`\n⚠️ WARNINGS (${result.warnings.length}):`);
       result.warnings.slice(0, 10).forEach((warning, index) => {
-        console.log(`${index + 1}. ${color('#f59e0b', 'css')}${warning.code}${warning.field ? '.' + warning.field : ''}${color('#ffffff', 'css')}`);
+        console.log(
+          `${index + 1}. ${color('#f59e0b', 'css')}${warning.code}${warning.field ? '.' + warning.field : ''}${color('#ffffff', 'css')}`
+        );
         console.log(`   ${warning.message}`);
         if (warning.suggestion) {
           console.log(`   💡 ${warning.suggestion}`);
@@ -567,11 +585,11 @@ class ErrorDocValidator {
 // CLI execution
 if (import.meta.main) {
   const validator = new ErrorDocValidator();
-  
+
   try {
     const result = await validator.validate();
     validator.displayResults(result);
-    
+
     // Exit with error code if validation failed
     if (!result.valid) {
       process.exit(1);

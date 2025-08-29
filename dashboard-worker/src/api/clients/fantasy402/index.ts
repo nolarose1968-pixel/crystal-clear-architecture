@@ -16,12 +16,7 @@ export class Fantasy402Client {
   private agentId?: string;
   private initialized = false;
 
-  constructor(
-    baseUrl: string,
-    username?: string,
-    password?: string,
-    agentId?: string
-  ) {
+  constructor(baseUrl: string, username?: string, password?: string, agentId?: string) {
     this.baseUrl = baseUrl;
     this.agentId = agentId;
 
@@ -54,7 +49,6 @@ export class Fantasy402Client {
       console.log('✅ Fantasy402Client initialized successfully');
 
       return true;
-
     } catch (error) {
       console.error('❌ Fantasy402Client initialization failed:', error);
       return false;
@@ -168,7 +162,9 @@ export class Fantasy402Client {
    * Legacy method for getting weekly figures
    */
   async getWeeklyFigures(params?: any) {
-    console.warn('⚠️ Using legacy getWeeklyFigures method. Consider using getFinancialSummary instead.');
+    console.warn(
+      '⚠️ Using legacy getWeeklyFigures method. Consider using getFinancialSummary instead.'
+    );
     return this.getFinancialSummary(this.agentId, 'weekly');
   }
 
@@ -176,7 +172,9 @@ export class Fantasy402Client {
    * Legacy method for getting weekly figure by agent lite
    */
   async getWeeklyFigureByAgentLite() {
-    console.warn('⚠️ Using legacy getWeeklyFigureByAgentLite method. Consider using getFinancialSummary instead.');
+    console.warn(
+      '⚠️ Using legacy getWeeklyFigureByAgentLite method. Consider using getFinancialSummary instead.'
+    );
     return this.getFinancialSummary(this.agentId, 'weekly');
   }
 
@@ -190,7 +188,7 @@ export class Fantasy402Client {
       success: false,
       error: 'Customer operations not yet implemented in modular client',
       timestamp: new Date(),
-      requestId: `legacy_customers_${Date.now()}`
+      requestId: `legacy_customers_${Date.now()}`,
     };
   }
 
@@ -203,7 +201,7 @@ export class Fantasy402Client {
       success: false,
       error: 'New user operations not yet implemented in modular client',
       timestamp: new Date(),
-      requestId: `legacy_new_users_${Date.now()}`
+      requestId: `legacy_new_users_${Date.now()}`,
     };
   }
 
@@ -216,7 +214,7 @@ export class Fantasy402Client {
       success: false,
       error: 'Player info operations not yet implemented in modular client',
       timestamp: new Date(),
-      requestId: `legacy_player_info_${Date.now()}`
+      requestId: `legacy_player_info_${Date.now()}`,
     };
   }
 
@@ -224,12 +222,14 @@ export class Fantasy402Client {
    * Legacy method for getting teaser profile
    */
   async getTeaserProfile() {
-    console.warn('⚠️ Using legacy getTeaserProfile method. This will be moved to reporting module.');
+    console.warn(
+      '⚠️ Using legacy getTeaserProfile method. This will be moved to reporting module.'
+    );
     return {
       success: false,
       error: 'Teaser profile operations not yet implemented in modular client',
       timestamp: new Date(),
-      requestId: `legacy_teaser_${Date.now()}`
+      requestId: `legacy_teaser_${Date.now()}`,
     };
   }
 
@@ -243,7 +243,6 @@ export class Fantasy402Client {
       // In a real implementation, this would call the API
       // For now, return a mock value
       return Math.floor(Math.random() * 10);
-
     } catch (error) {
       console.error('❌ Failed to get new emails count:', error);
       return 0;
@@ -259,7 +258,6 @@ export class Fantasy402Client {
 
       // In a real implementation, this would send to logging service
       console.log(`[${level.toUpperCase()}] ${message}`);
-
     } catch (error) {
       console.error('❌ Failed to write log:', error);
     }
@@ -280,7 +278,6 @@ export class Fantasy402Client {
 
       console.log('🔄 Token renewed successfully');
       return true;
-
     } catch (error) {
       console.error('❌ Failed to renew token:', error);
       return false;
@@ -299,7 +296,6 @@ export class Fantasy402Client {
       if (!this.authToken) {
         await this.renewToken();
       }
-
     } catch (error) {
       console.error('❌ Failed to check/renew token:', error);
     }
@@ -317,7 +313,7 @@ export class Fantasy402Client {
         agentPermissions: false,
         agentAccount: false,
         balance: false,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       // Test agent permissions
@@ -334,12 +330,11 @@ export class Fantasy402Client {
 
       console.log('🧪 Manager endpoints test completed:', results);
       return results;
-
     } catch (error) {
       console.error('❌ Failed to test manager endpoints:', error);
       return {
         error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }

@@ -7,7 +7,7 @@ import type {
   BalanceValidationRules,
   BalanceChangeEvent,
   RiskLevel,
-  TransactionType
+  TransactionType,
 } from '../../../core/types/finance';
 
 export class BalanceValidator {
@@ -20,7 +20,7 @@ export class BalanceValidator {
     weeklyChangeLimit: 200000, // Max weekly change $200K
     monthlyChangeLimit: 500000, // Max monthly change $500K
     maxNegativeBalance: -50000, // Absolute negative limit
-    requireApprovalThreshold: 100000 // Require approval for large changes
+    requireApprovalThreshold: 100000, // Require approval for large changes
   };
 
   private customRules: Map<string, BalanceValidationRules> = new Map();
@@ -50,59 +50,88 @@ export class BalanceValidator {
 
     // Basic balance limits
     if (newBalance < appliedRules.minBalance) {
-      errors.push(`Balance would exceed minimum limit: $${appliedRules.minBalance.toLocaleString()}`);
+      errors.push(
+        `Balance would exceed minimum limit: $${appliedRules.minBalance.toLocaleString()}`
+      );
     }
 
     if (newBalance > appliedRules.maxBalance) {
-      errors.push(`Balance would exceed maximum limit: $${appliedRules.maxBalance.toLocaleString()}`);
+      errors.push(
+        `Balance would exceed maximum limit: $${appliedRules.maxBalance.toLocaleString()}`
+      );
     }
 
     if (newBalance < appliedRules.maxNegativeBalance) {
-      errors.push(`Balance would exceed absolute negative limit: $${appliedRules.maxNegativeBalance.toLocaleString()}`);
+      errors.push(
+        `Balance would exceed absolute negative limit: $${appliedRules.maxNegativeBalance.toLocaleString()}`
+      );
     }
 
     // Threshold warnings
     if (newBalance <= appliedRules.criticalThreshold && newBalance > appliedRules.minBalance) {
-      warnings.push(`Critical balance threshold: $${appliedRules.criticalThreshold.toLocaleString()}`);
+      warnings.push(
+        `Critical balance threshold: $${appliedRules.criticalThreshold.toLocaleString()}`
+      );
     }
 
-    if (newBalance <= appliedRules.warningThreshold && newBalance > appliedRules.criticalThreshold) {
-      warnings.push(`Warning balance threshold: $${appliedRules.warningThreshold.toLocaleString()}`);
+    if (
+      newBalance <= appliedRules.warningThreshold &&
+      newBalance > appliedRules.criticalThreshold
+    ) {
+      warnings.push(
+        `Warning balance threshold: $${appliedRules.warningThreshold.toLocaleString()}`
+      );
     }
 
     // Daily change limit
     const dailyChange = this.getDailyChange(customerId) + Math.abs(changeAmount);
     if (dailyChange > appliedRules.dailyChangeLimit) {
-      errors.push(`Daily change limit exceeded: $${appliedRules.dailyChangeLimit.toLocaleString()}`);
+      errors.push(
+        `Daily change limit exceeded: $${appliedRules.dailyChangeLimit.toLocaleString()}`
+      );
     }
 
     // Weekly change limit
     const weeklyChange = this.getWeeklyChange(customerId) + Math.abs(changeAmount);
     if (weeklyChange > appliedRules.weeklyChangeLimit) {
-      errors.push(`Weekly change limit exceeded: $${appliedRules.weeklyChangeLimit.toLocaleString()}`);
+      errors.push(
+        `Weekly change limit exceeded: $${appliedRules.weeklyChangeLimit.toLocaleString()}`
+      );
     }
 
     // Large transaction approval
     const requiresApproval = Math.abs(changeAmount) >= appliedRules.requireApprovalThreshold;
 
     if (requiresApproval) {
-      warnings.push(`Large transaction requires approval: $${appliedRules.requireApprovalThreshold.toLocaleString()}+`);
+      warnings.push(
+        `Large transaction requires approval: $${appliedRules.requireApprovalThreshold.toLocaleString()}+`
+      );
     }
 
     // Transaction-specific validations
-    const transactionValidation = this.validateTransactionSpecific(customerId, changeAmount, changeType, newBalance);
+    const transactionValidation = this.validateTransactionSpecific(
+      customerId,
+      changeAmount,
+      changeType,
+      newBalance
+    );
     errors.push(...transactionValidation.errors);
     warnings.push(...transactionValidation.warnings);
 
     // Determine risk level
-    const riskLevel = this.calculateRiskLevel(errors.length, warnings.length, changeAmount, changeType);
+    const riskLevel = this.calculateRiskLevel(
+      errors.length,
+      warnings.length,
+      changeAmount,
+      changeType
+    );
 
     return {
       isValid: errors.length === 0,
       errors,
       warnings,
       requiresApproval,
-      riskLevel
+      riskLevel,
     };
   }
 
@@ -140,7 +169,7 @@ export class BalanceValidator {
     const currentDaily = this.dailyChanges.get(dailyKey)?.amount || 0;
     this.dailyChanges.set(dailyKey, {
       amount: currentDaily + Math.abs(changeAmount),
-      date: today
+      date: today,
     });
 
     // Update weekly change
@@ -148,7 +177,7 @@ export class BalanceValidator {
     const currentWeekly = this.weeklyChanges.get(weeklyKey)?.amount || 0;
     this.weeklyChanges.set(weeklyKey, {
       amount: currentWeekly + Math.abs(changeAmount),
-      week: currentWeek
+      week: currentWeek,
     });
 
     // Cleanup old entries
@@ -184,7 +213,12 @@ export class BalanceValidator {
     summary: { totalValid: number; totalInvalid: number; totalAmount: number };
   } {
     const valid: typeof changes = [];
-    const invalid: Array<{ customerId: string; amount: number; type: TransactionType; errors: string[] }> = [];
+    const invalid: Array<{
+      customerId: string;
+      amount: number;
+      type: TransactionType;
+      errors: string[];
+    }> = [];
     let totalAmount = 0;
 
     for (const change of changes) {
@@ -203,7 +237,7 @@ export class BalanceValidator {
       } else {
         invalid.push({
           ...change,
-          errors: validation.errors
+          errors: validation.errors,
         });
       }
     }
@@ -214,8 +248,8 @@ export class BalanceValidator {
       summary: {
         totalValid: valid.length,
         totalInvalid: invalid.length,
-        totalAmount
-      }
+        totalAmount,
+      },
     };
   }
 
@@ -237,7 +271,7 @@ export class BalanceValidator {
       totalWarnings: 0,
       errorRate: 0,
       warningRate: 0,
-      topErrors: []
+      topErrors: [],
     };
   }
 
@@ -275,7 +309,8 @@ export class BalanceValidator {
         break;
 
       case 'adjustment':
-        if (Math.abs(amount) > 10000) { // $10K adjustment limit
+        if (Math.abs(amount) > 10000) {
+          // $10K adjustment limit
           warnings.push('Large adjustment requires additional review');
         }
         break;
@@ -284,7 +319,12 @@ export class BalanceValidator {
     return { errors, warnings };
   }
 
-  private calculateRiskLevel(errorCount: number, warningCount: number, amount: number, type: TransactionType): RiskLevel {
+  private calculateRiskLevel(
+    errorCount: number,
+    warningCount: number,
+    amount: number,
+    type: TransactionType
+  ): RiskLevel {
     if (errorCount > 0) return 'extreme';
     if (warningCount > 2) return 'high';
     if (warningCount > 0 || Math.abs(amount) > 50000) return 'medium';

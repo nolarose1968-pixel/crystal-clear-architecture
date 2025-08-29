@@ -2,10 +2,10 @@
 
 /**
  * 🛡️ Fire22 Enhanced Error Handler
- * 
+ *
  * Provides standardized error handling, logging, and recovery mechanisms
  * for all Fire22 scripts with intelligent error categorization and resolution
- * 
+ *
  * @version 1.0.0
  * @author Fire22 Development Team
  */
@@ -41,18 +41,13 @@ class Fire22Error extends Error {
   public readonly info: ErrorInfo;
   public readonly errorId: string;
 
-  constructor(
-    message: string,
-    context: ErrorContext,
-    info: ErrorInfo,
-    cause?: Error
-  ) {
+  constructor(message: string, context: ErrorContext, info: ErrorInfo, cause?: Error) {
     super(message);
     this.name = 'Fire22Error';
     this.context = context;
     this.info = info;
     this.errorId = this.generateErrorId();
-    
+
     if (cause) {
       this.cause = cause;
     }
@@ -88,9 +83,9 @@ class ErrorHandler {
   async handleError(
     error: Error,
     context: ErrorContext,
-    options: { 
-      log?: boolean; 
-      recover?: boolean; 
+    options: {
+      log?: boolean;
+      recover?: boolean;
       report?: boolean;
       silent?: boolean;
     } = {}
@@ -100,7 +95,7 @@ class ErrorHandler {
 
     // Analyze the error
     const errorInfo = this.analyzeError(error);
-    
+
     // Create error report
     const errorReport: ErrorReport = {
       error,
@@ -108,7 +103,7 @@ class ErrorHandler {
       info: errorInfo,
       stack: error.stack || 'No stack trace available',
       timestamp: new Date().toISOString(),
-      errorId: this.generateErrorId()
+      errorId: this.generateErrorId(),
     };
 
     // Add to history
@@ -145,7 +140,7 @@ class ErrorHandler {
       type: 'unknown',
       severity: 'medium',
       recoverable: false,
-      suggestedActions: ['Check logs for more details', 'Verify configuration']
+      suggestedActions: ['Check logs for more details', 'Verify configuration'],
     };
 
     const finalInfo = { ...defaultInfo, ...info };
@@ -166,7 +161,7 @@ class ErrorHandler {
         type: 'validation',
         severity: 'medium',
         recoverable: true,
-        suggestedActions: ['Check input parameters', 'Verify data format']
+        suggestedActions: ['Check input parameters', 'Verify data format'],
       });
       throw error;
     }
@@ -179,8 +174,8 @@ class ErrorHandler {
   async executeWithErrorHandling<T>(
     operation: () => Promise<T>,
     context: ErrorContext,
-    options: { 
-      retries?: number; 
+    options: {
+      retries?: number;
       timeout?: number;
       fallback?: () => Promise<T>;
     } = {}
@@ -198,14 +193,13 @@ class ErrorHandler {
         // Execute operation
         const result = await Promise.race([operation(), timeoutPromise]);
         return result;
-
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
-        
+
         if (attempt < retries) {
           const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000); // Exponential backoff, max 10s
           await this.delay(delay);
-          
+
           this.log(`⚠️  Attempt ${attempt} failed, retrying in ${delay}ms...`, 'warn');
         }
       }
@@ -217,15 +211,20 @@ class ErrorHandler {
         this.log('🔄 All retries failed, attempting fallback...', 'warn');
         return await fallback();
       } catch (fallbackError) {
-        lastError = fallbackError instanceof Error ? fallbackError : new Error(String(fallbackError));
+        lastError =
+          fallbackError instanceof Error ? fallbackError : new Error(String(fallbackError));
       }
     }
 
     // Create comprehensive error report
-    const errorReport = await this.handleError(lastError!, {
-      ...context,
-      operation: `${context.operation} (after ${retries} retries)`
-    }, { log: true, recover: false, report: true });
+    const errorReport = await this.handleError(
+      lastError!,
+      {
+        ...context,
+        operation: `${context.operation} (after ${retries} retries)`,
+      },
+      { log: true, recover: false, report: true }
+    );
 
     throw new Fire22Error(
       `Operation failed after ${retries} attempts`,
@@ -234,7 +233,11 @@ class ErrorHandler {
         type: 'runtime',
         severity: 'high',
         recoverable: false,
-        suggestedActions: ['Check system resources', 'Verify external dependencies', 'Review error logs']
+        suggestedActions: [
+          'Check system resources',
+          'Verify external dependencies',
+          'Review error logs',
+        ],
       },
       lastError
     );
@@ -260,14 +263,17 @@ class ErrorHandler {
     });
 
     const recentErrors = this.errorHistory.slice(-10);
-    const errorRate = totalErrors > 0 ? (this.errorHistory.filter(r => r.info.severity === 'critical').length / totalErrors) * 100 : 0;
+    const errorRate =
+      totalErrors > 0
+        ? (this.errorHistory.filter(r => r.info.severity === 'critical').length / totalErrors) * 100
+        : 0;
 
     return {
       totalErrors,
       errorsByType,
       errorsBySeverity,
       recentErrors,
-      errorRate
+      errorRate,
     };
   }
 
@@ -278,7 +284,7 @@ class ErrorHandler {
     const stats = this.getErrorStats();
     const report = [
       '🛡️ Fire22 Error Handler Report',
-      '================================\n',
+      '!==!==!==!==!==!==\n',
       `📊 Total Errors: ${stats.totalErrors}`,
       `📈 Error Rate: ${stats.errorRate.toFixed(1)}%`,
       '',
@@ -286,13 +292,17 @@ class ErrorHandler {
       ...Object.entries(stats.errorsByType).map(([type, count]) => `   ${type}: ${count}`),
       '',
       '⚠️  Errors by Severity:',
-      ...Object.entries(stats.errorsBySeverity).map(([severity, count]) => `   ${severity}: ${count}`),
+      ...Object.entries(stats.errorsBySeverity).map(
+        ([severity, count]) => `   ${severity}: ${count}`
+      ),
       '',
-      '🕒 Recent Errors:'
+      '🕒 Recent Errors:',
     ];
 
     stats.recentErrors.forEach(errorReport => {
-      report.push(`   ${errorReport.timestamp} - ${errorReport.error.message} (${errorReport.info.type})`);
+      report.push(
+        `   ${errorReport.timestamp} - ${errorReport.error.message} (${errorReport.info.type})`
+      );
     });
 
     return report.join('\n');
@@ -315,31 +325,43 @@ class ErrorHandler {
       severity: 'medium',
       recoverable: true,
       suggestedActions: ['Check file path', 'Verify file exists', 'Check permissions'],
-      retryStrategy: 'delayed'
+      retryStrategy: 'delayed',
     });
 
     this.errorPatterns.set('EACCES', {
       type: 'permission',
       severity: 'high',
       recoverable: true,
-      suggestedActions: ['Check file permissions', 'Verify user rights', 'Run with elevated privileges'],
-      retryStrategy: 'none'
+      suggestedActions: [
+        'Check file permissions',
+        'Verify user rights',
+        'Run with elevated privileges',
+      ],
+      retryStrategy: 'none',
     });
 
     this.errorPatterns.set('ECONNREFUSED', {
       type: 'network',
       severity: 'medium',
       recoverable: true,
-      suggestedActions: ['Check service status', 'Verify connection details', 'Check firewall settings'],
-      retryStrategy: 'exponential'
+      suggestedActions: [
+        'Check service status',
+        'Verify connection details',
+        'Check firewall settings',
+      ],
+      retryStrategy: 'exponential',
     });
 
     this.errorPatterns.set('ETIMEDOUT', {
       type: 'network',
       severity: 'medium',
       recoverable: true,
-      suggestedActions: ['Check network connectivity', 'Increase timeout values', 'Verify service availability'],
-      retryStrategy: 'exponential'
+      suggestedActions: [
+        'Check network connectivity',
+        'Increase timeout values',
+        'Verify service availability',
+      ],
+      retryStrategy: 'exponential',
     });
   }
 
@@ -375,7 +397,11 @@ class ErrorHandler {
         type: 'permission',
         severity: 'high',
         recoverable: false,
-        suggestedActions: ['Check user permissions', 'Verify access rights', 'Contact administrator']
+        suggestedActions: [
+          'Check user permissions',
+          'Verify access rights',
+          'Contact administrator',
+        ],
       };
     }
 
@@ -384,8 +410,12 @@ class ErrorHandler {
         type: 'network',
         severity: 'medium',
         recoverable: true,
-        suggestedActions: ['Increase timeout values', 'Check network connectivity', 'Verify service status'],
-        retryStrategy: 'exponential'
+        suggestedActions: [
+          'Increase timeout values',
+          'Check network connectivity',
+          'Verify service status',
+        ],
+        retryStrategy: 'exponential',
       };
     }
 
@@ -395,7 +425,7 @@ class ErrorHandler {
         severity: 'medium',
         recoverable: true,
         suggestedActions: ['Check input parameters', 'Verify data format', 'Review configuration'],
-        retryStrategy: 'none'
+        retryStrategy: 'none',
       };
     }
 
@@ -404,18 +434,18 @@ class ErrorHandler {
       type: 'unknown',
       severity: 'medium',
       recoverable: false,
-      suggestedActions: ['Check error logs', 'Review recent changes', 'Contact support']
+      suggestedActions: ['Check error logs', 'Review recent changes', 'Contact support'],
     };
   }
 
   private async attemptRecovery(errorReport: ErrorReport): Promise<boolean> {
     const strategy = this.recoveryStrategies.get(errorReport.error.name);
-    
+
     if (strategy) {
       try {
         this.log('🔄 Attempting automatic recovery...', 'info');
         const success = await strategy();
-        
+
         if (success) {
           this.log('✅ Automatic recovery successful', 'info');
           return true;
@@ -440,7 +470,7 @@ class ErrorHandler {
 
   private addToHistory(errorReport: ErrorReport): void {
     this.errorHistory.push(errorReport);
-    
+
     // Maintain history size
     if (this.errorHistory.length > this.maxHistorySize) {
       this.errorHistory = this.errorHistory.slice(-this.maxHistorySize);
@@ -459,30 +489,30 @@ class ErrorHandler {
     if (silent) return;
 
     const { error, context, info, errorId } = errorReport;
-    
+
     console.error(`\n🛡️ Fire22 Error Handler - ${errorId}`);
     console.error(`🔧 Script: ${context.scriptName}`);
     console.error(`⚡ Operation: ${context.operation}`);
     console.error(`📊 Type: ${info.type} (${info.severity})`);
     console.error(`💥 Error: ${error.message}`);
     console.error(`🔄 Recoverable: ${info.recoverable ? 'Yes' : 'No'}`);
-    
+
     if (info.suggestedActions.length > 0) {
       console.error(`💡 Suggested Actions:`);
       info.suggestedActions.forEach(action => console.error(`   • ${action}`));
     }
-    
+
     if (info.retryStrategy && info.retryStrategy !== 'none') {
       console.error(`🔄 Retry Strategy: ${info.retryStrategy}`);
     }
-    
+
     console.error(`📅 Timestamp: ${errorReport.timestamp}\n`);
   }
 
   private log(message: string, level: string = 'info'): void {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [ERROR_HANDLER] [${level.toUpperCase()}]`;
-    
+
     switch (level) {
       case 'error':
         console.error(`${prefix} ${message}`);
@@ -503,6 +533,10 @@ class ErrorHandler {
 export { ErrorHandler, Fire22Error };
 export const handleError = ErrorHandler.getInstance().handleError.bind(ErrorHandler.getInstance());
 export const createError = ErrorHandler.getInstance().createError.bind(ErrorHandler.getInstance());
-export const validateInput = ErrorHandler.getInstance().validateInput.bind(ErrorHandler.getInstance());
-export const executeWithErrorHandling = ErrorHandler.getInstance().executeWithErrorHandling.bind(ErrorHandler.getInstance());
+export const validateInput = ErrorHandler.getInstance().validateInput.bind(
+  ErrorHandler.getInstance()
+);
+export const executeWithErrorHandling = ErrorHandler.getInstance().executeWithErrorHandling.bind(
+  ErrorHandler.getInstance()
+);
 export default ErrorHandler;

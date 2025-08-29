@@ -42,7 +42,7 @@ export class TimestampUtils {
     DATE_ONLY: /^\d{4}-\d{2}-\d{2}$/,
     TIME_ONLY: /^\d{2}:\d{2}:\d{2}(\.\d{3})?$/,
     UNIX: /^\d{10,13}$/,
-    RFC2822: /^[A-Za-z]{3}, \d{2} [A-Za-z]{3} \d{4} \d{2}:\d{2}:\d{2} [+-]\d{4}$/
+    RFC2822: /^[A-Za-z]{3}, \d{2} [A-Za-z]{3} \d{4} \d{2}:\d{2}:\d{2} [+-]\d{4}$/,
   };
 
   /**
@@ -64,9 +64,8 @@ export class TimestampUtils {
         const [datePart, timePart] = original.split(' ');
         const [year, month, day] = datePart.split('-').map(Number);
         const [hour, minute, second] = timePart.split(':').map(Number);
-        const millisecond = timePart.includes('.') ? 
-          parseInt(timePart.split('.')[1]) : 0;
-        
+        const millisecond = timePart.includes('.') ? parseInt(timePart.split('.')[1]) : 0;
+
         parsed = new Date(year, month - 1, day, hour, minute, second, millisecond);
         format = 'CUSTOM';
       } else if (TimestampUtils.FORMATS.DATE_ONLY.test(original)) {
@@ -75,10 +74,16 @@ export class TimestampUtils {
       } else if (TimestampUtils.FORMATS.TIME_ONLY.test(original)) {
         const today = new Date();
         const [hour, minute, second] = original.split(':').map(Number);
-        const millisecond = original.includes('.') ? 
-          parseInt(original.split('.')[1]) : 0;
-        parsed = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 
-                         hour, minute, second, millisecond);
+        const millisecond = original.includes('.') ? parseInt(original.split('.')[1]) : 0;
+        parsed = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate(),
+          hour,
+          minute,
+          second,
+          millisecond
+        );
         format = 'TIME_ONLY';
       } else if (TimestampUtils.FORMATS.UNIX.test(original)) {
         const unixTime = parseInt(original);
@@ -108,17 +113,25 @@ export class TimestampUtils {
 
     let relative = '';
     if (Math.abs(diffDays) > 0) {
-      relative = diffDays > 0 ? `in ${diffDays} day${diffDays > 1 ? 's' : ''}` : 
-                               `${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? 's' : ''} ago`;
+      relative =
+        diffDays > 0
+          ? `in ${diffDays} day${diffDays > 1 ? 's' : ''}`
+          : `${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? 's' : ''} ago`;
     } else if (Math.abs(diffHours) > 0) {
-      relative = diffHours > 0 ? `in ${diffHours} hour${diffHours > 1 ? 's' : ''}` : 
-                               `${Math.abs(diffHours)} hour${Math.abs(diffHours) > 1 ? 's' : ''} ago`;
+      relative =
+        diffHours > 0
+          ? `in ${diffHours} hour${diffHours > 1 ? 's' : ''}`
+          : `${Math.abs(diffHours)} hour${Math.abs(diffHours) > 1 ? 's' : ''} ago`;
     } else if (Math.abs(diffMinutes) > 0) {
-      relative = diffMinutes > 0 ? `in ${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}` : 
-                                 `${Math.abs(diffMinutes)} minute${Math.abs(diffMinutes) > 1 ? 's' : ''} ago`;
+      relative =
+        diffMinutes > 0
+          ? `in ${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`
+          : `${Math.abs(diffMinutes)} minute${Math.abs(diffMinutes) > 1 ? 's' : ''} ago`;
     } else if (Math.abs(diffSeconds) > 0) {
-      relative = diffSeconds > 0 ? `in ${diffSeconds} second${diffSeconds > 1 ? 's' : ''}` : 
-                                 `${Math.abs(diffSeconds)} second${Math.abs(diffSeconds) > 1 ? 's' : ''} ago`;
+      relative =
+        diffSeconds > 0
+          ? `in ${diffSeconds} second${diffSeconds > 1 ? 's' : ''}`
+          : `${Math.abs(diffSeconds)} second${Math.abs(diffSeconds) > 1 ? 's' : ''} ago`;
     } else {
       relative = 'now';
     }
@@ -139,8 +152,8 @@ export class TimestampUtils {
         hour: isValid ? parsed.getHours() : 0,
         minute: isValid ? parsed.getMinutes() : 0,
         second: isValid ? parsed.getSeconds() : 0,
-        millisecond: isValid ? parsed.getMilliseconds() : 0
-      }
+        millisecond: isValid ? parsed.getMilliseconds() : 0,
+      },
     };
   }
 
@@ -184,16 +197,19 @@ export class TimestampUtils {
       format: info.format,
       errors,
       warnings,
-      suggestions
+      suggestions,
     };
   }
 
   /**
    * Format timestamp in various output formats
    */
-  static formatTimestamp(timestamp: string, format: 'iso' | 'human' | 'custom' | 'unix' | 'relative' = 'human'): string {
+  static formatTimestamp(
+    timestamp: string,
+    format: 'iso' | 'human' | 'custom' | 'unix' | 'relative' = 'human'
+  ): string {
     const info = TimestampUtils.parseTimestamp(timestamp);
-    
+
     if (!info.isValid) {
       return 'Invalid timestamp';
     }
@@ -217,9 +233,12 @@ export class TimestampUtils {
   /**
    * Convert between timestamp formats
    */
-  static convertFormat(timestamp: string, targetFormat: 'iso' | 'custom' | 'unix' | 'rfc2822'): string {
+  static convertFormat(
+    timestamp: string,
+    targetFormat: 'iso' | 'custom' | 'unix' | 'rfc2822'
+  ): string {
     const info = TimestampUtils.parseTimestamp(timestamp);
-    
+
     if (!info.isValid) {
       return 'Invalid timestamp';
     }
@@ -241,7 +260,10 @@ export class TimestampUtils {
   /**
    * Get time difference between two timestamps
    */
-  static getTimeDifference(timestamp1: string, timestamp2: string): {
+  static getTimeDifference(
+    timestamp1: string,
+    timestamp2: string
+  ): {
     milliseconds: number;
     seconds: number;
     minutes: number;
@@ -259,7 +281,7 @@ export class TimestampUtils {
         minutes: 0,
         hours: 0,
         days: 0,
-        humanReadable: 'Invalid timestamp'
+        humanReadable: 'Invalid timestamp',
       };
     }
 
@@ -268,7 +290,7 @@ export class TimestampUtils {
     const diffMinutes = Math.floor(diffSeconds / 60);
     const diffHours = Math.floor(diffMinutes / 60);
     const diffDays = Math.floor(diffHours / 24);
-    
+
     // Calculate remaining hours after days
     const remainingHours = diffHours % 24;
     const remainingMinutes = diffMinutes % 60;
@@ -300,7 +322,7 @@ export class TimestampUtils {
       minutes: remainingMinutes, // Return remaining minutes after hours
       hours: remainingHours, // Return remaining hours after days
       days: diffDays,
-      humanReadable
+      humanReadable,
     };
   }
 
@@ -344,7 +366,11 @@ export class TimestampUtils {
   /**
    * Add time to a timestamp
    */
-  static addTime(timestamp: string, amount: number, unit: 'milliseconds' | 'seconds' | 'minutes' | 'hours' | 'days'): string {
+  static addTime(
+    timestamp: string,
+    amount: number,
+    unit: 'milliseconds' | 'seconds' | 'minutes' | 'hours' | 'days'
+  ): string {
     const info = TimestampUtils.parseTimestamp(timestamp);
     if (!info.isValid) return 'Invalid timestamp';
 
@@ -373,8 +399,12 @@ export class TimestampUtils {
   /**
    * Get business hours between two timestamps
    */
-  static getBusinessHours(startTimestamp: string, endTimestamp: string, 
-                         businessStartHour: number = 0, businessEndHour: number = 17): number {
+  static getBusinessHours(
+    startTimestamp: string,
+    endTimestamp: string,
+    businessStartHour: number = 0,
+    businessEndHour: number = 17
+  ): number {
     const info1 = TimestampUtils.parseTimestamp(startTimestamp);
     const info2 = TimestampUtils.parseTimestamp(endTimestamp);
 
@@ -382,19 +412,19 @@ export class TimestampUtils {
 
     const start = new Date(info1.parsed);
     const end = new Date(info2.parsed);
-    
+
     let businessHours = 0;
     const current = new Date(start);
 
     while (current < end) {
       const dayOfWeek = current.getDay();
       const hour = current.getHours();
-      
+
       // Skip weekends and non-business hours
       if (dayOfWeek > 0 && dayOfWeek < 6 && hour >= businessStartHour && hour < businessEndHour) {
         businessHours += 1;
       }
-      
+
       current.setHours(current.getHours() + 1);
     }
 

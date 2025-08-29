@@ -4,42 +4,42 @@
  * Add this script to your water-dashboard.html file
  */
 
-(function() {
-    'use strict';
+(function () {
+  'use strict';
 
-    console.log('🌊 Water Dashboard KPI Enhancer loaded...');
+  console.log('🌊 Water Dashboard KPI Enhancer loaded...');
 
-    // Wait for the page to be fully loaded
-    function waitForElement(selector, timeout = 10000) {
-        return new Promise((resolve, reject) => {
-            const element = document.querySelector(selector);
-            if (element) {
-                resolve(element);
-                return;
-            }
+  // Wait for the page to be fully loaded
+  function waitForElement(selector, timeout = 10000) {
+    return new Promise((resolve, reject) => {
+      const element = document.querySelector(selector);
+      if (element) {
+        resolve(element);
+        return;
+      }
 
-            const observer = new MutationObserver(() => {
-                const element = document.querySelector(selector);
-                if (element) {
-                    observer.disconnect();
-                    resolve(element);
-                }
-            });
+      const observer = new MutationObserver(() => {
+        const element = document.querySelector(selector);
+        if (element) {
+          observer.disconnect();
+          resolve(element);
+        }
+      });
 
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
 
-            setTimeout(() => {
-                observer.disconnect();
-                reject(new Error(`Element ${selector} not found within ${timeout}ms`));
-            }, timeout);
-        });
-    }
+      setTimeout(() => {
+        observer.disconnect();
+        reject(new Error(`Element ${selector} not found within ${timeout}ms`));
+      }, timeout);
+    });
+  }
 
-    // Enhanced KPI styles
-    const enhancedKPIStyles = `
+  // Enhanced KPI styles
+  const enhancedKPIStyles = `
         .enhanced-kpi-card {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             padding: 1.5rem;
@@ -166,154 +166,156 @@
         }
     `;
 
-    // Inject enhanced styles
-    function injectEnhancedStyles() {
-        if (!document.querySelector('#enhanced-kpi-styles')) {
-            const styleSheet = document.createElement('style');
-            styleSheet.id = 'enhanced-kpi-styles';
-            styleSheet.textContent = enhancedKPIStyles;
-            document.head.appendChild(styleSheet);
-        }
+  // Inject enhanced styles
+  function injectEnhancedStyles() {
+    if (!document.querySelector('#enhanced-kpi-styles')) {
+      const styleSheet = document.createElement('style');
+      styleSheet.id = 'enhanced-kpi-styles';
+      styleSheet.textContent = enhancedKPIStyles;
+      document.head.appendChild(styleSheet);
+    }
+  }
+
+  // Enhance existing KPI cards
+  function enhanceExistingKPIs() {
+    const kpiCards = document.querySelectorAll('.kpi-card');
+
+    if (kpiCards.length === 0) {
+      console.log('🌊 No existing KPI cards found to enhance');
+      return;
     }
 
-    // Enhance existing KPI cards
-    function enhanceExistingKPIs() {
-        const kpiCards = document.querySelectorAll('.kpi-card');
-        
-        if (kpiCards.length === 0) {
-            console.log('🌊 No existing KPI cards found to enhance');
-            return;
-        }
+    console.log(`🌊 Found ${kpiCards.length} KPI cards to enhance`);
 
-        console.log(`🌊 Found ${kpiCards.length} KPI cards to enhance`);
+    kpiCards.forEach((card, index) => {
+      enhanceKPICard(card, index);
+    });
+  }
 
-        kpiCards.forEach((card, index) => {
-            enhanceKPICard(card, index);
-        });
+  // Enhance individual KPI card
+  function enhanceKPICard(card, index) {
+    // Add enhanced class
+    card.classList.add('enhanced-kpi-card');
+
+    // Determine water theme based on existing classes
+    if (card.classList.contains('surface')) {
+      card.classList.add('surface');
+    } else if (card.classList.contains('mid-water')) {
+      card.classList.add('mid-water');
+    } else if (card.classList.contains('deep-water')) {
+      card.classList.add('deep-water');
+    } else {
+      // Default to mid-water theme
+      card.classList.add('mid-water');
     }
 
-    // Enhance individual KPI card
-    function enhanceKPICard(card, index) {
-        // Add enhanced class
-        card.classList.add('enhanced-kpi-card');
-        
-        // Determine water theme based on existing classes
-        if (card.classList.contains('surface')) {
-            card.classList.add('surface');
-        } else if (card.classList.contains('mid-water')) {
-            card.classList.add('mid-water');
-        } else if (card.classList.contains('deep-water')) {
-            card.classList.add('deep-water');
+    // Add icon if not present
+    const existingIcon = card.querySelector('.kpi-icon');
+    if (!existingIcon) {
+      const icon = document.createElement('div');
+      icon.className = 'enhanced-kpi-icon';
+
+      // Set appropriate icon based on label
+      const label = card.querySelector('.kpi-label');
+      if (label) {
+        const labelText = label.textContent || '';
+        if (labelText.includes('Temperature')) {
+          icon.textContent = '🌡️';
+        } else if (labelText.includes('Pressure')) {
+          icon.textContent = '💧';
+        } else if (labelText.includes('Flow')) {
+          icon.textContent = '🌊';
+        } else if (labelText.includes('Agents')) {
+          icon.textContent = '👥';
+        } else if (labelText.includes('Wagers')) {
+          icon.textContent = '📊';
+        } else if (labelText.includes('Amount')) {
+          icon.textContent = '💰';
         } else {
-            // Default to mid-water theme
-            card.classList.add('mid-water');
+          icon.textContent = '🌊';
         }
+      }
 
-        // Add icon if not present
-        const existingIcon = card.querySelector('.kpi-icon');
-        if (!existingIcon) {
-            const icon = document.createElement('div');
-            icon.className = 'enhanced-kpi-icon';
-            
-            // Set appropriate icon based on label
-            const label = card.querySelector('.kpi-label');
-            if (label) {
-                const labelText = label.textContent || '';
-                if (labelText.includes('Temperature')) {
-                    icon.textContent = '🌡️';
-                } else if (labelText.includes('Pressure')) {
-                    icon.textContent = '💧';
-                } else if (labelText.includes('Flow')) {
-                    icon.textContent = '🌊';
-                } else if (labelText.includes('Agents')) {
-                    icon.textContent = '👥';
-                } else if (labelText.includes('Wagers')) {
-                    icon.textContent = '📊';
-                } else if (labelText.includes('Amount')) {
-                    icon.textContent = '💰';
-                } else {
-                    icon.textContent = '🌊';
-                }
-            }
-            
-            card.insertBefore(icon, card.firstChild);
-        }
-
-        // Add trend indicator if not present
-        const existingTrend = card.querySelector('.kpi-trend');
-        if (!existingTrend) {
-            const trend = document.createElement('div');
-            trend.className = 'enhanced-kpi-trend enhanced-trend-neutral';
-            
-            // Set trend based on value
-            const valueElement = card.querySelector('.kpi-value');
-            if (valueElement) {
-                const valueText = valueElement.textContent || '';
-                if (valueText.includes('°C')) {
-                    const temp = parseFloat(valueText);
-                    if (temp > 21) {
-                        trend.textContent = '🌊 Rising';
-                        trend.className = 'enhanced-kpi-trend enhanced-trend-up';
-                    } else if (temp < 19) {
-                        trend.textContent = '💧 Falling';
-                        trend.className = 'enhanced-kpi-trend enhanced-trend-down';
-                    } else {
-                        trend.textContent = '🌊 Stable';
-                    }
-                } else if (valueText.includes('PSI')) {
-                    const pressure = parseFloat(valueText);
-                    if (pressure > 120) {
-                        trend.textContent = '⚠️ High';
-                        trend.className = 'enhanced-kpi-trend enhanced-trend-up';
-                    } else if (pressure < 80) {
-                        trend.textContent = '💧 Low';
-                        trend.className = 'enhanced-kpi-trend enhanced-trend-down';
-                    } else {
-                        trend.textContent = '🌊 Normal';
-                    }
-                } else if (valueText.includes('L/min')) {
-                    const flow = parseFloat(valueText);
-                    if (flow > 80) {
-                        trend.textContent = '🌊 High Flow';
-                        trend.className = 'enhanced-kpi-trend enhanced-trend-up';
-                    } else if (flow < 30) {
-                        trend.textContent = '💧 Low Flow';
-                        trend.className = 'enhanced-kpi-trend enhanced-trend-down';
-                    } else {
-                        trend.textContent = '🌊 Normal';
-                    }
-                } else {
-                    trend.textContent = '🌊 Active';
-                }
-            }
-            
-            card.appendChild(trend);
-        }
-
-        // Add pulse effect to important KPIs
-        if (card.querySelector('.kpi-label')?.textContent?.includes('Temperature')) {
-            card.classList.add('pulse-glow');
-        }
-
-        console.log(`🌊 Enhanced KPI card ${index + 1}: ${card.querySelector('.kpi-label')?.textContent || 'Unknown'}`);
+      card.insertBefore(icon, card.firstChild);
     }
 
-    // Add monitoring controls
-    function addMonitoringControls() {
-        const systemInfoSection = document.querySelector('[x-show*="system-info"]');
-        if (!systemInfoSection) {
-            console.log('🌊 System info section not found, skipping monitoring controls');
-            return;
-        }
+    // Add trend indicator if not present
+    const existingTrend = card.querySelector('.kpi-trend');
+    if (!existingTrend) {
+      const trend = document.createElement('div');
+      trend.className = 'enhanced-kpi-trend enhanced-trend-neutral';
 
-        // Check if controls already exist
-        if (systemInfoSection.querySelector('.enhanced-monitoring-controls')) {
-            return;
+      // Set trend based on value
+      const valueElement = card.querySelector('.kpi-value');
+      if (valueElement) {
+        const valueText = valueElement.textContent || '';
+        if (valueText.includes('°C')) {
+          const temp = parseFloat(valueText);
+          if (temp > 21) {
+            trend.textContent = '🌊 Rising';
+            trend.className = 'enhanced-kpi-trend enhanced-trend-up';
+          } else if (temp < 19) {
+            trend.textContent = '💧 Falling';
+            trend.className = 'enhanced-kpi-trend enhanced-trend-down';
+          } else {
+            trend.textContent = '🌊 Stable';
+          }
+        } else if (valueText.includes('PSI')) {
+          const pressure = parseFloat(valueText);
+          if (pressure > 120) {
+            trend.textContent = '⚠️ High';
+            trend.className = 'enhanced-kpi-trend enhanced-trend-up';
+          } else if (pressure < 80) {
+            trend.textContent = '💧 Low';
+            trend.className = 'enhanced-kpi-trend enhanced-trend-down';
+          } else {
+            trend.textContent = '🌊 Normal';
+          }
+        } else if (valueText.includes('L/min')) {
+          const flow = parseFloat(valueText);
+          if (flow > 80) {
+            trend.textContent = '🌊 High Flow';
+            trend.className = 'enhanced-kpi-trend enhanced-trend-up';
+          } else if (flow < 30) {
+            trend.textContent = '💧 Low Flow';
+            trend.className = 'enhanced-kpi-trend enhanced-trend-down';
+          } else {
+            trend.textContent = '🌊 Normal';
+          }
+        } else {
+          trend.textContent = '🌊 Active';
         }
+      }
 
-        const controlsContainer = document.createElement('div');
-        controlsContainer.className = 'enhanced-monitoring-controls';
-        controlsContainer.style.cssText = `
+      card.appendChild(trend);
+    }
+
+    // Add pulse effect to important KPIs
+    if (card.querySelector('.kpi-label')?.textContent?.includes('Temperature')) {
+      card.classList.add('pulse-glow');
+    }
+
+    console.log(
+      `🌊 Enhanced KPI card ${index + 1}: ${card.querySelector('.kpi-label')?.textContent || 'Unknown'}`
+    );
+  }
+
+  // Add monitoring controls
+  function addMonitoringControls() {
+    const systemInfoSection = document.querySelector('[x-show*="system-info"]');
+    if (!systemInfoSection) {
+      console.log('🌊 System info section not found, skipping monitoring controls');
+      return;
+    }
+
+    // Check if controls already exist
+    if (systemInfoSection.querySelector('.enhanced-monitoring-controls')) {
+      return;
+    }
+
+    const controlsContainer = document.createElement('div');
+    controlsContainer.className = 'enhanced-monitoring-controls';
+    controlsContainer.style.cssText = `
             margin-top: 2rem;
             padding: 1.5rem;
             background: rgba(135, 206, 235, 0.1);
@@ -321,7 +323,7 @@
             border: 1px solid rgba(135, 206, 235, 0.3);
         `;
 
-        controlsContainer.innerHTML = `
+    controlsContainer.innerHTML = `
             <h3 class="text-xl font-bold mb-4 glow-text" style="color: #87ceeb;">🌊 Enhanced Water Monitoring</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <button id="refresh-enhanced-kpis" class="enhanced-control-btn">
@@ -337,10 +339,10 @@
             </div>
         `;
 
-        systemInfoSection.appendChild(controlsContainer);
+    systemInfoSection.appendChild(controlsContainer);
 
-        // Add control button styles
-        const controlStyles = `
+    // Add control button styles
+    const controlStyles = `
             .enhanced-control-btn {
                 padding: 0.75rem 1.5rem;
                 border-radius: 0.75rem;
@@ -363,118 +365,125 @@
             }
         `;
 
-        if (!document.querySelector('#enhanced-control-styles')) {
-            const styleSheet = document.createElement('style');
-            styleSheet.id = 'enhanced-control-styles';
-            styleSheet.textContent = controlStyles;
-            document.head.appendChild(styleSheet);
-        }
-
-        // Add event listeners
-        const refreshBtn = document.getElementById('refresh-enhanced-kpis');
-        const toggleBtn = document.getElementById('toggle-enhancements');
-
-        if (refreshBtn) {
-            refreshBtn.addEventListener('click', () => {
-                refreshEnhancedKPIs();
-            });
-        }
-
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', () => {
-                toggleEnhancements();
-            });
-        }
+    if (!document.querySelector('#enhanced-control-styles')) {
+      const styleSheet = document.createElement('style');
+      styleSheet.id = 'enhanced-control-styles';
+      styleSheet.textContent = controlStyles;
+      document.head.appendChild(styleSheet);
     }
 
-    // Refresh enhanced KPIs
-    function refreshEnhancedKPIs() {
-        console.log('🌊 Refreshing enhanced KPIs...');
-        
-        // Update last enhancement time
-        const lastUpdateElement = document.getElementById('last-enhancement');
-        if (lastUpdateElement) {
-            lastUpdateElement.textContent = `Last Update: ${new Date().toLocaleTimeString()}`;
-        }
+    // Add event listeners
+    const refreshBtn = document.getElementById('refresh-enhanced-kpis');
+    const toggleBtn = document.getElementById('toggle-enhancements');
 
-        // Re-enhance KPIs
-        enhanceExistingKPIs();
-        
-        console.log('🌊 Enhanced KPIs refreshed!');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', () => {
+        refreshEnhancedKPIs();
+      });
     }
 
-    // Toggle enhancements
-    function toggleEnhancements() {
-        const kpiCards = document.querySelectorAll('.enhanced-kpi-card');
-        const toggleBtn = document.getElementById('toggle-enhancements');
-        const statusElement = document.getElementById('enhancement-status');
-        
-        if (kpiCards.length > 0) {
-            // Remove enhancements
-            kpiCards.forEach(card => {
-                card.classList.remove('enhanced-kpi-card', 'surface', 'mid-water', 'deep-water', 'pulse-glow');
-                const icon = card.querySelector('.enhanced-kpi-icon');
-                const trend = card.querySelector('.enhanced-kpi-trend');
-                if (icon) icon.remove();
-                if (trend) trend.remove();
-            });
-            
-            if (toggleBtn) toggleBtn.textContent = '🎨 Enable Enhancements';
-            if (statusElement) statusElement.textContent = 'Status: Disabled';
-            console.log('🌊 Enhancements disabled');
-        } else {
-            // Re-enable enhancements
-            enhanceExistingKPIs();
-            if (toggleBtn) toggleBtn.textContent = '🎨 Disable Enhancements';
-            if (statusElement) statusElement.textContent = 'Status: Enhanced';
-            console.log('🌊 Enhancements re-enabled');
-        }
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        toggleEnhancements();
+      });
+    }
+  }
+
+  // Refresh enhanced KPIs
+  function refreshEnhancedKPIs() {
+    console.log('🌊 Refreshing enhanced KPIs...');
+
+    // Update last enhancement time
+    const lastUpdateElement = document.getElementById('last-enhancement');
+    if (lastUpdateElement) {
+      lastUpdateElement.textContent = `Last Update: ${new Date().toLocaleTimeString()}`;
     }
 
-    // Main enhancement function
-    function enhanceWaterDashboard() {
-        console.log('🌊 Starting water dashboard enhancement...');
-        
-        // Inject styles
-        injectEnhancedStyles();
-        
-        // Wait for KPI cards to be available
-        waitForElement('.kpi-card')
-            .then(() => {
-                // Enhance existing KPIs
-                enhanceExistingKPIs();
-                
-                // Add monitoring controls
-                addMonitoringControls();
-                
-                console.log('🌊 Water dashboard enhancement completed!');
-            })
-            .catch(error => {
-                console.log('🌊 Enhancement delayed, retrying...');
-                // Retry after a delay
-                setTimeout(() => {
-                    enhanceExistingKPIs();
-                    addMonitoringControls();
-                }, 2000);
-            });
-    }
+    // Re-enhance KPIs
+    enhanceExistingKPIs();
 
-    // Auto-enhance on page load
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(enhanceWaterDashboard, 1000);
-        });
+    console.log('🌊 Enhanced KPIs refreshed!');
+  }
+
+  // Toggle enhancements
+  function toggleEnhancements() {
+    const kpiCards = document.querySelectorAll('.enhanced-kpi-card');
+    const toggleBtn = document.getElementById('toggle-enhancements');
+    const statusElement = document.getElementById('enhancement-status');
+
+    if (kpiCards.length > 0) {
+      // Remove enhancements
+      kpiCards.forEach(card => {
+        card.classList.remove(
+          'enhanced-kpi-card',
+          'surface',
+          'mid-water',
+          'deep-water',
+          'pulse-glow'
+        );
+        const icon = card.querySelector('.enhanced-kpi-icon');
+        const trend = card.querySelector('.enhanced-kpi-trend');
+        if (icon) icon.remove();
+        if (trend) trend.remove();
+      });
+
+      if (toggleBtn) toggleBtn.textContent = '🎨 Enable Enhancements';
+      if (statusElement) statusElement.textContent = 'Status: Disabled';
+      console.log('🌊 Enhancements disabled');
     } else {
-        setTimeout(enhanceWaterDashboard, 1000);
+      // Re-enable enhancements
+      enhanceExistingKPIs();
+      if (toggleBtn) toggleBtn.textContent = '🎨 Disable Enhancements';
+      if (statusElement) statusElement.textContent = 'Status: Enhanced';
+      console.log('🌊 Enhancements re-enabled');
     }
+  }
 
-    // Export functions for manual use
-    window.WaterDashboardEnhancer = {
-        enhance: enhanceWaterDashboard,
-        refresh: refreshEnhancedKPIs,
-        toggle: toggleEnhancements
-    };
+  // Main enhancement function
+  function enhanceWaterDashboard() {
+    console.log('🌊 Starting water dashboard enhancement...');
 
-    console.log('🌊 Water Dashboard KPI Enhancer ready! Use window.WaterDashboardEnhancer to control manually.');
+    // Inject styles
+    injectEnhancedStyles();
 
+    // Wait for KPI cards to be available
+    waitForElement('.kpi-card')
+      .then(() => {
+        // Enhance existing KPIs
+        enhanceExistingKPIs();
+
+        // Add monitoring controls
+        addMonitoringControls();
+
+        console.log('🌊 Water dashboard enhancement completed!');
+      })
+      .catch(error => {
+        console.log('🌊 Enhancement delayed, retrying...');
+        // Retry after a delay
+        setTimeout(() => {
+          enhanceExistingKPIs();
+          addMonitoringControls();
+        }, 2000);
+      });
+  }
+
+  // Auto-enhance on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(enhanceWaterDashboard, 1000);
+    });
+  } else {
+    setTimeout(enhanceWaterDashboard, 1000);
+  }
+
+  // Export functions for manual use
+  window.WaterDashboardEnhancer = {
+    enhance: enhanceWaterDashboard,
+    refresh: refreshEnhancedKPIs,
+    toggle: toggleEnhancements,
+  };
+
+  console.log(
+    '🌊 Water Dashboard KPI Enhancer ready! Use window.WaterDashboardEnhancer to control manually.'
+  );
 })();

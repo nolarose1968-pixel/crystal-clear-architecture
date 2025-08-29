@@ -16,7 +16,7 @@ class MatrixAPITester {
 
   async testMatrixHealth() {
     console.log('🔍 Testing Matrix Health API...');
-    
+
     try {
       const health = await this.checker.checkMatrixHealth();
       console.log('✅ Matrix Health Check:', {
@@ -24,7 +24,7 @@ class MatrixAPITester {
         status: health.status,
         score: health.matrix_health_score,
         agents: health.matrix_stats?.total_agents,
-        permissions: health.matrix_stats?.total_permissions
+        permissions: health.matrix_stats?.total_permissions,
       });
       return health.success;
     } catch (error) {
@@ -35,12 +35,12 @@ class MatrixAPITester {
 
   async testMatrixValidation() {
     console.log('✅ Testing Matrix Validation API...');
-    
+
     try {
       const validation = await this.checker.validatePermissionsMatrix();
       console.log('✅ Matrix Validation:', {
         success: validation.success,
-        message: validation.message
+        message: validation.message,
       });
       return validation.success;
     } catch (error) {
@@ -51,13 +51,13 @@ class MatrixAPITester {
 
   async testMatrixRepair() {
     console.log('🔧 Testing Matrix Repair API...');
-    
+
     try {
       const repair = await this.checker.repairMatrixIssues();
       console.log('✅ Matrix Repair:', {
         success: repair.success,
         issuesFixed: repair.issues_fixed,
-        message: repair.message
+        message: repair.message,
       });
       return repair.success;
     } catch (error) {
@@ -68,13 +68,13 @@ class MatrixAPITester {
 
   async testMatrixStatus() {
     console.log('📊 Testing Matrix Status API...');
-    
+
     try {
       const status = await this.checker.checkMatrixHealth();
       console.log('✅ Matrix Status:', {
         success: status.success,
         healthScore: status.matrix_health_score,
-        status: status.status
+        status: status.status,
       });
       return status.success;
     } catch (error) {
@@ -85,13 +85,13 @@ class MatrixAPITester {
 
   async testMatrixHistory() {
     console.log('📈 Testing Matrix History API...');
-    
+
     try {
       const history = this.checker.getMatrixHealthHistory(5);
       console.log('✅ Matrix History:', {
         total: history.length,
         latest: history[0]?.check_timestamp,
-        avgScore: history.reduce((sum, h) => sum + h.health_score, 0) / history.length
+        avgScore: history.reduce((sum, h) => sum + h.health_score, 0) / history.length,
       });
       return true;
     } catch (error) {
@@ -102,13 +102,13 @@ class MatrixAPITester {
 
   async testMatrixSummary() {
     console.log('📋 Testing Matrix Summary API...');
-    
+
     try {
       const summary = this.checker.getCurrentMatrixStatus();
       console.log('✅ Matrix Summary:', {
         lastCheck: summary?.last_check,
         avgHealthScore: summary?.avg_health_score,
-        avgDataCompleteness: summary?.avg_data_completeness
+        avgDataCompleteness: summary?.avg_data_completeness,
       });
       return true;
     } catch (error) {
@@ -119,7 +119,7 @@ class MatrixAPITester {
 
   async runAllTests() {
     console.log('🚀 Matrix Health API Test Suite');
-    console.log('================================\n');
+    console.log('!==!==!==!==!==!==\n');
 
     const tests = [
       { name: 'Matrix Health', test: () => this.testMatrixHealth() },
@@ -127,11 +127,11 @@ class MatrixAPITester {
       { name: 'Matrix Repair', test: () => this.testMatrixRepair() },
       { name: 'Matrix Status', test: () => this.testMatrixStatus() },
       { name: 'Matrix History', test: () => this.testMatrixHistory() },
-      { name: 'Matrix Summary', test: () => this.testMatrixSummary() }
+      { name: 'Matrix Summary', test: () => this.testMatrixSummary() },
     ];
 
     const results = [];
-    
+
     for (const test of tests) {
       const success = await test.test();
       results.push({ name: test.name, success });
@@ -140,18 +140,20 @@ class MatrixAPITester {
 
     // Summary
     console.log('📊 Test Results Summary');
-    console.log('========================');
-    
+    console.log('!==!==!==!====');
+
     const passed = results.filter(r => r.success).length;
     const total = results.length;
-    
+
     results.forEach(result => {
       const status = result.success ? '✅ PASS' : '❌ FAIL';
       console.log(`${status} ${result.name}`);
     });
-    
-    console.log(`\n🎯 Overall: ${passed}/${total} tests passed (${Math.round(passed/total*100)}%)`);
-    
+
+    console.log(
+      `\n🎯 Overall: ${passed}/${total} tests passed (${Math.round((passed / total) * 100)}%)`
+    );
+
     if (passed === total) {
       console.log('🎉 All Matrix Health API tests passed!');
     } else {

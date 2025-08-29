@@ -17,7 +17,7 @@ try {
   const lKeyCount = (mappingContent.match(/L\d{3}:/g) || []).length;
 
   console.log('🔍 L-Key Mapping Analysis');
-  console.log('========================');
+  console.log('!==!==!==!====');
   console.log('Total L-keys defined:', lKeyCount);
 
   // Current mappings from readiness check
@@ -28,7 +28,7 @@ try {
     'L-69': 'amount',
     'L-627': 'risk_amount',
     'L-628': 'win_amount',
-    'L-187': 'balance'
+    'L-187': 'balance',
   };
 
   console.log('Currently configured:', Object.keys(currentMappings).length);
@@ -43,7 +43,6 @@ try {
       console.log('  •', categoryName);
     });
   }
-
 } catch (error) {
   console.error('Error:', error.message);
 }

@@ -1,6 +1,7 @@
 # Getting Started
 
-Get up and running with Fire22 Dashboard in minutes using Bun's lightning-fast development experience.
+Get up and running with Fire22 Dashboard in minutes using Bun's lightning-fast
+development experience.
 
 ## Prerequisites
 
@@ -184,9 +185,11 @@ dashboard-worker/
 
 ## Next Steps
 
-1. **🏗️ [Architecture Overview](/architecture/overview)** - Understand the system design
-2. **🔌 [API Integration](/api/fire22/authentication)** - Connect to Fire22 APIs  
-3. **⚡ [Performance Optimization](/architecture/performance/optimization)** - Advanced tuning
+1. **🏗️ [Architecture Overview](/architecture/overview)** - Understand the
+   system design
+2. **🔌 [API Integration](/api/fire22/authentication)** - Connect to Fire22 APIs
+3. **⚡ [Performance Optimization](/architecture/performance/optimization)** -
+   Advanced tuning
 4. **🧪 [Testing Guide](./development/testing)** - Writing and running tests
 5. **🚀 [Deployment](./development/deployment)** - Production deployment
 
@@ -195,12 +198,14 @@ dashboard-worker/
 ### Common Issues
 
 **Bun version conflicts:**
+
 ```bash
 bun --version  # Ensure >= 1.2.20
 bun upgrade    # Update to latest
 ```
 
 **DNS performance issues:**
+
 ```bash
 # Test DNS configuration
 bun test scripts/dns-performance.test.ts
@@ -210,6 +215,7 @@ curl http://localhost:3001/api/fire22/dns-stats
 ```
 
 **Database connection issues:**
+
 ```bash
 # Verify PostgreSQL is running
 pg_isready -h localhost -p 5432
@@ -218,7 +224,8 @@ pg_isready -h localhost -p 5432
 bun run scripts/test-integration.ts
 ```
 
-For more troubleshooting help, see our [Troubleshooting Guide](./troubleshooting/common-issues).
+For more troubleshooting help, see our
+[Troubleshooting Guide](./troubleshooting/common-issues).
 
 ---
 

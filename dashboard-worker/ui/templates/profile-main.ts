@@ -4,7 +4,11 @@
  */
 
 import type { EmployeeData } from '../../personal-subdomains/src/types';
-import { generateHtmlHead, generateHeader, generateFooter } from '../../personal-subdomains/src/components';
+import {
+  generateHtmlHead,
+  generateHeader,
+  generateFooter,
+} from '../../personal-subdomains/src/components';
 
 export function generateProfilePage(employee: EmployeeData, pathname?: string): string {
   const content = generateProfileContent(employee, pathname);
@@ -44,12 +48,16 @@ function generateProfileContent(employee: EmployeeData, pathname?: string): stri
       </div>
     </div>
 
-    ${employee.bio ? `
+    ${
+      employee.bio
+        ? `
     <div class="profile-bio">
       <h3>About</h3>
       <p>${employee.bio}</p>
     </div>
-    ` : ''}
+    `
+        : ''
+    }
 
     <div class="profile-actions">
       <a href="/contact" class="action-button primary">Contact ${employee.name.split(' ')[0]}</a>
@@ -57,13 +65,17 @@ function generateProfileContent(employee: EmployeeData, pathname?: string): stri
       ${employee.department ? `<a href="/tools/dept" class="action-button tertiary">Department Tools</a>` : ''}
     </div>
 
-    ${employee.skills ? `
+    ${
+      employee.skills
+        ? `
     <div class="profile-skills">
       <h3>Skills & Expertise</h3>
       <div class="skills-grid">
         ${employee.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
       </div>
     </div>
-    ` : ''}
+    `
+        : ''
+    }
   `;
 }

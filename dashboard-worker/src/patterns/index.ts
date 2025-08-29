@@ -27,7 +27,7 @@ export {
   pipeline,
   conditional,
   retry,
-  compose
+  compose,
 } from './utilities/pattern-utilities';
 
 // Examples exports
@@ -76,7 +76,7 @@ export class UnifiedPatternSystem {
       pattern: patternName,
       context,
       applied: true,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -91,7 +91,7 @@ export class UnifiedPatternSystem {
     return {
       components: ['core', 'registry', 'utilities', 'examples'],
       health: 'healthy',
-      version: '2.0.0'
+      version: '2.0.0',
     };
   }
 
@@ -108,7 +108,7 @@ export class UnifiedPatternSystem {
       patternsExecuted: 1250,
       averageExecutionTime: 45.2,
       mostUsedPatterns: ['TABULAR', 'TIMING', 'LOADER'],
-      systemUptime: 99.8
+      systemUptime: 99.8,
     };
   }
 
@@ -153,8 +153,8 @@ export function getPatternSystemInfo(): {
       'Pattern Examples',
       'Pattern Weaver',
       'Pattern Connector',
-      'Shell Weaver'
-    ]
+      'Shell Weaver',
+    ],
   };
 }
 
@@ -180,7 +180,7 @@ export const PatternRegistryLegacy = {
     INTERACTIVE: '🎯 Interactive CLI',
     STREAM: '🌊 Stream Processing',
     FILESYSTEM: '📁 File System Operations',
-    UTILITIES: '🔧 Utility Functions'
+    UTILITIES: '🔧 Utility Functions',
   },
 
   connections: new Map([
@@ -204,7 +204,7 @@ export const PatternRegistryLegacy = {
     ['TEXT', ['UTILITIES', 'TABULAR', 'TIMING']],
     ['COMPRESSION', ['UTILITIES', 'FILESYSTEM', 'TIMING']],
     ['DEBUGGING', ['UTILITIES', 'TIMING', 'TABULAR', 'INTERACTIVE']],
-    ['PERFORMANCE', ['UTILITIES', 'TIMING', 'TABULAR']]
+    ['PERFORMANCE', ['UTILITIES', 'TIMING', 'TABULAR']],
   ]),
 
   getPatternsForContext(context: string): string[] {
@@ -218,7 +218,7 @@ export const PatternRegistryLegacy = {
       }
     }
     return false;
-  }
+  },
 };
 
 /**
@@ -252,9 +252,9 @@ export const PatternUtilsLegacy = {
           results.push({ pattern, result });
         }
         return results;
-      }
+      },
     };
-  }
+  },
 };
 
 // ╭─────────────────────────────────────────────────────────────────╮
@@ -276,14 +276,14 @@ export function getSystemHealthReport(): {
       core: { status: 'healthy', version: '2.0.0' },
       registry: { status: 'healthy', patterns: 13 },
       utilities: { status: 'healthy', functions: 6 },
-      examples: { status: 'healthy', scenarios: 15 }
+      examples: { status: 'healthy', scenarios: 15 },
     },
     recommendations: [
       'Monitor pattern execution times',
       'Review pattern usage statistics',
-      'Consider adding new pattern integrations'
+      'Consider adding new pattern integrations',
     ],
-    timestamp: new Date()
+    timestamp: new Date(),
   };
 }
 
@@ -297,7 +297,7 @@ export default {
   PatternUtils: PatternUtilsLegacy,
   executePattern,
   getPatternSystemInfo,
-  getSystemHealthReport
+  getSystemHealthReport,
 };
 
 /**

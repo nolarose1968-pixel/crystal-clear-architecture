@@ -1,6 +1,10 @@
 # Dependencies
 node_modules/
+
+# Bun-specific
 bun.lockb
+*.bun
+.bun-version
 
 # Build outputs
 dist/

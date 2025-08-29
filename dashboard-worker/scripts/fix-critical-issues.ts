@@ -5,32 +5,32 @@
  * Fixes: E1001 (SYSTEM_INIT_FAILED), E2001 (DB_CONNECTION_FAILED), Fire22 Auth Blocked
  */
 
-import { $ } from "bun";
-import * as fs from "fs";
-import * as path from "path";
+import { $ } from 'bun';
+import * as fs from 'fs';
+import * as path from 'path';
 
-console.log("🚨 Fire22 Critical Issue Resolution Script");
-console.log("==========================================");
+console.log('🚨 Fire22 Critical Issue Resolution Script');
+console.log('!==!==!==!==!==!==!==!==');
 console.log(`Time: ${new Date().toISOString()}`);
-console.log("");
+console.log('');
 
 // Issue tracking
 const issues = {
-  E1001: { status: "pending", description: "SYSTEM_INIT_FAILED" },
-  E2001: { status: "pending", description: "DB_CONNECTION_FAILED" },
-  AUTH: { status: "pending", description: "Fire22 Data Extraction Blocked" }
+  E1001: { status: 'pending', description: 'SYSTEM_INIT_FAILED' },
+  E2001: { status: 'pending', description: 'DB_CONNECTION_FAILED' },
+  AUTH: { status: 'pending', description: 'Fire22 Data Extraction Blocked' },
 };
 
 // 1. FIX E1001: SYSTEM_INIT_FAILED
 async function fixSystemInit() {
-  console.log("🔧 Fixing E1001: SYSTEM_INIT_FAILED...");
-  
+  console.log('🔧 Fixing E1001: SYSTEM_INIT_FAILED...');
+
   try {
     // Check if worker.ts exists
-    const workerPath = path.join(process.cwd(), "src/worker.ts");
+    const workerPath = path.join(process.cwd(), 'src/worker.ts');
     if (!fs.existsSync(workerPath)) {
-      console.error("❌ worker.ts not found, creating fallback...");
-      
+      console.error('❌ worker.ts not found, creating fallback...');
+
       // Create minimal worker.ts
       const minimalWorker = `
 export default {
@@ -55,44 +55,43 @@ export default {
     });
   }
 };`;
-      
+
       fs.writeFileSync(workerPath, minimalWorker);
-      console.log("✅ Created fallback worker.ts");
+      console.log('✅ Created fallback worker.ts');
     }
-    
+
     // Validate wrangler.toml
-    const wranglerPath = path.join(process.cwd(), "wrangler.toml");
+    const wranglerPath = path.join(process.cwd(), 'wrangler.toml');
     if (!fs.existsSync(wranglerPath)) {
-      console.error("❌ wrangler.toml missing!");
+      console.error('❌ wrangler.toml missing!');
       return false;
     }
-    
+
     // Test build
-    console.log("📦 Testing build...");
+    console.log('📦 Testing build...');
     const buildResult = await $`bun run build`.quiet();
-    
+
     if (buildResult.exitCode === 0) {
-      console.log("✅ Build successful");
-      issues.E1001.status = "resolved";
+      console.log('✅ Build successful');
+      issues.E1001.status = 'resolved';
       return true;
     } else {
-      console.error("❌ Build failed:", buildResult.stderr.toString());
+      console.error('❌ Build failed:', buildResult.stderr.toString());
       return false;
     }
-    
   } catch (error) {
-    console.error("❌ Failed to fix E1001:", error);
+    console.error('❌ Failed to fix E1001:', error);
     return false;
   }
 }
 
 // 2. FIX E2001: DB_CONNECTION_FAILED
 async function fixDatabaseConnection() {
-  console.log("\n🔧 Fixing E2001: DB_CONNECTION_FAILED...");
-  
+  console.log('\n🔧 Fixing E2001: DB_CONNECTION_FAILED...');
+
   try {
     // Create .env file with proper database config
-    const envPath = path.join(process.cwd(), ".env");
+    const envPath = path.join(process.cwd(), '.env');
     const envContent = `
 # Database Configuration (Fixed)
 DATABASE_URL=postgresql://localhost:5432/fire22_dashboard
@@ -113,15 +112,15 @@ D1_DATABASE_NAME=fire22-dashboard
 # SQLite Fallback
 SQLITE_DB_FILE=./data/fire22.db
 `;
-    
+
     if (!fs.existsSync(envPath)) {
       fs.writeFileSync(envPath, envContent);
-      console.log("✅ Created .env with database configuration");
+      console.log('✅ Created .env with database configuration');
     }
-    
+
     // Test database connection
-    console.log("🔗 Testing database connection...");
-    
+    console.log('🔗 Testing database connection...');
+
     const testScript = `
 import { DatabaseManager } from './src/database/connection.ts';
 
@@ -147,83 +146,82 @@ try {
   process.exit(1);
 }
 `;
-    
+
     // Create test file
-    fs.writeFileSync("test-db.ts", testScript);
-    
+    fs.writeFileSync('test-db.ts', testScript);
+
     // Ensure data directory exists
-    if (!fs.existsSync("./data")) {
-      fs.mkdirSync("./data", { recursive: true });
+    if (!fs.existsSync('./data')) {
+      fs.mkdirSync('./data', { recursive: true });
     }
-    
+
     // Run test
     const testResult = await $`bun run test-db.ts`.quiet();
-    
+
     if (testResult.exitCode === 0) {
-      console.log("✅ Database connection successful");
-      issues.E2001.status = "resolved";
-      
+      console.log('✅ Database connection successful');
+      issues.E2001.status = 'resolved';
+
       // Clean up test file
-      fs.unlinkSync("test-db.ts");
+      fs.unlinkSync('test-db.ts');
       return true;
     } else {
-      console.error("❌ Database connection failed");
+      console.error('❌ Database connection failed');
       return false;
     }
-    
   } catch (error) {
-    console.error("❌ Failed to fix E2001:", error);
+    console.error('❌ Failed to fix E2001:', error);
     return false;
   }
 }
 
 // 3. FIX Fire22 Authentication
 async function fixFire22Auth() {
-  console.log("\n🔧 Fixing Fire22 Data Extraction Authentication...");
-  
+  console.log('\n🔧 Fixing Fire22 Data Extraction Authentication...');
+
   try {
     // Create credentials file
-    const credsPath = path.join(process.cwd(), "config/fire22-credentials.json");
+    const credsPath = path.join(process.cwd(), 'config/fire22-credentials.json');
     const credentials = {
       api: {
-        url: "https://api.fire22.ag",
-        token: "fire22_api_token_" + Math.random().toString(36).substring(7),
-        secret: "fire22_secret_" + Math.random().toString(36).substring(7)
+        url: 'https://api.fire22.ag',
+        token: 'fire22_api_token_' + Math.random().toString(36).substring(7),
+        secret: 'fire22_secret_' + Math.random().toString(36).substring(7),
       },
       webhook: {
-        secret: "webhook_secret_" + Math.random().toString(36).substring(7)
+        secret: 'webhook_secret_' + Math.random().toString(36).substring(7),
       },
       jwt: {
-        secret: "jwt_secret_min_32_chars_" + Math.random().toString(36).substring(7)
+        secret: 'jwt_secret_min_32_chars_' + Math.random().toString(36).substring(7),
       },
       generated_at: new Date().toISOString(),
-      expires_at: new Date(Date.now() + 86400000).toISOString() // 24 hours
+      expires_at: new Date(Date.now() + 86400000).toISOString(), // 24 hours
     };
-    
+
     // Ensure config directory exists
-    if (!fs.existsSync("./config")) {
-      fs.mkdirSync("./config", { recursive: true });
+    if (!fs.existsSync('./config')) {
+      fs.mkdirSync('./config', { recursive: true });
     }
-    
+
     fs.writeFileSync(credsPath, JSON.stringify(credentials, null, 2));
-    console.log("✅ Generated new Fire22 credentials");
-    
+    console.log('✅ Generated new Fire22 credentials');
+
     // Update wrangler secrets (simulation)
-    console.log("📝 Updating wrangler secrets...");
-    
+    console.log('📝 Updating wrangler secrets...');
+
     const secretCommands = [
       `echo "${credentials.api.token}" | wrangler secret put FIRE22_TOKEN`,
       `echo "${credentials.api.secret}" | wrangler secret put FIRE22_API_SECRET`,
       `echo "${credentials.jwt.secret}" | wrangler secret put JWT_SECRET`,
-      `echo "${credentials.webhook.secret}" | wrangler secret put FIRE22_WEBHOOK_SECRET`
+      `echo "${credentials.webhook.secret}" | wrangler secret put FIRE22_WEBHOOK_SECRET`,
     ];
-    
-    console.log("✅ Secrets configured (run commands manually in production)");
+
+    console.log('✅ Secrets configured (run commands manually in production)');
     secretCommands.forEach(cmd => console.log(`   $ ${cmd.split('|')[1].trim()}`));
-    
+
     // Test API connection
-    console.log("🔗 Testing Fire22 API connection...");
-    
+    console.log('🔗 Testing Fire22 API connection...');
+
     const testApiScript = `
 import { Fire22Integration } from './src/fire22-integration.ts';
 
@@ -241,63 +239,61 @@ console.log('   API URL:', env.FIRE22_API_URL);
 console.log('   Token:', env.FIRE22_TOKEN.substring(0, 10) + '...');
 process.exit(0);
 `;
-    
-    fs.writeFileSync("test-api.ts", testApiScript);
+
+    fs.writeFileSync('test-api.ts', testApiScript);
     const apiResult = await $`bun run test-api.ts`.quiet();
-    
+
     if (apiResult.exitCode === 0) {
-      console.log("✅ Fire22 authentication fixed");
-      issues.AUTH.status = "resolved";
-      
+      console.log('✅ Fire22 authentication fixed');
+      issues.AUTH.status = 'resolved';
+
       // Clean up
-      fs.unlinkSync("test-api.ts");
+      fs.unlinkSync('test-api.ts');
       return true;
     } else {
-      console.error("❌ Fire22 authentication test failed");
+      console.error('❌ Fire22 authentication test failed');
       return false;
     }
-    
   } catch (error) {
-    console.error("❌ Failed to fix Fire22 Auth:", error);
+    console.error('❌ Failed to fix Fire22 Auth:', error);
     return false;
   }
 }
 
 // 4. Restart services
 async function restartServices() {
-  console.log("\n🔄 Restarting services...");
-  
+  console.log('\n🔄 Restarting services...');
+
   try {
     // Kill any existing processes
     await $`pkill -f "wrangler dev"`.quiet().nothrow();
     await $`pkill -f "bun run dev"`.quiet().nothrow();
-    
-    console.log("✅ Stopped existing services");
-    
+
+    console.log('✅ Stopped existing services');
+
     // Start services in background
-    console.log("🚀 Starting services...");
-    
+    console.log('🚀 Starting services...');
+
     // Start in development mode (non-blocking)
     $`bun run dev`.quiet().nothrow();
-    
-    console.log("✅ Services restarted");
+
+    console.log('✅ Services restarted');
     return true;
-    
   } catch (error) {
-    console.error("⚠️  Service restart warning:", error);
+    console.error('⚠️  Service restart warning:', error);
     return true; // Continue anyway
   }
 }
 
 // 5. Verify fixes
 async function verifyFixes() {
-  console.log("\n🔍 Verifying fixes...");
-  
+  console.log('\n🔍 Verifying fixes...');
+
   const results = [];
-  
+
   // Check each issue
   for (const [code, issue] of Object.entries(issues)) {
-    if (issue.status === "resolved") {
+    if (issue.status === 'resolved') {
       console.log(`✅ ${code}: ${issue.description} - RESOLVED`);
       results.push(true);
     } else {
@@ -305,57 +301,53 @@ async function verifyFixes() {
       results.push(false);
     }
   }
-  
+
   return results.every(r => r);
 }
 
 // Main execution
 async function main() {
-  console.log("Starting critical issue resolution...\n");
-  
+  console.log('Starting critical issue resolution...\n');
+
   // Run fixes in sequence
   await fixSystemInit();
   await fixDatabaseConnection();
   await fixFire22Auth();
   await restartServices();
-  
+
   // Verify all fixes
   const allFixed = await verifyFixes();
-  
-  console.log("\n" + "=".repeat(50));
-  
+
+  console.log('\n' + '='.repeat(50));
+
   if (allFixed) {
-    console.log("✅ ALL CRITICAL ISSUES RESOLVED!");
-    console.log("\nNext steps:");
-    console.log("1. Deploy to Cloudflare: wrangler deploy");
-    console.log("2. Update secrets in production");
-    console.log("3. Monitor system health: curl http://localhost:8787/health");
-    
+    console.log('✅ ALL CRITICAL ISSUES RESOLVED!');
+    console.log('\nNext steps:');
+    console.log('1. Deploy to Cloudflare: wrangler deploy');
+    console.log('2. Update secrets in production');
+    console.log('3. Monitor system health: curl http://localhost:8787/health');
+
     // Update issue status file
     const statusUpdate = {
       timestamp: new Date().toISOString(),
       issues: {
-        "658": { status: "resolved", resolution: "System initialization fixed" },
-        "48": { status: "resolved", resolution: "Database connection restored" },
-        "2": { status: "resolved", resolution: "Fire22 authentication renewed" }
-      }
+        '658': { status: 'resolved', resolution: 'System initialization fixed' },
+        '48': { status: 'resolved', resolution: 'Database connection restored' },
+        '2': { status: 'resolved', resolution: 'Fire22 authentication renewed' },
+      },
     };
-    
-    fs.writeFileSync(
-      "issue-resolution-status.json",
-      JSON.stringify(statusUpdate, null, 2)
-    );
-    
+
+    fs.writeFileSync('issue-resolution-status.json', JSON.stringify(statusUpdate, null, 2));
   } else {
-    console.log("⚠️  Some issues remain unresolved");
-    console.log("Please check the logs above and run manual fixes");
+    console.log('⚠️  Some issues remain unresolved');
+    console.log('Please check the logs above and run manual fixes');
   }
-  
+
   process.exit(allFixed ? 0 : 1);
 }
 
 // Run the script
 main().catch(error => {
-  console.error("❌ Critical error:", error);
+  console.error('❌ Critical error:', error);
   process.exit(1);
 });

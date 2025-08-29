@@ -19,24 +19,23 @@ interface DatabaseStatus {
 }
 
 class Fire22DatabaseVerifier {
-  
   async verifyDatabaseStatus(): Promise<DatabaseStatus> {
     console.log('🔍 Verifying Fire22 Database Status...\n');
-    
+
     const status: DatabaseStatus = {
       connected: false,
       schemaExists: false,
       tableCount: 0,
       fire22TablesExist: false,
       dataPopulated: false,
-      lastSync: new Date().toISOString()
+      lastSync: new Date().toISOString(),
     };
 
     try {
       // 1. Test database connection
       console.log('📡 Testing database connection...');
       await databaseService.connect('./dashboard.db');
-      
+
       const healthCheck = await databaseService.healthCheck();
       status.connected = healthCheck.connected;
       console.log(`   ${status.connected ? '✅' : '❌'} Database connected: ${status.connected}`);
@@ -50,7 +49,7 @@ class Fire22DatabaseVerifier {
       const schemaInfo = await databaseService.getSchemaInfo();
       status.schemaExists = schemaInfo.tableCount > 0;
       status.tableCount = schemaInfo.tableCount;
-      
+
       console.log(`   📊 Total tables: ${status.tableCount}`);
       console.log(`   📋 Tables found: ${schemaInfo.tables.join(', ')}`);
 
@@ -58,14 +57,14 @@ class Fire22DatabaseVerifier {
       console.log('\n🏈 Checking Fire22 tables...');
       const requiredTables = [
         'fire22_customers',
-        'fire22_agents', 
+        'fire22_agents',
         'fire22_transactions',
-        'fire22_bets'
+        'fire22_bets',
       ];
 
       const existingTables = schemaInfo.tables;
       const missingTables = requiredTables.filter(table => !existingTables.includes(table));
-      
+
       if (missingTables.length === 0) {
         status.fire22TablesExist = true;
         console.log('   ✅ All Fire22 tables exist');
@@ -80,7 +79,7 @@ class Fire22DatabaseVerifier {
       console.log('\n📊 Checking data population...');
       const dataStats = await this.checkDataStats();
       status.dataPopulated = dataStats.totalRecords > 0;
-      
+
       console.log(`   👥 Customers: ${dataStats.customers}`);
       console.log(`   🎯 Agents: ${dataStats.agents}`);
       console.log(`   💰 Transactions: ${dataStats.transactions}`);
@@ -91,14 +90,13 @@ class Fire22DatabaseVerifier {
       if (!status.dataPopulated) {
         console.log('\n🔄 Populating fresh test data...');
         await this.populateTestData();
-        
+
         const newStats = await this.checkDataStats();
         console.log(`   ✅ Populated ${newStats.totalRecords} records`);
         status.dataPopulated = true;
       }
 
       return status;
-
     } catch (error) {
       console.error('❌ Database verification failed:', error);
       throw error;
@@ -107,12 +105,12 @@ class Fire22DatabaseVerifier {
 
   async createMissingTables(missingTables: string[]): Promise<void> {
     console.log('🔨 Creating missing Fire22 tables...');
-    
+
     const db = databaseService.getDatabase();
-    
+
     for (const table of missingTables) {
       console.log(`   Creating ${table}...`);
-      
+
       switch (table) {
         case 'fire22_customers':
           await db.exec(`
@@ -267,30 +265,34 @@ class Fire22DatabaseVerifier {
 
   async checkDataStats(): Promise<{
     customers: number;
-    agents: number; 
+    agents: number;
     transactions: number;
     bets: number;
     totalRecords: number;
   }> {
     const db = databaseService.getDatabase();
-    
+
     try {
-      const customerCount = await db.prepare('SELECT COUNT(*) as count FROM fire22_customers').first();
+      const customerCount = await db
+        .prepare('SELECT COUNT(*) as count FROM fire22_customers')
+        .first();
       const agentCount = await db.prepare('SELECT COUNT(*) as count FROM fire22_agents').first();
-      const transactionCount = await db.prepare('SELECT COUNT(*) as count FROM fire22_transactions').first();
+      const transactionCount = await db
+        .prepare('SELECT COUNT(*) as count FROM fire22_transactions')
+        .first();
       const betCount = await db.prepare('SELECT COUNT(*) as count FROM fire22_bets').first();
-      
+
       const customers = (customerCount as any)?.count || 0;
       const agents = (agentCount as any)?.count || 0;
       const transactions = (transactionCount as any)?.count || 0;
       const bets = (betCount as any)?.count || 0;
-      
+
       return {
         customers,
         agents,
         transactions,
         bets,
-        totalRecords: customers + agents + transactions + bets
+        totalRecords: customers + agents + transactions + bets,
       };
     } catch (error) {
       console.warn('Warning: Could not check data stats, tables may not exist yet');
@@ -299,7 +301,7 @@ class Fire22DatabaseVerifier {
         agents: 0,
         transactions: 0,
         bets: 0,
-        totalRecords: 0
+        totalRecords: 0,
       };
     }
   }
@@ -318,7 +320,7 @@ class Fire22DatabaseVerifier {
         commission_rate: 0.1,
         max_bet_limit: 50000,
         max_payout_limit: 250000,
-        contact_email: 'master@fire22.ag'
+        contact_email: 'master@fire22.ag',
       },
       {
         agent_id: 'BLAKE_PPH',
@@ -330,11 +332,11 @@ class Fire22DatabaseVerifier {
         commission_rate: 0.08,
         max_bet_limit: 25000,
         max_payout_limit: 125000,
-        contact_email: 'blake@fire22.ag'
+        contact_email: 'blake@fire22.ag',
       },
       {
         agent_id: 'VIP_AGENT',
-        agent_login: 'vipagent', 
+        agent_login: 'vipagent',
         agent_name: 'VIP Agent',
         agent_type: 'agent' as const,
         parent_agent: 'FIRE22_MASTER',
@@ -343,8 +345,8 @@ class Fire22DatabaseVerifier {
         max_bet_limit: 75000,
         max_payout_limit: 375000,
         specializations: '["vip_customers", "high_rollers"]',
-        contact_email: 'vip@fire22.ag'
-      }
+        contact_email: 'vip@fire22.ag',
+      },
     ];
 
     for (const agentData of testAgents) {
@@ -368,11 +370,11 @@ class Fire22DatabaseVerifier {
         total_withdrawals: 425000,
         lifetime_volume: 2500000,
         vip_status: true,
-        risk_score: 25
+        risk_score: 25,
       },
       {
         fire22_customer_id: 'CUST_GOLD_002',
-        agent_id: 'BLAKE_PPH', 
+        agent_id: 'BLAKE_PPH',
         login: 'golden_player',
         first_name: 'Sarah',
         last_name: 'Johnson',
@@ -383,7 +385,7 @@ class Fire22DatabaseVerifier {
         total_withdrawals: 72500,
         lifetime_volume: 175000,
         vip_status: false,
-        risk_score: 35
+        risk_score: 35,
       },
       {
         fire22_customer_id: 'CUST_SILVER_003',
@@ -398,7 +400,7 @@ class Fire22DatabaseVerifier {
         total_withdrawals: 12600,
         lifetime_volume: 45000,
         vip_status: false,
-        risk_score: 15
+        risk_score: 15,
       },
       {
         fire22_customer_id: 'CUST_BRONZE_004',
@@ -413,14 +415,16 @@ class Fire22DatabaseVerifier {
         total_withdrawals: 2050,
         lifetime_volume: 8500,
         vip_status: false,
-        risk_score: 10
-      }
+        risk_score: 10,
+      },
     ];
 
     for (const customerData of testCustomers) {
       const customer = Fire22CustomerEntity.createNew(customerData);
       await customerRepository.create(customer.toJSON());
-      console.log(`   👥 Created customer: ${customerData.first_name} ${customerData.last_name} (${customerData.tier})`);
+      console.log(
+        `   👥 Created customer: ${customerData.first_name} ${customerData.last_name} (${customerData.tier})`
+      );
     }
 
     // Create sample transactions
@@ -434,10 +438,10 @@ class Fire22DatabaseVerifier {
         amount: 25000,
         currency: 'USD',
         balance_after: 75000,
-        payment_method: 'bank_transfer'
+        payment_method: 'bank_transfer',
       },
       {
-        transaction_id: 'TXN_WD_002', 
+        transaction_id: 'TXN_WD_002',
         fire22_customer_id: 'CUST_GOLD_002',
         agent_id: 'BLAKE_PPH',
         type: 'withdrawal',
@@ -445,29 +449,36 @@ class Fire22DatabaseVerifier {
         amount: 5000,
         currency: 'USD',
         balance_after: 12500,
-        payment_method: 'bank_transfer'
-      }
+        payment_method: 'bank_transfer',
+      },
     ];
 
     const db = databaseService.getDatabase();
     for (const txnData of testTransactions) {
-      await db.prepare(`
+      await db
+        .prepare(
+          `
         INSERT INTO fire22_transactions 
         (transaction_id, fire22_customer_id, agent_id, type, status, amount, currency, balance_after, payment_method)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(
-        txnData.transaction_id,
-        txnData.fire22_customer_id,
-        txnData.agent_id,
-        txnData.type,
-        txnData.status,
-        txnData.amount,
-        txnData.currency,
-        txnData.balance_after,
-        txnData.payment_method
-      ).run();
-      
-      console.log(`   💰 Created transaction: ${txnData.type} $${txnData.amount} (${txnData.transaction_id})`);
+      `
+        )
+        .bind(
+          txnData.transaction_id,
+          txnData.fire22_customer_id,
+          txnData.agent_id,
+          txnData.type,
+          txnData.status,
+          txnData.amount,
+          txnData.currency,
+          txnData.balance_after,
+          txnData.payment_method
+        )
+        .run();
+
+      console.log(
+        `   💰 Created transaction: ${txnData.type} $${txnData.amount} (${txnData.transaction_id})`
+      );
     }
 
     // Create sample bets
@@ -485,11 +496,11 @@ class Fire22DatabaseVerifier {
         actual_payout: 9500,
         odds: -110,
         teams: '{"home": "Patriots", "away": "Bills"}',
-        outcome: 'Patriots -3.5 WON'
+        outcome: 'Patriots -3.5 WON',
       },
       {
         bet_id: 'BET_NBA_002',
-        ticket_number: 'TKT_002', 
+        ticket_number: 'TKT_002',
         fire22_customer_id: 'CUST_GOLD_002',
         agent_id: 'BLAKE_PPH',
         type: 'parlay',
@@ -499,32 +510,37 @@ class Fire22DatabaseVerifier {
         potential_payout: 2800,
         odds: 460,
         teams: '{"leg1": "Lakers vs Warriors", "leg2": "Celtics vs Heat"}',
-        is_live_bet: false
-      }
+        is_live_bet: false,
+      },
     ];
 
     for (const betData of testBets) {
-      await db.prepare(`
+      await db
+        .prepare(
+          `
         INSERT INTO fire22_bets 
         (bet_id, ticket_number, fire22_customer_id, agent_id, type, status, sport, amount, potential_payout, actual_payout, odds, teams, outcome, is_live_bet)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(
-        betData.bet_id,
-        betData.ticket_number,
-        betData.fire22_customer_id,
-        betData.agent_id,
-        betData.type,
-        betData.status,
-        betData.sport,
-        betData.amount,
-        betData.potential_payout,
-        betData.actual_payout || null,
-        betData.odds,
-        betData.teams,
-        betData.outcome || null,
-        betData.is_live_bet
-      ).run();
-      
+      `
+        )
+        .bind(
+          betData.bet_id,
+          betData.ticket_number,
+          betData.fire22_customer_id,
+          betData.agent_id,
+          betData.type,
+          betData.status,
+          betData.sport,
+          betData.amount,
+          betData.potential_payout,
+          betData.actual_payout || null,
+          betData.odds,
+          betData.teams,
+          betData.outcome || null,
+          betData.is_live_bet
+        )
+        .run();
+
       console.log(`   🎲 Created bet: ${betData.sport} $${betData.amount} (${betData.status})`);
     }
 
@@ -536,11 +552,11 @@ class Fire22DatabaseVerifier {
 
     // Test customer repository
     console.log('👥 Customer Repository Tests:');
-    
+
     // Find VIP customers
     const vipCustomers = await customerRepository.findVipCustomers();
     console.log(`   ✨ VIP Customers: ${vipCustomers.data?.length || 0}`);
-    
+
     if (vipCustomers.data && vipCustomers.data.length > 0) {
       const vip = vipCustomers.data[0];
       console.log(`   🎯 First VIP: ${vip.login} - Balance: $${vip.balance.toLocaleString()}`);
@@ -552,16 +568,18 @@ class Fire22DatabaseVerifier {
       const metrics = customerMetrics.data;
       console.log(`   📊 Total Customers: ${metrics.total_customers}`);
       console.log(`   💰 Total Balance: $${metrics.total_balance.toLocaleString()}`);
-      console.log(`   📈 Tier Distribution: Bronze:${metrics.by_tier.bronze}, Silver:${metrics.by_tier.silver}, Gold:${metrics.by_tier.gold}, VIP:${metrics.by_tier.vip}`);
+      console.log(
+        `   📈 Tier Distribution: Bronze:${metrics.by_tier.bronze}, Silver:${metrics.by_tier.silver}, Gold:${metrics.by_tier.gold}, VIP:${metrics.by_tier.vip}`
+      );
     }
 
     // Test agent repository
     console.log('\n🎯 Agent Repository Tests:');
-    
+
     // Get agent hierarchy
     const hierarchy = await agentRepository.getAgentHierarchy();
     console.log(`   🌳 Hierarchy Levels: ${hierarchy.data?.length || 0}`);
-    
+
     // Get agent metrics
     const agentMetrics = await agentRepository.getAgentMetrics();
     if (agentMetrics.success && agentMetrics.data) {
@@ -576,23 +594,23 @@ class Fire22DatabaseVerifier {
   async generateStatusReport(): Promise<void> {
     console.log('\n📋 Fire22 Database Status Report');
     console.log('═'.repeat(50));
-    
+
     const status = await this.verifyDatabaseStatus();
-    
+
     console.log('\n🔍 Connection Status:');
     console.log(`   Database Connected: ${status.connected ? '✅' : '❌'}`);
     console.log(`   Schema Exists: ${status.schemaExists ? '✅' : '❌'}`);
     console.log(`   Fire22 Tables: ${status.fire22TablesExist ? '✅' : '❌'}`);
     console.log(`   Data Populated: ${status.dataPopulated ? '✅' : '❌'}`);
-    
+
     console.log('\n📊 Cache Status:');
     console.log(`   Last Verification: ${new Date().toLocaleString()}`);
     console.log(`   Total Tables: ${status.tableCount}`);
-    
+
     if (status.connected && status.dataPopulated) {
       await this.demonstrateRepositoryOperations();
     }
-    
+
     console.log('\n✅ Fire22 database verification completed successfully!');
   }
 }
@@ -600,7 +618,7 @@ class Fire22DatabaseVerifier {
 // Run verification if script is executed directly
 if (import.meta.main) {
   const verifier = new Fire22DatabaseVerifier();
-  
+
   try {
     await verifier.generateStatusReport();
   } catch (error) {

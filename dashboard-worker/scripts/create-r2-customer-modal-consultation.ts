@@ -14,7 +14,7 @@ class R2CustomerModalConsultationCreator {
 
   constructor() {
     // Initialize with in-memory database for standalone script execution
-    const db = new SQL(":memory:");
+    const db = new SQL(':memory:');
     this.consultationService = new TeamConsultationService(db);
   }
 
@@ -64,15 +64,15 @@ Integration of comprehensive R2 error monitoring system with enhanced customer d
             'Validate error notification visual patterns and micro-interactions',
             'Ensure brand consistency for error messaging and alert states',
             'Approve accessibility compliance for error handling components',
-            'Review design system impact and component library updates needed'
+            'Review design system impact and component library updates needed',
           ],
           deliverables: [
             'Signed off UI/UX designs for error states and loading patterns',
             'Design system component specifications for error handling',
             'Accessibility compliance verification documentation',
             'Error messaging style guide and brand consistency approval',
-            'Figma assets and design tokens for error state components'
-          ]
+            'Figma assets and design tokens for error state components',
+          ],
         },
         {
           team: 'cloudflare',
@@ -82,15 +82,15 @@ Integration of comprehensive R2 error monitoring system with enhanced customer d
             'Review Wrangler version compatibility and update recommendations',
             'Assess API endpoint performance impact on Cloudflare Workers platform',
             'Evaluate edge network considerations for customer data fetching',
-            'Review DNS optimization impact on customer modal loading performance'
+            'Review DNS optimization impact on customer modal loading performance',
           ],
           deliverables: [
             'R2 error handling protocol validation and approval',
             'Performance impact assessment for Workers platform',
             'Edge network optimization recommendations',
             'DNS prefetching strategy approval and configuration guide',
-            'Wrangler upgrade path and compatibility matrix'
-          ]
+            'Wrangler upgrade path and compatibility matrix',
+          ],
         },
         {
           team: 'special-ops',
@@ -100,16 +100,16 @@ Integration of comprehensive R2 error monitoring system with enhanced customer d
             'Customer data access logging and audit trail requirements review',
             'Team notification security protocols and authentication validation',
             'Error context data sanitization and filtering requirements',
-            'Incident response integration with existing security protocols'
+            'Incident response integration with existing security protocols',
           ],
           deliverables: [
             'Security architecture approval for error monitoring system',
             'Data handling and privacy compliance sign-off',
             'Team notification security protocol documentation',
             'Audit trail and logging requirements specification',
-            'Incident response integration procedures'
-          ]
-        }
+            'Incident response integration procedures',
+          ],
+        },
       ],
       attachments: [
         {
@@ -136,7 +136,7 @@ Integration of comprehensive R2 error monitoring system with enhanced customer d
 - Critical Errors → All teams based on error category
 - Security Issues → Special Operations Team
           `,
-          securityLevel: 'CONFIDENTIAL'
+          securityLevel: 'CONFIDENTIAL',
         },
         {
           type: 'error_flow',
@@ -159,7 +159,7 @@ viewCustomerDetails(customerID) → API Success → Modal Display
 - Error context preserved for support ticket creation
 - Resolution tracking integrated with error monitoring dashboard
           `,
-          securityLevel: 'CONFIDENTIAL'
+          securityLevel: 'CONFIDENTIAL',
         },
         {
           type: 'api_spec',
@@ -186,14 +186,14 @@ viewCustomerDetails(customerID) → API Success → Modal Display
   "teamContacts": ["array of email addresses"]
 }
           `,
-          securityLevel: 'CONFIDENTIAL'
-        }
-      ]
+          securityLevel: 'CONFIDENTIAL',
+        },
+      ],
     };
 
     try {
       const result = await this.consultationService.createConsultation(consultationRequest);
-      
+
       if (result.success && result.data) {
         console.log('✅ Consultation request created successfully!');
         console.log('\n📊 Consultation Status:');
@@ -201,7 +201,7 @@ viewCustomerDetails(customerID) → API Success → Modal Display
         console.log(`  Overall Status: ${result.data.overallStatus}`);
         console.log(`  Teams Required: ${result.data.totalTeams}`);
         console.log(`  Approvals: ${result.data.approvalCount}/${result.data.totalTeams}`);
-        
+
         console.log('\n👥 Team Consultation Status:');
         for (const [teamName, teamStatus] of result.data.teamStatuses) {
           console.log(`  • ${teamName}: ${teamStatus.status}`);
@@ -215,13 +215,15 @@ viewCustomerDetails(customerID) → API Success → Modal Display
 
         console.log('\n📧 Team Notifications Sent:');
         console.log('  • Design Team (Isabella Martinez, Ethan Cooper)');
-        console.log('  • Cloudflare Team (R2, Workers, Edge specialists)'); 
+        console.log('  • Cloudflare Team (R2, Workers, Edge specialists)');
         console.log('  • Special Operations Team (Security review)');
 
         console.log('\n📋 Next Steps:');
         console.log('  1. Teams will receive consultation requests via task assignments');
         console.log('  2. Each team will review requirements and provide deliverables');
-        console.log('  3. Monitor consultation status via /api/consultations/status/r2-error-customer-modal-integration');
+        console.log(
+          '  3. Monitor consultation status via /api/consultations/status/r2-error-customer-modal-integration'
+        );
         console.log('  4. Schedule cross-team coordination meeting once all approvals received');
         console.log('  5. Implementation can proceed after full team sign-off');
 
@@ -229,12 +231,10 @@ viewCustomerDetails(customerID) → API Success → Modal Display
         console.log(`  Project ID: ${consultationRequest.projectId}`);
         console.log(`  Deadline: ${consultationRequest.deadline}`);
         console.log(`  Security Level: ${consultationRequest.securityLevel}`);
-
       } else {
         console.error('❌ Failed to create consultation request:', result.error);
         process.exit(1);
       }
-
     } catch (error) {
       console.error('❌ Error creating consultation request:', error);
       process.exit(1);
@@ -246,9 +246,11 @@ viewCustomerDetails(customerID) → API Success → Modal Display
    */
   async checkConsultationStatus(): Promise<void> {
     console.log('\n🔍 Checking consultation status...');
-    
-    const status = await this.consultationService.getConsultationStatus('r2-error-customer-modal-integration');
-    
+
+    const status = await this.consultationService.getConsultationStatus(
+      'r2-error-customer-modal-integration'
+    );
+
     if (status) {
       console.log(`\n📊 Project: ${status.projectId}`);
       console.log(`Overall Status: ${status.overallStatus}`);
@@ -257,10 +259,15 @@ viewCustomerDetails(customerID) → API Success → Modal Display
 
       console.log('\n👥 Team Status Details:');
       for (const [teamName, teamStatus] of status.teamStatuses) {
-        const statusEmoji = teamStatus.status === 'approved' ? '✅' : 
-                           teamStatus.status === 'reviewing' ? '🔍' :
-                           teamStatus.status === 'rejected' ? '❌' : '⏳';
-        
+        const statusEmoji =
+          teamStatus.status === 'approved'
+            ? '✅'
+            : teamStatus.status === 'reviewing'
+              ? '🔍'
+              : teamStatus.status === 'rejected'
+                ? '❌'
+                : '⏳';
+
         console.log(`  ${statusEmoji} ${teamName}: ${teamStatus.status}`);
         if (teamStatus.reviewer) {
           console.log(`    👤 Reviewer: ${teamStatus.reviewer}`);
@@ -278,7 +285,6 @@ viewCustomerDetails(customerID) → API Success → Modal Display
       } else if (status.overallStatus === 'partial_approval') {
         console.log('\n⏳ Waiting for remaining team approvals before implementation can begin.');
       }
-
     } else {
       console.log('❌ Consultation not found or failed to retrieve status.');
     }
@@ -288,15 +294,15 @@ viewCustomerDetails(customerID) → API Success → Modal Display
 // Run consultation creator if executed directly
 if (import.meta.main) {
   const creator = new R2CustomerModalConsultationCreator();
-  
+
   // Check if we should just check status
   const shouldCheckStatus = process.argv.includes('--status');
-  
+
   if (shouldCheckStatus) {
     await creator.checkConsultationStatus();
   } else {
     await creator.createConsultationRequest();
-    
+
     // Also show status after creation
     setTimeout(async () => {
       await creator.checkConsultationStatus();

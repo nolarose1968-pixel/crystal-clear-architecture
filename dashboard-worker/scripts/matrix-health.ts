@@ -36,12 +36,12 @@ interface RepairResult {
 
 class MatrixHealthChecker {
   private db: Database;
-  
+
   constructor() {
     this.db = new Database('dashboard.db');
     this.initializeDatabase();
   }
-  
+
   private initializeDatabase() {
     try {
       // Create tables if they don't exist
@@ -56,7 +56,7 @@ class MatrixHealthChecker {
           updated_at TEXT NOT NULL DEFAULT (datetime('now'))
         )
       `);
-      
+
       this.db.exec(`
         CREATE TABLE IF NOT EXISTS customer_configs (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -75,7 +75,7 @@ class MatrixHealthChecker {
           notes TEXT
         )
       `);
-      
+
       this.db.exec(`
         CREATE TABLE IF NOT EXISTS matrix_health_logs (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -91,13 +91,15 @@ class MatrixHealthChecker {
           recommendations TEXT
         )
       `);
-      
+
       // Insert sample data if tables are empty
-      const agentCount = this.db.prepare('SELECT COUNT(*) as count FROM agent_configs').get() as { count: number };
+      const agentCount = this.db.prepare('SELECT COUNT(*) as count FROM agent_configs').get() as {
+        count: number;
+      };
       if (agentCount.count === 0) {
         this.insertSampleData();
       }
-      
+
       // Create views for easier querying
       this.db.exec(`
         CREATE VIEW IF NOT EXISTS v_matrix_health_summary AS
@@ -109,7 +111,7 @@ class MatrixHealthChecker {
           AVG(agent_data_quality) as avg_agent_data_quality
         FROM matrix_health_logs
       `);
-      
+
       this.db.exec(`
         CREATE VIEW IF NOT EXISTS v_agent_permissions_matrix AS
         SELECT 
@@ -123,12 +125,11 @@ class MatrixHealthChecker {
         LEFT JOIN customer_configs cc ON ac.agent_id = cc.agent_id
         GROUP BY ac.agent_id, ac.status, ac.permissions, ac.commission_rates
       `);
-      
     } catch (error) {
       console.error('Database initialization error:', error);
     }
   }
-  
+
   private insertSampleData() {
     try {
       // Sample agent configs
@@ -150,7 +151,7 @@ class MatrixHealthChecker {
          'active'
         )
       `);
-      
+
       // Sample customer configs
       this.db.exec(`
         INSERT OR REPLACE INTO customer_configs (customer_id, agent_id, permissions, betting_limits, account_settings, vip_status, risk_profile, created_by, updated_by) VALUES
@@ -171,21 +172,21 @@ class MatrixHealthChecker {
          'SYSTEM', 'SYSTEM'
         )
       `);
-      
+
       console.log('✅ Sample data inserted successfully');
     } catch (error) {
       console.error('Error inserting sample data:', error);
     }
   }
-  
+
   async checkMatrixHealth(): Promise<MatrixHealthResponse> {
     try {
       // Check agent configs
       const agentConfigs = this.db.prepare('SELECT * FROM agent_configs').all() as any[];
-      
+
       // Check customer configs
       const customerConfigs = this.db.prepare('SELECT * FROM customer_configs').all() as any[];
-      
+
       // Calculate matrix health metrics
       const totalAgents = agentConfigs.length;
       const totalPermissions = this.calculateTotalPermissions(agentConfigs);
@@ -193,12 +194,12 @@ class MatrixHealthChecker {
       const dataCompleteness = this.calculateDataCompleteness(agentConfigs, customerConfigs);
       const permissionCoverage = this.calculatePermissionCoverage(agentConfigs);
       const agentDataQuality = this.calculateAgentDataQuality(agentConfigs);
-      
+
       // Calculate overall health score
       const healthScore = Math.round(
         (dataCompleteness + permissionCoverage + agentDataQuality) / 3
       );
-      
+
       // Log the health check
       this.logMatrixHealth({
         health_score: healthScore,
@@ -209,9 +210,14 @@ class MatrixHealthChecker {
         permission_coverage: permissionCoverage,
         agent_data_quality: agentDataQuality,
         issues_found: this.identifyIssues(agentConfigs, customerConfigs),
-        recommendations: this.generateRecommendations(healthScore, dataCompleteness, permissionCoverage, agentDataQuality)
+        recommendations: this.generateRecommendations(
+          healthScore,
+          dataCompleteness,
+          permissionCoverage,
+          agentDataQuality
+        ),
       });
-      
+
       return {
         success: true,
         status: healthScore >= 80 ? 'OK' : healthScore >= 60 ? 'WARNING' : 'ERROR',
@@ -223,19 +229,19 @@ class MatrixHealthChecker {
           valid_matrix_cells: validMatrixCells,
           data_completeness: dataCompleteness,
           permission_coverage: permissionCoverage,
-          agent_data_quality: agentDataQuality
-        }
+          agent_data_quality: agentDataQuality,
+        },
       };
     } catch (error) {
       return {
         success: false,
         status: 'ERROR',
         matrix_health_score: 0,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
-  
+
   private calculateTotalPermissions(agentConfigs: any[]): number {
     return agentConfigs.reduce((total, agent) => {
       try {
@@ -246,10 +252,10 @@ class MatrixHealthChecker {
       }
     }, 0);
   }
-  
+
   private countValidMatrixCells(agentConfigs: any[], customerConfigs: any[]): number {
     let validCells = 0;
-    
+
     for (const agent of agentConfigs) {
       try {
         const permissions = JSON.parse(agent.permissions);
@@ -262,56 +268,72 @@ class MatrixHealthChecker {
         // Skip invalid JSON
       }
     }
-    
+
     return validCells;
   }
-  
+
   private calculateDataCompleteness(agentConfigs: any[], customerConfigs: any[]): number {
     const totalFields = agentConfigs.length * 8; // 8 fields per agent
     let completedFields = 0;
-    
+
     for (const agent of agentConfigs) {
-      const fields = ['agent_id', 'permissions', 'commission_rates', 'status', 'created_at', 'updated_at'];
+      const fields = [
+        'agent_id',
+        'permissions',
+        'commission_rates',
+        'status',
+        'created_at',
+        'updated_at',
+      ];
       for (const field of fields) {
         if (agent[field] && agent[field] !== '') {
           completedFields++;
         }
       }
     }
-    
+
     return Math.round((completedFields / totalFields) * 100);
   }
-  
+
   private calculatePermissionCoverage(agentConfigs: any[]): number {
-    const expectedPermissions = ['can_place_bets', 'can_modify_info', 'can_withdraw', 'can_deposit', 'can_view_history', 'can_use_telegram', 'can_use_mobile', 'can_use_desktop'];
+    const expectedPermissions = [
+      'can_place_bets',
+      'can_modify_info',
+      'can_withdraw',
+      'can_deposit',
+      'can_view_history',
+      'can_use_telegram',
+      'can_use_mobile',
+      'can_use_desktop',
+    ];
     let totalCoverage = 0;
-    
+
     for (const agent of agentConfigs) {
       try {
         const permissions = JSON.parse(agent.permissions);
         let agentCoverage = 0;
-        
+
         for (const expectedPermission of expectedPermissions) {
           if (permissions[expectedPermission] !== undefined) {
             agentCoverage++;
           }
         }
-        
+
         totalCoverage += (agentCoverage / expectedPermissions.length) * 100;
       } catch {
         // Skip invalid JSON
       }
     }
-    
+
     return Math.round(totalCoverage / agentConfigs.length);
   }
-  
+
   private calculateAgentDataQuality(agentConfigs: any[]): number {
     let qualityScore = 0;
-    
+
     for (const agent of agentConfigs) {
       let agentQuality = 0;
-      
+
       // Check if permissions JSON is valid
       try {
         JSON.parse(agent.permissions);
@@ -319,7 +341,7 @@ class MatrixHealthChecker {
       } catch {
         // Invalid JSON
       }
-      
+
       // Check if commission rates JSON is valid
       try {
         JSON.parse(agent.commission_rates);
@@ -327,20 +349,20 @@ class MatrixHealthChecker {
       } catch {
         // Invalid JSON
       }
-      
+
       // Check required fields
       if (agent.agent_id && agent.agent_id !== '') agentQuality += 25;
       if (agent.status && agent.status !== '') agentQuality += 25;
-      
+
       qualityScore += agentQuality;
     }
-    
+
     return Math.round(qualityScore / agentConfigs.length);
   }
-  
+
   private identifyIssues(agentConfigs: any[], customerConfigs: any[]): string {
     const issues = [];
-    
+
     // Check for invalid JSON
     for (const agent of agentConfigs) {
       try {
@@ -348,14 +370,14 @@ class MatrixHealthChecker {
       } catch {
         issues.push(`Invalid permissions JSON for agent ${agent.agent_id}`);
       }
-      
+
       try {
         JSON.parse(agent.commission_rates);
       } catch {
         issues.push(`Invalid commission rates JSON for agent ${agent.agent_id}`);
       }
     }
-    
+
     // Check for missing required fields
     for (const agent of agentConfigs) {
       if (!agent.agent_id || agent.agent_id === '') {
@@ -365,32 +387,37 @@ class MatrixHealthChecker {
         issues.push(`Missing status for agent ${agent.agent_id}`);
       }
     }
-    
+
     return issues.join('; ');
   }
-  
-  private generateRecommendations(healthScore: number, dataCompleteness: number, permissionCoverage: number, agentDataQuality: number): string {
+
+  private generateRecommendations(
+    healthScore: number,
+    dataCompleteness: number,
+    permissionCoverage: number,
+    agentDataQuality: number
+  ): string {
     const recommendations = [];
-    
+
     if (dataCompleteness < 80) {
       recommendations.push('Complete missing agent configuration data');
     }
-    
+
     if (permissionCoverage < 80) {
       recommendations.push('Add missing permission fields to agent configurations');
     }
-    
+
     if (agentDataQuality < 80) {
       recommendations.push('Fix invalid JSON in agent configurations');
     }
-    
+
     if (healthScore < 60) {
       recommendations.push('Perform comprehensive matrix health review');
     }
-    
+
     return recommendations.join('; ');
   }
-  
+
   private logMatrixHealth(data: {
     health_score: number;
     total_agents: number;
@@ -403,48 +430,58 @@ class MatrixHealthChecker {
     recommendations: string;
   }) {
     try {
-      this.db.prepare(`
+      this.db
+        .prepare(
+          `
         INSERT INTO matrix_health_logs (
           health_score, total_agents, total_permissions, valid_matrix_cells,
           data_completeness, permission_coverage, agent_data_quality,
           issues_found, recommendations
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(
-        data.health_score, data.total_agents, data.total_permissions, data.valid_matrix_cells,
-        data.data_completeness, data.permission_coverage, data.agent_data_quality,
-        data.issues_found, data.recommendations
-      );
+      `
+        )
+        .run(
+          data.health_score,
+          data.total_agents,
+          data.total_permissions,
+          data.valid_matrix_cells,
+          data.data_completeness,
+          data.permission_coverage,
+          data.agent_data_quality,
+          data.issues_found,
+          data.recommendations
+        );
     } catch (error) {
       console.error('Error logging matrix health:', error);
     }
   }
-  
+
   async validatePermissionsMatrix(): Promise<ValidationResult> {
     const health = await this.checkMatrixHealth();
-    
+
     if (health.status === 'OK') {
       return { success: true, message: 'Permissions matrix is healthy' };
     } else {
-      return { 
-        success: false, 
+      return {
+        success: false,
         message: `Permissions matrix has issues: ${health.status}`,
-        details: health.matrix_stats
+        details: health.matrix_stats,
       };
     }
   }
-  
+
   async repairMatrixIssues(): Promise<RepairResult> {
     try {
       let issuesFixed = 0;
-      
+
       // Fix invalid JSON in permissions
       const agentConfigs = this.db.prepare('SELECT * FROM agent_configs').all() as any[];
-      
+
       for (const agent of agentConfigs) {
         let needsUpdate = false;
         let fixedPermissions = agent.permissions;
         let fixedCommissionRates = agent.commission_rates;
-        
+
         // Fix permissions JSON
         try {
           JSON.parse(agent.permissions);
@@ -458,12 +495,12 @@ class MatrixHealthChecker {
             can_view_history: true,
             can_use_telegram: true,
             can_use_mobile: true,
-            can_use_desktop: true
+            can_use_desktop: true,
           });
           needsUpdate = true;
           issuesFixed++;
         }
-        
+
         // Fix commission rates JSON
         try {
           JSON.parse(agent.commission_rates);
@@ -472,56 +509,67 @@ class MatrixHealthChecker {
           fixedCommissionRates = JSON.stringify({
             standard: 0.05,
             vip: 0.08,
-            premium: 0.10
+            premium: 0.1,
           });
           needsUpdate = true;
           issuesFixed++;
         }
-        
+
         // Update if fixes were applied
         if (needsUpdate) {
-          this.db.prepare(`
+          this.db
+            .prepare(
+              `
             UPDATE agent_configs 
             SET permissions = ?, commission_rates = ?, updated_at = datetime('now')
             WHERE id = ?
-          `).run(fixedPermissions, fixedCommissionRates, agent.id);
+          `
+            )
+            .run(fixedPermissions, fixedCommissionRates, agent.id);
         }
       }
-      
+
       return {
         success: true,
         message: `Matrix issues repaired successfully`,
         issues_fixed: issuesFixed,
-        details: { agents_processed: agentConfigs.length }
+        details: { agents_processed: agentConfigs.length },
       };
-      
     } catch (error) {
       return {
         success: false,
         message: `Failed to repair matrix issues: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        issues_fixed: 0
+        issues_fixed: 0,
       };
     }
   }
-  
+
   getMatrixHealthHistory(limit: number = 10): any[] {
     try {
-      return this.db.prepare(`
+      return this.db
+        .prepare(
+          `
         SELECT * FROM matrix_health_logs 
         ORDER BY check_timestamp DESC 
         LIMIT ?
-      `).all(limit) as any[];
+      `
+        )
+        .all(limit) as any[];
     } catch (error) {
       console.error('Error fetching matrix health history:', error);
       return [];
     }
   }
-  
+
   getCurrentMatrixStatus(): any {
     try {
-      return this.db.prepare(`
+      return this.db
+        .prepare(
+          `
         SELECT * FROM v_matrix_health_summary
-      `).get() as any;
+      `
+        )
+        .get() as any;
     } catch (error) {
       console.error('Error fetching current matrix status:', error);
       return null;
@@ -533,23 +581,23 @@ class MatrixHealthChecker {
 async function main() {
   const args = process.argv.slice(2);
   const checker = new MatrixHealthChecker();
-  
+
   console.log('🔍 Fire22 Matrix Health Checker');
-  console.log('================================\n');
-  
+  console.log('!==!==!==!==!==!==\n');
+
   switch (args[0]) {
     case 'validate':
       console.log('🔍 Validating permissions matrix...\n');
       const validation = await checker.validatePermissionsMatrix();
       console.log(JSON.stringify(validation, null, 2));
       break;
-      
+
     case 'repair':
       console.log('🔧 Repairing matrix issues...\n');
       const repair = await checker.repairMatrixIssues();
       console.log(JSON.stringify(repair, null, 2));
       break;
-      
+
     case 'status':
       console.log('📊 Matrix health status...\n');
       const status = await checker.checkMatrixHealth();
@@ -561,24 +609,24 @@ async function main() {
         console.log(`Agent Data Quality: ${status.matrix_stats.agent_data_quality}%`);
       }
       break;
-      
+
     case 'history':
       console.log('📈 Matrix health history...\n');
       const history = checker.getMatrixHealthHistory(parseInt(args[1]) || 5);
       console.log(JSON.stringify(history, null, 2));
       break;
-      
+
     case 'summary':
       console.log('📋 Matrix health summary...\n');
       const summary = checker.getCurrentMatrixStatus();
       console.log(JSON.stringify(summary, null, 2));
       break;
-      
+
     default:
       console.log('🔍 Checking matrix health...\n');
       const health = await checker.checkMatrixHealth();
       console.log(JSON.stringify(health, null, 2));
-      
+
       if (health.success) {
         console.log(`\n🎯 Matrix Health Score: ${health.matrix_health_score}/100`);
         console.log(`📊 Status: ${health.status}`);

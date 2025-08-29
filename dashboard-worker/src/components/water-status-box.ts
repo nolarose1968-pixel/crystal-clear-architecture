@@ -2,10 +2,10 @@
 
 /**
  * 🌊 Water System Status Box
- * 
+ *
  * Creates beautiful ASCII-style status boxes for water system metrics
  * Can be used in terminal output or as styled HTML components
- * 
+ *
  * @version 1.0.0
  */
 
@@ -31,7 +31,6 @@ export interface StatusBoxOptions {
  * 🌊 Water Status Box Generator
  */
 export class WaterStatusBox {
-  
   /**
    * Generate ASCII/Unicode status box
    */
@@ -41,55 +40,71 @@ export class WaterStatusBox {
       width = 55,
       style = 'unicode',
       theme = 'ocean',
-      showTimestamp = false
+      showTimestamp = false,
     } = options;
-    
+
     if (style === 'html') {
       return this.generateHTMLBox(metrics, options);
     }
-    
+
     const chars = this.getBoxChars(style);
     const titleLine = this.centerText(title, width - 4);
     const contentWidth = width - 4;
-    
+
     // Format metrics
-    const flowLine = this.formatMetricLine('🌊 Flow Rate', `${metrics.flowRate} ${metrics.flowUnit}`, contentWidth);
-    const tempLine = this.formatMetricLine('🌡️ Temperature', `${metrics.temperature}${metrics.temperatureUnit}`, contentWidth);
-    const pressureLine = this.formatMetricLine('📊 Pressure', `${metrics.pressure} ${metrics.pressureUnit}`, contentWidth);
-    
+    const flowLine = this.formatMetricLine(
+      '🌊 Flow Rate',
+      `${metrics.flowRate} ${metrics.flowUnit}`,
+      contentWidth
+    );
+    const tempLine = this.formatMetricLine(
+      '🌡️ Temperature',
+      `${metrics.temperature}${metrics.temperatureUnit}`,
+      contentWidth
+    );
+    const pressureLine = this.formatMetricLine(
+      '📊 Pressure',
+      `${metrics.pressure} ${metrics.pressureUnit}`,
+      contentWidth
+    );
+
     let lines = [
       chars.topLeft + chars.horizontal.repeat(titleLine.length + 2) + chars.topRight,
       chars.vertical + ` ${titleLine} ` + chars.vertical,
       chars.leftT + chars.horizontal.repeat(titleLine.length + 2) + chars.rightT,
       chars.vertical + ` ${flowLine} ` + chars.vertical,
       chars.vertical + ` ${tempLine} ` + chars.vertical,
-      chars.vertical + ` ${pressureLine} ` + chars.vertical
+      chars.vertical + ` ${pressureLine} ` + chars.vertical,
     ];
-    
+
     if (showTimestamp && metrics.timestamp) {
-      const timestampLine = this.formatMetricLine('⏰ Updated', metrics.timestamp.toLocaleTimeString(), contentWidth);
+      const timestampLine = this.formatMetricLine(
+        '⏰ Updated',
+        metrics.timestamp.toLocaleTimeString(),
+        contentWidth
+      );
       lines.push(chars.vertical + ` ${timestampLine} ` + chars.vertical);
     }
-    
-    lines.push(chars.bottomLeft + chars.horizontal.repeat(titleLine.length + 2) + chars.bottomRight);
-    
+
+    lines.push(
+      chars.bottomLeft + chars.horizontal.repeat(titleLine.length + 2) + chars.bottomRight
+    );
+
     return lines.join('\n');
   }
-  
+
   /**
    * Generate HTML version of status box
    */
   static generateHTMLBox(metrics: WaterMetrics, options: StatusBoxOptions = {}): string {
-    const {
-      title = 'WATER SYSTEM',
-      showTimestamp = false,
-      theme = 'ocean'
-    } = options;
-    
+    const { title = 'WATER SYSTEM', showTimestamp = false, theme = 'ocean' } = options;
+
     const themeClass = `water-status-${theme}`;
-    const timestamp = showTimestamp && metrics.timestamp ? 
-      `<div class="metric-row"><span class="metric-icon">⏰</span><span class="metric-label">Updated:</span><span class="metric-value">${metrics.timestamp.toLocaleTimeString()}</span></div>` : '';
-    
+    const timestamp =
+      showTimestamp && metrics.timestamp
+        ? `<div class="metric-row"><span class="metric-icon">⏰</span><span class="metric-label">Updated:</span><span class="metric-value">${metrics.timestamp.toLocaleTimeString()}</span></div>`
+        : '';
+
     return `
       <div class="water-status-box ${themeClass}">
         <div class="status-header">${title}</div>
@@ -114,7 +129,7 @@ export class WaterStatusBox {
       </div>
     `;
   }
-  
+
   /**
    * Generate CSS for HTML status box
    */
@@ -213,7 +228,7 @@ export class WaterStatusBox {
       }
     `;
   }
-  
+
   /**
    * Get box drawing characters based on style
    */
@@ -227,10 +242,10 @@ export class WaterStatusBox {
         horizontal: '-',
         vertical: '|',
         leftT: '+',
-        rightT: '+'
+        rightT: '+',
       };
     }
-    
+
     return {
       topLeft: '╭',
       topRight: '╮',
@@ -239,10 +254,10 @@ export class WaterStatusBox {
       horizontal: '─',
       vertical: '│',
       leftT: '├',
-      rightT: '┤'
+      rightT: '┤',
     };
   }
-  
+
   /**
    * Center text within given width
    */
@@ -252,7 +267,7 @@ export class WaterStatusBox {
     const rightPad = padding - leftPad;
     return ' '.repeat(leftPad) + text + ' '.repeat(rightPad);
   }
-  
+
   /**
    * Format a metric line with proper spacing
    */
@@ -261,7 +276,7 @@ export class WaterStatusBox {
     const spacing = Math.max(1, width - totalContent.length);
     return label + ' '.repeat(spacing) + value;
   }
-  
+
   /**
    * Create real-time updating status box
    */
@@ -276,13 +291,13 @@ export class WaterStatusBox {
       const html = this.generateHTMLBox(metrics, { ...options, style: 'html' });
       container.innerHTML = html;
     };
-    
+
     // Initial render
     update();
-    
+
     // Set up interval
     const interval = setInterval(update, updateInterval);
-    
+
     // Return cleanup function
     return () => clearInterval(interval);
   }
@@ -296,29 +311,29 @@ export const waterStatusUtils = {
    * Generate terminal-style status box
    */
   terminal: (metrics: WaterMetrics, title?: string): string => {
-    return WaterStatusBox.generateBox(metrics, { 
-      title, 
+    return WaterStatusBox.generateBox(metrics, {
+      title,
       style: 'unicode',
       theme: 'ocean',
-      showTimestamp: true 
+      showTimestamp: true,
     });
   },
-  
+
   /**
    * Generate HTML status box
    */
   html: (metrics: WaterMetrics, theme: 'default' | 'ocean' | 'minimal' = 'ocean'): string => {
-    return WaterStatusBox.generateHTMLBox(metrics, { 
+    return WaterStatusBox.generateHTMLBox(metrics, {
       style: 'html',
       theme,
-      showTimestamp: true 
+      showTimestamp: true,
     });
   },
-  
+
   /**
    * Get CSS for styling
    */
-  css: (): string => WaterStatusBox.generateCSS()
+  css: (): string => WaterStatusBox.generateCSS(),
 };
 
 // Example usage
@@ -330,18 +345,18 @@ if (import.meta.main) {
     temperatureUnit: '°C',
     pressure: 120,
     pressureUnit: 'PSI',
-    timestamp: new Date()
+    timestamp: new Date(),
   };
-  
+
   console.log('🌊 Water Status Box Demo\n');
-  
+
   // Terminal style
   console.log('Unicode Style:');
   console.log(waterStatusUtils.terminal(exampleMetrics));
-  
+
   console.log('\nASCII Style:');
   console.log(WaterStatusBox.generateBox(exampleMetrics, { style: 'ascii' }));
-  
+
   // HTML style
   console.log('\nHTML Version:');
   console.log(waterStatusUtils.html(exampleMetrics));

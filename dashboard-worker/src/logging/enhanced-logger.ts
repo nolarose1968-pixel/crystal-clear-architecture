@@ -1,10 +1,10 @@
 /**
  * Enhanced Logging System with ANSI Stripping
- * 
+ *
  * This module provides enhanced logging capabilities that integrate with
  * Bun's new features, including ANSI stripping for clean output and
  * build-time configuration integration.
- * 
+ *
  * Features:
  * - ANSI color support for console output
  * - Clean text output for log files and monitoring
@@ -50,7 +50,7 @@ export class EnhancedLogger {
       includeVersion: true,
       colorize: true,
       stripANSI: true,
-      ...options
+      ...options,
     };
   }
 
@@ -64,7 +64,7 @@ export class EnhancedLogger {
       message,
       context,
       environment: this.config.environment,
-      version: this.config.version
+      version: this.config.version,
     };
 
     // Add to buffer
@@ -136,13 +136,13 @@ export class EnhancedLogger {
    */
   private colorize(message: string, level: LogLevel): string {
     const colors = {
-      debug: '\u001b[36m',    // Cyan
-      info: '\u001b[32m',     // Green
-      warn: '\u001b[33m',     // Yellow
-      error: '\u001b[31m',    // Red
-      fatal: '\u001b[35m'     // Magenta
+      debug: '\u001b[36m', // Cyan
+      info: '\u001b[32m', // Green
+      warn: '\u001b[33m', // Yellow
+      error: '\u001b[31m', // Red
+      fatal: '\u001b[35m', // Magenta
     };
-    
+
     const reset = '\u001b[0m';
     return `${colors[level]}${message}${reset}`;
   }
@@ -181,7 +181,7 @@ export class EnhancedLogger {
    */
   private addToBuffer(entry: LogEntry): void {
     this.logBuffer.push(entry);
-    
+
     // Maintain buffer size
     if (this.logBuffer.length > this.maxBufferSize) {
       this.logBuffer.shift();
@@ -195,10 +195,10 @@ export class EnhancedLogger {
     try {
       const logDir = './logs';
       const logFile = `${logDir}/${entry.environment}-${new Date().toISOString().split('T')[0]}.log`;
-      
+
       // Ensure log directory exists
       Bun.mkdir(logDir, { recursive: true });
-      
+
       const logLine = JSON.stringify(entry) + '\n';
       Bun.write(logFile, logLine, { append: true });
     } catch (error) {
@@ -245,7 +245,7 @@ export class EnhancedLogger {
       info: 0,
       warn: 0,
       error: 0,
-      fatal: 0
+      fatal: 0,
     };
 
     for (const entry of this.logBuffer) {
@@ -271,25 +271,25 @@ export class EnhancedLogger {
     improvement: number;
   }> {
     const longColoredText = '\u001b[31m'.repeat(1000) + 'Hello World' + '\u001b[0m'.repeat(1000);
-    
+
     // Test Bun.stripANSI
     const bunStart = performance.now();
     const bunResult = Bun.stripANSI(longColoredText);
     const bunEnd = performance.now();
     const bunTime = bunEnd - bunStart;
-    
+
     // Test manual stripping (simple regex)
     const manualStart = performance.now();
     const manualResult = longColoredText.replace(/\u001b\[[0-9;]*m/g, '');
     const manualEnd = performance.now();
     const manualTime = manualEnd - manualStart;
-    
+
     const improvement = manualTime / bunTime;
-    
+
     return {
       bunStripANSI: bunTime,
       manualStrip: manualTime,
-      improvement
+      improvement,
     };
   }
 }
@@ -298,22 +298,22 @@ export class EnhancedLogger {
 export const logger = new EnhancedLogger();
 
 // Export convenience functions
-export const log = (message: string, level: LogLevel = 'info', context?: Record<string, any>) => 
+export const log = (message: string, level: LogLevel = 'info', context?: Record<string, any>) =>
   logger.log(message, level, context);
 
-export const debug = (message: string, context?: Record<string, any>) => 
+export const debug = (message: string, context?: Record<string, any>) =>
   logger.debug(message, context);
 
-export const info = (message: string, context?: Record<string, any>) => 
+export const info = (message: string, context?: Record<string, any>) =>
   logger.info(message, context);
 
-export const warn = (message: string, context?: Record<string, any>) => 
+export const warn = (message: string, context?: Record<string, any>) =>
   logger.warn(message, context);
 
-export const error = (message: string, context?: Record<string, any>) => 
+export const error = (message: string, context?: Record<string, any>) =>
   logger.error(message, context);
 
-export const fatal = (message: string, context?: Record<string, any>) => 
+export const fatal = (message: string, context?: Record<string, any>) =>
   logger.fatal(message, context);
 
 export default logger;

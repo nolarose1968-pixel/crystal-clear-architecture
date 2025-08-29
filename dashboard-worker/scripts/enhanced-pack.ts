@@ -2,7 +2,7 @@
 
 /**
  * 📦 Enhanced Pack System with Advanced Features
- * 
+ *
  * - Handles version suffixes (1.2.3-[2], 1.0.0-beta.1, etc.)
  * - Dry run support for all operations
  * - Temporary package.json for version overrides
@@ -23,8 +23,8 @@ interface PackOptions {
   ignoreScripts?: boolean;
   gzipLevel?: number;
   quiet?: boolean;
-  version?: string;  // Override version
-  tempPackageJson?: boolean;  // Use temporary package.json
+  version?: string; // Override version
+  tempPackageJson?: boolean; // Use temporary package.json
 }
 
 interface VersionInfo {
@@ -43,11 +43,11 @@ export class EnhancedPackSystem {
   private readonly releasesDir = join(this.distDir, 'releases');
   private readonly ciDir = join(this.distDir, 'ci');
   private tempFiles: string[] = [];
-  
+
   constructor() {
     this.ensureDirectories();
   }
-  
+
   /**
    * Ensure all distribution directories exist
    */
@@ -57,16 +57,16 @@ export class EnhancedPackSystem {
       this.packagesDir,
       this.releasesDir,
       this.ciDir,
-      join(this.distDir, 'latest')
+      join(this.distDir, 'latest'),
     ];
-    
+
     for (const dir of dirs) {
       if (!existsSync(dir)) {
         mkdirSync(dir, { recursive: true });
       }
     }
   }
-  
+
   /**
    * Parse version string with support for suffixes
    * Examples: 1.2.3, 1.2.3-beta.1, 1.2.3-[2], 1.0.0+build.123
@@ -75,13 +75,13 @@ export class EnhancedPackSystem {
     // Handle semantic versioning with optional prerelease and metadata
     const versionRegex = /^(\d+)\.(\d+)\.(\d+)(?:-([\w\[\].-]+))?(?:\+([\w.-]+))?$/;
     const match = versionString.match(versionRegex);
-    
+
     if (!match) {
       throw new Error(`Invalid version format: ${versionString}`);
     }
-    
+
     const [, major, minor, patch, prerelease, metadata] = match;
-    
+
     return {
       version: versionString,
       major: parseInt(major),
@@ -89,53 +89,49 @@ export class EnhancedPackSystem {
       patch: parseInt(patch),
       prerelease,
       suffix: prerelease,
-      metadata
+      metadata,
     };
   }
-  
+
   /**
    * Sanitize version for filename
    * Convert special characters to safe alternatives
    */
   private sanitizeVersionForFilename(version: string): string {
-    return version
-      .replace(/\[/g, '_')
-      .replace(/\]/g, '_')
-      .replace(/\+/g, '_')
-      .replace(/\s/g, '-');
+    return version.replace(/\[/g, '_').replace(/\]/g, '_').replace(/\+/g, '_').replace(/\s/g, '-');
   }
-  
+
   /**
    * Create temporary package.json with version override
    */
   private async createTempPackageJson(version: string): Promise<string> {
     const originalPath = join(process.cwd(), 'package.json');
-    
+
     if (!existsSync(originalPath)) {
       throw new Error('package.json not found');
     }
-    
+
     // Create backup
     const backupPath = `${originalPath}.backup.${Date.now()}`;
     copyFileSync(originalPath, backupPath);
     this.tempFiles.push(backupPath);
-    
+
     // Read and modify package.json
     const packageData = JSON.parse(readFileSync(originalPath, 'utf8'));
     const originalVersion = packageData.version;
     packageData.version = version;
-    
+
     // Create temporary package.json
     const tempPath = join(tmpdir(), `package-${Date.now()}.json`);
     writeFileSync(tempPath, JSON.stringify(packageData, null, 2));
     this.tempFiles.push(tempPath);
-    
+
     console.log(`📝 Created temp package.json with version: ${version}`);
     console.log(`   Original version: ${originalVersion}`);
-    
+
     return tempPath;
   }
-  
+
   /**
    * Cleanup temporary files
    */
@@ -151,59 +147,59 @@ export class EnhancedPackSystem {
     }
     this.tempFiles = [];
   }
-  
+
   /**
    * Pack with enhanced options and error handling
    */
   async pack(options: PackOptions = {}): Promise<string | null> {
     let tempPackageJson: string | null = null;
-    
+
     try {
       // Validate files exist
       if (!existsSync('package.json')) {
         throw new Error('package.json not found in current directory');
       }
-      
+
       // Handle dry run
       if (options.dryRun) {
         console.log('🔍 DRY RUN - Simulating pack operation');
         console.log('   Would execute: bun pm pack');
-        
+
         if (options.destination) {
           console.log(`   Destination: ${options.destination}`);
-          
+
           // Check if destination exists
           if (!existsSync(options.destination)) {
             console.log(`   ⚠️  Destination does not exist, would create: ${options.destination}`);
           }
         }
-        
+
         if (options.version) {
           console.log(`   Version override: ${options.version}`);
         }
-        
+
         if (options.gzipLevel !== undefined) {
           console.log(`   Compression level: ${options.gzipLevel}`);
         }
-        
+
         // Show what would be packed
         await $`bun pm pack --dry-run`;
         return null;
       }
-      
+
       // Create destination directory if needed
       if (options.destination && !existsSync(options.destination)) {
         mkdirSync(options.destination, { recursive: true });
       }
-      
+
       // Handle version override with temp package.json
       if (options.version && options.tempPackageJson) {
         tempPackageJson = await this.createTempPackageJson(options.version);
       }
-      
+
       // Build pack command
       const args: string[] = ['pm', 'pack'];
-      
+
       if (options.destination) args.push('--destination', options.destination);
       if (options.filename) {
         // Sanitize filename if it contains version
@@ -215,19 +211,18 @@ export class EnhancedPackSystem {
         args.push('--gzip-level', options.gzipLevel.toString());
       }
       if (options.quiet) args.push('--quiet');
-      
+
       // Execute pack
       const result = await $`bun ${args}`.text();
-      
+
       if (options.quiet) {
         return result.trim();
       }
-      
+
       // Extract tarball name from verbose output
       const lines = result.split('\n');
       const tarballLine = lines.find(line => line.endsWith('.tgz'));
       return tarballLine || result;
-      
     } catch (error) {
       console.error('❌ Pack failed:', error);
       throw error;
@@ -236,52 +231,52 @@ export class EnhancedPackSystem {
       this.cleanup();
     }
   }
-  
+
   /**
    * Pack with version suffix handling
    */
   async packWithVersion(version: string, options: PackOptions = {}): Promise<string | null> {
     console.log(`📦 Packing with version: ${version}`);
-    
+
     try {
       // Parse and validate version
       const versionInfo = this.parseVersion(version);
       console.log(`   Version details:`, versionInfo);
-      
+
       // Prepare filename
       const sanitizedVersion = this.sanitizeVersionForFilename(version);
       const packageJson = await Bun.file('package.json').json();
       const packageName = packageJson.name || 'package';
       const filename = `${packageName}-${sanitizedVersion}.tgz`;
-      
+
       // Pack with version override
       const result = await this.pack({
         ...options,
         version,
         tempPackageJson: true,
-        filename
+        filename,
       });
-      
+
       return result;
     } catch (error) {
       console.error('❌ Version pack failed:', error);
       throw error;
     }
   }
-  
+
   /**
    * Batch pack with different versions
    */
   async batchPack(versions: string[], options: PackOptions = {}): Promise<void> {
     console.log('📦 Batch Pack Multiple Versions');
     console.log('='.repeat(50));
-    
+
     const results: { version: string; result: string | null; status: 'success' | 'failed' }[] = [];
-    
+
     for (const version of versions) {
       try {
         console.log(`\n📦 Packing version ${version}...`);
-        
+
         if (options.dryRun) {
           console.log('   🔍 DRY RUN - Would pack this version');
           results.push({ version, result: null, status: 'success' });
@@ -295,68 +290,71 @@ export class EnhancedPackSystem {
         console.log(`   ❌ Failed: ${error}`);
       }
     }
-    
+
     // Summary
     console.log('\n📊 Batch Pack Summary');
     console.log('='.repeat(50));
-    
+
     const successful = results.filter(r => r.status === 'success').length;
     const failed = results.filter(r => r.status === 'failed').length;
-    
+
     console.log(`✅ Successful: ${successful}`);
     console.log(`❌ Failed: ${failed}`);
-    
+
     if (failed > 0) {
       console.log('\nFailed versions:');
-      results.filter(r => r.status === 'failed').forEach(r => {
-        console.log(`   - ${r.version}`);
-      });
+      results
+        .filter(r => r.status === 'failed')
+        .forEach(r => {
+          console.log(`   - ${r.version}`);
+        });
     }
   }
-  
+
   /**
    * Safe pack with comprehensive error handling
    */
-  async safePack(options: PackOptions = {}): Promise<{ success: boolean; result?: string; error?: string }> {
+  async safePack(
+    options: PackOptions = {}
+  ): Promise<{ success: boolean; result?: string; error?: string }> {
     try {
       // Pre-flight checks
       const checks = await this.preFlightChecks(options);
       if (!checks.valid) {
         return { success: false, error: checks.error };
       }
-      
+
       // Execute pack
       const result = await this.pack(options);
-      
+
       // Post-pack validation
       if (result && !options.dryRun) {
-        const tarballPath = options.destination 
+        const tarballPath = options.destination
           ? join(options.destination, basename(result))
           : result;
-        
+
         if (!existsSync(tarballPath)) {
           return { success: false, error: `Tarball not found at: ${tarballPath}` };
         }
-        
+
         // Verify tarball integrity
         const integrity = await this.verifyTarball(tarballPath);
         if (!integrity.valid) {
           return { success: false, error: `Tarball integrity check failed: ${integrity.error}` };
         }
       }
-      
+
       return { success: true, result: result || undefined };
-      
     } catch (error) {
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : String(error) 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
       };
     } finally {
       this.cleanup();
     }
   }
-  
+
   /**
    * Pre-flight checks before packing
    */
@@ -365,7 +363,7 @@ export class EnhancedPackSystem {
     if (!existsSync('package.json')) {
       return { valid: false, error: 'package.json not found' };
     }
-    
+
     // Validate package.json
     try {
       const packageJson = await Bun.file('package.json').json();
@@ -378,7 +376,7 @@ export class EnhancedPackSystem {
     } catch (error) {
       return { valid: false, error: 'Invalid package.json format' };
     }
-    
+
     // Check destination accessibility
     if (options.destination) {
       const destDir = dirname(options.destination);
@@ -390,7 +388,7 @@ export class EnhancedPackSystem {
         }
       }
     }
-    
+
     // Validate version format if provided
     if (options.version) {
       try {
@@ -399,10 +397,10 @@ export class EnhancedPackSystem {
         return { valid: false, error: `Invalid version format: ${options.version}` };
       }
     }
-    
+
     return { valid: true };
   }
-  
+
   /**
    * Verify tarball integrity
    */
@@ -412,41 +410,41 @@ export class EnhancedPackSystem {
       if (!existsSync(tarballPath)) {
         return { valid: false, error: 'Tarball file not found' };
       }
-      
+
       // Check file size
       const stats = await Bun.file(tarballPath).size();
       if (stats === 0) {
         return { valid: false, error: 'Tarball is empty' };
       }
-      
+
       // Verify it's a valid gzip file
       const buffer = await Bun.file(tarballPath).bytes();
       const gzipMagic = new Uint8Array([0x1f, 0x8b]);
-      
+
       if (buffer[0] !== gzipMagic[0] || buffer[1] !== gzipMagic[1]) {
         return { valid: false, error: 'Invalid gzip file format' };
       }
-      
+
       // Calculate checksum
       const hash = createHash('sha256').update(buffer).digest('hex');
       console.log(`   🔐 SHA256: ${hash}`);
-      
+
       return { valid: true };
     } catch (error) {
-      return { 
-        valid: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+      return {
+        valid: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
-  
+
   /**
    * Show usage examples
    */
   showExamples(): void {
     console.log(`
 📦 Enhanced Pack System - Examples
-===================================
+!==!==!==!==!==!=====
 
 Basic Usage:
   bun run scripts/enhanced-pack.ts pack
@@ -491,19 +489,19 @@ Options:
 if (import.meta.main) {
   const system = new EnhancedPackSystem();
   const [command, ...args] = process.argv.slice(2);
-  
+
   try {
     switch (command) {
       case 'pack':
         const dryRun = args.includes('--dry-run');
         const quiet = args.includes('--quiet');
-        const destination = args.includes('--destination') 
-          ? args[args.indexOf('--destination') + 1] 
+        const destination = args.includes('--destination')
+          ? args[args.indexOf('--destination') + 1]
           : undefined;
-        
+
         await system.pack({ dryRun, quiet, destination });
         break;
-        
+
       case 'version':
         if (args.length === 0) {
           console.error('❌ Version required');
@@ -511,10 +509,10 @@ if (import.meta.main) {
         }
         await system.packWithVersion(args[0], {
           destination: './dist/packages',
-          dryRun: args.includes('--dry-run')
+          dryRun: args.includes('--dry-run'),
         });
         break;
-        
+
       case 'batch':
         const versions = args.filter(a => !a.startsWith('--'));
         if (versions.length === 0) {
@@ -523,18 +521,18 @@ if (import.meta.main) {
         }
         await system.batchPack(versions, {
           destination: './dist/packages',
-          dryRun: args.includes('--dry-run')
+          dryRun: args.includes('--dry-run'),
         });
         break;
-        
+
       case 'safe':
         const result = await system.safePack({
-          destination: args.includes('--destination') 
+          destination: args.includes('--destination')
             ? args[args.indexOf('--destination') + 1]
             : './dist/packages',
-          dryRun: args.includes('--dry-run')
+          dryRun: args.includes('--dry-run'),
         });
-        
+
         if (result.success) {
           console.log('✅ Pack successful:', result.result);
         } else {
@@ -542,16 +540,16 @@ if (import.meta.main) {
           process.exit(1);
         }
         break;
-        
+
       case 'help':
       case 'examples':
         system.showExamples();
         break;
-        
+
       default:
         console.log(`
 🚀 Enhanced Pack System
-=======================
+!==!==!==!====
 
 Commands:
   pack              Standard pack with options

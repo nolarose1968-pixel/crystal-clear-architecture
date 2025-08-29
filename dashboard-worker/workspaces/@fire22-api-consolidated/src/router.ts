@@ -1,6 +1,6 @@
 /**
  * Fire22 API Main Router
- * 
+ *
  * Enterprise-grade API router with comprehensive middleware stack
  */
 

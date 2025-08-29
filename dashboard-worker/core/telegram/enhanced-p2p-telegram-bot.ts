@@ -4,8 +4,14 @@
  */
 
 import { P2PPaymentMatching, P2PPaymentRequest, P2PMatch } from '../payments/p2p-payment-matching';
-import { CustomerPaymentValidation, PaymentValidationResult } from '../payments/customer-payment-validation';
-import { CustomerDatabaseManagement, CustomerProfile } from '../customers/customer-database-management';
+import {
+  CustomerPaymentValidation,
+  PaymentValidationResult,
+} from '../payments/customer-payment-validation';
+import {
+  CustomerDatabaseManagement,
+  CustomerProfile,
+} from '../customers/customer-database-management';
 
 export interface EnhancedTelegramSession extends TelegramSession {
   paymentValidation?: PaymentValidationResult;
@@ -133,13 +139,16 @@ export class EnhancedP2PTelegramBot extends P2PTelegramBot {
   /**
    * Handle enhanced deposit command with validation
    */
-  private async handleEnhancedDepositCommand(user: TelegramUser, session: EnhancedTelegramSession): string {
+  private async handleEnhancedDepositCommand(
+    user: TelegramUser,
+    session: EnhancedTelegramSession
+  ): string {
     if (!user.customerId) {
-      return "You need to link your account first. Please provide your customer ID.";
+      return 'You need to link your account first. Please provide your customer ID.';
     }
 
     if (!user.isVerified) {
-      return "Your account needs to be verified before you can make deposits.";
+      return 'Your account needs to be verified before you can make deposits.';
     }
 
     // Clear any previous validation data
@@ -150,7 +159,7 @@ export class EnhancedP2PTelegramBot extends P2PTelegramBot {
     session.currentStep = 'awaiting_deposit_amount';
     session.pendingRequest = {
       customerId: user.customerId,
-      type: 'deposit'
+      type: 'deposit',
     };
 
     let response = `💰 **Enhanced Deposit Request**\n\n`;
@@ -178,19 +187,22 @@ export class EnhancedP2PTelegramBot extends P2PTelegramBot {
   /**
    * Handle enhanced withdrawal command
    */
-  private async handleEnhancedWithdrawCommand(user: TelegramUser, session: EnhancedTelegramSession): string {
+  private async handleEnhancedWithdrawCommand(
+    user: TelegramUser,
+    session: EnhancedTelegramSession
+  ): string {
     if (!user.customerId) {
-      return "You need to link your account first. Please provide your customer ID.";
+      return 'You need to link your account first. Please provide your customer ID.';
     }
 
     if (!user.isVerified) {
-      return "Your account needs to be verified before you can make withdrawals.";
+      return 'Your account needs to be verified before you can make withdrawals.';
     }
 
     session.currentStep = 'awaiting_withdrawal_amount';
     session.pendingRequest = {
       customerId: user.customerId,
-      type: 'withdrawal'
+      type: 'withdrawal',
     };
 
     return `💸 **Enhanced Withdrawal Request**
@@ -207,15 +219,18 @@ I have your 3-year payment history and will validate all transactions for securi
   /**
    * Handle payment history command
    */
-  private handlePaymentHistoryCommand(user: TelegramUser, session: EnhancedTelegramSession): string {
+  private handlePaymentHistoryCommand(
+    user: TelegramUser,
+    session: EnhancedTelegramSession
+  ): string {
     if (!user.customerId) {
-      return "You need to link your account first.";
+      return 'You need to link your account first.';
     }
 
     const paymentStats = this.paymentValidation.getPaymentMethodStats(user.customerId);
 
     if (Object.keys(paymentStats).length === 0) {
-      return "No payment method history found. Start with /deposit or /withdraw to build your history!";
+      return 'No payment method history found. Start with /deposit or /withdraw to build your history!';
     }
 
     let response = `📊 **Your Payment Method History**\n\n`;
@@ -252,9 +267,12 @@ I have your 3-year payment history and will validate all transactions for securi
   /**
    * Handle payment validation command
    */
-  private handlePaymentValidationCommand(user: TelegramUser, session: EnhancedTelegramSession): string {
+  private handlePaymentValidationCommand(
+    user: TelegramUser,
+    session: EnhancedTelegramSession
+  ): string {
     if (!user.customerId) {
-      return "You need to link your account first.";
+      return 'You need to link your account first.';
     }
 
     session.currentStep = 'awaiting_payment_details';
@@ -284,10 +302,10 @@ I will check this against your 3-year payment history and provide a validation s
     session: EnhancedTelegramSession
   ): Promise<string> {
     const methodMap: Record<string, P2PPaymentRequest['paymentMethod']> = {
-      'venmo': 'venmo',
+      venmo: 'venmo',
       'cash app': 'cashapp',
-      'paypal': 'paypal',
-      'zelle': 'zelle'
+      paypal: 'paypal',
+      zelle: 'zelle',
     };
 
     const inputMethod = message.text.toLowerCase().trim();
@@ -311,7 +329,12 @@ Reply with the method name.
 
     // Validate payment method against customer history
     const amount = session.pendingRequest!.amount!;
-    const validation = await this.validatePaymentMethod(user.customerId!, paymentMethod, '', amount);
+    const validation = await this.validatePaymentMethod(
+      user.customerId!,
+      paymentMethod,
+      '',
+      amount
+    );
 
     session.paymentValidation = validation;
 
@@ -320,7 +343,11 @@ Reply with the method name.
     // Show validation results
     response += this.formatValidationResults(validation);
 
-    if (!validation.isValid || validation.riskLevel === 'high' || validation.riskLevel === 'critical') {
+    if (
+      !validation.isValid ||
+      validation.riskLevel === 'high' ||
+      validation.riskLevel === 'critical'
+    ) {
       response += `\n⚠️ **Action Required:**\n`;
       validation.recommendations.forEach(rec => {
         response += `• ${rec}\n`;
@@ -452,7 +479,6 @@ Example: ${this.getPaymentDetailsExample(paymentMethod)}
       response += `Use /matches to see if you have any matches.`;
 
       return response;
-
     } catch (error) {
       return `❌ **Error Creating Request**
 
@@ -555,15 +581,16 @@ Please try again or contact support.`;
     chatId: number,
     validation: PaymentValidationResult
   ): Promise<string> {
-    if (!request.matchedWith) return "Match information not available.";
+    if (!request.matchedWith) return 'Match information not available.';
 
-    const match = Array.from(this.p2pMatching['matches'].values())
-      .find(m => m.depositRequestId === request.id || m.withdrawalRequestId === request.id);
+    const match = Array.from(this.p2pMatching['matches'].values()).find(
+      m => m.depositRequestId === request.id || m.withdrawalRequestId === request.id
+    );
 
-    if (!match) return "Match details not found.";
+    if (!match) return 'Match details not found.';
 
     const counterpartyRequest = this.p2pMatching['requests'].get(request.matchedWith.requestId);
-    if (!counterpartyRequest) return "Counterparty details not found.";
+    if (!counterpartyRequest) return 'Counterparty details not found.';
 
     const details = counterpartyRequest.paymentDetails;
 
@@ -610,8 +637,16 @@ Please try again or contact support.`;
     // This would query the financial system for recent deposits
     // For now, return mock data
     return [
-      { amount: 250, paymentMethod: 'venmo', createdAt: new Date(Date.now() - 86400000).toISOString() },
-      { amount: 500, paymentMethod: 'paypal', createdAt: new Date(Date.now() - 172800000).toISOString() }
+      {
+        amount: 250,
+        paymentMethod: 'venmo',
+        createdAt: new Date(Date.now() - 86400000).toISOString(),
+      },
+      {
+        amount: 500,
+        paymentMethod: 'paypal',
+        createdAt: new Date(Date.now() - 172800000).toISOString(),
+      },
     ];
   }
 
@@ -669,7 +704,7 @@ Please try again or contact support.`;
       ...baseStats,
       totalValidations: validationStats.totalValidations,
       alertsCreated: validationStats.alertsCreated,
-      highRiskValidations: validationStats.highRiskValidations
+      highRiskValidations: validationStats.highRiskValidations,
     };
   }
 }

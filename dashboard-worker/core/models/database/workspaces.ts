@@ -11,15 +11,9 @@ import type {
   Transaction,
   SportEvent,
   BettingMarket,
-  BettingLine
+  BettingLine,
 } from './entities';
-import type {
-  SportType,
-  BetType,
-  DatabaseStatus,
-  RiskLevel,
-  CustomerTier
-} from '../../constants';
+import type { SportType, BetType, DatabaseStatus, RiskLevel, CustomerTier } from '../../constants';
 
 // === CORE DASHBOARD WORKSPACE ===
 export namespace CoreDashboard {
@@ -399,7 +393,20 @@ export namespace PatternSystem {
   export interface Pattern extends BaseEntity {
     pattern_id: string;
     name: string;
-    type: 'LOADER' | 'STYLER' | 'TABULAR' | 'SECURE' | 'TIMING' | 'BUILDER' | 'VERSIONER' | 'SHELL' | 'BUNX' | 'INTERACTIVE' | 'STREAM' | 'FILESYSTEM' | 'UTILITIES';
+    type:
+      | 'LOADER'
+      | 'STYLER'
+      | 'TABULAR'
+      | 'SECURE'
+      | 'TIMING'
+      | 'BUILDER'
+      | 'VERSIONER'
+      | 'SHELL'
+      | 'BUNX'
+      | 'INTERACTIVE'
+      | 'STREAM'
+      | 'FILESYSTEM'
+      | 'UTILITIES';
     category: string;
     description: string;
     implementation: string;
@@ -514,5 +521,5 @@ export {
   APIClient,
   SecurityRegistry,
   PatternSystem,
-  BuildSystem
+  BuildSystem,
 };

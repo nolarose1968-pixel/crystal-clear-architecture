@@ -8,10 +8,10 @@
  * - RSS feed setup and management
  */
 
-import { readFileSync } from "fs";
-import { join } from "path";
-import { TaskService } from "../src/api/tasks-enhanced";
-import { getDatabase } from "../src/database/connection";
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { TaskService } from '../src/api/tasks-enhanced';
+import { getDatabase } from '../src/database/connection';
 
 interface Department {
   id: string;
@@ -42,7 +42,7 @@ class DepartmentOutreachCoordinator {
    */
   async createDepartmentOutreachTasks(): Promise<void> {
     console.log('📞 Creating department outreach coordination tasks...');
-    
+
     if (!this.taskService) {
       throw new Error('Task service not initialized');
     }
@@ -75,8 +75,10 @@ class DepartmentOutreachCoordinator {
       }
     }
 
-    console.log(`\n🎯 Summary: Created ${createdTasks.length} outreach tasks across ${departments.length} departments`);
-    
+    console.log(
+      `\n🎯 Summary: Created ${createdTasks.length} outreach tasks across ${departments.length} departments`
+    );
+
     // Create master coordination task
     await this.createMasterCoordinationTask(createdTasks);
   }
@@ -124,13 +126,13 @@ ${dept.members.map(member => `- ${member.name} (${member.role}) - ${member.email
 4. Confirm communication protocols
 
 **Deadline:** Please respond within 5 business days.`,
-      priority: "high" as const,
-      status: "planning" as const,
+      priority: 'high' as const,
+      status: 'planning' as const,
       progress: 0,
       departmentId: dept.id,
       assigneeId,
       estimatedHours: 2,
-      tags: ["outreach", "point-of-contact", "coordination", "urgent"]
+      tags: ['outreach', 'point-of-contact', 'coordination', 'urgent'],
     };
 
     try {
@@ -180,13 +182,13 @@ ${dept.members.map(member => `- ${member.name} (${member.role}) - ${member.email
 - Preferred platform and setup
 
 **Timeline:** Please provide this information within 1 week.`,
-      priority: "medium" as const,
-      status: "planning" as const,
+      priority: 'medium' as const,
+      status: 'planning' as const,
       progress: 0,
       departmentId: dept.id,
       assigneeId,
       estimatedHours: 3,
-      tags: ["outreach", "blog", "content-strategy", "integration"]
+      tags: ['outreach', 'blog', 'content-strategy', 'integration'],
     };
 
     try {
@@ -234,13 +236,13 @@ ${dept.members.map(member => `- ${member.name} (${member.role}) - ${member.email
 - Department Index: /feeds/${dept.id}/
 
 **Timeline:** Setup within 2 weeks of content source identification.`,
-      priority: "medium" as const,
-      status: "planning" as const,
+      priority: 'medium' as const,
+      status: 'planning' as const,
       progress: 0,
       departmentId: dept.id,
       assigneeId,
       estimatedHours: 4,
-      tags: ["outreach", "rss-feed", "technical-setup", "integration"]
+      tags: ['outreach', 'rss-feed', 'technical-setup', 'integration'],
     };
 
     try {
@@ -257,7 +259,7 @@ ${dept.members.map(member => `- ${member.name} (${member.role}) - ${member.email
    */
   private async createMasterCoordinationTask(createdTasks: any[]) {
     const taskData = {
-      title: "Department Outreach Coordination - Master Task",
+      title: 'Department Outreach Coordination - Master Task',
       description: `Master coordination task for department outreach initiative.
 
 **Outreach Scope:**
@@ -266,7 +268,9 @@ ${dept.members.map(member => `- ${member.name} (${member.role}) - ${member.email
 - 3 categories: Point of Contact, Blog Information, RSS Feeds
 
 **Department Coverage:**
-${this.getDepartments().map(dept => `- ${dept.name} (${dept.id})`).join('\n')}
+${this.getDepartments()
+  .map(dept => `- ${dept.name} (${dept.id})`)
+  .join('\n')}
 
 **Success Criteria:**
 - All departments respond with contact information
@@ -275,13 +279,13 @@ ${this.getDepartments().map(dept => `- ${dept.name} (${dept.id})`).join('\n')}
 
 **Related Tasks:**
 ${createdTasks.map(task => `- ${task.title} (${task.uuid})`).join('\n')}`,
-      priority: "high" as const,
-      status: "active" as const,
+      priority: 'high' as const,
+      status: 'active' as const,
       progress: 10,
-      departmentId: "communications",
-      assigneeId: "sarah-martinez",
+      departmentId: 'communications',
+      assigneeId: 'sarah-martinez',
       estimatedHours: 8,
-      tags: ["coordination", "outreach", "master-task", "departments"]
+      tags: ['coordination', 'outreach', 'master-task', 'departments'],
     };
 
     try {
@@ -299,7 +303,7 @@ ${createdTasks.map(task => `- ${task.title} (${task.uuid})`).join('\n')}`,
    */
   private getDepartments(): Department[] {
     const departments: Department[] = [];
-    
+
     for (const [key, dept] of Object.entries(this.teamDirectory.departments)) {
       if (dept && typeof dept === 'object' && 'name' in dept) {
         departments.push({
@@ -308,11 +312,11 @@ ${createdTasks.map(task => `- ${task.title} (${task.uuid})`).join('\n')}`,
           email: dept.email,
           domain: dept.domain,
           color: dept.color,
-          members: dept.members || []
+          members: dept.members || [],
         });
       }
     }
-    
+
     return departments;
   }
 
@@ -320,27 +324,29 @@ ${createdTasks.map(task => `- ${task.title} (${task.uuid})`).join('\n')}`,
    * 👤 Get department head (first member with leadership role)
    */
   private getDepartmentHead(dept: Department) {
-    return dept.members.find(member => 
-      member.role.toLowerCase().includes('director') ||
-      member.role.toLowerCase().includes('head') ||
-      member.role.toLowerCase().includes('lead') ||
-      member.role.toLowerCase().includes('manager')
-    ) || dept.members[0]; // Fallback to first member
+    return (
+      dept.members.find(
+        member =>
+          member.role.toLowerCase().includes('director') ||
+          member.role.toLowerCase().includes('head') ||
+          member.role.toLowerCase().includes('lead') ||
+          member.role.toLowerCase().includes('manager')
+      ) || dept.members[0]
+    ); // Fallback to first member
   }
 }
 
 // CLI execution
 async function main() {
   console.log('🚀 Fire22 Department Outreach Coordinator');
-  console.log('==========================================');
-  
+  console.log('!==!==!==!==!==!==!==!==');
+
   try {
     const coordinator = new DepartmentOutreachCoordinator();
     await coordinator.initialize();
     await coordinator.createDepartmentOutreachTasks();
-    
+
     console.log('\n✅ Department outreach coordination completed successfully!');
-    
   } catch (error) {
     console.error('❌ Error during department outreach coordination:', error);
     process.exit(1);

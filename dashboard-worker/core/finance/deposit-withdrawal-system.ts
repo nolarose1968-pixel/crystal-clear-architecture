@@ -144,26 +144,34 @@ export class DepositWithdrawalSystem {
       description: `Deposit via ${request.paymentMethod}`,
       metadata: {
         ...request.metadata,
-        paymentDetails: this.sanitizePaymentDetails(request.paymentDetails)
+        paymentDetails: this.sanitizePaymentDetails(request.paymentDetails),
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       riskScore,
       complianceCheck: await this.performComplianceCheck(request.customerId),
-      auditTrail: [{
-        timestamp: new Date().toISOString(),
-        action: 'deposit_created',
-        performedBy: request.requestedBy,
-        details: 'Deposit request created',
-        changes: { status: 'pending' }
-      }]
+      auditTrail: [
+        {
+          timestamp: new Date().toISOString(),
+          action: 'deposit_created',
+          performedBy: request.requestedBy,
+          details: 'Deposit request created',
+          changes: { status: 'pending' },
+        },
+      ],
     };
 
     // Store transaction
     this.transactions.set(transaction.transactionId, transaction);
 
     // Update customer balance (pending)
-    await this.updateCustomerBalance(request.customerId, 'pending_deposit', request.amount, request.currency, transaction.transactionId);
+    await this.updateCustomerBalance(
+      request.customerId,
+      'pending_deposit',
+      request.amount,
+      request.currency,
+      transaction.transactionId
+    );
 
     // Process payment (simulate async processing)
     setTimeout(() => {
@@ -208,26 +216,34 @@ export class DepositWithdrawalSystem {
       metadata: {
         ...request.metadata,
         withdrawalDetails: this.sanitizeWithdrawalDetails(request.withdrawalDetails),
-        priority: request.priority
+        priority: request.priority,
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       riskScore,
       complianceCheck: await this.performComplianceCheck(request.customerId),
-      auditTrail: [{
-        timestamp: new Date().toISOString(),
-        action: 'withdrawal_created',
-        performedBy: request.requestedBy,
-        details: 'Withdrawal request created',
-        changes: { status: 'pending' }
-      }]
+      auditTrail: [
+        {
+          timestamp: new Date().toISOString(),
+          action: 'withdrawal_created',
+          performedBy: request.requestedBy,
+          details: 'Withdrawal request created',
+          changes: { status: 'pending' },
+        },
+      ],
     };
 
     // Store transaction
     this.transactions.set(transaction.transactionId, transaction);
 
     // Update customer balance (pending withdrawal)
-    await this.updateCustomerBalance(request.customerId, 'pending_withdrawal', -request.amount, request.currency, transaction.transactionId);
+    await this.updateCustomerBalance(
+      request.customerId,
+      'pending_withdrawal',
+      -request.amount,
+      request.currency,
+      transaction.transactionId
+    );
 
     // Process withdrawal (simulate async processing)
     setTimeout(() => {
@@ -252,7 +268,7 @@ export class DepositWithdrawalSystem {
         bonusBalance: 0,
         currency: 'USD',
         lastUpdated: new Date().toISOString(),
-        balanceHistory: []
+        balanceHistory: [],
       };
       this.customerBalances.set(customerId, balance);
     }
@@ -265,7 +281,13 @@ export class DepositWithdrawalSystem {
    */
   private async updateCustomerBalance(
     customerId: string,
-    changeType: 'deposit' | 'withdrawal' | 'pending_deposit' | 'pending_withdrawal' | 'bonus' | 'fee',
+    changeType:
+      | 'deposit'
+      | 'withdrawal'
+      | 'pending_deposit'
+      | 'pending_withdrawal'
+      | 'bonus'
+      | 'fee',
     amount: number,
     currency: string,
     transactionId: string
@@ -302,7 +324,7 @@ export class DepositWithdrawalSystem {
       previousBalance,
       newBalance: balance.availableBalance,
       transactionId,
-      changeReason: changeType
+      changeReason: changeType,
     });
 
     // Keep only last 100 history entries
@@ -328,7 +350,7 @@ export class DepositWithdrawalSystem {
         maxTransactionAmount: 10000,
         minTransactionAmount: 10,
         currency: 'USD',
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
       this.paymentLimits.set(customerId, limits);
     }
@@ -363,8 +385,9 @@ export class DepositWithdrawalSystem {
       offset?: number;
     } = {}
   ): FinancialTransaction[] {
-    let transactions = Array.from(this.transactions.values())
-      .filter(t => t.customerId === customerId);
+    let transactions = Array.from(this.transactions.values()).filter(
+      t => t.customerId === customerId
+    );
 
     if (options.type) {
       transactions = transactions.filter(t => t.type === options.type);
@@ -434,10 +457,12 @@ export class DepositWithdrawalSystem {
         timestamp: new Date().toISOString(),
         action: transaction.status === 'completed' ? 'payment_completed' : 'payment_failed',
         performedBy: 'system',
-        details: transaction.status === 'completed' ? 'Payment processed successfully' : 'Payment processing failed',
-        changes: { status: transaction.status }
+        details:
+          transaction.status === 'completed'
+            ? 'Payment processed successfully'
+            : 'Payment processing failed',
+        changes: { status: transaction.status },
       });
-
     } catch (error) {
       console.error(`Payment processing failed for ${transactionId}:`, error);
       transaction.status = 'failed';
@@ -490,10 +515,12 @@ export class DepositWithdrawalSystem {
         timestamp: new Date().toISOString(),
         action: transaction.status === 'completed' ? 'withdrawal_completed' : 'withdrawal_failed',
         performedBy: 'system',
-        details: transaction.status === 'completed' ? 'Withdrawal processed successfully' : 'Withdrawal processing failed',
-        changes: { status: transaction.status }
+        details:
+          transaction.status === 'completed'
+            ? 'Withdrawal processed successfully'
+            : 'Withdrawal processing failed',
+        changes: { status: transaction.status },
       });
-
     } catch (error) {
       console.error(`Withdrawal processing failed for ${transactionId}:`, error);
       transaction.status = 'failed';
@@ -606,7 +633,9 @@ export class DepositWithdrawalSystem {
 
     // Get today's transactions
     const today = new Date().toDateString();
-    const todayWithdrawals = this.getCustomerTransactions(request.customerId, { type: 'withdrawal' })
+    const todayWithdrawals = this.getCustomerTransactions(request.customerId, {
+      type: 'withdrawal',
+    })
       .filter(t => new Date(t.createdAt).toDateString() === today)
       .reduce((sum, t) => sum + t.amount, 0);
 
@@ -656,13 +685,15 @@ export class DepositWithdrawalSystem {
   /**
    * Perform compliance check
    */
-  private async performComplianceCheck(customerId: string): Promise<FinancialTransaction['complianceCheck']> {
+  private async performComplianceCheck(
+    customerId: string
+  ): Promise<FinancialTransaction['complianceCheck']> {
     // In a real implementation, this would integrate with compliance systems
     return {
       kycVerified: true, // Mock
-      amlCheck: true,    // Mock
+      amlCheck: true, // Mock
       sanctionsCheck: true, // Mock
-      riskAssessment: 'low' // Mock
+      riskAssessment: 'low', // Mock
     };
   }
 
@@ -672,11 +703,11 @@ export class DepositWithdrawalSystem {
   private calculateProcessingFee(request: DepositRequest): number {
     const feeRates = {
       credit_card: 0.029, // 2.9%
-      debit_card: 0.019,  // 1.9%
+      debit_card: 0.019, // 1.9%
       bank_transfer: 0.005, // 0.5%
-      crypto: 0.01,       // 1.0%
-      paypal: 0.024,      // 2.4%
-      cash: 0             // 0%
+      crypto: 0.01, // 1.0%
+      paypal: 0.024, // 2.4%
+      cash: 0, // 0%
     };
 
     return request.amount * (feeRates[request.paymentMethod] || 0.02);
@@ -691,13 +722,13 @@ export class DepositWithdrawalSystem {
       crypto: 10,
       paypal: 15,
       check: 5,
-      cash: 0
+      cash: 0,
     };
 
     const priorityMultipliers = {
       standard: 1.0,
       express: 1.5,
-      instant: 2.0
+      instant: 2.0,
     };
 
     const baseFee = baseFees[request.withdrawalMethod] || 10;
@@ -780,7 +811,7 @@ export class DepositWithdrawalSystem {
       completedTransactions,
       failedTransactions,
       totalVolume,
-      averageTransactionSize
+      averageTransactionSize,
     };
   }
 }

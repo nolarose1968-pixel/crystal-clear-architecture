@@ -2,7 +2,7 @@
 
 /**
  * 🤖🌐 Fire22 Multilingual Telegram Bot Integration
- * 
+ *
  * Complete Telegram bot integration with Fire22 language system
  * supporting 4 languages: English, Spanish, Portuguese, French
  */
@@ -79,14 +79,14 @@ export class MultilingualTelegramBot {
     if (!telegramLangCode) return null;
 
     const langMap: Record<string, string> = {
-      'en': 'en',
-      'es': 'es', 
-      'pt': 'pt',
+      en: 'en',
+      es: 'es',
+      pt: 'pt',
       'pt-br': 'pt',
-      'fr': 'fr',
+      fr: 'fr',
       'es-mx': 'es',
       'es-ar': 'es',
-      'es-es': 'es'
+      'es-es': 'es',
     };
 
     return langMap[telegramLangCode.toLowerCase()] || null;
@@ -101,44 +101,51 @@ export class MultilingualTelegramBot {
   } {
     const lang = this.getUserLanguage(telegramUser);
     const welcomeText = this.languageManager.getText('L-1500', lang);
-    
+
     return {
       text: `🎉 ${welcomeText}\n\n${this.generateUserAccountInfo(telegramUser, lang)}`,
       keyboard: {
-        inline_keyboard: [[
-          { 
-            text: this.languageManager.getText('L-1504', lang), // View Dashboard
-            url: 'https://dashboard.fire22.com' 
-          },
-          { 
-            text: '🌐 Language / Idioma', 
-            callback_data: 'change_language' 
-          }
-        ]]
-      }
+        inline_keyboard: [
+          [
+            {
+              text: this.languageManager.getText('L-1504', lang), // View Dashboard
+              url: 'https://dashboard.fire22.com',
+            },
+            {
+              text: '🌐 Language / Idioma',
+              callback_data: 'change_language',
+            },
+          ],
+        ],
+      },
     };
   }
 
   /**
    * Generate account linking success message
    */
-  generateAccountLinkMessage(telegramUser: TelegramUser, email: string): {
+  generateAccountLinkMessage(
+    telegramUser: TelegramUser,
+    email: string
+  ): {
     text: string;
     keyboard: any;
   } {
     const lang = this.getUserLanguage(telegramUser);
     const successText = this.languageManager.getText('L-1501', lang);
-    
+
     return {
       text: `✅ ${successText}\n📧 ${email}`,
       keyboard: {
-        inline_keyboard: [[
-          { 
-            text: this.languageManager.getText('L-1504', lang), // View Dashboard
-            url: 'https://dashboard.fire22.com' 
-          }
-        ]]
-      }
+        inline_keyboard: [
+          [
+            {
+              text: this.languageManager.getText('L-1504', lang), // View Dashboard
+              url: 'https://dashboard.fire22.com',
+            },
+          ],
+        ],
+      },
     };
   }
 
@@ -146,7 +153,7 @@ export class MultilingualTelegramBot {
    * Generate transaction notification
    */
   generateTransactionNotification(
-    telegramUser: TelegramUser, 
+    telegramUser: TelegramUser,
     notificationData: NotificationData
   ): {
     text: string;
@@ -154,10 +161,11 @@ export class MultilingualTelegramBot {
   } {
     const lang = this.getUserLanguage(telegramUser);
     const alertHeader = this.languageManager.getText('L-1502', lang); // New Transaction Alert
-    
+
     const { amount, type, timestamp, reference } = notificationData;
-    
-    const text = `🚨 ${alertHeader}\n\n` +
+
+    const text =
+      `🚨 ${alertHeader}\n\n` +
       `💰 ${this.getAmountText(lang)}: $${amount}\n` +
       `📊 ${this.getTypeText(lang)}: ${type}\n` +
       `⏰ ${this.getTimeText(lang)}: ${timestamp?.toLocaleString(this.getLocaleForLanguage(lang))}\n` +
@@ -166,17 +174,19 @@ export class MultilingualTelegramBot {
     return {
       text,
       keyboard: {
-        inline_keyboard: [[
-          { 
-            text: this.languageManager.getText('L-1504', lang), // View Dashboard
-            url: 'https://dashboard.fire22.com' 
-          },
-          { 
-            text: this.languageManager.getText('L-1505', lang), // Dismiss
-            callback_data: 'dismiss_alert' 
-          }
-        ]]
-      }
+        inline_keyboard: [
+          [
+            {
+              text: this.languageManager.getText('L-1504', lang), // View Dashboard
+              url: 'https://dashboard.fire22.com',
+            },
+            {
+              text: this.languageManager.getText('L-1505', lang), // Dismiss
+              callback_data: 'dismiss_alert',
+            },
+          ],
+        ],
+      },
     };
   }
 
@@ -197,8 +207,9 @@ export class MultilingualTelegramBot {
   } {
     const lang = this.getUserLanguage(telegramUser);
     const depositHeader = this.languageManager.getText('L-1506', lang); // New Deposit Request
-    
-    const text = `💰 ${depositHeader}\n\n` +
+
+    const text =
+      `💰 ${depositHeader}\n\n` +
       `💵 ${this.getAmountText(lang)}: $${depositData.amount}\n` +
       `💳 ${this.getMethodText(lang)}: ${depositData.paymentMethod}\n` +
       `🆔 ${this.getTransactionText(lang)}: ${depositData.transactionId}\n` +
@@ -207,22 +218,25 @@ export class MultilingualTelegramBot {
     return {
       text,
       keyboard: {
-        inline_keyboard: [[
-          { 
-            text: `✅ ${this.languageManager.getText('L-1507', lang)}`, // Approve
-            callback_data: `approve_deposit_${depositData.operationId}` 
-          },
-          { 
-            text: `❌ ${this.languageManager.getText('L-1508', lang)}`, // Reject
-            callback_data: `reject_deposit_${depositData.operationId}` 
-          }
-        ], [
-          { 
-            text: `🔍 ${this.languageManager.getText('L-1509', lang)}`, // Details
-            callback_data: `details_deposit_${depositData.operationId}` 
-          }
-        ]]
-      }
+        inline_keyboard: [
+          [
+            {
+              text: `✅ ${this.languageManager.getText('L-1507', lang)}`, // Approve
+              callback_data: `approve_deposit_${depositData.operationId}`,
+            },
+            {
+              text: `❌ ${this.languageManager.getText('L-1508', lang)}`, // Reject
+              callback_data: `reject_deposit_${depositData.operationId}`,
+            },
+          ],
+          [
+            {
+              text: `🔍 ${this.languageManager.getText('L-1509', lang)}`, // Details
+              callback_data: `details_deposit_${depositData.operationId}`,
+            },
+          ],
+        ],
+      },
     };
   }
 
@@ -246,33 +260,40 @@ export class MultilingualTelegramBot {
   } {
     const lang = this.getUserLanguage(telegramUser);
     const matchHeader = this.languageManager.getText('L-1510', lang); // P2P Match Found
-    
-    const text = `🎯 ${matchHeader}\n\n` +
+
+    const text =
+      `🎯 ${matchHeader}\n\n` +
       `📋 Queue ID: ${matchData.queueId}\n` +
       `🔍 ${matchData.matches.length} ${this.getMatchesText(lang)}\n\n` +
-      matchData.matches.map((match, i) => 
-        `${i+1}. $${match.amount} via ${match.paymentType} (${this.getScoreText(lang)}: ${match.matchScore}%)`
-      ).join('\n');
+      matchData.matches
+        .map(
+          (match, i) =>
+            `${i + 1}. $${match.amount} via ${match.paymentType} (${this.getScoreText(lang)}: ${match.matchScore}%)`
+        )
+        .join('\n');
 
     return {
       text,
       keyboard: {
-        inline_keyboard: [[
-          { 
-            text: `✅ ${this.languageManager.getText('L-1511', lang)}`, // Process Best Match
-            callback_data: `process_match_${matchData.queueId}_${matchData.matches[0]?.id}` 
-          }
-        ], [
-          { 
-            text: `📋 ${this.languageManager.getText('L-1512', lang)}`, // View All
-            callback_data: `view_matches_${matchData.queueId}` 
-          },
-          { 
-            text: `⏳ ${this.languageManager.getText('L-1513', lang)}`, // Wait for Better
-            callback_data: `wait_${matchData.queueId}` 
-          }
-        ]]
-      }
+        inline_keyboard: [
+          [
+            {
+              text: `✅ ${this.languageManager.getText('L-1511', lang)}`, // Process Best Match
+              callback_data: `process_match_${matchData.queueId}_${matchData.matches[0]?.id}`,
+            },
+          ],
+          [
+            {
+              text: `📋 ${this.languageManager.getText('L-1512', lang)}`, // View All
+              callback_data: `view_matches_${matchData.queueId}`,
+            },
+            {
+              text: `⏳ ${this.languageManager.getText('L-1513', lang)}`, // Wait for Better
+              callback_data: `wait_${matchData.queueId}`,
+            },
+          ],
+        ],
+      },
     };
   }
 
@@ -288,10 +309,11 @@ export class MultilingualTelegramBot {
   } {
     const lang = this.getUserLanguage(telegramUser);
     const ticketHeader = this.languageManager.getText('L-1514', lang); // Support Ticket Created
-    
+
     const priorityEmoji = this.getPriorityEmoji(ticketData.priority);
-    
-    const text = `🎫 ${ticketHeader}\n\n` +
+
+    const text =
+      `🎫 ${ticketHeader}\n\n` +
       `📋 ID: ${ticketData.id}\n` +
       `📝 ${this.getSubjectText(lang)}: ${ticketData.subject}\n` +
       `${priorityEmoji} ${this.getPriorityText(lang)}: ${this.translatePriority(ticketData.priority, lang)}\n` +
@@ -300,17 +322,19 @@ export class MultilingualTelegramBot {
     return {
       text,
       keyboard: {
-        inline_keyboard: [[
-          { 
-            text: `✅ ${this.languageManager.getText('L-1516', lang)}`, // Acknowledge
-            callback_data: `ack_ticket_${ticketData.id}` 
-          },
-          { 
-            text: `🚨 ${this.languageManager.getText('L-1517', lang)}`, // Escalate
-            callback_data: `escalate_ticket_${ticketData.id}` 
-          }
-        ]]
-      }
+        inline_keyboard: [
+          [
+            {
+              text: `✅ ${this.languageManager.getText('L-1516', lang)}`, // Acknowledge
+              callback_data: `ack_ticket_${ticketData.id}`,
+            },
+            {
+              text: `🚨 ${this.languageManager.getText('L-1517', lang)}`, // Escalate
+              callback_data: `escalate_ticket_${ticketData.id}`,
+            },
+          ],
+        ],
+      },
     };
   }
 
@@ -322,13 +346,13 @@ export class MultilingualTelegramBot {
       inline_keyboard: [
         [
           { text: '🇺🇸 English', callback_data: 'set_lang_en' },
-          { text: '🇪🇸 Español', callback_data: 'set_lang_es' }
+          { text: '🇪🇸 Español', callback_data: 'set_lang_es' },
         ],
         [
           { text: '🇵🇹 Português', callback_data: 'set_lang_pt' },
-          { text: '🇫🇷 Français', callback_data: 'set_lang_fr' }
-        ]
-      ]
+          { text: '🇫🇷 Français', callback_data: 'set_lang_fr' },
+        ],
+      ],
     };
   }
 
@@ -343,9 +367,12 @@ export class MultilingualTelegramBot {
   /**
    * Generate error messages
    */
-  generateErrorMessage(telegramUser: TelegramUser, errorType: 'registration' | 'linking' | 'general'): string {
+  generateErrorMessage(
+    telegramUser: TelegramUser,
+    errorType: 'registration' | 'linking' | 'general'
+  ): string {
     const lang = this.getUserLanguage(telegramUser);
-    
+
     switch (errorType) {
       case 'registration':
         return `❌ ${this.languageManager.getText('L-1518', lang)}`;
@@ -358,152 +385,197 @@ export class MultilingualTelegramBot {
 
   // Helper methods for common text elements
   private generateUserAccountInfo(user: TelegramUser, lang: string): string {
-    return `👤 ${user.first_name}${user.last_name ? ' ' + user.last_name : ''}\n` +
-           `🆔 ID: ${user.id}\n` +
-           `🌐 ${this.getLanguageText(lang)}: ${this.getLanguageDisplayName(lang)}`;
+    return (
+      `👤 ${user.first_name}${user.last_name ? ' ' + user.last_name : ''}\n` +
+      `🆔 ID: ${user.id}\n` +
+      `🌐 ${this.getLanguageText(lang)}: ${this.getLanguageDisplayName(lang)}`
+    );
   }
 
   private getAmountText(lang: string): string {
     const amountMap: Record<string, string> = {
-      'en': 'Amount', 'es': 'Cantidad', 'pt': 'Quantia', 'fr': 'Montant'
+      en: 'Amount',
+      es: 'Cantidad',
+      pt: 'Quantia',
+      fr: 'Montant',
     };
     return amountMap[lang] || 'Amount';
   }
 
   private getTypeText(lang: string): string {
     const typeMap: Record<string, string> = {
-      'en': 'Type', 'es': 'Tipo', 'pt': 'Tipo', 'fr': 'Type'
+      en: 'Type',
+      es: 'Tipo',
+      pt: 'Tipo',
+      fr: 'Type',
     };
     return typeMap[lang] || 'Type';
   }
 
   private getTimeText(lang: string): string {
     const timeMap: Record<string, string> = {
-      'en': 'Time', 'es': 'Tiempo', 'pt': 'Hora', 'fr': 'Heure'
+      en: 'Time',
+      es: 'Tiempo',
+      pt: 'Hora',
+      fr: 'Heure',
     };
     return timeMap[lang] || 'Time';
   }
 
   private getReferenceText(lang: string): string {
     const refMap: Record<string, string> = {
-      'en': 'Reference', 'es': 'Referencia', 'pt': 'Referência', 'fr': 'Référence'
+      en: 'Reference',
+      es: 'Referencia',
+      pt: 'Referência',
+      fr: 'Référence',
     };
     return refMap[lang] || 'Reference';
   }
 
   private getMethodText(lang: string): string {
     const methodMap: Record<string, string> = {
-      'en': 'Method', 'es': 'Método', 'pt': 'Método', 'fr': 'Méthode'
+      en: 'Method',
+      es: 'Método',
+      pt: 'Método',
+      fr: 'Méthode',
     };
     return methodMap[lang] || 'Method';
   }
 
   private getTransactionText(lang: string): string {
     const txMap: Record<string, string> = {
-      'en': 'Transaction', 'es': 'Transacción', 'pt': 'Transação', 'fr': 'Transaction'
+      en: 'Transaction',
+      es: 'Transacción',
+      pt: 'Transação',
+      fr: 'Transaction',
     };
     return txMap[lang] || 'Transaction';
   }
 
   private getStatusText(lang: string): string {
     const statusMap: Record<string, string> = {
-      'en': 'Status', 'es': 'Estado', 'pt': 'Status', 'fr': 'Statut'
+      en: 'Status',
+      es: 'Estado',
+      pt: 'Status',
+      fr: 'Statut',
     };
     return statusMap[lang] || 'Status';
   }
 
   private getProcessingText(lang: string): string {
     const procMap: Record<string, string> = {
-      'en': 'Processing', 'es': 'Procesando', 'pt': 'Processando', 'fr': 'En cours'
+      en: 'Processing',
+      es: 'Procesando',
+      pt: 'Processando',
+      fr: 'En cours',
     };
     return procMap[lang] || 'Processing';
   }
 
   private getMatchesText(lang: string): string {
     const matchMap: Record<string, string> = {
-      'en': 'potential matches', 'es': 'emparejamientos potenciales', 
-      'pt': 'correspondências potenciais', 'fr': 'correspondances potentielles'
+      en: 'potential matches',
+      es: 'emparejamientos potenciales',
+      pt: 'correspondências potenciais',
+      fr: 'correspondances potentielles',
     };
     return matchMap[lang] || 'potential matches';
   }
 
   private getScoreText(lang: string): string {
     const scoreMap: Record<string, string> = {
-      'en': 'Score', 'es': 'Puntuación', 'pt': 'Pontuação', 'fr': 'Score'
+      en: 'Score',
+      es: 'Puntuación',
+      pt: 'Pontuação',
+      fr: 'Score',
     };
     return scoreMap[lang] || 'Score';
   }
 
   private getSubjectText(lang: string): string {
     const subjectMap: Record<string, string> = {
-      'en': 'Subject', 'es': 'Asunto', 'pt': 'Assunto', 'fr': 'Sujet'
+      en: 'Subject',
+      es: 'Asunto',
+      pt: 'Assunto',
+      fr: 'Sujet',
     };
     return subjectMap[lang] || 'Subject';
   }
 
   private getPriorityText(lang: string): string {
     const priorityMap: Record<string, string> = {
-      'en': 'Priority', 'es': 'Prioridad', 'pt': 'Prioridade', 'fr': 'Priorité'
+      en: 'Priority',
+      es: 'Prioridad',
+      pt: 'Prioridade',
+      fr: 'Priorité',
     };
     return priorityMap[lang] || 'Priority';
   }
 
   private getServiceLevelText(lang: string): string {
     const serviceMap: Record<string, string> = {
-      'en': 'Service Level', 'es': 'Nivel de Servicio', 
-      'pt': 'Nível de Serviço', 'fr': 'Niveau de Service'
+      en: 'Service Level',
+      es: 'Nivel de Servicio',
+      pt: 'Nível de Serviço',
+      fr: 'Niveau de Service',
     };
     return serviceMap[lang] || 'Service Level';
   }
 
   private getLanguageText(lang: string): string {
     const langMap: Record<string, string> = {
-      'en': 'Language', 'es': 'Idioma', 'pt': 'Idioma', 'fr': 'Langue'
+      en: 'Language',
+      es: 'Idioma',
+      pt: 'Idioma',
+      fr: 'Langue',
     };
     return langMap[lang] || 'Language';
   }
 
   private getLanguageDisplayName(lang: string): string {
     const displayMap: Record<string, string> = {
-      'en': 'English', 'es': 'Español', 'pt': 'Português', 'fr': 'Français'
+      en: 'English',
+      es: 'Español',
+      pt: 'Português',
+      fr: 'Français',
     };
     return displayMap[lang] || 'English';
   }
 
   private translatePriority(priority: string, lang: string): string {
     const priorityMap: Record<string, Record<string, string>> = {
-      'normal': { 'en': 'Normal', 'es': 'Normal', 'pt': 'Normal', 'fr': 'Normal' },
-      'high': { 'en': 'High', 'es': 'Alta', 'pt': 'Alta', 'fr': 'Élevée' },
-      'urgent': { 'en': 'Urgent', 'es': 'Urgente', 'pt': 'Urgente', 'fr': 'Urgent' }
+      normal: { en: 'Normal', es: 'Normal', pt: 'Normal', fr: 'Normal' },
+      high: { en: 'High', es: 'Alta', pt: 'Alta', fr: 'Élevée' },
+      urgent: { en: 'Urgent', es: 'Urgente', pt: 'Urgente', fr: 'Urgent' },
     };
     return priorityMap[priority]?.[lang] || priority;
   }
 
   private translateServiceLevel(level: string, lang: string): string {
     const levelMap: Record<string, Record<string, string>> = {
-      'basic': { 'en': 'Basic', 'es': 'Básico', 'pt': 'Básico', 'fr': 'Basique' },
-      'premium': { 'en': 'Premium', 'es': 'Premium', 'pt': 'Premium', 'fr': 'Premium' },
-      'vip': { 'en': 'VIP', 'es': 'VIP', 'pt': 'VIP', 'fr': 'VIP' },
-      'enterprise': { 'en': 'Enterprise', 'es': 'Empresarial', 'pt': 'Empresarial', 'fr': 'Entreprise' }
+      basic: { en: 'Basic', es: 'Básico', pt: 'Básico', fr: 'Basique' },
+      premium: { en: 'Premium', es: 'Premium', pt: 'Premium', fr: 'Premium' },
+      vip: { en: 'VIP', es: 'VIP', pt: 'VIP', fr: 'VIP' },
+      enterprise: { en: 'Enterprise', es: 'Empresarial', pt: 'Empresarial', fr: 'Entreprise' },
     };
     return levelMap[level]?.[lang] || level;
   }
 
   private getPriorityEmoji(priority: string): string {
     const emojiMap: Record<string, string> = {
-      'normal': '📝',
-      'high': '⚠️',
-      'urgent': '🚨'
+      normal: '📝',
+      high: '⚠️',
+      urgent: '🚨',
     };
     return emojiMap[priority] || '📝';
   }
 
   private getLocaleForLanguage(lang: string): string {
     const localeMap: Record<string, string> = {
-      'en': 'en-US',
-      'es': 'es-ES',
-      'pt': 'pt-BR',
-      'fr': 'fr-FR'
+      en: 'en-US',
+      es: 'es-ES',
+      pt: 'pt-BR',
+      fr: 'fr-FR',
     };
     return localeMap[lang] || 'en-US';
   }
@@ -527,7 +599,7 @@ export class MultilingualTelegramBot {
       totalCodes: allCodes.length,
       telegramCodes: telegramCodes.length,
       supportedLanguages: this.languageManager.getSupportedLanguages(),
-      activeUsers: this.userLanguages.size
+      activeUsers: this.userLanguages.size,
     };
   }
 }

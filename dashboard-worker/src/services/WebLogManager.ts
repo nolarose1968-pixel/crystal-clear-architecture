@@ -3,12 +3,12 @@
  * Handles comprehensive web activity tracking with D1/PostgreSQL and R2 storage
  */
 
-import { 
-  WebLogBase, 
-  LogType, 
+import {
+  WebLogBase,
+  LogType,
   LogStatus,
-  AnyWebLog, 
-  LogQueryFilter, 
+  AnyWebLog,
+  LogQueryFilter,
   LogQueryResult,
   StorageConfig,
   LogAnalytics,
@@ -18,7 +18,7 @@ import {
   CasinoBetLog,
   SecurityLog,
   CreateLogRequest,
-  FIRE22_LOG_LANGUAGE_KEYS
+  FIRE22_LOG_LANGUAGE_KEYS,
 } from '../types/web-logs.types';
 
 export class WebLogManager {
@@ -31,21 +31,21 @@ export class WebLogManager {
       database: {
         binding: 'DB', // fire22-dashboard D1 database
         retentionDays: 90, // Configurable retention policy
-        batchSize: 1000
+        batchSize: 1000,
       },
       r2Storage: {
         binding: 'REGISTRY_STORAGE', // fire22-packages R2 bucket
         archivePath: 'logs/archived',
-        compressionEnabled: true
+        compressionEnabled: true,
       },
       kvCache: {
         binding: 'FIRE22_DATA_CACHE',
-        ttlSeconds: 3600 // 1 hour cache for analytics
-      }
+        ttlSeconds: 3600, // 1 hour cache for analytics
+      },
     };
   }
 
-  // ========== Core Logging Methods ==========
+  // !==!== Core Logging Methods !==!==
 
   /**
    * Create a new web log entry with automatic classification and risk assessment
@@ -53,10 +53,10 @@ export class WebLogManager {
   async createLog<T extends LogType>(logData: CreateLogRequest<T>): Promise<string> {
     const logId = this.generateLogId();
     const timestamp = new Date();
-    
+
     // Enhance log with metadata
     const enhancedLog: WebLogBase = {
-      ...logData as any,
+      ...(logData as any),
       id: logId,
       timestamp,
       createdAt: timestamp,
@@ -65,7 +65,9 @@ export class WebLogManager {
       riskScore: await this.calculateRiskScore(logData),
       isSuspicious: await this.detectSuspiciousActivity(logData),
       fire22LanguageKeys: this.getRelevantLanguageKeys(logData.logType),
-      retentionExpiresAt: new Date(Date.now() + (this.config.database.retentionDays * 24 * 60 * 60 * 1000))
+      retentionExpiresAt: new Date(
+        Date.now() + this.config.database.retentionDays * 24 * 60 * 60 * 1000
+      ),
     };
 
     // Store in D1 database
@@ -75,9 +77,7 @@ export class WebLogManager {
     await this.storeDetailedLog(enhancedLog);
 
     // Update analytics in background
-    this.updateAnalytics(enhancedLog).catch(err => 
-      console.error('Analytics update failed:', err)
-    );
+    this.updateAnalytics(enhancedLog).catch(err => console.error('Analytics update failed:', err));
 
     // Cache recent logs for performance
     await this.updateCacheLog(enhancedLog);
@@ -88,11 +88,13 @@ export class WebLogManager {
   /**
    * Transaction-specific logging with Fire22 compliance
    */
-  async logTransaction(data: Omit<CreateLogRequest<LogType.TRANSACTION>, 'logType'>): Promise<string> {
+  async logTransaction(
+    data: Omit<CreateLogRequest<LogType.TRANSACTION>, 'logType'>
+  ): Promise<string> {
     const transactionData: CreateLogRequest<LogType.TRANSACTION> = {
       ...data,
       logType: LogType.TRANSACTION,
-      fire22LanguageKeys: ['L-842', 'L-846'] // Transaction History, Account Balance
+      fire22LanguageKeys: ['L-842', 'L-846'], // Transaction History, Account Balance
     };
 
     return this.createLog(transactionData);
@@ -105,7 +107,7 @@ export class WebLogManager {
     const wagerData: CreateLogRequest<LogType.WAGER> = {
       ...data,
       logType: LogType.WAGER,
-      fire22LanguageKeys: ['L-1385', 'L-1389'] // 3rd Party Limits, Risk Management
+      fire22LanguageKeys: ['L-1385', 'L-1389'], // 3rd Party Limits, Risk Management
     };
 
     return this.createLog(wagerData);
@@ -114,11 +116,13 @@ export class WebLogManager {
   /**
    * Authentication logging with security analysis
    */
-  async logAuthentication(data: Omit<CreateLogRequest<LogType.AUTHENTICATION>, 'logType'>): Promise<string> {
+  async logAuthentication(
+    data: Omit<CreateLogRequest<LogType.AUTHENTICATION>, 'logType'>
+  ): Promise<string> {
     const authData: CreateLogRequest<LogType.AUTHENTICATION> = {
       ...data,
       logType: LogType.AUTHENTICATION,
-      fire22LanguageKeys: ['L-1387', 'L-1388'] // Security Settings, Account Verification
+      fire22LanguageKeys: ['L-1387', 'L-1388'], // Security Settings, Account Verification
     };
 
     return this.createLog(authData);
@@ -131,7 +135,7 @@ export class WebLogManager {
     const casinoData: CreateLogRequest<LogType.CASINO_BET> = {
       ...data,
       logType: LogType.CASINO_BET,
-      fire22LanguageKeys: ['L-848', 'L-1390'] // Fraud Detection, Compliance Check
+      fire22LanguageKeys: ['L-848', 'L-1390'], // Fraud Detection, Compliance Check
     };
 
     return this.createLog(casinoData);
@@ -140,26 +144,28 @@ export class WebLogManager {
   /**
    * Security incident logging
    */
-  async logSecurityIncident(data: Omit<CreateLogRequest<LogType.SECURITY>, 'logType'>): Promise<string> {
+  async logSecurityIncident(
+    data: Omit<CreateLogRequest<LogType.SECURITY>, 'logType'>
+  ): Promise<string> {
     const securityData: CreateLogRequest<LogType.SECURITY> = {
       ...data,
       logType: LogType.SECURITY,
       fire22LanguageKeys: ['L-1389', 'L-1391'], // Risk Management, Audit Trail
       isSuspicious: true, // Security logs are inherently suspicious
-      riskScore: Math.max(data.riskScore || 0, 50) // Minimum 50 risk score for security incidents
+      riskScore: Math.max(data.riskScore || 0, 50), // Minimum 50 risk score for security incidents
     };
 
     return this.createLog(securityData);
   }
 
-  // ========== Query and Retrieval Methods ==========
+  // !==!== Query and Retrieval Methods !==!==
 
   /**
    * Query web logs with advanced filtering
    */
   async queryLogs(filter: LogQueryFilter): Promise<LogQueryResult> {
     const cacheKey = `logs:query:${JSON.stringify(filter)}`;
-    
+
     // Try cache first for performance
     const cached = await this.getFromCache(cacheKey);
     if (cached) return cached;
@@ -220,8 +226,11 @@ export class WebLogManager {
     query += ` LIMIT ? OFFSET ?`;
     params.push(limit, offset);
 
-    const result = await db.prepare(query).bind(...params).all();
-    
+    const result = await db
+      .prepare(query)
+      .bind(...params)
+      .all();
+
     const logs = result.results.map(row => this.parseLogRow(row));
     const total = result.results[0]?.total_count || 0;
 
@@ -229,7 +238,7 @@ export class WebLogManager {
       logs,
       total,
       hasMore: offset + logs.length < total,
-      nextOffset: offset + logs.length < total ? offset + logs.length : undefined
+      nextOffset: offset + logs.length < total ? offset + logs.length : undefined,
     };
 
     // Cache result for 5 minutes
@@ -246,7 +255,7 @@ export class WebLogManager {
       logTypes: [logType],
       limit,
       orderBy: 'timestamp',
-      orderDirection: 'DESC'
+      orderDirection: 'DESC',
     };
 
     const result = await this.queryLogs(filter);
@@ -262,7 +271,7 @@ export class WebLogManager {
     if (cached) return cached;
 
     const db = this.env[this.config.database.binding];
-    const dateThreshold = new Date(Date.now() - (hoursBack * 60 * 60 * 1000));
+    const dateThreshold = new Date(Date.now() - hoursBack * 60 * 60 * 1000);
 
     const query = `
       SELECT 
@@ -281,9 +290,9 @@ export class WebLogManager {
     `;
 
     const result = await db.prepare(query).bind(dateThreshold.toISOString()).all();
-    
+
     const analytics: Record<LogType, LogAnalytics> = {} as any;
-    
+
     for (const row of result.results) {
       analytics[row.log_type as LogType] = {
         id: this.generateLogId(),
@@ -301,7 +310,7 @@ export class WebLogManager {
         avgRiskScore: Math.round(row.avg_risk_score || 0),
         maxRiskScore: row.max_risk_score || 0,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
     }
 
@@ -309,7 +318,7 @@ export class WebLogManager {
     return analytics;
   }
 
-  // ========== Storage Management ==========
+  // !==!== Storage Management !==!==
 
   /**
    * Archive old logs to R2 storage for long-term retention
@@ -317,30 +326,35 @@ export class WebLogManager {
   async archiveOldLogs(daysOld: number = 30): Promise<number> {
     const db = this.env[this.config.database.binding];
     const r2 = this.env[this.config.r2Storage.binding];
-    
-    const cutoffDate = new Date(Date.now() - (daysOld * 24 * 60 * 60 * 1000));
-    
+
+    const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
+
     // Get logs to archive
-    const logsToArchive = await db.prepare(`
+    const logsToArchive = await db
+      .prepare(
+        `
       SELECT * FROM web_logs 
       WHERE timestamp < ? AND status != 'archived'
       LIMIT ?
-    `).bind(cutoffDate.toISOString(), this.config.database.batchSize).all();
+    `
+      )
+      .bind(cutoffDate.toISOString(), this.config.database.batchSize)
+      .all();
 
     if (logsToArchive.results.length === 0) return 0;
 
     // Create archive file
     const archiveDate = new Date().toISOString().split('T')[0];
     const archiveKey = `${this.config.r2Storage.archivePath}/${archiveDate}/logs-${Date.now()}.json`;
-    
+
     const archiveData = {
       metadata: {
         archiveDate: new Date().toISOString(),
         cutoffDate: cutoffDate.toISOString(),
         totalLogs: logsToArchive.results.length,
-        fire22Version: '3.0.9'
+        fire22Version: '3.0.9',
       },
-      logs: logsToArchive.results
+      logs: logsToArchive.results,
     };
 
     // Store in R2
@@ -348,17 +362,22 @@ export class WebLogManager {
       customMetadata: {
         'fire22-log-archive': 'true',
         'archive-date': archiveDate,
-        'log-count': logsToArchive.results.length.toString()
-      }
+        'log-count': logsToArchive.results.length.toString(),
+      },
     });
 
     // Update database records as archived
     const logIds = logsToArchive.results.map(log => log.id);
-    await db.prepare(`
+    await db
+      .prepare(
+        `
       UPDATE web_logs 
       SET status = 'archived', archived_at = ? 
       WHERE id IN (${logIds.map(() => '?').join(',')})
-    `).bind(new Date().toISOString(), ...logIds).run();
+    `
+      )
+      .bind(new Date().toISOString(), ...logIds)
+      .run();
 
     return logsToArchive.results.length;
   }
@@ -368,16 +387,21 @@ export class WebLogManager {
    */
   async cleanupExpiredLogs(): Promise<number> {
     const db = this.env[this.config.database.binding];
-    
-    const result = await db.prepare(`
+
+    const result = await db
+      .prepare(
+        `
       DELETE FROM web_logs 
       WHERE retention_expires_at < ?
-    `).bind(new Date().toISOString()).run();
+    `
+      )
+      .bind(new Date().toISOString())
+      .run();
 
     return result.meta?.changes || 0;
   }
 
-  // ========== Private Helper Methods ==========
+  // !==!== Private Helper Methods !==!==
 
   private generateLogId(): string {
     return `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -388,8 +412,10 @@ export class WebLogManager {
 
     // Base risk assessment
     if (logData.logType === LogType.SECURITY) riskScore += 50;
-    if (logData.logType === LogType.TRANSACTION && logData.actionData?.amount > 10000) riskScore += 20;
-    if (logData.logType === LogType.WAGER && logData.actionData?.stakeAmount > 5000) riskScore += 15;
+    if (logData.logType === LogType.TRANSACTION && logData.actionData?.amount > 10000)
+      riskScore += 20;
+    if (logData.logType === LogType.WAGER && logData.actionData?.stakeAmount > 5000)
+      riskScore += 15;
 
     // IP-based risk (simplified)
     if (logData.ipAddress && !this.isKnownSafeIP(logData.ipAddress)) riskScore += 10;
@@ -416,37 +442,42 @@ export class WebLogManager {
 
   private async storeInDatabase(log: WebLogBase): Promise<void> {
     const db = this.env[this.config.database.binding];
-    
-    await db.prepare(`
+
+    await db
+      .prepare(
+        `
       INSERT INTO web_logs (
         id, timestamp, log_type, action_type, customer_id, session_id,
         ip_address, user_agent, geo_location, device_info, action_data,
         risk_score, is_suspicious, compliance_flags, status, processing_time_ms,
         language_code, fire22_language_keys, created_at, updated_at, retention_expires_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind(
-      log.id,
-      log.timestamp.toISOString(),
-      log.logType,
-      log.actionType,
-      log.customerId || null,
-      log.sessionId || null,
-      log.ipAddress,
-      log.userAgent || null,
-      JSON.stringify(log.geoLocation || null),
-      JSON.stringify(log.deviceInfo || null),
-      JSON.stringify(log.actionData),
-      log.riskScore,
-      log.isSuspicious ? 1 : 0,
-      JSON.stringify(log.complianceFlags || []),
-      log.status,
-      log.processingTimeMs || null,
-      log.languageCode,
-      JSON.stringify(log.fire22LanguageKeys || []),
-      log.createdAt.toISOString(),
-      log.updatedAt.toISOString(),
-      log.retentionExpiresAt?.toISOString() || null
-    ).run();
+    `
+      )
+      .bind(
+        log.id,
+        log.timestamp.toISOString(),
+        log.logType,
+        log.actionType,
+        log.customerId || null,
+        log.sessionId || null,
+        log.ipAddress,
+        log.userAgent || null,
+        JSON.stringify(log.geoLocation || null),
+        JSON.stringify(log.deviceInfo || null),
+        JSON.stringify(log.actionData),
+        log.riskScore,
+        log.isSuspicious ? 1 : 0,
+        JSON.stringify(log.complianceFlags || []),
+        log.status,
+        log.processingTimeMs || null,
+        log.languageCode,
+        JSON.stringify(log.fire22LanguageKeys || []),
+        log.createdAt.toISOString(),
+        log.updatedAt.toISOString(),
+        log.retentionExpiresAt?.toISOString() || null
+      )
+      .run();
   }
 
   private async storeDetailedLog(log: WebLogBase): Promise<void> {
@@ -463,7 +494,7 @@ export class WebLogManager {
   private async updateCacheLog(log: WebLogBase): Promise<void> {
     const kv = this.env[this.config.kvCache.binding];
     const key = `recent_logs:${log.logType}`;
-    
+
     // Keep last 50 logs of each type in cache
     let recentLogs = [];
     try {
@@ -476,7 +507,9 @@ export class WebLogManager {
     recentLogs.unshift(log);
     recentLogs = recentLogs.slice(0, 50); // Keep only 50 most recent
 
-    await kv.put(key, JSON.stringify(recentLogs), { expirationTtl: this.config.kvCache.ttlSeconds });
+    await kv.put(key, JSON.stringify(recentLogs), {
+      expirationTtl: this.config.kvCache.ttlSeconds,
+    });
   }
 
   private async getFromCache(key: string): Promise<any> {
@@ -520,7 +553,7 @@ export class WebLogManager {
       createdAt: new Date(row.created_at),
       updatedAt: new Date(row.updated_at),
       archivedAt: row.archived_at ? new Date(row.archived_at) : undefined,
-      retentionExpiresAt: row.retention_expires_at ? new Date(row.retention_expires_at) : undefined
+      retentionExpiresAt: row.retention_expires_at ? new Date(row.retention_expires_at) : undefined,
     };
   }
 
@@ -530,17 +563,25 @@ export class WebLogManager {
     return ip.startsWith('186.') || ip.startsWith('187.') || ip.startsWith('189.');
   }
 
-  private async getRecentActivityCount(customerId?: string, seconds: number = 300): Promise<number> {
+  private async getRecentActivityCount(
+    customerId?: string,
+    seconds: number = 300
+  ): Promise<number> {
     if (!customerId) return 0;
 
     const db = this.env[this.config.database.binding];
-    const threshold = new Date(Date.now() - (seconds * 1000));
+    const threshold = new Date(Date.now() - seconds * 1000);
 
-    const result = await db.prepare(`
+    const result = await db
+      .prepare(
+        `
       SELECT COUNT(*) as count 
       FROM web_logs 
       WHERE customer_id = ? AND timestamp >= ?
-    `).bind(customerId, threshold.toISOString()).first();
+    `
+      )
+      .bind(customerId, threshold.toISOString())
+      .first();
 
     return result?.count || 0;
   }

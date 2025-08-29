@@ -2,7 +2,7 @@
 
 /**
  * Fire22 Dashboard Bridge
- * 
+ *
  * This script creates a real-time bridge between the HTML dashboard
  * and the DashboardIntegration class, enabling live data exchange
  * and actual build execution.
@@ -39,12 +39,12 @@ class DashboardBridge {
 
   private startWebSocketServer() {
     const port = process.env.DASHBOARD_PORT || 3001;
-    
+
     this.server = Bun.serve({
       port: parseInt(port.toString()),
       fetch: (req, server) => {
         const url = new URL(req.url);
-        
+
         if (url.pathname === '/dashboard') {
           const success = server.upgrade(req);
           if (success) {
@@ -52,38 +52,38 @@ class DashboardBridge {
           }
           return success ? undefined : new Response('Upgrade failed', { status: 500 });
         }
-        
+
         if (url.pathname === '/api/packages') {
           return this.handlePackagesAPI();
         }
-        
+
         if (url.pathname === '/api/build') {
           return this.handleBuildAPI(req);
         }
-        
+
         if (url.pathname === '/api/status') {
           return this.handleStatusAPI();
         }
-        
+
         return new Response('Not found', { status: 404 });
       },
       websocket: {
-        open: (ws) => {
+        open: ws => {
           this.clients.add(ws);
           console.log('📱 Dashboard WebSocket connected');
           this.sendToClient(ws, {
             type: 'connected',
-            data: { message: 'Connected to Fire22 Dashboard Bridge' }
+            data: { message: 'Connected to Fire22 Dashboard Bridge' },
           });
         },
         message: (ws, message) => {
           this.handleWebSocketMessage(ws, message);
         },
-        close: (ws) => {
+        close: ws => {
           this.clients.delete(ws);
           console.log('📱 Dashboard WebSocket disconnected');
-        }
-      }
+        },
+      },
     });
 
     console.log(`🚀 Dashboard Bridge running on port ${port}`);
@@ -120,7 +120,7 @@ class DashboardBridge {
             type: 'error',
             data: { message: 'Unknown message type' },
             success: false,
-            id: data.id
+            id: data.id,
           });
       }
     } catch (error) {
@@ -128,7 +128,7 @@ class DashboardBridge {
       this.sendToClient(ws, {
         type: 'error',
         data: { message: 'Invalid message format' },
-        success: false
+        success: false,
       });
     }
   }
@@ -137,19 +137,19 @@ class DashboardBridge {
     try {
       const packages = await this.integration.getPackages();
       const stats = await this.integration.getPackageStatistics();
-      
+
       this.sendToClient(ws, {
         type: 'packages_data',
         data: { packages, statistics: stats },
         success: true,
-        id: message.id
+        id: message.id,
       });
     } catch (error) {
       this.sendToClient(ws, {
         type: 'error',
         data: { message: `Failed to get packages: ${error.message}` },
         success: false,
-        id: message.id
+        id: message.id,
       });
     }
   }
@@ -160,7 +160,7 @@ class DashboardBridge {
         type: 'build_response',
         data: { message: 'Build already running' },
         success: false,
-        id: message.id
+        id: message.id,
       });
       return;
     }
@@ -170,25 +170,24 @@ class DashboardBridge {
       this.currentBuild = {
         id: Date.now(),
         startTime: new Date(),
-        steps: []
+        steps: [],
       };
 
       // Broadcast build started
       this.broadcast({
         type: 'build_started',
-        data: { buildId: this.currentBuild.id, startTime: this.currentBuild.startTime }
+        data: { buildId: this.currentBuild.id, startTime: this.currentBuild.startTime },
       });
 
       // Start the actual build process
       await this.executeRealBuild(ws, message.id);
-
     } catch (error) {
       this.buildStatus = 'error';
       this.sendToClient(ws, {
         type: 'build_response',
         data: { message: `Build failed: ${error.message}` },
         success: false,
-        id: message.id
+        id: message.id,
       });
     }
   }
@@ -200,23 +199,26 @@ class DashboardBridge {
         { name: 'Version Management', action: () => this.integration.manageVersions() },
         { name: 'Dependency Analysis', action: () => this.integration.analyzeDependencies() },
         { name: 'Package Building', action: () => this.integration.buildPackages() },
-        { name: 'Documentation Generation', action: () => this.integration.generateDocumentation() },
+        {
+          name: 'Documentation Generation',
+          action: () => this.integration.generateDocumentation(),
+        },
         { name: 'Quality Checks', action: () => this.integration.runQualityChecks() },
-        { name: 'Final Assembly', action: () => this.integration.assembleBuild() }
+        { name: 'Final Assembly', action: () => this.integration.assembleBuild() },
       ];
 
       for (let i = 0; i < buildSteps.length; i++) {
         const step = buildSteps[i];
-        
+
         // Broadcast step started
         this.broadcast({
           type: 'build_step_started',
-          data: { 
-            step: step.name, 
-            stepNumber: i + 1, 
+          data: {
+            step: step.name,
+            stepNumber: i + 1,
             totalSteps: buildSteps.length,
-            buildId: this.currentBuild.id
-          }
+            buildId: this.currentBuild.id,
+          },
         });
 
         // Execute the actual step
@@ -225,65 +227,65 @@ class DashboardBridge {
         // Broadcast step completed
         this.broadcast({
           type: 'build_step_completed',
-          data: { 
-            step: step.name, 
-            stepNumber: i + 1, 
+          data: {
+            step: step.name,
+            stepNumber: i + 1,
             totalSteps: buildSteps.length,
-            buildId: this.currentBuild.id
-          }
+            buildId: this.currentBuild.id,
+          },
         });
 
         // Update progress
         const progress = ((i + 1) / buildSteps.length) * 100;
         this.broadcast({
           type: 'build_progress',
-          data: { progress, currentStep: step.name, buildId: this.currentBuild.id }
+          data: { progress, currentStep: step.name, buildId: this.currentBuild.id },
         });
       }
 
       // Build completed
       this.buildStatus = 'completed';
       this.currentBuild.endTime = new Date();
-      this.currentBuild.duration = this.currentBuild.endTime.getTime() - this.currentBuild.startTime.getTime();
+      this.currentBuild.duration =
+        this.currentBuild.endTime.getTime() - this.currentBuild.startTime.getTime();
 
       this.broadcast({
         type: 'build_completed',
-        data: { 
+        data: {
           buildId: this.currentBuild.id,
           duration: this.currentBuild.duration,
-          success: true
-        }
+          success: true,
+        },
       });
 
       // Send final response to original client
       this.sendToClient(ws, {
         type: 'build_response',
-        data: { 
+        data: {
           message: 'Build completed successfully',
           buildId: this.currentBuild.id,
-          duration: this.currentBuild.duration
+          duration: this.currentBuild.duration,
         },
         success: true,
-        id: messageId
+        id: messageId,
       });
-
     } catch (error) {
       this.buildStatus = 'error';
       this.currentBuild.error = error.message;
-      
+
       this.broadcast({
         type: 'build_error',
-        data: { 
+        data: {
           buildId: this.currentBuild.id,
-          error: error.message
-        }
+          error: error.message,
+        },
       });
 
       this.sendToClient(ws, {
         type: 'build_response',
         data: { message: `Build failed: ${error.message}` },
         success: false,
-        id: messageId
+        id: messageId,
       });
     }
   }
@@ -294,7 +296,7 @@ class DashboardBridge {
         type: 'build_response',
         data: { message: 'No build running' },
         success: false,
-        id: message.id
+        id: message.id,
       });
       return;
     }
@@ -307,22 +309,21 @@ class DashboardBridge {
 
       this.broadcast({
         type: 'build_stopped',
-        data: { buildId: this.currentBuild.id }
+        data: { buildId: this.currentBuild.id },
       });
 
       this.sendToClient(ws, {
         type: 'build_response',
         data: { message: 'Build stopped successfully' },
         success: true,
-        id: message.id
+        id: message.id,
       });
-
     } catch (error) {
       this.sendToClient(ws, {
         type: 'build_response',
         data: { message: `Failed to stop build: ${error.message}` },
         success: false,
-        id: message.id
+        id: message.id,
       });
     }
   }
@@ -330,10 +331,10 @@ class DashboardBridge {
   private async handleBuildPackage(ws: WebSocket, message: DashboardMessage) {
     try {
       const { packageName } = message.data;
-      
+
       this.broadcast({
         type: 'package_build_started',
-        data: { packageName }
+        data: { packageName },
       });
 
       // Execute package build
@@ -341,27 +342,26 @@ class DashboardBridge {
 
       this.broadcast({
         type: 'package_build_completed',
-        data: { packageName, success: true }
+        data: { packageName, success: true },
       });
 
       this.sendToClient(ws, {
         type: 'package_build_response',
         data: { message: `Package ${packageName} built successfully` },
         success: true,
-        id: message.id
+        id: message.id,
       });
-
     } catch (error) {
       this.broadcast({
         type: 'package_build_error',
-        data: { packageName: message.data.packageName, error: error.message }
+        data: { packageName: message.data.packageName, error: error.message },
       });
 
       this.sendToClient(ws, {
         type: 'package_build_response',
         data: { message: `Package build failed: ${error.message}` },
         success: false,
-        id: message.id
+        id: message.id,
       });
     }
   }
@@ -377,21 +377,20 @@ class DashboardBridge {
         type: 'refresh_response',
         data: { packages, statistics: stats, buildStatus: status },
         success: true,
-        id: message.id
+        id: message.id,
       });
 
       // Broadcast refresh to all clients
       this.broadcast({
         type: 'data_refreshed',
-        data: { timestamp: new Date().toISOString() }
+        data: { timestamp: new Date().toISOString() },
       });
-
     } catch (error) {
       this.sendToClient(ws, {
         type: 'error',
         data: { message: `Refresh failed: ${error.message}` },
         success: false,
-        id: message.id
+        id: message.id,
       });
     }
   }
@@ -402,51 +401,59 @@ class DashboardBridge {
         buildStatus: this.buildStatus,
         currentBuild: this.currentBuild,
         integrationStatus: 'connected',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       this.sendToClient(ws, {
         type: 'status_response',
         data: status,
         success: true,
-        id: message.id
+        id: message.id,
       });
-
     } catch (error) {
       this.sendToClient(ws, {
         type: 'error',
         data: { message: `Failed to get status: ${error.message}` },
         success: false,
-        id: message.id
+        id: message.id,
       });
     }
   }
 
   private handlePackagesAPI(): Response {
-    return new Response(JSON.stringify({
-      message: 'Use WebSocket for real-time updates or GET /api/packages for static data'
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        message: 'Use WebSocket for real-time updates or GET /api/packages for static data',
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 
   private handleBuildAPI(req: Request): Response {
-    return new Response(JSON.stringify({
-      message: 'Use WebSocket for real-time build control'
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        message: 'Use WebSocket for real-time build control',
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 
   private handleStatusAPI(): Response {
-    return new Response(JSON.stringify({
-      buildStatus: this.buildStatus,
-      currentBuild: this.currentBuild,
-      integrationStatus: 'connected',
-      timestamp: new Date().toISOString()
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        buildStatus: this.buildStatus,
+        currentBuild: this.currentBuild,
+        integrationStatus: 'connected',
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 
   private sendToClient(ws: WebSocket, message: DashboardResponse) {
@@ -473,7 +480,7 @@ class DashboardBridge {
   public async getBuildStatus() {
     return {
       status: this.buildStatus,
-      currentBuild: this.currentBuild
+      currentBuild: this.currentBuild,
     };
   }
 
@@ -486,7 +493,7 @@ class DashboardBridge {
     this.currentBuild = {
       id: Date.now(),
       startTime: new Date(),
-      steps: []
+      steps: [],
     };
 
     // Start build in background
@@ -510,20 +517,20 @@ class DashboardBridge {
 // Start the bridge if this script is run directly
 if (import.meta.main) {
   console.log('🔥 Starting Fire22 Dashboard Bridge...');
-  
+
   const bridge = new DashboardBridge();
-  
+
   // Handle graceful shutdown
   process.on('SIGINT', () => {
     console.log('\n🛑 Shutting down Dashboard Bridge...');
     process.exit(0);
   });
-  
+
   process.on('SIGTERM', () => {
     console.log('\n🛑 Shutting down Dashboard Bridge...');
     process.exit(0);
   });
-  
+
   console.log('✅ Dashboard Bridge is running and ready for connections');
 }
 

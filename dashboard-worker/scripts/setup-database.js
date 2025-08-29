@@ -9,8 +9,9 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:testpass123@localhost:5432/fire22_dashboard',
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  connectionString:
+    process.env.DATABASE_URL || 'postgresql://postgres:testpass123@localhost:5432/fire22_dashboard',
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
 const createTablesSQL = `
@@ -168,31 +169,30 @@ ON CONFLICT (customer_id) DO NOTHING;
 async function setupDatabase() {
   try {
     console.log('🚀 Setting up Fire22 Dashboard Database...');
-    
+
     // Test connection
     await pool.query('SELECT NOW()');
     console.log('✅ Database connection successful');
-    
+
     // Create tables
     console.log('📋 Creating tables...');
     await pool.query(createTablesSQL);
     console.log('✅ Tables created successfully');
-    
+
     // Insert sample data
     console.log('📊 Inserting sample data...');
     await pool.query(insertSampleData);
     console.log('✅ Sample data inserted successfully');
-    
+
     // Verify setup
     const playerCount = await pool.query('SELECT COUNT(*) FROM players');
     const wagerCount = await pool.query('SELECT COUNT(*) FROM wagers');
     const agentCount = await pool.query('SELECT COUNT(*) FROM agents');
-    
+
     console.log('🎯 Database setup complete!');
     console.log(`   Players: ${playerCount.rows[0].count}`);
     console.log(`   Wagers: ${wagerCount.rows[0].count}`);
     console.log(`   Agents: ${agentCount.rows[0].count}`);
-    
   } catch (error) {
     console.error('❌ Database setup failed:', error);
     process.exit(1);

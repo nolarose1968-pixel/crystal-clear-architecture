@@ -76,7 +76,6 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-
     // Setup initial analysis
     await this.analyzeCurrentPage();
 
@@ -93,7 +92,6 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
    * Analyze the current page structure
    */
   async analyzeCurrentPage(): Promise<Fantasy42PageStructure> {
-
     const structure: Fantasy42PageStructure = {
       url: window.location.href,
       title: document.title,
@@ -106,7 +104,7 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
       inputs: [],
       customerElements: [],
       agentElements: [],
-      transactionElements: []
+      transactionElements: [],
     };
 
     // Analyze main content areas
@@ -150,7 +148,7 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
       'div.row',
       'div.col',
       '.card',
-      '.panel'
+      '.panel',
     ];
 
     const elements: DOMElement[] = [];
@@ -180,7 +178,7 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
       '.sidebar',
       '[role="navigation"]',
       'ul[class*="menu"]',
-      '.breadcrumb'
+      '.breadcrumb',
     ];
 
     const elements: DOMElement[] = [];
@@ -251,7 +249,7 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
       '.btn',
       '[class*="button"]',
       'input[type="button"]',
-      'input[type="submit"]'
+      'input[type="submit"]',
     ];
 
     const elements: DOMElement[] = [];
@@ -319,7 +317,7 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
       '[data-field*="user"]',
       'tr[class*="customer"]',
       'tr[class*="player"]',
-      'tr[class*="user"]'
+      'tr[class*="user"]',
     ];
 
     const elements: DOMElement[] = [];
@@ -349,7 +347,7 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
       '.agent-tree',
       '.agent-list',
       '[href*="agent"]',
-      '[data-action*="agent"]'
+      '[data-action*="agent"]',
     ];
 
     const elements: DOMElement[] = [];
@@ -384,7 +382,7 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
       '[data-action*="payment"]',
       '[data-action*="cash"]',
       'tr[class*="transaction"]',
-      'tr[class*="payment"]'
+      'tr[class*="payment"]',
     ];
 
     const elements: DOMElement[] = [];
@@ -425,7 +423,7 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
         innerHTML: el.innerHTML,
         isVisible: this.isElementVisible(el),
         boundingRect: el.getBoundingClientRect(),
-        computedStyle: this.getComputedStyle(el)
+        computedStyle: this.getComputedStyle(el),
       };
 
       // Extract attributes
@@ -485,11 +483,13 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
    */
   private isElementVisible(element: HTMLElement): boolean {
     const style = window.getComputedStyle(element);
-    return style.display !== 'none' &&
-           style.visibility !== 'hidden' &&
-           style.opacity !== '0' &&
-           element.offsetWidth > 0 &&
-           element.offsetHeight > 0;
+    return (
+      style.display !== 'none' &&
+      style.visibility !== 'hidden' &&
+      style.opacity !== '0' &&
+      element.offsetWidth > 0 &&
+      element.offsetHeight > 0
+    );
   }
 
   /**
@@ -501,9 +501,22 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
 
     // Get key style properties
     const properties = [
-      'display', 'visibility', 'opacity', 'position', 'top', 'left',
-      'width', 'height', 'background-color', 'color', 'font-size',
-      'font-weight', 'text-align', 'border', 'padding', 'margin'
+      'display',
+      'visibility',
+      'opacity',
+      'position',
+      'top',
+      'left',
+      'width',
+      'height',
+      'background-color',
+      'color',
+      'font-size',
+      'font-weight',
+      'text-align',
+      'border',
+      'padding',
+      'margin',
     ];
 
     properties.forEach(prop => {
@@ -560,7 +573,7 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
       headers,
       rows,
       rowCount: rows.length,
-      columnCount: headers.length
+      columnCount: headers.length,
     };
   }
 
@@ -569,7 +582,7 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
    */
   private setupPageMonitoring(): void {
     // Monitor DOM changes
-    const observer = new MutationObserver((mutations) => {
+    const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
         if (mutation.type === 'childList') {
           this.handleDOMChange(mutation);
@@ -579,7 +592,7 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
 
     observer.observe(document.body, {
       childList: true,
-      subtree: true
+      subtree: true,
     });
 
     // Monitor URL changes
@@ -590,7 +603,6 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
         this.handleUrlChange(currentUrl);
       }
     }, 1000);
-
   }
 
   /**
@@ -605,16 +617,16 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
         {
           element: { xpath: '//input[@placeholder="Search customers"]' } as DOMElement,
           action: 'input',
-          value: '{searchTerm}'
+          value: '{searchTerm}',
         },
         {
           element: { xpath: '//button[@data-action="search"]' } as DOMElement,
           action: 'click',
-          delay: 500
-        }
+          delay: 500,
+        },
       ],
       triggers: ['customer-search-requested'],
-      conditions: ['search-input-available']
+      conditions: ['search-input-available'],
     });
 
     // Agent tree navigation
@@ -625,15 +637,15 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
         {
           element: { xpath: '//a[@data-action="get-agent-management"]' } as DOMElement,
           action: 'click',
-          delay: 1000
+          delay: 1000,
         },
         {
           element: { xpath: '//div[@class="agent-tree"]' } as DOMElement,
-          action: 'focus'
-        }
+          action: 'focus',
+        },
       ],
       triggers: ['agent-tree-requested'],
-      conditions: ['agent-tree-available']
+      conditions: ['agent-tree-available'],
     });
 
     // Transaction processing
@@ -644,18 +656,17 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
         {
           element: { xpath: '//a[@data-action="get-transactions"]' } as DOMElement,
           action: 'click',
-          delay: 1000
+          delay: 1000,
         },
         {
           element: { xpath: '//input[@name="amount"]' } as DOMElement,
           action: 'input',
-          value: '{amount}'
-        }
+          value: '{amount}',
+        },
       ],
       triggers: ['transaction-requested'],
-      conditions: ['transaction-form-available']
+      conditions: ['transaction-form-available'],
     });
-
   }
 
   /**
@@ -666,7 +677,6 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
     if (!script) {
       throw new Error(`Script '${scriptName}' not found`);
     }
-
 
     for (const step of script.steps) {
       try {
@@ -679,13 +689,15 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
         throw error;
       }
     }
-
   }
 
   /**
    * Execute automation step
    */
-  private async executeStep(step: ElementInteraction, parameters: Record<string, any>): Promise<void> {
+  private async executeStep(
+    step: ElementInteraction,
+    parameters: Record<string, any>
+  ): Promise<void> {
     // Find the element
     const element = this.xpathHandler.findElementByXPath(step.element.xpath);
     if (!element) {
@@ -807,9 +819,11 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
     for (const [scriptName, script] of this.automationScripts) {
       // Check if element matches any triggers
       const isTriggered = script.triggers.some(trigger => {
-        return element.attributes['data-action'] === trigger ||
-               element.className?.includes(trigger) ||
-               element.id === trigger;
+        return (
+          element.attributes['data-action'] === trigger ||
+          element.className?.includes(trigger) ||
+          element.id === trigger
+        );
       });
 
       if (isTriggered) {
@@ -909,7 +923,7 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
       pageStructure: this.pageStructure,
       elementCache: Array.from(this.elementCache.entries()),
       automationScripts: Array.from(this.automationScripts.entries()),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -924,7 +938,7 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
       pageInfo: {
         url: structure.url,
         title: structure.title,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
       elementCounts: {
         mainContent: structure.mainContent.length,
@@ -936,14 +950,16 @@ export class Fantasy42DOMAnalyzer extends EventEmitter {
         inputs: structure.inputs.length,
         customerElements: structure.customerElements.length,
         agentElements: structure.agentElements.length,
-        transactionElements: structure.transactionElements.length
+        transactionElements: structure.transactionElements.length,
       },
       interactiveElements: {
-        clickable: structure.buttons.filter(b => b.attributes.onclick || b.attributes['data-action']).length,
+        clickable: structure.buttons.filter(
+          b => b.attributes.onclick || b.attributes['data-action']
+        ).length,
         forms: structure.forms.length,
-        inputs: structure.inputs.length
+        inputs: structure.inputs.length,
       },
-      automationPotential: this.automationScripts.size
+      automationPotential: this.automationScripts.size,
     };
   }
 

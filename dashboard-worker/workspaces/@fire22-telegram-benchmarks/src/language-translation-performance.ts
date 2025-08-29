@@ -2,15 +2,15 @@
 
 /**
  * 🌐 Language Translation Performance Benchmarks
- * 
+ *
  * Tests the performance of the Fire22 multilingual system
  */
 
 import BenchmarkRunner from './index';
 
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 // 🎯 LANGUAGE BENCHMARKS
-// =============================================================================
+// !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
 export async function runBenchmarks(runner: BenchmarkRunner) {
   console.log('\n🌐 Running Language Translation Benchmarks...\n');
@@ -27,9 +27,9 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
     }
   }
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 BENCHMARK: Translation Lookup
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   await runner.benchmark(
     'Translation Lookup (Cached)',
@@ -43,9 +43,9 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
     100000
   );
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 BENCHMARK: Translation with Variables
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   const templateReplace = (template: string, variables: Record<string, any>) => {
     return template.replace(/\{\{(\w+)\}\}/g, (match, key) => variables[key] || match);
@@ -61,9 +61,9 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
     50000
   );
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 BENCHMARK: Language Detection
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   const detectLanguage = (text: string): string => {
     // Simple language detection based on keywords
@@ -96,9 +96,9 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
     50000
   );
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 BENCHMARK: Batch Translation
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   await runner.benchmark(
     'Batch Translation (10 items)',
@@ -115,9 +115,9 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
     10000
   );
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 BENCHMARK: Cache Miss Handling
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   const loadTranslation = async (code: string, lang: string): Promise<string> => {
     // Simulate database/file load
@@ -132,7 +132,7 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
       const code = `L-${9000 + Math.floor(Math.random() * 100)}`; // Non-cached codes
       const lang = languages[Math.floor(Math.random() * languages.length)];
       const key = `${code}_${lang}`;
-      
+
       let translation = translationCache.get(key);
       if (!translation) {
         translation = await loadTranslation(code, lang);
@@ -142,9 +142,9 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
     1000 // Fewer iterations due to async
   );
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 BENCHMARK: Language Switching
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   const userLanguages = new Map<string, string>();
 
@@ -156,7 +156,7 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
       const newLang = languages[Math.floor(Math.random() * languages.length)];
       const oldLang = userLanguages.get(userId);
       userLanguages.set(userId, newLang);
-      
+
       // Simulate cache invalidation
       if (oldLang && oldLang !== newLang) {
         // Clear user-specific cache entries
@@ -170,9 +170,9 @@ export async function runBenchmarks(runner: BenchmarkRunner) {
     10000
   );
 
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
   // 📊 BENCHMARK: Translation Memory Usage
-  // =============================================================================
+  // !==!==!==!==!==!==!==!==!==!==!==!==!==!====
 
   await runner.benchmark(
     'Translation Memory (1000 entries)',

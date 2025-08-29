@@ -46,9 +46,11 @@ curl http://localhost:3001/api/dashboard/performance
 ## 📊 API Endpoints
 
 ### GET `/api/dashboard/metrics`
+
 Returns real-time system metrics
 
 **Response:**
+
 ```json
 {
   "responseTime": 142,
@@ -65,13 +67,16 @@ Returns real-time system metrics
 ```
 
 ### GET `/api/dashboard/analytics`
+
 Returns analytics data for charts and visualizations
 
 **Query Parameters:**
+
 - `timeframe`: Time period (e.g., '7d', '30d')
 - `points`: Number of data points (default: 30)
 
 **Response:**
+
 ```json
 {
   "revenue": [85000, 92000, 101000, ...],
@@ -84,9 +89,11 @@ Returns analytics data for charts and visualizations
 ```
 
 ### GET `/api/dashboard/health`
+
 Returns system health status
 
 **Response:**
+
 ```json
 {
   "status": "healthy",
@@ -102,9 +109,11 @@ Returns system health status
 ```
 
 ### GET `/api/dashboard/performance`
+
 Returns API endpoint performance metrics
 
 **Response:**
+
 ```json
 {
   "endpoints": [
@@ -157,27 +166,32 @@ FANTASY402_BASE_URL=https://api.fantasy402.com/v2
 For production deployment, update the API URLs in the dashboard files:
 
 1. **Analytics Dashboard** (`analytics/analytics.js`):
+
    ```javascript
-   const apiBaseUrl = window.location.hostname === 'localhost'
-     ? 'http://localhost:3001'
-     : 'https://your-production-api.com';
+   const apiBaseUrl =
+     window.location.hostname === "localhost"
+       ? "http://localhost:3001"
+       : "https://your-production-api.com";
    ```
 
 2. **Performance Dashboard** (`performance-dashboard.html`):
    ```javascript
-   const apiBaseUrl = window.location.hostname === 'localhost'
-     ? 'http://localhost:3001'
-     : 'https://your-production-api.com';
+   const apiBaseUrl =
+     window.location.hostname === "localhost"
+       ? "http://localhost:3001"
+       : "https://your-production-api.com";
    ```
 
 ## 🏗️ Architecture
 
 ### Current Implementation
+
 - **Simulated Data**: Currently returns realistic simulated data
 - **Fallback Strategy**: Dashboards gracefully fall back to demo data if API is unavailable
 - **Real-time Updates**: 30-second refresh intervals with WebSocket support ready
 
 ### Integration Points
+
 - **Fantasy402 API**: Ready for real Fantasy402 data integration
 - **Database**: Prepared for PostgreSQL/SQLite integration
 - **WebSocket**: Configured for real-time data streaming
@@ -186,36 +200,43 @@ For production deployment, update the API URLs in the dashboard files:
 ## 🔄 Connecting Real Data
 
 ### 1. Database Integration
+
 Replace simulated data with real database queries:
 
 ```typescript
 // In dashboard.controller.ts
 export async function getMetrics(request: ValidatedRequest): Promise<Response> {
-  const metrics = await db.query('SELECT * FROM system_metrics WHERE timestamp > NOW() - INTERVAL \'1 hour\'');
+  const metrics = await db.query(
+    "SELECT * FROM system_metrics WHERE timestamp > NOW() - INTERVAL '1 hour'",
+  );
   // Process and return real data
 }
 ```
 
 ### 2. Fantasy402 Integration
+
 Connect to real Fantasy402 endpoints:
 
 ```typescript
 // In dashboard.controller.ts
-export async function getAnalytics(request: ValidatedRequest): Promise<Response> {
+export async function getAnalytics(
+  request: ValidatedRequest,
+): Promise<Response> {
   const fantasyData = await fantasy402Client.getAnalytics({
-    timeframe: '7d',
-    metrics: ['revenue', 'users', 'engagement']
+    timeframe: "7d",
+    metrics: ["revenue", "users", "engagement"],
   });
   // Process and return real data
 }
 ```
 
 ### 3. WebSocket Real-time Updates
+
 Enable real-time data streaming:
 
 ```typescript
 // WebSocket connection for live updates
-const ws = new WebSocket('wss://your-websocket-server.com');
+const ws = new WebSocket("wss://your-websocket-server.com");
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
   updateDashboard(data);
@@ -225,6 +246,7 @@ ws.onmessage = (event) => {
 ## 📱 Dashboard Features
 
 ### Analytics Dashboard
+
 - 📊 Real-time KPI metrics
 - 📈 Interactive charts (Chart.js)
 - 🎯 ROI calculator
@@ -233,6 +255,7 @@ ws.onmessage = (event) => {
 - 🎨 Professional terminal theme
 
 ### Performance Dashboard
+
 - ⚡ Real-time system monitoring
 - 🔌 API endpoint performance
 - 💻 Resource usage tracking
@@ -243,6 +266,7 @@ ws.onmessage = (event) => {
 ## 🚀 Deployment
 
 ### GitHub Pages
+
 The dashboards are ready for GitHub Pages deployment. Simply:
 
 1. Enable GitHub Pages in repository settings
@@ -250,6 +274,7 @@ The dashboards are ready for GitHub Pages deployment. Simply:
 3. Access at: `https://yourusername.github.io/repository-name/`
 
 ### Production API Server
+
 For production, deploy the API server:
 
 ```bash
@@ -265,6 +290,7 @@ docker run -p 3001:3001 fire22-dashboard-api
 ## 🔐 Security
 
 ### API Security Features
+
 - ✅ CORS protection
 - ✅ Rate limiting ready
 - ✅ Input validation
@@ -272,6 +298,7 @@ docker run -p 3001:3001 fire22-dashboard-api
 - ✅ No sensitive data exposure
 
 ### Production Security
+
 - 🔒 Use HTTPS in production
 - 🔑 Implement API key authentication
 - 🛡️ Add request validation
@@ -281,12 +308,14 @@ docker run -p 3001:3001 fire22-dashboard-api
 ## 📈 Monitoring & Analytics
 
 ### Built-in Monitoring
+
 - Health check endpoints
 - Performance metrics tracking
 - Error rate monitoring
 - System resource monitoring
 
 ### External Monitoring
+
 - Application Performance Monitoring (APM)
 - Error tracking services
 - Log aggregation
@@ -307,6 +336,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🆘 Support
 
 For support and questions:
+
 - 📧 Email: support@fire22.com
 - 💬 Discord: [Fire22 Community](https://discord.gg/fire22)
 - 📖 Documentation: [Fire22 Docs](https://docs.fire22.com)

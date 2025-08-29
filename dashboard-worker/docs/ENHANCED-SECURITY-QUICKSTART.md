@@ -203,12 +203,12 @@ bun run enhanced:report
 
 ### Common Issues
 
-| Issue | Solution |
-|-------|----------|
-| Bun.secrets not available | Update Bun to 1.2.20+ |
-| Credential access denied | Check OS credential manager |
-| Security scan failed | Review package.json for policy violations |
-| Deployment blocked | Fix security issues first |
+| Issue                     | Solution                                  |
+| ------------------------- | ----------------------------------------- |
+| Bun.secrets not available | Update Bun to 1.2.20+                     |
+| Credential access denied  | Check OS credential manager               |
+| Security scan failed      | Review package.json for policy violations |
+| Deployment blocked        | Fix security issues first                 |
 
 ### Debug Mode
 

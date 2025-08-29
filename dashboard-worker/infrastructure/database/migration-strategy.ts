@@ -55,10 +55,11 @@ export class DatabaseMigrationCoordinator {
     return {
       name: 'Fire22 Unified Schema Migration',
       version: '1.0.0',
-      description: 'Migrate from fragmented schema to unified Fire22-Telegram-Internal coordination system',
+      description:
+        'Migrate from fragmented schema to unified Fire22-Telegram-Internal coordination system',
       steps: this.getAllMigrationSteps(),
       totalSteps: this.getAllMigrationSteps().length,
-      estimatedDuration: '2-4 hours'
+      estimatedDuration: '2-4 hours',
     };
   }
 
@@ -77,7 +78,7 @@ export class DatabaseMigrationCoordinator {
 
     for (const step of steps) {
       const startTime = Date.now();
-      
+
       try {
         // Check if step already executed
         if (await this.isStepExecuted(step.id)) {
@@ -86,17 +87,17 @@ export class DatabaseMigrationCoordinator {
         }
 
         // Check dependencies
-        if (!await this.checkDependencies(step.dependencies)) {
+        if (!(await this.checkDependencies(step.dependencies))) {
           throw new Error(`Dependencies not met for step ${step.id}`);
         }
 
         console.log(`🔄 Executing step: ${step.name}`);
-        
+
         // Execute step
         await step.execute(this.db);
 
         // Verify step
-        if (!await step.verify(this.db)) {
+        if (!(await step.verify(this.db))) {
           throw new Error(`Step verification failed for ${step.id}`);
         }
 
@@ -109,11 +110,10 @@ export class DatabaseMigrationCoordinator {
           stepId: step.id,
           success: true,
           duration,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
 
         console.log(`✅ Step ${step.id} completed in ${duration}ms`);
-
       } catch (error) {
         const duration = Date.now() - startTime;
         results.push({
@@ -121,11 +121,11 @@ export class DatabaseMigrationCoordinator {
           success: false,
           error: error.message,
           duration,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
 
         console.error(`❌ Step ${step.id} failed:`, error.message);
-        
+
         // If step is critical, stop migration
         if (step.priority === 1) {
           console.error('🛑 Critical step failed, stopping migration');
@@ -152,34 +152,34 @@ export class DatabaseMigrationCoordinator {
       this.createMigrationTrackingStep(),
       this.createUnifiedUsersTableStep(),
       this.createDepartmentsTableStep(),
-      
+
       // Phase 2: Enhanced Fire22 Integration
       this.createEnhancedFire22CustomersStep(),
       this.createEnhancedFire22AgentsStep(),
       this.createEnhancedTransactionsStep(),
-      
+
       // Phase 3: Telegram Integration
       this.createTelegramTablesStep(),
       this.createSupportTicketsStep(),
-      
+
       // Phase 4: Coordination & Automation
       this.createWorkflowTablesStep(),
       this.createAnalyticsTablesStep(),
       this.createViewsStep(),
       this.createTriggersStep(),
-      
+
       // Phase 5: Data Migration
       this.migrateLegacyCustomersStep(),
       this.migrateLegacyTransactionsStep(),
       this.linkExistingTelegramUsersStep(),
-      
+
       // Phase 6: Optimization
       this.createIndexesStep(),
-      this.optimizePerformanceStep()
+      this.optimizePerformanceStep(),
     ].sort((a, b) => a.priority - b.priority);
   }
 
-  // ===== MIGRATION STEP DEFINITIONS =====
+  // !== MIGRATION STEP DEFINITIONS !==
 
   private createMigrationTrackingStep(): MigrationStep {
     return {
@@ -190,8 +190,10 @@ export class DatabaseMigrationCoordinator {
       dependencies: [],
       rollbackable: true,
       estimatedDuration: '1 minute',
-      execute: async (db) => {
-        await db.prepare(`
+      execute: async db => {
+        await db
+          .prepare(
+            `
           CREATE TABLE IF NOT EXISTS migration_history (
             id INTEGER PRIMARY KEY,
             step_id TEXT UNIQUE NOT NULL,
@@ -201,18 +203,24 @@ export class DatabaseMigrationCoordinator {
             success BOOLEAN DEFAULT TRUE,
             error_message TEXT
           )
-        `).run();
+        `
+          )
+          .run();
       },
-      rollback: async (db) => {
+      rollback: async db => {
         await db.prepare('DROP TABLE IF EXISTS migration_history').run();
       },
-      verify: async (db) => {
-        const result = await db.prepare(`
+      verify: async db => {
+        const result = await db
+          .prepare(
+            `
           SELECT name FROM sqlite_master 
           WHERE type='table' AND name='migration_history'
-        `).first();
+        `
+          )
+          .first();
         return !!result;
-      }
+      },
     };
   }
 
@@ -225,17 +233,20 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['create_migration_tracking'],
       rollbackable: true,
       estimatedDuration: '2 minutes',
-      execute: async (db) => {
+      execute: async db => {
         // Read and execute unified schema
         const fs = await import('fs');
         const schemaSQL = fs.readFileSync('./src/database/unified-schema.sql', 'utf8');
-        
+
         // Extract just the users table creation
-        const usersTableSQL = schemaSQL.match(/CREATE TABLE IF NOT EXISTS users[\s\S]*?(?=;)/)[0] + ';';
+        const usersTableSQL =
+          schemaSQL.match(/CREATE TABLE IF NOT EXISTS users[\s\S]*?(?=;)/)[0] + ';';
         await db.exec(usersTableSQL);
 
         // Create initial departments
-        await db.prepare(`
+        await db
+          .prepare(
+            `
           INSERT OR IGNORE INTO departments (name, display_name, description) VALUES
           ('finance', 'Finance Department', 'Handles deposits, withdrawals, and financial operations'),
           ('support', 'Customer Support', 'General customer service and support'),
@@ -243,24 +254,34 @@ export class DatabaseMigrationCoordinator {
           ('technical', 'Technical Support', 'System issues and technical problems'),
           ('compliance', 'Compliance & Risk', 'KYC, AML, and risk management'),
           ('management', 'Management', 'Leadership and oversight')
-        `).run();
+        `
+          )
+          .run();
       },
-      rollback: async (db) => {
+      rollback: async db => {
         await db.prepare('DROP TABLE IF EXISTS users').run();
         await db.prepare('DROP TABLE IF EXISTS departments').run();
       },
-      verify: async (db) => {
-        const usersTable = await db.prepare(`
+      verify: async db => {
+        const usersTable = await db
+          .prepare(
+            `
           SELECT name FROM sqlite_master 
           WHERE type='table' AND name='users'
-        `).first();
-        
-        const departmentCount = await db.prepare(`
+        `
+          )
+          .first();
+
+        const departmentCount = await db
+          .prepare(
+            `
           SELECT COUNT(*) as count FROM departments
-        `).first();
-        
+        `
+          )
+          .first();
+
         return !!usersTable && departmentCount.count >= 6;
-      }
+      },
     };
   }
 
@@ -273,9 +294,11 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['create_unified_users'],
       rollbackable: true,
       estimatedDuration: '3 minutes',
-      execute: async (db) => {
+      execute: async db => {
         // Create team_permissions table
-        await db.prepare(`
+        await db
+          .prepare(
+            `
           CREATE TABLE IF NOT EXISTS team_permissions (
             id INTEGER PRIMARY KEY,
             user_id INTEGER REFERENCES users(id),
@@ -289,32 +312,43 @@ export class DatabaseMigrationCoordinator {
             expires_at TEXT,
             UNIQUE(user_id, department_id)
           )
-        `).run();
+        `
+          )
+          .run();
 
         // Set up default permissions for departments
         const departments = await db.prepare('SELECT * FROM departments').all();
-        
+
         for (const dept of departments) {
           const defaultPermissions = this.getDefaultPermissionsForDepartment(dept.name);
-          await db.prepare(`
+          await db
+            .prepare(
+              `
             UPDATE departments SET 
               escalation_rules = ?,
               working_hours = ?
             WHERE id = ?
-          `).bind(
-            JSON.stringify(defaultPermissions.escalation),
-            JSON.stringify(defaultPermissions.hours),
-            dept.id
-          ).run();
+          `
+            )
+            .bind(
+              JSON.stringify(defaultPermissions.escalation),
+              JSON.stringify(defaultPermissions.hours),
+              dept.id
+            )
+            .run();
         }
       },
-      verify: async (db) => {
-        const permissionsTable = await db.prepare(`
+      verify: async db => {
+        const permissionsTable = await db
+          .prepare(
+            `
           SELECT name FROM sqlite_master 
           WHERE type='table' AND name='team_permissions'
-        `).first();
+        `
+          )
+          .first();
         return !!permissionsTable;
-      }
+      },
     };
   }
 
@@ -327,8 +361,10 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['create_departments_structure'],
       rollbackable: true,
       estimatedDuration: '5 minutes',
-      execute: async (db) => {
-        await db.prepare(`
+      execute: async db => {
+        await db
+          .prepare(
+            `
           CREATE TABLE IF NOT EXISTS fire22_customers (
             id INTEGER PRIMARY KEY,
             user_id INTEGER REFERENCES users(id),
@@ -360,10 +396,14 @@ export class DatabaseMigrationCoordinator {
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             updated_at TEXT DEFAULT CURRENT_TIMESTAMP
           )
-        `).run();
+        `
+          )
+          .run();
 
         // Create fire22_agents table
-        await db.prepare(`
+        await db
+          .prepare(
+            `
           CREATE TABLE IF NOT EXISTS fire22_agents (
             id INTEGER PRIMARY KEY,
             user_id INTEGER REFERENCES users(id),
@@ -395,21 +435,31 @@ export class DatabaseMigrationCoordinator {
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             updated_at TEXT DEFAULT CURRENT_TIMESTAMP
           )
-        `).run();
+        `
+          )
+          .run();
       },
-      verify: async (db) => {
-        const customersTable = await db.prepare(`
+      verify: async db => {
+        const customersTable = await db
+          .prepare(
+            `
           SELECT name FROM sqlite_master 
           WHERE type='table' AND name='fire22_customers'
-        `).first();
-        
-        const agentsTable = await db.prepare(`
+        `
+          )
+          .first();
+
+        const agentsTable = await db
+          .prepare(
+            `
           SELECT name FROM sqlite_master 
           WHERE type='table' AND name='fire22_agents'
-        `).first();
-        
+        `
+          )
+          .first();
+
         return !!customersTable && !!agentsTable;
-      }
+      },
     };
   }
 
@@ -422,13 +472,17 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['create_enhanced_fire22_customers'],
       rollbackable: false,
       estimatedDuration: '10 minutes',
-      execute: async (db) => {
+      execute: async db => {
         console.log('🔄 Migrating legacy customer data...');
 
         // Get existing customers from old schema
-        const legacyCustomers = await db.prepare(`
+        const legacyCustomers = await db
+          .prepare(
+            `
           SELECT * FROM customers WHERE 1=1
-        `).all();
+        `
+          )
+          .all();
 
         console.log(`📊 Found ${legacyCustomers.length} legacy customers to migrate`);
 
@@ -438,58 +492,77 @@ export class DatabaseMigrationCoordinator {
         for (const customer of legacyCustomers) {
           try {
             // Create unified user
-            const userResult = await db.prepare(`
+            const userResult = await db
+              .prepare(
+                `
               INSERT INTO users (
                 uuid, username, first_name, last_name, 
                 fire22_customer_id, role, status, created_at
               ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            `).bind(
-              `user_${customer.customer_id}`,
-              customer.username || customer.login,
-              customer.first_name || '',
-              customer.last_name || '',
-              customer.customer_id,
-              'customer',
-              'active',
-              customer.created_at || new Date().toISOString()
-            ).run();
+            `
+              )
+              .bind(
+                `user_${customer.customer_id}`,
+                customer.username || customer.login,
+                customer.first_name || '',
+                customer.last_name || '',
+                customer.customer_id,
+                'customer',
+                'active',
+                customer.created_at || new Date().toISOString()
+              )
+              .run();
 
             // Create Fire22 customer record
-            await db.prepare(`
+            await db
+              .prepare(
+                `
               INSERT INTO fire22_customers (
                 user_id, fire22_customer_id, login, 
                 agent_id, created_at, updated_at
               ) VALUES (?, ?, ?, ?, ?, ?)
-            `).bind(
-              userResult.lastInsertRowId,
-              customer.customer_id,
-              customer.login || customer.username,
-              'BLAKEPPH', // Default agent
-              customer.created_at || new Date().toISOString(),
-              new Date().toISOString()
-            ).run();
+            `
+              )
+              .bind(
+                userResult.lastInsertRowId,
+                customer.customer_id,
+                customer.login || customer.username,
+                'BLAKEPPH', // Default agent
+                customer.created_at || new Date().toISOString(),
+                new Date().toISOString()
+              )
+              .run();
 
             migratedCount++;
-
           } catch (error) {
             console.error(`Failed to migrate customer ${customer.customer_id}:`, error);
             errorCount++;
           }
         }
 
-        console.log(`✅ Migration completed: ${migratedCount} customers migrated, ${errorCount} errors`);
+        console.log(
+          `✅ Migration completed: ${migratedCount} customers migrated, ${errorCount} errors`
+        );
       },
-      verify: async (db) => {
-        const unifiedCount = await db.prepare(`
+      verify: async db => {
+        const unifiedCount = await db
+          .prepare(
+            `
           SELECT COUNT(*) as count FROM users WHERE role = 'customer'
-        `).first();
-        
-        const fire22Count = await db.prepare(`
+        `
+          )
+          .first();
+
+        const fire22Count = await db
+          .prepare(
+            `
           SELECT COUNT(*) as count FROM fire22_customers
-        `).first();
-        
+        `
+          )
+          .first();
+
         return unifiedCount.count > 0 && fire22Count.count > 0;
-      }
+      },
     };
   }
 
@@ -505,8 +578,12 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['create_enhanced_fire22_customers'],
       rollbackable: true,
       estimatedDuration: '3 minutes',
-      execute: async (db) => { /* Implementation */ },
-      verify: async (db) => { return true; }
+      execute: async db => {
+        /* Implementation */
+      },
+      verify: async db => {
+        return true;
+      },
     };
   }
 
@@ -519,8 +596,12 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['create_enhanced_fire22_agents'],
       rollbackable: true,
       estimatedDuration: '4 minutes',
-      execute: async (db) => { /* Implementation */ },
-      verify: async (db) => { return true; }
+      execute: async db => {
+        /* Implementation */
+      },
+      verify: async db => {
+        return true;
+      },
     };
   }
 
@@ -533,8 +614,12 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['create_enhanced_transactions'],
       rollbackable: true,
       estimatedDuration: '5 minutes',
-      execute: async (db) => { /* Implementation */ },
-      verify: async (db) => { return true; }
+      execute: async db => {
+        /* Implementation */
+      },
+      verify: async db => {
+        return true;
+      },
     };
   }
 
@@ -547,8 +632,12 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['create_telegram_tables'],
       rollbackable: true,
       estimatedDuration: '6 minutes',
-      execute: async (db) => { /* Implementation */ },
-      verify: async (db) => { return true; }
+      execute: async db => {
+        /* Implementation */
+      },
+      verify: async db => {
+        return true;
+      },
     };
   }
 
@@ -561,8 +650,12 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['create_support_tickets'],
       rollbackable: true,
       estimatedDuration: '4 minutes',
-      execute: async (db) => { /* Implementation */ },
-      verify: async (db) => { return true; }
+      execute: async db => {
+        /* Implementation */
+      },
+      verify: async db => {
+        return true;
+      },
     };
   }
 
@@ -575,8 +668,12 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['migrate_legacy_customers'],
       rollbackable: true,
       estimatedDuration: '3 minutes',
-      execute: async (db) => { /* Implementation */ },
-      verify: async (db) => { return true; }
+      execute: async db => {
+        /* Implementation */
+      },
+      verify: async db => {
+        return true;
+      },
     };
   }
 
@@ -589,8 +686,12 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['create_analytics_tables'],
       rollbackable: true,
       estimatedDuration: '2 minutes',
-      execute: async (db) => { /* Implementation */ },
-      verify: async (db) => { return true; }
+      execute: async db => {
+        /* Implementation */
+      },
+      verify: async db => {
+        return true;
+      },
     };
   }
 
@@ -603,8 +704,12 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['create_views'],
       rollbackable: true,
       estimatedDuration: '3 minutes',
-      execute: async (db) => { /* Implementation */ },
-      verify: async (db) => { return true; }
+      execute: async db => {
+        /* Implementation */
+      },
+      verify: async db => {
+        return true;
+      },
     };
   }
 
@@ -617,8 +722,12 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['create_triggers'],
       rollbackable: false,
       estimatedDuration: '15 minutes',
-      execute: async (db) => { /* Implementation */ },
-      verify: async (db) => { return true; }
+      execute: async db => {
+        /* Implementation */
+      },
+      verify: async db => {
+        return true;
+      },
     };
   }
 
@@ -631,8 +740,12 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['migrate_legacy_transactions'],
       rollbackable: false,
       estimatedDuration: '5 minutes',
-      execute: async (db) => { /* Implementation */ },
-      verify: async (db) => { return true; }
+      execute: async db => {
+        /* Implementation */
+      },
+      verify: async db => {
+        return true;
+      },
     };
   }
 
@@ -645,8 +758,12 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['link_telegram_users'],
       rollbackable: true,
       estimatedDuration: '5 minutes',
-      execute: async (db) => { /* Implementation */ },
-      verify: async (db) => { return true; }
+      execute: async db => {
+        /* Implementation */
+      },
+      verify: async db => {
+        return true;
+      },
     };
   }
 
@@ -659,18 +776,22 @@ export class DatabaseMigrationCoordinator {
       dependencies: ['create_indexes'],
       rollbackable: false,
       estimatedDuration: '3 minutes',
-      execute: async (db) => {
+      execute: async db => {
         await db.prepare('ANALYZE').run();
         await db.prepare('PRAGMA optimize').run();
       },
-      verify: async (db) => { return true; }
+      verify: async db => {
+        return true;
+      },
     };
   }
 
-  // ===== UTILITY METHODS =====
+  // !== UTILITY METHODS !==
 
   private async initializeMigrationTracking(): Promise<void> {
-    await this.db.prepare(`
+    await this.db
+      .prepare(
+        `
       CREATE TABLE IF NOT EXISTS migration_status (
         id INTEGER PRIMARY KEY,
         migration_name TEXT NOT NULL,
@@ -681,13 +802,20 @@ export class DatabaseMigrationCoordinator {
         steps_completed INTEGER DEFAULT 0,
         steps_total INTEGER DEFAULT 0
       )
-    `).run();
+    `
+      )
+      .run();
   }
 
   private async isStepExecuted(stepId: string): Promise<boolean> {
-    const result = await this.db.prepare(`
+    const result = await this.db
+      .prepare(
+        `
       SELECT id FROM migration_history WHERE step_id = ? AND success = 1
-    `).bind(stepId).first();
+    `
+      )
+      .bind(stepId)
+      .first();
     return !!result;
   }
 
@@ -695,47 +823,57 @@ export class DatabaseMigrationCoordinator {
     if (dependencies.length === 0) return true;
 
     const placeholders = dependencies.map(() => '?').join(',');
-    const result = await this.db.prepare(`
+    const result = await this.db
+      .prepare(
+        `
       SELECT COUNT(*) as count FROM migration_history 
       WHERE step_id IN (${placeholders}) AND success = 1
-    `).bind(...dependencies).first();
+    `
+      )
+      .bind(...dependencies)
+      .first();
 
     return result.count === dependencies.length;
   }
 
   private async markStepExecuted(stepId: string): Promise<void> {
-    await this.db.prepare(`
+    await this.db
+      .prepare(
+        `
       INSERT INTO migration_history (step_id, step_name, success) 
       VALUES (?, ?, 1)
-    `).bind(stepId, `Step ${stepId}`).run();
+    `
+      )
+      .bind(stepId, `Step ${stepId}`)
+      .run();
   }
 
   private getDefaultPermissionsForDepartment(departmentName: string): any {
     const permissionMap = {
       finance: {
         escalation: { threshold: 10000, escalate_to: 'management' },
-        hours: { start: '09:00', end: '17:00', timezone: 'America/New_York' }
+        hours: { start: '09:00', end: '17:00', timezone: 'America/New_York' },
       },
       support: {
         escalation: { response_time: 120, escalate_after: 240 },
-        hours: { start: '08:00', end: '20:00', timezone: 'America/New_York' }
+        hours: { start: '08:00', end: '20:00', timezone: 'America/New_York' },
       },
       vip: {
         escalation: { response_time: 30, priority: 'high' },
-        hours: { start: '00:00', end: '23:59', timezone: 'America/New_York' }
+        hours: { start: '00:00', end: '23:59', timezone: 'America/New_York' },
       },
       technical: {
         escalation: { severity_threshold: 'high' },
-        hours: { start: '09:00', end: '17:00', timezone: 'America/New_York' }
+        hours: { start: '09:00', end: '17:00', timezone: 'America/New_York' },
       },
       compliance: {
         escalation: { auto_escalate: false },
-        hours: { start: '09:00', end: '17:00', timezone: 'America/New_York' }
+        hours: { start: '09:00', end: '17:00', timezone: 'America/New_York' },
       },
       management: {
         escalation: { final_escalation: true },
-        hours: { start: '09:00', end: '17:00', timezone: 'America/New_York' }
-      }
+        hours: { start: '09:00', end: '17:00', timezone: 'America/New_York' },
+      },
     };
 
     return permissionMap[departmentName] || permissionMap.support;
@@ -746,12 +884,16 @@ export class DatabaseMigrationCoordinator {
    */
   public async getMigrationStatus(): Promise<any> {
     const steps = this.getAllMigrationSteps();
-    const executedSteps = await this.db.prepare(`
+    const executedSteps = await this.db
+      .prepare(
+        `
       SELECT step_id FROM migration_history WHERE success = 1
-    `).all();
+    `
+      )
+      .all();
 
     const executedIds = new Set(executedSteps.map(s => s.step_id));
-    
+
     return {
       totalSteps: steps.length,
       completedSteps: executedSteps.length,
@@ -762,8 +904,8 @@ export class DatabaseMigrationCoordinator {
         name: step.name,
         priority: step.priority,
         completed: executedIds.has(step.id),
-        estimatedDuration: step.estimatedDuration
-      }))
+        estimatedDuration: step.estimatedDuration,
+      })),
     };
   }
 }

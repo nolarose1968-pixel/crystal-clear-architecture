@@ -16,8 +16,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fire22/fire22-core-packages",
-    "directory": "../fire22-core-packages"
+    "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture.git",
+    "directory": "fire22-core-packages"
   },
   "scripts": {
     "build": "bun run build:all",

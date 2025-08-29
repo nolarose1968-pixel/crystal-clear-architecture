@@ -5,11 +5,11 @@
  * Centralized event handlers for cross-domain communication
  */
 
-import { DomainEvents } from './domain-events';
-import { BalanceController } from '../../balance/balance.controller';
-import { CollectionsController } from '../../collections/collections.controller';
-import { Fantasy402Gateway } from '../../external/fantasy402/gateway/fantasy402-gateway';
-import { ExternalEventMapper } from '../../external/shared/external-event-mapper';
+import { DomainEvents } from "./domain-events";
+import { BalanceController } from "../../balance/balance.controller";
+import { CollectionsController } from "../../collections/collections.controller";
+import { Fantasy402Gateway } from "../../external/fantasy402/gateway/fantasy402-gateway";
+import { ExternalEventMapper } from "../../external/shared/external-event-mapper";
 
 export class DomainEventHandlers {
   private balanceController: BalanceController;
@@ -21,7 +21,7 @@ export class DomainEventHandlers {
   constructor(
     balanceController: BalanceController,
     collectionsController: CollectionsController,
-    fantasyGateway: Fantasy402Gateway
+    fantasyGateway: Fantasy402Gateway,
   ) {
     this.balanceController = balanceController;
     this.collectionsController = collectionsController;
@@ -36,7 +36,7 @@ export class DomainEventHandlers {
    * Set up all domain event handlers
    */
   private setupEventHandlers(): void {
-    console.log('🔄 Setting up domain event handlers...');
+    console.log("🔄 Setting up domain event handlers...");
 
     // Collections Domain Event Handlers
     this.setupCollectionsEventHandlers();
@@ -50,7 +50,7 @@ export class DomainEventHandlers {
     // Cross-domain Business Process Handlers
     this.setupBusinessProcessHandlers();
 
-    console.log('✅ Domain event handlers configured successfully');
+    console.log("✅ Domain event handlers configured successfully");
   }
 
   /**
@@ -58,8 +58,8 @@ export class DomainEventHandlers {
    */
   private setupCollectionsEventHandlers(): void {
     // When a payment is processed, update balance and send notifications
-    this.events.subscribe('payment.processed', async (event) => {
-      console.log('💳 Processing payment event:', event.payload);
+    this.events.subscribe("payment.processed", async (event) => {
+      console.log("💳 Processing payment event:", event.payload);
 
       try {
         // Update customer balance
@@ -70,26 +70,25 @@ export class DomainEventHandlers {
 
         // Check for bonus eligibility
         await this.handleBonusEligibilityCheck(event.payload);
-
       } catch (error) {
-        console.error('❌ Failed to process payment event:', error);
-        await this.events.publish('payment.processing_failed', {
+        console.error("❌ Failed to process payment event:", error);
+        await this.events.publish("payment.processing_failed", {
           paymentId: event.payload.paymentId,
           error: error.message,
-          originalEvent: event.payload
+          originalEvent: event.payload,
         });
       }
     });
 
     // Handle payment failures
-    this.events.subscribe('payment.failed', async (event) => {
-      console.log('❌ Processing payment failure:', event.payload);
+    this.events.subscribe("payment.failed", async (event) => {
+      console.log("❌ Processing payment failure:", event.payload);
 
       // Log failure for audit
-      await this.events.publish('audit.payment_failure_logged', {
+      await this.events.publish("audit.payment_failure_logged", {
         paymentId: event.payload.paymentId,
         error: event.payload.error,
-        timestamp: new Date()
+        timestamp: new Date(),
       });
     });
   }
@@ -99,36 +98,36 @@ export class DomainEventHandlers {
    */
   private setupBalanceEventHandlers(): void {
     // Handle low balance alerts
-    this.events.subscribe('balance.threshold.exceeded', async (event) => {
-      console.log('⚠️ Processing low balance alert:', event.payload);
+    this.events.subscribe("balance.threshold.exceeded", async (event) => {
+      console.log("⚠️ Processing low balance alert:", event.payload);
 
       // Send balance warning notification
-      await this.events.publish('notification.balance_warning', {
+      await this.events.publish("notification.balance_warning", {
         customerId: event.payload.customerId,
         currentBalance: event.payload.currentBalance,
         threshold: event.payload.threshold,
-        severity: event.payload.severity || 'warning'
+        severity: event.payload.severity || "warning",
       });
     });
 
     // Handle balance freeze/unfreeze events
-    this.events.subscribe('balance.frozen', async (event) => {
-      console.log('🧊 Processing balance freeze:', event.payload);
+    this.events.subscribe("balance.frozen", async (event) => {
+      console.log("🧊 Processing balance freeze:", event.payload);
 
       // Notify relevant parties
-      await this.events.publish('notification.account_frozen', {
+      await this.events.publish("notification.account_frozen", {
         customerId: event.payload.customerId,
         reason: event.payload.reason,
-        performedBy: event.payload.performedBy
+        performedBy: event.payload.performedBy,
       });
     });
 
-    this.events.subscribe('balance.unfrozen', async (event) => {
-      console.log('🧊 Processing balance unfreeze:', event.payload);
+    this.events.subscribe("balance.unfrozen", async (event) => {
+      console.log("🧊 Processing balance unfreeze:", event.payload);
 
-      await this.events.publish('notification.account_unfrozen', {
+      await this.events.publish("notification.account_unfrozen", {
         customerId: event.payload.customerId,
-        performedBy: event.payload.performedBy
+        performedBy: event.payload.performedBy,
       });
     });
   }
@@ -138,51 +137,51 @@ export class DomainEventHandlers {
    */
   private setupExternalEventHandlers(): void {
     // Handle external sport events
-    this.events.subscribe('external.sport_event.live', async (event) => {
-      console.log('🏈 Processing live sport event:', event.payload);
+    this.events.subscribe("external.sport_event.live", async (event) => {
+      console.log("🏈 Processing live sport event:", event.payload);
 
       // Update any relevant internal state
-      await this.events.publish('internal.sport_event_available', {
+      await this.events.publish("internal.sport_event_available", {
         externalId: event.payload.externalId,
         sport: event.payload.sport,
         league: event.payload.league,
         teams: `${event.payload.homeTeam} vs ${event.payload.awayTeam}`,
-        startTime: event.payload.startTime
+        startTime: event.payload.startTime,
       });
     });
 
     // Handle external bet placements
-    this.events.subscribe('external.bet.received', async (event) => {
-      console.log('🎯 Processing external bet:', event.payload);
+    this.events.subscribe("external.bet.received", async (event) => {
+      console.log("🎯 Processing external bet:", event.payload);
 
       // Validate agent balance
       await this.validateBetBalance(event.payload);
 
       // Update internal bet tracking
-      await this.events.publish('internal.bet_recorded', {
+      await this.events.publish("internal.bet_recorded", {
         externalBetId: event.payload.externalId,
         agentId: event.payload.agentId,
         eventId: event.payload.eventId,
         amount: event.payload.amount,
-        odds: event.payload.odds
+        odds: event.payload.odds,
       });
     });
 
     // Handle external bet settlements
-    this.events.subscribe('external.bet.settled', async (event) => {
-      console.log('💰 Processing bet settlement:', event.payload);
+    this.events.subscribe("external.bet.settled", async (event) => {
+      console.log("💰 Processing bet settlement:", event.payload);
 
       // Update agent balance based on settlement
-      if (event.payload.result === 'won') {
+      if (event.payload.result === "won") {
         await this.handleBetWin(event.payload);
-      } else if (event.payload.result === 'lost') {
+      } else if (event.payload.result === "lost") {
         await this.handleBetLoss(event.payload);
       }
     });
 
     // Handle external balance updates
-    this.events.subscribe('external.agent.balance_updated', async (event) => {
-      console.log('💵 Processing external balance update:', event.payload);
+    this.events.subscribe("external.agent.balance_updated", async (event) => {
+      console.log("💵 Processing external balance update:", event.payload);
 
       // Sync internal balance with external system
       await this.syncAgentBalance(event.payload);
@@ -194,8 +193,8 @@ export class DomainEventHandlers {
    */
   private setupBusinessProcessHandlers(): void {
     // Handle customer onboarding completion
-    this.events.subscribe('customer.onboarding_completed', async (event) => {
-      console.log('🎉 Processing customer onboarding:', event.payload);
+    this.events.subscribe("customer.onboarding_completed", async (event) => {
+      console.log("🎉 Processing customer onboarding:", event.payload);
 
       // Create initial balance account
       await this.createInitialBalance(event.payload);
@@ -208,8 +207,8 @@ export class DomainEventHandlers {
     });
 
     // Handle bonus eligibility
-    this.events.subscribe('bonus.eligibility_checked', async (event) => {
-      console.log('🎁 Processing bonus eligibility:', event.payload);
+    this.events.subscribe("bonus.eligibility_checked", async (event) => {
+      console.log("🎁 Processing bonus eligibility:", event.payload);
 
       if (event.payload.eligible) {
         await this.awardBonus(event.payload);
@@ -217,18 +216,18 @@ export class DomainEventHandlers {
     });
 
     // Handle risk assessment triggers
-    this.events.subscribe('risk.assessment_required', async (event) => {
-      console.log('🔍 Processing risk assessment:', event.payload);
+    this.events.subscribe("risk.assessment_required", async (event) => {
+      console.log("🔍 Processing risk assessment:", event.payload);
 
       // Perform risk assessment
       const riskScore = await this.performRiskAssessment(event.payload);
 
       // Publish risk assessment result
-      await this.events.publish('risk.assessment_completed', {
+      await this.events.publish("risk.assessment_completed", {
         customerId: event.payload.customerId,
         riskScore,
         assessmentDate: new Date(),
-        factors: event.payload.factors
+        factors: event.payload.factors,
       });
     });
   }
@@ -241,9 +240,9 @@ export class DomainEventHandlers {
     const balanceResponse = await this.balanceController.processBalanceChange({
       customerId: payment.playerId,
       amount: payment.amount,
-      changeType: 'credit',
-      reason: 'Payment processed',
-      performedBy: 'system'
+      changeType: "credit",
+      reason: "Payment processed",
+      performedBy: "system",
     });
 
     if (!balanceResponse.success) {
@@ -252,43 +251,47 @@ export class DomainEventHandlers {
   }
 
   private async handlePaymentNotification(payment: any): Promise<void> {
-    await this.events.publish('notification.payment_confirmation', {
+    await this.events.publish("notification.payment_confirmation", {
       customerId: payment.playerId,
       paymentId: payment.paymentId,
       amount: payment.amount,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   }
 
   private async handleBonusEligibilityCheck(payment: any): Promise<void> {
     // Check if customer is eligible for bonuses based on payment history
-    const eligibilityResponse = await this.balanceController.getBalanceStatus(payment.playerId);
+    const eligibilityResponse = await this.balanceController.getBalanceStatus(
+      payment.playerId,
+    );
 
     if (eligibilityResponse.success && eligibilityResponse.balance) {
-      await this.events.publish('bonus.eligibility_checked', {
+      await this.events.publish("bonus.eligibility_checked", {
         customerId: payment.playerId,
         paymentAmount: payment.amount,
         balance: eligibilityResponse.balance.currentBalance,
-        eligible: payment.amount >= 50 // Example: $50+ payments eligible for bonus
+        eligible: payment.amount >= 50, // Example: $50+ payments eligible for bonus
       });
     }
   }
 
   private async validateBetBalance(bet: any): Promise<void> {
-    const balanceResponse = await this.balanceController.getBalanceStatus(bet.agentId);
+    const balanceResponse = await this.balanceController.getBalanceStatus(
+      bet.agentId,
+    );
 
     if (!balanceResponse.success || !balanceResponse.balance) {
       throw new Error(`Agent balance not found: ${bet.agentId}`);
     }
 
     if (balanceResponse.balance.currentBalance < bet.amount) {
-      await this.events.publish('bet.rejected_insufficient_funds', {
+      await this.events.publish("bet.rejected_insufficient_funds", {
         betId: bet.externalId,
         agentId: bet.agentId,
         requiredAmount: bet.amount,
-        availableBalance: balanceResponse.balance.currentBalance
+        availableBalance: balanceResponse.balance.currentBalance,
       });
-      throw new Error('Insufficient funds for bet');
+      throw new Error("Insufficient funds for bet");
     }
   }
 
@@ -298,37 +301,37 @@ export class DomainEventHandlers {
     await this.balanceController.processBalanceChange({
       customerId: settlement.agentId,
       amount: payout,
-      changeType: 'credit',
+      changeType: "credit",
       reason: `Bet win settlement - ${settlement.externalId}`,
-      performedBy: 'system'
+      performedBy: "system",
     });
   }
 
   private async handleBetLoss(settlement: any): Promise<void> {
     // Loss already deducted when bet was placed
     // Just log the settlement for audit
-    await this.events.publish('audit.bet_loss_settled', {
+    await this.events.publish("audit.bet_loss_settled", {
       betId: settlement.externalId,
       agentId: settlement.agentId,
       amount: settlement.payout || 0,
-      settledAt: settlement.settledAt
+      settledAt: settlement.settledAt,
     });
   }
 
   private async syncAgentBalance(balanceUpdate: any): Promise<void> {
     // Sync external balance changes with internal system
-    await this.events.publish('internal.balance_synced', {
+    await this.events.publish("internal.balance_synced", {
       agentId: balanceUpdate.agentId,
       externalBalance: balanceUpdate.newBalance,
       internalBalance: balanceUpdate.newBalance, // Would compare with internal
-      syncedAt: new Date()
+      syncedAt: new Date(),
     });
   }
 
   private async createInitialBalance(customer: any): Promise<void> {
     const balanceResponse = await this.balanceController.createBalance({
       customerId: customer.customerId,
-      agentId: customer.agentId || 'SYSTEM',
+      agentId: customer.agentId || "SYSTEM",
       initialBalance: 0,
       limits: {
         minBalance: -100,
@@ -336,30 +339,32 @@ export class DomainEventHandlers {
         warningThreshold: 50,
         criticalThreshold: 10,
         dailyChangeLimit: 1000,
-        weeklyChangeLimit: 5000
-      }
+        weeklyChangeLimit: 5000,
+      },
     });
 
     if (!balanceResponse.success) {
-      throw new Error(`Failed to create initial balance: ${balanceResponse.error}`);
+      throw new Error(
+        `Failed to create initial balance: ${balanceResponse.error}`,
+      );
     }
   }
 
   private async sendWelcomePackage(customer: any): Promise<void> {
-    await this.events.publish('notification.welcome_package', {
+    await this.events.publish("notification.welcome_package", {
       customerId: customer.customerId,
       welcomeBonus: 10, // Example welcome bonus
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   }
 
   private async processSignupBonuses(customer: any): Promise<void> {
     // Process any signup bonuses or promotions
-    await this.events.publish('bonus.signup_processed', {
+    await this.events.publish("bonus.signup_processed", {
       customerId: customer.customerId,
       bonusAmount: 10,
-      bonusType: 'welcome_bonus',
-      processedAt: new Date()
+      bonusType: "welcome_bonus",
+      processedAt: new Date(),
     });
   }
 
@@ -367,9 +372,9 @@ export class DomainEventHandlers {
     await this.balanceController.processBalanceChange({
       customerId: bonusData.customerId,
       amount: 10, // Example bonus amount
-      changeType: 'credit',
-      reason: 'Payment bonus reward',
-      performedBy: 'system'
+      changeType: "credit",
+      reason: "Payment bonus reward",
+      performedBy: "system",
     });
   }
 
@@ -397,7 +402,7 @@ export class DomainEventHandlers {
     return {
       registeredHandlers: 15, // Approximate count
       processedEvents: 0, // Would be tracked in real implementation
-      failedEvents: 0
+      failedEvents: 0,
     };
   }
 
@@ -405,24 +410,24 @@ export class DomainEventHandlers {
    * Health check for event handlers
    */
   public async healthCheck(): Promise<{
-    status: 'healthy' | 'degraded' | 'unhealthy';
+    status: "healthy" | "degraded" | "unhealthy";
     message: string;
   }> {
     try {
       // Test event publishing
-      await this.events.publish('health.check.test', {
+      await this.events.publish("health.check.test", {
         timestamp: new Date(),
-        test: true
+        test: true,
       });
 
       return {
-        status: 'healthy',
-        message: 'Event handlers are functioning correctly'
+        status: "healthy",
+        message: "Event handlers are functioning correctly",
       };
     } catch (error) {
       return {
-        status: 'unhealthy',
-        message: `Event handlers failed: ${error.message}`
+        status: "unhealthy",
+        message: `Event handlers failed: ${error.message}`,
       };
     }
   }

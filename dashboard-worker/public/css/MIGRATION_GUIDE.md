@@ -3,11 +3,13 @@
 ## Files to Update
 
 Replace inline styles and style blocks in these HTML files with:
+
 ```html
-<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/styles.css" />
 ```
 
 ### Files with extracted styles:
+
 - src/unified-dashboard.html
 - src/dashboard-index.html
 - src/enhanced-dashboard.html

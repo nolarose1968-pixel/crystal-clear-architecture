@@ -29,19 +29,23 @@ describe('Customer Database Operations', () => {
         username: 'testuser',
         first_name: 'John',
         last_name: 'Doe',
-        login: 'CUST001'
+        login: 'CUST001',
       };
 
-      const result = db.query(`
+      const result = db
+        .query(
+          `
         INSERT INTO customers (customer_id, username, first_name, last_name, login)
         VALUES (?, ?, ?, ?, ?)
-      `).run(
-        customerData.customer_id,
-        customerData.username,
-        customerData.first_name,
-        customerData.last_name,
-        customerData.login
-      );
+      `
+        )
+        .run(
+          customerData.customer_id,
+          customerData.username,
+          customerData.first_name,
+          customerData.last_name,
+          customerData.login
+        );
 
       expect(result.changes).toBe(1);
       expect(result.lastInsertRowid).toBeGreaterThan(0);
@@ -52,21 +56,30 @@ describe('Customer Database Operations', () => {
         customer_id: 'CUST001',
         username: 'testuser1',
         first_name: 'John',
-        last_name: 'Doe'
+        last_name: 'Doe',
       };
 
       // Insert first customer
-      db.query(`
+      db.query(
+        `
         INSERT INTO customers (customer_id, username, first_name, last_name)
         VALUES (?, ?, ?, ?)
-      `).run(customerData.customer_id, customerData.username, customerData.first_name, customerData.last_name);
+      `
+      ).run(
+        customerData.customer_id,
+        customerData.username,
+        customerData.first_name,
+        customerData.last_name
+      );
 
       // Try to insert duplicate customer_id
       expect(() => {
-        db.query(`
+        db.query(
+          `
           INSERT INTO customers (customer_id, username, first_name, last_name)
           VALUES (?, ?, ?, ?)
-        `).run(customerData.customer_id, 'testuser2', 'Jane', 'Smith');
+        `
+        ).run(customerData.customer_id, 'testuser2', 'Jane', 'Smith');
       }).toThrow();
     });
 
@@ -75,17 +88,28 @@ describe('Customer Database Operations', () => {
         customer_id: 'CUST001',
         username: 'testuser',
         first_name: 'John',
-        last_name: 'Doe'
+        last_name: 'Doe',
       };
 
-      db.query(`
+      db.query(
+        `
         INSERT INTO customers (customer_id, username, first_name, last_name)
         VALUES (?, ?, ?, ?)
-      `).run(customerData.customer_id, customerData.username, customerData.first_name, customerData.last_name);
+      `
+      ).run(
+        customerData.customer_id,
+        customerData.username,
+        customerData.first_name,
+        customerData.last_name
+      );
 
-      const customer = db.query(`
+      const customer = db
+        .query(
+          `
         SELECT * FROM customers WHERE customer_id = ?
-      `).get(customerData.customer_id);
+      `
+        )
+        .get(customerData.customer_id);
 
       expect(customer).toBeDefined();
       expect((customer as any).created_at).toBeDefined();
@@ -100,9 +124,13 @@ describe('Customer Database Operations', () => {
     });
 
     it('should retrieve customer by customer_id', () => {
-      const customer = db.query(`
+      const customer = db
+        .query(
+          `
         SELECT * FROM customers WHERE customer_id = ?
-      `).get('TEST001');
+      `
+        )
+        .get('TEST001');
 
       expect(customer).toBeDefined();
       expect((customer as any).customer_id).toBe('TEST001');
@@ -112,9 +140,13 @@ describe('Customer Database Operations', () => {
     });
 
     it('should retrieve all customers', () => {
-      const customers = db.query(`
+      const customers = db
+        .query(
+          `
         SELECT * FROM customers ORDER BY customer_id
-      `).all();
+      `
+        )
+        .all();
 
       expect(customers).toHaveLength(3);
       expect((customers as any[])[0].customer_id).toBe('TEST001');
@@ -123,19 +155,27 @@ describe('Customer Database Operations', () => {
     });
 
     it('should return null for non-existent customer', () => {
-      const customer = db.query(`
+      const customer = db
+        .query(
+          `
         SELECT * FROM customers WHERE customer_id = ?
-      `).get('NONEXISTENT');
+      `
+        )
+        .get('NONEXISTENT');
 
       expect(customer).toBeNull();
     });
 
     it('should search customers by name', () => {
-      const customers = db.query(`
+      const customers = db
+        .query(
+          `
         SELECT * FROM customers 
         WHERE first_name LIKE ? OR last_name LIKE ?
         ORDER BY customer_id
-      `).all('%John%', '%John%');
+      `
+        )
+        .all('%John%', '%John%');
 
       expect(customers).toHaveLength(2); // John Doe and Bob Johnson
       expect((customers as any[])[0].first_name).toBe('John');
@@ -149,28 +189,40 @@ describe('Customer Database Operations', () => {
     });
 
     it('should update customer information', () => {
-      const updateResult = db.query(`
+      const updateResult = db
+        .query(
+          `
         UPDATE customers 
         SET first_name = ?, last_name = ?
         WHERE customer_id = ?
-      `).run('Johnny', 'Doe-Updated', 'TEST001');
+      `
+        )
+        .run('Johnny', 'Doe-Updated', 'TEST001');
 
       expect(updateResult.changes).toBe(1);
 
-      const updatedCustomer = db.query(`
+      const updatedCustomer = db
+        .query(
+          `
         SELECT * FROM customers WHERE customer_id = ?
-      `).get('TEST001');
+      `
+        )
+        .get('TEST001');
 
       expect((updatedCustomer as any).first_name).toBe('Johnny');
       expect((updatedCustomer as any).last_name).toBe('Doe-Updated');
     });
 
     it('should not update non-existent customer', () => {
-      const updateResult = db.query(`
+      const updateResult = db
+        .query(
+          `
         UPDATE customers 
         SET first_name = ?
         WHERE customer_id = ?
-      `).run('NewName', 'NONEXISTENT');
+      `
+        )
+        .run('NewName', 'NONEXISTENT');
 
       expect(updateResult.changes).toBe(0);
     });
@@ -182,23 +234,35 @@ describe('Customer Database Operations', () => {
     });
 
     it('should delete customer by customer_id', () => {
-      const deleteResult = db.query(`
+      const deleteResult = db
+        .query(
+          `
         DELETE FROM customers WHERE customer_id = ?
-      `).run('TEST001');
+      `
+        )
+        .run('TEST001');
 
       expect(deleteResult.changes).toBe(1);
 
-      const deletedCustomer = db.query(`
+      const deletedCustomer = db
+        .query(
+          `
         SELECT * FROM customers WHERE customer_id = ?
-      `).get('TEST001');
+      `
+        )
+        .get('TEST001');
 
       expect(deletedCustomer).toBeNull();
     });
 
     it('should not delete non-existent customer', () => {
-      const deleteResult = db.query(`
+      const deleteResult = db
+        .query(
+          `
         DELETE FROM customers WHERE customer_id = ?
-      `).run('NONEXISTENT');
+      `
+        )
+        .run('NONEXISTENT');
 
       expect(deleteResult.changes).toBe(0);
     });
@@ -207,24 +271,34 @@ describe('Customer Database Operations', () => {
   describe('Customer Validation', () => {
     it('should handle empty customer_id', () => {
       expect(() => {
-        db.query(`
+        db.query(
+          `
           INSERT INTO customers (customer_id, username, first_name, last_name)
           VALUES (?, ?, ?, ?)
-        `).run('', 'testuser', 'John', 'Doe');
+        `
+        ).run('', 'testuser', 'John', 'Doe');
       }).not.toThrow(); // SQLite allows empty strings, but business logic should validate
     });
 
     it('should handle null values appropriately', () => {
-      const result = db.query(`
+      const result = db
+        .query(
+          `
         INSERT INTO customers (customer_id, username, first_name, last_name)
         VALUES (?, ?, ?, ?)
-      `).run('CUST001', null, null, null);
+      `
+        )
+        .run('CUST001', null, null, null);
 
       expect(result.changes).toBe(1);
 
-      const customer = db.query(`
+      const customer = db
+        .query(
+          `
         SELECT * FROM customers WHERE customer_id = ?
-      `).get('CUST001');
+      `
+        )
+        .get('CUST001');
 
       expect((customer as any).username).toBeNull();
       expect((customer as any).first_name).toBeNull();
@@ -236,21 +310,27 @@ describe('Customer Database Operations', () => {
     it('should use customer_id index for fast lookups', () => {
       // Seed with many customers to test index performance
       for (let i = 1; i <= 1000; i++) {
-        db.query(`
+        db.query(
+          `
           INSERT INTO customers (customer_id, username, first_name, last_name)
           VALUES (?, ?, ?, ?)
-        `).run(`CUST${i.toString().padStart(4, '0')}`, `user${i}`, `First${i}`, `Last${i}`);
+        `
+        ).run(`CUST${i.toString().padStart(4, '0')}`, `user${i}`, `First${i}`, `Last${i}`);
       }
 
       const startTime = performance.now();
-      const customer = db.query(`
+      const customer = db
+        .query(
+          `
         SELECT * FROM customers WHERE customer_id = ?
-      `).get('CUST0500');
+      `
+        )
+        .get('CUST0500');
       const endTime = performance.now();
 
       expect(customer).toBeDefined();
       expect((customer as any).customer_id).toBe('CUST0500');
-      
+
       // Query should be fast with index (less than 10ms)
       expect(endTime - startTime).toBeLessThan(10);
     });

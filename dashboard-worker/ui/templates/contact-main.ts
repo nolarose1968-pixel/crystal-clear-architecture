@@ -4,7 +4,11 @@
  */
 
 import type { EmployeeData } from '../../personal-subdomains/src/types';
-import { generateHtmlHead, generateHeader, generateFooter } from '../../personal-subdomains/src/components';
+import {
+  generateHtmlHead,
+  generateHeader,
+  generateFooter,
+} from '../../personal-subdomains/src/components';
 
 export function generateContactPage(employee: EmployeeData, pathname?: string): string {
   const content = generateContactContent(employee, pathname);
@@ -46,13 +50,17 @@ function generateContactContent(employee: EmployeeData, pathname?: string): stri
         <p class="contact-description">Available during business hours</p>
       </div>
 
-      ${employee.location ? `
+      ${
+        employee.location
+          ? `
       <div class="contact-card">
         <h3>📍 Location</h3>
         <p>${employee.location}</p>
         <p class="contact-description">Primary office location</p>
       </div>
-      ` : ''}
+      `
+          : ''
+      }
 
       <div class="contact-card">
         <h3>📅 Schedule Meeting</h3>

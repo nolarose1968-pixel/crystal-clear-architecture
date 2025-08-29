@@ -5,8 +5,8 @@
  * Comprehensive monitoring for YAML-based worker messaging performance
  */
 
-import { YAML } from 'bun';
-import { WorkerMessenger, WorkerMetrics } from '../core/worker-messenger';
+import { YAML } from "bun";
+import { WorkerMessenger, WorkerMetrics } from "../core/worker-messenger";
 
 export interface PerformanceMetrics {
   messagesProcessed: number;
@@ -23,7 +23,7 @@ export interface AlertRule {
   id: string;
   name: string;
   condition: (metrics: PerformanceMetrics) => boolean;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: "low" | "medium" | "high" | "critical";
   message: string;
   cooldown: number; // minutes
 }
@@ -32,7 +32,7 @@ export interface Alert {
   id: string;
   ruleId: string;
   timestamp: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: "low" | "medium" | "high" | "critical";
   message: string;
   metrics: PerformanceMetrics;
   resolved: boolean;
@@ -56,9 +56,9 @@ export interface PerformanceReport {
   alerts: Alert[];
   recommendations: string[];
   trends: {
-    latency: 'improving' | 'stable' | 'degrading';
-    throughput: 'improving' | 'stable' | 'degrading';
-    errors: 'improving' | 'stable' | 'degrading';
+    latency: "improving" | "stable" | "degrading";
+    throughput: "improving" | "stable" | "degrading";
+    errors: "improving" | "stable" | "degrading";
   };
 }
 
@@ -80,7 +80,7 @@ export class WorkerPerformanceDashboard {
       compressionRatio: 1.0,
       batchEfficiency: 1.0,
       memoryUsage: 0,
-      cpuUsage: 0
+      cpuUsage: 0,
     };
 
     this.setupDefaultAlertRules();
@@ -109,7 +109,8 @@ export class WorkerPerformanceDashboard {
     for (const [domainName, messenger] of this.messengers.entries()) {
       const messengerMetrics = messenger.getMetrics();
 
-      totalMessages += messengerMetrics.messagesSent + messengerMetrics.messagesReceived;
+      totalMessages +=
+        messengerMetrics.messagesSent + messengerMetrics.messagesReceived;
       totalLatency += messengerMetrics.averageLatency;
       totalErrors += messengerMetrics.errors;
       totalCompressionRatio += messengerMetrics.compressionRatio;
@@ -118,14 +119,17 @@ export class WorkerPerformanceDashboard {
 
       // Calculate messenger-specific throughput
       const uptime = (Date.now() - this.startTime) / 1000; // seconds
-      const messengerThroughput = (messengerMetrics.messagesSent + messengerMetrics.messagesReceived) / uptime;
+      const messengerThroughput =
+        (messengerMetrics.messagesSent + messengerMetrics.messagesReceived) /
+        uptime;
       totalThroughput += messengerThroughput;
     }
 
     if (messengerCount > 0) {
       this.metrics.messagesProcessed = totalMessages;
       this.metrics.averageLatency = totalLatency / messengerCount;
-      this.metrics.errorRate = totalMessages > 0 ? (totalErrors / totalMessages) * 100 : 0;
+      this.metrics.errorRate =
+        totalMessages > 0 ? (totalErrors / totalMessages) * 100 : 0;
       this.metrics.throughput = totalThroughput;
       this.metrics.compressionRatio = totalCompressionRatio / messengerCount;
       this.metrics.batchEfficiency = totalBatchEfficiency / messengerCount;
@@ -143,7 +147,7 @@ export class WorkerPerformanceDashboard {
    */
   private updateSystemMetrics(): void {
     // Memory usage (simplified - in real implementation, use actual system metrics)
-    if (typeof process !== 'undefined' && process.memoryUsage) {
+    if (typeof process !== "undefined" && process.memoryUsage) {
       const memUsage = process.memoryUsage();
       this.metrics.memoryUsage = memUsage.heapUsed / memUsage.heapTotal;
     }
@@ -159,45 +163,45 @@ export class WorkerPerformanceDashboard {
   private setupDefaultAlertRules(): void {
     this.alertRules = [
       {
-        id: 'high_latency',
-        name: 'High Latency Alert',
+        id: "high_latency",
+        name: "High Latency Alert",
         condition: (metrics) => metrics.averageLatency > 100,
-        severity: 'high',
-        message: 'Average message latency exceeds 100ms threshold',
-        cooldown: 5
+        severity: "high",
+        message: "Average message latency exceeds 100ms threshold",
+        cooldown: 5,
       },
       {
-        id: 'high_error_rate',
-        name: 'High Error Rate Alert',
+        id: "high_error_rate",
+        name: "High Error Rate Alert",
         condition: (metrics) => metrics.errorRate > 1.0,
-        severity: 'high',
-        message: 'Message error rate exceeds 1% threshold',
-        cooldown: 10
+        severity: "high",
+        message: "Message error rate exceeds 1% threshold",
+        cooldown: 10,
       },
       {
-        id: 'low_throughput',
-        name: 'Low Throughput Alert',
+        id: "low_throughput",
+        name: "Low Throughput Alert",
         condition: (metrics) => metrics.throughput < 50,
-        severity: 'medium',
-        message: 'Message throughput below 50 messages/second',
-        cooldown: 15
+        severity: "medium",
+        message: "Message throughput below 50 messages/second",
+        cooldown: 15,
       },
       {
-        id: 'high_memory_usage',
-        name: 'High Memory Usage Alert',
+        id: "high_memory_usage",
+        name: "High Memory Usage Alert",
         condition: (metrics) => metrics.memoryUsage > 0.8,
-        severity: 'critical',
-        message: 'Memory usage exceeds 80% threshold',
-        cooldown: 2
+        severity: "critical",
+        message: "Memory usage exceeds 80% threshold",
+        cooldown: 2,
       },
       {
-        id: 'compression_inefficient',
-        name: 'Compression Inefficient Alert',
+        id: "compression_inefficient",
+        name: "Compression Inefficient Alert",
         condition: (metrics) => metrics.compressionRatio > 2.0,
-        severity: 'low',
-        message: 'Message compression ratio indicates inefficiency',
-        cooldown: 30
-      }
+        severity: "low",
+        message: "Message compression ratio indicates inefficiency",
+        cooldown: 30,
+      },
     ];
   }
 
@@ -226,13 +230,15 @@ export class WorkerPerformanceDashboard {
           message: rule.message,
           metrics: { ...this.metrics },
           resolved: false,
-          acknowledged: false
+          acknowledged: false,
         };
 
         this.alerts.push(alert);
         this.alertHistory.set(rule.id, now);
 
-        console.log(`🚨 ALERT [${rule.severity.toUpperCase()}]: ${rule.message}`);
+        console.log(
+          `🚨 ALERT [${rule.severity.toUpperCase()}]: ${rule.message}`,
+        );
 
         // In real implementation, this would send notifications
         this.sendAlertNotification(alert);
@@ -245,7 +251,10 @@ export class WorkerPerformanceDashboard {
    */
   private sendAlertNotification(alert: Alert): void {
     // This would integrate with email, Slack, monitoring systems, etc.
-    console.log(`📢 Sending ${alert.severity} alert notification:`, alert.message);
+    console.log(
+      `📢 Sending ${alert.severity} alert notification:`,
+      alert.message,
+    );
 
     // Example integrations:
     // - Send email via SMTP
@@ -258,7 +267,7 @@ export class WorkerPerformanceDashboard {
    * Acknowledge alert
    */
   acknowledgeAlert(alertId: string, acknowledgedBy: string): boolean {
-    const alert = this.alerts.find(a => a.id === alertId);
+    const alert = this.alerts.find((a) => a.id === alertId);
     if (alert && !alert.acknowledged) {
       alert.acknowledged = true;
       alert.acknowledgedBy = acknowledgedBy;
@@ -272,7 +281,7 @@ export class WorkerPerformanceDashboard {
    * Resolve alert
    */
   resolveAlert(alertId: string): boolean {
-    const alert = this.alerts.find(a => a.id === alertId);
+    const alert = this.alerts.find((a) => a.id === alertId);
     if (alert && !alert.resolved) {
       alert.resolved = true;
       alert.resolvedAt = new Date().toISOString();
@@ -285,7 +294,7 @@ export class WorkerPerformanceDashboard {
    * Get active alerts
    */
   getActiveAlerts(): Alert[] {
-    return this.alerts.filter(alert => !alert.resolved);
+    return this.alerts.filter((alert) => !alert.resolved);
   }
 
   /**
@@ -313,9 +322,9 @@ export class WorkerPerformanceDashboard {
 
     // Calculate trends (simplified - in real implementation, use historical data)
     const trends = {
-      latency: this.metrics.averageLatency < 50 ? 'improving' : 'stable',
-      throughput: this.metrics.throughput > 100 ? 'improving' : 'stable',
-      errors: this.metrics.errorRate < 0.5 ? 'improving' : 'stable'
+      latency: this.metrics.averageLatency < 50 ? "improving" : "stable",
+      throughput: this.metrics.throughput > 100 ? "improving" : "stable",
+      errors: this.metrics.errorRate < 0.5 ? "improving" : "stable",
     };
 
     return {
@@ -327,11 +336,11 @@ export class WorkerPerformanceDashboard {
         averageLatency: this.metrics.averageLatency,
         errorRate: this.metrics.errorRate,
         throughput: this.metrics.throughput,
-        compressionRatio: this.metrics.compressionRatio
+        compressionRatio: this.metrics.compressionRatio,
       },
       alerts: this.getActiveAlerts(),
       recommendations,
-      trends
+      trends,
     };
   }
 
@@ -342,27 +351,35 @@ export class WorkerPerformanceDashboard {
     const recommendations: string[] = [];
 
     if (this.metrics.averageLatency > 100) {
-      recommendations.push('Consider implementing message batching for high-volume operations');
+      recommendations.push(
+        "Consider implementing message batching for high-volume operations",
+      );
     }
 
     if (this.metrics.errorRate > 0.5) {
-      recommendations.push('Review message validation logic and error handling');
+      recommendations.push(
+        "Review message validation logic and error handling",
+      );
     }
 
     if (this.metrics.throughput < 100) {
-      recommendations.push('Evaluate worker pool sizing and load distribution');
+      recommendations.push("Evaluate worker pool sizing and load distribution");
     }
 
     if (this.metrics.memoryUsage > 0.8) {
-      recommendations.push('Monitor memory usage and consider implementing message cleanup');
+      recommendations.push(
+        "Monitor memory usage and consider implementing message cleanup",
+      );
     }
 
     if (this.metrics.compressionRatio < 1.2) {
-      recommendations.push('Evaluate compression settings for better efficiency');
+      recommendations.push(
+        "Evaluate compression settings for better efficiency",
+      );
     }
 
-    if (this.alerts.filter(a => !a.acknowledged).length > 5) {
-      recommendations.push('Review and acknowledge pending alerts');
+    if (this.alerts.filter((a) => !a.acknowledged).length > 5) {
+      recommendations.push("Review and acknowledge pending alerts");
     }
 
     return recommendations;
@@ -374,9 +391,9 @@ export class WorkerPerformanceDashboard {
   exportMetrics(): string {
     const report = this.generateReport();
     return YAML.stringify({
-      reportType: 'WORKER_PERFORMANCE_DASHBOARD',
+      reportType: "WORKER_PERFORMANCE_DASHBOARD",
       timestamp: new Date().toISOString(),
-      ...report
+      ...report,
     });
   }
 
@@ -384,7 +401,7 @@ export class WorkerPerformanceDashboard {
    * Get dashboard summary
    */
   getDashboardSummary(): {
-    status: 'healthy' | 'warning' | 'critical';
+    status: "healthy" | "warning" | "critical";
     uptime: string;
     keyMetrics: {
       messagesProcessed: number;
@@ -398,11 +415,11 @@ export class WorkerPerformanceDashboard {
     const uptime = `${Math.floor((Date.now() - this.startTime) / (1000 * 60))}m`;
     const activeAlerts = this.getActiveAlerts();
 
-    let status: 'healthy' | 'warning' | 'critical' = 'healthy';
-    if (activeAlerts.some(a => a.severity === 'critical')) {
-      status = 'critical';
-    } else if (activeAlerts.some(a => a.severity === 'high')) {
-      status = 'warning';
+    let status: "healthy" | "warning" | "critical" = "healthy";
+    if (activeAlerts.some((a) => a.severity === "critical")) {
+      status = "critical";
+    } else if (activeAlerts.some((a) => a.severity === "high")) {
+      status = "warning";
     }
 
     return {
@@ -413,9 +430,9 @@ export class WorkerPerformanceDashboard {
         averageLatency: `${this.metrics.averageLatency.toFixed(2)}ms`,
         errorRate: `${this.metrics.errorRate.toFixed(2)}%`,
         throughput: `${this.metrics.throughput.toFixed(0)} msg/sec`,
-        activeAlerts: activeAlerts.length
+        activeAlerts: activeAlerts.length,
       },
-      recentAlerts: activeAlerts.slice(0, 5) // Last 5 alerts
+      recentAlerts: activeAlerts.slice(0, 5), // Last 5 alerts
     };
   }
 
@@ -431,7 +448,7 @@ export class WorkerPerformanceDashboard {
       compressionRatio: 1.0,
       batchEfficiency: 1.0,
       memoryUsage: 0,
-      cpuUsage: 0
+      cpuUsage: 0,
     };
     this.alerts = [];
     this.alertHistory.clear();
@@ -449,7 +466,7 @@ export class WorkerPerformanceDashboard {
    * Remove alert rule
    */
   removeAlertRule(ruleId: string): boolean {
-    const index = this.alertRules.findIndex(rule => rule.id === ruleId);
+    const index = this.alertRules.findIndex((rule) => rule.id === ruleId);
     if (index >= 0) {
       this.alertRules.splice(index, 1);
       return true;
@@ -461,8 +478,10 @@ export class WorkerPerformanceDashboard {
 /**
  * Health check utility
  */
-export async function performHealthCheck(dashboard: WorkerPerformanceDashboard): Promise<{
-  status: 'healthy' | 'degraded' | 'unhealthy';
+export async function performHealthCheck(
+  dashboard: WorkerPerformanceDashboard,
+): Promise<{
+  status: "healthy" | "degraded" | "unhealthy";
   checks: Record<string, boolean>;
   message: string;
 }> {
@@ -474,23 +493,26 @@ export async function performHealthCheck(dashboard: WorkerPerformanceDashboard):
     error_rate_ok: metrics.errorRate < 1.0,
     throughput_ok: metrics.throughput > 50,
     memory_ok: metrics.memoryUsage < 0.9,
-    no_critical_alerts: !alerts.some(a => a.severity === 'critical')
+    no_critical_alerts: !alerts.some((a) => a.severity === "critical"),
   };
 
-  const allChecksPass = Object.values(checks).every(check => check);
+  const allChecksPass = Object.values(checks).every((check) => check);
 
-  let status: 'healthy' | 'degraded' | 'unhealthy';
+  let status: "healthy" | "degraded" | "unhealthy";
   let message: string;
 
   if (allChecksPass) {
-    status = 'healthy';
-    message = 'All systems operating normally';
-  } else if (alerts.some(a => a.severity === 'critical') || !checks.memory_ok) {
-    status = 'unhealthy';
-    message = 'Critical issues detected - immediate attention required';
+    status = "healthy";
+    message = "All systems operating normally";
+  } else if (
+    alerts.some((a) => a.severity === "critical") ||
+    !checks.memory_ok
+  ) {
+    status = "unhealthy";
+    message = "Critical issues detected - immediate attention required";
   } else {
-    status = 'degraded';
-    message = 'Some systems showing degradation - monitor closely';
+    status = "degraded";
+    message = "Some systems showing degradation - monitor closely";
   }
 
   return { status, checks, message };

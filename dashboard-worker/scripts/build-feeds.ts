@@ -2,13 +2,13 @@
 
 /**
  * 📡 Fire22 RSS Feed Build System
- * 
+ *
  * Builds and optimizes RSS/Atom feeds for department error codes
  * Integrates with existing error code system and department structure
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
-import { join } from "path";
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
 
 interface FeedOptions {
   environment?: 'development' | 'staging' | 'production';
@@ -34,20 +34,20 @@ class Fire22FeedBuildSystem {
   private readonly srcDir = join(process.cwd(), 'src');
   private readonly distDir = join(process.cwd(), 'dist', 'pages', 'feeds');
   private readonly errorCodesPath = join(process.cwd(), 'docs', 'error-codes.json');
-  
+
   /**
    * 📡 Build all RSS feeds
    */
   async buildFeeds(options: FeedOptions = {}): Promise<void> {
     const startTime = Bun.nanoseconds();
-    
+
     console.log('📡 Fire22 RSS Feed Build System');
-    console.log('===============================');
-    
+    console.log('!==!==!==!==!==!==');
+
     const env = options.environment || 'development';
     console.log(`\n🎯 Environment: ${env}`);
     console.log(`🏢 Department: ${options.department || 'ALL'}`);
-    
+
     if (options.dryRun) {
       console.log('🔍 DRY RUN MODE - No files will be written');
     }
@@ -55,27 +55,26 @@ class Fire22FeedBuildSystem {
     try {
       // Setup feed environment
       await this.setupFeedEnvironment(options);
-      
+
       // Load error codes
       const errorCodes = await this.loadErrorCodes();
-      
+
       // Build RSS feed
       await this.buildRSSFeed(errorCodes, options);
-      
+
       // Build Atom feed
       await this.buildAtomFeed(errorCodes, options);
-      
+
       // Build feed index
       await this.buildFeedIndex(options);
-      
+
       // Validate feeds if requested
       if (options.validate) {
         await this.validateFeeds(options);
       }
-      
+
       const buildTime = (Bun.nanoseconds() - startTime) / 1_000_000;
       console.log(`\n✅ Feed build completed in ${buildTime.toFixed(2)}ms`);
-      
     } catch (error) {
       console.error('❌ Feed build failed:', error);
       process.exit(1);
@@ -87,13 +86,13 @@ class Fire22FeedBuildSystem {
    */
   private async setupFeedEnvironment(options: FeedOptions): Promise<void> {
     console.log('\n📁 Setting up feed environment...');
-    
+
     if (!options.dryRun) {
       if (!existsSync(this.distDir)) {
         mkdirSync(this.distDir, { recursive: true });
       }
     }
-    
+
     console.log('  ✅ Feed directory ready');
   }
 
@@ -102,25 +101,25 @@ class Fire22FeedBuildSystem {
    */
   private async loadErrorCodes(): Promise<ErrorCode[]> {
     console.log('\n📋 Loading error codes...');
-    
+
     if (!existsSync(this.errorCodesPath)) {
       throw new Error(`Error codes file not found: ${this.errorCodesPath}`);
     }
-    
+
     const errorCodesData = JSON.parse(readFileSync(this.errorCodesPath, 'utf-8'));
     const errorCodes: ErrorCode[] = [];
-    
+
     // Extract error codes from the JSON structure
     if (errorCodesData.errorCodes) {
       for (const [code, data] of Object.entries(errorCodesData.errorCodes)) {
         errorCodes.push({
           code,
           ...(data as any),
-          department: this.determineDepartment(code, data as any)
+          department: this.determineDepartment(code, data as any),
         });
       }
     }
-    
+
     console.log(`  ✅ Loaded ${errorCodes.length} error codes`);
     return errorCodes;
   }
@@ -131,16 +130,16 @@ class Fire22FeedBuildSystem {
   private determineDepartment(code: string, errorData: any): string {
     // Map error categories to departments
     const categoryToDepartment: Record<string, string> = {
-      'SYSTEM': 'Technology',
-      'DATABASE': 'Technology', 
-      'API': 'Technology',
-      'NETWORK': 'Technology',
-      'FIRE22': 'Operations',
-      'TELEGRAM': 'Customer Support',
-      'SECURITY': 'Security',
-      'COMPLIANCE': 'Compliance'
+      SYSTEM: 'Technology',
+      DATABASE: 'Technology',
+      API: 'Technology',
+      NETWORK: 'Technology',
+      FIRE22: 'Operations',
+      TELEGRAM: 'Customer Support',
+      SECURITY: 'Security',
+      COMPLIANCE: 'Compliance',
     };
-    
+
     return categoryToDepartment[errorData.category] || 'Technology';
   }
 
@@ -149,10 +148,10 @@ class Fire22FeedBuildSystem {
    */
   private async buildRSSFeed(errorCodes: ErrorCode[], options: FeedOptions): Promise<void> {
     console.log('\n📡 Building RSS 2.0 feed...');
-    
+
     const baseUrl = this.getBaseUrl(options.environment);
     const buildDate = new Date().toUTCString();
-    
+
     let rssContent = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
@@ -185,16 +184,20 @@ class Fire22FeedBuildSystem {
     // Filter error codes by department if specified
     let filteredCodes = errorCodes;
     if (options.department) {
-      filteredCodes = errorCodes.filter(code => 
-        code.department?.toLowerCase() === options.department?.toLowerCase()
+      filteredCodes = errorCodes.filter(
+        code => code.department?.toLowerCase() === options.department?.toLowerCase()
       );
     }
 
     // Add error code items
     for (const errorCode of filteredCodes) {
-      const severity = errorCode.severity === 'CRITICAL' ? '🔴 CRITICAL' :
-                      errorCode.severity === 'ERROR' ? '🟡 ERROR' : '⚠️ WARNING';
-      
+      const severity =
+        errorCode.severity === 'CRITICAL'
+          ? '🔴 CRITICAL'
+          : errorCode.severity === 'ERROR'
+            ? '🟡 ERROR'
+            : '⚠️ WARNING';
+
       rssContent += `  <item>
     <title>${severity}: ${errorCode.code} - ${errorCode.name}</title>
     <description><![CDATA[
@@ -230,7 +233,7 @@ class Fire22FeedBuildSystem {
     if (!options.dryRun) {
       writeFileSync(join(this.distDir, 'error-codes-rss.xml'), rssContent);
     }
-    
+
     console.log(`  ✅ RSS feed generated (${filteredCodes.length} items)`);
   }
 
@@ -239,10 +242,10 @@ class Fire22FeedBuildSystem {
    */
   private async buildAtomFeed(errorCodes: ErrorCode[], options: FeedOptions): Promise<void> {
     console.log('\n⚛️ Building Atom 1.0 feed...');
-    
+
     const baseUrl = this.getBaseUrl(options.environment);
     const buildDate = new Date().toISOString();
-    
+
     let atomContent = `<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en-us">
   <title>Fire22 Dashboard - Error Code Registry</title>
@@ -268,16 +271,20 @@ class Fire22FeedBuildSystem {
     // Filter error codes by department if specified
     let filteredCodes = errorCodes;
     if (options.department) {
-      filteredCodes = errorCodes.filter(code => 
-        code.department?.toLowerCase() === options.department?.toLowerCase()
+      filteredCodes = errorCodes.filter(
+        code => code.department?.toLowerCase() === options.department?.toLowerCase()
       );
     }
 
     // Add error code entries
     for (const errorCode of filteredCodes) {
-      const severity = errorCode.severity === 'CRITICAL' ? '🔴 CRITICAL' :
-                      errorCode.severity === 'ERROR' ? '🟡 ERROR' : '⚠️ WARNING';
-      
+      const severity =
+        errorCode.severity === 'CRITICAL'
+          ? '🔴 CRITICAL'
+          : errorCode.severity === 'ERROR'
+            ? '🟡 ERROR'
+            : '⚠️ WARNING';
+
       atomContent += `  <entry>
     <title>${severity}: ${errorCode.code} - ${errorCode.name}</title>
     <link href="${baseUrl}/docs/error-codes.json#${errorCode.code}" rel="alternate" type="text/html"/>
@@ -317,7 +324,7 @@ class Fire22FeedBuildSystem {
     if (!options.dryRun) {
       writeFileSync(join(this.distDir, 'error-codes-atom.xml'), atomContent);
     }
-    
+
     console.log(`  ✅ Atom feed generated (${filteredCodes.length} entries)`);
   }
 
@@ -326,14 +333,14 @@ class Fire22FeedBuildSystem {
    */
   private async buildFeedIndex(options: FeedOptions): Promise<void> {
     console.log('\n📋 Building feed index...');
-    
+
     // Copy the existing feed index from src/feeds/index.html
     const srcIndexPath = join(this.srcDir, 'feeds', 'index.html');
     const destIndexPath = join(this.distDir, 'index.html');
-    
+
     if (existsSync(srcIndexPath) && !options.dryRun) {
       let indexContent = readFileSync(srcIndexPath, 'utf-8');
-      
+
       // Update URLs for production
       if (options.environment === 'production') {
         const baseUrl = this.getBaseUrl(options.environment);
@@ -342,10 +349,10 @@ class Fire22FeedBuildSystem {
           baseUrl
         );
       }
-      
+
       writeFileSync(destIndexPath, indexContent);
     }
-    
+
     console.log('  ✅ Feed index page generated');
   }
 
@@ -354,30 +361,33 @@ class Fire22FeedBuildSystem {
    */
   private async validateFeeds(options: FeedOptions): Promise<void> {
     console.log('\n✅ Validating feeds...');
-    
+
     const feedFiles = [
       { file: 'error-codes-rss.xml', type: 'RSS 2.0' },
       { file: 'error-codes-atom.xml', type: 'Atom 1.0' },
-      { file: 'index.html', type: 'HTML Index' }
+      { file: 'index.html', type: 'HTML Index' },
     ];
-    
+
     for (const feed of feedFiles) {
       const feedPath = join(this.distDir, feed.file);
-      
+
       if (existsSync(feedPath)) {
         const content = readFileSync(feedPath, 'utf-8');
-        
+
         // Basic validation
         if (feed.type === 'RSS 2.0') {
           if (!content.includes('<rss version="2.0">') || !content.includes('</rss>')) {
             throw new Error(`Invalid RSS feed: ${feed.file}`);
           }
         } else if (feed.type === 'Atom 1.0') {
-          if (!content.includes('<feed xmlns="http://www.w3.org/2005/Atom">') || !content.includes('</feed>')) {
+          if (
+            !content.includes('<feed xmlns="http://www.w3.org/2005/Atom">') ||
+            !content.includes('</feed>')
+          ) {
             throw new Error(`Invalid Atom feed: ${feed.file}`);
           }
         }
-        
+
         console.log(`  ✅ ${feed.file} (${feed.type}) - Valid`);
       } else {
         console.log(`  ❌ ${feed.file} - Missing`);
@@ -404,16 +414,16 @@ class Fire22FeedBuildSystem {
    */
   private getDepartmentContact(department: string): string {
     const contacts: Record<string, string> = {
-      'Technology': 'tech-team@fire22.ag',
-      'Operations': 'ops-manager@fire22.ag',
+      Technology: 'tech-team@fire22.ag',
+      Operations: 'ops-manager@fire22.ag',
       'Customer Support': 'support@fire22.ag',
-      'Security': 'security@fire22.ag',
-      'Compliance': 'compliance@fire22.ag',
-      'Finance': 'finance@fire22.ag',
-      'Marketing': 'marketing@fire22.ag',
-      'Management': 'exec@fire22.ag'
+      Security: 'security@fire22.ag',
+      Compliance: 'compliance@fire22.ag',
+      Finance: 'finance@fire22.ag',
+      Marketing: 'marketing@fire22.ag',
+      Management: 'exec@fire22.ag',
     };
-    
+
     return contacts[department] || 'tech-team@fire22.ag';
   }
 }
@@ -425,13 +435,13 @@ async function main() {
     environment: 'development',
     validate: false,
     minify: false,
-    dryRun: false
+    dryRun: false,
   };
-  
+
   // Parse command line arguments
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    
+
     switch (arg) {
       case '--env':
       case '--environment':
@@ -474,7 +484,7 @@ Examples:
         process.exit(0);
     }
   }
-  
+
   const feedBuilder = new Fire22FeedBuildSystem();
   await feedBuilder.buildFeeds(options);
 }

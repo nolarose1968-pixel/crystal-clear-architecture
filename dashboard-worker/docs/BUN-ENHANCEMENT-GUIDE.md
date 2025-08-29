@@ -2,7 +2,9 @@
 
 ## Expanding on Bun's Technical Strengths
 
-This guide provides comprehensive enhancements to showcase Bun's runtime efficiency, performance capabilities, and developer experience features in the Fire22 dashboard.
+This guide provides comprehensive enhancements to showcase Bun's runtime
+efficiency, performance capabilities, and developer experience features in the
+Fire22 dashboard.
 
 ---
 
@@ -19,7 +21,7 @@ import { Bun } from 'bun';
 export class BunMetricsMonitor {
   private metricsInterval: Timer | null = null;
   private metricsHistory: BunMetrics[] = [];
-  
+
   interface BunMetrics {
     timestamp: number;
     memory: {
@@ -50,17 +52,17 @@ export class BunMetricsMonitor {
     const memUsage = process.memoryUsage();
     const cpuUsage = process.cpuUsage();
     const startTime = Bun.nanoseconds();
-    
+
     // Calculate CPU percentage
     const totalCpu = cpuUsage.user + cpuUsage.system;
     const elapsedTime = process.uptime() * 1000000; // Convert to microseconds
     const cpuPercent = (totalCpu / elapsedTime) * 100;
-    
+
     // Measure event loop lag
     const lagStart = Bun.nanoseconds();
     await new Promise(resolve => setImmediate(resolve));
     const eventLoopLag = Number(Bun.nanoseconds() - lagStart) / 1000000; // ms
-    
+
     return {
       timestamp: Date.now(),
       memory: {
@@ -92,7 +94,7 @@ export class BunMetricsMonitor {
     this.metricsInterval = setInterval(async () => {
       const metrics = await this.collectMetrics();
       this.metricsHistory.push(metrics);
-      
+
       // Keep only last 100 entries
       if (this.metricsHistory.length > 100) {
         this.metricsHistory.shift();
@@ -103,7 +105,7 @@ export class BunMetricsMonitor {
   getFormattedMetrics() {
     const latest = this.metricsHistory[this.metricsHistory.length - 1];
     if (!latest) return null;
-    
+
     return {
       memory: {
         label: "Bun Memory Usage",
@@ -134,17 +136,17 @@ export class BunMetricsMonitor {
 
   private calculateTrend(metric: 'memory' | 'cpu'): 'up' | 'down' | 'stable' {
     if (this.metricsHistory.length < 2) return 'stable';
-    
+
     const recent = this.metricsHistory.slice(-10);
-    const firstValue = metric === 'memory' 
-      ? recent[0].memory.heapUsed 
+    const firstValue = metric === 'memory'
+      ? recent[0].memory.heapUsed
       : recent[0].cpu.percent;
     const lastValue = metric === 'memory'
       ? recent[recent.length - 1].memory.heapUsed
       : recent[recent.length - 1].cpu.percent;
-    
+
     const change = ((lastValue - firstValue) / firstValue) * 100;
-    
+
     if (Math.abs(change) < 5) return 'stable';
     return change > 0 ? 'up' : 'down';
   }
@@ -160,12 +162,12 @@ import { BunMetricsMonitor } from '../monitoring/bun-metrics';
 export function BunMetricsWidget() {
   const monitor = new BunMetricsMonitor();
   monitor.startMonitoring();
-  
+
   return {
     render: () => {
       const metrics = monitor.getFormattedMetrics();
       if (!metrics) return null;
-      
+
       return `
         <div class="bun-metrics-widget">
           <h3>🚀 Bun Runtime Metrics</h3>
@@ -202,7 +204,7 @@ export function BunMetricsWidget() {
           </div>
         </div>
       `;
-    }
+    },
   };
 }
 ```
@@ -225,9 +227,9 @@ export class HotReloadMonitor {
   private fileWatcher: any = null;
 
   constructor() {
-    this.isDevMode = process.env.NODE_ENV === 'development' || 
+    this.isDevMode = process.env.NODE_ENV === 'development' ||
                      process.env.BUN_ENV === 'development';
-    
+
     if (this.isDevMode) {
       this.initializeWatcher();
     }
@@ -236,12 +238,12 @@ export class HotReloadMonitor {
   private initializeWatcher(): void {
     // Using Bun's built-in file watcher
     const watcher = Bun.file('./src');
-    
+
     // Monitor file changes
     this.fileWatcher = setInterval(async () => {
       // Check for file modifications
       const files = await this.scanDirectory('./src');
-      
+
       for (const file of files) {
         if (!this.watchedFiles.has(file)) {
           this.watchedFiles.add(file);
@@ -254,25 +256,25 @@ export class HotReloadMonitor {
   private async scanDirectory(dir: string): Promise<string[]> {
     const files: string[] = [];
     const entries = await Bun.readdir(dir);
-    
+
     for (const entry of entries) {
       const fullPath = `${dir}/${entry}`;
       const stat = await Bun.file(fullPath).stat();
-      
+
       if (stat.isDirectory()) {
         files.push(...await this.scanDirectory(fullPath));
       } else if (entry.endsWith('.ts') || entry.endsWith('.tsx')) {
         files.push(fullPath);
       }
     }
-    
+
     return files;
   }
 
   private handleFileChange(file: string): void {
     this.reloadCount++;
     this.lastReloadTime = new Date();
-    
+
     // Emit hot reload event
     this.emitReloadEvent({
       file,
@@ -322,11 +324,11 @@ export class HotReloadMonitor {
 // src/widgets/hot-reload-widget.tsx
 export function HotReloadWidget() {
   const monitor = new HotReloadMonitor();
-  
+
   return {
     render: () => {
       const status = monitor.getStatus();
-      
+
       return `
         <div class="hot-reload-widget">
           <div class="status-header">
@@ -344,7 +346,9 @@ export function HotReloadWidget() {
               <span class="detail-value">${status.subtitle}</span>
             </div>
             
-            ${status.status === 'Active' ? `
+            ${
+              status.status === 'Active'
+                ? `
               <div class="detail-row">
                 <span class="detail-label">Reloads:</span>
                 <span class="detail-value">${status.details.reloadCount}</span>
@@ -359,7 +363,9 @@ export function HotReloadWidget() {
                 <span class="detail-label">Watching:</span>
                 <span class="detail-value">${status.details.watchedFiles} files</span>
               </div>
-            ` : ''}
+            `
+                : ''
+            }
           </div>
         </div>
         
@@ -395,7 +401,7 @@ export function HotReloadWidget() {
           }
         </style>
       `;
-    }
+    },
   };
 }
 ```
@@ -415,7 +421,7 @@ import { $ } from 'bun';
 export class BunPackageStats {
   private installHistory: InstallMetric[] = [];
   private packageCache: Map<string, PackageInfo> = new Map();
-  
+
   interface InstallMetric {
     timestamp: Date;
     duration: number; // milliseconds
@@ -423,7 +429,7 @@ export class BunPackageStats {
     cacheHit: boolean;
     lockfileUsed: boolean;
   }
-  
+
   interface PackageInfo {
     name: string;
     version: string;
@@ -433,33 +439,33 @@ export class BunPackageStats {
 
   async collectPackageStats() {
     const startTime = Bun.nanoseconds();
-    
+
     // Read package.json
     const packageJson = await Bun.file('./package.json').json();
-    
+
     // Count dependencies
     const deps = Object.keys(packageJson.dependencies || {}).length;
     const devDeps = Object.keys(packageJson.devDependencies || {}).length;
     const peerDeps = Object.keys(packageJson.peerDependencies || {}).length;
     const totalDeps = deps + devDeps + peerDeps;
-    
+
     // Check node_modules size
     const nodeModulesSize = await this.getDirectorySize('./node_modules');
-    
+
     // Check lock file
     const lockfileExists = await Bun.file('./bun.lockb').exists();
-    
+
     // Measure theoretical install speed (dry run)
     const installStart = Bun.nanoseconds();
     const dryRunResult = await $`bun install --dry-run`.quiet();
     const installTime = Number(Bun.nanoseconds() - installStart) / 1000000; // ms
-    
+
     // Get cache statistics
     const cacheStats = await this.getBunCacheStats();
-    
+
     // Calculate average install speed from history
     const avgInstallSpeed = this.calculateAverageInstallSpeed();
-    
+
     return {
       dependencies: {
         label: "Dependencies",
@@ -516,11 +522,11 @@ export class BunPackageStats {
   private async getBunCacheStats() {
     // Bun cache is typically in ~/.bun/install/cache
     const cacheDir = `${process.env.HOME}/.bun/install/cache`;
-    
+
     try {
       const size = await this.getDirectorySize(cacheDir);
       const packages = await $`ls ${cacheDir} | wc -l`.quiet();
-      
+
       return {
         hits: this.packageCache.size,
         size,
@@ -533,20 +539,20 @@ export class BunPackageStats {
 
   private calculateAverageInstallSpeed(): string {
     if (this.installHistory.length === 0) return "1.2";
-    
+
     const total = this.installHistory.reduce((sum, m) => sum + m.duration, 0);
     const avg = total / this.installHistory.length / 1000; // Convert to seconds
-    
+
     return avg.toFixed(2);
   }
 
   async benchmarkInstall(): Promise<void> {
     console.log("🚀 Benchmarking Bun install speed...");
-    
+
     const start = Bun.nanoseconds();
     await $`bun install --force`.quiet();
     const duration = Number(Bun.nanoseconds() - start) / 1000000; // ms
-    
+
     this.installHistory.push({
       timestamp: new Date(),
       duration,
@@ -554,7 +560,7 @@ export class BunPackageStats {
       cacheHit: false,
       lockfileUsed: await Bun.file('./bun.lockb').exists()
     });
-    
+
     console.log(`✅ Install completed in ${(duration / 1000).toFixed(2)}s`);
   }
 
@@ -575,11 +581,11 @@ export class BunPackageStats {
 // src/widgets/package-stats-widget.tsx
 export function PackageStatsWidget() {
   const stats = new BunPackageStats();
-  
+
   return {
     render: async () => {
       const data = await stats.collectPackageStats();
-      
+
       return `
         <div class="package-stats-widget">
           <h3>📦 Bun Package Manager</h3>
@@ -685,7 +691,7 @@ export function PackageStatsWidget() {
           }
         </style>
       `;
-    }
+    },
   };
 }
 ```
@@ -721,13 +727,13 @@ export function PackageStatsWidget() {
     <div class="dashboard-grid">
       <!-- Bun Metrics Widget -->
       <div class="widget bun-metrics" x-html="bunMetricsWidget"></div>
-      
+
       <!-- Hot Reload Indicator -->
       <div class="widget hot-reload" x-html="hotReloadWidget"></div>
-      
+
       <!-- Package Stats Widget -->
       <div class="widget package-stats" x-html="packageStatsWidget"></div>
-      
+
       <!-- Existing Telegram widgets... -->
     </div>
 
@@ -765,38 +771,38 @@ export function PackageStatsWidget() {
       bunMetricsWidget: '',
       hotReloadWidget: '',
       packageStatsWidget: '',
-      
+
       async init() {
         // Connect to SSE for real-time updates
         const eventSource = new EventSource('/api/dashboard/stream');
-        
+
         eventSource.addEventListener('bun_metrics', (event) => {
           const data = JSON.parse(event.data);
           this.updateBunMetrics(data);
         });
-        
+
         eventSource.addEventListener('hot_reload', (event) => {
           const data = JSON.parse(event.data);
           this.handleHotReload(data);
         });
-        
+
         // Initial load
         await this.loadBunWidgets();
-        
+
         // Periodic refresh
         setInterval(() => this.loadBunWidgets(), 30000);
       },
-      
+
       async loadBunWidgets() {
         const response = await fetch('/api/bun/widgets');
         const widgets = await response.json();
-        
+
         this.bunMetricsWidget = widgets.metrics;
         this.hotReloadWidget = widgets.hotReload;
         this.packageStatsWidget = widgets.packageStats;
         this.bunVersion = widgets.version;
       },
-      
+
       updateBunMetrics(data) {
         this.bunMetrics = `
           <span class="metric">Mem: ${data.memory}</span>
@@ -804,11 +810,11 @@ export function PackageStatsWidget() {
           <span class="metric">Loop: ${data.eventLoop}</span>
         `;
       },
-      
+
       handleHotReload(data) {
         // Show notification
         this.showNotification(`🔥 Hot reload: ${data.file}`);
-        
+
         // Update reload counter
         const counter = document.querySelector('.reload-counter');
         if (counter) {
@@ -817,13 +823,13 @@ export function PackageStatsWidget() {
           setTimeout(() => counter.classList.remove('pulse'), 500);
         }
       },
-      
+
       showNotification(message) {
         const notification = document.createElement('div');
         notification.className = 'hot-reload-notification';
         notification.textContent = message;
         document.body.appendChild(notification);
-        
+
         setTimeout(() => {
           notification.classList.add('fade-out');
           setTimeout(() => notification.remove(), 300);
@@ -839,7 +845,7 @@ export function PackageStatsWidget() {
       --bun-accent: #f472b6;
       --bun-dark: #1a1a1a;
     }
-    
+
     .bun-header {
       display: flex;
       justify-content: space-between;
@@ -848,7 +854,7 @@ export function PackageStatsWidget() {
       background: var(--bun-primary);
       border-bottom: 2px solid var(--bun-accent);
     }
-    
+
     .runtime-badge {
       background: var(--bun-accent);
       color: white;
@@ -857,19 +863,19 @@ export function PackageStatsWidget() {
       font-size: 0.875rem;
       margin-left: 1rem;
     }
-    
+
     .runtime-status {
       display: flex;
       gap: 1rem;
     }
-    
+
     .runtime-status .metric {
       padding: 0.25rem 0.5rem;
       background: white;
       border-radius: 0.25rem;
       font-family: monospace;
     }
-    
+
     .hot-reload-notification {
       position: fixed;
       top: 1rem;
@@ -882,35 +888,35 @@ export function PackageStatsWidget() {
       animation: slideIn 0.3s ease;
       z-index: 1000;
     }
-    
+
     .hot-reload-notification.fade-out {
       animation: fadeOut 0.3s ease;
     }
-    
+
     @keyframes slideIn {
       from { transform: translateX(100%); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
     }
-    
+
     @keyframes fadeOut {
       from { opacity: 1; }
       to { opacity: 0; }
     }
-    
+
     .performance-footer {
       margin-top: 2rem;
       padding: 1.5rem;
       background: linear-gradient(135deg, var(--bun-primary) 0%, white 100%);
       border-radius: 0.5rem;
     }
-    
+
     .perf-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1rem;
       margin-top: 1rem;
     }
-    
+
     .perf-item {
       display: flex;
       flex-direction: column;
@@ -919,12 +925,12 @@ export function PackageStatsWidget() {
       border-radius: 0.25rem;
       border-left: 3px solid var(--bun-accent);
     }
-    
+
     .perf-item .label {
       font-size: 0.875rem;
       color: #666;
     }
-    
+
     .perf-item .value {
       font-size: 1.125rem;
       font-weight: bold;
@@ -955,47 +961,47 @@ const packageStats = new BunPackageStats();
 // Start monitoring
 metricsMonitor.startMonitoring();
 
-app.get('/api/bun/metrics', (c) => {
+app.get('/api/bun/metrics', c => {
   const metrics = metricsMonitor.getFormattedMetrics();
   return c.json(metrics);
 });
 
-app.get('/api/bun/hot-reload', (c) => {
+app.get('/api/bun/hot-reload', c => {
   const status = hotReloadMonitor.getStatus();
   return c.json(status);
 });
 
-app.get('/api/bun/package-stats', async (c) => {
+app.get('/api/bun/package-stats', async c => {
   const stats = await packageStats.collectPackageStats();
   return c.json(stats);
 });
 
-app.get('/api/bun/widgets', async (c) => {
+app.get('/api/bun/widgets', async c => {
   const [metrics, hotReload, pkgStats] = await Promise.all([
     metricsMonitor.getFormattedMetrics(),
     hotReloadMonitor.getStatus(),
-    packageStats.collectPackageStats()
+    packageStats.collectPackageStats(),
   ]);
-  
+
   return c.json({
     version: Bun.version,
     metrics: renderMetricsWidget(metrics),
     hotReload: renderHotReloadWidget(hotReload),
-    packageStats: renderPackageStatsWidget(pkgStats)
+    packageStats: renderPackageStatsWidget(pkgStats),
   });
 });
 
 // SSE endpoint for real-time updates
-app.get('/api/bun/stream', (c) => {
-  return streamSSE(c, async (stream) => {
+app.get('/api/bun/stream', c => {
+  return streamSSE(c, async stream => {
     const interval = setInterval(async () => {
       const metrics = metricsMonitor.getFormattedMetrics();
       await stream.writeSSE({
         event: 'bun_metrics',
-        data: JSON.stringify(metrics)
+        data: JSON.stringify(metrics),
       });
     }, 5000);
-    
+
     stream.onAbort(() => {
       clearInterval(interval);
     });
@@ -1013,9 +1019,12 @@ This enhancement guide demonstrates Bun's technical superiority through:
 
 1. **Real-time Runtime Metrics**: Memory, CPU, event loop monitoring
 2. **Hot Reload Visualization**: Development mode status with live updates
-3. **Package Manager Stats**: Installation speed comparisons showing 8.5x advantage
+3. **Package Manager Stats**: Installation speed comparisons showing 8.5x
+   advantage
 4. **Performance Comparisons**: Visual proof of Bun's efficiency
 5. **Native TypeScript**: Direct execution without transpilation
 6. **Nanosecond Precision**: Using Bun.nanoseconds() for accurate timing
 
-These enhancements make the Fire22 dashboard a showcase of Bun's capabilities, providing both functional value and technical demonstration of why Bun is the superior runtime choice.
+These enhancements make the Fire22 dashboard a showcase of Bun's capabilities,
+providing both functional value and technical demonstration of why Bun is the
+superior runtime choice.

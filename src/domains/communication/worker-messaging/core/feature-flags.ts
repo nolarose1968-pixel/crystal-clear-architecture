@@ -20,122 +20,122 @@ export interface RolloutPhase {
   domains: string[];
   percentage: number;
   duration: string;
-  monitoring: 'intensive' | 'standard' | 'light';
+  monitoring: "intensive" | "standard" | "light";
   successCriteria: string[];
 }
 
 export const WORKER_COMMUNICATION_FLAGS: Record<string, FeatureFlag> = {
   useYamlMessaging: {
     enabled: true,
-    description: 'Use YAML instead of JSON for worker messages',
+    description: "Use YAML instead of JSON for worker messages",
     rolloutPercentage: 100,
-    fallback: 'json',
+    fallback: "json",
     conditions: {
-      environment: 'production'
-    }
+      environment: "production",
+    },
   },
 
   enableCompression: {
     enabled: false,
-    description: 'Compress large messages to reduce bandwidth',
+    description: "Compress large messages to reduce bandwidth",
     rolloutPercentage: 0,
-    fallback: 'uncompressed',
+    fallback: "uncompressed",
     conditions: {
-      load: 1000 // messages per minute
-    }
+      load: 1000, // messages per minute
+    },
   },
 
   enableBatching: {
     enabled: false,
-    description: 'Batch multiple messages for efficiency',
+    description: "Batch multiple messages for efficiency",
     rolloutPercentage: 0,
-    fallback: 'individual',
+    fallback: "individual",
     conditions: {
-      domain: 'collections'
-    }
+      domain: "collections",
+    },
   },
 
   enablePerformanceMonitoring: {
     enabled: true,
-    description: 'Enable detailed performance monitoring and alerting',
+    description: "Enable detailed performance monitoring and alerting",
     rolloutPercentage: 100,
-    fallback: 'basic',
+    fallback: "basic",
     conditions: {
-      environment: 'all'
-    }
+      environment: "all",
+    },
   },
 
   enableMessageValidation: {
     enabled: true,
-    description: 'Validate message structure and content',
+    description: "Validate message structure and content",
     rolloutPercentage: 100,
-    fallback: 'none'
+    fallback: "none",
   },
 
   enableCircuitBreaker: {
     enabled: false,
-    description: 'Implement circuit breaker for message failures',
+    description: "Implement circuit breaker for message failures",
     rolloutPercentage: 0,
-    fallback: 'retry',
+    fallback: "retry",
     conditions: {
-      load: 5000
-    }
-  }
+      load: 5000,
+    },
+  },
 };
 
 export const ROLLOUT_PHASES: RolloutPhase[] = [
   {
-    name: 'pilot_phase',
-    domains: ['collections'],
+    name: "pilot_phase",
+    domains: ["collections"],
     percentage: 10,
-    duration: '1_week',
-    monitoring: 'intensive',
+    duration: "1_week",
+    monitoring: "intensive",
     successCriteria: [
-      'No message delivery failures',
-      'Latency improvement > 20%',
-      'Error rate < 0.1%',
-      'YAML parsing successful'
-    ]
+      "No message delivery failures",
+      "Latency improvement > 20%",
+      "Error rate < 0.1%",
+      "YAML parsing successful",
+    ],
   },
   {
-    name: 'expansion_phase',
-    domains: ['collections', 'balance'],
+    name: "expansion_phase",
+    domains: ["collections", "balance"],
     percentage: 50,
-    duration: '2_weeks',
-    monitoring: 'standard',
+    duration: "2_weeks",
+    monitoring: "standard",
     successCriteria: [
-      'Cross-domain communication working',
-      'Latency improvement > 30%',
-      'Throughput increase > 2x',
-      'Memory usage stable'
-    ]
+      "Cross-domain communication working",
+      "Latency improvement > 30%",
+      "Throughput increase > 2x",
+      "Memory usage stable",
+    ],
   },
   {
-    name: 'full_rollout',
-    domains: ['all'],
+    name: "full_rollout",
+    domains: ["all"],
     percentage: 100,
-    duration: '2_weeks',
-    monitoring: 'standard',
+    duration: "2_weeks",
+    monitoring: "standard",
     successCriteria: [
-      'All domains using YAML messaging',
-      '70-80% latency reduction achieved',
-      'System reliability > 99.9%',
-      'No critical alerts'
-    ]
+      "All domains using YAML messaging",
+      "70-80% latency reduction achieved",
+      "System reliability > 99.9%",
+      "No critical alerts",
+    ],
   },
   {
-    name: 'optimization_phase',
-    domains: ['all'],
+    name: "optimization_phase",
+    domains: ["all"],
     percentage: 100,
-    duration: '2_weeks',
-    monitoring: 'light',
+    duration: "2_weeks",
+    monitoring: "light",
     successCriteria: [
-      'Performance benchmarks completed',
-      'Compression and batching optimized',
-      'Monitoring dashboards operational',
-      'Documentation updated'
-    ]
-  }
+      "Performance benchmarks completed",
+      "Compression and batching optimized",
+      "Monitoring dashboards operational",
+      "Documentation updated",
+    ],
+  },
 ];
 
 /**
@@ -143,7 +143,7 @@ export const ROLLOUT_PHASES: RolloutPhase[] = [
  */
 export class FeatureFlagManager {
   private flags: Map<string, FeatureFlag> = new Map();
-  private rolloutPhase: string = 'pilot_phase';
+  private rolloutPhase: string = "pilot_phase";
 
   constructor() {
     // Initialize with default flags
@@ -155,12 +155,15 @@ export class FeatureFlagManager {
   /**
    * Check if a feature flag is enabled
    */
-  isEnabled(flagName: string, context?: {
-    domain?: string;
-    environment?: string;
-    load?: number;
-    userId?: string;
-  }): boolean {
+  isEnabled(
+    flagName: string,
+    context?: {
+      domain?: string;
+      environment?: string;
+      load?: number;
+      userId?: string;
+    },
+  ): boolean {
     const flag = this.flags.get(flagName);
     if (!flag) return false;
 
@@ -172,13 +175,23 @@ export class FeatureFlagManager {
 
     // Check conditions
     if (flag.conditions) {
-      if (flag.conditions.domain && context?.domain !== flag.conditions.domain) {
+      if (
+        flag.conditions.domain &&
+        context?.domain !== flag.conditions.domain
+      ) {
         return false;
       }
-      if (flag.conditions.environment && context?.environment !== flag.conditions.environment) {
+      if (
+        flag.conditions.environment &&
+        context?.environment !== flag.conditions.environment
+      ) {
         return false;
       }
-      if (flag.conditions.load && context?.load && context.load < flag.conditions.load) {
+      if (
+        flag.conditions.load &&
+        context?.load &&
+        context.load < flag.conditions.load
+      ) {
         return false;
       }
     }
@@ -219,14 +232,16 @@ export class FeatureFlagManager {
    * Get current rollout phase
    */
   getCurrentPhase(): RolloutPhase | undefined {
-    return ROLLOUT_PHASES.find(phase => phase.name === this.rolloutPhase);
+    return ROLLOUT_PHASES.find((phase) => phase.name === this.rolloutPhase);
   }
 
   /**
    * Advance to next rollout phase
    */
   advancePhase(): boolean {
-    const currentIndex = ROLLOUT_PHASES.findIndex(phase => phase.name === this.rolloutPhase);
+    const currentIndex = ROLLOUT_PHASES.findIndex(
+      (phase) => phase.name === this.rolloutPhase,
+    );
     if (currentIndex < 0 || currentIndex >= ROLLOUT_PHASES.length - 1) {
       return false;
     }
@@ -246,17 +261,22 @@ export class FeatureFlagManager {
    */
   private updateFlagsForPhase(phase: RolloutPhase): void {
     // Update rollout percentages
-    if (phase.domains.includes('collections') || phase.domains.includes('all')) {
-      this.updateFlag('useYamlMessaging', { rolloutPercentage: phase.percentage });
+    if (
+      phase.domains.includes("collections") ||
+      phase.domains.includes("all")
+    ) {
+      this.updateFlag("useYamlMessaging", {
+        rolloutPercentage: phase.percentage,
+      });
     }
 
     if (phase.percentage >= 50) {
-      this.updateFlag('enableBatching', { rolloutPercentage: 25 });
+      this.updateFlag("enableBatching", { rolloutPercentage: 25 });
     }
 
     if (phase.percentage >= 100) {
-      this.updateFlag('enableCompression', { rolloutPercentage: 50 });
-      this.updateFlag('enableCircuitBreaker', { rolloutPercentage: 25 });
+      this.updateFlag("enableCompression", { rolloutPercentage: 50 });
+      this.updateFlag("enableCircuitBreaker", { rolloutPercentage: 25 });
     }
   }
 
@@ -264,14 +284,23 @@ export class FeatureFlagManager {
    * Emergency rollback - disable all advanced features
    */
   emergencyRollback(): void {
-    console.log('🚨 EMERGENCY ROLLBACK: Disabling all advanced features');
+    console.log("🚨 EMERGENCY ROLLBACK: Disabling all advanced features");
 
-    this.updateFlag('useYamlMessaging', { enabled: false, rolloutPercentage: 0 });
-    this.updateFlag('enableCompression', { enabled: false, rolloutPercentage: 0 });
-    this.updateFlag('enableBatching', { enabled: false, rolloutPercentage: 0 });
-    this.updateFlag('enableCircuitBreaker', { enabled: false, rolloutPercentage: 0 });
+    this.updateFlag("useYamlMessaging", {
+      enabled: false,
+      rolloutPercentage: 0,
+    });
+    this.updateFlag("enableCompression", {
+      enabled: false,
+      rolloutPercentage: 0,
+    });
+    this.updateFlag("enableBatching", { enabled: false, rolloutPercentage: 0 });
+    this.updateFlag("enableCircuitBreaker", {
+      enabled: false,
+      rolloutPercentage: 0,
+    });
 
-    this.rolloutPhase = 'rollback';
+    this.rolloutPhase = "rollback";
   }
 
   /**
@@ -289,59 +318,70 @@ export class FeatureFlagManager {
     this.flags.forEach((flag, name) => {
       flags[name] = {
         enabled: flag.enabled,
-        percentage: flag.rolloutPercentage
+        percentage: flag.rolloutPercentage,
       };
     });
 
     // Generate recommendations
-    if (currentPhase && currentPhase.monitoring === 'intensive') {
-      recommendations.push('Monitor closely - intensive monitoring phase');
+    if (currentPhase && currentPhase.monitoring === "intensive") {
+      recommendations.push("Monitor closely - intensive monitoring phase");
     }
 
-    if (this.rolloutPhase === 'rollback') {
-      recommendations.push('System in rollback mode - investigate issues before re-enabling');
+    if (this.rolloutPhase === "rollback") {
+      recommendations.push(
+        "System in rollback mode - investigate issues before re-enabling",
+      );
     }
 
-    const yamlFlag = this.flags.get('useYamlMessaging');
+    const yamlFlag = this.flags.get("useYamlMessaging");
     if (yamlFlag && yamlFlag.rolloutPercentage < 100) {
-      recommendations.push(`YAML messaging at ${yamlFlag.rolloutPercentage}% rollout - monitor performance`);
+      recommendations.push(
+        `YAML messaging at ${yamlFlag.rolloutPercentage}% rollout - monitor performance`,
+      );
     }
 
     return {
       currentPhase: this.rolloutPhase,
       flags,
-      recommendations
+      recommendations,
     };
   }
 
   /**
    * Validate rollout phase success criteria
    */
-  validatePhaseCriteria(phase: RolloutPhase, metrics: {
-    latency: number;
-    errorRate: number;
-    throughput: number;
-    alerts: number;
-  }): { passed: boolean; results: Record<string, boolean> } {
+  validatePhaseCriteria(
+    phase: RolloutPhase,
+    metrics: {
+      latency: number;
+      errorRate: number;
+      throughput: number;
+      alerts: number;
+    },
+  ): { passed: boolean; results: Record<string, boolean> } {
     const results: Record<string, boolean> = {};
 
     // Define validation logic for each criterion
-    phase.successCriteria.forEach(criterion => {
+    phase.successCriteria.forEach((criterion) => {
       switch (true) {
-        case criterion.includes('latency improvement'):
-          const target = criterion.includes('70-80%') ? 70 : criterion.includes('20%') ? 20 : 30;
+        case criterion.includes("latency improvement"):
+          const target = criterion.includes("70-80%")
+            ? 70
+            : criterion.includes("20%")
+              ? 20
+              : 30;
           results[criterion] = metrics.latency >= target;
           break;
-        case criterion.includes('error rate'):
+        case criterion.includes("error rate"):
           results[criterion] = metrics.errorRate < 0.1;
           break;
-        case criterion.includes('throughput'):
+        case criterion.includes("throughput"):
           results[criterion] = metrics.throughput >= 100;
           break;
-        case criterion.includes('alerts'):
+        case criterion.includes("alerts"):
           results[criterion] = metrics.alerts === 0;
           break;
-        case criterion.includes('YAML parsing'):
+        case criterion.includes("YAML parsing"):
           results[criterion] = true; // Would check actual parsing success
           break;
         default:
@@ -349,7 +389,7 @@ export class FeatureFlagManager {
       }
     });
 
-    const passed = Object.values(results).every(result => result);
+    const passed = Object.values(results).every((result) => result);
 
     return { passed, results };
   }
@@ -362,8 +402,10 @@ export function createFeatureFlagManager(): FeatureFlagManager {
   return new FeatureFlagManager();
 }
 
-export function getRolloutPhaseInfo(phaseName: string): RolloutPhase | undefined {
-  return ROLLOUT_PHASES.find(phase => phase.name === phaseName);
+export function getRolloutPhaseInfo(
+  phaseName: string,
+): RolloutPhase | undefined {
+  return ROLLOUT_PHASES.find((phase) => phase.name === phaseName);
 }
 
 export function validateFeatureFlags(flags: Record<string, FeatureFlag>): {
@@ -383,7 +425,7 @@ export function validateFeatureFlags(flags: Record<string, FeatureFlag>): {
 
   return {
     valid: errors.length === 0,
-    errors
+    errors,
   };
 }
 

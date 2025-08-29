@@ -32,14 +32,14 @@ export class KPIComponent {
       format: 'text',
       color: 'primary',
       size: 'medium',
-      clickable: false
+      clickable: false,
     };
   }
 
   private createElement(): HTMLElement {
     const kpiCard = document.createElement('div');
     kpiCard.className = `kpi-card kpi-${this.config.color} kpi-${this.config.size}`;
-    
+
     if (this.config.clickable) {
       kpiCard.classList.add('kpi-clickable');
       kpiCard.addEventListener('click', () => this.config.onClick?.());
@@ -60,15 +60,17 @@ export class KPIComponent {
 
   private formatValue(): string {
     const value = this.config.value;
-    
+
     switch (this.config.format) {
       case 'number':
         return typeof value === 'number' ? value.toLocaleString() : String(value);
       case 'currency':
-        return typeof value === 'number' ? value.toLocaleString('en-US', {
-          style: 'currency',
-          currency: 'USD'
-        }) : String(value);
+        return typeof value === 'number'
+          ? value.toLocaleString('en-US', {
+              style: 'currency',
+              currency: 'USD',
+            })
+          : String(value);
       case 'percentage':
         return typeof value === 'number' ? `${value.toFixed(2)}%` : String(value);
       default:
@@ -78,20 +80,24 @@ export class KPIComponent {
 
   private createTrendIndicator(): string {
     if (!this.config.trend) return '';
-    
+
     const trendClass = `trend-${this.config.trend}`;
     const trendIcon = this.getTrendIcon();
     const trendValue = this.config.trendValue ? ` ${this.config.trendValue}` : '';
-    
+
     return `<div class="kpi-trend ${trendClass}">${trendIcon}${trendValue}</div>`;
   }
 
   private getTrendIcon(): string {
     switch (this.config.trend) {
-      case 'up': return '↗️';
-      case 'down': return '↘️';
-      case 'neutral': return '→';
-      default: return '';
+      case 'up':
+        return '↗️';
+      case 'down':
+        return '↘️';
+      case 'neutral':
+        return '→';
+      default:
+        return '';
     }
   }
 
@@ -282,7 +288,7 @@ export const createPendingAmountKPI = (amount: number): HTMLElement => {
     format: 'currency',
     color: 'warning',
     icon: '💰',
-    trend: 'up'
+    trend: 'up',
   });
 };
 
@@ -292,7 +298,7 @@ export const createTotalAgentsKPI = (count: number): HTMLElement => {
     value: count,
     format: 'number',
     color: 'primary',
-    icon: '👥'
+    icon: '👥',
   });
 };
 
@@ -302,7 +308,7 @@ export const createActiveAgentsKPI = (count: number): HTMLElement => {
     value: count,
     format: 'number',
     color: 'success',
-    icon: '✅'
+    icon: '✅',
   });
 };
 
@@ -312,6 +318,6 @@ export const createPendingWagersKPI = (count: number): HTMLElement => {
     value: count,
     format: 'number',
     color: 'warning',
-    icon: '📊'
+    icon: '📊',
   });
 };

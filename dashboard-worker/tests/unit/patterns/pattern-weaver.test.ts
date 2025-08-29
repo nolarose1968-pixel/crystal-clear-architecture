@@ -12,83 +12,88 @@ import { describe, it, expect, beforeEach } from 'bun:test';
 class MockPatternWeaver {
   readonly patternTypes = {
     LOADER: {
-      name: "loader",
-      description: "File loading and transformation",
-      bunFeatures: ["loaders", "import attributes"],
-      applies: ["*.json", "*.yaml", "*.toml", "*.db", "*.html"]
+      name: 'loader',
+      description: 'File loading and transformation',
+      bunFeatures: ['loaders', 'import attributes'],
+      applies: ['*.json', '*.yaml', '*.toml', '*.db', '*.html'],
     },
     STYLER: {
-      name: "styler",
-      description: "CSS processing and modules",
-      bunFeatures: ["CSS bundler", "CSS modules", "transpiling"],
-      applies: ["*.css", "*.module.css"]
+      name: 'styler',
+      description: 'CSS processing and modules',
+      bunFeatures: ['CSS bundler', 'CSS modules', 'transpiling'],
+      applies: ['*.css', '*.module.css'],
     },
     TABULAR: {
-      name: "tabular",
-      description: "Structured data display",
-      bunFeatures: ["Bun.inspect.table()", "formatting"],
-      applies: ["logs", "reports", "analytics"]
+      name: 'tabular',
+      description: 'Structured data display',
+      bunFeatures: ['Bun.inspect.table()', 'formatting'],
+      applies: ['logs', 'reports', 'analytics'],
     },
     SECURE: {
-      name: "secure",
-      description: "Credential and secret management",
-      bunFeatures: ["Bun.secrets", "encryption"],
-      applies: ["auth", "tokens", "api-keys"]
+      name: 'secure',
+      description: 'Credential and secret management',
+      bunFeatures: ['Bun.secrets', 'encryption'],
+      applies: ['auth', 'tokens', 'api-keys'],
     },
     TIMING: {
-      name: "timing",
-      description: "Performance measurement",
-      bunFeatures: ["Bun.nanoseconds()", "benchmarking"],
-      applies: ["profiling", "optimization", "metrics"]
+      name: 'timing',
+      description: 'Performance measurement',
+      bunFeatures: ['Bun.nanoseconds()', 'benchmarking'],
+      applies: ['profiling', 'optimization', 'metrics'],
     },
     BUILDER: {
-      name: "builder",
-      description: "Compilation and bundling",
-      bunFeatures: ["Bun.build()", "executables", "bundling"],
-      applies: ["build", "compile", "bundle"]
+      name: 'builder',
+      description: 'Compilation and bundling',
+      bunFeatures: ['Bun.build()', 'executables', 'bundling'],
+      applies: ['build', 'compile', 'bundle'],
     },
     VERSIONER: {
-      name: "versioner",
-      description: "Semantic versioning",
-      bunFeatures: ["Bun.semver", "version management"],
-      applies: ["releases", "updates", "compatibility"]
+      name: 'versioner',
+      description: 'Semantic versioning',
+      bunFeatures: ['Bun.semver', 'version management'],
+      applies: ['releases', 'updates', 'compatibility'],
     },
     SHELL: {
-      name: "shell",
-      description: "Execute shell commands",
-      bunFeatures: ["Bun.$", "shell scripts", "command execution"],
-      applies: ["*.sh", "commands", "automation"]
+      name: 'shell',
+      description: 'Execute shell commands',
+      bunFeatures: ['Bun.$', 'shell scripts', 'command execution'],
+      applies: ['*.sh', 'commands', 'automation'],
     },
     BUNX: {
-      name: "bunx",
-      description: "Execute packages without installation",
-      bunFeatures: ["bunx", "package execution", "version pinning"],
-      applies: ["tools", "cli", "development"]
+      name: 'bunx',
+      description: 'Execute packages without installation',
+      bunFeatures: ['bunx', 'package execution', 'version pinning'],
+      applies: ['tools', 'cli', 'development'],
     },
     INTERACTIVE: {
-      name: "interactive",
-      description: "Interactive CLI with console AsyncIterable",
-      bunFeatures: ["console AsyncIterable", "stdin reading", "prompts"],
-      applies: ["cli", "interactive", "prompts", "user-input"]
+      name: 'interactive',
+      description: 'Interactive CLI with console AsyncIterable',
+      bunFeatures: ['console AsyncIterable', 'stdin reading', 'prompts'],
+      applies: ['cli', 'interactive', 'prompts', 'user-input'],
     },
     STREAM: {
-      name: "stream",
-      description: "Stream processing with Bun.stdin",
-      bunFeatures: ["Bun.stdin", "streaming", "chunk processing"],
-      applies: ["pipes", "large-data", "streaming", "processing"]
+      name: 'stream',
+      description: 'Stream processing with Bun.stdin',
+      bunFeatures: ['Bun.stdin', 'streaming', 'chunk processing'],
+      applies: ['pipes', 'large-data', 'streaming', 'processing'],
     },
     FILESYSTEM: {
-      name: "filesystem",
-      description: "File system operations with Bun.file",
-      bunFeatures: ["Bun.file()", "file.exists()", "file operations"],
-      applies: ["files", "validation", "paths", "existence-check"]
+      name: 'filesystem',
+      description: 'File system operations with Bun.file',
+      bunFeatures: ['Bun.file()', 'file.exists()', 'file operations'],
+      applies: ['files', 'validation', 'paths', 'existence-check'],
     },
     UTILITIES: {
-      name: "utilities",
-      description: "Bun utility functions and helpers",
-      bunFeatures: ["Bun.stringWidth()", "Bun.stripANSI()", "Bun.escapeHTML()", "Bun.randomUUIDv7()"],
-      applies: ["text-processing", "uuid", "strings", "performance", "development", "compression"]
-    }
+      name: 'utilities',
+      description: 'Bun utility functions and helpers',
+      bunFeatures: [
+        'Bun.stringWidth()',
+        'Bun.stripANSI()',
+        'Bun.escapeHTML()',
+        'Bun.randomUUIDv7()',
+      ],
+      applies: ['text-processing', 'uuid', 'strings', 'performance', 'development', 'compression'],
+    },
   };
 
   registerPattern(pattern: any): void {
@@ -115,7 +120,11 @@ class MockPatternWeaver {
     return {
       lineCount: 10,
       wordCount: 50,
-      patterns: new Map([['import', 1], ['export', 1], ['classes', 1]])
+      patterns: new Map([
+        ['import', 1],
+        ['export', 1],
+        ['classes', 1],
+      ]),
     };
   }
 }
@@ -130,23 +139,41 @@ describe('Pattern Weaver System', () => {
   describe('Pattern Types', () => {
     it('should have all core pattern types defined', () => {
       const expectedPatterns = [
-        'LOADER', 'STYLER', 'TABULAR', 'SECURE', 'TIMING',
-        'BUILDER', 'VERSIONER', 'SHELL', 'BUNX', 'INTERACTIVE',
-        'STREAM', 'FILESYSTEM', 'UTILITIES'
+        'LOADER',
+        'STYLER',
+        'TABULAR',
+        'SECURE',
+        'TIMING',
+        'BUILDER',
+        'VERSIONER',
+        'SHELL',
+        'BUNX',
+        'INTERACTIVE',
+        'STREAM',
+        'FILESYSTEM',
+        'UTILITIES',
       ];
 
       for (const pattern of expectedPatterns) {
         expect(weaver.patternTypes).toHaveProperty(pattern);
-        expect(weaver.patternTypes[pattern as keyof typeof weaver.patternTypes]).toHaveProperty('name');
-        expect(weaver.patternTypes[pattern as keyof typeof weaver.patternTypes]).toHaveProperty('description');
-        expect(weaver.patternTypes[pattern as keyof typeof weaver.patternTypes]).toHaveProperty('bunFeatures');
-        expect(weaver.patternTypes[pattern as keyof typeof weaver.patternTypes]).toHaveProperty('applies');
+        expect(weaver.patternTypes[pattern as keyof typeof weaver.patternTypes]).toHaveProperty(
+          'name'
+        );
+        expect(weaver.patternTypes[pattern as keyof typeof weaver.patternTypes]).toHaveProperty(
+          'description'
+        );
+        expect(weaver.patternTypes[pattern as keyof typeof weaver.patternTypes]).toHaveProperty(
+          'bunFeatures'
+        );
+        expect(weaver.patternTypes[pattern as keyof typeof weaver.patternTypes]).toHaveProperty(
+          'applies'
+        );
       }
     });
 
     it('should have valid LOADER pattern configuration', () => {
       const loader = weaver.patternTypes.LOADER;
-      
+
       expect(loader.name).toBe('loader');
       expect(loader.description).toBe('File loading and transformation');
       expect(loader.bunFeatures).toContain('loaders');
@@ -157,7 +184,7 @@ describe('Pattern Weaver System', () => {
 
     it('should have valid STYLER pattern configuration', () => {
       const styler = weaver.patternTypes.STYLER;
-      
+
       expect(styler.name).toBe('styler');
       expect(styler.description).toBe('CSS processing and modules');
       expect(styler.bunFeatures).toContain('CSS bundler');
@@ -167,7 +194,7 @@ describe('Pattern Weaver System', () => {
 
     it('should have valid SECURE pattern configuration', () => {
       const secure = weaver.patternTypes.SECURE;
-      
+
       expect(secure.name).toBe('secure');
       expect(secure.description).toBe('Credential and secret management');
       expect(secure.bunFeatures).toContain('Bun.secrets');
@@ -178,7 +205,7 @@ describe('Pattern Weaver System', () => {
 
     it('should have valid UTILITIES pattern configuration', () => {
       const utilities = weaver.patternTypes.UTILITIES;
-      
+
       expect(utilities.name).toBe('utilities');
       expect(utilities.description).toBe('Bun utility functions and helpers');
       expect(utilities.bunFeatures).toContain('Bun.stringWidth()');
@@ -195,11 +222,11 @@ describe('Pattern Weaver System', () => {
         name: 'Test Pattern',
         description: 'A test pattern for unit testing',
         features: ['testing', 'validation'],
-        contexts: ['unit-test', 'development']
+        contexts: ['unit-test', 'development'],
       };
 
       weaver.registerPattern(testPattern);
-      
+
       // Note: We can't directly access private patterns map,
       // but we can test the behavior through public methods
       expect(() => weaver.registerPattern(testPattern)).not.toThrow();
@@ -211,7 +238,7 @@ describe('Pattern Weaver System', () => {
         name: 'Pattern 1',
         description: 'First test pattern',
         features: ['feature-a', 'feature-b'],
-        contexts: ['context-1']
+        contexts: ['context-1'],
       };
 
       const pattern2 = {
@@ -219,7 +246,7 @@ describe('Pattern Weaver System', () => {
         name: 'Pattern 2',
         description: 'Second test pattern',
         features: ['feature-b', 'feature-c'],
-        contexts: ['context-1', 'context-2']
+        contexts: ['context-1', 'context-2'],
       };
 
       // Register patterns and verify no errors
@@ -235,7 +262,7 @@ describe('Pattern Weaver System', () => {
       const testData = [
         { name: 'John', age: 30, city: 'New York' },
         { name: 'Jane', age: 25, city: 'Los Angeles' },
-        { name: 'Bob', age: 35, city: 'Chicago' }
+        { name: 'Bob', age: 35, city: 'Chicago' },
       ];
 
       // Test that pattern application doesn't throw errors
@@ -252,7 +279,7 @@ describe('Pattern Weaver System', () => {
     it('should handle timing pattern attempts', async () => {
       const context = {
         operation: 'test-operation',
-        iterations: 100
+        iterations: 100,
       };
 
       try {
@@ -267,7 +294,7 @@ describe('Pattern Weaver System', () => {
     it('should handle utilities pattern attempts', async () => {
       const context = {
         text: 'Hello World',
-        operation: 'stripANSI'
+        operation: 'stripANSI',
       };
 
       try {
@@ -282,7 +309,7 @@ describe('Pattern Weaver System', () => {
     it('should handle filesystem pattern attempts', async () => {
       const context = {
         path: './package.json',
-        operation: 'exists'
+        operation: 'exists',
       };
 
       try {
@@ -317,7 +344,7 @@ describe('Pattern Weaver System', () => {
               return 'test';
             }
           }
-        `
+        `,
       };
 
       try {
@@ -335,7 +362,7 @@ describe('Pattern Weaver System', () => {
 
     it('should handle empty file analysis attempts', async () => {
       const mockFile = {
-        text: async () => ''
+        text: async () => '',
       };
 
       try {
@@ -355,7 +382,7 @@ describe('Pattern Weaver System', () => {
         name: 'Web Pattern',
         description: 'Web-related functionality',
         features: ['http', 'css', 'html'],
-        contexts: ['web', 'frontend']
+        contexts: ['web', 'frontend'],
       };
 
       const pattern2 = {
@@ -363,7 +390,7 @@ describe('Pattern Weaver System', () => {
         name: 'Style Pattern',
         description: 'Styling functionality',
         features: ['css', 'styling'],
-        contexts: ['frontend', 'design']
+        contexts: ['frontend', 'design'],
       };
 
       // Register patterns
@@ -397,7 +424,7 @@ describe('Pattern Weaver System', () => {
 
       // Should handle null/undefined context gracefully
       const result = await weaver.applyPattern('TABULAR', invalidContext);
-      
+
       expect(result).toBeDefined();
     });
   });
@@ -410,7 +437,7 @@ describe('Pattern Weaver System', () => {
         name: 'Fire22 Sportsbook Pattern',
         description: 'Sportsbook-specific functionality',
         features: ['betting', 'odds', 'customers'],
-        contexts: ['sportsbook', 'gambling', 'fire22']
+        contexts: ['sportsbook', 'gambling', 'fire22'],
       };
 
       weaver.registerPattern(customPattern);
@@ -418,12 +445,12 @@ describe('Pattern Weaver System', () => {
       // Apply multiple patterns
       const tabularResult = await weaver.applyPattern('TABULAR', [
         { customer: 'CUST001', bet: 50, odds: 1.85 },
-        { customer: 'CUST002', bet: 100, odds: 2.10 }
+        { customer: 'CUST002', bet: 100, odds: 2.1 },
       ]);
 
       const timingResult = await weaver.applyPattern('TIMING', {
         operation: 'bet-processing',
-        iterations: 1000
+        iterations: 1000,
       });
 
       // Verify results

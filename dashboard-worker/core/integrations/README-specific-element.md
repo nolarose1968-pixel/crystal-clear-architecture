@@ -2,7 +2,8 @@
 
 ## Overview
 
-This integration targets a specific DOM element using the XPath: `/html/body/div[3]/div[5]/div/div[4]/div[7]/div`
+This integration targets a specific DOM element using the XPath:
+`/html/body/div[3]/div[5]/div/div[4]/div[7]/div`
 
 ## Features
 
@@ -23,7 +24,7 @@ import { Fantasy42AgentClient } from '../../src/api/fantasy42-agent-client';
 // Create client
 const client = new Fantasy42AgentClient({
   baseURL: 'https://api.fantasy42.com',
-  token: 'your-token'
+  token: 'your-token',
 });
 
 // Create and initialize manager
@@ -39,12 +40,13 @@ const data = manager.getCurrentData();
 
 ```typescript
 interface SpecificElementConfig {
-  xpath: string;                    // The XPath to target
+  xpath: string; // The XPath to target
   action: 'read' | 'write' | 'update' | 'click' | 'submit' | 'validate';
-  data?: any;                       // Data for write operations
-  autoUpdate?: boolean;             // Enable real-time monitoring
-  updateInterval?: number;          // Monitoring interval (ms)
-  validation?: {                    // Data validation rules
+  data?: any; // Data for write operations
+  autoUpdate?: boolean; // Enable real-time monitoring
+  updateInterval?: number; // Monitoring interval (ms)
+  validation?: {
+    // Data validation rules
     required?: boolean;
     pattern?: RegExp;
     minLength?: number;
@@ -65,7 +67,7 @@ const config: SpecificElementConfig = {
   action: 'read',
   onDataChange: (data, element) => {
     console.log('Element data:', data);
-  }
+  },
 };
 
 const manager = new Fantasy42SpecificElementManager(client, config);
@@ -84,7 +86,7 @@ const config: SpecificElementConfig = {
     // Handle data changes
     sendToBackend(newData);
     updateUI(newData);
-  }
+  },
 };
 ```
 
@@ -94,10 +96,10 @@ const config: SpecificElementConfig = {
 const config: SpecificElementConfig = {
   xpath: '/html/body/div[3]/div[5]/div/div[4]/div[7]/div',
   action: 'click',
-  onElementFound: (element) => {
+  onElementFound: element => {
     // Element found, can add additional listeners
     element.addEventListener('dblclick', handleDoubleClick);
-  }
+  },
 };
 ```
 
@@ -115,8 +117,8 @@ const structuredData = {
   content: 'New text content',
   attributes: {
     'data-status': 'updated',
-    'class': 'highlight'
-  }
+    class: 'highlight',
+  },
 };
 
 manager.writeElementData(structuredData);
@@ -125,7 +127,10 @@ manager.writeElementData(structuredData);
 ## Direct XPath Handler Usage
 
 ```typescript
-import { findSpecificElement, handleSpecificElement } from '../ui/xpath-element-handler';
+import {
+  findSpecificElement,
+  handleSpecificElement,
+} from '../ui/xpath-element-handler';
 
 // Find element
 const element = findSpecificElement();
@@ -146,11 +151,11 @@ The integration extracts the following data from the target element:
 
 ```typescript
 interface ElementData {
-  content: string;                    // Text content
+  content: string; // Text content
   attributes: Record<string, string>; // Element attributes
-  children: ElementData[];           // Child elements (simplified)
-  timestamp: string;                 // When data was extracted
-  xpath: string;                     // The XPath used
+  children: ElementData[]; // Child elements (simplified)
+  timestamp: string; // When data was extracted
+  xpath: string; // The XPath used
 }
 ```
 
@@ -178,10 +183,7 @@ const customerInfo = new Fantasy42CustomerInfo(/* config */);
 const elementManager = createSpecificElementManager(client);
 
 // Initialize both
-await Promise.all([
-  customerInfo.initialize(),
-  elementManager.initialize()
-]);
+await Promise.all([customerInfo.initialize(), elementManager.initialize()]);
 ```
 
 ### With P2P Automation
@@ -196,7 +198,7 @@ const config: SpecificElementConfig = {
   onDataChange: (data, element) => {
     // Trigger P2P automation based on element changes
     p2pAutomation.handleElementUpdate(data);
-  }
+  },
 };
 ```
 
@@ -248,7 +250,10 @@ console.log('Manual read:', data);
 ```typescript
 // Check API token and permissions
 console.log('Token valid:', await client.validateToken());
-console.log('Has permissions:', await client.checkPermissions(['element.read']));
+console.log(
+  'Has permissions:',
+  await client.checkPermissions(['element.read'])
+);
 ```
 
 ## API Reference
@@ -282,6 +287,7 @@ For issues or questions about this integration:
 ## Changelog
 
 ### v1.0.0
+
 - Initial release
 - Basic element targeting and monitoring
 - Data extraction and writing capabilities
@@ -298,4 +304,6 @@ For issues or questions about this integration:
 4. **Integrate with your existing workflows**
 5. **Customize the configuration** for your specific needs
 
-This integration provides a solid foundation for monitoring and interacting with specific elements on the Fantasy42 platform. Customize it further based on your specific requirements and use cases.
+This integration provides a solid foundation for monitoring and interacting with
+specific elements on the Fantasy42 platform. Customize it further based on your
+specific requirements and use cases.

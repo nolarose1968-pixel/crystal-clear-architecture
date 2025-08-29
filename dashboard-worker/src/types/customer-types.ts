@@ -12,7 +12,7 @@ export enum CustomerType {
   VIP = 'vip',
   SUSPENDED = 'suspended',
   BANNED = 'banned',
-  DORMANT = 'dormant'
+  DORMANT = 'dormant',
 }
 
 export enum CustomerTier {
@@ -20,7 +20,7 @@ export enum CustomerTier {
   SILVER = 'silver',
   GOLD = 'gold',
   PLATINUM = 'platinum',
-  DIAMOND = 'diamond'
+  DIAMOND = 'diamond',
 }
 
 export enum PaymentMethod {
@@ -35,7 +35,7 @@ export enum PaymentMethod {
   CRYPTO_USDC = 'crypto_usdc',
   CREDIT_CARD = 'credit_card',
   DEBIT_CARD = 'debit_card',
-  PREPAID_CARD = 'prepaid_card'
+  PREPAID_CARD = 'prepaid_card',
 }
 
 export enum TransactionStatus {
@@ -47,7 +47,7 @@ export enum TransactionStatus {
   CANCELLED = 'cancelled',
   EXPIRED = 'expired',
   DISPUTED = 'disputed',
-  REFUNDED = 'refunded'
+  REFUNDED = 'refunded',
 }
 
 export enum RiskLevel {
@@ -57,7 +57,7 @@ export enum RiskLevel {
   HIGH = 'high',
   CRITICAL = 'critical',
   SUSPENDED = 'suspended',
-  BANNED = 'banned'
+  BANNED = 'banned',
 }
 
 export enum AgentLevel {
@@ -68,7 +68,7 @@ export enum AgentLevel {
   BRANCH_MANAGER = 5,
   SENIOR_AGENT = 6,
   AGENT = 7,
-  PLAYER = 8
+  PLAYER = 8,
 }
 
 // Interface Definitions
@@ -149,31 +149,31 @@ export interface Customer {
   phone?: string;
   telegramId?: string;
   telegramUsername?: string;
-  
+
   // Customer Classification
   type: CustomerType;
   tier: CustomerTier;
   riskLevel: RiskLevel;
-  
+
   // Financial Information
   balance: number;
   creditLimit: number;
   lifetimeVolume: number;
   lifetimeCommission: number;
-  
+
   // Agent Hierarchy
   agentId?: string;
   agentLevel: AgentLevel;
   uplineAgentId?: string;
   downlineCount: number;
-  
+
   // Status & Verification
   isActive: boolean;
   isVerified: boolean;
   isSuspended: boolean;
   verificationDate?: Date;
   suspensionReason?: string;
-  
+
   // Timestamps
   createdAt: Date;
   updatedAt: Date;
@@ -186,39 +186,39 @@ export interface Transaction {
   id: string;
   customerId: string;
   agentId?: string;
-  
+
   // Transaction Details
   type: 'deposit' | 'withdrawal' | 'wager' | 'commission' | 'adjustment';
   status: TransactionStatus;
   paymentMethod: PaymentMethod;
   amount: number;
   currency: string;
-  
+
   // Commission Information
   commissionRate: number;
   commissionAmount: number;
   netAmount: number;
-  
+
   // Processing Information
   processingStartTime?: Date;
   processingEndTime?: Date;
   approvedBy?: string;
   approvedAt?: Date;
-  
+
   // External References
   externalTransactionId?: string;
   fire22TransactionId?: string;
   telegramMessageId?: string;
-  
+
   // P2P Matching
   p2pMatchId?: string;
   p2pPartnerId?: string;
-  
+
   // Metadata
   notes?: string;
   tags?: string[];
   metadata?: Record<string, any>;
-  
+
   // Timestamps
   createdAt: Date;
   updatedAt: Date;
@@ -229,26 +229,26 @@ export interface P2PQueueItem {
   id: string;
   customerId: string;
   type: 'deposit' | 'withdrawal';
-  
+
   // Transaction Details
   amount: number;
   paymentMethod: PaymentMethod;
   currency: string;
-  
+
   // Queue Information
   priority: number;
   timeoutAt: Date;
   matchTolerancePercentage: number;
-  
+
   // Matching Preferences
   preferredPartnerIds?: string[];
   excludedPartnerIds?: string[];
-  
+
   // Status
   isMatched: boolean;
   matchedWith?: string;
   matchedAt?: Date;
-  
+
   // Timestamps
   createdAt: Date;
   updatedAt: Date;
@@ -260,27 +260,27 @@ export interface Agent {
   code: string;
   username: string;
   email: string;
-  
+
   // Hierarchy Information
   level: AgentLevel;
   uplineAgentId?: string;
   downlineAgentIds: string[];
-  
+
   // Performance Metrics
   totalCommission: number;
   monthlyCommission: number;
   playerCount: number;
   activePlayerCount: number;
-  
+
   // Configuration
   commissionRate: number;
   maxPlayers: number;
   canCreateSubAgents: boolean;
-  
+
   // Status
   isActive: boolean;
   isVerified: boolean;
-  
+
   // Timestamps
   createdAt: Date;
   updatedAt: Date;

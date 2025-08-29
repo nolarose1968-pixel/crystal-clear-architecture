@@ -39,21 +39,21 @@ interface PerformanceMetrics {
 }
 
 interface SecurityEvent {
-  type: 'authentication' | 'authorization' | 'validation';
-  severity: 'low' | 'medium' | 'high';
+  type: "authentication" | "authorization" | "validation";
+  severity: "low" | "medium" | "high";
   details: Record<string, any>;
   timestamp: string;
   userId?: string;
 }
 
 interface HealthStatus {
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  status: "healthy" | "degraded" | "unhealthy";
   components: Record<string, ComponentHealth>;
   lastUpdated: string;
 }
 
 interface ComponentHealth {
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  status: "healthy" | "degraded" | "unhealthy";
   message?: string;
   lastChecked: string;
   metrics?: PerformanceMetrics;
@@ -64,6 +64,7 @@ interface ComponentHealth {
 Implement new files and modify existing ones to support the enhancements.
 
 New files:
+
 - src/error/enhanced-error-handler.ts (Error handling implementation)
 - src/monitoring/performance-monitor.ts (Performance monitoring)
 - src/monitoring/security-monitor.ts (Security event monitoring)
@@ -71,6 +72,7 @@ New files:
 - src/utils/monitoring-utils.ts (Shared monitoring utilities)
 
 Modified files:
+
 - src/index.ts (Add new monitoring middleware)
 - src/fire22-api.ts (Enhance error handling)
 - src/jwt-auth-worker-enhanced.ts (Add security monitoring)
@@ -81,9 +83,14 @@ Modified files:
 Implement new functions and modify existing ones.
 
 New functions:
+
 ```typescript
 // Error handling
-function createEnhancedError(code: string, message: string, details?: Record<string, any>): EnhancedError;
+function createEnhancedError(
+  code: string,
+  message: string,
+  details?: Record<string, any>,
+): EnhancedError;
 function formatErrorResponse(error: EnhancedError): ErrorResponse;
 function handleApiError(error: unknown): Response;
 
@@ -91,10 +98,14 @@ function handleApiError(error: unknown): Response;
 async function collectPerformanceMetrics(): Promise<PerformanceMetrics>;
 async function recordSecurityEvent(event: SecurityEvent): Promise<void>;
 async function performHealthCheck(): Promise<HealthStatus>;
-async function monitorEndpoint(request: Request, handler: Function): Promise<Response>;
+async function monitorEndpoint(
+  request: Request,
+  handler: Function,
+): Promise<Response>;
 ```
 
 Modified functions:
+
 - Fire22ApiClient.makeRequest() - Add error handling and monitoring
 - EnhancedJWTAuthService.authenticate() - Add security monitoring
 - MainWorker.processRequest() - Add performance monitoring
@@ -104,6 +115,7 @@ Modified functions:
 Implement new classes and modify existing ones.
 
 New classes:
+
 ```typescript
 class PerformanceMonitor {
   constructor(config: MonitoringConfig);
@@ -126,6 +138,7 @@ class HealthMonitor {
 ```
 
 Modified classes:
+
 - Fire22APIService (Add monitoring integration)
 - EnhancedAuthWorker (Add security monitoring)
 - MainWorker (Add health checks)
@@ -134,6 +147,7 @@ Modified classes:
 Add new dependencies and update existing ones.
 
 New dependencies:
+
 ```json
 {
   "dependencies": {
@@ -149,6 +163,7 @@ New dependencies:
 Implement comprehensive testing strategy.
 
 Test files:
+
 - test/error/enhanced-error-handler.test.ts
 - test/monitoring/performance-monitor.test.ts
 - test/monitoring/security-monitor.test.ts
@@ -156,6 +171,7 @@ Test files:
 - test/integration/monitoring-integration.test.ts
 
 Test coverage requirements:
+
 - Unit tests for all new functions and classes
 - Integration tests for monitoring system
 - Load tests for performance monitoring

@@ -1,21 +1,25 @@
 # Registry Configuration
 
-Fire22 Dashboard Worker uses a multi-registry setup for package management and deployment.
+Fire22 Dashboard Worker uses a multi-registry setup for package management and
+deployment.
 
 ## Registry Overview
 
 ### Primary Registry
+
 - **URL**: `https://registry.npmjs.org/`
 - **Usage**: Public npm packages and dependencies
 - **Authentication**: Not required for public packages
 
 ### Fire22 Private Registry
+
 - **URL**: `https://fire22.workers.dev/registry/`
 - **Usage**: Private Fire22 packages and internal workspaces
 - **Scope**: `@fire22/*`
 - **Authentication**: Required
 
 ### Cloudflare Workers Registry
+
 - **URL**: Managed through Wrangler
 - **Usage**: Cloudflare Worker deployments
 - **Authentication**: Cloudflare API token
@@ -23,6 +27,7 @@ Fire22 Dashboard Worker uses a multi-registry setup for package management and d
 ## Configuration
 
 ### NPM Configuration (`.npmrc`)
+
 ```ini
 # Main registry for public packages
 registry=https://registry.npmjs.org/
@@ -66,11 +71,13 @@ registry = "https://fire22.workers.dev/registry/"
 ## Package Scopes
 
 ### Public Packages (`npm`)
+
 - External dependencies
 - Open source libraries
 - Community packages
 
 ### Private Packages (`@fire22/*`)
+
 - `@fire22/core-dashboard`
 - `@fire22/pattern-system`
 - `@fire22/api-client`
@@ -81,6 +88,7 @@ registry = "https://fire22.workers.dev/registry/"
 ## Authentication
 
 ### NPM Authentication
+
 ```bash
 # Login to npm (if needed for private packages)
 npm login --registry=https://registry.npmjs.org/
@@ -122,8 +130,8 @@ bun publish --registry https://fire22.workers.dev/registry/
 ```
 
 ### Multi-Registry Publishing
-The workspace orchestrator supports publishing to multiple registries:
 
+The workspace orchestrator supports publishing to multiple registries:
 
 ```typescript
 // Publishing configuration
@@ -133,15 +141,15 @@ const publishConfig = {
       name: 'fire22-private',
       url: 'https://fire22.workers.dev/registry/',
       scope: '@fire22',
-      access: 'restricted'
+      access: 'restricted',
     },
     {
-      name: 'npm-public', 
+      name: 'npm-public',
       url: 'https://registry.npmjs.org/',
       scope: '@fire22-public',
-      access: 'public'
-    }
-  ]
+      access: 'public',
+    },
+  ],
 };
 ```
 
@@ -152,22 +160,27 @@ const publishConfig = {
 ```bash
 bun run workspace:publish --strategy stable
 ```
+
 - Publishes to production registry
 - Tags as `latest`
 - No prerelease flags
 
 #### Beta Release
+
 ```bash
 bun run workspace:publish --strategy beta
 ```
+
 - Publishes with `beta` tag
 - Prerelease version
 - Limited distribution
 
 #### Development Release
+
 ```bash
 bun run workspace:publish --strategy dev
 ```
+
 - Publishes with `dev` tag
 - Alpha versions
 - Internal testing only
@@ -175,6 +188,7 @@ bun run workspace:publish --strategy dev
 ## Registry Management
 
 ### Package Versioning
+
 ```bash
 # Automated version bumps
 bun run version:patch   # 3.0.9 -> 3.0.10
@@ -214,11 +228,13 @@ bun run registry:stats
 ## Security
 
 ### Package Signing
+
 - All packages are signed with GPG keys
 - Signature verification enabled in `.npmrc`
 - Automated signature checks in CI/CD
 
 ### Vulnerability Scanning
+
 ```bash
 # Audit all dependencies
 bun audit --audit-level high
@@ -228,6 +244,7 @@ bun audit --production --audit-level critical
 ```
 
 ### Access Control
+
 - Private registry requires authentication
 - Workspace packages are access-restricted
 - Role-based permissions for publishing
@@ -235,6 +252,7 @@ bun audit --production --audit-level critical
 ## Troubleshooting
 
 ### Authentication Issues
+
 ```bash
 # Clear npm cache
 npm cache clean --force
@@ -278,18 +296,21 @@ bun ls @fire22/core-dashboard
 ## Best Practices
 
 ### Package Management
+
 1. Use exact versions for production dependencies
 2. Pin workspace versions with `workspace:*` protocol
 3. Regular dependency audits and updates
 4. Automated vulnerability scanning
 
 ### Publishing
+
 1. Always run tests before publishing
 2. Use semantic versioning consistently
 3. Include comprehensive package metadata
 4. Verify package contents before publish
 
 ### Security
+
 1. Enable audit signatures
 2. Use scoped packages for internal code
 3. Regular security audits
@@ -298,6 +319,7 @@ bun ls @fire22/core-dashboard
 ## Registry Monitoring
 
 ### Metrics Tracked
+
 - Package download counts
 - Registry availability
 - Authentication success rates
@@ -305,6 +327,7 @@ bun ls @fire22/core-dashboard
 - Build and publish success rates
 
 ### Alerting
+
 - Registry downtime alerts
 - Failed publish notifications
 - Security vulnerability alerts
@@ -313,7 +336,9 @@ bun ls @fire22/core-dashboard
 ## Support
 
 For registry-related issues:
+
 1. Check [Registry Status](https://fire22.workers.dev/registry/status)
-2. Review [Issues](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues?q=label%3Aregistry)
+2. Review
+   [Issues](https://github.com/brendadeeznuts1111/fire22-dashboard-worker/issues?q=label%3Aregistry)
 3. Create new issue with `registry` label
 4. Contact registry administrators: registry@fire22.com

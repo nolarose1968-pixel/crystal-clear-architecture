@@ -31,7 +31,7 @@ class TestRunner {
       verbose: false,
       bail: false,
       parallel: true,
-      ...options
+      ...options,
     };
   }
 
@@ -129,20 +129,20 @@ class TestRunner {
     const command = this.buildCommand();
     console.log('🚀 Running tests:', command.join(' '));
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const child = spawn(command[0], command.slice(1), {
         stdio: 'inherit',
-        env: { ...process.env }
+        env: { ...process.env },
       });
 
-      child.on('close', async (code) => {
+      child.on('close', async code => {
         if (!this.options.watch) {
           await this.cleanup();
         }
         resolve(code || 0);
       });
 
-      child.on('error', async (error) => {
+      child.on('error', async error => {
         console.error('❌ Test execution failed:', error);
         await this.cleanup();
         resolve(1);
@@ -246,24 +246,23 @@ async function main(): Promise<void> {
   try {
     const options = parseArgs();
     const runner = new TestRunner(options);
-    
+
     console.log('🧪 Fire22 Dashboard Test Runner');
-    console.log('================================');
-    
+    console.log('!==!==!==!==!==!==');
+
     const exitCode = await runner.run();
-    
+
     if (options.coverage && !options.watch) {
       await runner.generateReport();
     }
-    
+
     if (exitCode === 0) {
       console.log('✅ All tests passed!');
     } else {
       console.log('❌ Some tests failed!');
     }
-    
+
     process.exit(exitCode);
-    
   } catch (error) {
     console.error('💥 Test runner failed:', error);
     process.exit(1);

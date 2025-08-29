@@ -75,7 +75,15 @@ export interface DetailedAccountInfo {
     agentName: string;
     timestamp: string;
     note: string;
-    category: 'general' | 'complaint' | 'praise' | 'warning' | 'suspension' | 'vip' | 'risk' | 'lottery';
+    category:
+      | 'general'
+      | 'complaint'
+      | 'praise'
+      | 'warning'
+      | 'suspension'
+      | 'vip'
+      | 'risk'
+      | 'lottery';
     isActive: boolean;
   }>;
 
@@ -161,14 +169,13 @@ export class Fantasy402AgentClient {
    */
   async initialize(): Promise<boolean> {
     try {
-      
       // Step 1: Login
       const loginResult = await this.auth.login();
       if (!loginResult.success) {
         console.error('❌ Login failed:', loginResult.error);
         return false;
       }
-      
+
       // Extract account info from login response
       if (loginResult.data?.accountInfo) {
         this.accountInfo = {
@@ -179,13 +186,13 @@ export class Fantasy402AgentClient {
           office: loginResult.data.accountInfo.Office || '',
           store: loginResult.data.accountInfo.Store || '',
           active: loginResult.data.accountInfo.Active === 'Y',
-          agentType: loginResult.data.accountInfo.AgentType || 'M'
+          agentType: loginResult.data.accountInfo.AgentType || 'M',
         };
       }
-      
+
       // Step 2: Get Authorizations
       await this.fetchAuthorizations();
-      
+
       return true;
     } catch (error) {
       console.error('❌ Initialization failed:', error);
@@ -198,11 +205,10 @@ export class Fantasy402AgentClient {
    */
   private async fetchAuthorizations(): Promise<void> {
     try {
-      
       const response = await this.auth.request('Manager/getAuthorizations', 'POST', {
-        agentID: this.auth.getSession()?.customerId
+        agentID: this.auth.getSession()?.customerId,
       });
-      
+
       if (response && typeof response === 'object') {
         this.permissions = {
           customerID: response.CustomerID?.trim() || '',
@@ -214,9 +220,8 @@ export class Fantasy402AgentClient {
           canDeleteBets: response.PermitDeleteBets === 'Y',
           canViewReports: response.DenyReports !== 'Y',
           canAccessBilling: response.DenyAgentBilling !== 'Y',
-          rawPermissions: response
+          rawPermissions: response,
         };
-        
       }
     } catch (error) {
       console.error('⚠️ Could not fetch authorizations:', error);
@@ -234,8 +239,7 @@ export class Fantasy402AgentClient {
   }): Promise<any> {
     try {
       const agentID = this.permissions?.agentID || this.auth.getSession()?.customerId;
-      
-      
+
       // Try the lite version first with all required parameters
       const response = await this.auth.getWeeklyFiguresLite({
         week: params?.week || '0',
@@ -245,13 +249,13 @@ export class Fantasy402AgentClient {
         layout: 'byDay',
         RRO: '1',
         agentOwner: agentID,
-        agentSite: '1'
+        agentSite: '1',
       });
-      
+
       if (response && response.status !== 'Failed' && response.LIST !== '') {
         return response;
       }
-      
+
       // Fallback to regular version
       const fullResponse = await this.auth.getWeeklyFigures({
         week: params?.week || '0',
@@ -261,9 +265,9 @@ export class Fantasy402AgentClient {
         layout: 'byDay',
         RRO: '1',
         agentOwner: agentID,
-        agentSite: '1'
+        agentSite: '1',
       });
-      
+
       return fullResponse;
     } catch (error) {
       console.error('❌ Failed to get weekly figures:', error);
@@ -283,32 +287,30 @@ export class Fantasy402AgentClient {
   }> {
     try {
       const agentID = this.permissions?.agentID || this.auth.getSession()?.customerId;
-      
-      
+
       const response = await this.auth.request('Manager/getWeeklyFigureByAgentLite', 'POST', {
-        agentID: agentID?.toUpperCase()
+        agentID: agentID?.toUpperCase(),
       });
-      
+
       if (response && typeof response === 'object') {
         // Extract values from root level (most convenient access pattern)
         const thisWeek = typeof response.ThisWeek === 'number' ? response.ThisWeek : 0;
         const today = typeof response.Today === 'number' ? response.Today : 0;
         const active = typeof response.Active === 'number' ? response.Active : 0;
-        
-        
+
         return {
           thisWeek,
           today,
           active,
-          raw: response
+          raw: response,
         };
       }
-      
+
       console.warn('⚠️ No data returned from getWeeklyFigureByAgentLite');
       return {
         thisWeek: 0,
         today: 0,
-        active: 0
+        active: 0,
       };
     } catch (error) {
       console.error('❌ Failed to get weekly figure by agent lite:', error);
@@ -324,33 +326,30 @@ export class Fantasy402AgentClient {
   async getAccountInfoOwner(): Promise<DetailedAccountInfo> {
     try {
       const agentID = this.permissions?.agentID || this.auth.getSession()?.customerId;
-      
-      
+
       // Get JWT token for request body (required by this endpoint)
       const jwtToken = this.auth.getSession()?.bearerToken;
       if (!jwtToken) {
         throw new Error('No JWT token available for getAccountInfoOwner request');
       }
-      
+
       // Construct the exact request structure from the working cURL command
       const endpointURL = 'Manager/getAccountInfoOwner';
       const httpMethod = 'POST';
       const requestData = {
         agentID: agentID?.toUpperCase(),
-        token: jwtToken,                        // JWT token in body (required)
-        operation: 'getAccountInfoOwner',       // Required operation parameter
-        agentOwner: agentID?.toUpperCase(),     // Required agent owner parameter
-        agentSite: '1'                          // Required site identifier
+        token: jwtToken, // JWT token in body (required)
+        operation: 'getAccountInfoOwner', // Required operation parameter
+        agentOwner: agentID?.toUpperCase(), // Required agent owner parameter
+        agentSite: '1', // Required site identifier
       };
-      
-      
+
       const response = await this.auth.request(endpointURL, httpMethod, requestData);
-      
+
       if (response && typeof response === 'object' && response.accountInfo) {
         // Extract account data directly from response.accountInfo (single level)
         const accountData = response.accountInfo;
-        
-        
+
         // Extract and clean the data (excluding sensitive information)
         const accountInfo: DetailedAccountInfo = {
           // Identity & Basic Info
@@ -359,13 +358,18 @@ export class Fantasy402AgentClient {
           office: accountData.Office?.trim() || '',
           store: accountData.Store?.trim() || '',
           agentType: accountData.AgentType?.trim() || 'U', // U = Unknown
-          
+
           // Financial Information
-          currentBalance: typeof accountData.CurrentBalance === 'number' ? accountData.CurrentBalance : 0,
-          availableBalance: typeof accountData.AvailableBalance === 'number' ? accountData.AvailableBalance : 0,
-          pendingWagerBalance: typeof accountData.PendingWagerBalance === 'number' ? accountData.PendingWagerBalance : 0,
+          currentBalance:
+            typeof accountData.CurrentBalance === 'number' ? accountData.CurrentBalance : 0,
+          availableBalance:
+            typeof accountData.AvailableBalance === 'number' ? accountData.AvailableBalance : 0,
+          pendingWagerBalance:
+            typeof accountData.PendingWagerBalance === 'number'
+              ? accountData.PendingWagerBalance
+              : 0,
           creditLimit: typeof accountData.CreditLimit === 'number' ? accountData.CreditLimit : 0,
-          
+
           // Account Settings & Permissions
           active: accountData.Active === 'Y',
           suspendSportsbook: accountData.SuspendSportsbook === 'Y',
@@ -374,34 +378,36 @@ export class Fantasy402AgentClient {
           permitDeleteBets: accountData.PermitDeleteBets === 'Y',
           manageLinesFlag: accountData.ManageLinesFlag === 'Y',
           addNewAccountFlag: accountData.AddNewAccountFlag === 'Y',
-          
+
           // Betting Configuration
           allowRoundRobin: accountData.AllowRoundRobin === 'Y',
           allowPropBuilder: accountData.AllowPropBuilder === 'Y',
           denyReports: accountData.DenyReports === 'Y',
           denyAgentBilling: accountData.DenyAgentBilling === 'Y',
-          
+
           // Timestamps
           openDateTime: accountData.OpenDateTime || '',
-          openDateTimeUnix: typeof accountData.OpenDateTimeUnix === 'number' ? accountData.OpenDateTimeUnix : 0,
-          
+          openDateTimeUnix:
+            typeof accountData.OpenDateTimeUnix === 'number' ? accountData.OpenDateTimeUnix : 0,
+
           // Raw response (with password filtered out for security)
           raw: {
             ...accountData,
-            Password: '[FILTERED_FOR_SECURITY]' // Replace password for security
-          }
+            Password: '[FILTERED_FOR_SECURITY]', // Replace password for security
+          },
         };
-        
-        
+
         return accountInfo;
       }
-      
+
       // Handle the case where accountInfo is null (old failing response)
       if (response && response.accountInfo === null) {
-        console.error('❌ getAccountInfoOwner returned null accountInfo - request parameters may be incorrect');
+        console.error(
+          '❌ getAccountInfoOwner returned null accountInfo - request parameters may be incorrect'
+        );
         throw new Error('Account information not available - null response from API');
       }
-      
+
       console.warn('⚠️ No valid response from getAccountInfoOwner');
       throw new Error('No account information available - invalid response structure');
     } catch (error) {
@@ -416,12 +422,11 @@ export class Fantasy402AgentClient {
   async getSubAgents(): Promise<any> {
     try {
       const agentID = this.permissions?.agentID || this.auth.getSession()?.customerId;
-      
-      
+
       const response = await this.auth.request('Manager/getListAgenstByAgent', 'POST', {
-        agentID: agentID?.toUpperCase()
+        agentID: agentID?.toUpperCase(),
       });
-      
+
       return response;
     } catch (error) {
       console.error('❌ Failed to get sub-agents:', error);
@@ -440,15 +445,11 @@ export class Fantasy402AgentClient {
       throw error;
     }
   }
-  
+
   /**
    * Get customer transactions with date range
    */
-  async getTransactions(params?: {
-    start?: string;
-    end?: string;
-    limit?: number;
-  }): Promise<any> {
+  async getTransactions(params?: { start?: string; end?: string; limit?: number }): Promise<any> {
     try {
       return await this.auth.getCustomerTransactions(params);
     } catch (error) {
@@ -456,7 +457,7 @@ export class Fantasy402AgentClient {
       throw error;
     }
   }
-  
+
   /**
    * Get customer wagers with date range
    */
@@ -473,7 +474,7 @@ export class Fantasy402AgentClient {
       throw error;
     }
   }
-  
+
   /**
    * Get live/pending wagers with Manager context
    * Enhanced for Manager-level access to pending wagers across managed accounts
@@ -481,41 +482,43 @@ export class Fantasy402AgentClient {
   async getLiveWagers(): Promise<any> {
     try {
       const agentID = this.permissions?.agentID || this.auth.getSession()?.customerId;
-      
-      
+
       // Try Manager-level endpoint first
       try {
         const managerWagersPayload = {
           agentID: agentID?.toUpperCase(),
           agentType: 'M',
-          operation: 'getLiveWagers'
+          operation: 'getLiveWagers',
         };
-        
-        
-        const managerResponse = await this.auth.request('Manager/getLiveWagers', 'POST', managerWagersPayload);
-        
-        if (managerResponse && (managerResponse.wagers || managerResponse.LIST || managerResponse.ARRAY)) {
+
+        const managerResponse = await this.auth.request(
+          'Manager/getLiveWagers',
+          'POST',
+          managerWagersPayload
+        );
+
+        if (
+          managerResponse &&
+          (managerResponse.wagers || managerResponse.LIST || managerResponse.ARRAY)
+        ) {
           return managerResponse;
         }
-        
-      } catch (managerError) {
-      }
-      
+      } catch (managerError) {}
+
       // Fallback to customer-level endpoint
       return await this.auth.getCustomerLiveWagers();
-      
     } catch (error) {
       console.error('❌ Failed to get live wagers (all methods):', error);
-      
+
       // Return structured error response
       return {
         wagers: [],
         error: error instanceof Error ? error.message : 'Unknown error',
-        message: 'Live wagers not accessible with current permissions'
+        message: 'Live wagers not accessible with current permissions',
       };
     }
   }
-  
+
   /**
    * Get customer list for this agent (if available)
    * Enhanced with Manager context for better compatibility
@@ -523,48 +526,43 @@ export class Fantasy402AgentClient {
   async getCustomers(limit: number = 100): Promise<any> {
     try {
       const agentID = this.permissions?.agentID || this.auth.getSession()?.customerId;
-      
-      
+
       // Enhanced request with Manager context and multiple parameter variations
       const requestPayload = {
         agentID: agentID?.toUpperCase(),
         agentType: 'M', // Manager type context
         top: limit.toString(),
         operation: 'getCustomersList', // Operation-specific parameter
-        limit: limit // Alternative limit parameter
+        limit: limit, // Alternative limit parameter
       };
-      
-      
+
       const response = await this.auth.request('Manager/getCustomersList', 'POST', requestPayload);
-      
+
       if (response && (response.customers || response.LIST || response.ARRAY)) {
         return response;
       } else {
         return response || { customers: [], message: 'No customers found' };
       }
-      
     } catch (error) {
       console.error('❌ Failed to get customers:', error);
-      
+
       // Try alternative endpoint structure
       try {
-        
         const alternativeResponse = await this.auth.request('Manager/getCustomers', 'POST', {
           agentID: agentID?.toUpperCase(),
           agentType: 'M',
-          max: limit
+          max: limit,
         });
-        
+
         if (alternativeResponse) {
           return alternativeResponse;
         }
-      } catch (altError) {
-      }
-      
-      return { 
-        customers: [], 
+      } catch (altError) {}
+
+      return {
+        customers: [],
         error: error instanceof Error ? error.message : 'Unknown error',
-        agentType: 'Manager endpoints may require special permissions'
+        agentType: 'Manager endpoints may require special permissions',
       };
     }
   }
@@ -575,11 +573,11 @@ export class Fantasy402AgentClient {
   async getNewEmailsCount(): Promise<number> {
     try {
       const response = await this.auth.request('Manager/getNewEmailsCount', 'GET');
-      
+
       if (typeof response === 'object' && response.count !== undefined) {
         return response.count;
       }
-      
+
       return 0;
     } catch (error) {
       console.error('⚠️ Failed to get email count:', error);
@@ -596,7 +594,7 @@ export class Fantasy402AgentClient {
         level,
         message,
         customerID: this.permissions?.customerID || this.auth.getSession()?.customerId,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       console.error('⚠️ Failed to write log:', error);
@@ -609,15 +607,15 @@ export class Fantasy402AgentClient {
   async renewToken(): Promise<boolean> {
     try {
       const response = await this.auth.request('System/renewToken', 'POST', {
-        customerID: this.auth.getSession()?.customerId
+        customerID: this.auth.getSession()?.customerId,
       });
-      
+
       if (response && response.code) {
         // Update the token in the auth session
         const session = this.auth.getSession();
         if (session) {
           session.bearerToken = response.code;
-          
+
           // Update expiration
           try {
             const [, payload] = response.code.split('.');
@@ -627,13 +625,13 @@ export class Fantasy402AgentClient {
             }
           } catch (e) {
             // Set default 20 minutes
-            session.expiresAt = Date.now() + (20 * 60 * 1000);
+            session.expiresAt = Date.now() + 20 * 60 * 1000;
           }
         }
-        
+
         return true;
       }
-      
+
       return false;
     } catch (error) {
       console.error('❌ Failed to renew token:', error);
@@ -647,9 +645,9 @@ export class Fantasy402AgentClient {
   async checkAndRenewToken(): Promise<void> {
     const session = this.auth.getSession();
     if (!session) return;
-    
+
     const fiveMinutes = 5 * 60 * 1000;
-    if (session.expiresAt && (Date.now() + fiveMinutes) > session.expiresAt) {
+    if (session.expiresAt && Date.now() + fiveMinutes > session.expiresAt) {
       await this.renewToken();
     }
   }
@@ -702,8 +700,7 @@ export class Fantasy402AgentClient {
       error?: string;
       attempts: number;
     }> = [];
-    
-    
+
     // Define endpoints to test with various parameter combinations
     const endpointsToTest = [
       {
@@ -711,40 +708,39 @@ export class Fantasy402AgentClient {
         payloads: [
           { agentID: agentID?.toUpperCase(), agentType: 'M', top: '10' },
           { agentID: agentID?.toUpperCase(), operation: 'getCustomersList', limit: 10 },
-          { agentID: agentID?.toUpperCase(), top: '10' }
-        ]
+          { agentID: agentID?.toUpperCase(), top: '10' },
+        ],
       },
       {
         name: 'Manager/getLiveWagers',
         payloads: [
           { agentID: agentID?.toUpperCase(), agentType: 'M' },
           { agentID: agentID?.toUpperCase(), operation: 'getLiveWagers' },
-          { agentID: agentID?.toUpperCase() }
-        ]
+          { agentID: agentID?.toUpperCase() },
+        ],
       },
       {
         name: 'Manager/getAgentBalance',
         payloads: [
           { agentID: agentID?.toUpperCase(), agentType: 'M' },
-          { agentID: agentID?.toUpperCase() }
-        ]
-      }
+          { agentID: agentID?.toUpperCase() },
+        ],
+      },
     ];
-    
+
     // Test each endpoint with multiple payload variations
     for (const endpointTest of endpointsToTest) {
       let attempts = 0;
       let success = false;
       let lastError = '';
       let successData = null;
-      
+
       for (const payload of endpointTest.payloads) {
         attempts++;
-        
+
         try {
-          
           const response = await this.auth.request(endpointTest.name, 'POST', payload);
-          
+
           if (response && response !== 'Invalid Method' && !response.error) {
             success = true;
             successData = response;
@@ -756,30 +752,29 @@ export class Fantasy402AgentClient {
           const errorMsg = error instanceof Error ? error.message : 'Unknown error';
           lastError = errorMsg;
         }
-        
+
         // Small delay between attempts
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-      
+
       results.push({
         endpoint: endpointTest.name,
         success,
         data: successData,
         error: success ? undefined : lastError,
-        attempts
+        attempts,
       });
     }
-    
+
     const summary = {
       successful: results.filter(r => r.success).length,
       failed: results.filter(r => !r.success).length,
-      total: results.length
+      total: results.length,
     };
-    
-    
+
     return {
       endpointResults: results,
-      summary
+      summary,
     };
   }
 
@@ -789,7 +784,6 @@ export class Fantasy402AgentClient {
    */
   async getNewUsers(days: number = 7): Promise<any> {
     try {
-      
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -797,7 +791,7 @@ export class Fantasy402AgentClient {
       }
 
       const agentID = this.permissions?.customerID || session.customerId || 'UNKNOWN';
-      
+
       // Prepare the payload following the exact cURL structure
       const requestPayload = {
         agentID: agentID.toUpperCase(),
@@ -805,22 +799,22 @@ export class Fantasy402AgentClient {
         operation: 'getNewUsersInfo',
         RRO: '1',
         agentOwner: agentID.toUpperCase(),
-        agentSite: '1'
+        agentSite: '1',
       };
 
       // Make the POST request to getNewUsersInfo
       const response = await this.auth.request('Manager/getNewUsersInfo', 'POST', requestPayload);
-      
+
       if (response && typeof response === 'object') {
-        
         // Transform the response to match our expected format
         return {
           success: true,
           data: response,
           newUsers: response.users || response.LIST || response.ARRAY || [],
-          totalCount: response.totalCount || response.count || (response.users ? response.users.length : 0),
+          totalCount:
+            response.totalCount || response.count || (response.users ? response.users.length : 0),
           period: `${days} days`,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         };
       } else {
         return {
@@ -830,10 +824,9 @@ export class Fantasy402AgentClient {
           totalCount: 0,
           period: `${days} days`,
           error: 'Unexpected response format',
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         };
       }
-      
     } catch (error) {
       console.error('❌ Failed to fetch new users information:', error);
       return {
@@ -843,7 +836,7 @@ export class Fantasy402AgentClient {
         totalCount: 0,
         period: `${days} days`,
         error: error instanceof Error ? error.message : 'Unknown error',
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
     }
   }
@@ -854,7 +847,6 @@ export class Fantasy402AgentClient {
    */
   async getTeaserProfile(): Promise<any> {
     try {
-      
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -862,23 +854,22 @@ export class Fantasy402AgentClient {
       }
 
       const agentID = this.permissions?.customerID || session.customerId || 'UNKNOWN';
-      
+
       // Prepare the payload following the exact cURL structure
       // Note: Uses 'acc=' instead of 'agentID=' as the primary identifier
       const requestPayload = {
-        acc: agentID.toUpperCase(),                    // Primary account identifier
+        acc: agentID.toUpperCase(), // Primary account identifier
         operation: 'getTeaserProfile',
         RRO: '1',
-        agentID: agentID.toUpperCase(),               // Secondary agent identifier
+        agentID: agentID.toUpperCase(), // Secondary agent identifier
         agentOwner: agentID.toUpperCase(),
-        agentSite: '1'
+        agentSite: '1',
       };
 
       // Make the POST request to getTeaserProfile
       const response = await this.auth.request('Manager/getTeaserProfile', 'POST', requestPayload);
-      
+
       if (response && typeof response === 'object') {
-        
         // Transform the response to match our expected format
         return {
           success: true,
@@ -887,7 +878,7 @@ export class Fantasy402AgentClient {
           settings: response.settings || {},
           limits: response.limits || {},
           enabled: response.enabled !== false && response.active !== false,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         };
       } else {
         return {
@@ -898,10 +889,9 @@ export class Fantasy402AgentClient {
           limits: {},
           enabled: false,
           error: 'Unexpected response format',
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         };
       }
-      
     } catch (error) {
       console.error('❌ Failed to fetch teaser profile configuration:', error);
       return {
@@ -912,7 +902,7 @@ export class Fantasy402AgentClient {
         limits: {},
         enabled: false,
         error: error instanceof Error ? error.message : 'Unknown error',
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
     }
   }
@@ -923,7 +913,6 @@ export class Fantasy402AgentClient {
    */
   async getInfoPlayer(playerID: string): Promise<any> {
     try {
-      
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -931,22 +920,21 @@ export class Fantasy402AgentClient {
       }
 
       const agentID = this.permissions?.customerID || session.customerId || 'UNKNOWN';
-      
+
       // Prepare the payload following the established Manager endpoint pattern
       const requestPayload = {
-        customerID: playerID.toUpperCase(),           // The player/customer to fetch info for
-        agentID: agentID.toUpperCase(),              // Current agent ID
-        operation: 'getInfoPlayer',                  // Operation identifier
-        RRO: '1',                                    // Standard parameter
-        agentOwner: agentID.toUpperCase(),           // Agent owner parameter
-        agentSite: '1'                               // Site identifier
+        customerID: playerID.toUpperCase(), // The player/customer to fetch info for
+        agentID: agentID.toUpperCase(), // Current agent ID
+        operation: 'getInfoPlayer', // Operation identifier
+        RRO: '1', // Standard parameter
+        agentOwner: agentID.toUpperCase(), // Agent owner parameter
+        agentSite: '1', // Site identifier
       };
 
       // Make the POST request to getInfoPlayer
       const response = await this.auth.request('Manager/getInfoPlayer', 'POST', requestPayload);
-      
+
       if (response && typeof response === 'object') {
-        
         // Transform the response to match our expected format
         return {
           success: true,
@@ -959,39 +947,47 @@ export class Fantasy402AgentClient {
             lastName: response.lastName || response.LastName || '',
             email: response.email || response.Email || '',
             phone: response.phone || response.Phone || '',
-            
+
             // Account Information
             active: response.active === 'Y' || response.Active === 'Y' || response.active === true,
-            suspended: response.suspended === 'Y' || response.Suspended === 'Y' || response.suspended === true,
+            suspended:
+              response.suspended === 'Y' ||
+              response.Suspended === 'Y' ||
+              response.suspended === true,
             openDateTime: response.openDateTime || response.OpenDateTime || '',
             lastLogin: response.lastLogin || response.LastLogin || '',
-            
+
             // Financial Information
             currentBalance: parseFloat(response.currentBalance || response.CurrentBalance || '0'),
-            availableBalance: parseFloat(response.availableBalance || response.AvailableBalance || '0'),
-            pendingWagerBalance: parseFloat(response.pendingWagerBalance || response.PendingWagerBalance || '0'),
+            availableBalance: parseFloat(
+              response.availableBalance || response.AvailableBalance || '0'
+            ),
+            pendingWagerBalance: parseFloat(
+              response.pendingWagerBalance || response.PendingWagerBalance || '0'
+            ),
             creditLimit: parseFloat(response.creditLimit || response.CreditLimit || '0'),
-            
+
             // Betting Configuration
-            suspendSportsbook: response.suspendSportsbook === 'Y' || response.SuspendSportsbook === 'Y',
+            suspendSportsbook:
+              response.suspendSportsbook === 'Y' || response.SuspendSportsbook === 'Y',
             suspendCasino: response.suspendCasino === 'Y' || response.SuspendCasino === 'Y',
             maxWager: parseFloat(response.maxWager || response.MaxWager || '0'),
             maxPayout: parseFloat(response.maxPayout || response.MaxPayout || '0'),
-            
+
             // Location & Assignment
             office: response.office || response.Office || '',
             store: response.store || response.Store || '',
             agentID: response.agentID || response.AgentID || agentID,
-            
+
             // Additional Information
             notes: response.notes || response.Notes || '',
             referredBy: response.referredBy || response.ReferredBy || '',
             playerType: response.playerType || response.PlayerType || 'Regular',
-            
+
             // Raw response for advanced access
-            raw: response
+            raw: response,
           },
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         };
       } else {
         return {
@@ -999,10 +995,9 @@ export class Fantasy402AgentClient {
           data: {},
           playerInfo: null,
           error: 'Unexpected response format',
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         };
       }
-      
     } catch (error) {
       console.error('❌ Failed to fetch player information:', error);
       return {
@@ -1010,7 +1005,7 @@ export class Fantasy402AgentClient {
         data: {},
         playerInfo: null,
         error: error instanceof Error ? error.message : 'Unknown error',
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
     }
   }
@@ -1021,7 +1016,6 @@ export class Fantasy402AgentClient {
    */
   async getPendingWebReportsConfig(): Promise<any> {
     try {
-      
       // Get current session and JWT token
       const session = this.auth.getSession();
       if (!session || !session.jwtToken) {
@@ -1029,27 +1023,30 @@ export class Fantasy402AgentClient {
       }
 
       const agentID = this.permissions?.customerID || session.customerId || 'UNKNOWN';
-      
+
       // Prepare the payload with JWT token in both header and body
       const requestPayload = {
         agentID: agentID.toUpperCase(),
         agentType: this.permissions?.agentType || 'M', // Default to Manager
         token: session.jwtToken, // JWT token in body as required
-        operation: 'getConfigWebReportsPending'
+        operation: 'getConfigWebReportsPending',
       };
 
       // Make the POST request to getConfigWebReportsPending
-      const response = await this.auth.request('Manager/getConfigWebReportsPending', 'POST', requestPayload);
-      
+      const response = await this.auth.request(
+        'Manager/getConfigWebReportsPending',
+        'POST',
+        requestPayload
+      );
+
       if (response && typeof response === 'object') {
-        
         // Transform the response to match our expected format
         return {
           success: true,
           config: response,
           pendingReports: response.pendingReports || [],
           reportConfigs: response.configs || [],
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         };
       } else {
         return {
@@ -1058,10 +1055,9 @@ export class Fantasy402AgentClient {
           pendingReports: [],
           reportConfigs: [],
           error: 'Unexpected response format',
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         };
       }
-      
     } catch (error) {
       console.error('❌ Failed to fetch web reports configuration:', error);
       return {
@@ -1070,7 +1066,7 @@ export class Fantasy402AgentClient {
         pendingReports: [],
         reportConfigs: [],
         error: error instanceof Error ? error.message : 'Unknown error',
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
     }
   }
@@ -1081,7 +1077,6 @@ export class Fantasy402AgentClient {
    */
   async getListAgenstByAgent(): Promise<any> {
     try {
-      
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -1089,23 +1084,26 @@ export class Fantasy402AgentClient {
       }
 
       const agentID = this.permissions?.customerID || session.customerId || 'UNKNOWN';
-      
+
       // Prepare the payload based on captured request format
       const requestPayload = {
         agentID: agentID.toUpperCase(),
         agentType: this.permissions?.agentType || 'M',
         operation: 'getListAgenstByAgent',
         limit: 100, // Get up to 100 customers
-        offset: 0
+        offset: 0,
       };
 
+      const response = await this.auth.request(
+        'Manager/getListAgenstByAgent',
+        'POST',
+        requestPayload
+      );
 
-      const response = await this.auth.request('Manager/getListAgenstByAgent', 'POST', requestPayload);
-      
       if (response && (response.LIST || response.PLAYERS || Array.isArray(response))) {
         // Handle different response formats
         let customerList = [];
-        
+
         if (response.LIST && Array.isArray(response.LIST)) {
           customerList = response.LIST;
         } else if (response.PLAYERS && Array.isArray(response.PLAYERS)) {
@@ -1118,60 +1116,62 @@ export class Fantasy402AgentClient {
         const sanitizedCustomers = customerList.map((customer: any) => {
           // Remove password and other sensitive fields
           const { Password, password, ...sanitizedCustomer } = customer;
-          
+
           return {
             // Core identity
             customerID: customer.CustomerID || customer.customerID || '',
             login: customer.Login || customer.login || '',
             name: customer.Name || customer.name || '',
-            
+
             // Financial information
             currentBalance: parseFloat(customer.CurrentBalance || customer.currentBalance || '0'),
-            availableBalance: parseFloat(customer.AvailableBalance || customer.availableBalance || '0'),
-            pendingWagerBalance: parseFloat(customer.PendingWagerBalance || customer.pendingWagerBalance || '0'),
+            availableBalance: parseFloat(
+              customer.AvailableBalance || customer.availableBalance || '0'
+            ),
+            pendingWagerBalance: parseFloat(
+              customer.PendingWagerBalance || customer.pendingWagerBalance || '0'
+            ),
             creditLimit: parseFloat(customer.CreditLimit || customer.creditLimit || '0'),
             wagerLimit: parseFloat(customer.WagerLimit || customer.wagerLimit || '0'),
-            
+
             // Status flags
             active: customer.Active === 'Y' || customer.active === 'Y' || customer.active === true,
             sportbookActive: customer.SportbookActive === 'Y' || customer.sportbookActive === 'Y',
             casinoActive: customer.CasinoActive === 'Y' || customer.casinoActive === 'Y',
-            suspendSportsbook: customer.SuspendSportsbook === 'Y' || customer.suspendSportsbook === 'Y',
-            
+            suspendSportsbook:
+              customer.SuspendSportsbook === 'Y' || customer.suspendSportsbook === 'Y',
+
             // Contact information
             phone: customer.Phone || customer.phone || '',
             email: customer.Email || customer.email || '',
-            
+
             // Additional information
             playerNotes: customer.PlayerNotes || customer.playerNotes || '',
             openDateTime: customer.OpenDateTime || customer.openDateTime || '',
             lastVerDateTime: customer.LastVerDateTime || customer.lastVerDateTime || '',
             agentID: customer.AgentID || customer.agentID || agentID,
             masterAgent: customer.MasterAgent || customer.masterAgent || '',
-            
+
             // Keep raw data for advanced use (but sanitized)
-            raw: sanitizedCustomer
+            raw: sanitizedCustomer,
           };
         });
 
-        
         return {
           success: true,
           customers: sanitizedCustomers,
           totalCount: sanitizedCustomers.length,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         };
-        
       } else {
         return {
           success: false,
           customers: [],
           totalCount: 0,
           error: 'Unexpected response format from customer list API',
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         };
       }
-      
     } catch (error) {
       console.error('❌ Failed to fetch customer list:', error);
       return {
@@ -1179,14 +1179,14 @@ export class Fantasy402AgentClient {
         customers: [],
         totalCount: 0,
         error: error instanceof Error ? error.message : 'Unknown error',
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
     }
   }
 
-  // ===============================
+  // !==!==!==!==!==!==
   // LOTTERY MANAGEMENT METHODS
-  // ===============================
+  // !==!==!==!==!==!==
 
   /**
    * Get available lottery games
@@ -1199,7 +1199,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -1214,52 +1213,51 @@ export class Fantasy402AgentClient {
         operation: 'getLotteryGames',
         RRO: '1',
         agentOwner: agentID.toUpperCase(),
-        agentSite: '1'
+        agentSite: '1',
       };
-
 
       const response = await this.auth.request('Manager/getLotteryGames', 'POST', requestPayload);
 
       if (response && typeof response === 'object') {
-
         // Transform the response to match our expected format
         const games: LotteryGame[] = [];
         if (response.games && Array.isArray(response.games)) {
-          games.push(...response.games.map((game: any) => ({
-            gameId: game.GameID || game.gameId || '',
-            gameName: game.GameName || game.gameName || '',
-            gameType: game.GameType || game.gameType || 'daily',
-            status: game.Status || game.status || 'active',
-            jackpotAmount: parseFloat(game.JackpotAmount || game.jackpotAmount || '0'),
-            minBet: parseFloat(game.MinBet || game.minBet || '1'),
-            maxBet: parseFloat(game.MaxBet || game.maxBet || '100'),
-            drawTime: game.DrawTime || game.drawTime || '',
-            nextDraw: game.NextDraw || game.nextDraw || '',
-            description: game.Description || game.description || ''
-          })));
+          games.push(
+            ...response.games.map((game: any) => ({
+              gameId: game.GameID || game.gameId || '',
+              gameName: game.GameName || game.gameName || '',
+              gameType: game.GameType || game.gameType || 'daily',
+              status: game.Status || game.status || 'active',
+              jackpotAmount: parseFloat(game.JackpotAmount || game.jackpotAmount || '0'),
+              minBet: parseFloat(game.MinBet || game.minBet || '1'),
+              maxBet: parseFloat(game.MaxBet || game.maxBet || '100'),
+              drawTime: game.DrawTime || game.drawTime || '',
+              nextDraw: game.NextDraw || game.nextDraw || '',
+              description: game.Description || game.description || '',
+            }))
+          );
         }
 
         return {
           success: true,
           games,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         };
       } else {
         return {
           success: false,
           games: [],
           error: 'Unexpected response format',
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         };
       }
-
     } catch (error) {
       console.error('❌ Failed to fetch lottery games:', error);
       return {
         success: false,
         games: [],
         error: error instanceof Error ? error.message : 'Unknown error',
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
     }
   }
@@ -1274,7 +1272,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -1290,47 +1287,64 @@ export class Fantasy402AgentClient {
         operation: 'getLotterySettings',
         RRO: '1',
         agentOwner: agentID.toUpperCase(),
-        agentSite: '1'
+        agentSite: '1',
       };
 
-
-      const response = await this.auth.request('Manager/getLotterySettings', 'POST', requestPayload);
+      const response = await this.auth.request(
+        'Manager/getLotterySettings',
+        'POST',
+        requestPayload
+      );
 
       if (response && typeof response === 'object' && response.settings) {
-
         const settings: LotterySettings = {
           customerID,
           allowLotto: response.settings.AllowLotto === 'Y' || response.settings.allowLotto === true,
-          suspendLottery: response.settings.SuspendLottery === 'Y' || response.settings.suspendLottery === true,
-          lottoMaxWager: parseFloat(response.settings.LottoMaxWager || response.settings.lottoMaxWager || '100'),
-          lottoMinWager: parseFloat(response.settings.LottoMinWager || response.settings.lottoMinWager || '1'),
-          lottoDailyLimit: parseFloat(response.settings.LottoDailyLimit || response.settings.lottoDailyLimit || '500'),
-          lottoWeeklyLimit: parseFloat(response.settings.LottoWeeklyLimit || response.settings.lottoWeeklyLimit || '2500'),
-          lottoMonthlyLimit: parseFloat(response.settings.LottoMonthlyLimit || response.settings.lottoMonthlyLimit || '10000'),
-          preferredGames: response.settings.PreferredGames ? response.settings.PreferredGames.split(',') : [],
-          autoPlayEnabled: response.settings.AutoPlayEnabled === 'Y' || response.settings.autoPlayEnabled === true,
-          winNotificationEnabled: response.settings.WinNotificationEnabled === 'Y' || response.settings.winNotificationEnabled === true,
-          lastUpdated: new Date().toISOString()
+          suspendLottery:
+            response.settings.SuspendLottery === 'Y' || response.settings.suspendLottery === true,
+          lottoMaxWager: parseFloat(
+            response.settings.LottoMaxWager || response.settings.lottoMaxWager || '100'
+          ),
+          lottoMinWager: parseFloat(
+            response.settings.LottoMinWager || response.settings.lottoMinWager || '1'
+          ),
+          lottoDailyLimit: parseFloat(
+            response.settings.LottoDailyLimit || response.settings.lottoDailyLimit || '500'
+          ),
+          lottoWeeklyLimit: parseFloat(
+            response.settings.LottoWeeklyLimit || response.settings.lottoWeeklyLimit || '2500'
+          ),
+          lottoMonthlyLimit: parseFloat(
+            response.settings.LottoMonthlyLimit || response.settings.lottoMonthlyLimit || '10000'
+          ),
+          preferredGames: response.settings.PreferredGames
+            ? response.settings.PreferredGames.split(',')
+            : [],
+          autoPlayEnabled:
+            response.settings.AutoPlayEnabled === 'Y' || response.settings.autoPlayEnabled === true,
+          winNotificationEnabled:
+            response.settings.WinNotificationEnabled === 'Y' ||
+            response.settings.winNotificationEnabled === true,
+          lastUpdated: new Date().toISOString(),
         };
 
         return {
           success: true,
-          settings
+          settings,
         };
       } else {
         return {
           success: false,
           settings: null,
-          error: 'No lottery settings found'
+          error: 'No lottery settings found',
         };
       }
-
     } catch (error) {
       console.error('❌ Failed to fetch lottery settings:', error);
       return {
         success: false,
         settings: null,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -1339,13 +1353,15 @@ export class Fantasy402AgentClient {
    * Update lottery settings for a customer
    * Modifies the lottery configuration for a specific customer
    */
-  async updateLotterySettings(customerID: string, settings: Partial<LotterySettings>): Promise<{
+  async updateLotterySettings(
+    customerID: string,
+    settings: Partial<LotterySettings>
+  ): Promise<{
     success: boolean;
     message: string;
     error?: string;
   }> {
     try {
-
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -1363,16 +1379,28 @@ export class Fantasy402AgentClient {
         agentOwner: agentID.toUpperCase(),
         agentSite: '1',
         // Settings to update
-        allowLotto: settings.allowLotto !== undefined ? (settings.allowLotto ? 'Y' : 'N') : undefined,
-        suspendLottery: settings.suspendLottery !== undefined ? (settings.suspendLottery ? 'Y' : 'N') : undefined,
+        allowLotto:
+          settings.allowLotto !== undefined ? (settings.allowLotto ? 'Y' : 'N') : undefined,
+        suspendLottery:
+          settings.suspendLottery !== undefined ? (settings.suspendLottery ? 'Y' : 'N') : undefined,
         lottoMaxWager: settings.lottoMaxWager,
         lottoMinWager: settings.lottoMinWager,
         lottoDailyLimit: settings.lottoDailyLimit,
         lottoWeeklyLimit: settings.lottoWeeklyLimit,
         lottoMonthlyLimit: settings.lottoMonthlyLimit,
         preferredGames: settings.preferredGames?.join(','),
-        autoPlayEnabled: settings.autoPlayEnabled !== undefined ? (settings.autoPlayEnabled ? 'Y' : 'N') : undefined,
-        winNotificationEnabled: settings.winNotificationEnabled !== undefined ? (settings.winNotificationEnabled ? 'Y' : 'N') : undefined
+        autoPlayEnabled:
+          settings.autoPlayEnabled !== undefined
+            ? settings.autoPlayEnabled
+              ? 'Y'
+              : 'N'
+            : undefined,
+        winNotificationEnabled:
+          settings.winNotificationEnabled !== undefined
+            ? settings.winNotificationEnabled
+              ? 'Y'
+              : 'N'
+            : undefined,
       };
 
       // Remove undefined values
@@ -1382,27 +1410,30 @@ export class Fantasy402AgentClient {
         }
       });
 
-      const response = await this.auth.request('Manager/updateLotterySettings', 'POST', requestPayload);
+      const response = await this.auth.request(
+        'Manager/updateLotterySettings',
+        'POST',
+        requestPayload
+      );
 
       if (response && typeof response === 'object' && response.success !== false) {
         return {
           success: true,
-          message: 'Lottery settings updated successfully'
+          message: 'Lottery settings updated successfully',
         };
       } else {
         return {
           success: false,
           message: 'Failed to update lottery settings',
-          error: response?.message || 'Unknown error'
+          error: response?.message || 'Unknown error',
         };
       }
-
     } catch (error) {
       console.error('❌ Failed to update lottery settings:', error);
       return {
         success: false,
         message: 'Failed to update lottery settings',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -1411,19 +1442,21 @@ export class Fantasy402AgentClient {
    * Place a lottery bet for a customer
    * Submits a lottery bet on behalf of a customer
    */
-  async placeLotteryBet(customerID: string, betData: {
-    gameId: string;
-    betAmount: number;
-    numbers: string[];
-    specialNumbers?: string[];
-    multiplier?: number;
-  }): Promise<{
+  async placeLotteryBet(
+    customerID: string,
+    betData: {
+      gameId: string;
+      betAmount: number;
+      numbers: string[];
+      specialNumbers?: string[];
+      multiplier?: number;
+    }
+  ): Promise<{
     success: boolean;
     bet: LotteryBet | null;
     error?: string;
   }> {
     try {
-
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -1452,11 +1485,15 @@ export class Fantasy402AgentClient {
       }
 
       if (betData.betAmount > settings.settings.lottoMaxWager) {
-        throw new Error(`Bet amount exceeds maximum wager limit of $${settings.settings.lottoMaxWager}`);
+        throw new Error(
+          `Bet amount exceeds maximum wager limit of $${settings.settings.lottoMaxWager}`
+        );
       }
 
       if (betData.betAmount < settings.settings.lottoMinWager) {
-        throw new Error(`Bet amount is below minimum wager limit of $${settings.settings.lottoMinWager}`);
+        throw new Error(
+          `Bet amount is below minimum wager limit of $${settings.settings.lottoMinWager}`
+        );
       }
 
       // Prepare the payload for placing lottery bet
@@ -1471,13 +1508,12 @@ export class Fantasy402AgentClient {
         operation: 'placeLotteryBet',
         RRO: '1',
         agentOwner: agentID.toUpperCase(),
-        agentSite: '1'
+        agentSite: '1',
       };
 
       const response = await this.auth.request('Manager/placeLotteryBet', 'POST', requestPayload);
 
       if (response && typeof response === 'object' && response.bet) {
-
         const bet: LotteryBet = {
           betId: response.bet.BetID || response.bet.betId || '',
           customerID,
@@ -1489,27 +1525,26 @@ export class Fantasy402AgentClient {
           multiplier: betData.multiplier || 1,
           status: 'pending',
           placedAt: new Date().toISOString(),
-          ticketNumber: response.bet.TicketNumber || response.bet.ticketNumber || ''
+          ticketNumber: response.bet.TicketNumber || response.bet.ticketNumber || '',
         };
 
         return {
           success: true,
-          bet
+          bet,
         };
       } else {
         return {
           success: false,
           bet: null,
-          error: response?.message || 'Failed to place lottery bet'
+          error: response?.message || 'Failed to place lottery bet',
         };
       }
-
     } catch (error) {
       console.error('❌ Failed to place lottery bet:', error);
       return {
         success: false,
         bet: null,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -1518,19 +1553,21 @@ export class Fantasy402AgentClient {
    * Get lottery bets for a customer
    * Fetches lottery betting history for a specific customer
    */
-  async getLotteryBets(customerID: string, options: {
-    status?: 'pending' | 'won' | 'lost' | 'cancelled';
-    dateFrom?: string;
-    dateTo?: string;
-    limit?: number;
-  } = {}): Promise<{
+  async getLotteryBets(
+    customerID: string,
+    options: {
+      status?: 'pending' | 'won' | 'lost' | 'cancelled';
+      dateFrom?: string;
+      dateTo?: string;
+      limit?: number;
+    } = {}
+  ): Promise<{
     success: boolean;
     bets: LotteryBet[];
     totalCount: number;
     error?: string;
   }> {
     try {
-
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -1550,54 +1587,54 @@ export class Fantasy402AgentClient {
         operation: 'getLotteryBets',
         RRO: '1',
         agentOwner: agentID.toUpperCase(),
-        agentSite: '1'
+        agentSite: '1',
       };
 
       const response = await this.auth.request('Manager/getLotteryBets', 'POST', requestPayload);
 
       if (response && typeof response === 'object') {
-
         const bets: LotteryBet[] = [];
         if (response.bets && Array.isArray(response.bets)) {
-          bets.push(...response.bets.map((bet: any) => ({
-            betId: bet.BetID || bet.betId || '',
-            customerID,
-            gameId: bet.GameID || bet.gameId || '',
-            gameName: bet.GameName || bet.gameName || '',
-            betAmount: parseFloat(bet.BetAmount || bet.betAmount || '0'),
-            numbers: bet.Numbers ? bet.Numbers.split(',') : [],
-            specialNumbers: bet.SpecialNumbers ? bet.SpecialNumbers.split(',') : undefined,
-            multiplier: parseFloat(bet.Multiplier || bet.multiplier || '1'),
-            status: bet.Status || bet.status || 'pending',
-            placedAt: bet.PlacedAt || bet.placedAt || '',
-            drawDate: bet.DrawDate || bet.drawDate,
-            winAmount: parseFloat(bet.WinAmount || bet.winAmount || '0'),
-            payoutStatus: bet.PayoutStatus || bet.payoutStatus,
-            ticketNumber: bet.TicketNumber || bet.ticketNumber || ''
-          })));
+          bets.push(
+            ...response.bets.map((bet: any) => ({
+              betId: bet.BetID || bet.betId || '',
+              customerID,
+              gameId: bet.GameID || bet.gameId || '',
+              gameName: bet.GameName || bet.gameName || '',
+              betAmount: parseFloat(bet.BetAmount || bet.betAmount || '0'),
+              numbers: bet.Numbers ? bet.Numbers.split(',') : [],
+              specialNumbers: bet.SpecialNumbers ? bet.SpecialNumbers.split(',') : undefined,
+              multiplier: parseFloat(bet.Multiplier || bet.multiplier || '1'),
+              status: bet.Status || bet.status || 'pending',
+              placedAt: bet.PlacedAt || bet.placedAt || '',
+              drawDate: bet.DrawDate || bet.drawDate,
+              winAmount: parseFloat(bet.WinAmount || bet.winAmount || '0'),
+              payoutStatus: bet.PayoutStatus || bet.payoutStatus,
+              ticketNumber: bet.TicketNumber || bet.ticketNumber || '',
+            }))
+          );
         }
 
         return {
           success: true,
           bets,
-          totalCount: response.totalCount || bets.length
+          totalCount: response.totalCount || bets.length,
         };
       } else {
         return {
           success: false,
           bets: [],
           totalCount: 0,
-          error: 'No lottery bets found'
+          error: 'No lottery bets found',
         };
       }
-
     } catch (error) {
       console.error('❌ Failed to fetch lottery bets:', error);
       return {
         success: false,
         bets: [],
         totalCount: 0,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -1606,18 +1643,19 @@ export class Fantasy402AgentClient {
    * Get lottery draw results
    * Fetches lottery draw results and winning numbers
    */
-  async getLotteryDraws(options: {
-    gameId?: string;
-    dateFrom?: string;
-    dateTo?: string;
-    limit?: number;
-  } = {}): Promise<{
+  async getLotteryDraws(
+    options: {
+      gameId?: string;
+      dateFrom?: string;
+      dateTo?: string;
+      limit?: number;
+    } = {}
+  ): Promise<{
     success: boolean;
     draws: LotteryDraw[];
     error?: string;
   }> {
     try {
-
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -1636,50 +1674,49 @@ export class Fantasy402AgentClient {
         operation: 'getLotteryDraws',
         RRO: '1',
         agentOwner: agentID.toUpperCase(),
-        agentSite: '1'
+        agentSite: '1',
       };
-
 
       const response = await this.auth.request('Manager/getLotteryDraws', 'POST', requestPayload);
 
       if (response && typeof response === 'object') {
-
         const draws: LotteryDraw[] = [];
         if (response.draws && Array.isArray(response.draws)) {
-          draws.push(...response.draws.map((draw: any) => ({
-            drawId: draw.DrawID || draw.drawId || '',
-            gameId: draw.GameID || draw.gameId || '',
-            gameName: draw.GameName || draw.gameName || '',
-            drawDate: draw.DrawDate || draw.drawDate || '',
-            drawTime: draw.DrawTime || draw.drawTime || '',
-            winningNumbers: draw.WinningNumbers ? draw.WinningNumbers.split(',') : [],
-            specialNumbers: draw.SpecialNumbers ? draw.SpecialNumbers.split(',') : undefined,
-            jackpotAmount: parseFloat(draw.JackpotAmount || draw.jackpotAmount || '0'),
-            totalWinners: parseInt(draw.TotalWinners || draw.totalWinners || '0'),
-            totalPrizePool: parseFloat(draw.TotalPrizePool || draw.totalPrizePool || '0'),
-            status: draw.Status || draw.status || 'completed',
-            nextDraw: draw.NextDraw || draw.nextDraw
-          })));
+          draws.push(
+            ...response.draws.map((draw: any) => ({
+              drawId: draw.DrawID || draw.drawId || '',
+              gameId: draw.GameID || draw.gameId || '',
+              gameName: draw.GameName || draw.gameName || '',
+              drawDate: draw.DrawDate || draw.drawDate || '',
+              drawTime: draw.DrawTime || draw.drawTime || '',
+              winningNumbers: draw.WinningNumbers ? draw.WinningNumbers.split(',') : [],
+              specialNumbers: draw.SpecialNumbers ? draw.SpecialNumbers.split(',') : undefined,
+              jackpotAmount: parseFloat(draw.JackpotAmount || draw.jackpotAmount || '0'),
+              totalWinners: parseInt(draw.TotalWinners || draw.totalWinners || '0'),
+              totalPrizePool: parseFloat(draw.TotalPrizePool || draw.totalPrizePool || '0'),
+              status: draw.Status || draw.status || 'completed',
+              nextDraw: draw.NextDraw || draw.nextDraw,
+            }))
+          );
         }
 
         return {
           success: true,
-          draws
+          draws,
         };
       } else {
         return {
           success: false,
           draws: [],
-          error: 'No lottery draws found'
+          error: 'No lottery draws found',
         };
       }
-
     } catch (error) {
       console.error('❌ Failed to fetch lottery draws:', error);
       return {
         success: false,
         draws: [],
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -1688,11 +1725,13 @@ export class Fantasy402AgentClient {
    * Get lottery statistics for agent
    * Fetches comprehensive lottery statistics and performance metrics
    */
-  async getLotteryStatistics(options: {
-    dateFrom?: string;
-    dateTo?: string;
-    customerID?: string;
-  } = {}): Promise<{
+  async getLotteryStatistics(
+    options: {
+      dateFrom?: string;
+      dateTo?: string;
+      customerID?: string;
+    } = {}
+  ): Promise<{
     success: boolean;
     statistics: {
       totalBets: number;
@@ -1721,7 +1760,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -1739,14 +1777,16 @@ export class Fantasy402AgentClient {
         operation: 'getLotteryStatistics',
         RRO: '1',
         agentOwner: agentID.toUpperCase(),
-        agentSite: '1'
+        agentSite: '1',
       };
 
-
-      const response = await this.auth.request('Manager/getLotteryStatistics', 'POST', requestPayload);
+      const response = await this.auth.request(
+        'Manager/getLotteryStatistics',
+        'POST',
+        requestPayload
+      );
 
       if (response && typeof response === 'object' && response.statistics) {
-
         const stats = response.statistics;
         const statistics = {
           totalBets: parseInt(stats.TotalBets || stats.totalBets || '0'),
@@ -1758,13 +1798,13 @@ export class Fantasy402AgentClient {
           customerStats: {
             activeCustomers: parseInt(stats.ActiveCustomers || stats.activeCustomers || '0'),
             newCustomers: parseInt(stats.NewCustomers || stats.newCustomers || '0'),
-            topCustomers: stats.TopCustomers || stats.topCustomers || []
-          }
+            topCustomers: stats.TopCustomers || stats.topCustomers || [],
+          },
         };
 
         return {
           success: true,
-          statistics
+          statistics,
         };
       } else {
         return {
@@ -1779,13 +1819,12 @@ export class Fantasy402AgentClient {
             customerStats: {
               activeCustomers: 0,
               newCustomers: 0,
-              topCustomers: []
-            }
+              topCustomers: [],
+            },
           },
-          error: 'No statistics available'
+          error: 'No statistics available',
         };
       }
-
     } catch (error) {
       console.error('❌ Failed to fetch lottery statistics:', error);
       return {
@@ -1800,17 +1839,17 @@ export class Fantasy402AgentClient {
           customerStats: {
             activeCustomers: 0,
             newCustomers: 0,
-            topCustomers: []
-          }
+            topCustomers: [],
+          },
         },
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
 
-    // ===============================
+  // !==!==!==!==!==!==
   // PLAYER NOTES MANAGEMENT METHODS
-  // ===============================
+  // !==!==!==!==!==!==
 
   /**
    * Get player notes for a specific customer
@@ -1832,7 +1871,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -1848,23 +1886,21 @@ export class Fantasy402AgentClient {
         operation: 'getPlayerNotes',
         RRO: '1',
         agentOwner: agentID.toUpperCase(),
-        agentSite: '1'
+        agentSite: '1',
       };
-
 
       const response = await this.auth.request('Manager/getPlayerNotes', 'POST', requestPayload);
 
       if (response && typeof response === 'object') {
-
         const notes = {
           playerNotes: response.playerNotes || response.PlayerNotes || '',
           lastNoteUpdate: response.lastNoteUpdate || response.LastNoteUpdate || '',
-          noteHistory: response.noteHistory || response.NoteHistory || []
+          noteHistory: response.noteHistory || response.NoteHistory || [],
         };
 
         return {
           success: true,
-          ...notes
+          ...notes,
         };
       } else {
         return {
@@ -1872,10 +1908,9 @@ export class Fantasy402AgentClient {
           playerNotes: '',
           lastNoteUpdate: '',
           noteHistory: [],
-          error: 'No player notes found'
+          error: 'No player notes found',
         };
       }
-
     } catch (error) {
       console.error('❌ Failed to fetch player notes:', error);
       return {
@@ -1883,7 +1918,7 @@ export class Fantasy402AgentClient {
         playerNotes: '',
         lastNoteUpdate: '',
         noteHistory: [],
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -1892,14 +1927,25 @@ export class Fantasy402AgentClient {
    * Update player notes for a specific customer
    * Allows agents to add or modify notes for reference
    */
-  async updatePlayerNotes(customerID: string, notes: string, category: 'general' | 'complaint' | 'praise' | 'warning' | 'suspension' | 'vip' | 'risk' | 'lottery' = 'general'): Promise<{
+  async updatePlayerNotes(
+    customerID: string,
+    notes: string,
+    category:
+      | 'general'
+      | 'complaint'
+      | 'praise'
+      | 'warning'
+      | 'suspension'
+      | 'vip'
+      | 'risk'
+      | 'lottery' = 'general'
+  ): Promise<{
     success: boolean;
     message: string;
     noteId?: string;
     error?: string;
   }> {
     try {
-
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -1925,34 +1971,33 @@ export class Fantasy402AgentClient {
         RRO: '1',
         agentOwner: agentID.toUpperCase(),
         agentSite: '1',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       const response = await this.auth.request('Manager/updatePlayerNotes', 'POST', requestPayload);
 
       if (response && typeof response === 'object' && response.success !== false) {
-
-        const noteId = response.noteId || `note_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        const noteId =
+          response.noteId || `note_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
         return {
           success: true,
           message: 'Player notes updated successfully',
-          noteId: noteId
+          noteId: noteId,
         };
       } else {
         return {
           success: false,
           message: 'Failed to update player notes',
-          error: response?.message || 'Unknown error'
+          error: response?.message || 'Unknown error',
         };
       }
-
     } catch (error) {
       console.error('❌ Failed to update player notes:', error);
       return {
         success: false,
         message: 'Failed to update player notes',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -1961,14 +2006,25 @@ export class Fantasy402AgentClient {
    * Add a new note to player history
    * Creates a timestamped note entry with category and agent information
    */
-  async addPlayerNote(customerID: string, note: string, category: 'general' | 'complaint' | 'praise' | 'warning' | 'suspension' | 'vip' | 'risk' | 'lottery' = 'general'): Promise<{
+  async addPlayerNote(
+    customerID: string,
+    note: string,
+    category:
+      | 'general'
+      | 'complaint'
+      | 'praise'
+      | 'warning'
+      | 'suspension'
+      | 'vip'
+      | 'risk'
+      | 'lottery' = 'general'
+  ): Promise<{
     success: boolean;
     message: string;
     noteId: string;
     error?: string;
   }> {
     try {
-
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -2003,34 +2059,32 @@ export class Fantasy402AgentClient {
         agentOwner: agentID.toUpperCase(),
         agentSite: '1',
         timestamp: new Date().toISOString(),
-        isActive: true
+        isActive: true,
       };
 
       const response = await this.auth.request('Manager/addPlayerNote', 'POST', requestPayload);
 
       if (response && typeof response === 'object' && response.success !== false) {
-
         return {
           success: true,
           message: 'Player note added successfully',
-          noteId: noteId
+          noteId: noteId,
         };
       } else {
         return {
           success: false,
           message: 'Failed to add player note',
           noteId: '',
-          error: response?.message || 'Unknown error'
+          error: response?.message || 'Unknown error',
         };
       }
-
     } catch (error) {
       console.error('❌ Failed to add player note:', error);
       return {
         success: false,
         message: 'Failed to add player note',
         noteId: '',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -2039,13 +2093,24 @@ export class Fantasy402AgentClient {
    * Get player note history with filtering options
    * Retrieves historical notes with optional category and date filtering
    */
-  async getPlayerNoteHistory(customerID: string, options: {
-    category?: 'general' | 'complaint' | 'praise' | 'warning' | 'suspension' | 'vip' | 'risk' | 'lottery';
-    dateFrom?: string;
-    dateTo?: string;
-    limit?: number;
-    includeInactive?: boolean;
-  } = {}): Promise<{
+  async getPlayerNoteHistory(
+    customerID: string,
+    options: {
+      category?:
+        | 'general'
+        | 'complaint'
+        | 'praise'
+        | 'warning'
+        | 'suspension'
+        | 'vip'
+        | 'risk'
+        | 'lottery';
+      dateFrom?: string;
+      dateTo?: string;
+      limit?: number;
+      includeInactive?: boolean;
+    } = {}
+  ): Promise<{
     success: boolean;
     noteHistory: Array<{
       noteId: string;
@@ -2060,7 +2125,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -2081,37 +2145,39 @@ export class Fantasy402AgentClient {
         operation: 'getPlayerNoteHistory',
         RRO: '1',
         agentOwner: agentID.toUpperCase(),
-        agentSite: '1'
+        agentSite: '1',
       };
 
-      const response = await this.auth.request('Manager/getPlayerNoteHistory', 'POST', requestPayload);
+      const response = await this.auth.request(
+        'Manager/getPlayerNoteHistory',
+        'POST',
+        requestPayload
+      );
 
       if (response && typeof response === 'object') {
-
         const noteHistory = response.noteHistory || response.NoteHistory || [];
         const totalCount = response.totalCount || noteHistory.length;
 
         return {
           success: true,
           noteHistory,
-          totalCount
+          totalCount,
         };
       } else {
         return {
           success: false,
           noteHistory: [],
           totalCount: 0,
-          error: 'No player note history found'
+          error: 'No player note history found',
         };
       }
-
     } catch (error) {
       console.error('❌ Failed to fetch player note history:', error);
       return {
         success: false,
         noteHistory: [],
         totalCount: 0,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -2120,13 +2186,16 @@ export class Fantasy402AgentClient {
    * Delete or deactivate a player note
    * Removes a note from active status (soft delete)
    */
-  async deletePlayerNote(customerID: string, noteId: string, reason?: string): Promise<{
+  async deletePlayerNote(
+    customerID: string,
+    noteId: string,
+    reason?: string
+  ): Promise<{
     success: boolean;
     message: string;
     error?: string;
   }> {
     try {
-
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -2148,31 +2217,29 @@ export class Fantasy402AgentClient {
         agentOwner: agentID.toUpperCase(),
         agentSite: '1',
         timestamp: new Date().toISOString(),
-        isActive: false
+        isActive: false,
       };
 
       const response = await this.auth.request('Manager/deletePlayerNote', 'POST', requestPayload);
 
       if (response && typeof response === 'object' && response.success !== false) {
-
         return {
           success: true,
-          message: 'Player note deleted successfully'
+          message: 'Player note deleted successfully',
         };
       } else {
         return {
           success: false,
           message: 'Failed to delete player note',
-          error: response?.message || 'Unknown error'
+          error: response?.message || 'Unknown error',
         };
       }
-
     } catch (error) {
       console.error('❌ Failed to delete player note:', error);
       return {
         success: false,
         message: 'Failed to delete player note',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -2181,12 +2248,23 @@ export class Fantasy402AgentClient {
    * Get notes by category across multiple customers
    * Useful for finding patterns or managing specific types of notes
    */
-  async getNotesByCategory(category: 'general' | 'complaint' | 'praise' | 'warning' | 'suspension' | 'vip' | 'risk' | 'lottery', options: {
-    dateFrom?: string;
-    dateTo?: string;
-    limit?: number;
-    customerID?: string;
-  } = {}): Promise<{
+  async getNotesByCategory(
+    category:
+      | 'general'
+      | 'complaint'
+      | 'praise'
+      | 'warning'
+      | 'suspension'
+      | 'vip'
+      | 'risk'
+      | 'lottery',
+    options: {
+      dateFrom?: string;
+      dateTo?: string;
+      limit?: number;
+      customerID?: string;
+    } = {}
+  ): Promise<{
     success: boolean;
     notes: Array<{
       noteId: string;
@@ -2203,7 +2281,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -2223,37 +2300,39 @@ export class Fantasy402AgentClient {
         operation: 'getNotesByCategory',
         RRO: '1',
         agentOwner: agentID.toUpperCase(),
-        agentSite: '1'
+        agentSite: '1',
       };
 
-      const response = await this.auth.request('Manager/getNotesByCategory', 'POST', requestPayload);
+      const response = await this.auth.request(
+        'Manager/getNotesByCategory',
+        'POST',
+        requestPayload
+      );
 
       if (response && typeof response === 'object') {
-
         const notes = response.notes || response.Notes || [];
         const totalCount = response.totalCount || notes.length;
 
         return {
           success: true,
           notes,
-          totalCount
+          totalCount,
         };
       } else {
         return {
           success: false,
           notes: [],
           totalCount: 0,
-          error: 'No notes found for category'
+          error: 'No notes found for category',
         };
       }
-
     } catch (error) {
       console.error('❌ Failed to fetch notes by category:', error);
       return {
         success: false,
         notes: [],
         totalCount: 0,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -2262,13 +2341,24 @@ export class Fantasy402AgentClient {
    * Search player notes with full-text search
    * Allows agents to search through all player notes for specific terms
    */
-  async searchPlayerNotes(searchTerm: string, options: {
-    category?: 'general' | 'complaint' | 'praise' | 'warning' | 'suspension' | 'vip' | 'risk' | 'lottery';
-    dateFrom?: string;
-    dateTo?: string;
-    limit?: number;
-    customerID?: string;
-  } = {}): Promise<{
+  async searchPlayerNotes(
+    searchTerm: string,
+    options: {
+      category?:
+        | 'general'
+        | 'complaint'
+        | 'praise'
+        | 'warning'
+        | 'suspension'
+        | 'vip'
+        | 'risk'
+        | 'lottery';
+      dateFrom?: string;
+      dateTo?: string;
+      limit?: number;
+      customerID?: string;
+    } = {}
+  ): Promise<{
     success: boolean;
     results: Array<{
       noteId: string;
@@ -2287,7 +2377,6 @@ export class Fantasy402AgentClient {
     error?: string;
   }> {
     try {
-
       // Get current session and agent information
       const session = this.auth.getSession();
       if (!session) {
@@ -2313,13 +2402,12 @@ export class Fantasy402AgentClient {
         operation: 'searchPlayerNotes',
         RRO: '1',
         agentOwner: agentID.toUpperCase(),
-        agentSite: '1'
+        agentSite: '1',
       };
 
       const response = await this.auth.request('Manager/searchPlayerNotes', 'POST', requestPayload);
 
       if (response && typeof response === 'object') {
-
         const results = response.results || response.searchResults || [];
         const totalCount = response.totalCount || results.length;
 
@@ -2327,7 +2415,7 @@ export class Fantasy402AgentClient {
           success: true,
           results,
           totalCount,
-          searchTerm: searchTerm
+          searchTerm: searchTerm,
         };
       } else {
         return {
@@ -2335,10 +2423,9 @@ export class Fantasy402AgentClient {
           results: [],
           totalCount: 0,
           searchTerm: searchTerm,
-          error: 'No search results found'
+          error: 'No search results found',
         };
       }
-
     } catch (error) {
       console.error('❌ Failed to search player notes:', error);
       return {
@@ -2346,7 +2433,7 @@ export class Fantasy402AgentClient {
         results: [],
         totalCount: 0,
         searchTerm: searchTerm,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }

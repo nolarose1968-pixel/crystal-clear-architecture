@@ -24,11 +24,11 @@ interface WorkingData {
 
 async function testWorkingEndpoints(): Promise<WorkingData> {
   console.log('🎯 Testing Only Working Fantasy402 Endpoints');
-  console.log('===========================================');
+  console.log('!==!==!==!==!==!==!==!===');
   console.log(`Agent: ${USERNAME}\n`);
 
   const client = new Fantasy402AgentClient(USERNAME, PASSWORD);
-  
+
   // Initialize
   const initialized = await client.initialize();
   if (!initialized) {
@@ -40,7 +40,7 @@ async function testWorkingEndpoints(): Promise<WorkingData> {
     transactions: null,
     emailCount: 0,
     accountInfo: client.getAccountInfo(),
-    permissions: client.getPermissions()
+    permissions: client.getPermissions(),
   };
 
   // Get date range
@@ -49,35 +49,45 @@ async function testWorkingEndpoints(): Promise<WorkingData> {
 
   console.log('📊 1. Weekly Figures (WORKING)');
   console.log('------------------------------');
-  
+
   // Current week figures
   try {
     workingData.weeklyFigures.current = await client.getWeeklyFigures({ week: '0' });
     console.log('✅ Current Week Data:');
-    console.log(`   Profit: $${workingData.weeklyFigures.current?.LIST?.ARRAY?.[0]?.ThisWeek?.toLocaleString() || 'N/A'}`);
-    console.log(`   Today: $${workingData.weeklyFigures.current?.LIST?.ARRAY?.[0]?.Today?.toLocaleString() || 'N/A'}`);
-    console.log(`   Active Players: ${workingData.weeklyFigures.current?.LIST?.ARRAY?.[0]?.Active?.toLocaleString() || 'N/A'}`);
+    console.log(
+      `   Profit: $${workingData.weeklyFigures.current?.LIST?.ARRAY?.[0]?.ThisWeek?.toLocaleString() || 'N/A'}`
+    );
+    console.log(
+      `   Today: $${workingData.weeklyFigures.current?.LIST?.ARRAY?.[0]?.Today?.toLocaleString() || 'N/A'}`
+    );
+    console.log(
+      `   Active Players: ${workingData.weeklyFigures.current?.LIST?.ARRAY?.[0]?.Active?.toLocaleString() || 'N/A'}`
+    );
   } catch (error) {
     console.error('❌ Current week failed:', error);
   }
 
-  // Last week figures  
+  // Last week figures
   try {
     workingData.weeklyFigures.lastWeek = await client.getWeeklyFigures({ week: '-1' });
     console.log('✅ Last Week Data:');
-    console.log(`   Profit: $${workingData.weeklyFigures.lastWeek?.LIST?.ARRAY?.[0]?.ThisWeek?.toLocaleString() || 'N/A'}`);
+    console.log(
+      `   Profit: $${workingData.weeklyFigures.lastWeek?.LIST?.ARRAY?.[0]?.ThisWeek?.toLocaleString() || 'N/A'}`
+    );
   } catch (error) {
     console.error('❌ Last week failed:', error);
   }
 
   // Date range figures
   try {
-    workingData.weeklyFigures.dateRange = await client.getWeeklyFigures({ 
-      dateFrom: lastWeek, 
-      dateTo: today 
+    workingData.weeklyFigures.dateRange = await client.getWeeklyFigures({
+      dateFrom: lastWeek,
+      dateTo: today,
     });
     console.log('✅ Date Range Data:');
-    console.log(`   Profit: $${workingData.weeklyFigures.dateRange?.LIST?.ARRAY?.[0]?.ThisWeek?.toLocaleString() || 'N/A'}`);
+    console.log(
+      `   Profit: $${workingData.weeklyFigures.dateRange?.LIST?.ARRAY?.[0]?.ThisWeek?.toLocaleString() || 'N/A'}`
+    );
   } catch (error) {
     console.error('❌ Date range failed:', error);
   }
@@ -88,7 +98,7 @@ async function testWorkingEndpoints(): Promise<WorkingData> {
     workingData.transactions = await client.rawRequest('Manager/getTransactions', 'POST', {
       agentID: USERNAME.toUpperCase(),
       start: lastWeek,
-      end: today
+      end: today,
     });
     console.log('✅ Transactions endpoint works');
     console.log(`   Response: ${JSON.stringify(workingData.transactions).slice(0, 100)}`);
@@ -136,20 +146,23 @@ if (import.meta.main) {
   testWorkingEndpoints()
     .then(data => {
       console.log('\n🎉 SUCCESS! Working Endpoints Identified');
-      console.log('========================================');
+      console.log('!==!==!==!==!==!==!====');
       console.log('✅ Weekly Figures - Real financial data');
       console.log('✅ Email Count - System notifications');
-      console.log('✅ Token Renewal - Session management');  
+      console.log('✅ Token Renewal - Session management');
       console.log('✅ Activity Logging - Audit trail');
       console.log('✅ Manager Transactions - Empty but valid endpoint');
-      
+
       console.log('\n📊 Dashboard Integration Ready');
       console.log('------------------------------');
       console.log('Account:', data.accountInfo?.customerID);
       console.log('Office:', data.accountInfo?.office);
       console.log('Balance:', `$${data.accountInfo?.balance?.toLocaleString()}`);
       console.log('Active Players:', data.weeklyFigures.current?.LIST?.ARRAY?.[0]?.Active);
-      console.log('This Week Profit:', `$${data.weeklyFigures.current?.LIST?.ARRAY?.[0]?.ThisWeek?.toLocaleString()}`);
+      console.log(
+        'This Week Profit:',
+        `$${data.weeklyFigures.current?.LIST?.ARRAY?.[0]?.ThisWeek?.toLocaleString()}`
+      );
     })
     .catch(error => {
       console.error('❌ Test failed:', error);

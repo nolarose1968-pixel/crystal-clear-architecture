@@ -2,11 +2,14 @@
 
 ## Overview
 
-This guide covers the enhanced workspace development workflows using Bun's latest features and our custom scripts. Fire22 has **15 workspaces** organized as a monorepo with powerful development tools.
+This guide covers the enhanced workspace development workflows using Bun's
+latest features and our custom scripts. Fire22 has **15 workspaces** organized
+as a monorepo with powerful development tools.
 
 ## Quick Reference Commands
 
 ### 📋 Workspace Discovery
+
 ```bash
 # List all workspaces
 bun run workspaces:list
@@ -21,6 +24,7 @@ bun run workspaces:outdated
 ### 🚀 Single Workspace Development
 
 #### Start Development with Hot Reload
+
 ```bash
 # Method 1: Using our helper script
 bun run ws:dev api-client
@@ -30,6 +34,7 @@ cd workspaces/@fire22-api-client && bun run dev
 ```
 
 #### Build and Test Specific Workspace
+
 ```bash
 # Build specific workspace
 bun run ws:build api-client
@@ -45,11 +50,12 @@ cd workspaces/@fire22-api-client && bun test
 ### 📦 Dependency Management
 
 #### Add to Specific Workspace
+
 ```bash
 # Add production dependency
 bun run ws:add api-client zod
 
-# Add dev dependency  
+# Add dev dependency
 bun run ws:add-dev api-client typescript
 
 # Direct approach (original pattern)
@@ -58,6 +64,7 @@ cd workspaces/@fire22-api-client && bun add -D typescript
 ```
 
 #### Bulk Operations Across All Workspaces
+
 ```bash
 # Add dev dependency to ALL workspaces (original pattern enhanced)
 bun run all:add-dev "@types/node"
@@ -74,6 +81,7 @@ done
 ### 🔄 Bulk Operations
 
 #### Build, Test, Lint Everything
+
 ```bash
 # Build all workspaces
 bun run all:build
@@ -89,6 +97,7 @@ bun run all:lint
 ```
 
 #### Clean Everything
+
 ```bash
 # Clean all node_modules, dist, build folders
 bun run all:clean
@@ -97,10 +106,11 @@ bun run all:clean
 ## Workspace Architecture
 
 ### Current Fire22 Workspaces (15 total)
+
 ```
 📦 Fire22 Workspaces:
   → @fire22-api-client          # API client library
-  → @fire22-api-consolidated    # Consolidated API endpoints  
+  → @fire22-api-consolidated    # Consolidated API endpoints
   → @fire22-build-system        # Build tools and configs
   → @fire22-core-dashboard      # Core dashboard components
   → @fire22-language-keys       # Internationalization
@@ -117,10 +127,11 @@ bun run all:clean
 ```
 
 ### Version Status Example
+
 ```bash
 Root version: "4.0.0-staging"
 @fire22-api-client: "3.0.9"
-@fire22-api-consolidated: "1.0.0"  
+@fire22-api-consolidated: "1.0.0"
 @fire22-build-system: "3.0.9"
 # ... shows version inconsistencies
 ```
@@ -130,11 +141,12 @@ Root version: "4.0.0-staging"
 ### 🔥 Hot Development Workflow
 
 #### Starting Development on Multiple Workspaces
+
 ```bash
 # Terminal 1: API development
 bun run ws:dev api-client
 
-# Terminal 2: Dashboard development  
+# Terminal 2: Dashboard development
 bun run ws:dev core-dashboard
 
 # Terminal 3: Integration testing
@@ -142,6 +154,7 @@ bun run ws:test telegram-integration
 ```
 
 #### Dependency Updates During Development
+
 ```bash
 # Add new dependency while developing
 bun run ws:add api-client axios
@@ -156,6 +169,7 @@ bun run all:add axios
 ### 🔧 Maintenance Workflows
 
 #### Daily Dependency Health Check
+
 ```bash
 # Check what's outdated
 bun run workspaces:outdated
@@ -168,6 +182,7 @@ bun run pkg:fix-all
 ```
 
 #### Weekly Bulk Updates
+
 ```bash
 # Update dev dependencies everywhere
 bun run all:add-dev "@types/node@latest"
@@ -181,6 +196,7 @@ bun run all:test
 ```
 
 ### 🚀 Release Preparation
+
 ```bash
 # 1. Sync all versions to root
 bun run version:sync
@@ -200,6 +216,7 @@ bun run verify:pre-publish
 ### 🎯 Selective Operations
 
 #### Working with Specific Workspace Groups
+
 ```bash
 # Telegram-related workspaces only
 for ws in workspaces/@fire22-telegram-*/; do
@@ -214,6 +231,7 @@ done
 ```
 
 #### Conditional Operations
+
 ```bash
 # Only build workspaces that have build scripts
 bun run all:build  # Automatically skips missing scripts
@@ -229,6 +247,7 @@ done
 ### 🔍 Debugging and Analysis
 
 #### Dependency Chain Analysis
+
 ```bash
 # Why is a package installed?
 bun run deps:why zod
@@ -241,6 +260,7 @@ bun run deps:analyze
 ```
 
 #### Performance Monitoring
+
 ```bash
 # Benchmark installations
 time bun run all:clean && time bun install
@@ -252,6 +272,7 @@ du -sh workspaces/@fire22-*/ | sort -hr
 ## Configuration Management
 
 ### 🔧 Package.json Synchronization
+
 ```bash
 # Get workspace package info
 cd workspaces/@fire22-api-client && bun run pkg:get name version
@@ -264,6 +285,7 @@ done
 ```
 
 ### 📝 Automated Scripts Management
+
 ```bash
 # Add common scripts to all workspaces
 for ws in workspaces/@fire22-*/; do
@@ -277,15 +299,17 @@ done
 ### 🎯 Development Best Practices
 
 1. **Use Workspace Shortcuts**
+
    ```bash
    # Preferred
    bun run ws:dev api-client
-   
+
    # Instead of
    cd workspaces/@fire22-api-client && bun run dev
    ```
 
 2. **Bulk Operations for Consistency**
+
    ```bash
    # Keep all workspaces in sync
    bun run all:add-dev "@types/node"
@@ -303,10 +327,12 @@ done
 ### ⚠️ Common Pitfalls
 
 1. **Version Drift**
+
    - Use `bun run version:sync` regularly
    - Check `bun run version:status` before releases
 
 2. **Dependency Inconsistencies**
+
    - Use bulk operations: `bun run all:add-dev`
    - Avoid manual per-workspace installs for common deps
 
@@ -319,15 +345,17 @@ done
 ### 🚀 Speed Optimizations
 
 1. **Use Bun's Native Features**
+
    ```bash
    # Fast filtering (when available)
    bun lint --filter="@fire22/*"
-   
+
    # Parallel operations
    bun run all:build  # Runs in parallel where possible
    ```
 
 2. **Smart Caching**
+
    - Bun automatically caches dependencies
    - Use `--frozen-lockfile` for CI/CD
 
@@ -348,6 +376,7 @@ done
 ### 🔧 Common Issues
 
 #### Workspace Not Found
+
 ```bash
 $ bun run ws:dev nonexistent
 ❌ Workspace @fire22-nonexistent not found
@@ -357,6 +386,7 @@ bun run workspaces:list
 ```
 
 #### Version Inconsistencies
+
 ```bash
 # Problem: Mixed versions across workspaces
 bun run version:status
@@ -366,6 +396,7 @@ bun run version:sync
 ```
 
 #### Dependency Conflicts
+
 ```bash
 # Problem: Different package versions
 bun run deps:why problematic-package
@@ -377,6 +408,7 @@ bun run all:add problematic-package@latest
 ### 🚨 Emergency Procedures
 
 #### Complete Reset
+
 ```bash
 # Nuclear option: clean everything and reinstall
 bun run all:clean
@@ -385,6 +417,7 @@ bun run pkg:fix-all
 ```
 
 #### Selective Workspace Reset
+
 ```bash
 # Reset specific workspace
 cd workspaces/@fire22-problematic && rm -rf node_modules
@@ -394,6 +427,7 @@ cd workspaces/@fire22-problematic && bun install
 ## Integration with CI/CD
 
 ### 🔄 Automated Workflows
+
 ```bash
 # Pre-commit hook
 bun run pkg:fix-all
@@ -407,6 +441,7 @@ bun run verify:pre-publish
 ```
 
 ### 📊 Monitoring
+
 ```bash
 # Generate reports
 bun run deps:analyze  # Creates JSON report
@@ -420,12 +455,12 @@ bun run workspaces:outdated > outdated-report.txt
 ```bash
 # Workspace Operations
 bun run ws:dev <name>           # Start dev server
-bun run ws:build <name>         # Build workspace  
+bun run ws:build <name>         # Build workspace
 bun run ws:test <name>          # Test workspace
 bun run ws:add <name> <pkg>     # Add dependency
 bun run ws:add-dev <name> <pkg> # Add dev dependency
 
-# Bulk Operations  
+# Bulk Operations
 bun run all:add <pkg>           # Add to all workspaces
 bun run all:add-dev <pkg>       # Add dev dep to all
 bun run all:build               # Build all workspaces
@@ -441,4 +476,5 @@ bun run version:sync            # Sync versions to root
 bun run pkg:fix-all            # Fix all package.json files
 ```
 
-This guide provides comprehensive patterns for managing Fire22's 15-workspace monorepo using Bun's enhanced features and our custom automation scripts.
+This guide provides comprehensive patterns for managing Fire22's 15-workspace
+monorepo using Bun's enhanced features and our custom automation scripts.

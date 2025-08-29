@@ -19,7 +19,8 @@ class Fire22Cache implements Fire22CacheInterface {
   private cacheHits = 0;
   private cacheMisses = 0;
 
-  constructor(d1Database: any) { // Constructor takes D1 database binding
+  constructor(d1Database: any) {
+    // Constructor takes D1 database binding
     this.db = d1Database;
     // Auto-cleanup for expired cache entries
     setInterval(() => this.cleanup(), 30_000);
@@ -42,11 +43,18 @@ class Fire22Cache implements Fire22CacheInterface {
   // Caching method specifically for D1 SQL queries
   async query<T>(sql: string, params?: any[], ttl = this.defaultTTL): Promise<T[]> {
     const cacheKey = sql + JSON.stringify(params || []);
-    return this.get(cacheKey, async () => {
-      // Use this.db.prepare for D1
-      const { results } = await this.db.prepare(sql).bind(...(params || [])).all();
-      return results as T[]; // D1 returns results in `results` array
-    }, ttl);
+    return this.get(
+      cacheKey,
+      async () => {
+        // Use this.db.prepare for D1
+        const { results } = await this.db
+          .prepare(sql)
+          .bind(...(params || []))
+          .all();
+        return results as T[]; // D1 returns results in `results` array
+      },
+      ttl
+    );
   }
 
   // --- NEW METHOD TO EXPOSE CACHE STATS ---
@@ -55,7 +63,10 @@ class Fire22Cache implements Fire22CacheInterface {
       cacheSize: this.cache.size,
       cacheHits: this.cacheHits,
       cacheMisses: this.cacheMisses,
-      hitRate: this.cacheHits + this.cacheMisses === 0 ? "0%" : `${((this.cacheHits / (this.cacheHits + this.cacheMisses)) * 100).toFixed(1)}%`
+      hitRate:
+        this.cacheHits + this.cacheMisses === 0
+          ? '0%'
+          : `${((this.cacheHits / (this.cacheHits + this.cacheMisses)) * 100).toFixed(1)}%`,
     };
   }
 
@@ -191,11 +202,11 @@ const corsMiddleware = (request: Request) => {
   headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   headers.set('Access-Control-Max-Age', '86400');
-  
+
   if (request.method === 'OPTIONS') {
     return new Response(null, { status: 200, headers });
   }
-  
+
   return null; // Continue to next handler
 };
 
@@ -203,12 +214,15 @@ const corsMiddleware = (request: Request) => {
 const authMiddleware = async (request: Request) => {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return new Response(JSON.stringify({ success: false, message: 'No valid authorization header' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({ success: false, message: 'No valid authorization header' }),
+      {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
-  
+
   const token = authHeader.substring(7);
   try {
     const decoded = jwt.verify(token, 'fire22-secret-key');
@@ -217,7 +231,7 @@ const authMiddleware = async (request: Request) => {
   } catch (error) {
     return new Response(JSON.stringify({ success: false, message: 'Invalid token' }), {
       status: 401,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 };
@@ -228,33 +242,42 @@ router.use(corsMiddleware);
 // Static routes
 router.get('/', () => new Response(loginHtml, { headers: { 'Content-Type': 'text/html' } }));
 router.get('/login', () => new Response(loginHtml, { headers: { 'Content-Type': 'text/html' } }));
-router.get('/dashboard', () => new Response(dashboardHtml, { headers: { 'Content-Type': 'text/html' } }));
+router.get(
+  '/dashboard',
+  () => new Response(dashboardHtml, { headers: { 'Content-Type': 'text/html' } })
+);
 
 // Health check endpoint
 router.get('/api/health/system', async (request: Request, env: any) => {
   try {
     const cache = new Fire22Cache(env.DB);
     const stats = cache.getStats();
-    
-    return new Response(JSON.stringify({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      uptime: Date.now(),
-      cache: stats,
-      database: 'connected',
-      version: '1.0.0'
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+
+    return new Response(
+      JSON.stringify({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        uptime: Date.now(),
+        cache: stats,
+        database: 'connected',
+        version: '1.0.0',
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({
-      status: 'unhealthy',
-      timestamp: new Date().toISOString(),
-      error: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        status: 'unhealthy',
+        timestamp: new Date().toISOString(),
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 });
 
@@ -262,35 +285,46 @@ router.get('/api/health/system', async (request: Request, env: any) => {
 router.post('/api/auth/login', async (request: Request, env: any) => {
   try {
     const { username, password } = await request.json();
-    
+
     // Simple demo authentication
     if (username === 'admin' && password === 'fire22demo') {
-      const token = jwt.sign({ username, role: 'admin' }, 'fire22-secret-key', { expiresIn: '24h' });
-      return new Response(JSON.stringify({
-        success: true,
-        token,
-        user: { username, role: 'admin' }
-      }), {
-        headers: { 'Content-Type': 'application/json' }
+      const token = jwt.sign({ username, role: 'admin' }, 'fire22-secret-key', {
+        expiresIn: '24h',
       });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          token,
+          user: { username, role: 'admin' },
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
-    
-    return new Response(JSON.stringify({
-      success: false,
-      message: 'Invalid credentials'
-    }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' }
-    });
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: 'Invalid credentials',
+      }),
+      {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({
-      success: false,
-      message: 'Login failed',
-      error: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: 'Login failed',
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 });
 
@@ -302,7 +336,7 @@ router.use('/api/manager/*', authMiddleware);
 router.post('/api/manager/getWeeklyFigureByAgent', async (request: Request, env: any) => {
   try {
     const { agentID = 'BLAKEPPH' } = await request.json();
-    
+
     // Get weekly data from database
     const weeklyQuery = `
       SELECT
@@ -318,7 +352,7 @@ router.post('/api/manager/getWeeklyFigureByAgent', async (request: Request, env:
     `;
 
     const weeklyResult = await env.DB.prepare(weeklyQuery).all();
-    
+
     // Map day numbers to day names
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const weeklyData = (weeklyResult.results || []).map(row => ({
@@ -326,7 +360,7 @@ router.post('/api/manager/getWeeklyFigureByAgent', async (request: Request, env:
       handle: row.handle || 0,
       win: row.win || 0,
       volume: row.volume || 0,
-      bets: row.bets || 0
+      bets: row.bets || 0,
     }));
 
     // Fill missing days with zeros
@@ -335,28 +369,34 @@ router.post('/api/manager/getWeeklyFigureByAgent', async (request: Request, env:
       return existing || { day, handle: 0, win: 0, volume: 0, bets: 0 };
     });
 
-    return new Response(JSON.stringify({
-      success: true,
-      data: {
-        agentID: agentID,
-        weeklyFigures: allDays,
-        totalHandle: allDays.reduce((sum, day) => sum + day.handle, 0),
-        totalWin: allDays.reduce((sum, day) => sum + day.win, 0),
-        totalVolume: allDays.reduce((sum, day) => sum + day.volume, 0),
-        totalBets: allDays.reduce((sum, day) => sum + day.bets, 0)
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: {
+          agentID: agentID,
+          weeklyFigures: allDays,
+          totalHandle: allDays.reduce((sum, day) => sum + day.handle, 0),
+          totalWin: allDays.reduce((sum, day) => sum + day.win, 0),
+          totalVolume: allDays.reduce((sum, day) => sum + day.volume, 0),
+          totalBets: allDays.reduce((sum, day) => sum + day.bets, 0),
+        },
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
       }
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    );
   } catch (error) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: 'Failed to fetch weekly figures',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'Failed to fetch weekly figures',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 });
 
@@ -366,7 +406,7 @@ router.get('/api/manager/getWeeklyFigureByAgent', async (request: Request, env: 
     const url = new URL(request.url);
     const agentID = url.searchParams.get('agentID') || 'BLAKEPPH';
     const week = url.searchParams.get('week') || '0';
-    
+
     // Get weekly data from database
     const weeklyQuery = `
       SELECT
@@ -390,7 +430,7 @@ router.get('/api/manager/getWeeklyFigureByAgent', async (request: Request, env: 
       handle: row.handle || 0,
       win: row.win || 0,
       volume: row.volume || 0,
-      bets: row.bets || 0
+      bets: row.bets || 0,
     }));
 
     // Fill missing days with zeros
@@ -399,28 +439,34 @@ router.get('/api/manager/getWeeklyFigureByAgent', async (request: Request, env: 
       return existing || { day, handle: 0, win: 0, volume: 0, bets: 0 };
     });
 
-    return new Response(JSON.stringify({
-      success: true,
-      data: {
-        agentID: agentID,
-        weeklyFigures: allDays,
-        totalHandle: allDays.reduce((sum, day) => sum + day.handle, 0),
-        totalWin: allDays.reduce((sum, day) => sum + day.win, 0),
-        totalVolume: allDays.reduce((sum, day) => sum + day.volume, 0),
-        totalBets: allDays.reduce((sum, day) => sum + day.bets, 0)
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: {
+          agentID: agentID,
+          weeklyFigures: allDays,
+          totalHandle: allDays.reduce((sum, day) => sum + day.handle, 0),
+          totalWin: allDays.reduce((sum, day) => sum + day.win, 0),
+          totalVolume: allDays.reduce((sum, day) => sum + day.volume, 0),
+          totalBets: allDays.reduce((sum, day) => sum + day.bets, 0),
+        },
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
       }
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    );
   } catch (error) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: 'Failed to fetch weekly figures',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'Failed to fetch weekly figures',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 });
 
@@ -429,24 +475,30 @@ router.get('/api/debug/cache-stats', async (request: Request, env: any) => {
   try {
     const cache = new Fire22Cache(env.DB);
     const stats = cache.getStats();
-    
-    return new Response(JSON.stringify({
-      success: true,
-      cacheStats: stats,
-      source: 'public_debug_endpoint',
-      adminAccess: false
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        cacheStats: stats,
+        source: 'public_debug_endpoint',
+        adminAccess: false,
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({
-      success: false,
-      error: 'Failed to fetch cache stats',
-      message: error.message
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'Failed to fetch cache stats',
+        message: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 });
 
@@ -457,5 +509,5 @@ router.all('*', () => new Response('Not Found', { status: 404 }));
 export default {
   async fetch(request: Request, env: any, ctx: any) {
     return router.handle(request, env, ctx);
-  }
+  },
 };

@@ -65,7 +65,7 @@ export class ResponseManager {
         statusCode: 401,
         category: 'auth',
         retryable: false,
-        logLevel: 'info'
+        logLevel: 'info',
       },
       {
         code: 'FORBIDDEN',
@@ -73,7 +73,7 @@ export class ResponseManager {
         statusCode: 403,
         category: 'auth',
         retryable: false,
-        logLevel: 'warn'
+        logLevel: 'warn',
       },
       {
         code: 'TOKEN_EXPIRED',
@@ -81,7 +81,7 @@ export class ResponseManager {
         statusCode: 401,
         category: 'auth',
         retryable: true,
-        logLevel: 'info'
+        logLevel: 'info',
       },
       {
         code: 'INVALID_TOKEN',
@@ -89,7 +89,7 @@ export class ResponseManager {
         statusCode: 401,
         category: 'auth',
         retryable: false,
-        logLevel: 'warn'
+        logLevel: 'warn',
       },
 
       // Validation errors
@@ -99,7 +99,7 @@ export class ResponseManager {
         statusCode: 400,
         category: 'validation',
         retryable: false,
-        logLevel: 'info'
+        logLevel: 'info',
       },
       {
         code: 'MISSING_REQUIRED_FIELD',
@@ -107,7 +107,7 @@ export class ResponseManager {
         statusCode: 400,
         category: 'validation',
         retryable: false,
-        logLevel: 'info'
+        logLevel: 'info',
       },
       {
         code: 'INVALID_FORMAT',
@@ -115,7 +115,7 @@ export class ResponseManager {
         statusCode: 400,
         category: 'validation',
         retryable: false,
-        logLevel: 'info'
+        logLevel: 'info',
       },
 
       // Client errors
@@ -125,7 +125,7 @@ export class ResponseManager {
         statusCode: 404,
         category: 'client',
         retryable: false,
-        logLevel: 'info'
+        logLevel: 'info',
       },
       {
         code: 'METHOD_NOT_ALLOWED',
@@ -133,7 +133,7 @@ export class ResponseManager {
         statusCode: 405,
         category: 'client',
         retryable: false,
-        logLevel: 'info'
+        logLevel: 'info',
       },
       {
         code: 'UNSUPPORTED_MEDIA_TYPE',
@@ -141,7 +141,7 @@ export class ResponseManager {
         statusCode: 415,
         category: 'client',
         retryable: false,
-        logLevel: 'info'
+        logLevel: 'info',
       },
 
       // Rate limiting
@@ -151,7 +151,7 @@ export class ResponseManager {
         statusCode: 429,
         category: 'rate_limit',
         retryable: true,
-        logLevel: 'warn'
+        logLevel: 'warn',
       },
 
       // Server errors
@@ -161,7 +161,7 @@ export class ResponseManager {
         statusCode: 500,
         category: 'server',
         retryable: true,
-        logLevel: 'error'
+        logLevel: 'error',
       },
       {
         code: 'SERVICE_UNAVAILABLE',
@@ -169,7 +169,7 @@ export class ResponseManager {
         statusCode: 503,
         category: 'server',
         retryable: true,
-        logLevel: 'error'
+        logLevel: 'error',
       },
       {
         code: 'DATABASE_ERROR',
@@ -177,7 +177,7 @@ export class ResponseManager {
         statusCode: 500,
         category: 'server',
         retryable: true,
-        logLevel: 'error'
+        logLevel: 'error',
       },
 
       // Custom errors
@@ -187,7 +187,7 @@ export class ResponseManager {
         statusCode: 406,
         category: 'client',
         retryable: false,
-        logLevel: 'info'
+        logLevel: 'info',
       },
       {
         code: 'FEATURE_DISABLED',
@@ -195,8 +195,8 @@ export class ResponseManager {
         statusCode: 403,
         category: 'client',
         retryable: false,
-        logLevel: 'info'
-      }
+        logLevel: 'info',
+      },
     ];
 
     errors.forEach(error => this.errorDefinitions.set(error.code, error));
@@ -220,7 +220,7 @@ export class ResponseManager {
       data,
       timestamp: new Date().toISOString(),
       requestId,
-      ...options
+      ...options,
     };
 
     return new Response(JSON.stringify(response), {
@@ -228,8 +228,8 @@ export class ResponseManager {
       headers: {
         'Content-Type': 'application/json',
         'X-Request-ID': requestId,
-        ...(options.version && { 'X-API-Version': options.version })
-      }
+        ...(options.version && { 'X-API-Version': options.version }),
+      },
     });
   }
 
@@ -252,7 +252,7 @@ export class ResponseManager {
     if (!errorDef) {
       // Unknown error code
       return this.createErrorResponse('INTERNAL_ERROR', requestId, {
-        details: { originalErrorCode: errorCode }
+        details: { originalErrorCode: errorCode },
       });
     }
 
@@ -262,11 +262,11 @@ export class ResponseManager {
         code: errorCode,
         message: options.customMessage || errorDef.message,
         details: options.details,
-        field: options.field
+        field: options.field,
       },
       timestamp: new Date().toISOString(),
       requestId,
-      version: options.version
+      version: options.version,
     };
 
     // Log error based on level
@@ -297,8 +297,8 @@ export class ResponseManager {
         'X-Error-Category': errorDef.category,
         ...(options.version && { 'X-API-Version': options.version }),
         ...(errorDef.retryable && { 'Retry-After': '60' }),
-        ...(errorDef.category === 'rate_limit' && { 'X-RateLimit-Reset': '60' })
-      }
+        ...(errorDef.category === 'rate_limit' && { 'X-RateLimit-Reset': '60' }),
+      },
     });
   }
 
@@ -331,9 +331,9 @@ export class ResponseManager {
         total: pagination.total,
         totalPages,
         hasNext: pagination.page < totalPages,
-        hasPrev: pagination.page > 1
+        hasPrev: pagination.page > 1,
       },
-      ...options
+      ...options,
     };
 
     return new Response(JSON.stringify(response), {
@@ -344,8 +344,8 @@ export class ResponseManager {
         'X-Total-Count': pagination.total.toString(),
         'X-Page-Count': totalPages.toString(),
         'X-Current-Page': pagination.page.toString(),
-        ...(options.version && { 'X-API-Version': options.version })
-      }
+        ...(options.version && { 'X-API-Version': options.version }),
+      },
     });
   }
 
@@ -371,7 +371,7 @@ export class ResponseManager {
         } catch (error) {
           controller.error(error);
         }
-      }
+      },
     });
 
     return new Response(stream, {
@@ -379,9 +379,9 @@ export class ResponseManager {
         'Content-Type': options.contentType || 'application/json',
         'X-Request-ID': requestId,
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        ...(options.version && { 'X-API-Version': options.version })
-      }
+        Connection: 'keep-alive',
+        ...(options.version && { 'X-API-Version': options.version }),
+      },
     });
   }
 
@@ -408,7 +408,7 @@ export class ResponseManager {
     // Unsupported format
     return this.createErrorResponse('UNSUPPORTED_MEDIA_TYPE', requestId, {
       details: { requested: accept, supported: supportedFormats },
-      version: options.version
+      version: options.version,
     });
   }
 
@@ -470,16 +470,15 @@ export class ResponseManager {
     },
     requestId: string
   ): Response {
-    const statusCode = health.status === 'healthy' ? 200 :
-                      health.status === 'degraded' ? 207 : 503;
+    const statusCode = health.status === 'healthy' ? 200 : health.status === 'degraded' ? 207 : 503;
 
     return this.createSuccessResponse(health, requestId, {
       statusCode,
       metadata: {
         uptime: process.uptime(),
         memory: process.memoryUsage(),
-        version: process.version
-      }
+        version: process.version,
+      },
     });
   }
 
@@ -500,8 +499,8 @@ export class ResponseManager {
       metadata: {
         server: 'Fire22 Dashboard Worker',
         environment: process.env.NODE_ENV || 'development',
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     });
   }
 
@@ -518,8 +517,8 @@ export class ResponseManager {
       message: 'Validation failed',
       details: errors.map(error => ({
         field: error.field || 'unknown',
-        message: error.message || 'Invalid value'
-      }))
+        message: error.message || 'Invalid value',
+      })),
     };
   }
 
@@ -550,7 +549,7 @@ export class ResponseManager {
     return {
       total: errors.length,
       byCategory,
-      byStatusCode
+      byStatusCode,
     };
   }
 }
@@ -562,5 +561,5 @@ export const defaultResponseConfig: ResponseConfig = {
   defaultLanguage: 'en',
   supportedLanguages: ['en', 'es', 'fr', 'de'],
   enableCompression: true,
-  maxResponseSize: 10 * 1024 * 1024 // 10MB
+  maxResponseSize: 10 * 1024 * 1024, // 10MB
 };

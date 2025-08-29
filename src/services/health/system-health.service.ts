@@ -3,12 +3,12 @@
  * Monitors CPU, memory, disk, and network system resources
  */
 
-import * as os from 'os';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as os from "os";
+import * as fs from "fs";
+import * as path from "path";
 
 interface SystemHealthMetrics {
-  status: 'healthy' | 'degraded' | 'critical';
+  status: "healthy" | "degraded" | "critical";
   timestamp: string;
   uptime: number;
   loadAverage: number[];
@@ -34,61 +34,73 @@ export class SystemHealthService {
     cpuUsage: 90, // 90% CPU usage
     memoryUsage: 90, // 90% memory usage
     diskUsage: 90, // 90% disk usage
-    loadAverage: os.cpus().length * 2 // 2x CPU count
+    loadAverage: os.cpus().length * 2, // 2x CPU count
   };
 
   private readonly warningThresholds = {
     cpuUsage: 70,
     memoryUsage: 75,
     diskUsage: 75,
-    loadAverage: os.cpus().length * 1.5
+    loadAverage: os.cpus().length * 1.5,
   };
 
   /**
    * Get overall system status
    */
-  async getSystemStatus(): Promise<{ status: string; message: string; timestamp: string }> {
+  async getSystemStatus(): Promise<{
+    status: string;
+    message: string;
+    timestamp: string;
+  }> {
     try {
       const metrics = await this.getSystemMetrics();
 
-      let status = 'healthy';
-      let message = 'All systems operational';
+      let status = "healthy";
+      let message = "All systems operational";
 
       // Check critical thresholds
       if (metrics.cpuUsage > this.criticalThresholds.cpuUsage) {
-        status = 'critical';
+        status = "critical";
         message = `Critical CPU usage: ${metrics.cpuUsage.toFixed(1)}%`;
-      } else if (metrics.memoryUsage.usagePercent > this.criticalThresholds.memoryUsage) {
-        status = 'critical';
+      } else if (
+        metrics.memoryUsage.usagePercent > this.criticalThresholds.memoryUsage
+      ) {
+        status = "critical";
         message = `Critical memory usage: ${metrics.memoryUsage.usagePercent.toFixed(1)}%`;
-      } else if (metrics.diskUsage.some(disk => disk.usagePercent > this.criticalThresholds.diskUsage)) {
-        status = 'critical';
-        message = 'Critical disk usage detected';
+      } else if (
+        metrics.diskUsage.some(
+          (disk) => disk.usagePercent > this.criticalThresholds.diskUsage,
+        )
+      ) {
+        status = "critical";
+        message = "Critical disk usage detected";
       } else if (metrics.loadAverage[0] > this.criticalThresholds.loadAverage) {
-        status = 'critical';
+        status = "critical";
         message = `Critical load average: ${metrics.loadAverage[0].toFixed(2)}`;
       }
       // Check warning thresholds
       else if (
         metrics.cpuUsage > this.warningThresholds.cpuUsage ||
         metrics.memoryUsage.usagePercent > this.warningThresholds.memoryUsage ||
-        metrics.diskUsage.some(disk => disk.usagePercent > this.warningThresholds.diskUsage) ||
+        metrics.diskUsage.some(
+          (disk) => disk.usagePercent > this.warningThresholds.diskUsage,
+        ) ||
         metrics.loadAverage[0] > this.warningThresholds.loadAverage
       ) {
-        status = 'degraded';
-        message = 'System under elevated load';
+        status = "degraded";
+        message = "System under elevated load";
       }
 
       return {
         status,
         message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       return {
-        status: 'critical',
-        message: `System monitoring error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        timestamp: new Date().toISOString()
+        status: "critical",
+        message: `System monitoring error: ${error instanceof Error ? error.message : "Unknown error"}`,
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -102,7 +114,7 @@ export class SystemHealthService {
 
     return {
       ...metrics,
-      status: status.status as 'healthy' | 'degraded' | 'critical'
+      status: status.status as "healthy" | "degraded" | "critical",
     };
   }
 
@@ -121,13 +133,19 @@ export class SystemHealthService {
       const usage = await this.getCPUUsage();
       const loadAverage = os.loadavg();
       const cores = os.cpus().length;
-      const model = os.cpus()[0]?.model || 'Unknown';
+      const model = os.cpus()[0]?.model || "Unknown";
 
-      let status = 'healthy';
-      if (usage > this.criticalThresholds.cpuUsage || loadAverage[0] > this.criticalThresholds.loadAverage) {
-        status = 'critical';
-      } else if (usage > this.warningThresholds.cpuUsage || loadAverage[0] > this.warningThresholds.loadAverage) {
-        status = 'degraded';
+      let status = "healthy";
+      if (
+        usage > this.criticalThresholds.cpuUsage ||
+        loadAverage[0] > this.criticalThresholds.loadAverage
+      ) {
+        status = "critical";
+      } else if (
+        usage > this.warningThresholds.cpuUsage ||
+        loadAverage[0] > this.warningThresholds.loadAverage
+      ) {
+        status = "degraded";
       }
 
       return {
@@ -136,16 +154,16 @@ export class SystemHealthService {
         loadAverage,
         cores,
         model,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       return {
-        status: 'critical',
+        status: "critical",
         usage: 0,
         loadAverage: [0, 0, 0],
         cores: 0,
-        model: 'Error',
-        timestamp: new Date().toISOString()
+        model: "Error",
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -167,11 +185,11 @@ export class SystemHealthService {
       const used = total - free;
       const usagePercent = (used / total) * 100;
 
-      let status = 'healthy';
+      let status = "healthy";
       if (usagePercent > this.criticalThresholds.memoryUsage) {
-        status = 'critical';
+        status = "critical";
       } else if (usagePercent > this.warningThresholds.memoryUsage) {
-        status = 'degraded';
+        status = "degraded";
       }
 
       return {
@@ -180,16 +198,16 @@ export class SystemHealthService {
         used,
         free,
         usagePercent,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       return {
-        status: 'critical',
+        status: "critical",
         total: 0,
         used: 0,
         free: 0,
         usagePercent: 0,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -212,7 +230,7 @@ export class SystemHealthService {
       const filesystems = [];
 
       // Check common mount points
-      const mountPoints = ['/', '/tmp', '/var', '/usr', '/home'];
+      const mountPoints = ["/", "/tmp", "/var", "/usr", "/home"];
       let hasCriticalDisk = false;
       let hasWarningDisk = false;
 
@@ -232,7 +250,7 @@ export class SystemHealthService {
               total,
               used,
               free,
-              usagePercent: simulatedUsage
+              usagePercent: simulatedUsage,
             });
 
             if (simulatedUsage > this.criticalThresholds.diskUsage) {
@@ -247,23 +265,23 @@ export class SystemHealthService {
         }
       }
 
-      let status = 'healthy';
+      let status = "healthy";
       if (hasCriticalDisk) {
-        status = 'critical';
+        status = "critical";
       } else if (hasWarningDisk) {
-        status = 'degraded';
+        status = "degraded";
       }
 
       return {
         status,
         filesystems,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       return {
-        status: 'critical',
+        status: "critical",
         filesystems: [],
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -289,24 +307,27 @@ export class SystemHealthService {
         if (addresses && addresses.length > 0) {
           const interfaceInfo = {
             name,
-            mac: addresses[0].mac || 'Unknown',
+            mac: addresses[0].mac || "Unknown",
             internal: addresses[0].internal,
-            addresses: addresses.map(addr => `${addr.address}${addr.family === 'IPv6' ? '' : `:${addr.port || ''}`}`)
+            addresses: addresses.map(
+              (addr) =>
+                `${addr.address}${addr.family === "IPv6" ? "" : `:${addr.port || ""}`}`,
+            ),
           };
           interfaces.push(interfaceInfo);
         }
       }
 
       return {
-        status: 'healthy', // Network interfaces are usually always "healthy" if they exist
+        status: "healthy", // Network interfaces are usually always "healthy" if they exist
         interfaces,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       return {
-        status: 'critical',
+        status: "critical",
         interfaces: [],
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -317,7 +338,7 @@ export class SystemHealthService {
   private async getCPUUsage(): Promise<number> {
     try {
       const startUsage = process.cpuUsage();
-      await new Promise(resolve => setTimeout(resolve, 100)); // Sample for 100ms
+      await new Promise((resolve) => setTimeout(resolve, 100)); // Sample for 100ms
       const endUsage = process.cpuUsage(startUsage);
 
       const totalUsage = (endUsage.user + endUsage.system) / 1000; // Convert to milliseconds
@@ -332,11 +353,13 @@ export class SystemHealthService {
   /**
    * Private method to get all system metrics
    */
-  private async getSystemMetrics(): Promise<Omit<SystemHealthMetrics, 'status' | 'timestamp'>> {
+  private async getSystemMetrics(): Promise<
+    Omit<SystemHealthMetrics, "status" | "timestamp">
+  > {
     const [cpuUsage, memoryUsage, diskUsage] = await Promise.all([
       this.getCPUUsage(),
       this.getMemoryHealth(),
-      this.getDiskHealth()
+      this.getDiskHealth(),
     ]);
 
     return {
@@ -347,13 +370,15 @@ export class SystemHealthService {
         total: memoryUsage.total,
         used: memoryUsage.used,
         free: memoryUsage.free,
-        usagePercent: memoryUsage.usagePercent
+        usagePercent: memoryUsage.usagePercent,
       },
       diskUsage: diskUsage.filesystems,
-      networkInterfaces: Object.entries(os.networkInterfaces()).map(([name, addresses]) => ({
-        name,
-        addresses: addresses || []
-      }))
+      networkInterfaces: Object.entries(os.networkInterfaces()).map(
+        ([name, addresses]) => ({
+          name,
+          addresses: addresses || [],
+        }),
+      ),
     };
   }
 }

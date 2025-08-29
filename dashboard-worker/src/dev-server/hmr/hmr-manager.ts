@@ -9,13 +9,13 @@ import type {
   HMRMessageType,
   WebSocketClient,
   WatchConfig,
-  HMRConfig
+  HMRConfig,
 } from '../../../core/types/dev-server';
 
 import {
   PluginManager,
   createDefaultPluginConfig,
-  type FileChangeResult
+  type FileChangeResult,
 } from '../core/file-watcher-plugin';
 
 export class HMRManager {
@@ -36,7 +36,7 @@ export class HMRManager {
       reconnectInterval: 5000,
       maxReconnectAttempts: 5,
       overlay: true,
-      ...hmrConfig
+      ...hmrConfig,
     };
 
     this.watchConfig = {
@@ -45,7 +45,7 @@ export class HMRManager {
       debounceMs: 300,
       usePolling: false,
       interval: 100,
-      ...watchConfig
+      ...watchConfig,
     };
 
     // Initialize plugin manager with default configuration
@@ -140,8 +140,8 @@ export class HMRManager {
                 success: true,
                 action: 'ignore',
                 data: { reason: 'ignored_by_watch_config' },
-                processedBy: 'watch_config'
-              }
+                processedBy: 'watch_config',
+              },
             });
             continue;
           }
@@ -160,8 +160,8 @@ export class HMRManager {
               success: false,
               action: 'ignore',
               error: error instanceof Error ? error.message : 'Unknown error',
-              processedBy: 'error'
-            }
+              processedBy: 'error',
+            },
           });
         }
       }
@@ -189,7 +189,6 @@ export class HMRManager {
         console.log(`🔧 Custom action for ${customChange.change.path}:`, customChange.result.data);
         // Custom actions can be handled here based on the plugin's data
       }
-
     } catch (error) {
       console.error('❌ Failed to process file changes:', error);
     } finally {
@@ -208,7 +207,7 @@ export class HMRManager {
       id: clientId,
       connectedAt: now,
       lastActivity: now,
-      ...client
+      ...client,
     };
 
     this.clients.set(clientId, fullClient);
@@ -219,9 +218,9 @@ export class HMRManager {
       payload: {
         message: 'Connected to HMR server',
         clientId,
-        config: this.config
+        config: this.config,
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     });
 
     console.log(`🔗 HMR client connected: ${clientId}`);
@@ -298,9 +297,9 @@ export class HMRManager {
       type: 'file-change',
       payload: {
         changes,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     this.broadcastMessage(hmrMessage);
@@ -320,9 +319,9 @@ export class HMRManager {
       payload: {
         reason: 'bulk_file_changes',
         changes: changes.length,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     this.broadcastMessage(reloadMessage);
@@ -376,9 +375,9 @@ export class HMRManager {
       payload: {
         message: 'HMR connection established',
         clientId,
-        serverTime: new Date().toISOString()
+        serverTime: new Date().toISOString(),
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   }
 
@@ -393,16 +392,17 @@ export class HMRManager {
       onChange: (callback: (change: FileChangeEvent) => void) => {
         // Simulate occasional file changes for demo
         setInterval(() => {
-          if (Math.random() < 0.1) { // 10% chance every 5 seconds
+          if (Math.random() < 0.1) {
+            // 10% chance every 5 seconds
             const mockChange: FileChangeEvent = {
               type: 'modify',
               path: `${path}/mock-file-${Math.floor(Math.random() * 100)}.ts`,
-              timestamp: new Date()
+              timestamp: new Date(),
             };
             callback(mockChange);
           }
         }, 5000);
-      }
+      },
     };
   }
 
@@ -421,7 +421,7 @@ export class HMRManager {
       clients: this.clients.size,
       watchers: this.watchers.size,
       config: { ...this.config },
-      plugins: this.pluginManager.getStats()
+      plugins: this.pluginManager.getStats(),
     };
   }
 
@@ -440,9 +440,9 @@ export class HMRManager {
       type: 'reload',
       payload: {
         reason,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     this.broadcastMessage(reloadMessage);

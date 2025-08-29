@@ -1,6 +1,6 @@
 /**
  * 🌐 Fire22 Language Manager
- * 
+ *
  * Comprehensive language management system for Fire22 platform
  */
 
@@ -30,13 +30,13 @@ export class Fire22LanguageManager {
   private missingTranslations: Set<string> = new Set();
 
   constructor(defaultLanguage: string = 'en') {
-    this.codes = {...(languageCodes as any)};
+    this.codes = { ...(languageCodes as any) };
     this.metadata = this.codes._metadata as any;
     this.currentLanguage = defaultLanguage;
-    
+
     // Remove metadata from codes object
     delete (this.codes as any)._metadata;
-    
+
     // Initialize metadata if not found
     if (!this.metadata) {
       this.metadata = {
@@ -44,10 +44,10 @@ export class Fire22LanguageManager {
         lastUpdated: new Date().toISOString(),
         totalCodes: Object.keys(this.codes).length,
         supportedLanguages: ['en', 'es', 'pt', 'fr'],
-        defaultLanguage: 'en'
+        defaultLanguage: 'en',
       };
     }
-    
+
     this.detectUserLanguage();
   }
 
@@ -61,9 +61,9 @@ export class Fire22LanguageManager {
       const urlLang = urlParams.get('lang');
       const storedLang = localStorage.getItem('fire22_language');
       const browserLang = navigator.language.split('-')[0];
-      
+
       const detectedLang = urlLang || storedLang || browserLang || this.fallbackLanguage;
-      
+
       if (this.metadata.supportedLanguages.includes(detectedLang)) {
         this.currentLanguage = detectedLang;
       }
@@ -76,7 +76,7 @@ export class Fire22LanguageManager {
   getText(code: string, language?: string): string {
     const lang = language || this.currentLanguage;
     const entry = this.codes[code];
-    
+
     if (!entry) {
       this.missingTranslations.add(code);
       console.warn(`Missing language code: ${code}`);
@@ -84,9 +84,10 @@ export class Fire22LanguageManager {
     }
 
     // Try requested language, then fallback language, then English
-    const text = entry[lang as keyof LanguageCode] || 
-                 entry[this.fallbackLanguage as keyof LanguageCode] || 
-                 entry.en;
+    const text =
+      entry[lang as keyof LanguageCode] ||
+      entry[this.fallbackLanguage as keyof LanguageCode] ||
+      entry.en;
 
     if (!text) {
       this.missingTranslations.add(`${code}:${lang}`);
@@ -107,23 +108,25 @@ export class Fire22LanguageManager {
     }
 
     this.currentLanguage = language;
-    
+
     // Store in localStorage
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('fire22_language', language);
     }
-    
+
     // Update all DOM elements
     this.updateAllLanguageElements();
-    
+
     // Dispatch language change event
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('fire22LanguageChanged', {
-        detail: { 
-          language: language,
-          previousLanguage: this.currentLanguage 
-        }
-      }));
+      window.dispatchEvent(
+        new CustomEvent('fire22LanguageChanged', {
+          detail: {
+            language: language,
+            previousLanguage: this.currentLanguage,
+          },
+        })
+      );
     }
 
     return true;
@@ -160,45 +163,48 @@ export class Fire22LanguageManager {
   /**
    * Search for language codes by text
    */
-  searchCodes(searchTerm: string, language: string = 'en'): Array<{code: string, text: string, context?: string}> {
-    const results: Array<{code: string, text: string, context?: string}> = [];
-    
+  searchCodes(
+    searchTerm: string,
+    language: string = 'en'
+  ): Array<{ code: string; text: string; context?: string }> {
+    const results: Array<{ code: string; text: string; context?: string }> = [];
+
     for (const [code, entry] of Object.entries(this.codes)) {
       const text = entry[language as keyof LanguageCode] as string;
       if (text && text.toLowerCase().includes(searchTerm.toLowerCase())) {
         results.push({
           code,
           text,
-          context: entry.context
+          context: entry.context,
         });
       }
     }
-    
+
     return results;
   }
 
   /**
    * Validate language codes in DOM
    */
-  validateDOMCodes(): Array<{element: Element, code: string, valid: boolean}> {
-    const results: Array<{element: Element, code: string, valid: boolean}> = [];
-    
+  validateDOMCodes(): Array<{ element: Element; code: string; valid: boolean }> {
+    const results: Array<{ element: Element; code: string; valid: boolean }> = [];
+
     if (typeof document !== 'undefined') {
       const elements = document.querySelectorAll('[data-language]');
-      
+
       elements.forEach(element => {
         const code = element.getAttribute('data-language');
         if (code) {
           const valid = this.codes.hasOwnProperty(code);
           results.push({ element, code, valid });
-          
+
           if (!valid) {
             console.warn(`Invalid language code in DOM: ${code}`, element);
           }
         }
       });
     }
-    
+
     return results;
   }
 
@@ -207,52 +213,54 @@ export class Fire22LanguageManager {
    */
   updateAllLanguageElements(): void {
     if (typeof document === 'undefined') return;
-    
+
     const elements = document.querySelectorAll('[data-language]');
     let updatedCount = 0;
-    
+
     elements.forEach(element => {
       const code = element.getAttribute('data-language');
       if (code) {
         const text = this.getText(code);
-        
+
         // Handle different element types
-        if (element.tagName === 'INPUT' && (element as HTMLInputElement).placeholder !== undefined) {
+        if (
+          element.tagName === 'INPUT' &&
+          (element as HTMLInputElement).placeholder !== undefined
+        ) {
           (element as HTMLInputElement).placeholder = text;
         } else if (element.tagName === 'IMG' && (element as HTMLImageElement).alt !== undefined) {
           (element as HTMLImageElement).alt = text;
         } else {
           element.textContent = text;
         }
-        
+
         // Add language attribute for CSS styling
         element.setAttribute('data-lang', this.currentLanguage);
         updatedCount++;
       }
     });
-    
   }
 
   /**
    * Get missing translations report
    */
-  getMissingTranslationsReport(): Array<{code: string, missingLanguages: string[]}> {
-    const report: Array<{code: string, missingLanguages: string[]}> = [];
-    
+  getMissingTranslationsReport(): Array<{ code: string; missingLanguages: string[] }> {
+    const report: Array<{ code: string; missingLanguages: string[] }> = [];
+
     for (const [code, entry] of Object.entries(this.codes)) {
       const missingLanguages: string[] = [];
-      
+
       for (const lang of this.metadata.supportedLanguages) {
         if (!entry[lang as keyof LanguageCode]) {
           missingLanguages.push(lang);
         }
       }
-      
+
       if (missingLanguages.length > 0) {
         report.push({ code, missingLanguages });
       }
     }
-    
+
     return report;
   }
 
@@ -262,29 +270,29 @@ export class Fire22LanguageManager {
   exportTranslations(language: string, format: 'json' | 'csv' = 'json'): string {
     if (format === 'csv') {
       let csv = 'Code,Context,English,Translation\n';
-      
+
       for (const [code, entry] of Object.entries(this.codes)) {
         const context = entry.context || '';
         const english = entry.en || '';
         const translation = entry[language as keyof LanguageCode] || '';
-        
+
         csv += `"${code}","${context}","${english}","${translation}"\n`;
       }
-      
+
       return csv;
     }
-    
+
     // JSON format
     const exportData: Record<string, any> = {};
-    
+
     for (const [code, entry] of Object.entries(this.codes)) {
       exportData[code] = {
         context: entry.context,
         english: entry.en,
-        translation: entry[language as keyof LanguageCode] || ''
+        translation: entry[language as keyof LanguageCode] || '',
       };
     }
-    
+
     return JSON.stringify(exportData, null, 2);
   }
 
@@ -295,7 +303,7 @@ export class Fire22LanguageManager {
     try {
       const translations = JSON.parse(translationsJson);
       let importedCount = 0;
-      
+
       for (const [code, data] of Object.entries(translations)) {
         if (this.codes[code] && data && typeof data === 'object') {
           const translation = (data as any).translation || (data as any)[language];
@@ -305,7 +313,7 @@ export class Fire22LanguageManager {
           }
         }
       }
-      
+
       return true;
     } catch (error) {
       console.error('Failed to import translations:', error);
@@ -324,24 +332,24 @@ export class Fire22LanguageManager {
   } {
     const totalCodes = Object.keys(this.codes).length;
     const completionRates: Record<string, number> = {};
-    
+
     for (const lang of this.metadata.supportedLanguages) {
       let completed = 0;
-      
+
       for (const entry of Object.values(this.codes)) {
         if (entry[lang as keyof LanguageCode]) {
           completed++;
         }
       }
-      
+
       completionRates[lang] = Math.round((completed / totalCodes) * 100);
     }
-    
+
     return {
       totalCodes,
       supportedLanguages: this.metadata.supportedLanguages.length,
       completionRates,
-      missingTranslations: this.missingTranslations.size
+      missingTranslations: this.missingTranslations.size,
     };
   }
 
@@ -403,7 +411,7 @@ export class Fire22LanguageManager {
    */
   formatNumber(number: number, options?: Intl.NumberFormatOptions): string {
     if (typeof Intl === 'undefined') return number.toString();
-    
+
     try {
       return new Intl.NumberFormat(this.currentLanguage, options).format(number);
     } catch (error) {
@@ -416,7 +424,7 @@ export class Fire22LanguageManager {
    */
   formatDate(date: Date, options?: Intl.DateTimeFormatOptions): string {
     if (typeof Intl === 'undefined') return date.toString();
-    
+
     try {
       return new Intl.DateTimeFormat(this.currentLanguage, options).format(date);
     } catch (error) {
@@ -461,12 +469,12 @@ export class Fire22LanguageManagerWithHub extends Fire22LanguageManager {
 
   constructor(defaultLanguage: string = 'en', hubConfig: Partial<HubSyncConfig> = {}) {
     super(defaultLanguage);
-    
+
     this.hubConfig = {
       hubUrl: process.env.HUB_URL || 'http://localhost:3001', // Use 3001 for testing
       autoSync: true,
       syncInterval: 300000, // 5 minutes
-      ...hubConfig
+      ...hubConfig,
     };
 
     if (this.hubConfig.autoSync && typeof window === 'undefined') {
@@ -508,7 +516,7 @@ export class Fire22LanguageManagerWithHub extends Fire22LanguageManager {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(this.hubConfig.apiKey && { 'Authorization': `Bearer ${this.hubConfig.apiKey}` })
+            ...(this.hubConfig.apiKey && { Authorization: `Bearer ${this.hubConfig.apiKey}` }),
           },
           body: JSON.stringify({
             operation: 'push',
@@ -517,9 +525,9 @@ export class Fire22LanguageManagerWithHub extends Fire22LanguageManager {
               currentLanguage: this.getCurrentLanguage(),
               supportedLanguages: this.getSupportedLanguages(),
               statistics: this.getStatistics(),
-              metadata: this.metadata
-            }
-          })
+              metadata: this.metadata,
+            },
+          }),
         });
 
         if (!response.ok) {
@@ -533,8 +541,8 @@ export class Fire22LanguageManagerWithHub extends Fire22LanguageManager {
         const response = await fetch(`${this.hubConfig.hubUrl}/api/hub/language/codes`, {
           method: 'GET',
           headers: {
-            ...(this.hubConfig.apiKey && { 'Authorization': `Bearer ${this.hubConfig.apiKey}` })
-          }
+            ...(this.hubConfig.apiKey && { Authorization: `Bearer ${this.hubConfig.apiKey}` }),
+          },
         });
 
         if (!response.ok) {
@@ -574,9 +582,9 @@ export class Fire22LanguageManagerWithHub extends Fire22LanguageManager {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          ...(this.hubConfig.apiKey && { 'Authorization': `Bearer ${this.hubConfig.apiKey}` })
+          ...(this.hubConfig.apiKey && { Authorization: `Bearer ${this.hubConfig.apiKey}` }),
         },
-        body: JSON.stringify(codeInfo)
+        body: JSON.stringify(codeInfo),
       });
 
       return response.ok;
@@ -598,9 +606,9 @@ export class Fire22LanguageManagerWithHub extends Fire22LanguageManager {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(this.hubConfig.apiKey && { 'Authorization': `Bearer ${this.hubConfig.apiKey}` })
+            ...(this.hubConfig.apiKey && { Authorization: `Bearer ${this.hubConfig.apiKey}` }),
           },
-          body: JSON.stringify({ language })
+          body: JSON.stringify({ language }),
         });
       } catch (error) {
         console.warn('Failed to sync language change with hub:', error);
@@ -620,17 +628,17 @@ export class Fire22LanguageManagerWithHub extends Fire22LanguageManager {
     try {
       const response = await fetch(`${this.hubConfig.hubUrl}/api/hub/health`, {
         method: 'GET',
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(5000),
       });
 
       return {
         connected: response.ok,
-        lastSync: new Date().toISOString()
+        lastSync: new Date().toISOString(),
       };
     } catch (error) {
       return {
         connected: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -655,7 +663,7 @@ if (typeof window !== 'undefined') {
   (window as any).Fire22Language = fire22Language;
   (window as any).Fire22LanguageWithHub = fire22LanguageWithHub;
   (window as any).t = t;
-  
+
   // Auto-update on DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {

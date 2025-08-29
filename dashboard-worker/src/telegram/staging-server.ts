@@ -2,7 +2,7 @@
 
 /**
  * 🎭 Fire22 Telegram Staging Server
- * 
+ *
  * Complete staging environment for testing all Telegram system components
  * before production deployment
  */
@@ -25,145 +25,151 @@ const mockSystemStatus = () => ({
   workflows: { active: Math.floor(Math.random() * 50) + 10 },
   metrics: {
     totalMessages: Math.floor(Math.random() * 10000) + 5000,
-    errors: Math.floor(Math.random() * 10)
-  }
+    errors: Math.floor(Math.random() * 10),
+  },
 });
 
 const mockDashboardData = () => ({
   botStatus: {
     isRunning: true,
     activeUsers: Math.floor(Math.random() * 100) + 20,
-    messagesPerHour: Math.floor(Math.random() * 500) + 200
+    messagesPerHour: Math.floor(Math.random() * 500) + 200,
   },
   queueData: {
     matchedPairs: Math.floor(Math.random() * 50) + 5,
     pendingWithdrawals: Math.floor(Math.random() * 20) + 2,
-    pendingDeposits: Math.floor(Math.random() * 15) + 3
+    pendingDeposits: Math.floor(Math.random() * 15) + 3,
   },
   languageStats: {
     totalLanguages: 4,
-    translationRequests: Math.floor(Math.random() * 2000) + 1000
+    translationRequests: Math.floor(Math.random() * 2000) + 1000,
   },
   realTimeMetrics: {
     responseTime: Math.floor(Math.random() * 50) + 30,
-    errorRate: Math.random() * 0.1
-  }
+    errorRate: Math.random() * 0.1,
+  },
 });
 
 // Staging-specific endpoints
-app.get('/api/staging/status', (c) => {
+app.get('/api/staging/status', c => {
   const systemStatus = mockSystemStatus();
   const dashboardData = mockDashboardData();
-  
+
   return c.json({
     environment: 'staging',
     version: '4.0.0-staging',
     deployTime: new Date().toISOString(),
-    botStatus: systemStatus.status === 'running' 
-      ? { text: 'Online', class: 'status-healthy' } 
-      : { text: 'Offline', class: 'status-error' },
-    queueStatus: dashboardData.queueData.matchedPairs > 0 
-      ? { text: 'Active', class: 'status-healthy' } 
-      : { text: 'Idle', class: 'status-warning' },
+    botStatus:
+      systemStatus.status === 'running'
+        ? { text: 'Online', class: 'status-healthy' }
+        : { text: 'Offline', class: 'status-error' },
+    queueStatus:
+      dashboardData.queueData.matchedPairs > 0
+        ? { text: 'Active', class: 'status-healthy' }
+        : { text: 'Idle', class: 'status-warning' },
     languageStats: dashboardData.languageStats,
     workflowStats: systemStatus.workflows,
     performance: {
       responseTime: `${dashboardData.realTimeMetrics.responseTime}ms`,
       throughput: '1,250 req/s',
       memory: `${Math.round(process.memoryUsage().heapUsed / 1048576)}MB`,
-      errorRate: `${dashboardData.realTimeMetrics.errorRate.toFixed(3)}%`
+      errorRate: `${dashboardData.realTimeMetrics.errorRate.toFixed(3)}%`,
     },
     stats: {
       activeUsers: dashboardData.botStatus.activeUsers,
       messagesPerHour: dashboardData.botStatus.messagesPerHour,
       queueMatches: dashboardData.queueData.matchedPairs,
-      translations: dashboardData.languageStats.translationRequests
+      translations: dashboardData.languageStats.translationRequests,
     },
     bunInfo: {
       version: Bun.version,
       platform: `${process.platform}-${process.arch}`,
       hotReload: process.env.NODE_ENV === 'development',
-      installSpeed: '1.2s'
-    }
+      installSpeed: '1.2s',
+    },
   });
 });
 
-app.post('/api/staging/test', async (c) => {
+app.post('/api/staging/test', async c => {
   // Simulate test run delay
   await new Promise(resolve => setTimeout(resolve, 2000));
-  
+
   const testResults = {
     total: 253,
     passed: 249 + Math.floor(Math.random() * 4),
     failed: Math.floor(Math.random() * 4),
-    coverage: '94%'
+    coverage: '94%',
   };
-  
+
   const benchmarks = {
     translation: `${(Math.random() * 0.5 + 0.5).toFixed(1)}ms avg`,
     queueMatching: `${Math.floor(Math.random() * 20 + 35)}ms avg`,
     workflow: `${Math.floor(Math.random() * 3 + 3)}ms avg`,
-    sse: `${Math.floor(Math.random() * 100 + 900)} events/sec`
+    sse: `${Math.floor(Math.random() * 100 + 900)} events/sec`,
   };
-  
+
   return c.json({
     tests: testResults,
-    benchmarks
+    benchmarks,
   });
 });
 
 // SSE endpoint with mock data
-app.get('/api/dashboard/stream', (c) => {
+app.get('/api/dashboard/stream', c => {
   const headers = {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive',
+    Connection: 'keep-alive',
     'Access-Control-Allow-Origin': '*',
   };
-  
+
   const encoder = new TextEncoder();
-  
+
   const stream = new ReadableStream({
     start(controller) {
       // Send initial data
       const initialData = mockDashboardData();
       controller.enqueue(
-        encoder.encode(`data: ${JSON.stringify({
-          type: 'dashboard_update',
-          data: initialData
-        })}\n\n`)
+        encoder.encode(
+          `data: ${JSON.stringify({
+            type: 'dashboard_update',
+            data: initialData,
+          })}\n\n`
+        )
       );
-      
+
       // Send periodic updates
       const interval = setInterval(() => {
         const updateData = mockDashboardData();
         controller.enqueue(
-          encoder.encode(`data: ${JSON.stringify({
-            type: 'dashboard_update',
-            data: updateData
-          })}\n\n`)
+          encoder.encode(
+            `data: ${JSON.stringify({
+              type: 'dashboard_update',
+              data: updateData,
+            })}\n\n`
+          )
         );
       }, 5000);
-      
+
       // Heartbeat
       const heartbeat = setInterval(() => {
         controller.enqueue(encoder.encode(': heartbeat\n\n'));
       }, 30000);
-      
+
       return () => {
         clearInterval(interval);
         clearInterval(heartbeat);
       };
-    }
+    },
   });
-  
+
   return new Response(stream, { headers });
 });
 
 // Health check
-app.get('/api/health', (c) => {
+app.get('/api/health', c => {
   const memUsage = process.memoryUsage();
-  
+
   return c.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -181,13 +187,13 @@ app.get('/api/health', (c) => {
         total: Math.round(memUsage.heapTotal / 1048576),
       },
       version: Bun.version,
-      environment: 'staging'
-    }
+      environment: 'staging',
+    },
   });
 });
 
 // Serve staging dashboard
-app.get('/dashboard', async (c) => {
+app.get('/dashboard', async c => {
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -717,7 +723,7 @@ app.get('/dashboard', async (c) => {
   </script>
 </body>
 </html>`;
-  
+
   return c.html(html);
 });
 

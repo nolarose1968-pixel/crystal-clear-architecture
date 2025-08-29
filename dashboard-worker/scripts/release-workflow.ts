@@ -35,32 +35,32 @@ class ReleaseWorkflow {
       name: 'Pre-Release Testing',
       description: 'Run comprehensive test suite to ensure system health',
       executor: this.runPreReleaseTests.bind(this),
-      critical: true
+      critical: true,
     },
     {
       name: 'Version Bump',
       description: 'Bump version according to semantic versioning',
       executor: this.bumpVersion.bind(this),
-      critical: true
+      critical: true,
     },
     {
       name: 'Deployment Validation',
       description: 'Validate all systems are ready for production deployment',
       executor: this.validateDeployment.bind(this),
-      critical: true
+      critical: true,
     },
     {
       name: 'Documentation Update',
       description: 'Update changelog and documentation',
       executor: this.updateDocumentation.bind(this),
-      critical: false
+      critical: false,
     },
     {
       name: 'Release Summary',
       description: 'Generate comprehensive release summary',
       executor: this.generateReleaseSummary.bind(this),
-      critical: false
-    }
+      critical: false,
+    },
   ];
 
   async runWorkflow(): Promise<void> {
@@ -79,7 +79,7 @@ class ReleaseWorkflow {
 
     for (const step of this.releaseSteps) {
       console.log(`🔍 ${step.name}: ${step.description}`);
-      
+
       const stepStart = Date.now();
       const passed = await step.executor();
       const duration = Date.now() - stepStart;
@@ -89,7 +89,7 @@ class ReleaseWorkflow {
         status: passed ? 'PASS' : 'FAIL',
         details: passed ? 'Step completed successfully' : 'Step failed',
         duration,
-        critical: step.critical
+        critical: step.critical,
       };
 
       this.results.push(result);
@@ -125,12 +125,12 @@ class ReleaseWorkflow {
   private async runPreReleaseTests(): Promise<boolean> {
     try {
       console.log('   🧪 Running quick test suite...');
-      
+
       // Run quick tests
       const { execSync } = await import('child_process');
-      const testResult = execSync('bun run test:quick', { 
+      const testResult = execSync('bun run test:quick', {
         encoding: 'utf8',
-        stdio: 'pipe'
+        stdio: 'pipe',
       });
 
       if (testResult.includes('✅ Quick test PASSED')) {
@@ -153,11 +153,11 @@ class ReleaseWorkflow {
       }
 
       console.log(`   🔄 Bumping ${this.versionType} version...`);
-      
+
       const { execSync } = await import('child_process');
-      const versionResult = execSync(`bun run version:${this.versionType}`, { 
+      const versionResult = execSync(`bun run version:${this.versionType}`, {
         encoding: 'utf8',
-        stdio: 'pipe'
+        stdio: 'pipe',
       });
 
       if (versionResult.includes('Version bump completed successfully')) {
@@ -176,11 +176,11 @@ class ReleaseWorkflow {
   private async validateDeployment(): Promise<boolean> {
     try {
       console.log('   🔍 Running deployment validation...');
-      
+
       const { execSync } = await import('child_process');
-      const validationResult = execSync('bun run deploy:check', { 
+      const validationResult = execSync('bun run deploy:check', {
         encoding: 'utf8',
-        stdio: 'pipe'
+        stdio: 'pipe',
       });
 
       if (validationResult.includes('🎉 DEPLOYMENT APPROVED!')) {
@@ -199,11 +199,11 @@ class ReleaseWorkflow {
   private async updateDocumentation(): Promise<boolean> {
     try {
       console.log('   📝 Updating documentation...');
-      
+
       // Check if changelog was updated
       const changelogContent = await Bun.file('CHANGELOG.md').text();
       const hasRecentEntry = changelogContent.includes(new Date().toISOString().split('T')[0]);
-      
+
       if (hasRecentEntry) {
         console.log('   ✅ Changelog updated');
         return true;
@@ -220,12 +220,12 @@ class ReleaseWorkflow {
   private async generateReleaseSummary(): Promise<boolean> {
     try {
       console.log('   📊 Generating release summary...');
-      
+
       // Get current version
       const { execSync } = await import('child_process');
-      const versionResult = execSync('bun run version:show', { 
+      const versionResult = execSync('bun run version:show', {
         encoding: 'utf8',
-        stdio: 'pipe'
+        stdio: 'pipe',
       });
 
       const versionMatch = versionResult.match(/Version: (\d+\.\d+\.\d+)/);
@@ -261,10 +261,12 @@ class ReleaseWorkflow {
     // Show failed steps
     if (failed > 0) {
       console.log('\n❌ FAILED STEPS:');
-      this.results.filter(r => r.status === 'FAIL').forEach(result => {
-        const criticalFlag = result.critical ? ' [CRITICAL]' : '';
-        console.log(`   - ${result.step}${criticalFlag}: ${result.details}`);
-      });
+      this.results
+        .filter(r => r.status === 'FAIL')
+        .forEach(result => {
+          const criticalFlag = result.critical ? ' [CRITICAL]' : '';
+          console.log(`   - ${result.step}${criticalFlag}: ${result.details}`);
+        });
     }
 
     // Release recommendation
@@ -319,14 +321,16 @@ async function main() {
   }
 
   const workflow = new ReleaseWorkflow(versionType);
-  
+
   try {
     await workflow.runWorkflow();
-    
+
     // Exit with appropriate code for CI/CD systems
-    const hasCriticalFailures = workflow.exportResults().some(r => r.status === 'FAIL' && r.critical);
+    const hasCriticalFailures = workflow
+      .exportResults()
+      .some(r => r.status === 'FAIL' && r.critical);
     const hasFailures = workflow.exportResults().some(r => r.status === 'FAIL');
-    
+
     if (hasCriticalFailures) {
       process.exit(2); // Critical failures - block release
     } else if (hasFailures) {

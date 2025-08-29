@@ -1,6 +1,8 @@
 # @fire22/security-core
 
-Enterprise-grade security package for Fire22 dashboard with native Bun integration. Provides secure credential management, vulnerability scanning, and environment isolation using Bun's native APIs.
+Enterprise-grade security package for Fire22 dashboard with native Bun
+integration. Provides secure credential management, vulnerability scanning, and
+environment isolation using Bun's native APIs.
 
 ## 🚀 Quick Start
 
@@ -15,18 +17,22 @@ bun run security:integration
 ## 🔐 Features
 
 ### Native Credential Management
-- **OS Keychain Integration**: macOS Keychain, Linux libsecret, Windows Credential Manager
+
+- **OS Keychain Integration**: macOS Keychain, Linux libsecret, Windows
+  Credential Manager
 - **Environment Isolation**: Separate credentials for dev/staging/production
 - **Zero Plaintext**: No secrets in code or config files
 - **Performance**: 1.3ms average credential retrieval
 
 ### Security Scanner
+
 - **Vulnerability Detection**: CVE scanning with severity levels
 - **Custom Policies**: Fire22-specific security rules
 - **Supply Chain Protection**: Malicious package detection
-- **Workspace Integration**: Trusts @fire22/* packages automatically
+- **Workspace Integration**: Trusts @fire22/\* packages automatically
 
 ### Environment Management
+
 - **Multi-Environment**: Seamless dev/staging/production workflow
 - **Credential Validation**: Format checking and security rules
 - **Migration Tools**: Easy migration from .env files
@@ -35,6 +41,7 @@ bun run security:integration
 ## 📦 Integration with Fire22 Packages
 
 ### @fire22/core
+
 ```typescript
 import { initializeFire22Security } from '@fire22/security-core';
 import type { Fire22Config } from '@fire22/core';
@@ -44,12 +51,14 @@ const config = await security.credentialManager.loadFire22Config();
 ```
 
 ### @fire22/middleware
+
 ```typescript
 // JWT secrets stored securely
 const jwtSecret = await security.getCredential('jwt_secret');
 ```
 
 ### @fire22/wager-system
+
 ```typescript
 // Stripe keys encrypted in keychain
 const stripeKey = await security.getCredential('stripe_secret_key');
@@ -58,6 +67,7 @@ const stripeKey = await security.getCredential('stripe_secret_key');
 ## 🛠️ Usage Examples
 
 ### Basic Setup
+
 ```typescript
 import { initializeFire22Security } from '@fire22/security-core';
 
@@ -67,25 +77,26 @@ const security = await initializeFire22Security({
   environments: ['development', 'staging', 'production'],
   scanner: {
     enabled: true,
-    excludePackages: ['@fire22/testing-framework']
-  }
+    excludePackages: ['@fire22/testing-framework'],
+  },
 });
 
 // Store credentials securely
 await security.storeCredential(
-  'database_url', 
+  'database_url',
   'postgresql://user:pass@localhost:5432/fire22',
   'Production database connection',
   'production'
 );
 
 // Retrieve during app startup
-const dbUrl = await security.getCredential('database_url', { 
-  environment: 'production' 
+const dbUrl = await security.getCredential('database_url', {
+  environment: 'production',
 });
 ```
 
 ### Security Scanning
+
 ```typescript
 // Scan workspace dependencies
 const scanResult = await security.scanDependencies();
@@ -97,15 +108,16 @@ if (!scanResult.passed) {
 ```
 
 ### Environment Management
+
 ```typescript
 // Setup secure environment
 await security.setupEnvironment('production');
 
 // Migrate from .env files
 const migration = await security.credentialManager.migrateFromEnv({
-  'DATABASE_URL': 'database_url',
-  'FIRE22_API_TOKEN': 'fire22_api_token',
-  'JWT_SECRET': 'jwt_secret'
+  DATABASE_URL: 'database_url',
+  FIRE22_API_TOKEN: 'fire22_api_token',
+  JWT_SECRET: 'jwt_secret',
 });
 
 console.log('Migrated:', migration.migrated);
@@ -114,6 +126,7 @@ console.log('Migrated:', migration.migrated);
 ## 🔧 Configuration
 
 ### bunfig.toml
+
 ```toml
 [install.security]
 # Use Fire22 security scanner
@@ -132,6 +145,7 @@ scopes = {
 ```
 
 ### Security Config
+
 ```typescript
 const securityConfig = {
   service: 'fire22-dashboard-workspace',
@@ -143,29 +157,29 @@ const securityConfig = {
         name: 'no-crypto-mining',
         pattern: '(crypto|mining|bitcoin)',
         severity: 'fatal',
-        description: 'Cryptocurrency mining packages not allowed'
-      }
-    ]
+        description: 'Cryptocurrency mining packages not allowed',
+      },
+    ],
   },
   credentials: {
     validation: true,
-    rotation: { enabled: false }
-  }
+    rotation: { enabled: false },
+  },
 };
 ```
 
 ## 🌍 Cross-Platform Support
 
-| Platform | Credential Storage | Status |
-|----------|-------------------|--------|
-| macOS | Keychain Services | ✅ Full Support |
-| Linux | libsecret (GNOME/KDE) | ✅ Full Support |  
-| Windows | Credential Manager | ✅ Full Support |
+| Platform | Credential Storage    | Status          |
+| -------- | --------------------- | --------------- |
+| macOS    | Keychain Services     | ✅ Full Support |
+| Linux    | libsecret (GNOME/KDE) | ✅ Full Support |
+| Windows  | Credential Manager    | ✅ Full Support |
 
 ## ⚡ Performance
 
 - **Credential Retrieval**: ~1.3ms average
-- **Dependency Scanning**: ~1ms per package  
+- **Dependency Scanning**: ~1ms per package
 - **Memory Usage**: Minimal overhead
 - **Zero Dependencies**: Pure Bun native APIs
 
@@ -174,7 +188,7 @@ const securityConfig = {
 ```bash
 # Interactive demos
 bun run security:integration    # Full workspace integration demo
-bun run secrets-demo           # Credential management demo  
+bun run secrets-demo           # Credential management demo
 bun run security-demo          # Vulnerability scanner demo
 
 # Production commands
@@ -199,7 +213,7 @@ Perfect integration with Fire22's workspace ecosystem:
 ✅ **Environment Isolation**: Separate credentials per environment  
 ✅ **Workspace Optimization**: Trusts Fire22 internal packages  
 ✅ **Enterprise Ready**: Audit trails and compliance features  
-✅ **High Performance**: Native Bun APIs for maximum speed  
+✅ **High Performance**: Native Bun APIs for maximum speed
 
 ## 🔗 Related Packages
 

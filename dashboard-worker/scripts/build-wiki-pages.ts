@@ -5,10 +5,10 @@
  * Generates static HTML pages from wiki markdown files
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from "fs";
-import { join, basename, dirname, extname } from "path";
-import { marked } from "marked";
-import hljs from "highlight.js";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs';
+import { join, basename, dirname, extname } from 'path';
+import { marked } from 'marked';
+import hljs from 'highlight.js';
 
 // Configure marked with syntax highlighting
 marked.setOptions({
@@ -19,7 +19,7 @@ marked.setOptions({
     return hljs.highlightAuto(code).value;
   },
   breaks: true,
-  gfm: true
+  gfm: true,
 });
 
 interface WikiBuildOptions {
@@ -43,7 +43,7 @@ class WikiPageBuilder {
 
   async build(): Promise<void> {
     console.log('🏗️ Building Wiki Pages');
-    console.log('=====================');
+    console.log('!==!==!==!==');
     console.log(`📂 Source: ${this.source}`);
     console.log(`📂 Output: ${this.output}`);
 
@@ -132,13 +132,13 @@ class WikiPageBuilder {
       content: contentHtml,
       metadata,
       path: outputPath,
-      filename
+      filename,
     });
 
     // Save to output
     const outputFullPath = join(this.output, outputPath);
     const outputDir = dirname(outputFullPath);
-    
+
     if (!existsSync(outputDir)) {
       mkdirSync(outputDir, { recursive: true });
     }
@@ -186,7 +186,7 @@ class WikiPageBuilder {
     filename: string;
   }): string {
     const theme = this.options.theme || 'auto';
-    
+
     return `<!DOCTYPE html>
 <html lang="en" data-theme="${theme}">
 <head>
@@ -365,9 +365,11 @@ class WikiPageBuilder {
     <main class="wiki-container">
         <div class="breadcrumb">
             <a href="/wiki">Wiki</a> / 
-            ${options.path.split('/').slice(0, -1).map((part, i, arr) => 
-                `<a href="/wiki/${arr.slice(0, i + 1).join('/')}">${part}</a>`
-            ).join(' / ')}
+            ${options.path
+              .split('/')
+              .slice(0, -1)
+              .map((part, i, arr) => `<a href="/wiki/${arr.slice(0, i + 1).join('/')}">${part}</a>`)
+              .join(' / ')}
             ${options.path.split('/').length > 1 ? ' / ' : ''}
             <span>${options.title}</span>
         </div>
@@ -421,8 +423,8 @@ class WikiPageBuilder {
         { title: 'API', path: '/api', pages: [] },
         { title: 'Development', path: '/development', pages: [] },
         { title: 'Architecture', path: '/architecture', pages: [] },
-        { title: 'Operations', path: '/operations', pages: [] }
-      ]
+        { title: 'Operations', path: '/operations', pages: [] },
+      ],
     };
 
     // Populate navigation from pages
@@ -434,10 +436,7 @@ class WikiPageBuilder {
     });
 
     // Save navigation JSON
-    writeFileSync(
-      join(this.output, 'navigation.json'),
-      JSON.stringify(nav, null, 2)
-    );
+    writeFileSync(join(this.output, 'navigation.json'), JSON.stringify(nav, null, 2));
 
     console.log('✅ Navigation generated');
   }
@@ -491,12 +490,16 @@ class WikiPageBuilder {
     const baseUrl = 'https://brendadeeznuts1111.github.io/fire22-dashboard-worker';
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${Array.from(this.pages.entries()).map(([path, title]) => `  <url>
+${Array.from(this.pages.entries())
+  .map(
+    ([path, title]) => `  <url>
     <loc>${baseUrl}/wiki/${path}</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>`).join('\n')}
+  </url>`
+  )
+  .join('\n')}
 </urlset>`;
 
     writeFileSync(join(this.output, 'sitemap.xml'), sitemap);

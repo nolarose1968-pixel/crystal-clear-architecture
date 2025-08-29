@@ -3,9 +3,9 @@
  * Domain-Driven Design Implementation
  */
 
-import { DomainEntity } from '../../shared/domain-entity';
-import { BalanceLimits } from '../value-objects/balance-limits';
-import { DomainError } from '../../shared/domain-entity';
+import { DomainEntity } from "../../shared/domain-entity";
+import { BalanceLimits } from "../value-objects/balance-limits";
+import { DomainError } from "../../shared/domain-entity";
 
 export class Balance extends DomainEntity {
   private constructor(
@@ -17,7 +17,7 @@ export class Balance extends DomainEntity {
     private isActive: boolean,
     private lastActivity: Date,
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
   ) {
     super(id, createdAt, updatedAt);
   }
@@ -34,7 +34,10 @@ export class Balance extends DomainEntity {
     const initialBalance = params.initialBalance || 0;
 
     if (!limits.isWithinLimits(initialBalance)) {
-      throw new DomainError('Initial balance violates limits', 'INVALID_INITIAL_BALANCE');
+      throw new DomainError(
+        "Initial balance violates limits",
+        "INVALID_INITIAL_BALANCE",
+      );
     }
 
     return new Balance(
@@ -46,7 +49,7 @@ export class Balance extends DomainEntity {
       true,
       now,
       now,
-      now
+      now,
     );
   }
 
@@ -60,14 +63,17 @@ export class Balance extends DomainEntity {
       data.isActive,
       new Date(data.lastActivity),
       new Date(data.createdAt),
-      new Date(data.updatedAt)
+      new Date(data.updatedAt),
     );
   }
 
   // Business methods
   canDebit(amount: number): boolean {
     if (!this.isActive) {
-      throw new DomainError('Cannot debit inactive balance', 'BALANCE_INACTIVE');
+      throw new DomainError(
+        "Cannot debit inactive balance",
+        "BALANCE_INACTIVE",
+      );
     }
 
     const newBalance = this.currentBalance - amount;
@@ -76,7 +82,10 @@ export class Balance extends DomainEntity {
 
   canCredit(amount: number): boolean {
     if (!this.isActive) {
-      throw new DomainError('Cannot credit inactive balance', 'BALANCE_INACTIVE');
+      throw new DomainError(
+        "Cannot credit inactive balance",
+        "BALANCE_INACTIVE",
+      );
     }
 
     const newBalance = this.currentBalance + amount;
@@ -85,7 +94,10 @@ export class Balance extends DomainEntity {
 
   debit(amount: number, reason: string, performedBy: string): BalanceChange {
     if (!this.canDebit(amount)) {
-      throw new DomainError('Debit would violate balance limits', 'INSUFFICIENT_FUNDS');
+      throw new DomainError(
+        "Debit would violate balance limits",
+        "INSUFFICIENT_FUNDS",
+      );
     }
 
     const previousBalance = this.currentBalance;
@@ -95,18 +107,21 @@ export class Balance extends DomainEntity {
 
     return BalanceChange.create({
       balanceId: this.getId(),
-      changeType: 'debit',
+      changeType: "debit",
       amount: -amount,
       previousBalance,
       newBalance: this.currentBalance,
       reason,
-      performedBy
+      performedBy,
     });
   }
 
   credit(amount: number, reason: string, performedBy: string): BalanceChange {
     if (!this.canCredit(amount)) {
-      throw new DomainError('Credit would violate balance limits', 'EXCEEDS_MAX_BALANCE');
+      throw new DomainError(
+        "Credit would violate balance limits",
+        "EXCEEDS_MAX_BALANCE",
+      );
     }
 
     const previousBalance = this.currentBalance;
@@ -116,12 +131,12 @@ export class Balance extends DomainEntity {
 
     return BalanceChange.create({
       balanceId: this.getId(),
-      changeType: 'credit',
+      changeType: "credit",
       amount,
       previousBalance,
       newBalance: this.currentBalance,
       reason,
-      performedBy
+      performedBy,
     });
   }
 
@@ -136,20 +151,32 @@ export class Balance extends DomainEntity {
   }
 
   // Getters
-  getCustomerId(): string { return this.customerId; }
-  getAgentId(): string { return this.agentId; }
-  getCurrentBalance(): number { return this.currentBalance; }
-  getLimits(): BalanceLimits { return this.limits; }
-  getIsActive(): boolean { return this.isActive; }
-  getLastActivity(): Date { return this.lastActivity; }
+  getCustomerId(): string {
+    return this.customerId;
+  }
+  getAgentId(): string {
+    return this.agentId;
+  }
+  getCurrentBalance(): number {
+    return this.currentBalance;
+  }
+  getLimits(): BalanceLimits {
+    return this.limits;
+  }
+  getIsActive(): boolean {
+    return this.isActive;
+  }
+  getLastActivity(): Date {
+    return this.lastActivity;
+  }
 
   // Business rules
-  getThresholdStatus(): 'normal' | 'warning' | 'critical' {
+  getThresholdStatus(): "normal" | "warning" | "critical" {
     return this.limits.getThresholdStatus(this.currentBalance);
   }
 
   requiresAttention(): boolean {
-    return this.getThresholdStatus() !== 'normal';
+    return this.getThresholdStatus() !== "normal";
   }
 
   toJSON(): any {
@@ -164,12 +191,12 @@ export class Balance extends DomainEntity {
         warningThreshold: this.limits.getWarningThreshold(),
         criticalThreshold: this.limits.getCriticalThreshold(),
         dailyChangeLimit: this.limits.getDailyChangeLimit(),
-        weeklyChangeLimit: this.limits.getWeeklyChangeLimit()
+        weeklyChangeLimit: this.limits.getWeeklyChangeLimit(),
       },
       isActive: this.isActive,
       lastActivity: this.lastActivity.toISOString(),
       createdAt: this.getCreatedAt().toISOString(),
-      updatedAt: this.getUpdatedAt().toISOString()
+      updatedAt: this.getUpdatedAt().toISOString(),
     };
   }
 }
@@ -179,7 +206,7 @@ export class BalanceChange extends DomainEntity {
   private constructor(
     id: string,
     private readonly balanceId: string,
-    private readonly changeType: 'credit' | 'debit';
+    private readonly changeType: "credit" | "debit",
     private readonly amount: number,
     private readonly previousBalance: number,
     private readonly newBalance: number,
@@ -187,14 +214,14 @@ export class BalanceChange extends DomainEntity {
     private readonly performedBy: string,
     private readonly metadata?: Record<string, any>,
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
   ) {
     super(id, createdAt, updatedAt);
   }
 
   static create(params: {
     balanceId: string;
-    changeType: 'credit' | 'debit';
+    changeType: "credit" | "debit";
     amount: number;
     previousBalance: number;
     newBalance: number;
@@ -214,19 +241,35 @@ export class BalanceChange extends DomainEntity {
       params.performedBy,
       params.metadata,
       now,
-      now
+      now,
     );
   }
 
   // Getters
-  getBalanceId(): string { return this.balanceId; }
-  getChangeType(): string { return this.changeType; }
-  getAmount(): number { return this.amount; }
-  getPreviousBalance(): number { return this.previousBalance; }
-  getNewBalance(): number { return this.newBalance; }
-  getReason(): string { return this.reason; }
-  getPerformedBy(): string { return this.performedBy; }
-  getMetadata(): Record<string, any> | undefined { return this.metadata; }
+  getBalanceId(): string {
+    return this.balanceId;
+  }
+  getChangeType(): string {
+    return this.changeType;
+  }
+  getAmount(): number {
+    return this.amount;
+  }
+  getPreviousBalance(): number {
+    return this.previousBalance;
+  }
+  getNewBalance(): number {
+    return this.newBalance;
+  }
+  getReason(): string {
+    return this.reason;
+  }
+  getPerformedBy(): string {
+    return this.performedBy;
+  }
+  getMetadata(): Record<string, any> | undefined {
+    return this.metadata;
+  }
 
   toJSON(): any {
     return {
@@ -240,7 +283,7 @@ export class BalanceChange extends DomainEntity {
       performedBy: this.performedBy,
       metadata: this.metadata,
       createdAt: this.getCreatedAt().toISOString(),
-      updatedAt: this.getUpdatedAt().toISOString()
+      updatedAt: this.getUpdatedAt().toISOString(),
     };
   }
 }

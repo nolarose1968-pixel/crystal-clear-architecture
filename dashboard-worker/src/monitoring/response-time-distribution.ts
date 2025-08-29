@@ -8,7 +8,7 @@ export class ResponseTimeDistribution {
   private measurements: number[];
   private maxMeasurements: number;
   private bucketRanges: number[];
-  
+
   // Statistics cache
   private stats: {
     count: number;
@@ -29,15 +29,13 @@ export class ResponseTimeDistribution {
   constructor(maxMeasurements = 10000) {
     this.maxMeasurements = maxMeasurements;
     this.measurements = [];
-    
+
     // Define histogram buckets (in milliseconds)
-    this.bucketRanges = [
-      0, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, Infinity
-    ];
-    
+    this.bucketRanges = [0, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, Infinity];
+
     this.buckets = new Map();
     this.bucketRanges.forEach(range => this.buckets.set(range, 0));
-    
+
     this.stats = this.getEmptyStats();
   }
 
@@ -76,7 +74,7 @@ export class ResponseTimeDistribution {
    */
   private calculatePercentile(percentile: number): number {
     if (this.measurements.length === 0) return 0;
-    
+
     const sorted = [...this.measurements].sort((a, b) => a - b);
     const index = Math.ceil((percentile / 100) * sorted.length) - 1;
     return sorted[Math.max(0, index)];
@@ -87,9 +85,10 @@ export class ResponseTimeDistribution {
    */
   private calculateStdDev(mean: number): number {
     if (this.measurements.length === 0) return 0;
-    
+
     const squaredDiffs = this.measurements.map(value => Math.pow(value - mean, 2));
-    const avgSquaredDiff = squaredDiffs.reduce((sum, value) => sum + value, 0) / this.measurements.length;
+    const avgSquaredDiff =
+      squaredDiffs.reduce((sum, value) => sum + value, 0) / this.measurements.length;
     return Math.sqrt(avgSquaredDiff);
   }
 
@@ -110,7 +109,7 @@ export class ResponseTimeDistribution {
       p99: 0,
       p999: 0,
       stdDev: 0,
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     };
   }
 
@@ -143,7 +142,7 @@ export class ResponseTimeDistribution {
       p99: this.calculatePercentile(99),
       p999: this.calculatePercentile(99.9),
       stdDev: this.calculateStdDev(mean),
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     };
 
     return this.stats;
@@ -154,18 +153,18 @@ export class ResponseTimeDistribution {
    */
   getHistogram() {
     const histogram = [];
-    
+
     for (let i = 0; i < this.bucketRanges.length - 1; i++) {
       const rangeStart = this.bucketRanges[i];
       const rangeEnd = this.bucketRanges[i + 1];
       const count = this.buckets.get(rangeStart) || 0;
-      
+
       histogram.push({
         range: rangeEnd === Infinity ? `>${rangeStart}ms` : `${rangeStart}-${rangeEnd}ms`,
         rangeStart,
         rangeEnd,
         count,
-        percentage: this.measurements.length > 0 ? (count / this.measurements.length) * 100 : 0
+        percentage: this.measurements.length > 0 ? (count / this.measurements.length) * 100 : 0,
       });
     }
 
@@ -184,10 +183,12 @@ export class ResponseTimeDistribution {
       histogram,
       summary: {
         fast: histogram.filter(h => h.rangeStart < 100).reduce((sum, h) => sum + h.count, 0),
-        medium: histogram.filter(h => h.rangeStart >= 100 && h.rangeStart < 1000).reduce((sum, h) => sum + h.count, 0),
+        medium: histogram
+          .filter(h => h.rangeStart >= 100 && h.rangeStart < 1000)
+          .reduce((sum, h) => sum + h.count, 0),
         slow: histogram.filter(h => h.rangeStart >= 1000).reduce((sum, h) => sum + h.count, 0),
-        totalRequests: stats.count
-      }
+        totalRequests: stats.count,
+      },
     };
   }
 
@@ -208,7 +209,7 @@ export class ResponseTimeDistribution {
       measurements: [...this.measurements],
       timestamp: Date.now(),
       stats: this.getStats(),
-      histogram: this.getHistogram()
+      histogram: this.getHistogram(),
     };
   }
 }
@@ -225,17 +226,17 @@ export class ResponseTimeMonitor {
     timestamp: number;
     severity: 'warning' | 'critical';
   }>;
-  
+
   // Alert thresholds (in ms)
   private thresholds = {
     warning: {
       p95: 1000,
-      p99: 2000
+      p99: 2000,
     },
     critical: {
       p95: 2000,
-      p99: 5000
-    }
+      p99: 5000,
+    },
   };
 
   constructor() {
@@ -281,18 +282,34 @@ export class ResponseTimeMonitor {
     if (!distribution) return;
 
     const stats = distribution.getStats();
-    
+
     // Check critical thresholds
     if (stats.p95 > this.thresholds.critical.p95) {
-      this.addAlert(endpoint, `P95 response time (${stats.p95.toFixed(2)}ms) exceeds critical threshold`, 'critical');
+      this.addAlert(
+        endpoint,
+        `P95 response time (${stats.p95.toFixed(2)}ms) exceeds critical threshold`,
+        'critical'
+      );
     } else if (stats.p95 > this.thresholds.warning.p95) {
-      this.addAlert(endpoint, `P95 response time (${stats.p95.toFixed(2)}ms) exceeds warning threshold`, 'warning');
+      this.addAlert(
+        endpoint,
+        `P95 response time (${stats.p95.toFixed(2)}ms) exceeds warning threshold`,
+        'warning'
+      );
     }
 
     if (stats.p99 > this.thresholds.critical.p99) {
-      this.addAlert(endpoint, `P99 response time (${stats.p99.toFixed(2)}ms) exceeds critical threshold`, 'critical');
+      this.addAlert(
+        endpoint,
+        `P99 response time (${stats.p99.toFixed(2)}ms) exceeds critical threshold`,
+        'critical'
+      );
     } else if (stats.p99 > this.thresholds.warning.p99) {
-      this.addAlert(endpoint, `P99 response time (${stats.p99.toFixed(2)}ms) exceeds warning threshold`, 'warning');
+      this.addAlert(
+        endpoint,
+        `P99 response time (${stats.p99.toFixed(2)}ms) exceeds warning threshold`,
+        'warning'
+      );
     }
   }
 
@@ -302,9 +319,8 @@ export class ResponseTimeMonitor {
   private addAlert(endpoint: string, message: string, severity: 'warning' | 'critical') {
     // Prevent duplicate alerts within 5 minutes
     const recentAlert = this.alerts.find(
-      a => a.endpoint === endpoint && 
-          a.message === message && 
-          Date.now() - a.timestamp < 5 * 60 * 1000
+      a =>
+        a.endpoint === endpoint && a.message === message && Date.now() - a.timestamp < 5 * 60 * 1000
     );
 
     if (!recentAlert) {
@@ -312,7 +328,7 @@ export class ResponseTimeMonitor {
         endpoint,
         message,
         timestamp: Date.now(),
-        severity
+        severity,
       });
 
       // Keep only last 100 alerts
@@ -346,7 +362,7 @@ export class ResponseTimeMonitor {
    */
   getAllStats() {
     const endpoints: Record<string, any> = {};
-    
+
     this.distributions.forEach((distribution, endpoint) => {
       endpoints[endpoint] = distribution.getDistribution();
     });
@@ -359,8 +375,8 @@ export class ResponseTimeMonitor {
         totalEndpoints: this.distributions.size,
         totalRequests: this.globalDistribution.getStats().count,
         averageResponseTime: this.globalDistribution.getStats().mean,
-        activeAlerts: this.alerts.filter(a => Date.now() - a.timestamp < 5 * 60 * 1000).length
-      }
+        activeAlerts: this.alerts.filter(a => Date.now() - a.timestamp < 5 * 60 * 1000).length,
+      },
     };
   }
 

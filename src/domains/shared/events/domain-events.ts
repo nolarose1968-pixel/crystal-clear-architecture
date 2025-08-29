@@ -3,7 +3,7 @@
  * Event-driven communication between domains
  */
 
-import { DomainEvent } from './domain-event';
+// DomainEvent interface is defined below in this file
 
 type EventHandler<T extends DomainEvent> = (event: T) => Promise<void> | void;
 type EventHandlerMap = Map<string, EventHandler<any>[]>;
@@ -29,7 +29,7 @@ export class DomainEvents {
    */
   subscribe<T extends DomainEvent>(
     eventType: string,
-    handler: EventHandler<T>
+    handler: EventHandler<T>,
   ): void {
     if (!this.handlers.has(eventType)) {
       this.handlers.set(eventType, []);
@@ -42,7 +42,7 @@ export class DomainEvents {
    */
   unsubscribe<T extends DomainEvent>(
     eventType: string,
-    handler: EventHandler<T>
+    handler: EventHandler<T>,
   ): void {
     const handlers = this.handlers.get(eventType);
     if (handlers) {
@@ -58,14 +58,14 @@ export class DomainEvents {
    */
   async publish<T extends DomainEvent>(
     eventType: string,
-    event: T
+    event: T,
   ): Promise<void> {
     // Log event
     console.log(`📢 Domain Event: ${eventType}`, {
       eventId: event.eventId,
       aggregateId: event.aggregateId,
       timestamp: event.timestamp,
-      version: event.version
+      version: event.version,
     });
 
     // Publish to event bus
@@ -75,14 +75,14 @@ export class DomainEvents {
     const handlers = this.handlers.get(eventType);
     if (handlers) {
       await Promise.all(
-        handlers.map(handler => {
+        handlers.map((handler) => {
           try {
             return handler(event);
           } catch (error) {
             console.error(`Error in event handler for ${eventType}:`, error);
             return Promise.resolve(); // Don't let one handler break others
           }
-        })
+        }),
       );
     }
   }
@@ -110,19 +110,19 @@ class EventBus {
 
   async publish<T extends DomainEvent>(
     eventType: string,
-    event: T
+    event: T,
   ): Promise<void> {
     const handlers = this.subscribers.get(eventType);
     if (handlers) {
       await Promise.all(
-        handlers.map(handler => {
+        handlers.map((handler) => {
           try {
             return handler(event);
           } catch (error) {
             console.error(`Event bus error for ${eventType}:`, error);
             return Promise.resolve();
           }
-        })
+        }),
       );
     }
   }
@@ -161,6 +161,8 @@ export interface DomainEvent {
     sessionId?: string;
     correlationId?: string;
     causationId?: string;
+    timezone?: string;
+    timezoneContext?: string;
   };
 }
 
@@ -192,12 +194,17 @@ export abstract class BaseDomainEvent implements DomainEvent {
       sessionId?: string;
       correlationId?: string;
       causationId?: string;
-    }
+      timezone?: string;
+      timezoneContext?: string;
+    },
   ) {
     // Fallback for environments without crypto.randomUUID
-    this.eventId = (typeof globalThis !== 'undefined' && globalThis.crypto && globalThis.crypto.randomUUID)
-      ? globalThis.crypto.randomUUID()
-      : `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    this.eventId =
+      typeof globalThis !== "undefined" &&
+      globalThis.crypto &&
+      globalThis.crypto.randomUUID
+        ? globalThis.crypto.randomUUID()
+        : `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     this.eventType = eventType;
     this.aggregateId = aggregateId;
     this.aggregateType = aggregateType;

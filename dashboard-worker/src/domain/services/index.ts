@@ -27,10 +27,7 @@ export interface ServiceOptions {
 }
 
 // Factory function for creating service instances with configuration
-export function createService<T>(
-  ServiceClass: new () => T,
-  options?: ServiceOptions
-): T {
+export function createService<T>(ServiceClass: new () => T, options?: ServiceOptions): T {
   const instance = new ServiceClass();
 
   // Apply options if the service supports configuration
