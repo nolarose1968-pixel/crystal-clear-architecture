@@ -1,0 +1,80 @@
+# Fire22 Enterprise System - Bun Configuration
+# Following Bun semver conventions with enterprise-grade versioning
+
+[install]
+registry = "https://registry.npmjs.org/"
+cache = true
+dev = true
+
+# Version Management Configuration
+[version]
+# Fire22 follows semantic versioning with Bun's enhanced conventions
+# Format: MAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]
+# Example: 2.0.3-architecture+20241219
+
+# Version bump strategies
+major = ["BREAKING CHANGES", "major"]
+minor = ["feat", "minor"]
+patch = ["fix", "perf", "docs", "style", "refactor", "test", "build", "ci", "chore", "revert"]
+
+# Pre-release identifiers for different environments
+prerelease = ["alpha", "beta", "rc", "architecture", "testing", "development"]
+
+# Build metadata for CI/CD tracking
+build = ["timestamp", "commit", "pipeline"]
+
+# Domain-specific versioning
+[version.domains]
+collections = "1.0.0"
+balance = "1.0.0"
+wager = "1.0.0"
+settlement = "0.1.0-testing"
+vip = "1.0.0"
+user-management = "1.0.0"
+fantasy42 = "1.0.0"
+telegram = "1.0.0"
+dashboard = "1.0.0"
+health-monitoring = "1.0.0"
+security = "1.0.0"
+database = "1.0.0"
+
+# Architecture versioning
+[version.architecture]
+domain-architecture = "2.3.0"
+system-blueprint = "1.0.0"
+technical-overview = "1.0.0"
+
+# Release channels
+[version.channels]
+stable = "latest"
+testing = "testing"
+development = "dev"
+architecture = "architecture"
+
+# Dependencies version constraints
+[version.dependencies]
+bun = "^1.0.0"
+typescript = "^5.0.0"
+semver = "^7.0.0"
+
+# Version validation rules
+[version.validation]
+require-changelog = true
+require-tests = true
+require-documentation = true
+enforce-semantic-commits = true
+
+# Version automation
+[version.automation]
+auto-tag = true
+auto-changelog = true
+auto-release-notes = true
+github-releases = true
+
+# Version metadata
+[version.metadata]
+organization = "Fire22"
+project = "Enterprise System"
+architecture = "Domain-Driven Design"
+runtime = "Bun v1.x"
+framework = "Crystal Clear Architecture"

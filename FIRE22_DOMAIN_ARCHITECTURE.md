@@ -183,7 +183,9 @@ Notifications → All Domains (OPTIONAL)
 
 ---
 
-**ARCHITECTURE VERSION**: FF-Domain-Architecture-v2.0.3.23
+**ARCHITECTURE VERSION**: FF-Domain-Architecture-2.0.3
 **LAST UPDATED**: 2024-12-19T00:00:00.000Z
 **STATUS**: Production Live 🟢
 **NEXT REVIEW**: Q2 2024
+**BUN SEMVER**: Compliant ✅
+**VERSION FORMAT**: 2.0.3+20241219.a299ce5

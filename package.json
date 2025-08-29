@@ -1,4 +1,24 @@
 {
+  "name": "@fire22/enterprise-system",
+  "version": "2.3.0-architecture+20241219",
+  "description": "Fire22 Enterprise System - Domain-Driven Architecture",
+  "author": "Fire22 Team",
+  "license": "MIT",
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nolarose1968-pixel/crystal-clear-architecture.git"
+  },
+  "keywords": [
+    "fire22",
+    "enterprise",
+    "domain-driven-design",
+    "bun",
+    "typescript",
+    "architecture"
+  ],
   "dependencies": {
     "@iarna/toml": "^2.2.5",
     "@types/bun": "^1.2.21",
@@ -26,12 +46,24 @@
   },
   "scripts": {
     "build": "node build/build.js",
-    "build:analyze": "node build/build.js && npx webpack-bundle-analyzer build/stats.json",
+    "build:analyze": "node build/build.js && bunx webpack-bundle-analyzer build/stats.json",
     "build:dev": "NODE_ENV=development node build/build.js",
     "build:prod": "NODE_ENV=production node build/build.js",
-    "optimize": "npm run build:prod && npm run build:analyze",
-    "serve": "npx serve build -p 3000",
+    "optimize": "bun run build:prod && bun run build:analyze",
+    "serve": "bunx serve build -p 3000",
     "dashboard:dev": "node dashboard-server.js",
-    "lighthouse": "npx lighthouse http://localhost:3000/analytics/ --output=json --output-path=./build/lighthouse-report.json"
+    "lighthouse": "bunx lighthouse http://localhost:3000/analytics/ --output=json --output-path=./build/lighthouse-report.json",
+
+    "version:major": "bun run scripts/version-manager.ts --bump major",
+    "version:minor": "bun run scripts/version-manager.ts --bump minor",
+    "version:patch": "bun run scripts/version-manager.ts --bump patch",
+    "version:prerelease": "bun run scripts/version-manager.ts --prerelease",
+    "version:release": "bun run scripts/version-manager.ts --release",
+    "version:status": "bun run scripts/version-manager.ts --status",
+    "version:validate": "bun run scripts/version-manager.ts --validate",
+
+    "release:prepare": "bun run version:validate && bun run build:prod",
+    "release:tag": "bun run scripts/version-manager.ts --tag",
+    "release:notes": "bun run scripts/version-manager.ts --changelog"
   }
 }
