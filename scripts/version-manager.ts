@@ -75,7 +75,7 @@ class Fire22VersionManager {
     return semver.valid(version) !== null;
   }
 
-  private generateBuildMetadata(): string {
+  private async generateBuildMetadata(): Promise<string> {
     const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const commit = await $`git rev-parse --short HEAD`.text().trim();
     return `${timestamp}.${commit}`;
