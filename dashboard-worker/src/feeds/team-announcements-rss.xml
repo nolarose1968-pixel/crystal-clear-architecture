@@ -15,9 +15,9 @@
     <atom:link href="https://dashboard-worker.fire22.workers.dev/feeds/team-announcements-rss.xml" rel="self" type="application/rss+xml" />
 
     <image>
-      <url>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/assets/fire22-logo.png</url>
+      <url>https://dashboard-worker.nolarose2503.workers.dev/assets/fire22-logo.png</url>
       <title>Fire22 Team Announcements</title>
-      <link>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/</link>
+      <link>https://dashboard-worker.nolarose2503.workers.dev/</link>
       <width>144</width>
       <height>144</height>
       <description>Fire22 Team Announcements Feed</description>

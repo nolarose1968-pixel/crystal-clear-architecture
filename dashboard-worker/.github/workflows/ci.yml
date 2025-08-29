@@ -61,6 +61,11 @@ jobs:
             docs-changes:
               - 'docs/**'
               - '*.md'
+            rss-feeds:
+              - 'src/feeds/**'
+              - 'scripts/build-feeds*.ts'
+              - 'scripts/deploy-feeds.ts'
+              - 'scripts/validate-feeds.ts'
 
   # Code quality and linting
   code-quality:
@@ -239,6 +244,59 @@ jobs:
             benchmark-results.json
             standalone-benchmark-results.json
           retention-days: 30
+
+  # RSS Feeds Build and Validation
+  rss-feeds:
+    name: 📡 RSS Feeds Build & Deploy
+    runs-on: ubuntu-latest
+    needs: [detect-changes, code-quality]
+    if: needs.detect-changes.outputs.rss-feeds == 'true' || needs.detect-changes.outputs.root-changes == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      
+      - name: 📦 Install Dependencies
+        run: bun install --frozen-lockfile
+      
+      - name: 📡 Build RSS Feeds Module
+        run: bun run scripts/build-feeds-module.ts
+      
+      - name: 🔧 Build RSS Feeds
+        run: bun run feeds:build
+      
+      - name: ✅ Validate RSS Feeds
+        run: |
+          # Validate all RSS/Atom feeds
+          for feed in src/feeds/*.xml; do
+            echo "Validating $feed..."
+            xmllint --noout "$feed" || exit 1
+          done
+      
+      - name: 🧪 Test RSS Feed Handler
+        run: |
+          bun test src/feeds-handler.ts
+          bun test scripts/build-feeds-module.ts
+      
+      - name: 📊 RSS Feed Report
+        run: |
+          echo "## 📡 RSS Feeds Build Report" >> $GITHUB_STEP_SUMMARY
+          echo "### Feed Files Generated:" >> $GITHUB_STEP_SUMMARY
+          ls -la src/feeds/*.xml | awk '{print "- " $9 " (" $5 " bytes)"}' >> $GITHUB_STEP_SUMMARY
+          echo "### Feed Module Size:" >> $GITHUB_STEP_SUMMARY
+          ls -lh src/feeds-content.ts | awk '{print $5}' >> $GITHUB_STEP_SUMMARY
+      
+      - name: 📦 Upload RSS Feed Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: rss-feeds
+          path: |
+            src/feeds/*.xml
+            src/feeds/*.html
+            src/feeds-content.ts
+          retention-days: 7
 
   # Workspace orchestration tests
   workspace-health:

@@ -1,0 +1,183 @@
+[
+  {
+    "name": "Technology",
+    "head": "Mike Hunt",
+    "email": "mike.hunt@technology.fire22",
+    "internalId": "DEPT-TECH-001",
+    "headEmployeeId": "EMP-TECH-001",
+    "packages": ["@fire22/core-dashboard", "@fire22/pattern-system"],
+    "dependencies": ["typescript", "@types/bun", "eslint"],
+    "maintenanceResponsibilities": [
+      "@fire22/core-dashboard",
+      "@fire22/pattern-system",
+      "@fire22/api-client",
+      "@fire22/build-system"
+    ],
+    "status": "active"
+  },
+  {
+    "name": "Communications",
+    "head": "Sarah Martinez",
+    "email": "sarah.martinez@communications.fire22",
+    "internalId": "DEPT-COMM-002",
+    "headEmployeeId": "EMP-COMM-001",
+    "packages": [],
+    "dependencies": [],
+    "maintenanceResponsibilities": ["@fire22/communications-hub"],
+    "status": "active"
+  },
+  {
+    "name": "Design",
+    "head": "Isabella Martinez",
+    "email": "isabella.martinez@design.fire22",
+    "internalId": "DEPT-DES-003",
+    "headEmployeeId": "EMP-DES-001",
+    "packages": [],
+    "dependencies": [],
+    "maintenanceResponsibilities": ["@fire22/design-system"],
+    "status": "active"
+  },
+  {
+    "name": "Operations",
+    "head": "David Martinez",
+    "email": "david.martinez@operations.fire22",
+    "internalId": "DEPT-OPS-004",
+    "headEmployeeId": "EMP-OPS-001",
+    "packages": ["@fire22/ops-tools"],
+    "dependencies": [],
+    "maintenanceResponsibilities": ["@fire22/sports-betting"],
+    "status": "active"
+  },
+  {
+    "name": "Finance",
+    "head": "John Smith",
+    "email": "john.smith@finance.fire22",
+    "internalId": "DEPT-FIN-005",
+    "headEmployeeId": "EMP-FIN-001",
+    "packages": ["@fire22/financial-reporting"],
+    "dependencies": [],
+    "maintenanceResponsibilities": ["@fire22/financial-reporting"],
+    "status": "active"
+  },
+  {
+    "name": "Marketing",
+    "head": "Michelle Rodriguez",
+    "email": "michelle.rodriguez@marketing.fire22",
+    "internalId": "DEPT-MARK-006",
+    "headEmployeeId": "EMP-MARK-001",
+    "packages": ["@fire22/marketing-tools"],
+    "dependencies": [],
+    "maintenanceResponsibilities": ["@fire22/telegram-integration"],
+    "status": "active"
+  },
+  {
+    "name": "Customer Support",
+    "head": "Emily Davis",
+    "email": "emily.davis@support.fire22",
+    "internalId": "DEPT-SUP-007",
+    "headEmployeeId": "EMP-SUP-001",
+    "packages": [],
+    "dependencies": [],
+    "maintenanceResponsibilities": ["@fire22/support-tools"],
+    "status": "active"
+  },
+  {
+    "name": "Compliance",
+    "head": "Lisa Anderson",
+    "email": "lisa.anderson@compliance.fire22",
+    "internalId": "DEPT-COMP-008",
+    "headEmployeeId": "EMP-COMP-001",
+    "packages": ["@fire22/compliance-tools"],
+    "dependencies": [],
+    "maintenanceResponsibilities": ["@fire22/compliance-tools"],
+    "status": "active"
+  },
+  {
+    "name": "Management",
+    "head": "William Harris",
+    "email": "william.harris@exec.fire22",
+    "internalId": "DEPT-MGMT-009",
+    "headEmployeeId": "EMP-MGMT-001",
+    "packages": [],
+    "dependencies": [],
+    "maintenanceResponsibilities": [],
+    "status": "active"
+  },
+  {
+    "name": "VIP Management",
+    "head": "Vinny2times",
+    "email": "vinny2times@vip.fire22",
+    "internalId": "DEPT-VIP-010",
+    "headEmployeeId": "EMP-VIP-001",
+    "packages": [],
+    "dependencies": [],
+    "maintenanceResponsibilities": ["@fire22/vip-tools"],
+    "status": "active"
+  },
+  {
+    "name": "Human Resources",
+    "head": "Jennifer Adams",
+    "email": "jennifer.adams@hr.fire22",
+    "internalId": "DEPT-HR-011",
+    "headEmployeeId": "EMP-HR-001",
+    "packages": [],
+    "dependencies": [],
+    "maintenanceResponsibilities": ["@fire22/hr-systems"],
+    "status": "active"
+  },
+  {
+    "name": "Maintenance",
+    "head": "Carlos Santos",
+    "email": "carlos.santos@maintenance.fire22",
+    "internalId": "DEPT-MAINT-012",
+    "headEmployeeId": "EMP-MAINT-001",
+    "packages": [],
+    "dependencies": [],
+    "maintenanceResponsibilities": ["@fire22/maintenance-tools"],
+    "status": "active"
+  },
+  {
+    "name": "Product Management",
+    "head": "Alexandra Kim",
+    "email": "alexandra.kim@product.fire22",
+    "internalId": "DEPT-PROD-013",
+    "headEmployeeId": "EMP-PROD-001",
+    "packages": [],
+    "dependencies": [],
+    "maintenanceResponsibilities": ["@fire22/product-roadmap"],
+    "status": "active"
+  },
+  {
+    "name": "Onboarding",
+    "head": "Natasha Cooper",
+    "email": "natasha.cooper@onboarding.fire22",
+    "internalId": "DEPT-ONB-014",
+    "headEmployeeId": "EMP-ONB-001",
+    "packages": [],
+    "dependencies": [],
+    "maintenanceResponsibilities": ["@fire22/onboarding-flow"],
+    "status": "active"
+  },
+  {
+    "name": "Water System Operations",
+    "head": "Aqua Manager",
+    "email": "aqua.manager@water-system.fire22",
+    "internalId": "DEPT-WATER-015",
+    "headEmployeeId": "EMP-WATER-001",
+    "packages": [],
+    "dependencies": [],
+    "maintenanceResponsibilities": ["@fire22/water-systems"],
+    "status": "active"
+  },
+  {
+    "name": "Security",
+    "head": "TBD",
+    "email": "head@security.fire22",
+    "internalId": "DEPT-SEC-016",
+    "headEmployeeId": "TBD",
+    "packages": ["@fire22/security-scanner"],
+    "dependencies": [],
+    "maintenanceResponsibilities": ["@fire22/security-scanner"],
+    "status": "pending"
+  }
+]

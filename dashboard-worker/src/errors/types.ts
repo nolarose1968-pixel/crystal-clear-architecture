@@ -78,6 +78,9 @@ export const ERROR_CODES = {
   SECURITY_SCAN_FAILED: 'FIRE22_SECURITY_SCAN_FAILED',
   STORAGE_ERROR: 'FIRE22_STORAGE_ERROR',
   
+  // Cloudflare R2 Errors
+  R2_BUCKET_ALREADY_EXISTS: 'FIRE22_R2_BUCKET_ALREADY_EXISTS',
+  
   // Fire22 API Errors
   FIRE22_API_ERROR: 'FIRE22_API_ERROR',
   FIRE22_AUTH_FAILED: 'FIRE22_AUTH_FAILED',
@@ -141,6 +144,14 @@ export const ERROR_CLASSIFICATIONS: Record<string, Partial<Fire22Error>> = {
     retryable: true,
     retryAfter: 5,
   },
+  
+  [ERROR_CODES.R2_BUCKET_ALREADY_EXISTS]: {
+    severity: 'low',
+    category: 'validation',
+    recoverable: 'non-recoverable',
+    httpStatus: 409,
+    retryable: false,
+  },
 };
 
 // Troubleshooting guides
@@ -171,5 +182,13 @@ export const TROUBLESHOOTING_GUIDES: Record<string, string[]> = {
     'Verify user authentication status',
     'Review required permissions and scopes',
     'Ensure proper Authorization header format',
+  ],
+  
+  [ERROR_CODES.R2_BUCKET_ALREADY_EXISTS]: [
+    'The R2 bucket already exists in your account',
+    'You can safely use the existing bucket',
+    'If you need to recreate it, delete the existing bucket first',
+    'Check your wrangler.toml for the correct bucket name configuration',
+    'Verify bucket ownership in the Cloudflare dashboard',
   ],
 };

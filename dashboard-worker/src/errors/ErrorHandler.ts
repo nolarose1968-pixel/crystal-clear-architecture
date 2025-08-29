@@ -238,6 +238,39 @@ export class ErrorHandler {
   }
 
   /**
+   * Handle Cloudflare R2 bucket errors
+   */
+  handleR2BucketError(
+    bucketName: string,
+    errorCode: number,
+    originalError: Error,
+    request?: Request
+  ): Response {
+    // Handle specific Cloudflare R2 error codes
+    if (errorCode === 10004) {
+      const error = this.createError(
+        ERROR_CODES.R2_BUCKET_ALREADY_EXISTS,
+        `R2 bucket '${bucketName}' already exists and is owned by your account`,
+        request,
+        originalError,
+        { bucketName, cloudflareErrorCode: errorCode }
+      );
+      return this.createErrorResponse(error);
+    }
+
+    // Default to storage error for other R2 issues
+    const error = this.createError(
+      ERROR_CODES.STORAGE_ERROR,
+      `R2 storage error for bucket '${bucketName}'`,
+      request,
+      originalError,
+      { bucketName, cloudflareErrorCode: errorCode }
+    );
+
+    return this.createErrorResponse(error);
+  }
+
+  /**
    * Create user-friendly error messages
    */
   private getUserFriendlyMessage(code: string, originalMessage: string): string {
@@ -251,6 +284,7 @@ export class ErrorHandler {
       [ERROR_CODES.RATE_LIMITED]: 'Too many requests. Please slow down and try again later.',
       [ERROR_CODES.INVALID_INPUT]: 'Please check your input and try again.',
       [ERROR_CODES.TIMEOUT]: 'Request timed out. Please try again.',
+      [ERROR_CODES.R2_BUCKET_ALREADY_EXISTS]: 'The R2 bucket already exists and is ready to use.',
     };
 
     return userMessages[code] || (this.isDevelopment ? originalMessage : 'An error occurred. Please try again.');

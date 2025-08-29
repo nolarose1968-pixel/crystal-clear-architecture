@@ -14,6 +14,7 @@ import { Fire22Integration } from './fire22-integration';
 import { createSystemController, Fire22SystemController } from './integration/system-controller';
 import { createFire22UISystem } from './fire22-ui-system';
 import { createFire22APICompatible } from './fire22-api-compatible';
+import { handleFeedsRequest } from './feeds-handler';
 
 // Import Cloudflare Workers types
 interface D1Result {
@@ -301,6 +302,11 @@ const mainHandler = async (request: Request, env: Env, ctx: ExecutionContext): P
         message: (error as Error).message
       });
     }
+  }
+
+  // RSS/Atom Feeds endpoints
+  if (path.startsWith('/feeds/') || path.startsWith('/src/feeds/')) {
+    return handleFeedsRequest(path);
   }
 
   // Agent management endpoints

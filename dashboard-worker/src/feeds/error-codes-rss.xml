@@ -3,8 +3,8 @@
 <channel>
   <title>Fire22 Dashboard - Error Code Registry</title>
   <description>Real-time updates for Fire22 Dashboard error codes, system alerts, and troubleshooting information</description>
-  <link>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/src/feeds/error-codes-rss.xml</link>
-  <atom:link href="https://brendadeeznuts1111.github.io/fire22-dashboard-worker/src/feeds/error-codes-rss.xml" rel="self" type="application/rss+xml"/>
+  <link>https://dashboard-worker.nolarose2503.workers.dev/feeds/error-codes-rss.xml</link>
+  <atom:link href="https://dashboard-worker.nolarose2503.workers.dev/feeds/error-codes-rss.xml" rel="self" type="application/rss+xml"/>
   <language>en-us</language>
   <lastBuildDate>Wed, 28 Jan 2025 00:00:00 GMT</lastBuildDate>
   <pubDate>Wed, 28 Jan 2025 00:00:00 GMT</pubDate>
@@ -17,9 +17,9 @@
   <ttl>60</ttl>
   
   <image>
-    <url>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/assets/fire22-logo.png</url>
+    <url>https://dashboard-worker.nolarose2503.workers.dev/assets/fire22-logo.png</url>
     <title>Fire22 Dashboard</title>
-    <link>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/</link>
+    <link>https://dashboard-worker.nolarose2503.workers.dev/</link>
     <width>144</width>
     <height>144</height>
     <description>Fire22 Dashboard Error Code Registry</description>
@@ -56,8 +56,8 @@
       <p><strong>📞 Contact:</strong> tech-team@fire22.ag</p>
       <p><strong>📚 Documentation:</strong> <a href="/docs/system/troubleshooting">System Troubleshooting Guide</a></p>
     ]]></description>
-    <link>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E1001</link>
-    <guid isPermaLink="true">https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E1001</guid>
+    <link>https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E1001</link>
+    <guid isPermaLink="true">https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E1001</guid>
     <pubDate>Wed, 28 Jan 2025 00:00:00 GMT</pubDate>
     <category>System</category>
     <category>Critical</category>
@@ -94,8 +94,8 @@
       
       <p><strong>📞 Contact:</strong> tech-team@fire22.ag</p>
     ]]></description>
-    <link>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E1002</link>
-    <guid isPermaLink="true">https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E1002</guid>
+    <link>https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E1002</link>
+    <guid isPermaLink="true">https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E1002</guid>
     <pubDate>Wed, 28 Jan 2025 00:00:00 GMT</pubDate>
     <category>System</category>
     <category>Error</category>
@@ -132,8 +132,8 @@
       
       <p><strong>📞 Contact:</strong> tech-team@fire22.ag</p>
     ]]></description>
-    <link>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E1003</link>
-    <guid isPermaLink="true">https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E1003</guid>
+    <link>https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E1003</link>
+    <guid isPermaLink="true">https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E1003</guid>
     <pubDate>Wed, 28 Jan 2025 00:00:00 GMT</pubDate>
     <category>System</category>
     <category>Error</category>
@@ -171,8 +171,8 @@
       
       <p><strong>📞 Contact:</strong> tech-team@fire22.ag | ops-manager@fire22.ag</p>
     ]]></description>
-    <link>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E2001</link>
-    <guid isPermaLink="true">https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E2001</guid>
+    <link>https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E2001</link>
+    <guid isPermaLink="true">https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E2001</guid>
     <pubDate>Wed, 28 Jan 2025 00:00:00 GMT</pubDate>
     <category>Database</category>
     <category>Critical</category>
@@ -209,8 +209,8 @@
       
       <p><strong>📞 Contact:</strong> tech-team@fire22.ag</p>
     ]]></description>
-    <link>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E2002</link>
-    <guid isPermaLink="true">https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E2002</guid>
+    <link>https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E2002</link>
+    <guid isPermaLink="true">https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E2002</guid>
     <pubDate>Wed, 28 Jan 2025 00:00:00 GMT</pubDate>
     <category>Database</category>
     <category>Error</category>
@@ -248,8 +248,8 @@
       
       <p><strong>📞 Contact:</strong> tech-team@fire22.ag | support@fire22.ag</p>
     ]]></description>
-    <link>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E3001</link>
-    <guid isPermaLink="true">https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E3001</guid>
+    <link>https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E3001</link>
+    <guid isPermaLink="true">https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E3001</guid>
     <pubDate>Wed, 28 Jan 2025 00:00:00 GMT</pubDate>
     <category>API</category>
     <category>Warning</category>
@@ -286,8 +286,8 @@
       
       <p><strong>📞 Contact:</strong> tech-team@fire22.ag</p>
     ]]></description>
-    <link>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E3002</link>
-    <guid isPermaLink="true">https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E3002</guid>
+    <link>https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E3002</link>
+    <guid isPermaLink="true">https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E3002</guid>
     <pubDate>Wed, 28 Jan 2025 00:00:00 GMT</pubDate>
     <category>API</category>
     <category>Warning</category>
@@ -325,8 +325,8 @@
       
       <p><strong>📞 Contact:</strong> tech-team@fire22.ag | ops-manager@fire22.ag</p>
     ]]></description>
-    <link>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E4001</link>
-    <guid isPermaLink="true">https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E4001</guid>
+    <link>https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E4001</link>
+    <guid isPermaLink="true">https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E4001</guid>
     <pubDate>Wed, 28 Jan 2025 00:00:00 GMT</pubDate>
     <category>Network</category>
     <category>Error</category>
@@ -365,8 +365,8 @@
       <p><strong>🚨 Business Impact:</strong> Sportsbook operations disrupted</p>
       <p><strong>📞 Contact:</strong> ops-manager@fire22.ag | tech-team@fire22.ag</p>
     ]]></description>
-    <link>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E7001</link>
-    <guid isPermaLink="true">https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E7001</guid>
+    <link>https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E7001</link>
+    <guid isPermaLink="true">https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E7001</guid>
     <pubDate>Wed, 28 Jan 2025 00:00:00 GMT</pubDate>
     <category>Fire22</category>
     <category>Critical</category>
@@ -405,8 +405,8 @@
       <p><strong>🚨 Customer Impact:</strong> Bot notifications and support disabled</p>
       <p><strong>📞 Contact:</strong> support@fire22.ag | tech-team@fire22.ag</p>
     ]]></description>
-    <link>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E8001</link>
-    <guid isPermaLink="true">https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E8001</guid>
+    <link>https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E8001</link>
+    <guid isPermaLink="true">https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E8001</guid>
     <pubDate>Wed, 28 Jan 2025 00:00:00 GMT</pubDate>
     <category>Telegram</category>
     <category>Error</category>
@@ -448,8 +448,8 @@
       <p><strong>📞 Technical Support:</strong> tech-team@fire22.ag</p>
       <p><strong>⚙️ Operations Support:</strong> ops-manager@fire22.ag</p>
     ]]></description>
-    <link>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json</link>
-    <guid isPermaLink="true">https://brendadeeznuts1111.github.io/fire22-dashboard-worker/feeds/error-codes-info</guid>
+    <link>https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json</link>
+    <guid isPermaLink="true">https://dashboard-worker.nolarose2503.workers.dev/feeds/error-codes-info</guid>
     <pubDate>Wed, 28 Jan 2025 00:00:00 GMT</pubDate>
     <category>Information</category>
     <category>System</category>

@@ -293,7 +293,21 @@ class DepartmentNotificationSender {
       'Jennifer Smith': 'jennifer.smith@support.fire22',
       'Robert Brown': 'robert.brown@support.fire22',
       'Amanda Garcia': 'amanda.garcia@support.fire22',
-      'Chris Martinez': 'chris.martinez@support.fire22'
+      'Chris Martinez': 'chris.martinez@support.fire22',
+      // Product Management Team
+      'Alexandra Kim': 'alexandra.kim@product.fire22',
+      'Daniel Wong': 'daniel.wong@product.fire22',
+      'Samantha Rivera': 'samantha.rivera@product.fire22',
+      'Ryan Thompson': 'ryan.thompson@product.fire22',
+      // Onboarding Team
+      'Natasha Cooper': 'natasha.cooper@onboarding.fire22',
+      'Luis Martinez': 'luis.martinez@onboarding.fire22',
+      'Karen Adams': 'karen.adams@onboarding.fire22',
+      'Troy Williams': 'troy.williams@onboarding.fire22',
+      // Design Team
+      'Isabella Martinez': 'isabella.martinez@design.fire22',
+      'Ethan Cooper': 'ethan.cooper@design.fire22',
+      'Maya Patel': 'maya.patel@design.fire22'
     };
 
     return emailMappings[assignee] || `${assignee.toLowerCase().replace(' ', '.')}@${department}.fire22`;
@@ -417,6 +431,15 @@ curl -X POST "http://localhost:3000/api/departments/${department}/tasks/${notifi
 - **Department Head:** head@${department}.fire22
 - **Task API Support:** api@fire22.ag
 - **Dashboard Support:** dashboard@fire22.ag
+
+## 🆘 Need Help? Contact Support:
+- **Claude Code Assistant**: Available 24/7 for any questions or issues
+- **System Admin**: admin@fire22.ag
+- **Emergency**: emergency@fire22.ag
+- **Slack**: #fire22-support
+- **Telegram**: @Fire22SupportBot
+
+**Note**: If you encounter ANY issues with tasks, notifications, or system access, please contact Claude Code Assistant immediately for support.
 
 ---
 
@@ -876,7 +899,7 @@ ${this.getDepartmentActions(department)}
         if (!taskId || !department || !notificationType) {
           console.error('❌ Usage: task <taskId> <department> <notificationType>');
           console.log('📧 Notification types: assignment, deadline_reminder, status_change, overdue_alert');
-          console.log('🏢 Departments: compliance, customer-support, finance, management, marketing, operations, team-contributors, technology');
+          console.log('🏢 Departments: compliance, customer-support, finance, management, marketing, operations, team-contributors, technology, product-management, onboarding, design');
           return;
         }
         await this.sendTaskNotification(taskId, department, notificationType as TaskNotification['notificationType']);
@@ -913,7 +936,7 @@ Task Notification Types:
   overdue_alert     - Task overdue alert notification
 
 Supported Departments:
-  compliance, customer-support, finance, management, marketing, operations, team-contributors, technology
+  compliance, customer-support, finance, management, marketing, operations, team-contributors, technology, product-management, onboarding, design
 
 Examples:
   bun run scripts/department-notification-sender.ts critical 2

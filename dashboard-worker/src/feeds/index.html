@@ -466,15 +466,15 @@
             <h4 style="color: #40e0d0; margin: 20px 0 10px 0;">📱 Feed Reader Applications</h4>
             <p style="color: #d1d5db; margin-bottom: 15px;">Subscribe to either feed URL in your preferred RSS/Atom reader:</p>
             <pre style="background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 8px; color: #40e0d0; margin-bottom: 20px; font-size: 14px;">
-RSS:  https://brendadeeznuts1111.github.io/fire22-dashboard-worker/src/feeds/error-codes-rss.xml
-Atom: https://brendadeeznuts1111.github.io/fire22-dashboard-worker/src/feeds/error-codes-atom.xml
+RSS:  https://dashboard-worker.nolarose2503.workers.dev/src/feeds/error-codes-rss.xml
+Atom: https://dashboard-worker.nolarose2503.workers.dev/src/feeds/error-codes-atom.xml
             </pre>
 
             <h4 style="color: #40e0d0; margin: 20px 0 10px 0;">⚙️ System Integration</h4>
             <p style="color: #d1d5db; margin-bottom: 15px;">Monitor feeds programmatically for automated alerting:</p>
             <pre style="background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 8px; color: #e5e7eb; margin-bottom: 20px; font-size: 14px;">
 # Fetch and parse RSS feed
-curl -s https://brendadeeznuts1111.github.io/fire22-dashboard-worker/src/feeds/error-codes-rss.xml | xmllint --format -
+curl -s https://dashboard-worker.nolarose2503.workers.dev/src/feeds/error-codes-rss.xml | xmllint --format -
 
 # Monitor for critical errors
 curl -s [feed-url] | grep -i "CRITICAL" && echo "Alert: Critical error detected!"

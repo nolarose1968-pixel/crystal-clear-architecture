@@ -2,9 +2,9 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en-us">
   <title>Fire22 Dashboard - Error Code Registry</title>
   <subtitle>Real-time updates for Fire22 Dashboard error codes, system alerts, and troubleshooting information</subtitle>
-  <link href="https://brendadeeznuts1111.github.io/fire22-dashboard-worker/src/feeds/error-codes-atom.xml" rel="self" type="application/atom+xml"/>
-  <link href="https://brendadeeznuts1111.github.io/fire22-dashboard-worker/" rel="alternate" type="text/html"/>
-  <id>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/feeds/error-codes</id>
+  <link href="https://dashboard-worker.nolarose2503.workers.dev/src/feeds/error-codes-atom.xml" rel="self" type="application/atom+xml"/>
+  <link href="https://dashboard-worker.nolarose2503.workers.dev/" rel="alternate" type="text/html"/>
+  <id>https://dashboard-worker.nolarose2503.workers.dev/feeds/error-codes</id>
   <updated>2025-01-28T00:00:00Z</updated>
   <generator uri="https://fire22.ag" version="1.0.0">Fire22 Dashboard Error Code System</generator>
   <rights>© 2025 Fire22 Dashboard. All rights reserved.</rights>
@@ -15,14 +15,14 @@
   <category term="Technology"/>
   <category term="System Monitoring"/>
   <category term="Error Tracking"/>
-  <icon>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/assets/fire22-logo.png</icon>
-  <logo>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/assets/fire22-logo.png</logo>
+  <icon>https://dashboard-worker.nolarose2503.workers.dev/assets/fire22-logo.png</icon>
+  <logo>https://dashboard-worker.nolarose2503.workers.dev/assets/fire22-logo.png</logo>
 
   <!-- System Errors (E1xxx) - Technology Department -->
   <entry>
     <title>🔴 CRITICAL: E1001 - SYSTEM_INIT_FAILED</title>
-    <link href="https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E1001" rel="alternate" type="text/html"/>
-    <id>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/error-codes/E1001</id>
+    <link href="https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E1001" rel="alternate" type="text/html"/>
+    <id>https://dashboard-worker.nolarose2503.workers.dev/error-codes/E1001</id>
     <published>2025-01-28T00:00:00Z</published>
     <updated>2025-01-28T00:00:00Z</updated>
     <summary type="text">System initialization failed - Core system components failed to initialize properly during application startup.</summary>
@@ -71,8 +71,8 @@ bun run health:database
 
   <entry>
     <title>🔴 CRITICAL: E2001 - DB_CONNECTION_FAILED</title>
-    <link href="https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E2001" rel="alternate" type="text/html"/>
-    <id>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/error-codes/E2001</id>
+    <link href="https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E2001" rel="alternate" type="text/html"/>
+    <id>https://dashboard-worker.nolarose2503.workers.dev/error-codes/E2001</id>
     <published>2025-01-28T00:00:00Z</published>
     <updated>2025-01-28T00:00:00Z</updated>
     <summary type="text">Database connection failed - Unable to establish connection to database server, preventing all data operations.</summary>
@@ -112,8 +112,8 @@ docker logs fire22-postgres
 
   <entry>
     <title>🔴 CRITICAL: E7001 - FIRE22_API_CONNECTION_FAILED</title>
-    <link href="https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E7001" rel="alternate" type="text/html"/>
-    <id>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/error-codes/E7001</id>
+    <link href="https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E7001" rel="alternate" type="text/html"/>
+    <id>https://dashboard-worker.nolarose2503.workers.dev/error-codes/E7001</id>
     <published>2025-01-28T00:00:00Z</published>
     <updated>2025-01-28T00:00:00Z</updated>
     <summary type="text">Fire22 API connection failed - Unable to connect to Fire22 sportsbook API, preventing betting operations.</summary>
@@ -154,8 +154,8 @@ curl -I https://api.fire22.ag/v1/limits
 
   <entry>
     <title>⚠️ WARNING: E3001 - API_UNAUTHORIZED</title>
-    <link href="https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E3001" rel="alternate" type="text/html"/>
-    <id>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/error-codes/E3001</id>
+    <link href="https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E3001" rel="alternate" type="text/html"/>
+    <id>https://dashboard-worker.nolarose2503.workers.dev/error-codes/E3001</id>
     <published>2025-01-28T00:00:00Z</published>
     <updated>2025-01-28T00:00:00Z</updated>
     <summary type="text">Unauthorized API request - Request lacks valid authentication credentials or token has expired.</summary>
@@ -195,8 +195,8 @@ curl -X POST https://api.fire22.ag/auth/refresh
 
   <entry>
     <title>🟡 ERROR: E8001 - TELEGRAM_BOT_AUTHENTICATION_FAILED</title>
-    <link href="https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json#E8001" rel="alternate" type="text/html"/>
-    <id>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/error-codes/E8001</id>
+    <link href="https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json#E8001" rel="alternate" type="text/html"/>
+    <id>https://dashboard-worker.nolarose2503.workers.dev/error-codes/E8001</id>
     <published>2025-01-28T00:00:00Z</published>
     <updated>2025-01-28T00:00:00Z</updated>
     <summary type="text">Telegram bot authentication failed - Bot token is invalid or expired, preventing customer communication.</summary>
@@ -239,8 +239,8 @@ bun run logs:telegram-bot
   <!-- Feed Information Entry -->
   <entry>
     <title>📊 Fire22 Dashboard - Error Code Registry Feed Information</title>
-    <link href="https://brendadeeznuts1111.github.io/fire22-dashboard-worker/docs/error-codes.json" rel="alternate" type="text/html"/>
-    <id>https://brendadeeznuts1111.github.io/fire22-dashboard-worker/feeds/error-codes-info</id>
+    <link href="https://dashboard-worker.nolarose2503.workers.dev/docs/error-codes.json" rel="alternate" type="text/html"/>
+    <id>https://dashboard-worker.nolarose2503.workers.dev/feeds/error-codes-info</id>
     <published>2025-01-28T00:00:00Z</published>
     <updated>2025-01-28T00:00:00Z</updated>
     <summary type="text">Fire22 Dashboard Error Code Registry system information and departmental assignments.</summary>
